@@ -4,7 +4,8 @@ title:  "깃블로그로 이전...!"
 image: ''
 date:   2018-01-14 12:27:31
 tags:
-- Git
+- git
+- blog
 description: ''
 categories:
 - Git
