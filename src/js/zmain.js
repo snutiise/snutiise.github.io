@@ -26,7 +26,19 @@
   $('#searching').click(function(){
     $('#fade').trigger('click');
     $("#search").trigger('click');
-  })
+  });
+
+  $('#navigation').find("li").eq(8).click(function(){
+    $('#fade').trigger('click');
+    $('.search-wrapper').toggleClass('active');
+    bs.searchform.toggleClass('active');
+    // Only focus the form after key release, prvent the character 's'
+    // entered immediately after key enter
+    // bs.searchform.find('input').focus();
+    bs.canvas.toggleClass('search-overlay');
+    $('.search-field').simpleJekyllSearch();
+    $(".search-form").find('input').focus();
+  });
 
   //Keys
   $(document).keydown(function(e){
