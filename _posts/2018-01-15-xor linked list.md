@@ -77,7 +77,7 @@ void MEInsertTail(MEDoubleLinkedList **head, int data)
 
 	MEDoubleLinkedList* cur = head;
 	MEDoubleLinkedList* prev = NULL;
-	MEDoubleLinkedList* new = (MEDoubleLinkedList*)malloc(sizeof(MEDoubleLinkedList));;
+	MEDoubleLinkedList* new = (MEDoubleLinkedList*)malloc(sizeof(MEDoubleLinkedList));
 
 	while ((MEDoubleLinkedList*)((unsigned int)prev ^ (unsigned int)cur->ptr) != NULL)
 	{
