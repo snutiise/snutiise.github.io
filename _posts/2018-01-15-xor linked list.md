@@ -2,7 +2,7 @@
 layout: post
 title:  "메모리 최적화 링크드 리스트(xor linked list)"
 image: ''
-date:   2018-01-15 13:21:00
+date:   2018-01-15 05:03:31
 tags:
 - xor linked list
 description: ''
