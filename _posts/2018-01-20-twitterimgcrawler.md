@@ -7,6 +7,7 @@ tags:
 - python
 - selenium
 - scrapy
+- crawler
 description: ''
 categories:
 - Python
@@ -233,7 +234,7 @@ cnt값이 page보다 커질경우 크롤러를 강제종료하는데 page(즉, m
 
 한가지 특이한점은 gif이미지가 실제로는 mp4로 올라와있기 때문에 video태그로 접근해야한다. 용량이 큰 실제 vedio의 경우에는 blob 타입으로 제공되며 parse_img에서 저장할 수 없다.
 
-용량이 큰 동영상에 대해서는 blob 객체를 좀 공부해보고 어떻게 저장할지 생각좀 해봐야겠다. 일단은 여기선 패스!
+용량이 큰 동영상에 대해서는 blob 객체를 좀 공부해보고 어떻게 저장할지 생각좀 해봐야겠다. 일단 여기선 패스!
 
 {% highlight python %}
 	def parse_img(self, response):
