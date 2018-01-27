@@ -4,7 +4,6 @@ title:  "플로이드 순환 찾기 알고리즘 Floyd's Cycle Detection Algorit
 image: ''
 date:   2018-01-27 04:00:00
 tags:
-- c
 - algorithm
 - floyd
 description: ''
