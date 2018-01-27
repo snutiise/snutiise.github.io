@@ -21,7 +21,7 @@ categories:
 물론 해시테이블을 이용해서 순환여부를 검사할 수 있겠지만 이번 시간에는 플로이드 순환 찾기 알고리즘을 이용해서 풀어보고자 한다.
 
 
-#Floyd's Cycle Detection Algorithm
+## Floyd's Cycle Detection Algorithm
 
 기본 개념은 이러하다. 
 
