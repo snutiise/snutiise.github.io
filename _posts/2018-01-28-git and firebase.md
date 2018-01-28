@@ -2,7 +2,7 @@
 layout: post
 title:  "Firebase Cloud Function을 이용한 Git Page 기능 구현"
 image: ''
-date:   2018-01-28 12:00:00
+date:   2018-01-28 10:00:00
 tags:
 - firebase
 - git
