@@ -84,4 +84,33 @@
         ::-webkit-scrollbar-track {background: #efefef; -webkit-border-radius: 10px; border-radius:10px; -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,.2)}
         ::-webkit-scrollbar-thumb {height: 50px; width: 50px; background: rgba(0,0,0,.2); -webkit-border-radius: 8px; border-radius: 8px; -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,.1)}
     </style>
+
+    <!-- firebase hit -->
+    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase.js"></script>
+    <script>
+        var config = {
+            apiKey: "AAAAlc6OCq4:APA91bFjQCf3jzEzndYfl95qVaI9hcWEqkE0kakyF48xLATomDOAj0v8S97HCoZ3t-N1HpPpSeZFS5EKz0x4xgLOoxpFdZRvN7TWLfX5g22WC89dO9QQPyiZauSfgW3xoa9EWSrgYwsa",
+            authDomain: "https://snutiise.github.io/",
+            databaseURL: "https://gitblog-885f6.firebaseio.com",
+            storageBucket: "gitblog-885f6.appspot.com",
+            messagingSenderId: "643415542446",
+        };
+        firebase.initializeApp(config);
+
+        var database = firebase.database();
+        var hit = document.createElement("div");
+        hit.setAttribute("id", "hitbox");
+        database.ref('blog').once('value').then(function(snapshot) {
+            hit.innerHTML="<h2 id='hit'>"+snapshot.val().visitor+" Hit!</h2>";
+            database.ref('blog').set({visitor: Number(snapshot.val().visitor)+1});
+            hit.style.left=window.innerWidth-120+"px";
+            hit.style.top=window.innerHeight-100+"px";
+            document.body.appendChild(hit);
+            setTimeout(function(){
+                hit.style.transitionDuration="2s";
+                hit.style.opacity="0";
+            },2000);
+            database.goOffline();
+        });
+    </script>
 </head>
