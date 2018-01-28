@@ -86,18 +86,7 @@
     </style>
 
     <!-- firebase hit -->
-    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase.js"></script>
     <script>
-        var config = {
-            apiKey: "AAAAlc6OCq4:APA91bFjQCf3jzEzndYfl95qVaI9hcWEqkE0kakyF48xLATomDOAj0v8S97HCoZ3t-N1HpPpSeZFS5EKz0x4xgLOoxpFdZRvN7TWLfX5g22WC89dO9QQPyiZauSfgW3xoa9EWSrgYwsa",
-            authDomain: "https://snutiise.github.io/",
-            databaseURL: "https://gitblog-885f6.firebaseio.com",
-            storageBucket: "gitblog-885f6.appspot.com",
-            messagingSenderId: "643415542446",
-        };
-        firebase.initializeApp(config);
-
-        var database = firebase.database();
         var hit = document.createElement("div");
         hit.setAttribute("id", "hitbox");
         hit.style.opacity="1";
@@ -107,16 +96,24 @@
         hit.style.height= "100px";
         hit.style.zIndex="100";
 
-        database.ref('blog').once('value').then(function(snapshot) {
-            hit.innerHTML="<h2 id='hit' style='color: #ff5151;'>"+snapshot.val().visitor+" Hit!</h2>";
-            database.ref('blog').set({visitor: Number(snapshot.val().visitor)+1});
-            hit.style.left=window.innerWidth-120+"px";
-            hit.style.top=window.innerHeight-100+"px";
-            document.body.appendChild(hit);
-            setTimeout(function(){
-                hit.style.transitionDuration="2s";
-                hit.style.opacity="0";
-            },2000);
-        });
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function() {
+        if (req.readyState === req.DONE) {
+            if (req.status === 200 || req.status === 201) {
+                hit.innerHTML="<h2 id='hit' style='color: #ff5151;'>"+req.responseText+" Hit!</h2>";
+                hit.style.left=window.innerWidth-120+"px";
+                hit.style.top=window.innerHeight-100+"px";
+                document.body.appendChild(hit);
+                setTimeout(function(){
+                    hit.style.transitionDuration="2s";
+                    hit.style.opacity="0";
+                },2000);
+            } else {
+            console.error(req.responseText);
+            }
+        }
+        };
+        req.open("GET","https://us-central1-gitblog-885f6.cloudfunctions.net/countVisitor");
+        req.send();
     </script>
 </head>
