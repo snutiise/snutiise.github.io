@@ -92,31 +92,31 @@
         hit.style.left=window.innerWidth-120+"px";
         hit.style.top=window.innerHeight-100+"px";
         hit.style.opacity="1";
-        hit.style.position= "absolute";
+        hit.style.position= "fixed";
         hit.style.width= "100px";
         hit.style.height= "100px";
         hit.style.zIndex="100";
 
         var req = new XMLHttpRequest();
         req.onreadystatechange = function() {
-        if (req.readyState === req.DONE) {
-            if (req.status === 200 || req.status === 201) {
-                let res=req.responseText.split(",");
-                hit.innerHTML="<h2 id='hit' style='color: #ff5151;'>"+res[0]+" Hit!</h2>";
-                hit.style.transitionDuration="4s";
-                document.body.appendChild(hit);
-                setTimeout(function(){
-                    hit.style.left=window.innerWidth-120+"px";
-                    hit.style.top="0px";
+            if (req.readyState === req.DONE) {
+                if (req.status === 200 || req.status === 201) {
+                    let res=req.responseText.split(",");
+                    hit.innerHTML="<h2 id='hit' style='color: #ff5151;'>"+res[0]+" Hit!</h2>";
                     hit.style.transitionDuration="4s";
-                    hit.style.opacity="0";
-                    hit.style.zIndex="-1";
-                },4000);
-                document.getElementById("userip").innerText=res[1]+"님 "+res[2]+"번째 방문을 환영합니다!";             
-            } else {
-            console.error(req.responseText);
+                    document.body.appendChild(hit);
+                    setTimeout(function(){
+                        hit.style.left=window.innerWidth-120+"px";
+                        hit.style.top="0px";
+                        hit.style.transitionDuration="4s";
+                        hit.style.opacity="0";
+                        hit.style.zIndex="-1";
+                    },4000);
+                    document.getElementById("userip").innerText=res[1]+"님 "+res[2]+"번째 방문을 환영합니다!";             
+                } else {
+                console.error(req.responseText);
+                }
             }
-        }
         };
         req.open("GET","https://us-central1-gitblog-885f6.cloudfunctions.net/countVisitor");
         req.send();
