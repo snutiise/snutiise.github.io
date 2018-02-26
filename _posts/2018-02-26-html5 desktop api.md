@@ -16,7 +16,9 @@ categories:
 
 지난번 채팅앱을 구현할 때 child window를 통해서 알림창을 구현했다.
 
-하지만 electron의 경우 notification을 제공한다. main process에서 notification 모듈을 통해 알림창 표시가 가능하지만 os 제약이 심한편이다. (windows계열이 문제이다.)
+그때에는 언급하지 못했지만 electron의 경우 notification을 제공한다. 
+
+main process에서 notification 모듈을 통해 알림창 표시가 가능하지만 os 제약이 심한편이다. (windows계열이 문제이다.)
 
 결국은 main process에서 알림창을 범용적으로 구현하고 싶으면 child window로 직접 구현하는게 속편하다.
 
