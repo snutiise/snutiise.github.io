@@ -13,6 +13,12 @@ categories:
 
 <img src="https://octodex.github.com/images/codercat.jpg" alt="">
 
+fcm token의 유효성 검사를 하는방법은 sdk를 이용하는 방법과 아래와 같이 직접 질의해서 확인하는 방법이 있다.
+
+sdk를 이용하는 방법은 <a href="https://firebase.google.com/docs/admin/setup/?hl=ko">여기</a>를 참고하면 된다.
+
+이번에는 직접 질의해서 fcm token을 검사하도록 해보자.
+
 클라이언트에서 받은 fcm token이 유효한지 알려면 아래와 같이 헤더를 설정해서 응답값을 확인하면 된다.
 
 {% highlight bash %}
