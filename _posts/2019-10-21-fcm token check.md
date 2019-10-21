@@ -30,14 +30,14 @@ $ curl -H "Content-Type: application/json" -H "Authorization: key=$FCM_API_KEY" 
 
 {% highlight bash %}
 # 성공했을경우 응답
-{"multicast_id":1007984435159395389,"success":1,"failure":0,"canonical_ids":0,"results":[{"message_id":"0:1571645063718949%12f57db2f9fd7ecd"}]}
+$ {"multicast_id":1007984435159395389,"success":1,"failure":0,"canonical_ids":0,"results":[{"message_id":"0:1571645063718949%12f57db2f9fd7ecd"}]}
 {% endhighlight %}
 
 실패하면 success는 0, failure는 1으로 응답이 온다.
 
 {% highlight bash %}
 # 실패했을경우 응답
-{"multicast_id":4920904892700104086,"success":0,"failure":1,"canonical_ids":0,"results":[{"error":"InvalidRegistration"}]}
+$ {"multicast_id":4920904892700104086,"success":0,"failure":1,"canonical_ids":0,"results":[{"error":"InvalidRegistration"}]}
 {% endhighlight %}
 
 또한, 실패의 경우엔 results 필드에 어떤 이유로 실패했는지도 포함되어 있다.
