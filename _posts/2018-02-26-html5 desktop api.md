@@ -9,7 +9,7 @@ tags:
 - html5
 description: ''
 categories:
-- Electron
+- Programming
 ---
 
 <img src="https://octodex.github.com/images/codercat.jpg" alt="">

@@ -9,7 +9,7 @@ tags:
 - socket io
 description: ''
 categories:
-- React
+- Programming
 ---
 
 <img src="https://octodex.github.com/images/codercat.jpg" alt="">

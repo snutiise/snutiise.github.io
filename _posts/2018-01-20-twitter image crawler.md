@@ -10,7 +10,7 @@ tags:
 - crawler
 description: ''
 categories:
-- Python
+- Programming
 ---
 
 <img src="https://octodex.github.com/images/codercat.jpg" alt="">
