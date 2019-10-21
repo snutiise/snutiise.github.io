@@ -7,7 +7,7 @@ tags:
 - daily life
 description: ''
 categories:
-- Daily Life
+- Chat
 ---
 
 <img src="https://octodex.github.com/images/codercat.jpg" alt="">
