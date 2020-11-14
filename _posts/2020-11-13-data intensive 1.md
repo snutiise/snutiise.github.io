@@ -2,7 +2,7 @@
 layout: post
 title:  "데이터 중심 애플리케이션 설계 (1)"
 image: ''
-date:   2020-11-14 00:00:00
+date:   2020-11-13 23:00:00
 tags:
 - study
 description: ''
