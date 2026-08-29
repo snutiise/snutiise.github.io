@@ -12,7 +12,7 @@ categories:
 - Git
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
 
 깃 블로그 내에 방문자 카운트 같은 기능을 구현하고 싶어졌다. 
 
@@ -22,7 +22,6 @@ categories:
 
 ## Firebase란?
 
-<img src="https://firebase.google.com/_static/images/firebase/touchicon-180.png">
 
 >Firebase는 실시간 데이터베이스와 백엔드를 서비스로 제공합니다. 이 서비스는 애플리케이션 개발자에게 애플리케이션 데이터를 클라이언트간에 동기화하고 Firebase의 클라우드에 저장할 수있는 API를 제공합니다.
 

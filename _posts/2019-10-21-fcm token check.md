@@ -11,7 +11,7 @@ categories:
 - Programming
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
 
 fcm token의 유효성 검사를 하는방법은 sdk를 이용하는 방법과 아래와 같이 직접 질의해서 확인하는 방법이 있다.
 

@@ -10,7 +10,7 @@ categories:
 - Database
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
 
 레디스는 키를 삭제하기 위한 dels를 따로 지원하지 않는다.
 

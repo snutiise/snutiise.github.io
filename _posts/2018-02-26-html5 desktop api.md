@@ -12,7 +12,7 @@ categories:
 - Programming
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
 
 지난번 채팅앱을 구현할 때 child window를 통해서 알림창을 구현했다.
 

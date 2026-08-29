@@ -10,7 +10,7 @@ categories:
 - Data Structure
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
 
 ## A Memory-Efficient Doubly Linked List
 
@@ -37,15 +37,15 @@ categories:
 
 10000개 생성에 대한 테스트
 
-<img src="{{ "/assets/img/2018-01-15-1.png"}}" alt="">
+<img src="{{ "/assets/img/2018-01-15-1.png"}}" alt="" loading="lazy" decoding="async">
 
 50000개 생성에 대한 테스트
 
-<img src="{{ "/assets/img/2018-01-15-2.png"}}" alt="">
+<img src="{{ "/assets/img/2018-01-15-2.png"}}" alt="" loading="lazy" decoding="async">
 
 100000개 생성에 대한 테스트
 
-<img src="{{ "/assets/img/2018-01-15-3.png"}}" alt="">
+<img src="{{ "/assets/img/2018-01-15-3.png"}}" alt="" loading="lazy" decoding="async">
 
  
 
@@ -59,7 +59,7 @@ categories:
 
 이 차이가 얼마나 증가할지 궁금해서  15만개의 노드에 대해서도 테스트를 해보기로 했다.
 
-<img src="{{ "/assets/img/2018-01-15-4.png"}}" alt="">
+<img src="{{ "/assets/img/2018-01-15-4.png"}}" alt="" loading="lazy" decoding="async">
 
 10만개 때 보다 2초 정도의 시간이 증가했지만 노드의 개수가 5만개 증가한 것이 비하면 괜찮은 수치로 보인다.
 

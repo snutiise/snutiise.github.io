@@ -10,7 +10,7 @@ categories:
 - Chat
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
 
 근황 업데이트...
 
@@ -22,7 +22,7 @@ categories:
 
 (매일밤 서버를 걱정하는 그 짜릿함...)
 
-<img src="{{ "/assets/img/2020-11-05-1.png"}}" alt="">
+<img src="{{ "/assets/img/2020-11-05-1.png"}}" alt="" loading="lazy" decoding="async">
 <center>(firebase로 본 사용자)</center>
 <br/>
 미러서버가 밀리고 마스터는 힘들어하는 재밌는 경험
