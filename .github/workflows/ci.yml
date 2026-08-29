@@ -41,11 +41,14 @@ jobs:
         # 내부 링크·이미지 깨짐만 막는다.
         run: |
           gem install html-proofer --no-document --silent
+          # --swap-urls 는 쓰지 않는다: 값이 pattern:replacement 인데 URL 안의
+          # '://' 가 구분자로 먹혀 https://octodex... 같은 정상 링크를
+          # //snutiise.github.io://octodex... 로 망가뜨린다(오탐 유발).
+          # feed-research/ 는 다른 파이프라인 산출물이라 검사 대상이 아니다.
           htmlproofer _site \
             --disable-external \
             --ignore-missing-alt \
-            --ignore-urls "/^\/feed-research/" \
-            --swap-urls "^https://snutiise.github.io:" \
+            --ignore-files "/feed-research/" \
             --no-enforce-https
 
       - name: 산출물 업로드
