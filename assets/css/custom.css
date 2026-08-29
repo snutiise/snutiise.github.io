@@ -144,10 +144,26 @@ body { font-family: var(--sans); -webkit-font-smoothing: antialiased; }
 .header-site .social a:hover { transform: translateY(-2px); }
 
 /* ── 목록: 전폭 밑줄 → 카드 ─────────────────────────────────────────── */
-/* 부모(.content)가 절대 위치라 % 기반 max-width 로는 뷰포트를 넘길 수 있다.
-   vw 를 섞어 어떤 폭에서도 화면 밖으로 나가지 않게 한다. */
-.header-site .recent { max-width: min(560px, 90vw); margin-top: 34px; }
-.header-site .content { max-width: 100vw; }
+/* 히어로 정렬: 원래는 .content 를 position:absolute + translate 로 수직
+   중앙에 놓는데, 내용이 뷰포트보다 길어지면 위쪽이 화면 밖(-40px)으로
+   잘리고 스크롤로도 볼 수 없다(375x812 실측). flex 중앙 정렬로 바꾸면
+   내용이 길 때 자연스럽게 위에서 시작하고 스크롤로 전부 읽힌다. */
+.header-site {
+  height: auto;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header-site .content {
+  position: relative;
+  top: auto; left: auto; right: auto; bottom: auto;
+  transform: none;
+  margin: 0 auto;
+  padding: 84px 16px 56px;   /* 상단 햄버거·검색 버튼과 겹치지 않게 */
+  max-width: 100%;
+}
+.header-site .recent { max-width: min(560px, 100%); margin-top: 34px; }
 .header-site .recent p {
   font-size: .78rem; font-weight: 700; letter-spacing: .14em;
   text-transform: uppercase; color: var(--ink-faint);
