@@ -169,27 +169,27 @@ ul.rl .chip b { font-size: 13px; }
 <header class="cover">
   <div class="kicker">FEED RESEARCH · 일일 리포트</div>
   <h1>2026-08-23</h1>
-  <div class="wd">일요일 · 읽는 데 약 46분</div>
+  <div class="wd">일요일 · 읽는 데 약 48분</div>
   <ul class="chips"></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X가 4세대 이후 일곱 번째 후속 드랍(<a href="https://github.com/xai-org/x-algorithm/commit/28e414f">28e414f</a>, 2026-08-21)에서 (1) <strong>광고 conversion 액션 20개 신설</strong>(ADS ActionName 171–190 — Mobile App Conversion Tracking(MACT)의 purchase·add_to_cart·level_achieved·tutorial_complete·sign_up·custom 각 6종 × click/view 2종 = 12개 + view-through conversion 8종), (2) <strong>delayed feedback를 학습 손실에서 분기</strong>하는 <code>split_head_training_by_source</code> config — kafka에 <code>is_delayed_feedback</code> 컬럼을 흘리면 <code>sample_source</code> batch 필드로 들어와 <code>fresh</code>/<code>delayed_clicked</code>/<code>delayed_non_clicked</code> 메트릭 슬라이스와 loss mask 분기를 붙임(engagement head는 fresh 샘플에만, conversion head는 delayed 샘플에만 학습), (3) <strong>Muon optimizer가 export에 정식 포함</strong> — TRAINING.md·README가 &quot;AdamW만 export, Muon은 프로덕션 전용&quot;에서 &quot;flagship ranking config + <code>home_direct_packed_nano</code>가 프로덕션 Muon 레시피로 end-to-end 학습, two-tower·gen-recs·레거시만 AdamW arm 사용&quot;으로 재작성, (4) <strong>NVIDIA GB300 하드웨어 전용 오버라이드</strong> 첫 등장 — <code>_GB300_OVERRIDES</code>에 <code>bs_per_device=512</code>·<code>ep=64</code>·<code>attn_impl=&quot;cutedsl_ranker_varlen_attn&quot;</code>·<code>remat_policy=RematType.SAVE_GB300_RECSYS</code>·<code>unroll_layer_stack=True</code>·<code>checkpoint_every_n=300</code>·LR 5e-4가 정의되고 <code>home_direct_packed_nano</code>가 이 오버라이드를 상속(nano조차 GB300에 맞춰 최적화), (5) <strong><code>xai-o2</code> 스토리지 크레이트 인터페이스 공개</strong> — S3 호환 오브젝트 스토리지 클라이언트의 <code>BaseO2Client</code> trait과 <code>O2ClientBuilder</code> 스터브가 154줄 신규, 다만 오픈소스 빌드에서는 <code>build()</code>가 항상 <code>&quot;the xai-o2 backend is not included in this build; use the default object_store backend&quot;</code> 에러 반환(인터페이스만 공개, 실 구현 미공개), (6) <strong><code>SlateContext</code>가 <code>NextActionDistribution</code> 필드 #9로 추가</strong> — 4세대+4에서 <code>ScoreInfo.slateContext</code>(재순위 슬레이트의 최종 결정에 붙는 컨텍스트)로 도입됐던 게 이제 각 candidate의 <strong>action distribution 안에도</strong> 함께 붙음(예측 응답 스키마 확장), (7) <strong>grox reply_spam follower 임계 60k → 80k</strong> (10일간 15k → 30k → 60k → 80k, 이번은 1.33배로 이전 두 차례 2배보다 완만), (8) <strong>visibility-filtering dark_traffic 타깃이 <code>xai-vf-shadow.prod.visibility</code>에서 <code>xai-vf-service.staging.visibility:grpc</code>로 전환</strong> — 프로덕션 shadow deployment 4일 만에 staging 미러링으로 리네이밍(도메인·워크로드 이름 모두 <code>.staging.</code>으로 이동), (9) <strong>Grok 4.5 internal 완전 제거</strong> — 4세대+2의 심판 도입 이후 매일 정교화되던 dial(0.1 → 0.3)을 하루 만에 100%로 갈아엎고 <code>_eapi_4_5_internal_breaker</code>·<code>_sample_4_5_internal</code>·<code>_GROK_4_6_INTERNAL_DIAL</code> 전부 삭제, PTOS 심판 스택이 Grok 4.6 internal 단일화, (10) <strong>retrieval post-embedding 계산에 65,536 rows 청킹</strong>(<code>maybe_build_retrieval_post_embeddings</code> — <code>total_samples % data_world_size == 0</code>인 균등 shard 케이스에서만 chunk 진입, 아니면 shard 통째 처리), (11) <strong>inference hotswap에 <code>malloc_trim(0)</code> 옵션</strong> — CLI 도움말이 *&quot;glibc slots otherwise ratchet ~196 MiB/cycle. No-op under jemalloc&quot;*로 hotswap 사이클당 ~196MiB 누수를 문서화. 커밋 규모 35 파일 +856/−152. <strong>광고 도메인의 매출 예측 예산이 갑자기 20개 액션으로 부풀어 오른 것과 delayed feedback을 학습 손실에 정식으로 분리한 것이 오늘 드랍의 두 축</strong>이라 4세대+2·+4의 &quot;reward·slate·SID&quot; 스코어 예측 확장 라인과 별개로 <strong>광고 매출 예측 헤드가 대폭 세분화되는 새 축이 시작</strong>된 신호로 유의미하다.</div>
+  <div class="lead"><span class="lb">한 줄 요약</span>X가 4세대 이후 일곱 번째 후속 커밋(<a href="https://github.com/xai-org/x-algorithm/commit/28e414f">28e414f</a>, 2026-08-21)을 공개했다. (1) <strong>광고 conversion 액션 20개를 신설했다</strong>(ADS ActionName 171–190으로, Mobile App Conversion Tracking(MACT)의 purchase·add_to_cart·level_achieved·tutorial_complete·sign_up·custom 6종에 click/view 2종을 곱한 12개와 view-through conversion 8종을 합한 수다). (2) <strong>delayed feedback을 학습 손실에서 분리하는</strong> <code>split_head_training_by_source</code> config가 추가됐다. kafka에 <code>is_delayed_feedback</code> 컬럼을 실어 보내면 <code>sample_source</code> batch 필드로 들어오고, 여기에 맞춰 <code>fresh</code>/<code>delayed_clicked</code>/<code>delayed_non_clicked</code> 메트릭 슬라이스와 loss mask 분기가 적용된다(engagement head는 fresh 샘플만, conversion head는 delayed 샘플만 학습한다). (3) <strong>Muon optimizer가 export에 정식으로 포함됐다.</strong> TRAINING.md와 README가 &quot;AdamW만 export, Muon은 프로덕션 전용&quot;에서 &quot;flagship ranking config + <code>home_direct_packed_nano</code>가 프로덕션 Muon 레시피로 end-to-end 학습, two-tower·gen-recs·레거시만 AdamW arm 사용&quot;으로 다시 쓰였다. (4) <strong>NVIDIA GB300 하드웨어 전용 오버라이드가 처음 등장했다.</strong> <code>_GB300_OVERRIDES</code>에 <code>bs_per_device=512</code>·<code>ep=64</code>·<code>attn_impl=&quot;cutedsl_ranker_varlen_attn&quot;</code>·<code>remat_policy=RematType.SAVE_GB300_RECSYS</code>·<code>unroll_layer_stack=True</code>·<code>checkpoint_every_n=300</code>과 LR 5e-4가 정의됐고, <code>home_direct_packed_nano</code>가 이 오버라이드를 상속한다(nano조차 GB300에 맞춰 최적화됐다). (5) <strong><code>xai-o2</code> 스토리지 크레이트 인터페이스가 공개됐다.</strong> S3 호환 오브젝트 스토리지 클라이언트의 <code>BaseO2Client</code> trait과 <code>O2ClientBuilder</code> 스터브가 134줄 새로 들어왔지만, 오픈소스 빌드에서는 <code>build()</code>가 항상 <code>&quot;the xai-o2 backend is not included in this build; use the default object_store backend&quot;</code> 에러를 반환한다(인터페이스만 공개했고 실제 구현은 공개하지 않았다). (6) <strong><code>SlateContext</code>가 <code>NextActionDistribution</code>의 필드 #9로 추가됐다.</strong> 4세대+4에서 <code>ScoreInfo.slateContext</code>(재순위 슬레이트의 최종 결정에 함께 실리는 컨텍스트)로 도입됐던 값이 이제 각 candidate의 <strong>action distribution 안에도</strong> 들어간다(예측 응답 스키마가 확장됐다). (7) <strong>grox reply_spam follower 임계가 60k에서 80k로 올랐다</strong>(10일 동안 15k → 30k → 60k → 80k로 올렸고, 이번에는 1.33배여서 이전 두 차례의 2배보다 완만하다). (8) <strong>visibility-filtering dark_traffic 타깃이 <code>xai-vf-shadow.prod.visibility</code>에서 <code>xai-vf-service.staging.visibility:grpc</code>로 바뀌었다.</strong> 프로덕션 shadow deployment를 배선한 지 2일 만에 staging 미러링으로 이름을 바꿨고, 도메인과 워크로드 이름이 모두 <code>.staging.</code>으로 옮겨 갔다. (9) <strong>Grok 4.5 internal을 완전히 제거했다.</strong> 4세대+2에서 심판을 도입한 이후 날마다 정교하게 조정하던 dial(0.1 → 0.3)을 하루 만에 100%로 올리면서 <code>_eapi_4_5_internal_breaker</code>·<code>_sample_4_5_internal</code>·<code>_GROK_4_6_INTERNAL_DIAL</code>을 전부 삭제했고, PTOS 심판 스택이 Grok 4.6 internal 하나로 단일화됐다. (10) <strong>retrieval post-embedding 계산에 65,536 rows 청킹을 도입했다</strong>(<code>maybe_build_retrieval_post_embeddings</code>에서 <code>total_samples % data_world_size == 0</code>인 균등 shard 케이스에만 chunk로 진입하고, 그렇지 않으면 shard를 통째로 처리한다). (11) <strong>inference hotswap에 <code>malloc_trim(0)</code> 옵션이 추가됐다.</strong> CLI 도움말이 *&quot;glibc slots otherwise ratchet ~196 MiB/cycle. No-op under jemalloc&quot;*이라고 적어, hotswap 사이클마다 약 196MiB씩 새는 문제를 문서로 남겼다. 커밋 규모는 35 파일 +856/−152이다. <strong>광고 도메인의 매출 예측 예산이 갑자기 20개 액션으로 불어난 것과 delayed feedback을 학습 손실에서 정식으로 분리한 것이 이번 커밋의 두 축이다.</strong> 그래서 4세대+2·+4의 &quot;reward·slate·SID&quot; 스코어 예측 확장과는 별개로 <strong>광고 매출 예측 헤드가 대폭 세분화되는 새 축이 시작됐다는 신호</strong>로서 의미가 있다.</div>
 </header>
 <div class="wrap" id="content">
-<h2>1. Phoenix 랭커에 광고 conversion 액션 20개가 늘고 delayed feedback 학습 분기가 붙었다 — X (4세대+6, 28e414f) — 광고·랭킹</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/28e414f">xai-org/x-algorithm @ 28e414f — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-21 19:10 UTC, 공개 소스코드. 파일 35개, <strong>+856/−152</strong>. 4세대+5(d0cef2f, 2026-08-20, 14 파일 +479/−200) 대비 규모는 2배 가까이지만 4세대+4의 대형 확장(79 파일 +3.3k/−0.7k)의 1/4 수준. <strong>광고 매출 예측 스택</strong>의 액션 수·delayed feedback 처리·Muon 레시피 export의 세 축이 이번 드랍의 새 내용이고, 나머지는 4세대+2·+4에서 시작된 흐름(Grok 4.6 심판, dark_traffic shadow, <code>SlateContext</code> 배선)의 후속 정리다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 4세대 이후 X 저장소는 매일 커밋 리듬으로 후속 드랍이 붙어 왔다: 8/14 4세대+1(c65aa17) → 8/17 +2(b089ce6) → 8/18 +3(11a71f8) → 8/19 +4(aad7179, 대형) → 8/20 +5(d0cef2f) → <strong>8/21 +6(28e414f, 이번)</strong>. 이번 커밋은 4세대~+5까지의 canon이 다뤄 온 세 흐름 —</p></div>
+<h2>1. Phoenix 랭커에 광고 conversion 액션 20개가 늘고 delayed feedback 학습 분기가 추가됐다 — X (4세대+6, 28e414f) — 광고·랭킹</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/28e414f">xai-org/x-algorithm @ 28e414f — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-21 19:10 UTC, 공개 소스코드. 파일 35개, <strong>+856/−152</strong>이다. 4세대+5(d0cef2f, 2026-08-20, 14 파일 +479/−200)와 견주면 규모가 2배에 가깝지만, 4세대+4의 대형 확장(79 파일 +3.3k/−0.7k)에 비하면 1/4 수준이다. <strong>광고 매출 예측 스택</strong>의 액션 수, delayed feedback 처리, Muon 레시피 export라는 세 축이 이번 커밋에서 새로 들어온 내용이고, 나머지는 4세대+2·+4에서 시작된 작업(Grok 4.6 심판, dark_traffic shadow, <code>SlateContext</code> 배선)을 이어서 정리한 것이다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 4세대 이후 X 저장소는 날마다 커밋하는 리듬으로 후속 공개를 이어 왔다: 8/14 4세대+1(c65aa17) → 8/17 +2(b089ce6) → 8/18 +3(11a71f8) → 8/19 +4(aad7179, 대형) → 8/20 +5(d0cef2f) → <strong>8/21 +6(28e414f, 이번)</strong>. 이번 커밋은 4세대부터 +5까지의 canon이 다뤄 온 세 가지 흐름과 방향이 같다.</p></div>
 <ul>
 <li>(a) <strong>랭킹 파이프라인의 signal 채널 확장</strong> (topic feedback → AI trend feedback, SID 3계층, <code>RewardOutputs</code>·rewardRerankSlotProb, <code>SlateContext</code>)</li>
 <li>(b) <strong>PTOS 심판 계층의 세대 전환</strong> (safemodel↔PtOS disagreement → Grok 4.5 심판 → 4.6 dial 0.1 → 0.3)</li>
 <li>(c) <strong>VF·grox 리소스 튜닝</strong> (visibility-filtering shadow, grox reply_spam follower 임계)</li>
 </ul>
-<p>와 결이 통하지만, <strong>광고 매출 예측 헤드의 세분화</strong>라는 새 축이 붙었다는 게 4세대~+5와의 차이다. 새로 나오는 개념 몇 개:</p>
+<p>다만 <strong>광고 매출 예측 헤드를 세분화한다</strong>는 새 축이 추가됐다는 점이 4세대~+5와 다르다. 새로 나오는 개념을 몇 가지 정리하면 다음과 같다.</p>
 <ul>
-<li><strong>MACT (Mobile App Conversion Tracking)</strong> — 모바일 앱 광고에서 앱 내 이벤트(인앱 구매·튜토리얼 완료·회원 가입 등)를 광고 노출·클릭에 귀속시키는 계측 프레임워크. 광고주가 SDK로 앱 내 이벤트를 로그하면 X 광고 시스템이 어떤 노출·클릭이 그 이벤트를 유도했는지 매칭. 기존 X 랭커 proto에는 <code>ADS_ATTRIBUTED_MACT_CLICK_INSTALL</code> 하나만 있었는데(앱 설치가 클릭에 귀속), 이번에 <strong>6개 인앱 이벤트 × click·view 각 2종</strong> = 12개로 부풀어 올랐다.</li>
-<li><strong>View-through conversion</strong> — 유저가 광고를 봤지만 클릭하지는 않고, 이후 다른 경로로 컨버전(구매·가입 등)한 경우. 클릭 기반 귀속(click-through)과 대비되고, 노출만으로도 광고 효과가 있었다고 인정하는 계측 방식. 이번에 X 랭커가 <strong>view-through 계열 8개 액션</strong>(purchase·add_to_cart·checkout_initiated·sign_up·site_visit·session·landing_page_view·upper_funnel)을 신설.</li>
-<li><strong>Delayed feedback</strong> — 광고 conversion은 노출·클릭 시점과 실제 컨버전(예: 회원 가입, 인앱 구매) 시점이 몇 시간~며칠 벌어진다. 학습 시점에 도착한 라벨이 &quot;아직 안 일어남&quot;인지 &quot;안 일어날 것&quot;인지 구분하기 어려워 손실 왜곡이 생긴다. 랭커 문헌에서는 delayed conversion prediction이 별도 학문 분야(Chapelle 2014 이후). 이번 커밋에서 X는 각 학습 샘플에 <code>is_delayed_feedback</code> 컬럼을 붙이고, 광고 conversion 헤드는 delayed 샘플만·engagement 헤드는 fresh 샘플만 학습하도록 loss mask를 갈랐다.</li>
-<li><strong>Muon optimizer</strong> — Newton-Schulz orthogonalization으로 gradient momentum matrix를 근사 직교화하는 optimizer. Keller Jordan 2024 원문 + Moonshot Kimi K2 계열의 LLM 학습에서 확산. 4세대+4(aad7179)에서 X Phoenix 랭커의 dense-parameter 기본 optimizer로 도입됐지만, TRAINING.md는 export 파이썬 코드가 여전히 AdamW라고 명시하고 있었다. 이번 커밋에서 문서·config·reference 학습 스크립트가 <strong>flagship + nano가 Muon으로 학습됨</strong>을 명시하는 방향으로 재작성돼 export/프로덕션 간극이 좁혀졌다.</li>
-<li><strong>NVIDIA GB300 (Grace Blackwell 300)</strong> — NVIDIA의 2025~2026 datacenter GPU. Blackwell 세대(B200 후속). 각 GB300 노드가 대용량 HBM3e과 CUTLASS/CUTe DSL 기반 attention 커널을 지원. X가 처음으로 <strong>하드웨어 특정 config</strong>(batch size, expert parallelism, remat policy, attention impl)를 명시적으로 코드에 드러냈다.</li>
-<li><strong><code>xai-o2</code> object storage</strong> — xAI 내부 스토리지 시스템으로 추정되는 S3 호환 오브젝트 스토리지. 이번 커밋에서 클라이언트 crate 인터페이스는 공개됐으나 실 구현은 오픈소스 빌드 제외. 프로덕션 checkpoint·데이터 저장이 <code>xai-o2</code>에 붙는 듯한 신호 <code>[추정]</code> — 오픈소스 빌드에서는 표준 <code>object_store</code> crate로 폴백 필요.</li>
+<li><strong>MACT (Mobile App Conversion Tracking)</strong> — 모바일 앱 광고에서 앱 내 이벤트(인앱 구매·튜토리얼 완료·회원 가입 등)를 광고 노출·클릭에 귀속시키는 계측 프레임워크다. 광고주가 SDK로 앱 내 이벤트를 로그하면 X 광고 시스템이 어떤 노출·클릭이 그 이벤트를 유도했는지 대응시킨다. 기존 X 랭커 proto에는 <code>ADS_ATTRIBUTED_MACT_CLICK_INSTALL</code> 하나만 있었는데(앱 설치가 클릭에 귀속), 이번에 <strong>인앱 이벤트 6개에 click·view 각 2종</strong>을 곱한 12개로 늘어났다.</li>
+<li><strong>View-through conversion</strong> — 사용자가 광고를 봤지만 클릭하지는 않고, 이후 다른 경로로 컨버전(구매·가입 등)에 이른 경우를 말한다. 클릭 기반 귀속(click-through)과 대비되고, 노출만으로도 광고 효과가 있었다고 인정하는 계측 방식이다. 이번에 X 랭커가 <strong>view-through 계열 8개 액션</strong>(purchase·add_to_cart·checkout_initiated·sign_up·site_visit·session·landing_page_view·upper_funnel)을 신설했다.</li>
+<li><strong>Delayed feedback</strong> — 광고 conversion은 노출·클릭 시점과 실제 컨버전(예: 회원 가입, 인앱 구매) 시점이 몇 시간에서 며칠까지 벌어진다. 학습 시점에 도착한 라벨이 &quot;아직 안 일어남&quot;인지 &quot;안 일어날 것&quot;인지 구분하기 어려워 손실이 왜곡된다. 랭커 문헌에서는 delayed conversion prediction이 별도의 연구 분야로 자리 잡았다(Chapelle 2014 이후). 이번 커밋에서 X는 각 학습 샘플에 <code>is_delayed_feedback</code> 컬럼을 추가하고, 광고 conversion 헤드는 delayed 샘플만, engagement 헤드는 fresh 샘플만 학습하도록 loss mask를 나눴다.</li>
+<li><strong>Muon optimizer</strong> — Newton-Schulz orthogonalization으로 gradient momentum matrix를 근사 직교화하는 optimizer다. Keller Jordan 2024 원문과 Moonshot Kimi K2 계열의 LLM 학습을 거치며 확산됐다. 4세대+4(aad7179)에서 X Phoenix 랭커의 dense-parameter 기본 optimizer로 도입됐지만, TRAINING.md는 export 파이썬 코드가 여전히 AdamW라고 명시하고 있었다. 이번 커밋에서 문서와 config, reference 학습 스크립트가 <strong>flagship과 nano가 Muon으로 학습된다</strong>고 명시하는 방향으로 다시 쓰이면서 export와 프로덕션 사이의 간극이 좁혀졌다.</li>
+<li><strong>NVIDIA GB300 (Grace Blackwell 300)</strong> — NVIDIA의 2025~2026년 datacenter GPU이고 Blackwell 세대에 속한다(B200 후속). 각 GB300 노드가 대용량 HBM3e과 CUTLASS/CUTe DSL 기반 attention 커널을 지원한다. X가 처음으로 <strong>하드웨어 전용 config</strong>(batch size, expert parallelism, remat policy, attention impl)를 코드에 명시적으로 드러냈다.</li>
+<li><strong><code>xai-o2</code> object storage</strong> — xAI 내부 스토리지 시스템으로 추정되는 S3 호환 오브젝트 스토리지다. 이번 커밋에서 클라이언트 crate 인터페이스는 공개됐지만 실제 구현은 오픈소스 빌드에서 빠졌다. 프로덕션의 checkpoint와 데이터 저장이 <code>xai-o2</code>로 이어진다고 볼 만한 신호다 <code>[추정]</code>. 오픈소스 빌드에서는 표준 <code>object_store</code> crate로 대체해야 한다.</li>
 </ul>
 <h3>광고 conversion 액션 20개 신설 (proto 171–190)</h3>
 <p><strong>proto 액션 신설 목록</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a> <code>enum ActionName</code>:</p>
@@ -217,18 +217,18 @@ ADS_UPPER_FUNNEL_CONVERSION_VIEW_THROUGH = 190;
 <p>두 부류로 나뉜다:</p>
 <p><strong>(A) MACT 6개 인앱 이벤트 × click/view = 12개 (171–182):</strong></p>
 <ul>
-<li>purchase (인앱 구매), add_to_cart, level_achieved (게임 레벨 달성), tutorial_complete (튜토리얼 완료), sign_up (회원 가입), custom (광고주 정의 커스텀 이벤트)</li>
-<li>각각 <code>MACT_&lt;이벤트&gt;</code> (click-attributed = 유저가 광고 클릭 후 앱에서 이벤트) + <code>MACT_VIEW_&lt;이벤트&gt;</code> (view-attributed = 유저가 광고 보기만 하고 클릭 없이 앱에서 이벤트) 두 계열.</li>
+<li>purchase (인앱 구매), add_to_cart, level_achieved (게임 레벨 달성), tutorial_complete (튜토리얼 완료), sign_up (회원 가입), custom (광고주가 정의한 커스텀 이벤트)</li>
+<li>각각 <code>MACT_&lt;이벤트&gt;</code> (click-attributed = 사용자가 광고를 클릭한 뒤 앱에서 발생한 이벤트)와 <code>MACT_VIEW_&lt;이벤트&gt;</code> (view-attributed = 사용자가 광고를 보기만 하고 클릭 없이 앱에서 발생한 이벤트) 두 계열이 있다.</li>
 <li>기존에는 <code>ADS_ATTRIBUTED_MACT_CLICK_INSTALL</code>(=140) 하나만 있어서 앱 설치만 예측했다면, 이제 <strong>앱 설치 이후의 6가지 참여 이벤트를 클릭·뷰 각각으로 12개 헤드</strong>로 예측한다.</li>
 </ul>
 <p><strong>(B) View-through conversion 8개 (183–190):</strong></p>
 <ul>
 <li>purchase / add_to_cart / checkout_initiated / sign_up / site_visit / session / landing_page_view / upper_funnel</li>
-<li>각각 <code>&lt;conversion&gt;_VIEW_THROUGH</code>. 이미 존재하던 click-attributed conversion(<code>ADS_PURCHASE_CONVERSION</code> = 200 등)과 짝을 이뤄 <strong>view-through 대응 헤드</strong>가 신설. 8개 웹 컨버전(광고주 사이트 방문·구매·가입 등)을 view-through로도 예측.</li>
+<li>각각 <code>&lt;conversion&gt;_VIEW_THROUGH</code>라는 이름을 쓴다. 이미 있던 click-attributed conversion(<code>ADS_PURCHASE_CONVERSION</code> = 200 등)과 짝을 이루도록 <strong>view-through 대응 헤드</strong>를 신설했다. 웹 컨버전 8개(광고주 사이트 방문·구매·가입 등)를 view-through로도 예측한다.</li>
 </ul>
 <h3><code>ads_slim</code>과 <code>ads_conversion_view_through</code> 엔게이지먼트 그룹 매핑</h3>
 <p><strong><code>constants.py</code> 신규 매핑</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/data/recsys/constants.py"><code>phoenix/xrex/data/recsys/constants.py</code></a>:</p>
-<p>기존 <code>ads_conversion_engagement_to_action_types</code>에 신규 12 MACT 매핑 추가:</p>
+<p>기존 <code>ads_conversion_engagement_to_action_types</code>에 MACT 매핑 12개를 새로 추가했다:</p>
 <pre><code class="language-python">&quot;IsAttributedMactPurchase&quot;: [&quot;AdsAttributedMactPurchase&quot;],
 &quot;IsAttributedMactAddToCart&quot;: [&quot;AdsAttributedMactAddToCart&quot;],
 ...
@@ -238,7 +238,7 @@ ADS_UPPER_FUNNEL_CONVERSION_VIEW_THROUGH = 190;
 ...
 &quot;IsUpperFunnelConversionViewThrough&quot;: [&quot;AdsUpperFunnelConversionViewThrough&quot;],
 </code></pre>
-<p>그리고 <strong>새 metric group <code>ads_slim</code></strong> — 7개 signal + 앞 conversion click 매핑에서 primary가 아닌 것들만 걸러 넣음:</p>
+<p>그리고 <strong><code>ads_slim</code>이라는 metric group을 새로 만들었다.</strong> signal 7개에 더해, 앞의 conversion click 매핑 가운데 primary가 아닌 항목만 걸러서 넣었다:</p>
 <pre><code class="language-python">ads_slim_engagement_to_action_types = {
     &quot;IsOpenLink&quot;: [&quot;ClientTweetOpenLink&quot;],
     &quot;IsExternalLinkLongDwelled&quot;: [&quot;ClientTweetExternalLinkLongDwelled&quot;],
@@ -254,10 +254,10 @@ ADS_UPPER_FUNNEL_CONVERSION_VIEW_THROUGH = 190;
     },
 }
 </code></pre>
-<p>즉 광고 랭커의 &quot;slim&quot; 라인은 3개 긍정 신호(open link + external link long dwell + video quality view) + 4개 부정 신호(not interested + block + report + mute) + primary가 아닌 conversion click들만 학습. metric group 라우팅 딕셔너리에도 <code>&quot;ads_slim&quot;: ads_slim_engagement_to_action_types</code> 등록. 광고 랭킹 config가 이 그룹을 골라 붙일 수 있게 준비.</p>
-<p><strong><code>SOURCE_SPLIT_CONVERSION_HEAD_INDICES</code></strong> 신설 — click-conditioned action index + view-through action index 두 리스트를 이어붙인 대이스트. 아래 delayed feedback 분기에서 사용.</p>
-<p><strong><code>NEGATIVE_FEEDBACK_HEAD_INDICES</code>에 <code>CLIENT_TWEET_SEARCH_QUERY_REFORMULATED</code> 추가</strong> — 4세대+4의 <code>xrecsys_search</code> config 확장과 이어지는 signal: 유저가 검색 결과가 마음에 안 들어 쿼리를 다시 짜면 이를 부정 피드백 헤드에 포함. 검색 지면 랭킹이 이 신호를 학습.</p>
-<h3>Delayed feedback를 학습 손실에서 분기</h3>
+<p>즉 광고 랭커의 &quot;slim&quot; 라인은 긍정 신호 3개(open link + external link long dwell + video quality view)와 부정 신호 4개(not interested + block + report + mute), 그리고 primary가 아닌 conversion click만 학습한다. metric group 라우팅 딕셔너리에도 <code>&quot;ads_slim&quot;: ads_slim_engagement_to_action_types</code>를 등록해서, 광고 랭킹 config가 이 그룹을 골라 쓸 수 있도록 준비했다.</p>
+<p>**<code>SOURCE_SPLIT_CONVERSION_HEAD_INDICES</code>**를 신설했다. click-conditioned action index 리스트와 view-through action index 리스트를 이어 붙인 목록이고, 아래의 delayed feedback 분기에서 사용한다.</p>
+<p><strong><code>NEGATIVE_FEEDBACK_HEAD_INDICES</code>에 <code>CLIENT_TWEET_SEARCH_QUERY_REFORMULATED</code> 추가</strong> — 4세대+4의 <code>xrecsys_search</code> config 확장과 이어지는 신호다. 사용자가 검색 결과가 마음에 들지 않아 쿼리를 다시 작성하면 이를 부정 피드백 헤드에 포함한다. 검색 지면 랭킹이 이 신호를 학습하게 된다.</p>
+<h3>Delayed feedback을 학습 손실에서 분기</h3>
 <p><strong><code>sample_source</code> batch 필드 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/data/recsys/recsys_batch.py"><code>phoenix/xrex/data/recsys/recsys_batch.py:980</code></a>:</p>
 <pre><code class="language-python">sample_source=(
     record_batch.column(&quot;is_delayed_feedback&quot;)
@@ -269,7 +269,7 @@ ADS_UPPER_FUNNEL_CONVERSION_VIEW_THROUGH = 190;
     else np.zeros((batch_size, 1), dtype=np.bool_)
 ),
 </code></pre>
-<p>즉 kafka/parquet record batch에 <code>is_delayed_feedback</code> 컬럼이 있으면 그 값(True=이 샘플은 delayed feedback 재관측분)을 <code>sample_source</code>로 배치에 담고, 없으면 전부 False. <code>feature_config.py</code>의 required columns 리스트에 <code>is_delayed_feedback</code>·<code>conversionKeepMask</code> 두 컬럼이 추가돼 upstream 인디케이터가 확정된다.</p>
+<p>즉 kafka/parquet record batch에 <code>is_delayed_feedback</code> 컬럼이 있으면 그 값(True = 이 샘플은 delayed feedback 재관측분)을 <code>sample_source</code>로 배치에 담고, 없으면 전부 False로 채운다. <code>feature_config.py</code>의 required columns 리스트에 <code>is_delayed_feedback</code>과 <code>conversionKeepMask</code> 두 컬럼이 추가되면서 upstream 인디케이터가 확정됐다.</p>
 <p><strong>loss mask 분기</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/models/recsys_model.py"><code>phoenix/xrex/models/recsys_model.py</code></a> <code>loss()</code> 함수:</p>
 <pre><code class="language-python">if self.config.split_head_training_by_source and delayed_mask is not None:
     conv_head_split_mask = (
@@ -280,16 +280,16 @@ ADS_UPPER_FUNNEL_CONVERSION_VIEW_THROUGH = 190;
     loss_mask = loss_mask * (1 - is_delayed * eng_head_mask)      # delayed 샘플에서는 engagement head 손실 0
     loss_mask = loss_mask * (1 - (1 - is_delayed) * conv_head_split_mask)  # fresh 샘플에서는 conversion head 손실 0
 </code></pre>
-<p>즉 <strong>각 학습 샘플이 fresh(원본 impression) 또는 delayed(conversion 도착 후 재관측) 두 상태 중 하나이고</strong>:</p>
+<p>즉 <strong>각 학습 샘플이 fresh(원본 impression)와 delayed(conversion 도착 후 재관측) 두 상태 중 하나이고</strong>:</p>
 <ul>
-<li>fresh 샘플: engagement 헤드(favorite·reply·click 등)만 학습, conversion 헤드는 mask=0</li>
-<li>delayed 샘플: conversion 헤드(위 20개 신설 + 기존 click-conditioned 액션)만 학습, engagement 헤드는 mask=0</li>
+<li>fresh 샘플: engagement 헤드(favorite·reply·click 등)만 학습하고, conversion 헤드는 mask=0으로 둔다</li>
+<li>delayed 샘플: conversion 헤드(위 20개 신설 + 기존 click-conditioned 액션)만 학습하고, engagement 헤드는 mask=0으로 둔다</li>
 </ul>
-<p><strong>메트릭 슬라이스 신설</strong> — <code>fresh</code>(delayed=0), <code>delayed_clicked</code>(delayed=1 &amp; clicked=1), <code>delayed_non_clicked</code>(delayed=1 &amp; clicked=0) 세 슬라이스가 관측되도록 <code>build_metric_masks</code>에 분기 추가. <code>condition_conversion_on_click</code>이 필수 전제조건(assert)이라 delayed 샘플이라도 &quot;click 있었나&quot;라는 조건 하에 conversion을 예측하는 conditional 학습 유지.</p>
-<div class="blk why"><p><span class="lbl">의미</span> delayed feedback modeling이 광고 conversion 예측의 표준 문제인데, X는 이제 (a) 별도 kafka 이벤트로 delayed 재관측분을 흘리고 (b) 랭커 학습에서 손실을 분기해 fresh는 engagement로 delayed는 conversion으로 갈라 학습한다. 이는 duplicate labeling 문제(같은 impression을 fresh와 delayed 두 이벤트로 두 번 로그)에 대한 손실 정합성 장치이자, <strong>conversion 예측 헤드가 20개로 부풀면서 각 헤드의 학습 signal이 충분히 갱신되게 유지하는 인프라 뒷받침</strong>.</p></div>
-<p><strong><code>mact_in_app_loss_weight</code></strong> — MACT 12개 액션에만 곱하는 loss weight (default 1.0). config 파라미터로 노출되어 광고 conversion 12 헤드의 학습 강도를 조정 가능. <code>stats[&quot;mact-in-app-loss-weight&quot;]</code>로 관측.</p>
-<p><strong><code>train_view_through_heads</code></strong> — 8개 view-through 헤드를 학습할지 게이트. False면 view-through head 손실 mask를 0으로 만들어 학습 안 함. 즉 view-through 예측은 config에서 opt-in.</p>
-<p><strong><code>conversion_keep_mask</code> / <code>conversionKeepMask</code></strong> — 후보별로 conversion 학습에서 제외할지 마스킹. <code>from_record_batch</code>에서 kafka의 <code>conversionKeepMask</code> 컬럼을 읽고, null인 행은 True로 대체(=keep). <code>loss()</code>에서 이 마스크를 <code>target_padding_mask</code>와 AND해서 conversion 학습 대상에서 제외. <strong>주의:</strong> sequence packing에서는 <code>all(True)</code>만 허용 — 아직 미배선 케이스는 assert로 명시 실패.</p>
+<p><strong>메트릭 슬라이스를 신설했다.</strong> <code>fresh</code>(delayed=0), <code>delayed_clicked</code>(delayed=1 &amp; clicked=1), <code>delayed_non_clicked</code>(delayed=1 &amp; clicked=0) 세 슬라이스를 관측할 수 있도록 <code>build_metric_masks</code>에 분기를 추가했다. <code>condition_conversion_on_click</code>이 필수 전제조건(assert)이므로, delayed 샘플이라도 &quot;click 있었나&quot;라는 조건 아래에서 conversion을 예측하는 conditional 학습을 그대로 유지한다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> delayed feedback modeling은 광고 conversion 예측의 표준 문제인데, X는 이제 (a) 별도 kafka 이벤트로 delayed 재관측분을 흘려보내고 (b) 랭커 학습에서 손실을 분기해 fresh는 engagement로, delayed는 conversion으로 갈라서 학습한다. 이는 duplicate labeling 문제(같은 impression을 fresh와 delayed 두 이벤트로 두 번 로그하는 문제)에 대한 손실 정합성 장치이자, <strong>conversion 예측 헤드가 20개로 늘어나는 가운데 각 헤드의 학습 signal이 충분히 갱신되도록 유지하는 인프라 뒷받침</strong>이기도 하다.</p></div>
+<p>**<code>mact_in_app_loss_weight</code>**는 MACT 액션 12개에만 곱하는 loss weight이고 기본값은 1.0이다. config 파라미터로 노출돼 있어서 광고 conversion 헤드 12개의 학습 강도를 조정할 수 있다. <code>stats[&quot;mact-in-app-loss-weight&quot;]</code>로 관측한다.</p>
+<p>**<code>train_view_through_heads</code>**는 view-through 헤드 8개를 학습할지 결정하는 게이트다. False로 두면 view-through head의 손실 mask를 0으로 만들어 학습하지 않는다. 즉 view-through 예측은 config에서 opt-in으로 켜야 한다.</p>
+<p>**<code>conversion_keep_mask</code> / <code>conversionKeepMask</code>**는 후보마다 conversion 학습에서 제외할지를 표시하는 마스크다. <code>from_record_batch</code>에서 kafka의 <code>conversionKeepMask</code> 컬럼을 읽고, null인 행은 True로 대체한다(=keep). <code>loss()</code>에서 이 마스크를 <code>target_padding_mask</code>와 AND 연산해 conversion 학습 대상에서 제외한다. <strong>주의할 점:</strong> sequence packing에서는 <code>all(True)</code>만 허용하고, 아직 배선되지 않은 경우는 assert로 명시적으로 실패시킨다.</p>
 <h3>Muon optimizer export 승격</h3>
 <p><strong>TRAINING.md 재작성</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/TRAINING.md"><code>phoenix/TRAINING.md</code></a>:</p>
 <p>이전:</p>
@@ -304,10 +304,10 @@ ADS_UPPER_FUNNEL_CONVERSION_VIEW_THROUGH = 190;
 <li><strong>Standard Optax AdamW</strong>: the slot used by the remaining shipped configs (two-tower retrieval, gen-recs, and the legacy ranking presets). ...</li>
 </ul>
 </blockquote>
-<p><strong>README.md</strong> 역시 이전의 &quot;one training-recipe exception ... standard AdamW rather than production&#39;s tuned internal variant&quot;에서 **&quot;The flagship ranking configs and the nano twin train the production Muon recipe, which ships in full&quot;**로 재작성. <code>reference/README.md</code>의 <code>train_step.py</code> 항목도 &quot;dense optimizer + rowwise-AdaGrad&quot;로 일반화됐고 flagship/nano가 Muon 사용 명시.</p>
-<p><strong>임베딩 optimizer 도 확장 정본화</strong> — 임베딩 rowwise AdaGrad에 flagship + nano는 (a) accumulator half-life decay, (b) lazy per-row decay, (c) decoupled weight decay 세 옵션을 함께 씀을 TRAINING.md가 명시. 4세대+4의 <code>emb_optim_config</code>(LR 0.28, half-life 2500 step, lazy_decay, weight_decay 2.8e-4) 파라미터가 정본화된 셈.</p>
-<div class="blk why"><p><span class="lbl">의미</span> 4세대+4(2026-08-19)에 Muon이 코드로 도입됐을 때 canon 이해는 &quot;코드는 export됐지만 학습 레시피는 여전히 프로덕션 특화&quot;였다. 이번 커밋으로 <strong>export되는 학습 파이썬 코드를 그대로 돌리면 프로덕션 Muon 레시피와 동일한 학습이 되는 상태</strong>로 이동. 재현성 문서가 좁혀졌지만 데이터·infra는 여전히 미공개(README caveat 유지).</p></div>
-<h3>GB300 하드웨어 특정 오버라이드</h3>
+<p><strong>README.md</strong> 역시 이전의 &quot;one training-recipe exception ... standard AdamW rather than production&#39;s tuned internal variant&quot;에서 **&quot;The flagship ranking configs and the nano twin train the production Muon recipe, which ships in full&quot;**로 다시 쓰였다. <code>reference/README.md</code>의 <code>train_step.py</code> 항목도 &quot;dense optimizer + rowwise-AdaGrad&quot;로 일반화됐고, flagship과 nano가 Muon을 사용한다고 명시했다.</p>
+<p><strong>임베딩 optimizer도 정본에 함께 반영됐다.</strong> flagship과 nano가 임베딩 rowwise AdaGrad에서 (a) accumulator half-life decay, (b) lazy per-row decay, (c) decoupled weight decay 세 옵션을 함께 쓴다고 TRAINING.md가 명시했다. 4세대+4의 <code>emb_optim_config</code>(LR 0.28, half-life 2500 step, lazy_decay, weight_decay 2.8e-4) 파라미터가 정본으로 확정된 셈이다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대+4(2026-08-19)에 Muon이 코드로 도입됐을 때 canon의 이해는 &quot;코드는 export됐지만 학습 레시피는 여전히 프로덕션 특화&quot;였다. 이번 커밋으로 <strong>export되는 학습 파이썬 코드를 그대로 실행하면 프로덕션 Muon 레시피와 같은 학습이 되는 상태</strong>로 옮겨 갔다. 재현성에 관한 문서는 간극이 줄었지만 데이터와 인프라는 여전히 공개되지 않았다(README의 caveat은 그대로 남아 있다).</p></div>
+<h3>GB300 하드웨어 전용 오버라이드</h3>
 <p><strong><code>_GB300_OVERRIDES</code> 정의</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/configs/xrecsys.py"><code>phoenix/xrex/configs/xrecsys.py:330-345</code></a>:</p>
 <pre><code class="language-python">_GB300_OVERRIDES = {
     &quot;bs_per_device&quot;: 512,
@@ -331,29 +331,29 @@ ADS_UPPER_FUNNEL_CONVERSION_VIEW_THROUGH = 190;
 }
 </code></pre>
 <ul>
-<li><code>bs_per_device=512</code>: 이전 <code>_home_direct_packed_nano</code>의 <code>bs_per_device=64</code>보다 8배. GB300의 HBM 여유 반영.</li>
-<li><code>ep=64</code>: expert parallelism 64-way. MoE 스타일 sharding.</li>
-<li><code>attn_impl=&quot;cutedsl_ranker_varlen_attn&quot;</code>: NVIDIA CUTLASS/CUTe DSL 기반 variable-length attention 커널. GB300 최적화된 신규 attention impl.</li>
-<li><code>remat_policy=RematType.SAVE_GB300_RECSYS</code>: GB300 메모리 계층에 맞춘 rematerialization 정책(무엇을 checkpoint하고 무엇을 재계산할지).</li>
-<li><code>unroll_layer_stack=True</code>: 트랜스포머 layer stack을 unroll(순환 대신 명시 나열)로 컴파일. XLA 최적화 여지 확장.</li>
-<li><code>learning_rate=5e-4</code>: 4세대+4의 flagship base LR 7.1e-4보다 약간 낮음. bs_per_device 8배에 맞춘 스케일링 <code>[추정]</code>.</li>
-<li><code>checkpoint_every_n=300</code>: 300 step마다 checkpoint 저장.</li>
+<li><code>bs_per_device=512</code>: 이전 <code>_home_direct_packed_nano</code>의 <code>bs_per_device=64</code>보다 8배 크다. GB300의 넉넉한 HBM 용량을 반영한 값이다.</li>
+<li><code>ep=64</code>: expert parallelism을 64-way로 둔다. MoE 방식의 sharding이다.</li>
+<li><code>attn_impl=&quot;cutedsl_ranker_varlen_attn&quot;</code>: NVIDIA CUTLASS/CUTe DSL 기반의 variable-length attention 커널이다. GB300에 맞춰 최적화한 새 attention 구현이다.</li>
+<li><code>remat_policy=RematType.SAVE_GB300_RECSYS</code>: GB300 메모리 계층에 맞춘 rematerialization 정책이다(무엇을 checkpoint하고 무엇을 재계산할지 정한다).</li>
+<li><code>unroll_layer_stack=True</code>: 트랜스포머 layer stack을 unroll해서(순환 대신 명시적으로 나열해서) 컴파일한다. XLA가 최적화할 여지가 넓어진다.</li>
+<li><code>learning_rate=5e-4</code>: 4세대+4의 flagship base LR 7.1e-4보다 조금 낮다. bs_per_device가 8배로 커진 데 맞춘 조정으로 보인다 <code>[추정]</code>.</li>
+<li><code>checkpoint_every_n=300</code>: 300 step마다 checkpoint를 저장한다.</li>
 </ul>
-<p><strong><code>_home_direct_packed_nano</code>가 이 오버라이드를 상속</strong> — 이전엔 <code>learning_rate=2e-3</code>으로 별도였는데 이번 커밋에서 <code>_GB300_OVERRIDES</code>의 LR·optim_config·emb_optim_config를 그대로 상속. 즉 export의 &quot;nano&quot; 모델조차 GB300 학습을 상정한 파라미터로 튜닝됨.</p>
-<div class="blk why"><p><span class="lbl">의미</span> X가 하드웨어 세대 전환을 코드에 노출한 첫 사례. 이전 canon은 &quot;Phoenix가 어느 GPU에서 도는지 미공개&quot;였는데 이제 <strong>GB300이 프로덕션 표준 하드웨어</strong>라는 강한 신호. NVIDIA GB300은 2025 하반기 출하 시작, Blackwell B200 후속. LLM 회사가 대량 확보하는 최신 세대인데 xAI가 랭커 학습·서빙 파이프라인에 그대로 붙였다. <code>cutedsl_ranker_varlen_attn</code>은 xAI 자체 커널일 가능성 — 오픈소스 커널 카탈로그에 이 이름은 없다 <code>[추정]</code>.</p></div>
+<p><strong><code>_home_direct_packed_nano</code>가 이 오버라이드를 상속</strong> — 이전에는 <code>learning_rate=2e-3</code>으로 따로 두었는데, 이번 커밋에서는 <code>_GB300_OVERRIDES</code>의 LR과 optim_config, emb_optim_config를 그대로 상속한다. 즉 export에 포함된 &quot;nano&quot; 모델조차 GB300 학습을 전제로 조정됐다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> X가 하드웨어 세대 전환을 코드에 드러낸 첫 사례다. 이전 canon은 &quot;Phoenix가 어느 GPU에서 도는지 미공개&quot;였는데, 이제 <strong>GB300이 프로덕션 표준 하드웨어</strong>라는 강한 신호가 나왔다. NVIDIA GB300은 2025년 하반기에 출하를 시작했고 Blackwell B200의 후속이다. LLM 회사들이 대량으로 확보하는 최신 세대인데, xAI가 이를 랭커 학습과 서빙 파이프라인에 그대로 적용했다. <code>cutedsl_ranker_varlen_attn</code>은 xAI가 직접 만든 커널일 가능성이 있는데, 오픈소스 커널 카탈로그에는 이 이름이 없다 <code>[추정]</code>.</p></div>
 <h3><code>xai-o2</code> 스토리지 crate 인터페이스 공개</h3>
 <p><strong><code>xai-o2</code> crate 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/tree/28e414f/phoenix/crates/storage/xai-o2"><code>phoenix/crates/storage/xai-o2/</code></a>:</p>
 <p>Cargo.toml description:</p>
 <blockquote>
 <p>Client interface for the xai-o2 (S3-compatible) object storage backend</p>
 </blockquote>
-<p>3개 파일:</p>
+<p>파일 3개로 구성된다:</p>
 <ul>
-<li><code>base_client.rs</code> (12줄): <code>BaseO2Client</code> async trait — <code>put(key, data) -&gt; Result&lt;()&gt;</code> 하나만 정의된 최소 인터페이스.</li>
-<li><code>o2_client_builder.rs</code> (115줄): <code>O2ClientBuilder</code>가 endpoint·bucket·prefix·access_key_id·secret_access_key·allow_anonymous·timeout·io_timeout·retry_max_times·retry_min_delay·retry_max_delay·write_chunk_size_mib·write_chunk_concurrency·max_concurrent_write_requests·trace_always 15개 builder method를 노출.</li>
-<li><code>lib.rs</code> (7줄): <code>pub mod</code> 선언.</li>
+<li><code>base_client.rs</code> (12줄): <code>BaseO2Client</code> async trait이고, <code>put(key, data) -&gt; Result&lt;()&gt;</code> 하나만 정의한 최소 인터페이스다.</li>
+<li><code>o2_client_builder.rs</code> (115줄): <code>O2ClientBuilder</code>가 endpoint·bucket·prefix·access_key_id·secret_access_key·allow_anonymous·timeout·io_timeout·retry_max_times·retry_min_delay·retry_max_delay·write_chunk_size_mib·write_chunk_concurrency·max_concurrent_write_requests·trace_always까지 builder method 15개를 노출한다.</li>
+<li><code>lib.rs</code> (7줄): <code>pub mod</code> 선언만 들어 있다.</li>
 </ul>
-<p><strong>중요:</strong> <code>O2ClientBuilder::build()</code>는 오픈소스 빌드에서 <strong>항상</strong> 다음 에러 반환:</p>
+<p><strong>중요:</strong> <code>O2ClientBuilder::build()</code>는 오픈소스 빌드에서 <strong>항상</strong> 다음 에러를 반환한다:</p>
 <pre><code class="language-rust">pub const BACKEND_UNAVAILABLE: &amp;str =
     &quot;the xai-o2 backend is not included in this build; use the default object_store backend&quot;;
 
@@ -361,8 +361,8 @@ pub fn build(&amp;self) -&gt; Result&lt;Arc&lt;dyn BaseO2Client&gt;&gt; {
     Err(anyhow::anyhow!(BACKEND_UNAVAILABLE))
 }
 </code></pre>
-<p>즉 <strong>인터페이스 스터브만 공개, 실 구현체는 오픈소스 빌드에 포함 안 됨</strong>. <code>xai-recsys-engine</code> crate가 <code>xai-o2 = { workspace = true }</code>로 의존성 선언은 했지만 실제 사용 시 폴백 필요.</p>
-<div class="blk why"><p><span class="lbl">의미</span> xAI 내부에 <code>xai-o2</code>라는 이름의 S3 호환 오브젝트 스토리지 시스템이 있다는 게 처음 확정. 15개 builder param은 프로덕션에서 실제 튜닝하는 항목 목록이라 유의미 — chunk 8MiB, concurrency 16, max_concurrent 64, retry 6회, min/max delay 1/32s, timeout 300s가 테스트에 나오는 realistic 값(<code>build_fails_loudly_after_full_configuration</code> 테스트 세팅). 프로덕션 checkpoint·데이터 저장이 여기 붙는다는 신호 <code>[추정]</code> — 오픈소스 빌드는 표준 <code>object_store</code> crate(AWS S3 등)로 폴백.</p></div>
+<p>즉 <strong>인터페이스 스터브만 공개했고 실제 구현체는 오픈소스 빌드에 포함하지 않았다</strong>. <code>xai-recsys-engine</code> crate가 <code>xai-o2 = { workspace = true }</code>로 의존성을 선언하기는 했지만, 실제로 사용하려면 다른 백엔드로 대체해야 한다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> xAI 내부에 <code>xai-o2</code>라는 이름의 S3 호환 오브젝트 스토리지 시스템이 있다는 사실이 처음 확정됐다. builder 파라미터 15개는 프로덕션에서 실제로 조정하는 항목의 목록이라 의미가 있다. 테스트(<code>build_fails_loudly_after_full_configuration</code>)에는 chunk 8MiB, concurrency 16, max_concurrent 64, retry 6회, min/max delay 1/32s, timeout 300s처럼 실제 운영에 가까운 값이 들어 있다. 프로덕션의 checkpoint와 데이터 저장이 여기에 연결된다는 신호다 <code>[추정]</code>. 오픈소스 빌드는 표준 <code>object_store</code> crate(AWS S3 등)로 대체해야 한다.</p></div>
 <h3><code>SlateContext</code>가 <code>NextActionDistribution</code> 필드로 이동</h3>
 <p><strong>proto diff</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>:</p>
 <pre><code class="language-proto">message NextActionDistribution {
@@ -371,8 +371,8 @@ pub fn build(&amp;self) -&gt; Result&lt;Arc&lt;dyn BaseO2Client&gt;&gt; {
 +  SlateContext slateContext = 9;
 }
 </code></pre>
-<div class="blk why"><p><span class="lbl">의미</span> 4세대+4(aad7179)에서 <code>SlateContext</code>는 <code>ScoreInfo</code> 메시지의 필드로 처음 등장했다(pool_rank·fatigue·pre_diversity·SID 3계층·SID gap 3계층). 4세대+5(d0cef2f)에서 <code>PostCandidate.served_slate_context</code>가 배선돼 home-mixer가 이 값을 소비하기 시작했다. 이번 4세대+6에서는 <strong><code>NextActionDistribution</code>(각 후보의 action별 예측 분포)에도 SlateContext가 붙는다</strong> — 즉 Phoenix가 서빙 응답에서 (a) 후보 하나에 대해 각 action별 예측 분포를 돌려주고, (b) 각 액션 분포 옆에 slate context를 함께 실어 보낼 수 있게 된다. <code>ScoreInfo</code>(재순위 슬레이트 결정)와 <code>NextActionDistribution</code>(액션 예측)의 두 자리에 slate context가 붙는다는 관찰.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">../services/x.md</a> <code>랭킹</code> 및 <code>Phoenix 학습·인덱스</code> 절 — 4세대+6 후속 드랍 절 신설 (<code>### 4세대+6 (2026-08-21) — 광고 conversion 20 헤드·delayed feedback split·Muon export 승격·GB300 override·xai-o2 stub·SlateContext per-action·grox 임계 80k·dark_traffic staging·Grok 4.6 100%</code>).</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대+4(aad7179)에서 <code>SlateContext</code>는 <code>ScoreInfo</code> 메시지의 필드로 처음 등장했다(pool_rank·fatigue·pre_diversity·SID 3계층·SID gap 3계층). 4세대+5(d0cef2f)에서는 <code>PostCandidate.served_slate_context</code>가 배선돼 home-mixer가 이 값을 소비하기 시작했다. 이번 4세대+6에서는 <strong><code>NextActionDistribution</code>(각 후보의 action별 예측 분포)에도 SlateContext가 들어간다.</strong> 즉 Phoenix가 서빙 응답에서 (a) 후보 하나에 대해 각 action별 예측 분포를 돌려주고, (b) 각 액션 분포 옆에 slate context를 함께 실어 보낼 수 있게 된다. <code>ScoreInfo</code>(재순위 슬레이트 결정)와 <code>NextActionDistribution</code>(액션 예측) 두 자리 모두에 slate context가 실린다는 점을 관찰할 수 있다.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">../services/x.md</a>의 <code>랭킹</code>과 <code>Phoenix 학습·인덱스</code> 절에 4세대+6 후속 커밋 절을 신설했다 (<code>### 4세대+6 (2026-08-21) — 광고 conversion 20 헤드·delayed feedback split·Muon export 승격·GB300 override·xai-o2 stub·SlateContext per-action·grox 임계 80k·dark_traffic staging·Grok 4.6 100%</code>).</p></div>
 <h3>grox reply_spam follower 임계 60k → 80k (3번째 상향, 1.33배)</h3>
 <p><strong>diff</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/grox/flows/reply_spam/task_filter.py"><code>grox/flows/reply_spam/task_filter.py</code></a>:</p>
 <pre><code class="language-python">-    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 60000
@@ -381,8 +381,8 @@ pub fn build(&amp;self) -&gt; Result&lt;Arc&lt;dyn BaseO2Client&gt;&gt; {
 -    FOLLOWER_COUNT_THRESHOLD_FOR_REPLY_RANKING = 60000
 +    FOLLOWER_COUNT_THRESHOLD_FOR_REPLY_RANKING = 80000
 </code></pre>
-<p>10일간 4단계 상향: 15,000 (2026-08-13 이전) → 30,000 (2026-08-14, 4세대+1) → 60,000 (2026-08-18, 4세대+3) → <strong>80,000 (2026-08-21, 4세대+6)</strong>. 이전 두 번은 2배씩(15→30, 30→60)이었는데 이번은 1.33배로 상승 폭이 완만해졌다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> 임계는 &quot;follower_count &lt; threshold일 때만 grok으로 답글 스팸 판정·답글 랭킹 스코어 매김&quot;의 상한이라, <strong>임계가 오를수록 grok 리소스가 더 큰 계정의 답글까지 커버</strong>한다. 80k에서 상승 속도가 느려진 건 (a) grok 예산 병목에 근접, (b) 그 이상 계정에서는 스팸 답글 유입이 적어 marginal utility 감소, 또는 (c) 다음 단계는 임계 없이 전면 온으로 넘어갈 준비 중 셋 중 하나 <code>[추정]</code>.</p></div>
+<p>10일 동안 4단계로 올렸다: 15,000(2026-08-13 이전) → 30,000(2026-08-14, 4세대+1) → 60,000(2026-08-18, 4세대+3) → <strong>80,000(2026-08-21, 4세대+6)</strong>. 이전 두 번은 2배씩(15→30, 30→60) 올렸는데, 이번에는 1.33배여서 상승 폭이 완만해졌다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> 이 임계는 &quot;follower_count &lt; threshold일 때만 grok으로 답글 스팸을 판정하고 답글 랭킹 점수를 매긴다&quot;는 조건의 상한이므로, <strong>임계가 오를수록 grok 리소스가 더 큰 계정의 답글까지 담당하게</strong> 된다. 80k에서 상승 속도가 느려진 이유로는 (a) grok 예산의 병목에 가까워졌거나, (b) 그보다 큰 계정에서는 스팸 답글 유입이 적어 marginal utility가 줄었거나, (c) 다음 단계에서 임계 없이 전면 적용으로 넘어갈 준비를 하고 있거나, 셋 중 하나를 생각해 볼 수 있다 <code>[추정]</code>.</p></div>
 <h3>visibility-filtering dark_traffic 타깃을 shadow → staging으로 전환</h3>
 <p><strong>diff</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/visibility-filtering/dark_traffic_setup.rs"><code>visibility-filtering/dark_traffic_setup.rs</code></a>:</p>
 <pre><code class="language-rust">-const SHADOW_WORKLOAD: &amp;str = &quot;xai-vf-shadow&quot;;
@@ -396,58 +396,58 @@ pub fn build(&amp;self) -&gt; Result&lt;Arc&lt;dyn BaseO2Client&gt;&gt; {
 -struct StaticShadowDiscovery;
 +struct StaticStagingDiscovery;
 </code></pre>
-<p>4세대+4(aad7179, 2026-08-19)에서 3일 전 도입된 dark_traffic 인프라가 <strong>프로덕션 shadow 워크로드(<code>xai-vf-shadow.prod.visibility</code>)에서 스테이징 환경(<code>xai-vf-service.staging.visibility</code>)으로 리네이밍</strong>. TLS 도메인도 <code>visibility.visibility-filtering-service.prod.{dc}.s2s.twttr.net</code>에서 <code>.staging.</code>으로 이동. <code>StaticShadowDiscovery</code> 구조체 이름도 <code>StaticStagingDiscovery</code>로 리네이밍.</p>
-<div class="blk why"><p><span class="lbl">의미</span> dark_traffic이 프로덕션 트래픽을 프로덕션 shadow 워크로드에 미러링하는 구조에서 <strong>프로덕션 트래픽을 staging 환경으로 미러링</strong>하는 구조로 전환. 3일 만에 방향이 바뀐 셈이다. 두 해석:</p></div>
+<p>2일 전인 4세대+4(aad7179, 2026-08-19)에 도입된 dark_traffic 인프라가 <strong>프로덕션 shadow 워크로드(<code>xai-vf-shadow.prod.visibility</code>)에서 스테이징 환경(<code>xai-vf-service.staging.visibility</code>)으로 이름을 바꿨다</strong>. TLS 도메인도 <code>visibility.visibility-filtering-service.prod.{dc}.s2s.twttr.net</code>에서 <code>.staging.</code>으로 옮겼고, <code>StaticShadowDiscovery</code> 구조체 이름도 <code>StaticStagingDiscovery</code>로 바꿨다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> dark_traffic이 프로덕션 트래픽을 프로덕션 shadow 워크로드에 미러링하는 구조에서 <strong>프로덕션 트래픽을 staging 환경으로 미러링</strong>하는 구조로 바뀌었다. 2일 만에 방향이 바뀐 셈이다. 해석은 두 가지다:</p></div>
 <ol>
-<li>Shadow 워크로드를 별도로 유지하지 않고 staging 환경을 shadow처럼 활용 — infra 정리.</li>
-<li>프로덕션 트래픽 shadow가 staging 배포 검증에 쓸 만한 값이 있다고 판단.</li>
+<li>Shadow 워크로드를 따로 유지하지 않고 staging 환경을 shadow처럼 활용하는, 인프라 정리 차원의 변경이다.</li>
+<li>프로덕션 트래픽의 shadow가 staging 배포를 검증하는 데 쓸 만하다고 판단했다.</li>
 </ol>
-<p>어느 쪽이든 <strong>VF 실험이 프로덕션 shadow 자원이 아니라 staging 자원 예산에서 돌게 됨</strong>. 4세대+5까지의 canon은 &quot;shadow deploy 기반이 배선됐다&quot;였는데 이제 그 기반이 stage 미러링으로 재정의된다 — <strong>⚠ 4세대+4의 shadow 서술 재해석</strong>.</p>
+<p>어느 쪽이든 <strong>VF 실험이 프로덕션 shadow 자원이 아니라 staging 자원 예산에서 돌아가게 됐다</strong>. 4세대+5까지의 canon은 &quot;shadow deploy 기반이 배선됐다&quot;였는데, 이제 그 기반이 staging 미러링으로 다시 정의된다: <strong>⚠ 4세대+4의 shadow 서술을 다시 해석해야 한다</strong>.</p>
 <h3>Grok 4.5 internal 완전 제거, PTOS 심판 100% Grok 4.6 internal 전환</h3>
 <p><strong>diff</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/grox/flows/ptos/classifier.py"><code>grox/flows/ptos/classifier.py</code></a> (+6/−63):</p>
-<p>삭제:</p>
+<p>삭제한 항목:</p>
 <ul>
 <li><code>_EAPI_4_5_INTERNAL_BREAKER_CONFIG</code> (circuit breaker config)</li>
 <li><code>_eapi_4_5_internal_breaker</code> (breaker instance)</li>
-<li><code>_GROK_4_6_INTERNAL_DIAL</code> 상수 (하루 전 0.3이었던)</li>
-<li><code>self.eapi_4_5_internal</code> 두 클래스에서 초기화 제거</li>
+<li><code>_GROK_4_6_INTERNAL_DIAL</code> 상수 (하루 전에는 0.3이었다)</li>
+<li>두 클래스에서 <code>self.eapi_4_5_internal</code> 초기화 제거</li>
 <li><code>_sample_4_5_internal</code> method 제거</li>
-<li><code>_cross_model_validate_with_4_5</code>에서 확률 분기 제거 — 항상 4.6 internal 직접 호출</li>
-<li><code>classify_policy_for_violation</code>의 deluxe 4.3 재분류에서 확률 분기 제거 — 항상 <code>deluxe-4.6-internal</code></li>
+<li><code>_cross_model_validate_with_4_5</code>에서 확률 분기 제거: 이제 항상 4.6 internal을 직접 호출한다</li>
+<li><code>classify_policy_for_violation</code>의 deluxe 4.3 재분류에서 확률 분기 제거: 이제 항상 <code>deluxe-4.6-internal</code>을 사용한다</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> 4세대+2 (2026-08-17)에 도입된 심판 계층 → +4 (0.1) → +5 (0.3)의 dial-up 흐름이 <strong>4세대+6에서 4.6 internal 100% 전환</strong>으로 완결. Grok 4.5 internal은 코드에서 완전 제거돼 롤백 불가. dial 상승이 4일간(10%→30%→100%) 이뤄진 셈. <code>EAPI_GROK_4_5_INTERNAL</code> 모델 자체는 <code>grox_config</code>에 남아 있으나 PTOS classifier에서는 참조 안 함. 4세대+5까지의 canon은 &quot;dial의 다음 이동이 관전 포인트 — 50%/100%로 뛰면 완전 전환 근접&quot;이었는데 이번에 그 관전 포인트가 해소됐다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대+2 (2026-08-17)에 도입된 심판 계층에서 +4 (0.1), +5 (0.3)로 이어지던 dial-up 흐름이 <strong>4세대+6의 4.6 internal 100% 전환</strong>으로 마무리됐다. Grok 4.5 internal은 코드에서 완전히 제거돼 롤백할 수 없다. dial은 4일 동안(10%→30%→100%) 올라간 셈이다. <code>EAPI_GROK_4_5_INTERNAL</code> 모델 자체는 <code>grox_config</code>에 남아 있지만 PTOS classifier에서는 참조하지 않는다. 4세대+5까지의 canon은 &quot;dial의 다음 이동이 관전 포인트 — 50%/100%로 뛰면 완전 전환 근접&quot;이었는데, 이번에 그 관전 포인트가 해소됐다.</p></div>
 <h3>retrieval post-embedding에 65k 청킹</h3>
-<p><strong><code>maybe_build_retrieval_post_embeddings</code> 리팩터</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/train/trainer_recsys.py"><code>phoenix/xrex/train/trainer_recsys.py</code></a> <code>_forward_chunked</code> 헬퍼 신설:</p>
-<p>기존은 shard 전체를 한 번의 <code>candidate_tower_forward_jit</code> 호출로 계산했는데, 이제:</p>
+<p><strong><code>maybe_build_retrieval_post_embeddings</code> 리팩터</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/train/trainer_recsys.py"><code>phoenix/xrex/train/trainer_recsys.py</code></a>에 <code>_forward_chunked</code> 헬퍼를 신설했다:</p>
+<p>기존에는 shard 전체를 <code>candidate_tower_forward_jit</code> 한 번의 호출로 계산했지만, 이제는 다음과 같이 처리한다:</p>
 <ul>
-<li><code>total_samples % data_world_size == 0</code>인 균등 shard 케이스일 때만 <code>_chunk_rows = min(_shard_rows, 65536)</code>으로 chunk 진입</li>
-<li>그 외에는 shard 통째 처리 (<code>_chunk_rows = _shard_rows</code>)</li>
-<li>chunk 단위로 <code>jax.make_array_from_process_local_data</code> → <code>_lookup</code> → <code>candidate_tower_forward_jit</code> → local shard concatenate → 최종 concat</li>
+<li><code>total_samples % data_world_size == 0</code>인 균등 shard 케이스일 때만 <code>_chunk_rows = min(_shard_rows, 65536)</code>으로 chunk에 진입한다</li>
+<li>그 외에는 shard를 통째로 처리한다 (<code>_chunk_rows = _shard_rows</code>)</li>
+<li>chunk 단위로 <code>jax.make_array_from_process_local_data</code> → <code>_lookup</code> → <code>candidate_tower_forward_jit</code> → local shard concatenate 순으로 계산한 뒤 마지막에 concat한다</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> retrieval two-tower의 post embedding 배치가 커지면 XLA 컴파일/실행 시 OOM 위험이 있어 65k row 단위로 잘라 순차 처리. Muon 승격·GB300 config로 학습 규모가 커지는 흐름의 서브루틴 안정화. <code>head_dataset_mapping</code> 여러 head인 경우도 각 head마다 <code>_forward_chunked</code> 호출로 동일 청킹.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> retrieval two-tower의 post embedding 배치가 커지면 XLA 컴파일과 실행 시점에 OOM이 발생할 위험이 있어서 65k row 단위로 잘라 순차 처리한다. Muon 승격과 GB300 config로 학습 규모가 커지는 흐름에 맞춰 서브루틴을 안정화한 것이다. <code>head_dataset_mapping</code>에 head가 여럿인 경우에도 head마다 <code>_forward_chunked</code>를 호출해 같은 방식으로 청킹한다.</p></div>
 <h3>inference hotswap에 <code>--hotswap_malloc_trim</code> CLI 추가</h3>
 <p><strong>diff</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/inference/model_runner.py"><code>phoenix/xrex/inference/model_runner.py</code></a> + <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/inference/launch_inference.py"><code>launch_inference.py</code></a>:</p>
-<p>새 옵션:</p>
+<p>새로 추가된 옵션은 다음과 같다:</p>
 <ul>
 <li><code>hotswap_malloc_trim: bool = True</code> (<code>InferenceModelRunner</code> 필드)</li>
 <li>CLI 인자 <code>--hotswap_malloc_trim</code> (default True)</li>
-<li><code>_malloc_trim_after_swap()</code> 메소드: 매 hotswap cycle 마지막에 <code>_glibc_malloc_trim()</code>(=libc <code>malloc_trim(0)</code>) 호출</li>
+<li><code>_malloc_trim_after_swap()</code> 메소드: hotswap cycle이 끝날 때마다 <code>_glibc_malloc_trim()</code>(= libc <code>malloc_trim(0)</code>)을 호출한다</li>
 <li>관측: <code>metrics_publisher.checkpoint_reload_step_seconds.labels(step=&quot;malloc_trim&quot;).observe(secs)</code></li>
 </ul>
-<p><strong>CLI 도움말이 문제를 명시:</strong></p>
+<p><strong>CLI 도움말이 문제를 명시하고 있다:</strong></p>
 <blockquote>
 <p>glibc malloc_trim(0) on the coordinator thread after each applied hotswap; returns the cycle&#39;s freed pages (glibc slots otherwise ratchet ~196 MiB/cycle). No-op under jemalloc.</p>
 </blockquote>
-<div class="blk why"><p><span class="lbl">의미</span> Phoenix 서빙에서 embedding table hotswap(주기적으로 새 임베딩 checkpoint를 프로세스 안에서 in-place로 교체)이 glibc 메모리 할당자 하에서 사이클당 ~196MiB씩 RSS를 누수해 왔다는 게 처음 문서화. libc의 <code>malloc_trim(0)</code>으로 해제된 페이지를 OS에 반환. jemalloc(다른 할당자 옵션) 하에서는 무의미. 프로덕션 서빙 하드닝의 작은 패치지만 <strong>hotswap이 프로덕션에서 오래 도는 인프라라 이 패치가 필요할 만큼 누적 부담이 있었다</strong>는 관찰이 붙는다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> Phoenix 서빙에서 embedding table hotswap(주기적으로 새 임베딩 checkpoint를 프로세스 안에서 교체하는 작업)이 glibc 메모리 할당자 아래에서 사이클마다 약 196MiB씩 RSS를 누수해 왔다는 사실이 처음으로 문서에 드러났다. libc의 <code>malloc_trim(0)</code>을 호출해 해제된 페이지를 OS에 반환한다. 다른 할당자인 jemalloc에서는 의미가 없다. 프로덕션 서빙을 다듬는 작은 패치지만, <strong>hotswap이 프로덕션에서 오래 돌아가는 인프라라서 이 패치가 필요할 만큼 부담이 쌓였다</strong>는 점을 함께 관찰할 수 있다.</p></div>
 <h3>two-tower retrieval 소소한 세팅 추가</h3>
 <p><strong>diff</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/configs/xrecsys_two_tower.py"><code>phoenix/xrex/configs/xrecsys_two_tower.py:426-431</code></a>:</p>
-<p><code>_xrecsys_two_tower_combined_base()</code> 기본 config에 세 옵션 추가:</p>
+<p><code>_xrecsys_two_tower_combined_base()</code> 기본 config에 옵션 세 개를 추가했다:</p>
 <ul>
-<li><code>&quot;qk_norm&quot;: True</code> — attention query/key normalization</li>
-<li><code>&quot;attn_logit_cap&quot;: -1</code> — attention logit capping 비활성화 (-1 = 미사용)</li>
-<li><code>&quot;right_anchored_rope&quot;: True</code> — RoPE positional encoding right-anchored (시퀀스 끝에서 앵커링)</li>
+<li><code>&quot;qk_norm&quot;: True</code> — attention query/key normalization을 켠다</li>
+<li><code>&quot;attn_logit_cap&quot;: -1</code> — attention logit capping을 끈다 (-1 = 미사용)</li>
+<li><code>&quot;right_anchored_rope&quot;: True</code> — RoPE positional encoding을 right-anchored로 둔다(시퀀스 끝을 기준으로 앵커링한다)</li>
 </ul>
-<p>LLM 학습에서 흔한 안정성 트릭들이 retrieval two-tower로 넘어왔다.</p>
+<p>LLM 학습에서 흔히 쓰는 안정화 기법이 retrieval two-tower로 넘어왔다.</p>
 <h3><code>EVERGREEN</code> retrieval dataset 축소 — 5년 → 4~14일</h3>
 <p><strong>diff</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/phoenix/xrex/data/retrieval_dataset.py"><code>phoenix/xrex/data/retrieval_dataset.py:255-258</code></a>:</p>
 <pre><code class="language-python">EVERGREEN = (
@@ -458,38 +458,38 @@ pub fn build(&amp;self) -&gt; Result&lt;Arc&lt;dyn BaseO2Client&gt;&gt; {
 +    _idx(&quot;post_sid_v5_256x6_snapshots_backup/video_4to14day.parquet&quot;),
 )
 </code></pre>
-<p>이름은 여전히 EVERGREEN이지만 실 참조는 <strong>1825일(5년)에서 4~14일 최신 비디오로 극단적 축소</strong>. 신선한 비디오 4~14일 창을 evergreen slot에 넣는 실험 <code>[추정]</code> — 이름과 실체가 어긋난 상태라 임시적 변경일 가능성.</p>
+<p>이름은 여전히 EVERGREEN이지만 실제로 참조하는 대상은 <strong>1825일(5년)에서 4~14일 이내의 최신 비디오로 크게 줄었다</strong>. 최근 4~14일 구간의 비디오를 evergreen slot에 넣어 보는 실험으로 보인다 <code>[추정]</code>. 이름과 실체가 어긋나 있어서 임시 변경일 가능성이 있다.</p>
 <h3>기타 소소한 패치</h3>
 <ul>
-<li><strong>request_metrics.rs 이중 카운트 픽스</strong> — <code>deadline_admission</code>으로 shed된 요청이 그 이후 gRPC <code>ResourceExhausted</code> 상태 코드 때문에 <code>inflight_cap</code>으로도 카운트되던 문제를 <code>guard.recorded_reject</code> flag로 방지. 테스트 두 개(<code>deadline_shed_does_not_double_count_as_inflight_cap</code>, <code>resource_exhausted_without_prior_reject_counts_inflight_cap</code>) 신규.</li>
-<li><strong>checkpoint metadata robustness</strong> — <code>_ORBAX_TMP_PREFIX</code> → 공개 상수 <code>ORBAX_TMP_DIR_SUFFIX</code>로 리네임(이름이 suffix 시맨틱과 맞음), <code>_has_committed_payload</code> + <code>_is_loadable_checkpoint</code> 헬퍼로 completion marker(<code>COMPLETED_FILENAME</code>)만 있고 실제 orbax tmp-dir 커밋(rename)이 안 된 checkpoint를 스킵. 크래시-during-checkpoint 시나리오에서 오염 checkpoint 로드 방지.</li>
-<li><strong>kafkaloader <code>exclude_required_columns</code></strong> — 특정 kafka feed가 일부 required column을 옵트아웃할 수 있게. 예상 컬럼이 없을 때 경고 로그와 schema-mismatch 에러 경로 모두 스킵.</li>
-<li><strong>grox <code>config.py</code> 1줄 제거</strong> — 사소한 정리 (구체 diff는 짧아 생략).</li>
+<li><strong>request_metrics.rs 이중 카운트 픽스</strong> — <code>deadline_admission</code>으로 shed된 요청이 그 이후 gRPC <code>ResourceExhausted</code> 상태 코드 때문에 <code>inflight_cap</code>으로도 카운트되던 문제를 <code>guard.recorded_reject</code> flag로 막았다. 테스트 두 개(<code>deadline_shed_does_not_double_count_as_inflight_cap</code>, <code>resource_exhausted_without_prior_reject_counts_inflight_cap</code>)를 새로 추가했다.</li>
+<li><strong>checkpoint metadata robustness</strong> — <code>_ORBAX_TMP_PREFIX</code>를 공개 상수 <code>ORBAX_TMP_DIR_SUFFIX</code>로 이름을 바꿨고(이름이 suffix 시맨틱과 맞다), <code>_has_committed_payload</code>와 <code>_is_loadable_checkpoint</code> 헬퍼로 completion marker(<code>COMPLETED_FILENAME</code>)만 있고 실제 orbax tmp-dir 커밋(rename)은 되지 않은 checkpoint를 건너뛴다. checkpoint 도중 크래시가 난 상황에서 오염된 checkpoint를 읽지 않도록 막는다.</li>
+<li><strong>kafkaloader <code>exclude_required_columns</code></strong> — 특정 kafka feed가 일부 required column을 제외할 수 있게 했다. 예상한 컬럼이 없을 때 경고 로그와 schema-mismatch 에러 경로를 모두 건너뛴다.</li>
+<li><strong>grox <code>config.py</code>에서 1줄 제거</strong> — 사소한 정리라서 구체적인 diff는 생략한다.</li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">../services/x.md</a> — (a) <code>광고</code> 절에 MACT/view-through 20 액션·<code>ads_slim</code> metric group·delayed feedback split 관련 단락 추가, (b) <code>Phoenix 학습·인덱스 (4세대에서 신설)</code>에 Muon export 승격·GB300 override·xai-o2 stub 절 추가, (c) <code>안전성</code> 하위 절에서 dark_traffic shadow→staging 서술 뒤집기, (d) PTOS 심판 절의 4세대+6 완결 서술(4.5 internal 완전 제거), (e) <code>열린 질문</code>에 <code>### 4세대+6 드랍으로 해소된 것 / 신규 (2026-08-23)</code> 절 추가, (f) <code>출처</code>에 28e414f 커밋 및 관련 파일 링크 추가.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> 4세대~+5까지의 정본 서술축은 (a) 랭킹 signal 채널 확장·SID 3계층·<code>RewardOutputs</code>, (b) PTOS 심판 세대 전환, (c) VF·grox 리소스 튜닝, (d) 파이프라인 v3 마이그레이션이었다. 4세대+6에서 <strong>광고 매출 예측 스택</strong>이라는 네 번째 큰 축이 붙었다:</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">../services/x.md</a> — (a) <code>광고</code> 절에 MACT/view-through 20 액션, <code>ads_slim</code> metric group, delayed feedback split 관련 단락을 추가하고, (b) <code>Phoenix 학습·인덱스 (4세대에서 신설)</code>에 Muon export 승격·GB300 override·xai-o2 stub 절을 추가하고, (c) <code>안전성</code> 하위 절에서 dark_traffic의 shadow → staging 서술을 뒤집고, (d) PTOS 심판 절에 4세대+6에서 마무리된 서술(4.5 internal 완전 제거)을 반영하고, (e) <code>열린 질문</code>에 <code>### 4세대+6 공개로 해소된 것 / 신규 (2026-08-23)</code> 절을 추가하고, (f) <code>출처</code>에 28e414f 커밋과 관련 파일 링크를 추가한다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대부터 +5까지 정본의 서술축은 (a) 랭킹 signal 채널 확장·SID 3계층·<code>RewardOutputs</code>, (b) PTOS 심판 세대 전환, (c) VF·grox 리소스 튜닝, (d) 파이프라인 v3 마이그레이션이었다. 4세대+6에서 <strong>광고 매출 예측 스택</strong>이라는 네 번째 큰 축이 추가됐다:</p></div>
 <ul>
-<li>proto ActionName 20개 신설(전체 액션 수의 큰 폭 확장)</li>
-<li>delayed feedback를 학습 손실 분기로 정식 처리 (X 랭커 학습이 광고 delayed conversion prediction 문헌과 명시적으로 정렬)</li>
-<li><code>ads_slim</code> metric group으로 광고 랭킹 라인의 signal 조합 분리</li>
-<li><code>mact_in_app_loss_weight</code>·<code>train_view_through_heads</code> config로 광고 헤드 학습 강도 튜닝 노브 노출</li>
+<li>proto ActionName 20개를 신설해 전체 액션 수를 크게 늘렸다</li>
+<li>delayed feedback을 학습 손실 분기로 정식 처리했다 (X 랭커 학습이 광고 delayed conversion prediction 문헌과 명시적으로 정렬됐다)</li>
+<li><code>ads_slim</code> metric group으로 광고 랭킹 라인의 signal 조합을 분리했다</li>
+<li><code>mact_in_app_loss_weight</code>와 <code>train_view_through_heads</code> config로 광고 헤드의 학습 강도를 조정하는 수단을 노출했다</li>
 </ul>
-<p>동시에 (a) Muon 학습 레시피가 export에 정식 포함되고 (b) GB300 하드웨어 특정 config가 처음 등장하면서 <strong>재현 가능 학습 인프라와 하드웨어 세대 확인이 나란히 온 사이클</strong>. <code>xai-o2</code> stub 공개는 인프라의 어느 스토리지 계층에 xAI 자체 시스템이 있는지 처음 명시. dark_traffic이 shadow → staging으로 재정의된 건 <strong>하나의 문서적 관찰이라기보다는 canon이 반영해야 할 4세대+4 재해석</strong>이라 유의미.</p>
+<p>동시에 (a) Muon 학습 레시피가 export에 정식으로 포함되고 (b) GB300 하드웨어 전용 config가 처음 등장하면서, <strong>재현 가능한 학습 인프라와 하드웨어 세대 확인이 나란히 도착한 사이클</strong>이 됐다. <code>xai-o2</code> stub 공개는 인프라의 어느 스토리지 계층에 xAI 자체 시스템이 있는지를 처음으로 명시한다. dark_traffic이 shadow에서 staging으로 다시 정의된 것은 <strong>단순히 문서에 남길 관찰이 아니라 canon이 반영해야 할 4세대+4의 재해석</strong>이라서 의미가 있다.</p>
 <h2>검증에서 뒤집힌 것</h2>
 <ul>
-<li><strong>VF dark_traffic이 프로덕션 shadow에서 staging 미러링으로 재정의됨</strong> — 4세대+4(2026-08-19) 정본 반영 시점의 서술은 &quot;프로덕션 트래픽을 <code>xai-vf-shadow.prod.visibility</code>에 미러링&quot;이었다. 3일 만에 shadow 워크로드 참조가 삭제되고 staging 환경으로 리다이렉트됐다. <code>../services/x.md</code>의 <a href="x.html#4%EC%84%B8%EB%8C%804-2026-08-19--visibility-filtering-shadow-deployment-xai-vf-shadow-%EB%B0%B0%EC%84%A0">4세대+4 dark_traffic 절</a> 서술을 이번 4세대+6 반영에서 재작성.</li>
+<li><strong>VF dark_traffic이 프로덕션 shadow에서 staging 미러링으로 재정의됐다</strong> — 4세대+4(2026-08-19)를 정본에 반영하던 시점의 서술은 &quot;프로덕션 트래픽을 <code>xai-vf-shadow.prod.visibility</code>에 미러링&quot;이었다. 2일 만에 shadow 워크로드 참조가 삭제되고 staging 환경으로 리다이렉트됐다. <code>../services/x.md</code>의 <a href="x.html#4%EC%84%B8%EB%8C%804-2026-08-19--visibility-filtering-shadow-deployment-xai-vf-shadow-%EB%B0%B0%EC%84%A0">4세대+4 dark_traffic 절</a> 서술을 이번 4세대+6 반영에서 다시 쓴다.</li>
 </ul>
 <h2>레이더</h2>
-<p>없음. arXiv cs.IR 8/19~8/20 신규 30건 triage — 통과 0. 대부분 학술(dense retrieval RL, sequential rec benchmarks, financial RAG 등)이고 프로덕션 진술 있는 항목 없음. Meta engineering·Netflix tech blog 신규 없음(Meta 최신은 2026-08-12, Netflix 2026-08-21은 Flink autoscaler 순수 인프라).</p>
+<p>없다. arXiv cs.IR 8/19~8/20 신규 30건을 triage했고 통과한 항목은 0건이다. 대부분 학술 논문(dense retrieval RL, sequential rec benchmarks, financial RAG 등)이고 프로덕션 진술이 담긴 항목은 없었다. Meta engineering과 Netflix tech blog에는 새 글이 없다(Meta의 최신 글은 2026-08-12, Netflix의 2026-08-21 글은 Flink autoscaler를 다룬 순수 인프라 내용이다).</p>
 <h2>다음에 볼 것</h2>
 <ul>
-<li><strong><code>is_delayed_feedback</code> upstream 파이프라인</strong> — kafka에 이 컬럼을 흘리는 컨버전 재관측 이벤트 로거의 소스가 코드에 없음. Server-side conversion tracking API 어딘가일 텐데 오픈소스 빌드에는 미포함. 다음 커밋에서 이 컬럼 소스가 드러날 가능성.</li>
-<li><strong><code>split_head_training_by_source</code> 프로덕션 활성 시점</strong> — config default False라 아직 opt-in. <code>_home_direct_packed_base()</code>나 flagship config에서 True로 승격되는 시점이 광고 conversion 학습 파이프라인 프로덕션 전환의 신호.</li>
-<li><strong><code>train_view_through_heads</code> 승격</strong> — 8개 view-through 헤드가 opt-in 상태. 이 값이 True로 승격되면 X 광고 랭킹이 view-through conversion을 정식으로 예측하기 시작한다는 뜻.</li>
-<li><strong>GB300 config의 실 사용</strong> — <code>_GB300_OVERRIDES</code>가 <code>home_direct_packed_nano</code>에 상속됐지만 flagship 랭킹 config에는 아직 명시 상속 안 됨(base가 이미 4세대+4의 Muon으로 세팅됐고 별개). GB300 override 상속이 flagship에도 붙는지가 관측 포인트.</li>
-<li><strong><code>xai-o2</code> 실 구현 공개 여부</strong> — stub이 나왔다는 건 인터페이스가 안정화됐다는 뜻이지만, 실 구현이 오픈소스 빌드에 들어올 가능성은 낮다 <code>[추정]</code>.</li>
-<li><strong><code>EVERGREEN</code> retrieval dataset의 재정의</strong> — 이름이 실체와 어긋난 상태라 다음 커밋에서 이름 변경(EVERGREEN → SHORT_TERM_VIDEO) 또는 원상 복구를 관측.</li>
-<li><strong>Grok 4.6 internal이 완전 전환됐으므로 다음 심판 세대(4.7?) 시작 시점</strong> — 4.5 → 4.6이 4일간 dial 0.1→0.3→1.0로 매일 정교화됐다. 4.6 완전 정착 후 4.7 shadow가 언제 시작되는지가 다음 세대 전환 신호.</li>
+<li><strong><code>is_delayed_feedback</code> upstream 파이프라인</strong> — kafka에 이 컬럼을 실어 보내는 컨버전 재관측 이벤트 로거의 소스가 코드에 없다. Server-side conversion tracking API 어딘가일 텐데 오픈소스 빌드에는 포함되지 않았다. 다음 커밋에서 이 컬럼의 소스가 드러날 가능성이 있다.</li>
+<li><strong><code>split_head_training_by_source</code> 프로덕션 활성 시점</strong> — config의 기본값이 False라 아직은 opt-in이다. <code>_home_direct_packed_base()</code>나 flagship config에서 True로 승격되는 시점이 광고 conversion 학습 파이프라인의 프로덕션 전환 신호다.</li>
+<li><strong><code>train_view_through_heads</code> 승격</strong> — view-through 헤드 8개가 opt-in 상태다. 이 값이 True로 승격되면 X 광고 랭킹이 view-through conversion을 정식으로 예측하기 시작한다는 뜻이다.</li>
+<li><strong>GB300 config의 실제 사용</strong> — <code>_GB300_OVERRIDES</code>가 <code>home_direct_packed_nano</code>에 상속됐지만 flagship 랭킹 config에는 아직 명시적으로 상속되지 않았다(base가 이미 4세대+4의 Muon으로 설정돼 있고 별개다). GB300 override 상속이 flagship에도 적용되는지가 관측 지점이다.</li>
+<li><strong><code>xai-o2</code> 실제 구현 공개 여부</strong> — stub이 나왔다는 것은 인터페이스가 안정화됐다는 뜻이지만, 실제 구현이 오픈소스 빌드에 들어올 가능성은 낮다 <code>[추정]</code>.</li>
+<li><strong><code>EVERGREEN</code> retrieval dataset의 재정의</strong> — 이름이 실체와 어긋나 있어서 다음 커밋에서 이름을 바꾸거나(EVERGREEN → SHORT_TERM_VIDEO) 원래대로 되돌리는지 관측한다.</li>
+<li><strong>Grok 4.6 internal이 완전히 전환됐으므로 다음 심판 세대(4.7?)가 시작되는 시점</strong> — 4.5에서 4.6으로 넘어가는 dial이 4일 동안 0.1→0.3→1.0으로 날마다 정교해졌다. 4.6이 완전히 자리 잡은 뒤 4.7 shadow가 언제 시작되는지가 다음 세대 전환의 신호다.</li>
 </ul>
 
 

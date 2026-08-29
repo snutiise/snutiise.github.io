@@ -101,15 +101,15 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <main id="content">
 <h1>설문 신호 — 물어보고, 그 답으로 랭커를 학습시킨다</h1>
 <p><strong>최종 갱신:</strong> 2026-08-09</p>
-<p>참여 로그는 유저가 <strong>무엇을 했는지</strong>만 알려준다. 설문은 <strong>직접 묻는다.</strong> &quot;이 포스트가 시간을 쓸 가치가 있었나&quot;, &quot;이 영상이 네 관심사에 얼마나 맞나&quot;. 그 답을 라벨로 써서 랭커를 바꾼다.</p>
+<p>참여 로그는 유저가 <strong>무엇을 했는지</strong>만 알려준다. 설문은 <strong>직접 묻는다.</strong> &quot;이 포스트가 시간을 쓸 가치가 있었나&quot;, &quot;이 영상이 네 관심사에 얼마나 맞나&quot;라고 묻는다. 그 답을 라벨로 써서 랭커를 바꾼다.</p>
 <p>문제는 하나로 요약된다. <strong>설문 응답은 참여 로그보다 4자릿수 이상 희소하다.</strong></p>
 <blockquote>
 <p><em>&quot;the model has a limited number of labeled positive and negative examples for user-item pairs, accounting for <strong>less than one ten-thousandth of the total video exposures</strong>&quot;</em></p>
 </blockquote>
 <p><code>[확인]</code> — <a href="https://arxiv.org/html/2412.10674v1">USM (TikTok), arXiv:2412.10674</a>, 2024. <strong>설문 커버리지를 숫자로 밝힌 유일한 1차 출처다.</strong></p>
 <p>Meta도 같은 말을 정성적으로만 한다: <em>&quot;User perception feedback collected using surveys are <strong>extremely sparse</strong>&quot;</em> <code>[확인]</code> <a href="https://engineering.fb.com/2026/01/14/ml-applications/adapting-the-facebook-reels-recsys-ai-model-based-on-user-feedback/">engineering.fb.com, 2026-01-14</a>.</p>
-<p>이 정도 데이터로는 랭커를 직접 학습시킬 수 없다. 그래서 공개된 시스템은 전부 <strong>설문을 밀집 신호로 환산하는 중간 장치</strong>를 갖고 있다. 그 장치가 무엇인지가 이 노트의 본론이다. &quot;설문을 랭킹에 반영한다&quot;는 문장은 아무것도 설명하지 않는다.</p>
-<h2>지렛대 4가지 — 희소한 설문이 랭커를 움직이는 법</h2>
+<p>이 정도 데이터로는 랭커를 직접 학습시킬 수 없다. 그래서 공개된 시스템은 전부 <strong>설문을 밀집 신호로 환산하는 중간 장치</strong>를 두고 있다. 그 장치가 무엇인지가 이 노트의 본론이다. &quot;설문을 랭킹에 반영한다&quot;는 문장은 아무것도 설명하지 않는다.</p>
+<h2>방식 4가지 — 희소한 설문이 랭커를 움직이는 법</h2>
 <table>
 <thead>
 <tr>
@@ -144,36 +144,36 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <td>TikTok USM 2024</td>
 </tr>
 </tbody></table>
-<p><code>[확인]</code> 각 항목은 아래에서 개별 인용.</p>
-<p><strong>①만 유일하게 모델을 건드리지 않는다.</strong> 나머지 셋은 전부 &quot;설문 응답을 예측하는 함수&quot;를 만들어 희소성을 우회한다. ②와 ③의 차이가 특히 중요하다 — ②는 원시 피처에서 설문을 새로 예측하고, ③은 <strong>이미 학습된 참여 예측들 위에 얇은 층을 얹는다.</strong> ③이 훨씬 적은 라벨로 수렴한다 <code>[추정]</code> (근거: 입력 차원이 헤드 개수 수준으로 줄고, 본 모델이 이미 표현학습을 끝냈다).</p>
+<p><code>[확인]</code> 각 항목은 아래에서 개별적으로 인용한다.</p>
+<p><strong>①만 유일하게 모델을 건드리지 않는다.</strong> 나머지 셋은 전부 &quot;설문 응답을 예측하는 함수&quot;를 만들어 희소성을 우회한다. ②와 ③의 차이가 특히 중요하다. ②는 원시 피처에서 설문을 새로 예측하고, ③은 <strong>이미 학습된 참여 예측들 위에 가벼운 층을 하나 더한다.</strong> ③이 훨씬 적은 라벨로 수렴한다 <code>[추정]</code> (근거: 입력 차원이 헤드 개수 수준으로 줄어들고, 본 모델이 이미 표현학습을 끝냈다).</p>
 <h3>① 가중치를 설문으로 정한다 — Meta 2021</h3>
-<p>Meta의 value model <code>V = Σ w·Y</code>에서 <strong><code>w</code>를 무엇으로 고르느냐</strong>의 답이 설문이다.</p>
+<p>Meta의 value model <code>V = Σ w·Y</code>에서 <strong><code>w</code>를 무엇으로 고르느냐</strong>에 대한 답이 설문이다.</p>
 <blockquote>
 <p><em>&quot;the way we take each prediction into account for Juan is based on the actions that people tell us (<strong>via surveys</strong>) are more meaningful and worth their time&quot;</em>
 <em>&quot;People with higher correlation gain more value from that specific event, as long as we make this method incremental and control for potential confounding variables.&quot;</em></p>
 </blockquote>
 <p><code>[확인]</code> — <a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/">engineering.fb.com, 2021-01-26</a></p>
-<p>두 번째 문장이 기계적으로 더 중요하다. **&quot;correlation&quot;**이라고 썼다 — 설문 응답과 각 참여 이벤트의 상관을 재서 가중치를 조정한다는 뜻이다 <code>[추정]</code>. 즉 설문은 라벨이 아니라 <strong>가중치 캘리브레이션의 기준점</strong>으로 쓰인다. 수식도, 상관 계수도, 갱신 주기도 공개되지 않았다.</p>
-<p>수식·헤드 구조 자체는 → <a href="multi-task-ranking.html">multi-task-ranking.md</a>, Meta 쪽 맥락은 → <a href="facebook.html">facebook.md</a>.</p>
+<p>두 번째 문장이 기계적으로 더 중요하다. **&quot;correlation&quot;**이라고 썼는데, 이는 설문 응답과 각 참여 이벤트의 상관을 재서 가중치를 조정한다는 뜻이다 <code>[추정]</code>. 즉 설문은 라벨이 아니라 <strong>가중치 캘리브레이션의 기준점</strong>으로 쓰인다. 수식도, 상관 계수도, 갱신 주기도 공개되지 않았다.</p>
+<p>수식과 헤드 구조 자체는 → <a href="multi-task-ranking.html">multi-task-ranking.md</a>에, Meta 쪽 맥락은 → <a href="facebook.html">facebook.md</a>에 정리했다.</p>
 <h3>② 설문 응답을 예측하는 모델을 만든다 — YouTube 2021</h3>
-<p>가장 오래되고 가장 널리 알려진 방식.</p>
+<p>가장 오래되고 가장 널리 알려진 방식이다.</p>
 <ul>
 <li>척도: <em>&quot;rate the video you watched <strong>from one to five stars</strong>&quot;</em> <code>[확인]</code></li>
-<li>후속 질문이 양쪽에 다 붙는다: 1–2점이면 왜 낮은지, 4–5점이면 <em>&quot;was it inspirational or meaningful?&quot;</em> <code>[확인]</code></li>
-<li><strong><code>valued watchtime</code> 정의</strong>: <em>&quot;the time spent watching a video that you consider valuable&quot;</em>, 4–5점 시청만 센다 <code>[확인]</code></li>
+<li>후속 질문이 양쪽에 모두 이어진다. 1–2점이면 왜 낮은지 묻고, 4–5점이면 *&quot;was it inspirational or meaningful?&quot;*을 묻는다 <code>[확인]</code></li>
+<li><strong><code>valued watchtime</code> 정의</strong>: *&quot;the time spent watching a video that you consider valuable&quot;*이고, 4–5점을 준 시청만 계산한다 <code>[확인]</code></li>
 <li>희소성 해법: <em>&quot;we <strong>trained a machine learning model to predict potential survey responses for everyone</strong>&quot;</em> <code>[확인]</code></li>
-<li>검증: <em>&quot;purposely hold back some of the survey responses from the training&quot;</em> — 홀드아웃으로 예측 정합을 상시 감시 <code>[확인]</code></li>
+<li>검증: <em>&quot;purposely hold back some of the survey responses from the training&quot;</em>, 즉 홀드아웃으로 예측이 실제 응답과 맞는지 상시 감시한다 <code>[확인]</code></li>
 </ul>
 <p><code>[확인]</code> — <a href="https://blog.youtube/inside-youtube/on-youtubes-recommendation-system/">On YouTube&#39;s recommendation system</a>, Cristos Goodrow, 2021-09-15</p>
-<p><strong>구조적으로 이게 가장 공격적인 선택이다.</strong> 설문을 보조 신호로 쓰는 게 아니라 <strong>최적화 대상 자체를 설문 예측치로 바꿨다</strong>(watchtime → valued watchtime). 대신 대리 모델이 틀리면 목적함수 전체가 틀린다. YouTube가 홀드아웃 감시를 명시하는 이유가 이것으로 보인다 <code>[추정]</code>.</p>
-<p>모델 구조·투입 지점(랭커의 어느 헤드인지, 가중치가 몇인지)은 블로그에 없다. <code>[관찰]</code> 2026-08-09 (검사한 코퍼스: 이 절이 인용한 YouTube 블로그 본문 1건)</p>
-<h3>③ 기존 예측 위에 정렬 레이어를 얹는다 — Meta UTIS, 2026</h3>
+<p><strong>구조적으로 이게 가장 과감한 선택이다.</strong> 설문을 보조 신호로 쓰는 게 아니라 <strong>최적화 대상 자체를 설문 예측치로 바꿨다</strong>(watchtime → valued watchtime). 대신 대리 모델이 틀리면 목적함수 전체가 틀린다. YouTube가 홀드아웃 감시를 명시하는 이유가 이것으로 보인다 <code>[추정]</code>.</p>
+<p>모델 구조와 투입 위치(랭커의 어느 헤드인지, 가중치가 얼마인지)는 블로그에 나오지 않는다. <code>[관찰]</code> 2026-08-09 (검사한 코퍼스: 이 절이 인용한 YouTube 블로그 본문 1건)</p>
+<h3>③ 기존 예측 위에 정렬 레이어를 추가한다 — Meta UTIS, 2026</h3>
 <p>이 저장소가 찾은 <strong>설문 신호에 대한 가장 기계적인 1차 출처</strong>다. 전부 <code>[확인]</code> — <a href="https://engineering.fb.com/2026/01/14/ml-applications/adapting-the-facebook-reels-recsys-ai-model-based-on-user-feedback/">Adapting the Facebook Reels RecSys AI Model Based on User Feedback</a>, engineering.fb.com, 2026-01-14.</p>
-<p><strong>UTIS = User True Interest Survey.</strong></p>
+<p><strong>UTIS는 User True Interest Survey의 약자다.</strong></p>
 <blockquote>
 <p><em>&quot;Daily, a certain proportion of users viewing sessions on the platform are randomly chosen to display a single-question survey asking, <strong>&#39;To what extent does this video match your interests?&#39;</strong> on a <strong>1-5 scale</strong>.&quot;</em></p>
 </blockquote>
-<p>핵심 메커니즘 세 문장:</p>
+<p>핵심 메커니즘을 담은 세 문장은 다음과 같다.</p>
 <blockquote>
 <p><em>&quot;User perception feedback collected using surveys are extremely sparse but such feedback can be generalized in large scale recommendation systems using our novel model <strong>&#39;Perception Layer&#39;</strong> architecture that <strong>uses existing event predictions as additional features</strong>.&quot;</em></p>
 </blockquote>
@@ -183,11 +183,11 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <blockquote>
 <p><em>&quot;The survey responses used to train our model were <strong>binarized</strong> for easy modelling and denoises variance in responses.&quot;</em></p>
 </blockquote>
-<p><strong>→ 이게 희소성 문제의 답이다.</strong> 설문 모델의 입력이 원시 피처가 아니라 <strong>본 랭킹 모델이 이미 뱉고 있는 참여 예측 벡터</strong>다. 입력 차원이 헤드 개수 수준으로 줄어드니 수만 건 규모의 라벨로도 학습이 된다 <code>[추정]</code>. 그리고 1–5 척도를 <strong>이진화</strong>해서 응답 분산을 죽인다 — 5단계 회귀를 포기하고 노이즈를 줄이는 쪽을 택했다.</p>
-<p>투입 지점이 <strong>두 군데로 갈린다:</strong></p>
+<p><strong>→ 이것이 희소성 문제의 답이다.</strong> 설문 모델의 입력이 원시 피처가 아니라 <strong>본 랭킹 모델이 이미 산출하고 있는 참여 예측 벡터</strong>다. 입력 차원이 헤드 개수 수준으로 줄어드니 수만 건 규모의 라벨로도 학습이 된다 <code>[추정]</code>. 그리고 1–5 척도를 <strong>이진화</strong>해서 응답 분산을 억제한다. 5단계 회귀를 포기하고 노이즈를 줄이는 쪽을 택한 것이다.</p>
+<p>투입 위치가 <strong>두 군데로 나뉜다.</strong></p>
 <ul>
-<li><strong>Late Stage Ranking:</strong> <em>&quot;UTIS is deployed <strong>in parallel to the LSR</strong> model, providing an <strong>additional input feature into the final value formula</strong>.&quot;</em> → 헤드가 아니라 <strong>value formula의 추가 입력항</strong>이다.</li>
-<li><strong>Early Stage / retrieval:</strong> <em>&quot;large sequences based on user-to-item retrieval models are aligned using <strong>knowledge distillation</strong> based objectives trained on <strong>UTIS predictions from LSR as labels</strong>.&quot;</em> → <strong>2단 증류다.</strong> 설문 → LSR의 UTIS 예측 → 그 예측을 라벨 삼아 retrieval 모델을 정렬. 설문 응답이 직접 retrieval까지 가는 게 아니다.</li>
+<li><strong>Late Stage Ranking:</strong> <em>&quot;UTIS is deployed <strong>in parallel to the LSR</strong> model, providing an <strong>additional input feature into the final value formula</strong>.&quot;</em> → 헤드가 아니라 <strong>value formula의 추가 입력항이다.</strong></li>
+<li><strong>Early Stage / retrieval:</strong> <em>&quot;large sequences based on user-to-item retrieval models are aligned using <strong>knowledge distillation</strong> based objectives trained on <strong>UTIS predictions from LSR as labels</strong>.&quot;</em> → <strong>2단 증류다.</strong> 설문으로 LSR의 UTIS 예측을 만들고, 그 예측을 라벨 삼아 retrieval 모델을 정렬한다. 설문 응답이 직접 retrieval까지 가는 게 아니다.</li>
 </ul>
 <p><strong>성과 (전부 <code>[확인]</code>, 같은 글):</strong></p>
 <table>
@@ -226,99 +226,99 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <td><strong>−0.34%</strong></td>
 </tr>
 </tbody></table>
-<p><strong>⚠ 성과 지표 해석 주의.</strong> &quot;high survey ratings +5.4%&quot;는 <strong>설문 응답률 지표가 개선됐다</strong>는 뜻이고, 이 모델은 바로 그 설문을 예측하도록 학습됐다. 목적함수와 평가지표가 같은 축이다. 진짜 반증력은 <strong>engagement +5.2%가 같이 올랐다</strong>는 데 있다 — 설문 최적화가 참여를 깎지 않았다는 것 <code>[추정]</code>.</p>
-<p><strong>⚠ 오프라인 baseline이 무엇인지 안 밝혔다.</strong> accuracy 59.5%의 비교 대상이 &quot;설문 헤드 없는 본 모델&quot;인지 &quot;다수 클래스 예측&quot;인지 글에 없다. <code>[관찰]</code> 2026-08-09 (UTIS 블로그 본문 1건)</p>
+<p><strong>⚠ 성과 지표 해석에 주의해야 한다.</strong> &quot;high survey ratings +5.4%&quot;는 <strong>설문 응답률 지표가 개선됐다</strong>는 뜻이고, 이 모델은 바로 그 설문을 예측하도록 학습됐다. 목적함수와 평가지표가 같은 대상을 재고 있다. 이 순환을 벗어나는 근거는 <strong>engagement +5.2%가 같이 올랐다</strong>는 데 있다. 설문 최적화가 참여를 줄이지 않았다는 뜻이다 <code>[추정]</code>.</p>
+<p><strong>⚠ 오프라인 baseline이 무엇인지 밝히지 않았다.</strong> accuracy 59.5%의 비교 대상이 &quot;설문 헤드 없는 본 모델&quot;인지 &quot;다수 클래스 예측&quot;인지 글에 나오지 않는다. <code>[관찰]</code> 2026-08-09 (UTIS 블로그 본문 1건)</p>
 <h3>④ 헤드로 넣되 &quot;누가 답하는가&quot;를 보정한다 — TikTok USM, 2024</h3>
 <p><code>[확인]</code> — <a href="https://arxiv.org/html/2412.10674v1">USM: Unbiased Survey Modeling for Limiting Negative User Experiences in Recommendation Systems</a>, TikTok, 2024</p>
 <ul>
-<li>설문 2종: <strong>Satisfaction</strong>(<em>&quot;I like it&quot; / &quot;Neither like nor dislike it&quot; / &quot;I don&#39;t like it&quot;</em> 3점), <strong>Inappropriate</strong>(사유 선택 — <em>sexually suggestive, disgusting, hateful, violent, spammy, uninteresting</em>) <code>[확인]</code></li>
-<li>결합식이 공개된 <strong>유일한</strong> 사례다: <code>final_s(item) = Σ wᵢ·p(surveyᵢ) + other_s(item)</code> — <strong>설문 예측이 참여 헤드와 나란히 가중합에 들어간다.</strong> <code>[확인]</code></li>
-<li><strong>응답 편향 보정이 핵심 기여다.</strong> <em>&quot;users&#39; willingness to answer and submit the survey is not uniform&quot;</em> → 별도의 <strong>survey-submit model</strong>이 응답 확률을 예측하고 <code>1/P(ans|ss)</code>로 샘플에 IPW를 건다. <code>[확인]</code></li>
+<li>설문 2종: <strong>Satisfaction</strong>(<em>&quot;I like it&quot; / &quot;Neither like nor dislike it&quot; / &quot;I don&#39;t like it&quot;</em> 3점), <strong>Inappropriate</strong>(사유 선택: <em>sexually suggestive, disgusting, hateful, violent, spammy, uninteresting</em>) <code>[확인]</code></li>
+<li>결합식이 공개된 <strong>유일한</strong> 사례다: <code>final_s(item) = Σ wᵢ·p(surveyᵢ) + other_s(item)</code>. 즉 <strong>설문 예측이 참여 헤드와 나란히 가중합에 들어간다.</strong> <code>[확인]</code></li>
+<li><strong>응답 편향 보정이 핵심 기여다.</strong> <em>&quot;users&#39; willingness to answer and submit the survey is not uniform&quot;</em> → 별도의 <strong>survey-submit model</strong>이 응답 확률을 예측하고 <code>1/P(ans|ss)</code>로 샘플에 IPW를 적용한다. <code>[확인]</code></li>
 <li>온라인 성과: reports <strong>−1.75%</strong>, dislikes <strong>−2.57%</strong>, survey inappropriate rate <strong>−2.06%</strong> <code>[확인]</code></li>
 </ul>
-<p><strong>→ ①②③이 다루지 않는 문제를 여기서만 다룬다.</strong> 설문에 답하는 사람은 무작위 표본이 아니다. 화난 사람이 더 답한다면 설문 모델은 불만을 과대추정한다. Meta UTIS 글에도 YouTube 블로그에도 이 보정에 대한 언급이 없다. <code>[관찰]</code> 2026-08-09 (검사한 코퍼스: 두 블로그 본문 2건)</p>
+<p><strong>→ ①②③이 다루지 않는 문제를 여기서만 다룬다.</strong> 설문에 답하는 사람은 무작위 표본이 아니다. 화난 사람이 더 많이 답한다면 설문 모델은 불만을 과대추정한다. Meta UTIS 글에도 YouTube 블로그에도 이 보정에 대한 언급이 없다. <code>[관찰]</code> 2026-08-09 (검사한 코퍼스: 두 블로그 본문 2건)</p>
 <h2>X — 설문 프롬프트는 있는데, 랭킹으로 가는 경로가 안 보인다</h2>
-<p>X는 For You 타임라인에 <strong>설문 프롬프트를 실제로 꽂는다.</strong> 그런데 공개 코드에서 그 응답이 랭커로 흘러가는 배선을 찾을 수 없다.</p>
+<p>X는 For You 타임라인에 <strong>설문 프롬프트를 실제로 노출한다.</strong> 그런데 공개 코드에서 그 응답이 랭커로 전달되는 연결 경로를 찾을 수 없다.</p>
 <p><strong>있는 것 (전부 <code>[확인]</code>, <code>twitter/the-algorithm</code> @ <code>c54bec0</code>, 2025-09-03):</strong></p>
 <ul>
-<li>전용 후보 파이프라인 <code>ForYouRelevancePromptCandidatePipelineConfig.scala</code>. 후보 ID가 문자열 리터럴 <strong><code>&quot;feed-survey-prompt&quot;</code></strong> (<code>:55</code>)</li>
-<li>클라이언트 이벤트 컴포넌트명이 <strong><code>&quot;for_you_survey_feed&quot;</code></strong>, 액션은 <code>&quot;served_prompts&quot;</code> (<code>ClientEventsBuilder.scala:54,60,113-114</code>)</li>
-<li>UI 형태: 제목 + <strong>positive / negative / neutral 3버튼</strong>, 자유 텍스트 후속 입력(<code>RelevancePromptFollowUpTextInput</code>), 표시 타입 4종(<code>Normal</code> / <code>Compact</code> / <code>Large</code> / <strong><code>ThumbsUpAndDown</code></strong>) — <code>RelevancePromptFollowUpFeedbackType.scala</code>, <code>RelevancePromptDisplayType.scala</code></li>
-<li><strong>노출 빈도 상한이 파라미터로 박혀 있다:</strong> <code>for_you_relevance_prompt_min_injection_interval_minutes</code> <strong>default 1440분 = 24시간</strong> (min 0 / max 144000분 ≈ 100일), 삽입 위치 <code>for_you_relevance_prompt_position</code> <strong>default 15</strong>. <code>ForYouParam.scala:568-585</code></li>
-<li>마스터 스위치 <code>for_you_relevance_prompt_enable</code> <strong>default <code>false</code></strong> (<code>:562-566</code>), 질문·버튼 문구 4종은 전부 <strong>default <code>&quot;&quot;</code></strong> (<code>:587-609</code>) — <strong>문구가 레포에 없다.</strong> 이 레포의 일관된 패턴(값은 런타임, 형태만 코드)과 같다.</li>
+<li>전용 후보 파이프라인 <code>ForYouRelevancePromptCandidatePipelineConfig.scala</code>가 있다. 후보 ID는 문자열 리터럴 **<code>&quot;feed-survey-prompt&quot;</code>**이다 (<code>:55</code>)</li>
+<li>클라이언트 이벤트 컴포넌트명은 **<code>&quot;for_you_survey_feed&quot;</code>**이고, 액션은 <code>&quot;served_prompts&quot;</code>다 (<code>ClientEventsBuilder.scala:54,60,113-114</code>)</li>
+<li>UI 형태는 제목과 <strong>positive / negative / neutral 3버튼</strong>, 자유 텍스트 후속 입력(<code>RelevancePromptFollowUpTextInput</code>), 표시 타입 4종(<code>Normal</code> / <code>Compact</code> / <code>Large</code> / <strong><code>ThumbsUpAndDown</code></strong>)으로 이루어진다. 근거 파일은 <code>RelevancePromptFollowUpFeedbackType.scala</code>와 <code>RelevancePromptDisplayType.scala</code>다</li>
+<li><strong>노출 빈도 상한이 파라미터로 명시되어 있다:</strong> <code>for_you_relevance_prompt_min_injection_interval_minutes</code>가 <strong>default 1440분 = 24시간</strong>이고(min 0 / max 144000분 ≈ 100일), 삽입 위치 <code>for_you_relevance_prompt_position</code>은 <strong>default 15</strong>다. <code>ForYouParam.scala:568-585</code></li>
+<li>마스터 스위치 <code>for_you_relevance_prompt_enable</code>은 **default <code>false</code>**이고(<code>:562-566</code>), 질문과 버튼 문구 4종은 전부 **default <code>&quot;&quot;</code>**다(<code>:587-609</code>). 즉 <strong>문구가 레포에 없다.</strong> 이 레포의 일관된 패턴(값은 런타임, 형태만 코드)과 같다.</li>
 <li>2026 Rust 세대도 여전히 요청한다: <code>PromptsSource</code>가 <code>supported_prompt_types</code>에 **<code>PromptType::RELEVANCE_PROMPT</code>**를 넣어 보낸다. <code>[확인]</code> — <code>xai-org/x-algorithm</code>, <code>home-mixer/sources/prompts_source.rs</code></li>
 </ul>
 <p><strong>없는 것 — 여기가 결론이다:</strong></p>
 <ol>
-<li><strong>홈 타임라인 응답이 학습 신호 스트림(UUA)으로 구조화되지 않는다.</strong> <code>BaseFeedbackSubmitClientEvent</code>는 <code>eventNamespace.page</code>로 분기하는데 <strong><code>case &quot;search&quot;</code> 하나만 처리하고 나머지는 <code>case _ =&gt; None</code>으로 버린다</strong> (<code>:16,39</code>). 구조화되는 건 검색 결과 페이지의 <code>relevance_prompt_module</code>(→ <code>TweetRelevantToSearch</code>)과 <code>did_you_find_it_module</code>(→ <code>DidYouFindItSearch</code>)뿐이다. <code>[확인]</code></li>
-<li><strong>홈 쪽 로깅은 &quot;몇 개 띄웠나&quot;만 센다.</strong> <code>eventValue = count(relevancePrompt)</code> — 응답 내용이 아니라 노출 카운트다. <code>[확인]</code> <code>ClientEventsBuilder.scala:113-114</code></li>
-<li><strong>랭커에 설문 헤드가 없다.</strong> Phoenix 공개 체크포인트 19개, 프로덕션 22개, 2025 Navi 15개 — 어느 목록에도 설문 계열 헤드가 없다. <code>[확인]</code> → <a href="multi-task-ranking.html">multi-task-ranking.md</a></li>
+<li><strong>홈 타임라인 응답이 학습 신호 스트림(UUA)으로 구조화되지 않는다.</strong> <code>BaseFeedbackSubmitClientEvent</code>는 <code>eventNamespace.page</code>로 분기하는데 <strong><code>case &quot;search&quot;</code> 하나만 처리하고 나머지는 <code>case _ =&gt; None</code>으로 버린다</strong> (<code>:16,39</code>). 구조화되는 것은 검색 결과 페이지의 <code>relevance_prompt_module</code>(→ <code>TweetRelevantToSearch</code>)과 <code>did_you_find_it_module</code>(→ <code>DidYouFindItSearch</code>)뿐이다. <code>[확인]</code></li>
+<li><strong>홈 쪽 로깅은 &quot;몇 개를 표시했는가&quot;만 센다.</strong> <code>eventValue = count(relevancePrompt)</code>이므로 응답 내용이 아니라 노출 카운트다. <code>[확인]</code> <code>ClientEventsBuilder.scala:113-114</code></li>
+<li><strong>랭커에 설문 헤드가 없다.</strong> Phoenix 공개 체크포인트 19개, 프로덕션 22개, 2025 Navi 15개를 확인했는데, 어느 목록에도 설문 계열 헤드가 없다. <code>[확인]</code> → <a href="multi-task-ranking.html">multi-task-ranking.md</a></li>
 </ol>
-<p><strong>→ <code>[추정]</code>: X는 설문을 랭킹 라벨이 아니라 제품 지표·수동 분석용으로 쓰거나, 소비 경로가 공개 범위 밖이다.</strong> 근거는 위 3가지의 조합이다. &quot;X는 설문을 랭킹에 쓴다&quot;고도 &quot;안 쓴다&quot;고도 단정할 수 없고, <strong>공개된 것은 수집 장치뿐</strong>이라고만 말할 수 있다.</p>
-<p>지면·랭커 맥락은 → <a href="x.html">x.md</a>.</p>
+<p><strong>→ <code>[추정]</code>: X는 설문을 랭킹 라벨이 아니라 제품 지표나 수동 분석용으로 쓰고 있거나, 소비 경로가 공개 범위 밖에 있다.</strong> 근거는 위 3가지의 조합이다. &quot;X는 설문을 랭킹에 쓴다&quot;고도 &quot;안 쓴다&quot;고도 단정할 수 없고, <strong>공개된 것은 수집 장치뿐</strong>이라고만 말할 수 있다.</p>
+<p>지면과 랭커 맥락은 → <a href="x.html">x.md</a>에 정리했다.</p>
 <h2>Netflix — 설문이 아니라 명시적 평점, 그리고 온보딩 취향 조사</h2>
-<p>Netflix의 공개 자료는 <strong>랜덤 표본 설문</strong>이 아니라 <strong>모든 유저가 언제든 누를 수 있는 제품 컨트롤</strong>(별점 → thumbs → two thumbs up) 쪽이다. 이건 이 노트의 주제와 구조가 다르다 — 희소하지만 무작위가 아니고, 응답 편향 성격도 다르다.</p>
-<p>1차 출처 확보 (2026-08-09 갱신 — 이전 판의 &quot;no primary source found&quot;에서 승격):</p>
+<p>Netflix의 공개 자료는 <strong>랜덤 표본 설문</strong>이 아니라 <strong>모든 유저가 언제든 누를 수 있는 제품 컨트롤</strong>(별점 → thumbs → two thumbs up) 쪽이다. 이건 이 노트의 주제와 구조가 다르다. 희소하지만 무작위가 아니고, 응답 편향의 성격도 다르다.</p>
+<p>1차 출처를 확보했다 (2026-08-09 갱신: 이전 판의 &quot;no primary source found&quot;에서 승격했다).</p>
 <ul>
-<li><strong>2017 별점 → thumbs 전환</strong> <code>[확인]</code> <a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs">Goodbye Stars, Hello Thumbs</a>, about.netflix.com: thumbs up = &quot;비슷한 것 더 추천&quot;, thumbs down = &quot;그만 추천&quot;으로 <strong>버튼의 의미가 랭킹 동작으로 정의돼 있다</strong>. 별점 대비 <strong>평점 활동 200% 증가</strong> — 척도를 낮출수록 응답이 는다는 실측(UTIS의 이진화, YouTube의 4–5점 축약과 같은 방향의 선택을 제품 레벨에서 한 것).</li>
-<li>같은 발표의 <strong>% Match</strong>: <em>&quot;시청 습관·행동 분석만으로&quot;</em> 산출되는 표시용 점수 — <strong>명시 평점이 랭킹의 입력이고, 화면의 퍼센트는 별개</strong>라는 분리가 명시돼 있다.</li>
-<li><strong>2022 Two Thumbs Up</strong> <code>[확인]</code> <a href="https://about.netflix.com/en/news/two-thumbs-up-even-better-recommendations">발표</a>: &quot;정말 좋았음&quot;을 별도 신호로 — 추천에 더 강하게 반영. 3단계 명시 척도의 복원이다(별점 5단계 → 이진 → 3단계).</li>
-<li><strong>온보딩 타이틀 픽커</strong> <code>[확인]</code> TMIS 2015 §5.5 + <a href="https://help.netflix.com/en/node/100639">help.netflix.com</a>: 가입 시 좋아하는 타이틀을 고르게 하는 <strong>명시적 취향 조사</strong>가 2015 논문부터 현행 헬프 문서까지 이어진다. 선택사항이고, 건너뛰면 &quot;다양하고 인기 있는&quot; 기본 셋으로 시작. 콜드스타트 한정의 elicitation 장치 — 이 노트의 지렛대 분류로는 ②(신규 유저 한정의 직접 라벨 수집)에 가깝다.</li>
+<li><strong>2017 별점 → thumbs 전환</strong> <code>[확인]</code> <a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs">Goodbye Stars, Hello Thumbs</a>, about.netflix.com: thumbs up은 &quot;비슷한 것 더 추천&quot;, thumbs down은 &quot;그만 추천&quot;으로 <strong>버튼의 의미가 랭킹 동작으로 정의돼 있다</strong>. 별점 대비 <strong>평점 활동이 200% 증가</strong>했는데, 척도를 낮출수록 응답이 늘어난다는 실측이다(UTIS의 이진화, YouTube의 4–5점 축약과 같은 방향의 선택을 제품 레벨에서 한 것이다).</li>
+<li>같은 발표의 <strong>% Match</strong>: <em>&quot;시청 습관·행동 분석만으로&quot;</em> 산출되는 표시용 점수인데, <strong>명시 평점이 랭킹의 입력이고, 화면의 퍼센트는 별개</strong>라는 분리가 명시돼 있다.</li>
+<li><strong>2022 Two Thumbs Up</strong> <code>[확인]</code> <a href="https://about.netflix.com/en/news/two-thumbs-up-even-better-recommendations">발표</a>: &quot;정말 좋았음&quot;을 별도 신호로 삼아 추천에 더 강하게 반영한다. 3단계 명시 척도를 복원한 것이다(별점 5단계 → 이진 → 3단계).</li>
+<li><strong>온보딩 타이틀 픽커</strong> <code>[확인]</code> TMIS 2015 §5.5 + <a href="https://help.netflix.com/en/node/100639">help.netflix.com</a>: 가입 시 좋아하는 타이틀을 고르게 하는 <strong>명시적 취향 조사</strong>가 2015 논문부터 현행 헬프 문서까지 이어진다. 선택사항이고, 건너뛰면 &quot;다양하고 인기 있는&quot; 기본 셋으로 시작한다. 콜드스타트에 한정된 elicitation 방식이고, 이 노트의 방식 분류로는 ②(신규 유저에 한정해 직접 라벨을 수집하는 방식)에 가깝다.</li>
 </ul>
-<p><strong>랜덤 표본 설문(UTIS류)을 랭킹 라벨로 쓴다는 1차 출처는 여전히 없다.</strong> <code>[추정]</code> — 검사한 코퍼스는 netflixtechblog.com과 about.netflix.com의 추천 관련 글(2026-08-09 열람)이고, 미공개 자료까지 없다는 근거는 아니다. 2024 장기 만족 블로그의 보상 함수 <code>r=f(play, complete, thumb)</code>에 <strong>thumb이 항으로 들어 있어</strong> 명시 평점의 랭킹 소비는 확인된다 <code>[확인]</code> → <a href="netflix.html">netflix.md</a>. 유사 기능(Meta의 Show more/less, X의 not_interested)은 설문이 아니라 유저 컨트롤로 분류하는 게 맞다 → <a href="facebook.html">facebook.md</a>의 &quot;유저 컨트롤&quot; 절.</p>
+<p><strong>랜덤 표본 설문(UTIS류)을 랭킹 라벨로 쓴다는 1차 출처는 여전히 없다.</strong> <code>[추정]</code> — 검사한 코퍼스는 netflixtechblog.com과 about.netflix.com의 추천 관련 글(2026-08-09 열람)이고, 미공개 자료까지 없다는 근거는 아니다. 2024 장기 만족 블로그의 보상 함수 <code>r=f(play, complete, thumb)</code>에 <strong>thumb이 항으로 들어 있어</strong> 명시 평점이 랭킹에 쓰인다는 사실은 확인된다 <code>[확인]</code> → <a href="netflix.html">netflix.md</a>. 유사 기능(Meta의 Show more/less, X의 not_interested)은 설문이 아니라 유저 컨트롤로 분류하는 게 맞다 → <a href="facebook.html">facebook.md</a>의 &quot;유저 컨트롤&quot; 절.</p>
 <h2>Meta 자체 문서 간 불일치 — Reels</h2>
-<p><strong>UTIS 블로그는 Facebook Reels를 명시하는데, Facebook Reels system card에는 &quot;survey&quot;라는 단어가 한 번도 안 나온다.</strong> 카드가 나열하는 예측 태스크 10개(시청시간, 풀스크린 진입, 완주, 스킵, like, hide, &quot;see less&quot; 요청, 세션 시작, 다음 릴 이동 등)는 전부 참여·부정 행동이고 설문 항목이 없다.</p>
-<p><code>[관찰]</code> 2026-08-09 — 검사한 코퍼스는 <a href="https://transparency.meta.com/features/explaining-ranking/fb-reels/">fb-reels system card</a> 본문 1건(최종 갱신 2026-06-19)이고 <code>survey</code> 문자열이 0회다. 대조 대상은 <a href="https://engineering.fb.com/2026/01/14/ml-applications/adapting-the-facebook-reels-recsys-ai-model-based-on-user-feedback/">UTIS 블로그</a> 2026-01-14. ⚠ 카드 인용의 유효기간 주의 → <a href="facebook.html">facebook.md</a>의 &quot;system card 인용의 유효기간&quot; 절.</p>
-<p><code>[추정]</code> 두 가지 해석이 가능하고 구분할 근거가 없다: (a) UTIS는 헤드가 아니라 value formula의 추가 입력항이라 &quot;예측 태스크&quot; 목록에 안 들어간다 (블로그 서술과 일관됨), (b) system card가 갱신 시점 기준으로 아직 반영하지 않았다.</p>
-<p>→ <strong>이 저장소 규칙의 실전 사례다.</strong> 엔지니어링 블로그가 규제 공개 문서보다 앞서 있고, 두 문서를 합쳐야 그림이 나온다. 규제 문서를 정본으로 삼으면 UTIS가 통째로 안 보인다.</p>
+<p><strong>UTIS 블로그는 Facebook Reels를 명시하는데, Facebook Reels system card에는 &quot;survey&quot;라는 단어가 한 번도 나오지 않는다.</strong> 카드가 나열하는 예측 태스크 10개(시청시간, 풀스크린 진입, 완주, 스킵, like, hide, &quot;see less&quot; 요청, 세션 시작, 다음 릴 이동 등)는 전부 참여 행동이거나 부정 행동이고, 설문 항목은 없다.</p>
+<p><code>[관찰]</code> 2026-08-09 — 검사한 코퍼스는 <a href="https://transparency.meta.com/features/explaining-ranking/fb-reels/">fb-reels system card</a> 본문 1건(최종 갱신 2026-06-19)이고 <code>survey</code> 문자열이 0회 나온다. 대조 대상은 <a href="https://engineering.fb.com/2026/01/14/ml-applications/adapting-the-facebook-reels-recsys-ai-model-based-on-user-feedback/">UTIS 블로그</a> 2026-01-14 글이다. ⚠ 카드 인용의 유효기간에 주의해야 한다 → <a href="facebook.html">facebook.md</a>의 &quot;system card 인용의 유효기간&quot; 절.</p>
+<p><code>[추정]</code> 두 가지 해석이 가능하고 구분할 근거가 없다: (a) UTIS는 헤드가 아니라 value formula의 추가 입력항이라서 &quot;예측 태스크&quot; 목록에 들어가지 않는다 (블로그 서술과 일관된다), (b) system card가 갱신 시점 기준으로 아직 반영하지 않았다.</p>
+<p>→ <strong>이 저장소 규칙의 실전 사례다.</strong> 엔지니어링 블로그가 규제 공개 문서보다 앞서 있고, 두 문서를 합쳐야 전체 구조가 드러난다. 규제 문서를 정본으로 삼으면 UTIS가 전혀 보이지 않는다.</p>
 <h2>이 케이스에서 일반화할 수 있는 것</h2>
 <ul>
-<li><strong>&quot;설문을 랭킹에 쓴다&quot;는 문장은 정보가 0이다.</strong> 가중치를 정하는가(①), 대리 모델을 만드는가(②), 기존 예측 위에 얹는가(③), 헤드로 넣는가(④) — 네 개가 전부 다른 시스템이다. 어느 쪽인지 안 밝힌 서술은 인용 가치가 없다.</li>
-<li><strong>희소성 해법은 결국 &quot;설문을 예측하는 함수&quot;다.</strong> 라벨이 0.01% 미만이면 직접 학습이 불가능하므로, 전 노출에 적용 가능한 밀집 예측치로 환산한 뒤 그걸 랭킹에 넣는다. 세 서비스가 독립적으로 같은 형태에 도달했다.</li>
-<li><strong>입력을 본 모델의 출력으로 잡으면 라벨이 훨씬 적게 든다.</strong> Meta UTIS의 핵심이 이것이고, 이 선택이 &quot;경량 레이어&quot;를 가능하게 한다. 반대로 대리 모델을 원시 피처에서 새로 학습하면(YouTube 방식) 데이터가 더 필요하고 목적함수 전체가 그 모델에 걸린다.</li>
-<li><strong>응답 편향을 다루는 곳이 하나뿐이다.</strong> TikTok만 submit propensity를 IPW로 보정한다. 설문 기반 지표를 비교할 때 이 보정 유무를 확인해야 한다.</li>
-<li><strong>설문 최적화 성과는 설문 지표로 보고된다 — 순환이다.</strong> 반증력은 참여·integrity 같은 <strong>다른 축 지표가 같이 개선됐는가</strong>에만 있다.</li>
-<li><strong>1–5 척도는 그대로 안 쓰인다.</strong> Meta는 이진화, YouTube는 4–5점만 valued로 계산. 5단계 순서 정보는 둘 다 버린다.</li>
-<li><strong>설문 프롬프트가 코드에 있다고 랭킹 신호라는 뜻이 아니다.</strong> X가 정확히 그 경우다. 수집 장치와 소비 경로를 따로 확인해야 한다.</li>
+<li><strong>&quot;설문을 랭킹에 쓴다&quot;는 문장은 정보를 담고 있지 않다.</strong> 가중치를 정하는가(①), 대리 모델을 만드는가(②), 기존 예측 위에 추가하는가(③), 헤드로 넣는가(④). 네 가지가 전부 다른 시스템이다. 어느 쪽인지 밝히지 않은 서술은 인용할 가치가 없다.</li>
+<li><strong>희소성 해법은 결국 &quot;설문을 예측하는 함수&quot;다.</strong> 라벨이 0.01% 미만이면 직접 학습이 불가능하므로, 전 노출에 적용할 수 있는 밀집 예측치로 환산한 뒤 그것을 랭킹에 넣는다. 세 서비스가 독립적으로 같은 형태에 도달했다.</li>
+<li><strong>입력을 본 모델의 출력으로 잡으면 라벨이 훨씬 적게 든다.</strong> Meta UTIS의 핵심이 이것이고, 이 선택이 &quot;경량 레이어&quot;를 가능하게 한다. 반대로 대리 모델을 원시 피처에서 새로 학습하면(YouTube 방식) 데이터가 더 필요하고 목적함수 전체가 그 모델에 의존하게 된다.</li>
+<li><strong>응답 편향을 다루는 곳이 하나뿐이다.</strong> TikTok만 submit propensity를 IPW로 보정한다. 설문 기반 지표를 비교할 때는 이 보정이 있는지 확인해야 한다.</li>
+<li><strong>설문 최적화 성과는 설문 지표로 보고되므로 순환이다.</strong> 이 순환을 벗어난 근거는 참여나 integrity 같은 <strong>다른 종류의 지표가 같이 개선됐는가</strong>에만 있다.</li>
+<li><strong>1–5 척도는 그대로 쓰이지 않는다.</strong> Meta는 이진화하고, YouTube는 4–5점만 valued로 계산한다. 5단계 순서 정보는 둘 다 버린다.</li>
+<li><strong>설문 프롬프트가 코드에 있다고 해서 랭킹 신호라는 뜻은 아니다.</strong> X가 정확히 그런 경우다. 수집 장치와 소비 경로를 따로 확인해야 한다.</li>
 </ul>
 <h2>누가 이걸 쓰는가</h2>
 <ul>
-<li><strong>Facebook / Meta</strong> — 가장 깊게 공개했다. 2019-05 도입(친한 친구 목록, <em>&quot;worth your time&quot;</em>, Page 관심도, Group 중요도), 2021-04 확장(inspirational / 토픽 관심 / angry 반응 많은 포스트), 2021-01 가중치 <code>w</code> 결정 근거, 2026-01 UTIS. 지면 맥락과 value model은 → <a href="facebook.html">facebook.md</a> <code>[확인]</code></li>
-<li><strong>X</strong> — For You에 <code>feed-survey-prompt</code>를 서빙하는 파이프라인이 실재하고 2026 세대에도 살아 있다. <strong>다만 응답이 랭킹으로 가는 경로는 공개 코드에 없다.</strong> → <a href="x.html">x.md</a> <code>[확인]</code>(수집) / <code>[추정]</code>(소비 부재)</li>
-<li><strong>YouTube</strong> — 1–5점 설문 → 대리 모델 → <code>valued watchtime</code>을 목적함수로. 이 저장소에 서비스 노트 없음. <code>[확인]</code></li>
-<li><strong>TikTok</strong> — 설문 헤드를 가중합에 직접 넣고 응답 편향을 IPW로 보정. 이 저장소에 서비스 노트 없음. <code>[확인]</code></li>
-<li><strong>Netflix</strong> — 랜덤 표본 설문의 1차 출처는 없음. 대신 <strong>명시 평점의 1차 출처가 가장 충실하다</strong>: thumbs(2017, 활동 200%↑)·two thumbs(2022)·온보딩 타이틀 픽커(2015~현행), 그리고 thumb이 보상 함수의 항으로 확인됨. → <a href="netflix.html">netflix.md</a> <code>[확인]</code></li>
+<li><strong>Facebook / Meta</strong> — 가장 자세히 공개했다. 2019-05에 도입했고(친한 친구 목록, <em>&quot;worth your time&quot;</em>, Page 관심도, Group 중요도), 2021-04에 확장했으며(inspirational / 토픽 관심 / angry 반응 많은 포스트), 2021-01에는 가중치 <code>w</code>를 정하는 근거를 밝혔고, 2026-01에 UTIS를 공개했다. 지면 맥락과 value model은 → <a href="facebook.html">facebook.md</a> <code>[확인]</code></li>
+<li><strong>X</strong> — For You에 <code>feed-survey-prompt</code>를 서빙하는 파이프라인이 실재하고 2026 세대에도 남아 있다. <strong>다만 응답이 랭킹으로 가는 경로는 공개 코드에 없다.</strong> → <a href="x.html">x.md</a> <code>[확인]</code>(수집) / <code>[추정]</code>(소비 부재)</li>
+<li><strong>YouTube</strong> — 1–5점 설문으로 대리 모델을 학습하고 <code>valued watchtime</code>을 목적함수로 삼는다. 이 저장소에 서비스 노트는 없다. <code>[확인]</code></li>
+<li><strong>TikTok</strong> — 설문 헤드를 가중합에 직접 넣고 응답 편향을 IPW로 보정한다. 이 저장소에 서비스 노트는 없다. <code>[확인]</code></li>
+<li><strong>Netflix</strong> — 랜덤 표본 설문의 1차 출처는 없다. 대신 <strong>명시 평점의 1차 출처가 가장 충실하다</strong>: thumbs(2017, 활동 200% 증가), two thumbs(2022), 온보딩 타이틀 픽커(2015~현행)가 있고, thumb이 보상 함수의 항이라는 사실도 확인된다. → <a href="netflix.html">netflix.md</a> <code>[확인]</code></li>
 </ul>
-<h2>아직 확인 못한 것</h2>
+<h2>아직 확인하지 못한 것</h2>
 <ul>
 <li><strong>Meta의 설문 샘플링률.</strong> *&quot;a certain proportion of users viewing sessions&quot;*가 전부다. TikTok의 <code>&lt; 1/10,000</code>에 대응하는 Meta 수치가 없다.</li>
-<li><strong>UTIS alignment layer의 실제 구조</strong> — 레이어 수, 입력으로 쓰는 예측 헤드가 몇 개인지, 학습 주기. 블로그에 없다.</li>
+<li><strong>UTIS alignment layer의 실제 구조</strong> — 레이어 수, 입력으로 쓰는 예측 헤드가 몇 개인지, 학습 주기가 어떻게 되는지는 블로그에 없다.</li>
 <li><strong>UTIS가 value formula에 들어갈 때의 가중치.</strong> Meta는 어느 문서에서도 <code>w</code> 실값을 공개한 적이 없다 → <a href="facebook.html">facebook.md</a>.</li>
-<li><strong>Meta가 응답 편향(누가 설문에 답하는가)을 보정하는가.</strong> 언급 자체가 없다.</li>
-<li><strong>YouTube 대리 모델이 랭커의 어느 지점에 들어가는가</strong> — 헤드인지 별도 모델인지, <code>valued watchtime</code>이 리트리벌까지 내려가는지.</li>
-<li><strong>2021 Meta 블로그의 &quot;correlation&quot; 방법론</strong> — 설문 응답과 참여 이벤트의 상관을 어떻게 재고 얼마나 자주 갱신하는지.</li>
+<li><strong>Meta가 응답 편향(누가 설문에 답하는가)을 보정하는지 여부.</strong> 언급 자체가 없다.</li>
+<li><strong>YouTube 대리 모델이 랭커의 어느 단계에 들어가는가</strong> — 헤드인지 별도 모델인지, <code>valued watchtime</code>이 리트리벌까지 내려가는지 확인하지 못했다.</li>
+<li><strong>2021 Meta 블로그의 &quot;correlation&quot; 방법론</strong> — 설문 응답과 참여 이벤트의 상관을 어떻게 재고 얼마나 자주 갱신하는지 확인하지 못했다.</li>
 <li><strong>Instagram / Threads의 설문 운용 여부.</strong> 서비스 노트 자체가 아직 없다.</li>
 </ul>
 <h2>출처</h2>
 <ul>
-<li><a href="https://engineering.fb.com/2026/01/14/ml-applications/adapting-the-facebook-reels-recsys-ai-model-based-on-user-feedback/">Adapting the Facebook Reels RecSys AI Model Based on User Feedback</a> — 2026, 블로그(engineering.fb.com). <strong>UTIS. 설문 신호에 대한 가장 기계적인 1차 출처.</strong></li>
-<li><a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/">How machine learning powers Facebook&#39;s News Feed ranking algorithm</a> — 2021, 블로그. 설문으로 value model 가중치를 정한다는 유일한 서술.</li>
-<li><a href="https://about.fb.com/news/2019/05/more-personalized-experiences/">Using Surveys to Make News Feed More Personal</a> — 2019, 블로그(뉴스룸). 설문 4종 도입.</li>
-<li><a href="https://about.fb.com/news/2021/04/incorporating-more-feedback-into-news-feed-ranking/">Incorporating More Feedback Into News Feed Ranking</a> — 2021, 블로그(뉴스룸). inspirational / 토픽 / angry 확장.</li>
-<li><a href="https://transparency.meta.com/features/explaining-ranking/fb-reels/">Facebook Reels system card</a> — 2026-06-19 갱신, 규제 대응 문서. <strong>설문 언급 0.</strong></li>
-<li><a href="https://blog.youtube/inside-youtube/on-youtubes-recommendation-system/">On YouTube&#39;s recommendation system</a> — 2021, 블로그(Cristos Goodrow). 1–5점 설문, <code>valued watchtime</code>, 대리 모델.</li>
-<li><a href="https://arxiv.org/html/2412.10674v1">USM: Unbiased Survey Modeling for Limiting Negative User Experiences in Recommendation Systems</a> — 2024, 논문(TikTok). 설문 커버리지 수치와 결합식이 나오는 유일한 출처. <strong>PDF 아닌 HTML 판을 봤다.</strong></li>
+<li><a href="https://engineering.fb.com/2026/01/14/ml-applications/adapting-the-facebook-reels-recsys-ai-model-based-on-user-feedback/">Adapting the Facebook Reels RecSys AI Model Based on User Feedback</a> — 2026, 블로그(engineering.fb.com). <strong>UTIS를 다뤘고, 설문 신호에 대한 가장 기계적인 1차 출처다.</strong></li>
+<li><a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/">How machine learning powers Facebook&#39;s News Feed ranking algorithm</a> — 2021, 블로그. 설문으로 value model 가중치를 정한다는 유일한 서술이 담겨 있다.</li>
+<li><a href="https://about.fb.com/news/2019/05/more-personalized-experiences/">Using Surveys to Make News Feed More Personal</a> — 2019, 블로그(뉴스룸). 설문 4종을 도입했다.</li>
+<li><a href="https://about.fb.com/news/2021/04/incorporating-more-feedback-into-news-feed-ranking/">Incorporating More Feedback Into News Feed Ranking</a> — 2021, 블로그(뉴스룸). inspirational, 토픽, angry로 확장했다.</li>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/fb-reels/">Facebook Reels system card</a> — 2026-06-19 갱신, 규제 대응 문서. <strong>설문 언급이 0회다.</strong></li>
+<li><a href="https://blog.youtube/inside-youtube/on-youtubes-recommendation-system/">On YouTube&#39;s recommendation system</a> — 2021, 블로그(Cristos Goodrow). 1–5점 설문과 <code>valued watchtime</code>, 대리 모델을 설명한다.</li>
+<li><a href="https://arxiv.org/html/2412.10674v1">USM: Unbiased Survey Modeling for Limiting Negative User Experiences in Recommendation Systems</a> — 2024, 논문(TikTok). 설문 커버리지 수치와 결합식이 나오는 유일한 출처다. <strong>PDF가 아니라 HTML 판을 읽었다.</strong></li>
 </ul>
 <h3>Netflix (1차)</h3>
 <ul>
-<li><a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs">Goodbye Stars, Hello Thumbs</a> — 2017, 발표. thumbs 의미 정의, 활동 200%, % Match.</li>
+<li><a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs">Goodbye Stars, Hello Thumbs</a> — 2017, 발표. thumbs의 의미 정의와 활동 200% 증가, % Match를 다룬다.</li>
 <li><a href="https://about.netflix.com/en/news/two-thumbs-up-even-better-recommendations">Two Thumbs Up, Even Better Recommendations</a> — 2022, 발표.</li>
-<li><a href="https://dl.acm.org/doi/10.1145/2843948">The Netflix Recommender System (TMIS)</a> §5.5 — 2015, 논문. 온보딩 타이틀 픽커.</li>
-<li><a href="https://help.netflix.com/en/node/100639">How Netflix&#39;s recommendations system works</a> — 현행 헬프 문서. 픽커 존속 확인.</li>
+<li><a href="https://dl.acm.org/doi/10.1145/2843948">The Netflix Recommender System (TMIS)</a> §5.5 — 2015, 논문. 온보딩 타이틀 픽커를 설명한다.</li>
+<li><a href="https://help.netflix.com/en/node/100639">How Netflix&#39;s recommendations system works</a> — 현행 헬프 문서. 픽커가 존속한다는 사실을 확인했다.</li>
 </ul>
 <h3>2차 (참고용 — 1차 확보로 강등 해제)</h3>
 <ul>
-<li><a href="https://variety.com/2022/digital/news/netflix-two-thumbs-up-ratings-1235228641/">Variety — Netflix Launches &#39;Two Thumbs Up&#39;</a> · <a href="https://techcrunch.com/2022/04/11/netflix-adds-a-two-thumbs-up-button-in-effort-to-learn-what-users-love-not-just-like">TechCrunch</a> — 2022, 보도. 2021 하반기 글로벌 테스트 시점 등 1차에 없는 디테일만 참고.</li>
+<li><a href="https://variety.com/2022/digital/news/netflix-two-thumbs-up-ratings-1235228641/">Variety — Netflix Launches &#39;Two Thumbs Up&#39;</a> · <a href="https://techcrunch.com/2022/04/11/netflix-adds-a-two-thumbs-up-button-in-effort-to-learn-what-users-love-not-just-like">TechCrunch</a> — 2022, 보도. 2021 하반기 글로벌 테스트 시점 등 1차에 없는 디테일만 참고한다.</li>
 </ul>
 <h3>공개 소스코드</h3>
 <ul>

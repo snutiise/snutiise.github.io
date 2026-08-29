@@ -112,33 +112,33 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </thead>
 <tbody><tr>
 <td>그래프 분해</td>
-<td>팔로우 그래프를 커뮤니티로 쪼개고 소속도를 벡터로</td>
+<td>팔로우 그래프를 커뮤니티로 나누고 소속 정도를 벡터로 삼는다</td>
 <td>SimClusters</td>
 </tr>
 <tr>
 <td>그래프 임베딩</td>
-<td>이종 그래프의 엣지를 학습 목표로</td>
+<td>이종 그래프의 엣지를 학습 목표로 삼는다</td>
 <td>TwHIN</td>
 </tr>
 <tr>
 <td>Two-tower</td>
-<td>유저탑·아이템탑을 따로 학습, 내적으로 채점</td>
+<td>유저탑과 아이템탑을 따로 학습하고 내적으로 채점한다</td>
 <td>DeepRetrieval, Phoenix retrieval</td>
 </tr>
 </tbody></table>
-<p><strong>Meta를 같이 놓으면 축이 하나 더 생긴다.</strong> X 자료에서 캘 수 있는 건 &quot;벡터를 어떻게 만드는가&quot;(인코더 계열)이고, Meta 자료에서 캘 수 있는 건 대부분 **&quot;그 벡터를 어디에 어떻게 담는가&quot;(인덱스)**다. 같은 질문의 서로 다른 절반이라 한쪽 문헌만 읽으면 다른 쪽이 통째로 안 보인다. 아래 X 3계열 → Meta 인덱스 스택 → 대조 순서로 읽으면 된다.</p>
+<p><strong>Meta를 같이 놓으면 비교 기준이 하나 더 생긴다.</strong> X 자료에서 확인할 수 있는 것은 &quot;벡터를 어떻게 만드는가&quot;(인코더 계열)이고, Meta 자료에서 확인할 수 있는 것은 대부분 **&quot;그 벡터를 어디에 어떻게 담는가&quot;(인덱스)**다. 두 자료는 같은 질문의 서로 다른 절반이어서, 한쪽 문헌만 읽으면 다른 쪽이 전혀 보이지 않는다. 아래는 X의 3계열, Meta의 인덱스 스택, 두 회사의 대조 순서로 읽으면 된다.</p>
 <h2>계열 1 — 그래프 분해 (SimClusters)</h2>
 <p><strong>희소 벡터</strong>다. 차원이 커뮤니티 수이고 대부분 0이다. 학습이 아니라 <strong>커뮤니티 탐지</strong>로 만든다.</p>
-<p>파이프라인 <code>[확인]</code> <code>src/scala/com/twitter/simclusters_v2/</code>:</p>
+<p>파이프라인은 다음과 같다 <code>[확인]</code> <code>src/scala/com/twitter/simclusters_v2/</code>:</p>
 <ol>
-<li>팔로우 그래프에서 producer-producer 코사인 유사도를 만든다. producer 자격 <code>minActiveFollowers</code>, 상위 <code>topK</code>명. <code>[확인]</code> <code>UpdateKnownFor20M145K2020.scala:65-66</code></li>
-<li>이웃을 <code>maxNeighbors</code>로 자르고, 양방향 중 <code>Max(score)</code>로 대칭화. <code>squareWeightsEnable</code>이 켜져 있으면 엣지 가중치를 <code>cos² × 10</code>으로 바꾼다 — 이 <code>10</code>은 <strong>하드코딩</strong>이다(옆에 <code>wtCoeff</code> 파라미터가 따로 있는데 여기 안 쓰인다). <code>[확인]</code> <code>UpdateKnownForSBFRunner.scala:321-339,409-413</code>, <code>UpdateKnownFor20M145K2020.scala:84</code></li>
-<li>Metropolis-Hastings 커뮤니티 탐지로 <strong>KnownFor</strong>(producer → 커뮤니티)를 만든다. <strong>주 1회 실행</strong>(<code>batchIncrement = Days(7)</code>). <code>[확인]</code> <code>UpdateKnownFor20M145K2020.scala:46</code></li>
-<li><code>InterestedIn = 팔로우행렬 × KnownFor</code> → 유저 → 커뮤니티. <code>socialProofThreshold = 2</code>, <code>maxClustersPerUser = 50</code>. <code>[확인]</code> <code>InterestedInFromKnownFor.scala:85-86,327-336</code></li>
+<li>팔로우 그래프에서 producer-producer 코사인 유사도를 만든다. producer 자격은 <code>minActiveFollowers</code>로 정하고 상위 <code>topK</code>명을 남긴다. <code>[확인]</code> <code>UpdateKnownFor20M145K2020.scala:65-66</code></li>
+<li>이웃을 <code>maxNeighbors</code>로 자르고, 양방향 중 <code>Max(score)</code>로 대칭화한다. <code>squareWeightsEnable</code>이 켜져 있으면 엣지 가중치를 <code>cos² × 10</code>으로 바꾸는데, 이 <code>10</code>은 <strong>하드코딩</strong>이다(옆에 <code>wtCoeff</code> 파라미터가 따로 있지만 여기서는 쓰이지 않는다). <code>[확인]</code> <code>UpdateKnownForSBFRunner.scala:321-339,409-413</code>, <code>UpdateKnownFor20M145K2020.scala:84</code></li>
+<li>Metropolis-Hastings 커뮤니티 탐지로 <strong>KnownFor</strong>(producer → 커뮤니티)를 만든다. <strong>주 1회 실행</strong>한다(<code>batchIncrement = Days(7)</code>). <code>[확인]</code> <code>UpdateKnownFor20M145K2020.scala:46</code></li>
+<li><code>InterestedIn = 팔로우행렬 × KnownFor</code>로 유저별 커뮤니티를 만든다. 이때 <code>socialProofThreshold = 2</code>, <code>maxClustersPerUser = 50</code>을 쓴다. <code>[확인]</code> <code>InterestedInFromKnownFor.scala:85-86,327-336</code></li>
 <li>트윗 임베딩은 <strong>좋아요가 눌릴 때마다 그 유저의 InterestedIn 벡터를 더해서</strong> 실시간으로 누적한다. <code>[확인]</code> <code>simclusters_v2/README.md:65-67</code>, <code>summingbird/storm/TweetJob.scala:123-207</code></li>
 </ol>
 <h3>상수를 인용하기 전에 — 코드 기본값과 실제 프로덕션 실행이 다르다</h3>
-<p>이 잡의 하이퍼파라미터는 전부 <code>args.int(&quot;name&quot;, default)</code> 꼴이라 <strong>코드에 보이는 값은 CLI 인자가 없을 때의 폴백</strong>이다. 그리고 같은 파일이 주석으로 <strong>실제 프로덕션 실행 명령을 적어놨는데, 두 개가 어긋난다.</strong> <code>[확인]</code> — <code>UpdateKnownFor20M145K2020.scala:144,155</code></p>
+<p>이 잡의 하이퍼파라미터는 전부 <code>args.int(&quot;name&quot;, default)</code> 꼴이라 <strong>코드에 보이는 값은 CLI 인자가 없을 때의 폴백</strong>이다. 그리고 같은 파일이 주석으로 <strong>실제 프로덕션 실행 명령을 적어 두었는데, 두 값이 서로 어긋난다.</strong> <code>[확인]</code> — <code>UpdateKnownFor20M145K2020.scala:144,155</code></p>
 <table>
 <thead>
 <tr>
@@ -176,60 +176,60 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <td><code>wtCoeff</code></td>
 <td>10.0 <code>:84</code></td>
 <td><code>--wtCoeff 10.0</code></td>
-<td>✅ (단 위 2번에서 안 쓰임)</td>
+<td>✅ (단 위 2번에서 쓰이지 않는다)</td>
 </tr>
 </tbody></table>
-<p><code>maxEpochs</code>는 옆 파일 docstring도 &quot;run the clustering algorithm for x iterations (<strong>x = 4 in the prod setting</strong>)&quot;이라고 쓴다 <code>[확인]</code> <code>UpdateKnownForSBFRunner.scala:50</code>. 즉 <strong>두 개의 독립된 문서가 4를 가리키는데 코드 기본값만 3이다.</strong> 인용해야 할 값은 100과 4다 <code>[추정]</code>.</p>
-<p><strong>중요한 사실 두 가지 더:</strong></p>
+<p><code>maxEpochs</code>는 옆 파일의 docstring에서도 &quot;run the clustering algorithm for x iterations (<strong>x = 4 in the prod setting</strong>)&quot;이라고 쓴다 <code>[확인]</code> <code>UpdateKnownForSBFRunner.scala:50</code>. 즉 <strong>두 개의 독립된 문서가 4를 가리키는데 코드 기본값만 3이다.</strong> 인용해야 할 값은 100과 4다 <code>[추정]</code>.</p>
+<p><strong>중요한 사실이 두 가지 더 있다.</strong></p>
 <ul>
-<li><strong>&quot;커뮤니티 145,000개&quot;는 코드에 없다.</strong> 정수 <code>145000</code>은 레포 전체에서 <code>README.md:33</code> 산문 한 줄에만 나오고(&quot;In production … k ~= 145000&quot;), 나머지는 모델 버전 문자열 <code>&quot;20M_145K_2020&quot;</code>뿐이다. 코드상 k는 <strong>지난주 결과에서 이어받는다</strong>(<code>maxClusterIdInPreviousAssignment</code>). 즉 설정하는 하이퍼파라미터가 아니라 창발값이다. <code>[확인]</code> — repo-wide <code>grep 145000</code>, <code>ModelVersions.scala:11-13</code>, <code>UpdateKnownForSBFRunner.scala:636,646</code></li>
-<li><strong>알고리즘 본체가 레포에 없다.</strong> <code>com.twitter.sbf.core.MHAlgorithm</code>을 import만 하고 <code>com/twitter/sbf/</code> 소스 트리는 없다. 공개된 건 설정값뿐이다. <code>[확인]</code> <code>UpdateKnownForSBFRunner.scala:5-9</code></li>
+<li><strong>&quot;커뮤니티 145,000개&quot;는 코드에 없다.</strong> 정수 <code>145000</code>은 레포 전체에서 <code>README.md:33</code>의 산문 한 줄에만 나오고(&quot;In production … k ~= 145000&quot;), 나머지는 모델 버전 문자열 <code>&quot;20M_145K_2020&quot;</code>뿐이다. 코드에서 k는 <strong>지난주 결과에서 이어받는다</strong>(<code>maxClusterIdInPreviousAssignment</code>). 즉 설정으로 정하는 하이퍼파라미터가 아니라 실행 결과로 나타나는 값이다. <code>[확인]</code> — repo-wide <code>grep 145000</code>, <code>ModelVersions.scala:11-13</code>, <code>UpdateKnownForSBFRunner.scala:636,646</code></li>
+<li><strong>알고리즘 본체가 레포에 없다.</strong> <code>com.twitter.sbf.core.MHAlgorithm</code>을 import만 하고 <code>com/twitter/sbf/</code> 소스 트리는 없다. 공개된 것은 설정값뿐이다. <code>[확인]</code> <code>UpdateKnownForSBFRunner.scala:5-9</code></li>
 </ul>
 <p><strong>시간 감쇠가 계층마다 다르다</strong> <code>[확인]</code>:</p>
 <ul>
-<li>InterestedIn의 fav 신호: 반감기 <strong>100일</strong> (<code>InterestedInFromKnownFor.scala:286-301</code>)</li>
-<li>트윗 임베딩: 반감기 <strong>8시간</strong> (<code>summingbird/common/Configs.scala:38</code>)</li>
+<li>InterestedIn의 fav 신호는 반감기가 <strong>100일</strong>이다 (<code>InterestedInFromKnownFor.scala:286-301</code>).</li>
+<li>트윗 임베딩은 반감기가 <strong>8시간</strong>이다 (<code>summingbird/common/Configs.scala:38</code>).</li>
 </ul>
-<p>유저 취향은 느리게, 콘텐츠 인기는 빠르게 잊는다. 같은 시스템 안에서 시간 상수를 12,500배 다르게 잡았다.</p>
+<p>유저 취향은 느리게 잊고 콘텐츠 인기는 빠르게 잊는다. 같은 시스템 안에서 시간 상수를 12,500배 다르게 정했다.</p>
 <h3>SANN — 검색은 ANN이 아니라 역인덱스 스캔이다</h3>
-<p>이름은 &quot;SimClusters ANN&quot;인데 <strong>HNSW 같은 그래프 인덱스가 아니다.</strong> 커뮤니티 → 트윗 역인덱스를 브루트포스로 훑는다. <code>[확인]</code> — <code>simclusters-ann/.../ApproximateCosineSimilarity.scala</code></p>
+<p>이름은 &quot;SimClusters ANN&quot;인데 <strong>HNSW 같은 그래프 인덱스가 아니다.</strong> 커뮤니티 → 트윗 역인덱스를 브루트포스로 전부 스캔한다. <code>[확인]</code> — <code>simclusters-ann/.../ApproximateCosineSimilarity.scala</code></p>
 <pre><code>후보 클러스터 최대 50개 스캔 × 클러스터당 트윗 최대 200개 → 점수 누적 → 상위 N
 </code></pre>
 <p><code>[확인]</code> — <code>maxScanClusters = 50</code>, <code>maxTopTweetsPerCluster = 200</code>, <code>SimClustersANNCandidateSource.scala:325-347</code></p>
-<p>채점 모드가 4가지고 런타임에 고른다 <code>[확인]</code> <code>:111-119</code>:</p>
+<p>채점 모드가 4가지이고 런타임에 고른다 <code>[확인]</code> <code>:111-119</code>:</p>
 <ul>
-<li><code>LogCosine</code> — <code>score / sourceEmbedding.logNorm / log(1 + norm)</code></li>
-<li><code>Cosine</code> — <code>score / l2norm / sqrt(...)</code></li>
-<li><code>NoSourceNorm</code> — 소스 정규화 생략</li>
-<li><code>DotProduct</code> — 정규화 없음</li>
+<li><code>LogCosine</code> — <code>score / sourceEmbedding.logNorm / log(1 + norm)</code>을 쓴다.</li>
+<li><code>Cosine</code> — <code>score / l2norm / sqrt(...)</code>를 쓴다.</li>
+<li><code>NoSourceNorm</code> — 소스 정규화를 생략한다.</li>
+<li><code>DotProduct</code> — 정규화를 하지 않는다.</li>
 </ul>
-<p>프로덕션 default는 <code>PairEmbeddingCosineSimilarity</code>, <code>minScore = 0.7</code>, 후보 나이 상한 <code>1.days</code>. <code>[확인]</code> <code>:325-347</code></p>
-<p><strong>희소 벡터라서 이게 성립한다.</strong> 0이 아닌 차원이 50개뿐이면 역인덱스 스캔이 그래프 인덱스보다 싸다. 조밀 벡터에는 못 쓰는 접근이다 <code>[추정]</code>.</p>
+<p>프로덕션 기본값은 <code>PairEmbeddingCosineSimilarity</code>이고, <code>minScore = 0.7</code>, 후보 나이 상한은 <code>1.days</code>이다. <code>[확인]</code> <code>:325-347</code></p>
+<p><strong>희소 벡터라서 이 방식이 성립한다.</strong> 0이 아닌 차원이 50개뿐이면 역인덱스 스캔이 그래프 인덱스보다 비용이 적다. 조밀 벡터에는 쓸 수 없는 방식이다 <code>[추정]</code>.</p>
 <h2>계열 2 — 그래프 임베딩 (TwHIN)</h2>
 <p>이종 그래프의 (lhs, relation, rhs) 트리플을 학습한다. <strong>TransE 계열인데 거리가 아니라 내적을 쓴다.</strong></p>
 <pre><code class="language-python">translated = x[:, 1, :] + trans_embs      # RHS에 관계 벡터를 더한다
 score      = (x[:, 0, :] * translated).sum(-1)
 </code></pre>
 <p><code>[확인]</code> — <code>the-algorithm-ml/projects/twhin/models/models.py:53-54,90</code></p>
-<p><strong>공개 학습 코드에 문제가 여럿 있다</strong> — 그대로 재현하면 안 된다 <code>[확인]</code>:</p>
+<p><strong>공개 학습 코드에 문제가 여럿 있어서 그대로 재현하면 안 된다</strong> <code>[확인]</code>:</p>
 <ul>
 <li>설정 파일 docstring은 &quot;lhs에 변환을 적용&quot;이라고 쓰는데 코드는 <strong>rhs에 적용</strong>한다. <code>config.py:39-41</code> vs <code>models.py:54</code></li>
-<li>관계 임베딩 조회가 <code>self.all_trans_embs.data[batch.rels]</code> — <strong><code>.data</code>라서 autograd에서 분리된다.</strong> 이 경로로는 관계 벡터가 학습되지 않는다. <code>models.py:36</code></li>
-<li>음성 샘플에 <strong>레이블 1을 붙이고</strong> <code>neg_weight</code>로 눌러서 구분한다. <code>labels = cat([batch.labels, ones(num_negatives)])</code>. <code>models.py:150-159</code></li>
-<li>음성 점수는 관계 벡터 <strong>없이</strong> 계산한다. 양성만 <code>+ trans_embs</code>를 받는다. <code>models.py:67-68,83-87</code></li>
-<li><code>global_negatives</code>는 대입만 되고 <code>forward()</code>에서 안 쓰인다. <strong>죽은 코드.</strong> <code>models.py:25</code></li>
-<li>검증 데이터셋 생성이 주석 처리, LR 스케줄러 비활성(<code>scheduler = None</code>). <code>run.py:49</code>, <code>optimizer.py:63-64</code></li>
+<li>관계 임베딩을 <code>self.all_trans_embs.data[batch.rels]</code>로 조회하는데, <strong><code>.data</code>라서 autograd에서 분리된다.</strong> 이 경로로는 관계 벡터가 학습되지 않는다. <code>models.py:36</code></li>
+<li>음성 샘플에 <strong>레이블 1을 붙이고</strong> <code>neg_weight</code>로 가중치를 낮춰서 구분한다. <code>labels = cat([batch.labels, ones(num_negatives)])</code>. <code>models.py:150-159</code></li>
+<li>음성 점수는 관계 벡터 <strong>없이</strong> 계산한다. 양성 샘플만 <code>+ trans_embs</code>를 받는다. <code>models.py:67-68,83-87</code></li>
+<li><code>global_negatives</code>는 대입만 되고 <code>forward()</code>에서 쓰이지 않는다. <strong>죽은 코드다.</strong> <code>models.py:25</code></li>
+<li>검증 데이터셋 생성은 주석 처리돼 있고, LR 스케줄러는 비활성 상태다(<code>scheduler = None</code>). <code>run.py:49</code>, <code>optimizer.py:63-64</code></li>
 </ul>
-<p><strong>프로덕션 차원 수는 공개 안 됐다.</strong> 공개된 유일한 설정은 장난감(<code>embedding_dim: 4</code>)이고 테스트 상수는 <code>EMB_DIM = 128</code>이다. <code>[확인]</code> <code>local.yaml</code>, <code>test_models.py:16-17</code></p>
-<p>서빙 쪽은 별개로 잘 드러난다 <code>[확인]</code>:</p>
+<p><strong>프로덕션 차원 수는 공개되지 않았다.</strong> 공개된 유일한 설정은 예제용이고(<code>embedding_dim: 4</code>), 테스트 상수는 <code>EMB_DIM = 128</code>이다. <code>[확인]</code> <code>local.yaml</code>, <code>test_models.py:16-17</code></p>
+<p>서빙 쪽은 이와 별개로 잘 드러나 있다 <code>[확인]</code>:</p>
 <ul>
-<li>Manhattan 데이터셋 6종: <code>twhin_user_positive_embeddings</code>, <code>twhin_user_negative_embeddings</code>, <code>twhin_tweet_embeddings</code>, <code>twhin_video_embeddings</code>, rebuild 2종. <code>TwhinEmbeddingsStore.scala:32-49</code></li>
-<li><strong>참여 16회 미만이면 임베딩을 0으로 만든다</strong> (<code>MinEngagementCount = 16</code>, 이상이면 카운트로 나눠 정규화). <code>:32-49,57-65</code></li>
-<li>홈 랭킹 피처로도 들어간다: <code>user.twhin.tw_hi_n.user_engagement_as_float_tensor</code> 등. <code>TwhinEmbeddingsAdapter.scala:33-46</code></li>
+<li>Manhattan 데이터셋을 6종 쓴다. <code>twhin_user_positive_embeddings</code>, <code>twhin_user_negative_embeddings</code>, <code>twhin_tweet_embeddings</code>, <code>twhin_video_embeddings</code>, 그리고 rebuild 2종이다. <code>TwhinEmbeddingsStore.scala:32-49</code></li>
+<li><strong>참여 16회 미만이면 임베딩을 0으로 만든다</strong> (<code>MinEngagementCount = 16</code>, 그 이상이면 카운트로 나눠 정규화한다). <code>:32-49,57-65</code></li>
+<li>홈 랭킹 피처로도 들어간다. <code>user.twhin.tw_hi_n.user_engagement_as_float_tensor</code> 등이 그 예다. <code>TwhinEmbeddingsAdapter.scala:33-46</code></li>
 </ul>
 <p><strong>즉 TwHIN은 검색용이면서 동시에 랭킹 피처다.</strong> 임베딩을 두 군데서 재사용한다.</p>
 <h2>계열 3 — Two-tower (DeepRetrieval)</h2>
-<p>X 2025의 주력 OON 후보 생성기. <strong>유저탑은 실시간 원격 호출, 아이템탑은 미리 계산해 벡터DB에.</strong></p>
+<p>X 2025의 주력 OON 후보 생성기다. <strong>유저탑은 실시간으로 원격 호출하고, 아이템탑은 미리 계산해 벡터DB에 넣어 둔다.</strong></p>
 <pre><code>유저 임베딩 = Hydra EmbeddingGenerationService gRPC 호출
 아이템      = VecDB 컬렉션(사전 계산)
 검색        = annClient.search(collection, vector, SearchParams(limit, scoreThreshold), filter)
@@ -237,13 +237,13 @@ score      = (x[:, 0, :] * translated).sum(-1)
 <p><code>[확인]</code> — <code>DeepRetrievalUserEmbeddingQueryFeatureHydrator.scala:92-98</code>, <code>DeepRetrievalUserTweetANNCandidateSource.scala:77-84</code></p>
 <p><strong>u2i와 i2i가 호출 방식부터 다르다</strong> <code>[확인]</code>:</p>
 <ul>
-<li>u2i: 클라이언트가 유저 벡터를 들고 가서 <code>search(vector)</code></li>
-<li>i2i: 벡터를 안 보내고 <code>searchById(tweetId)</code> — 씨앗 트윗의 벡터를 서버가 알아서 찾는다. <code>DeepRetrievalTweetTweetANNCandidateSource.scala:71-77</code></li>
+<li>u2i: 클라이언트가 유저 벡터를 들고 가서 <code>search(vector)</code>를 호출한다.</li>
+<li>i2i: 벡터를 보내지 않고 <code>searchById(tweetId)</code>를 호출하면, 씨앗 트윗의 벡터를 서버가 직접 찾는다. <code>DeepRetrievalTweetTweetANNCandidateSource.scala:71-77</code></li>
 </ul>
-<p><strong>지연 예산이 아주 빡빡하다.</strong> 유저 임베딩 생성은 요청당 150ms / 총 250ms, 재시도는 1%만. <code>[확인]</code> <code>HydraEmbeddingGenerationServiceClientModule.scala:19-40</code></p>
-<p><strong>페이로드 필터가 벡터 검색에 붙는다</strong> — <code>category</code>, <code>isHighQuality</code>, <code>isHighNegEngRatio</code>, <code>tier</code>. 즉 순수 최근접이 아니라 <strong>필터링된 ANN</strong>이다. <code>[확인]</code> <code>DeepRetrievalUserTweetANNCandidateSource.scala:103-121</code></p>
-<p>컬렉션이 최소 12개다 — <code>tweet-deep-retrieval</code>, <code>tweet-deep-retrieval-exp3</code>, <code>content-exploration-deep-retrieval</code>, <code>content-exploration-text-emb</code>, <code>tweet-deep-retrieval-media</code>, <code>creator-incentive-retrieval-v1</code>, <code>refreshed-twhin-tweet</code> 등. <strong>여러 모델을 동시에 서빙한다.</strong> <code>[확인]</code> <code>TweetMixerGlobalParams.scala:461-1149</code></p>
-<p><strong>학습 코드는 공개되지 않았다.</strong> <code>tweet-mixer/</code>에는 추론 호출만 있고 아키텍처·손실·음성 샘플링이 없다. <code>[확인]</code> — repo-wide</p>
+<p><strong>지연 예산이 매우 빠듯하다.</strong> 유저 임베딩 생성은 요청당 150ms, 전체 250ms이고, 재시도는 1%만 허용한다. <code>[확인]</code> <code>HydraEmbeddingGenerationServiceClientModule.scala:19-40</code></p>
+<p><strong>벡터 검색에 페이로드 필터가 함께 적용된다.</strong> 필터는 <code>category</code>, <code>isHighQuality</code>, <code>isHighNegEngRatio</code>, <code>tier</code>이다. 즉 순수 최근접 검색이 아니라 <strong>필터링된 ANN</strong>이다. <code>[확인]</code> <code>DeepRetrievalUserTweetANNCandidateSource.scala:103-121</code></p>
+<p>컬렉션이 최소 12개다. <code>tweet-deep-retrieval</code>, <code>tweet-deep-retrieval-exp3</code>, <code>content-exploration-deep-retrieval</code>, <code>content-exploration-text-emb</code>, <code>tweet-deep-retrieval-media</code>, <code>creator-incentive-retrieval-v1</code>, <code>refreshed-twhin-tweet</code> 등이 있다. <strong>여러 모델을 동시에 서빙한다.</strong> <code>[확인]</code> <code>TweetMixerGlobalParams.scala:461-1149</code></p>
+<p><strong>학습 코드는 공개되지 않았다.</strong> <code>tweet-mixer/</code>에는 추론 호출만 있고 아키텍처와 손실, 음성 샘플링이 없다. <code>[확인]</code> — repo-wide</p>
 <h2>인덱스 계층 — 세 종류가 공존한다</h2>
 <table>
 <thead>
@@ -256,7 +256,7 @@ score      = (x[:, 0, :] * translated).sum(-1)
 <tbody><tr>
 <td>자체 HNSW (Scala/Java)</td>
 <td>레거시 ANN 서비스</td>
-<td><strong>레포에 프로덕션 값 없음</strong> — 아래 참조</td>
+<td><strong>레포에 프로덕션 값이 없다.</strong> 아래를 참조하라</td>
 </tr>
 <tr>
 <td>FAISS SWIG 바인딩</td>
@@ -276,23 +276,23 @@ score      = (x[:, 0, :] * translated).sum(-1)
 <tr>
 <td>SANN 역인덱스</td>
 <td>SimClusters</td>
-<td>위 참조</td>
+<td>위를 참조하라</td>
 </tr>
 </tbody></table>
 <p><code>[확인]</code> — <code>TwHINANNCandidateSource.scala:76-78</code>, <code>ann/src/main/java/com/twitter/ann/faiss/swig/</code></p>
-<p><strong>HNSW 숫자를 인용하면 안 되는 이유.</strong> grep으로 잡히는 세 값이 전부 프로덕션 설정이 아니다 <code>[확인]</code>:</p>
+<p><strong>HNSW 숫자를 인용하면 안 되는 이유는 다음과 같다.</strong> grep으로 검색되는 세 값이 모두 프로덕션 설정이 아니다 <code>[확인]</code>:</p>
 <ul>
-<li><code>efConstruction = 200</code>, <code>maxM = 16</code> → <code>ann/.../experimental/Runner.scala:28-29</code>. 같은 <code>main()</code> 안에 <code>dimen = 300</code>, <code>trainDataSetSize = 2000</code>, <code>testDataSetSize = 30</code>이 함께 있는 <strong>리콜 벤치마크 장난감</strong>이다.</li>
-<li><code>ef = 800</code> → <code>HnswQueryIndexServer.scala:95</code>. <code>warmup()</code> 안의 <code>queryWithDistance(randomQuery(), 100, HnswParams(ef = 800))</code> — <strong>JIT 예열용 무작위 쿼리</strong>지 서빙 기본값이 아니다.</li>
-<li>실제 값은 전부 잡 인자다: <code>args.int(&quot;ef_construction&quot;)</code> <code>[확인]</code> <code>IndexBuilderApp.scala:59</code>, <code>IndexBuilderFromBQApp.scala:124</code>, <code>IndexingStrategy.scala:50</code>. <strong>인자를 넘기는 설정 파일은 레포에 없다.</strong></li>
+<li><code>efConstruction = 200</code>, <code>maxM = 16</code> → <code>ann/.../experimental/Runner.scala:28-29</code>. 같은 <code>main()</code> 안에 <code>dimen = 300</code>, <code>trainDataSetSize = 2000</code>, <code>testDataSetSize = 30</code>이 함께 있는 <strong>리콜 벤치마크용 예제 코드</strong>다.</li>
+<li><code>ef = 800</code> → <code>HnswQueryIndexServer.scala:95</code>. <code>warmup()</code> 안에 있는 <code>queryWithDistance(randomQuery(), 100, HnswParams(ef = 800))</code>의 값인데, <strong>JIT 예열용 무작위 쿼리</strong>이지 서빙 기본값이 아니다.</li>
+<li>실제 값은 전부 잡 인자다. <code>args.int(&quot;ef_construction&quot;)</code>으로 받는다 <code>[확인]</code> <code>IndexBuilderApp.scala:59</code>, <code>IndexBuilderFromBQApp.scala:124</code>, <code>IndexingStrategy.scala:50</code>. <strong>인자를 넘기는 설정 파일은 레포에 없다.</strong></li>
 </ul>
-<p>같은 함정을 2026 Rust 쪽에서도 봤다 — 모듈 트리에서 끊긴 스코어러 파일에 <code>p::AUTHOR_DIVERSITY_DECAY</code> 하드코딩 상수가 남아 있는 것. <strong>&quot;grep으로 숫자가 잡힌다&quot;와 &quot;그 숫자가 돌고 있다&quot;는 다른 얘기다.</strong></p>
-<p><strong>모든 임베딩 검색 결과는 memcache로 감싼다.</strong> TTL 600초에 **지터 20%**를 준다 — <code>randomizedTTL(ttl, earlyExpiration = 0.2)</code> = <code>ttl - ttl × 0.2 × rand()</code>. 동시 만료로 인한 thundering herd 방지다 <code>[추정]</code>. <code>[확인]</code> <code>Utils.scala:47-49</code></p>
-<p>예외: 트윗-트윗 <strong>임베딩</strong> ANN만 TTL 180초다. <code>[확인]</code> <code>DeepRetrievalTweetTweetEmbeddingANNCandidateSource.scala:52</code></p>
-<p><strong>캐시 코드에 함정이 하나 있다.</strong> <code>MemcachedCandidateSource</code>에서 캐시가 &quot;꺼진&quot; 경로도 <strong>쓰기는 한다</strong> — 읽기만 건너뛴다. <code>[확인]</code> <code>MemcachedCandidateSource.scala:41-53</code></p>
+<p>같은 주의할 점을 2026 Rust 쪽에서도 확인했다. 모듈 트리에서 끊긴 스코어러 파일에 <code>p::AUTHOR_DIVERSITY_DECAY</code> 하드코딩 상수가 남아 있었다. <strong>&quot;grep으로 숫자가 검색된다&quot;와 &quot;그 숫자가 실제로 돌고 있다&quot;는 다른 이야기다.</strong></p>
+<p><strong>모든 임베딩 검색 결과는 memcache로 감싼다.</strong> TTL 600초에 **지터 20%**를 준다. 계산식은 <code>randomizedTTL(ttl, earlyExpiration = 0.2)</code> = <code>ttl - ttl × 0.2 × rand()</code>이다. 동시 만료로 인한 thundering herd를 막으려는 처리다 <code>[추정]</code>. <code>[확인]</code> <code>Utils.scala:47-49</code></p>
+<p>예외가 하나 있다. 트윗-트윗 <strong>임베딩</strong> ANN만 TTL 180초다. <code>[확인]</code> <code>DeepRetrievalTweetTweetEmbeddingANNCandidateSource.scala:52</code></p>
+<p><strong>캐시 코드에 주의할 점이 하나 있다.</strong> <code>MemcachedCandidateSource</code>에서 캐시가 &quot;꺼진&quot; 경로도 <strong>쓰기는 한다</strong>. 건너뛰는 것은 읽기뿐이다. <code>[확인]</code> <code>MemcachedCandidateSource.scala:41-53</code></p>
 <hr>
 <h1>Meta — 재미있는 부분이 인코더가 아니라 인덱스에 있다</h1>
-<p>Meta의 retrieval 공개 문헌을 시간순으로 늘어놓으면 <strong>two-tower가 등장하는 건 중간 한 번뿐이고, 앞뒤로는 전부 인덱스 얘기다.</strong> 2020년에는 ANN을 기존 역인덱스 쿼리 언어에 밀어 넣었고, 2024~2026년에는 인덱스를 학습시키거나(HILL) 모델 텐서 안으로 접어 넣었다(SilverTorch). &quot;무슨 임베딩을 쓰나&quot;보다 **&quot;인덱스를 무엇으로 볼 것인가&quot;**가 이 계보의 질문이다.</p>
+<p>Meta의 retrieval 공개 문헌을 시간순으로 나열하면 <strong>two-tower가 등장하는 것은 중간 한 번뿐이고, 앞뒤로는 전부 인덱스 이야기다.</strong> 2020년에는 ANN을 기존 역인덱스 쿼리 언어 안에 추가했고, 2024~2026년에는 인덱스를 학습시키거나(HILL) 모델 텐서 안으로 옮겼다(SilverTorch). &quot;무슨 임베딩을 쓰나&quot;보다 **&quot;인덱스를 무엇으로 볼 것인가&quot;**가 이 계보의 질문이다.</p>
 <h2>계층 0 — EBR 2020: ANN을 별도 서비스로 빼지 않았다</h2>
 <p><code>[확인]</code> <a href="https://arxiv.org/abs/2006.11632">Embedding-based Retrieval in Facebook Search</a>, KDD 2020 (arXiv 2020-06). Facebook Search 배포 사례이지만 이후 Meta 전체 retrieval 문헌의 출발점이라 여기에 둔다.</p>
 <p>기존 Boolean 역인덱스(Unicorn)에 <strong>최근접 이웃 연산자를 하나 추가</strong>했다:</p>
@@ -301,30 +301,30 @@ score      = (x[:, 0, :] * translated).sum(-1)
 <blockquote>
 <p><em>&quot;By having the (nn) operator as part of our Boolean query language we can now support <strong>hybrid retrieval expressions</strong>, with arbitrary combinations of embeddings and terms.&quot;</em></p>
 </blockquote>
-<p>즉 <code>(and (term &quot;sports&quot;) (nn user_emb :radius 0.3))</code> 같은 식으로 <strong>term 매칭과 임베딩 검색이 한 쿼리 안에서 합성된다.</strong> 별도 ANN 서비스에 붙였다 떼는 구조가 아니다. 이유도 직접 밝힌다 <code>[확인]</code>:</p>
+<p>즉 <code>(and (term &quot;sports&quot;) (nn user_emb :radius 0.3))</code> 같은 식으로 <strong>term 매칭과 임베딩 검색이 한 쿼리 안에서 합성된다.</strong> 별도의 ANN 서비스를 붙였다 떼는 구조가 아니다. 이유도 직접 밝힌다 <code>[확인]</code>:</p>
 <blockquote>
 <p><em>&quot;By implementing NN support in terms of pre-existing primitives, instead of writing a separate system, we <strong>inherited all the features of the existing system</strong>, such as realtime updates, efficient query planning and execution, and support for multi-hop queries.&quot;</em></p>
 </blockquote>
-<p><strong>radius 모드 vs top-K 모드</strong> — 논문이 radius 쪽을 골랐다 <code>[확인]</code>:</p>
+<p><strong>radius 모드와 top-K 모드 중에서 논문은 radius 모드를 골랐다</strong> <code>[확인]</code>:</p>
 <blockquote>
 <p><em>&quot;we found that <strong>radius mode can give better trade-off</strong> of system performance and result quality. One possible reason is that radius mode enables a <strong>constrained NN search</strong> (constrained by other parts of the matching expression) but top K mode provides a more relaxed operation which needs to <strong>scan the whole index</strong> to get top K results.&quot;</em></p>
 </blockquote>
-<p>→ <strong>필터가 ANN 결과에 사후 적용되는 게 아니라 ANN 탐색 자체를 제약한다.</strong> X의 DeepRetrieval도 payload 필터를 거는 &quot;필터링된 ANN&quot;이지만(위 참조), 그건 벡터DB에 필터를 넘기는 형태고 Meta 2020은 <strong>필터가 곧 쿼리 언어</strong>다. 같은 문제의식에 대한 두 단계 다른 답이다 <code>[추정]</code>.</p>
+<p>→ <strong>필터가 ANN 결과에 사후 적용되는 것이 아니라 ANN 탐색 자체를 제약한다.</strong> X의 DeepRetrieval도 payload 필터를 거는 &quot;필터링된 ANN&quot;이지만(위 참조), 그것은 벡터DB에 필터를 넘기는 형태이고 Meta 2020은 <strong>필터가 곧 쿼리 언어</strong>다. 같은 문제의식에 대한 두 단계 다른 답이다 <code>[추정]</code>.</p>
 <p><strong>양자화 튜닝</strong> (전부 <code>[확인]</code>, 같은 논문):</p>
 <ul>
 <li><em>&quot;We experimented with both PCA and OPQ to transform the data, and observed that <strong>OPQ is generally more effective</strong>.&quot;</em></li>
 <li>PQ 바이트 수: <em>&quot;we found that the accuracy improvement is limited after x &gt; d/4.&quot;</em></li>
 <li>coarse quantizer: <em>&quot;It is useful to compare between <strong>IMI and IVF</strong> algorithms.&quot;</em></li>
-<li>운영 지침: <em>&quot;<strong>Tune nprobe, num_clusters, and pq_bytes online</strong> to understand the real perf impact.&quot;</em> — 오프라인 recall이 아니라 온라인에서 튜닝하라고 명시한다.</li>
+<li>운영 지침: <em>&quot;<strong>Tune nprobe, num_clusters, and pq_bytes online</strong> to understand the real perf impact.&quot;</em> 오프라인 recall이 아니라 온라인에서 튜닝하라고 명시한다.</li>
 </ul>
 <p><strong>hard negative mining</strong> (전부 <code>[확인]</code>):</p>
 <ul>
-<li>online HNM: 배치 안의 다른 positive 문서들로 작은 풀을 만들고 <em>&quot;select the documents which received the highest similarity scores as the hardest negatives&quot;</em></li>
-<li>offline HNM: (1) 쿼리별 top K 생성 → (2) hard negative 선택 → (3) 재학습 → (4) 반복</li>
+<li>online HNM: 배치 안의 다른 positive 문서들로 작은 풀을 만들고 *&quot;select the documents which received the highest similarity scores as the hardest negatives&quot;*라고 설명한다.</li>
+<li>offline HNM: (1) 쿼리별로 top K를 생성하고 → (2) hard negative를 선택하고 → (3) 재학습하고 → (4) 이 과정을 반복한다.</li>
 <li><strong>가장 어려운 것을 쓰면 안 된다</strong>: <em>&quot;using the <strong>hardest examples is not the best strategy</strong>. We compared sampling from different rank positions and found <strong>sampling between rank 101-500</strong> achieved the best model recall.&quot;</em></li>
 </ul>
-<p><code>[추정]</code> 이 마지막 문장이 실무적으로 제일 값나간다. &quot;hard negative를 쓴다&quot;는 서술만 있는 논문이 대부분인데 <strong>어느 랭크 구간에서 뽑는지가 결과를 가른다</strong>고 수치로 말한 몇 안 되는 1차 출처다.</p>
-<h2>계층 1 — SilverTorch (2025~2026): 인덱스를 모델 안 텐서로 접었다</h2>
+<p><code>[추정]</code> 이 마지막 문장이 실무적으로 가장 가치가 크다. &quot;hard negative를 쓴다&quot;는 서술만 있는 논문이 대부분인데, <strong>어느 랭크 구간에서 뽑는지가 결과를 좌우한다</strong>고 수치로 말한 몇 안 되는 1차 출처다.</p>
+<h2>계층 1 — SilverTorch (2025~2026): 인덱스를 모델 안의 텐서로 옮겼다</h2>
 <p><code>[확인]</code> <a href="https://engineering.fb.com/2026/05/26/ml-applications/silvertorch-index-as-model-new-retrieval-paradigm-recommendation-systems/">SilverTorch 블로그</a>, 2026-05-26 / <a href="https://arxiv.org/html/2511.14881v3">논문 HTML</a>, arXiv 2025-11 초판</p>
 <blockquote>
 <p><em>&quot;<strong>Index as Model</strong>: Every retrieval component — the item index, eligibility filter, scoring layer and user tower — becomes <strong>a tensor or operator inside a single PyTorch model</strong>.&quot;</em></p>
@@ -354,53 +354,53 @@ score      = (x[:, 0, :] * translated).sum(-1)
 <td>후단 랭킹 일부</td>
 </tr>
 </tbody></table>
-<p>수치 (전부 <code>[확인]</code>): Bloom index <strong>291–523×</strong> faster than CPU inverted index / fused Int8 ANN kernel <strong>2.2–14.7×</strong> faster than Faiss-GPU / 전체 <strong>23.7×</strong> more requests per second, TCO <strong>20.9×</strong>.</p>
-<p><strong>정책 필터가 GPU 커널 안으로 들어갔다는 게 핵심이다</strong> <code>[추정]</code>. X는 필터를 벡터DB의 payload 조건으로 넘기고, Meta 2020은 쿼리 언어의 Boolean 절로 표현했고, SilverTorch는 <strong>모델 forward 안의 bitwise 연산</strong>으로 만들었다. 세 세대 모두 &quot;필터를 어디에 두느냐&quot;가 아키텍처를 결정한다.</p>
-<p>인덱스 갱신 주기·스트리밍 in-place 갱신은 여기서 반복하지 않는다 → <a href="model-freshness.html">model-freshness.md</a>.</p>
-<h2>계층 2 — MoL과 h-indexer: 내적을 버리되 인덱스로 벌충한다</h2>
+<p>수치는 다음과 같다 (전부 <code>[확인]</code>). Bloom index는 CPU 역인덱스보다 <strong>291–523×</strong> 빠르고, fused Int8 ANN kernel은 Faiss-GPU보다 <strong>2.2–14.7×</strong> 빠르며, 전체 처리량은 초당 요청 수 기준 <strong>23.7×</strong>, TCO는 <strong>20.9×</strong> 개선된다.</p>
+<p><strong>정책 필터가 GPU 커널 안으로 들어갔다는 것이 핵심이다</strong> <code>[추정]</code>. X는 필터를 벡터DB의 payload 조건으로 넘기고, Meta 2020은 쿼리 언어의 Boolean 절로 표현했고, SilverTorch는 <strong>모델 forward 안의 bitwise 연산</strong>으로 만들었다. 세 세대 모두 &quot;필터를 어디에 두느냐&quot;가 아키텍처를 결정한다.</p>
+<p>인덱스 갱신 주기와 스트리밍 in-place 갱신은 여기서 반복하지 않는다 → <a href="model-freshness.html">model-freshness.md</a>.</p>
+<h2>계층 2 — MoL과 h-indexer: 내적을 버리되 인덱스로 보완한다</h2>
 <p><code>[확인]</code> <a href="https://arxiv.org/abs/2306.04039">Revisiting Neural Retrieval on Accelerators</a>, KDD 2023 (Meta)</p>
 <p>문제 제기가 명확하다: <em>&quot;dot product-based models produce <strong>low-rank</strong> recommendations&quot;</em>, <em>&quot;dot products cannot capture complex user-item interactions, which are <strong>multifaceted and likely high rank</strong>.&quot;</em> <code>[확인]</code></p>
 <ul>
-<li><strong>MoL (Mixture of Logits)</strong> — <em>&quot;parameterize ϕθ(u,x) as an <strong>adaptive mixture of more elementary logits</strong>&quot;</em>. 후속 논문의 수식: <code>ϕ(q,x) = Σ_{p=1..P} π_p(q,x)·⟨f_p(q), g_p(x)⟩</code> — P쌍의 저랭크 임베딩 내적에 adaptive gating weight를 건다. <code>[확인]</code> <a href="https://arxiv.org/abs/2407.15462">Retrieval with Learned Similarities</a>, Bailu Ding(Microsoft)·Jiaqi Zhai(Meta), arXiv 2024-07</li>
-<li><strong>h-indexer</strong> — MoL은 내적이 아니라 ANN 인덱스를 못 쓴다. 그래서 2단으로 나눈다 <code>[확인]</code>: <em>&quot;an accelerator friendly algorithm, <strong>h-indexer</strong>, is used to find a large number of candidates (<strong>k′=10⁵</strong>) out of a <strong>100M corpus</strong>, and then a complex similarity function (e.g., mixture-of-logits) is used to find the final top k (e.g., <strong>100</strong>) candidates.&quot;</em></li>
-<li>지연: <em>&quot;The median serving GPU latency of our proposed architecture is <strong>30ms</strong>, comparable with optimized CPU MIPS baseline (<strong>20ms</strong>).&quot;</em> <code>[확인]</code></li>
+<li><strong>MoL (Mixture of Logits)</strong> — *&quot;parameterize ϕθ(u,x) as an <strong>adaptive mixture of more elementary logits</strong>&quot;*라고 쓴다. 후속 논문의 수식은 <code>ϕ(q,x) = Σ_{p=1..P} π_p(q,x)·⟨f_p(q), g_p(x)⟩</code>이다. 즉 P쌍의 저랭크 임베딩 내적에 adaptive gating weight를 적용한다. <code>[확인]</code> <a href="https://arxiv.org/abs/2407.15462">Retrieval with Learned Similarities</a>, Bailu Ding(Microsoft)·Jiaqi Zhai(Meta), arXiv 2024-07</li>
+<li><strong>h-indexer</strong> — MoL은 내적이 아니라서 ANN 인덱스를 쓸 수 없다. 그래서 2단으로 나눈다 <code>[확인]</code>: <em>&quot;an accelerator friendly algorithm, <strong>h-indexer</strong>, is used to find a large number of candidates (<strong>k′=10⁵</strong>) out of a <strong>100M corpus</strong>, and then a complex similarity function (e.g., mixture-of-logits) is used to find the final top k (e.g., <strong>100</strong>) candidates.&quot;</em></li>
+<li>지연은 다음과 같다: <em>&quot;The median serving GPU latency of our proposed architecture is <strong>30ms</strong>, comparable with optimized CPU MIPS baseline (<strong>20ms</strong>).&quot;</em> <code>[확인]</code></li>
 </ul>
-<p>→ <strong>&quot;내적을 버렸다&quot;가 아니라 &quot;내적을 1단으로 강등했다&quot;이다</strong> <code>[추정]</code>. 표현력을 올리는 대가를 인덱스 계층 하나를 더 쌓아서 치른다. SilverTorch의 OverArch가 MoL을 구현한다는 문장과 이어 읽으면, MoL은 2023 논문에서 2026 프로덕션 서빙 스택으로 실제로 넘어간 것으로 보인다 <code>[추정]</code> — 다만 두 문서가 서로를 명시적으로 잇지는 않는다.</p>
-<p>⚠ <strong>h-indexer는 MoL 논문(2407.15462)에 없다.</strong> 출처는 KDD 2023 쪽이다. <code>[관찰]</code> 2026-08-09 — 검사한 코퍼스는 arXiv 2407.15462의 <strong>v3·v4 HTML 전문 2건</strong>이고 <code>h-indexer</code> 문자열이 0회다.</p>
+<p>→ <strong>&quot;내적을 버렸다&quot;가 아니라 &quot;내적을 1단으로 강등했다&quot;이다</strong> <code>[추정]</code>. 표현력을 올리는 대가를 인덱스 계층 하나를 더 쌓아서 치른다. SilverTorch의 OverArch가 MoL을 구현한다는 문장과 이어 읽으면, MoL은 2023 논문에서 2026 프로덕션 서빙 스택으로 실제로 넘어간 것으로 보인다 <code>[추정]</code>. 다만 두 문서가 서로를 명시적으로 연결하지는 않는다.</p>
+<p>⚠ <strong>h-indexer는 MoL 논문(2407.15462)에 없다.</strong> 출처는 KDD 2023 쪽이다. <code>[관찰]</code> 2026-08-09. 검사한 코퍼스는 arXiv 2407.15462의 <strong>v3·v4 HTML 전문 2건</strong>이고, 그 안에서 <code>h-indexer</code> 문자열은 0회 나온다.</p>
 <h2>계층 3 — RankGraph: co-engagement 그래프를 retrieval 인덱스로 쓴다</h2>
 <ul>
-<li><strong>RankGraph</strong> <code>[확인]</code> <a href="https://arxiv.org/abs/2509.02942">arXiv:2509.02942</a>, 2025-09. 여러 프로덕트를 가로지르는 이종 그래프(users, posts, ads 등)를 만들고 GPU GNN + contrastive learning으로 similarity retrieval과 real-time clustering에 쓴다. <strong>recommendation foundation model의 구성요소</strong>로 위치시킨다.</li>
-<li><strong>RankGraph-2</strong> <code>[확인]</code> <a href="https://arxiv.org/html/2606.18379">arXiv HTML 2606.18379</a>, 2026. <strong>U2U2I / U2I2I</strong> 두 경로. 엣지 3종(U-U, I-I, U-I)을 <strong>참여 데이터만으로</strong> 만들고, I-I 엣지에 popularity bias 보정, PPR 기반 이웃 사전계산. 오프라인 recall 최대 <strong>3.8×</strong>, 14일 A/B에서 CTR <strong>+0.96%</strong> / CVR <strong>+2.75%</strong>, U2U 서빙 인프라 비용 <strong>−83%</strong>.</li>
+<li><strong>RankGraph</strong> <code>[확인]</code> <a href="https://arxiv.org/abs/2509.02942">arXiv:2509.02942</a>, 2025-09. 여러 프로덕트를 가로지르는 이종 그래프(users, posts, ads 등)를 만들고, GPU GNN과 contrastive learning으로 similarity retrieval과 real-time clustering에 쓴다. <strong>recommendation foundation model의 구성요소</strong>로 자리매김한다.</li>
+<li><strong>RankGraph-2</strong> <code>[확인]</code> <a href="https://arxiv.org/html/2606.18379">arXiv HTML 2606.18379</a>, 2026. <strong>U2U2I / U2I2I</strong> 두 경로를 쓴다. 엣지 3종(U-U, I-I, U-I)을 <strong>참여 데이터만으로</strong> 만들고, I-I 엣지에는 popularity bias를 보정하며, PPR을 기준으로 이웃을 미리 계산한다. 오프라인 recall이 최대 <strong>3.8×</strong> 오르고, 14일 A/B에서 CTR은 <strong>+0.96%</strong>, CVR은 <strong>+2.75%</strong> 올랐으며, U2U 서빙 인프라 비용의 변화는 **−83%**다.</li>
 </ul>
-<p><strong>X의 SimClusters와 겨냥이 다르다</strong> <code>[추정]</code>: SimClusters는 <strong>팔로우 그래프</strong>를 커뮤니티로 분해하고 주 1회 갱신하는데, RankGraph-2는 <strong>참여 그래프</strong>를 3시간마다 통째로 다시 만든다(→ <a href="model-freshness.html">model-freshness.md</a>). 소셜 그래프 기반과 행동 그래프 기반의 차이가 그대로 갱신 주기 차이로 나온다. 다만 X도 TwHIN에서 참여 엣지를 쓰므로 &quot;X=소셜 / Meta=행동&quot;으로 단순화하면 틀린다.</p>
+<p><strong>X의 SimClusters와 목표가 다르다</strong> <code>[추정]</code>. SimClusters는 <strong>팔로우 그래프</strong>를 커뮤니티로 분해하고 주 1회 갱신하는데, RankGraph-2는 <strong>참여 그래프</strong>를 3시간마다 전부 다시 만든다(→ <a href="model-freshness.html">model-freshness.md</a>). 소셜 그래프 기반과 행동 그래프 기반의 차이가 그대로 갱신 주기 차이로 나타난다. 다만 X도 TwHIN에서 참여 엣지를 쓰므로 &quot;X=소셜 / Meta=행동&quot;으로 단순화하면 틀린다.</p>
 <h2>계층 4 — Andromeda + HILL/MoNN: 인덱스를 학습시킨다</h2>
 <p><code>[확인]</code> <a href="https://engineering.fb.com/2024/12/02/production-engineering/meta-andromeda-advantage-automation-next-gen-personalized-ads-retrieval-engine/">Meta Andromeda</a>, 2024-12-02</p>
 <blockquote>
 <p><em>&quot;Andromeda organizes ads into a <strong>hierarchical index with multiple layers</strong>, reducing the number of inference steps by focusing only on most relevant nodes.&quot;</em>
 <em>&quot;The <strong>hierarchical index and retrieval models are jointly trained</strong>, which aligns the index representations with neural networks; this improves both precision and recall compared to <strong>commonly used two-tower neural networks or approximate nearest neighbor search</strong>.&quot;</em></p>
 </blockquote>
-<p><strong>이 마지막 절이 이 노트에서 가장 중요한 한 줄이다.</strong> Meta가 two-tower + ANN을 <strong>자기가 이겨야 할 베이스라인</strong>으로 명시했다. 이 저장소가 &quot;two-tower가 표준&quot;이라고 적어온 프레임을 1차 출처가 직접 반박한다.</p>
+<p><strong>이 마지막 절이 이 노트에서 가장 중요한 한 줄이다.</strong> Meta가 two-tower와 ANN을 <strong>자기가 이겨야 할 베이스라인</strong>으로 명시했다. 이 저장소가 &quot;two-tower가 표준&quot;이라고 적어온 틀을 1차 출처가 직접 반박한다.</p>
 <ul>
 <li>하드웨어: <em>&quot;NVIDIA Grace Hopper Superchip and <strong>Meta Training and Inference Accelerator (MTIA)</strong> hardware&quot;</em> <code>[확인]</code></li>
 <li>성과: <em>&quot;+<strong>6% recall</strong> improvement to the retrieval system, delivering +<strong>8% ads quality</strong> improvement on selected segments&quot;</em> <code>[확인]</code></li>
 </ul>
-<p>2026년에 논문으로 내부가 열렸다 <code>[확인]</code> <a href="https://arxiv.org/html/2604.12965v1">Efficient Retrieval Scaling with Hierarchical Indexing for Large Scale Recommendation</a>, Meta, arXiv 2026-04-14:</p>
+<p>2026년에 논문으로 내부 구조가 공개됐다 <code>[확인]</code> <a href="https://arxiv.org/html/2604.12965v1">Efficient Retrieval Scaling with Hierarchical Indexing for Large Scale Recommendation</a>, Meta, arXiv 2026-04-14:</p>
 <ul>
-<li><strong>MoNN = Modular Neural Network</strong> — <em>&quot;enhances the learning of sophisticated user and item interactions <strong>beyond a single dot product</strong> while maintaining high efficiency.&quot;</em> Meta Ads Platform의 foundation retrieval model이고 <em>&quot;currently in service for recommending advertisements to daily Facebook and Instagram users.&quot;</em></li>
-<li><strong>HILL</strong> — <em>&quot;aims to <strong>hierarchically organize the memory in the foundation retrieval model</strong>, such that the searching and retrieval along the structure can be speed up and maintain the exactness.&quot;</em></li>
-<li>트리 구축이 학습이다: <em>&quot;we aim to design a <strong>learning-based tree construction method</strong>&quot;</em>, 아이템 임베딩을 query로 쓰는 cross-attention, <em>&quot;inspired by <strong>residual quantization</strong> ... we aim to pass residue between input item embedding&quot;</em>, 그리고 <em>&quot;enjoys the <strong>co-training</strong> with the foundation retrieval model.&quot;</em></li>
+<li><strong>MoNN = Modular Neural Network</strong> — *&quot;enhances the learning of sophisticated user and item interactions <strong>beyond a single dot product</strong> while maintaining high efficiency.&quot;*라고 쓴다. Meta Ads Platform의 foundation retrieval model이고 *&quot;currently in service for recommending advertisements to daily Facebook and Instagram users.&quot;*라고 밝힌다.</li>
+<li><strong>HILL</strong> — *&quot;aims to <strong>hierarchically organize the memory in the foundation retrieval model</strong>, such that the searching and retrieval along the structure can be speed up and maintain the exactness.&quot;*라고 설명한다.</li>
+<li>트리 구축 자체가 학습이다. *&quot;we aim to design a <strong>learning-based tree construction method</strong>&quot;*라고 쓰고, 아이템 임베딩을 query로 쓰는 cross-attention을 두며, *&quot;inspired by <strong>residual quantization</strong> ... we aim to pass residue between input item embedding&quot;*이라고 밝히고, 그리고 *&quot;enjoys the <strong>co-training</strong> with the foundation retrieval model.&quot;*이라고 덧붙인다.</li>
 <li><strong>test-time training</strong>: <em>&quot;fine-tuning the model on this set further improves inference performance, and concretize the concept of <strong>&#39;test-time training&#39;</strong> within the recommendation system domain.&quot;</em></li>
 </ul>
-<p>⚠ <strong>Andromeda·HILL·MoNN은 전부 광고 쪽 문헌이다.</strong> 유기적 피드 retrieval에 같은 스택이 쓰인다는 1차 진술을 찾지 못했다. <code>[추정]</code> — 검사한 코퍼스는 아래 출처 목록의 Meta 블로그·논문과 Transparency Center 시스템 카드 15종(2026-08-09 열람)이다. 미공개 자료까지 없다는 근거는 아니다. — 다만 facebook.md가 인용한 2023년 유기 쪽 블로그의 <em>&quot;a novel <strong>hierarchical</strong> deep neural retrieval architecture&quot;</em> 한 줄과 방향이 같아 계보상 연결로 읽을 여지는 있다 <code>[추정]</code>.</p>
+<p>⚠ <strong>Andromeda·HILL·MoNN은 전부 광고 쪽 문헌이다.</strong> 유기적 피드 retrieval에 같은 스택이 쓰인다는 1차 진술을 찾지 못했다. <code>[추정]</code> 검사한 코퍼스는 아래 출처 목록의 Meta 블로그와 논문, 그리고 Transparency Center 시스템 카드 15종(2026-08-09 열람)이다. 미공개 자료까지 없다는 근거는 아니다. 다만 facebook.md가 인용한 2023년 유기 쪽 블로그의 <em>&quot;a novel <strong>hierarchical</strong> deep neural retrieval architecture&quot;</em> 한 줄과 방향이 같아 계보상 연결로 읽을 여지는 있다 <code>[추정]</code>.</p>
 <h2>계층 5 — Instagram: 서빙 비용이 아키텍처를 정한 사례</h2>
-<p>상세는 <a href="instagram.html">instagram.md</a>에 있고 여기서는 <strong>왜 이 노트에 값나가는지</strong>만 적는다.</p>
+<p>상세는 <a href="instagram.html">instagram.md</a>에 있고, 여기서는 <strong>왜 이 노트에서 중요한지</strong>만 적는다.</p>
 <ul>
 <li><strong>two-tower를 고른 이유가 정확도가 아니라 캐시다</strong> <code>[확인]</code>: <em>&quot;user and item embeddings <strong>can be cached</strong>, making inference for the Two Tower model extremely efficient&quot;</em> — <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/">Scaling the Instagram Explore recommendations system</a>, 2023-08-09. ANN은 *&quot;e.g., FAISS, HNSW, etc&quot;*라고만 쓴다.<ul>
-<li>→ <strong>아이템탑 출력이 캐시 가능하다는 서빙 제약이 모델 구조를 결정했다.</strong> 논문에서는 거의 안 나오는 종류의 이유이고, 이 저장소가 존재하는 이유에 가장 가까운 문장이다. 그 대가(아이템탑 재학습 주기가 인덱스 재구축 비용에 묶임)는 → <a href="model-freshness.html">model-freshness.md</a>.</li>
+<li>→ <strong>아이템탑 출력이 캐시 가능하다는 서빙 제약이 모델 구조를 결정했다.</strong> 논문에서는 거의 나오지 않는 종류의 이유이고, 이 저장소가 존재하는 이유에 가장 가까운 문장이다. 그 대가로 아이템탑 재학습 주기가 인덱스 재구축 비용에 묶이는데, 자세한 내용은 <a href="model-freshness.html">model-freshness.md</a>에 있다.</li>
 </ul>
 </li>
-<li><strong>first-stage ranker의 라벨이 second-stage의 top-K 소속 여부다</strong> <code>[확인]</code>: <em>&quot;We train the first stage ranker to predict the output of the second stage with the label: PSelect = { media in top K results ranked by the second stage}&quot;</em> — retrieval/ESR을 랭커의 증류로 만든다.</li>
-<li><strong>IGQL / IG2Vec</strong> — retrieval 전용 DSL과 계정 임베딩. 2019년 원문(<code>ai.meta.com/blog/powered-by-ai-instagrams-explore-recommender-system/</code>)이 <strong>HTTP 500으로 접근 불가</strong>라 이름의 1차 근거는 비어 있다 <code>[관찰]</code> 2026-08-09 (직접 요청해 본 URL 3건 — <code>ai.meta.com</code>·<code>ai.facebook.com</code>·Medium 미러). 다만 <strong>기계는 2020년 글에 살아 있다</strong> <code>[확인]</code>:</li>
+<li><strong>first-stage ranker의 라벨이 second-stage의 top-K 소속 여부다</strong> <code>[확인]</code>: <em>&quot;We train the first stage ranker to predict the output of the second stage with the label: PSelect = { media in top K results ranked by the second stage}&quot;</em> 즉 retrieval과 ESR을 랭커의 증류로 만든다.</li>
+<li><strong>IGQL / IG2Vec</strong> — retrieval 전용 DSL과 계정 임베딩이다. 2019년 원문(<code>ai.meta.com/blog/powered-by-ai-instagrams-explore-recommender-system/</code>)이 <strong>HTTP 500으로 접근되지 않아서</strong> 이름의 1차 근거는 비어 있다 <code>[관찰]</code> 2026-08-09 (직접 요청해 본 URL 3건: <code>ai.meta.com</code>·<code>ai.facebook.com</code>·Medium 미러). 다만 <strong>동작 방식 자체는 2020년 글에 남아 있다</strong> <code>[확인]</code>:</li>
 </ul>
 <pre><code>user.let(seed_id=user_id)
     .liked(max_num_to_retrieve=30)
@@ -410,17 +410,17 @@ score      = (x[:, 0, :] * translated).sum(-1)
     .rank(ranking_model=default)
     .diversify_by(seed_id, method=round_robin)
 </code></pre>
-<p><code>[추정]</code> <code>account_nn(embedding_config=default)</code>가 IG2Vec 계열 계정 임베딩 + 최근접 이웃이다 — 메서드 이름 자체가 account nearest-neighbor다. <strong>그리고 이 쿼리는 계층 0의 하이브리드 사상과 같다</strong>: 임베딩 검색(<code>account_nn</code>)·정책 필터(<code>filter</code>)·랭킹·다양성이 <strong>하나의 retrieval 표현식</strong> 안에 들어 있다. Facebook Search 2020의 <code>(nn ...)</code> 연산자와 Instagram 2020의 IGQL이 독립적으로 같은 형태에 도달했다.</p>
+<p><code>[추정]</code> <code>account_nn(embedding_config=default)</code>가 IG2Vec 계열 계정 임베딩에 최근접 이웃을 더한 것이다. 메서드 이름 자체가 account nearest-neighbor다. <strong>그리고 이 쿼리는 계층 0의 하이브리드 발상과 같다.</strong> 임베딩 검색(<code>account_nn</code>), 정책 필터(<code>filter</code>), 랭킹, 다양성이 <strong>하나의 retrieval 표현식</strong> 안에 들어 있다. Facebook Search 2020의 <code>(nn ...)</code> 연산자와 Instagram 2020의 IGQL이 독립적으로 같은 형태에 도달했다.</p>
 <h2>계층 -1 — Facebook 연결 콘텐츠에는 ANN이 아예 없다</h2>
 <p><code>[추정]</code> 코퍼스가 이미 유저의 연결로 제한돼 있어 임베딩 검색이 필요 없다 → <a href="facebook.html">facebook.md</a>. 비연결 쪽만 *&quot;billions → thousands → a few hundred&quot;*로 서술된다 <code>[확인]</code> <a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/">ai.meta.com, 2023</a>.</p>
-<p><strong>이게 두 회사 문헌량 격차의 근본 원인이다</strong> <code>[추정]</code>: X는 팔로우 그래프가 얇고 OON 비중이 처음부터 커서 retrieval이 곧 제품이었고, Facebook은 2021년까지 연결 콘텐츠가 주력이라 retrieval 문제 자체가 작았다. 그 비중이 2021 11.7% → 2025 Q4 41.0%로 바뀌었고(facebook.md), Meta의 retrieval 문헌이 쏟아지기 시작한 시점과 겹친다.</p>
+<p><strong>이것이 두 회사 사이의 문헌량 격차를 만든 근본 원인이다</strong> <code>[추정]</code>. X는 팔로우 그래프의 연결이 적고 OON 비중이 처음부터 커서 retrieval이 곧 제품이었고, Facebook은 2021년까지 연결 콘텐츠가 주력이라 retrieval 문제 자체가 작았다. 그 비중이 2021 11.7% → 2025 Q4 41.0%로 바뀌었고(facebook.md), 이 시점은 Meta의 retrieval 문헌이 크게 늘어나기 시작한 시점과 겹친다.</p>
 <h2>케이스: Netflix — &quot;retrieval 없음&quot; 극단의 두 번째 표본</h2>
-<p>Facebook 연결 콘텐츠가 &quot;그래프가 곧 후보 집합&quot;이라 ANN이 없다면, Netflix는 <strong>&quot;카탈로그가 곧 후보 집합&quot;이라 ANN이 없다.</strong> PVR이 *&quot;카탈로그 전체(또는 장르 필터된 부분집합)를 회원별로 정렬&quot;*한다 <code>[확인]</code> <a href="https://dl.acm.org/doi/10.1145/2843948">TMIS 2015</a> — 코퍼스 수천~수만이면 브루트포스 전 채점이 가능해서 &quot;가까운 것을 빨리 찾는&quot; 문제 자체가 없다. <strong>ANN은 기법이 아니라 코퍼스가 수억이라는 조건의 산물</strong>임을 보여주는 대조군이다.</p>
-<p>그래도 임베딩은 쓴다 — 용도가 다르다:</p>
+<p>Facebook 연결 콘텐츠가 &quot;그래프가 곧 후보 집합&quot;이라 ANN이 없다면, Netflix는 <strong>&quot;카탈로그가 곧 후보 집합&quot;이라 ANN이 없다.</strong> PVR이 *&quot;카탈로그 전체(또는 장르 필터된 부분집합)를 회원별로 정렬&quot;*한다 <code>[확인]</code> <a href="https://dl.acm.org/doi/10.1145/2843948">TMIS 2015</a>. 코퍼스가 수천에서 수만이면 브루트포스로 전부 채점할 수 있어서 &quot;가까운 것을 빨리 찾는&quot; 문제 자체가 없다. <strong>ANN은 기법이 아니라 코퍼스가 수억이라는 조건의 산물</strong>임을 보여주는 대조군이다.</p>
+<p>그래도 임베딩은 쓰는데, 용도가 다르다:</p>
 <ul>
-<li><strong>FM 임베딩 스토어</strong> <code>[확인]</code> <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb">통합 블로그 2025</a>: Foundation Model이 회원·타이틀 임베딩을 일 단위 배치로 만들어 임베딩 스토어에 넣고, 다운스트림 모델들이 <strong>피처와 후보 소스 양쪽으로</strong> 재사용한다. X의 TwHIN이 검색용+랭킹 피처 겸용인 것과 같은 dual-use 패턴 — 임베딩 재사용은 코퍼스 크기와 무관하게 성립한다.</li>
-<li><strong>신규 타이틀 임베딩 초기화가 ID가 아니라 메타데이터다</strong> <code>[확인]</code> <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39">FM 블로그 2025</a>: 신규 타이틀은 메타데이터 기반 가중 결합으로 임베딩을 만들고, entity age 기반 어텐션으로 ID 임베딩과 혼합 비율을 조절한다. X TwHIN이 참여 16회 미만이면 임베딩을 0으로 만드는 것(위 계열 2)과 정반대 — <strong>X는 신호 없으면 버리고, Netflix는 콘텐츠 정보로 채운다.</strong> 편성 카탈로그(모든 타이틀에 풍부한 메타데이터)라 가능한 선택 <code>[추정]</code>.</li>
-<li>고전 세대의 sims(타이틀 유사도)는 비개인화 유사도 리스트 + 개인화 행 선택 조합 <code>[확인]</code> TMIS 2015 — i2i의 가장 단순한 형태가 최근까지 살아 있었다.</li>
+<li><strong>FM 임베딩 스토어</strong> <code>[확인]</code> <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb">통합 블로그 2025</a>: Foundation Model이 회원 임베딩과 타이틀 임베딩을 일 단위 배치로 만들어 임베딩 스토어에 넣고, 다운스트림 모델들이 <strong>피처와 후보 소스 양쪽으로</strong> 재사용한다. X의 TwHIN이 검색용과 랭킹 피처를 겸하는 것과 같은 dual-use 패턴이다. 임베딩 재사용은 코퍼스 크기와 무관하게 성립한다.</li>
+<li><strong>신규 타이틀 임베딩 초기화가 ID가 아니라 메타데이터다</strong> <code>[확인]</code> <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39">FM 블로그 2025</a>: 신규 타이틀은 메타데이터 기반 가중 결합으로 임베딩을 만들고, entity age 기반 어텐션으로 ID 임베딩과 혼합 비율을 조절한다. X의 TwHIN이 참여 16회 미만이면 임베딩을 0으로 만드는 것(위 계열 2)과 정반대다. <strong>X는 신호가 없으면 버리고, Netflix는 콘텐츠 정보로 채운다.</strong> 편성 카탈로그여서(모든 타이틀에 메타데이터가 풍부하다) 가능한 선택이다 <code>[추정]</code>.</li>
+<li>고전 세대의 sims(타이틀 유사도)는 비개인화 유사도 리스트와 개인화 행 선택을 조합한 방식이다 <code>[확인]</code> TMIS 2015. i2i의 가장 단순한 형태가 최근까지 살아 있었다.</li>
 </ul>
 <p>→ <a href="netflix.html">netflix.md</a></p>
 <h2>X vs Meta — 구조적 대조</h2>
@@ -439,18 +439,18 @@ score      = (x[:, 0, :] * translated).sum(-1)
 </tr>
 <tr>
 <td>후보 생성의 단위</td>
-<td>이름 붙은 소스를 병렬 실행 후 concat</td>
-<td>계층 인덱스를 한 번 타고 내려감</td>
+<td>이름 붙은 소스를 병렬로 실행한 뒤 concat한다</td>
+<td>계층 인덱스를 한 번 타고 내려간다</td>
 </tr>
 <tr>
-<td>필터가 붙는 곳</td>
+<td>필터가 적용되는 곳</td>
 <td>벡터DB payload 조건 + 파이프라인 필터 17개</td>
 <td>쿼리 언어 Boolean 절(2020) → GPU 커널 bitwise(2026)</td>
 </tr>
 <tr>
 <td>인코더</td>
 <td>SimClusters / TwHIN / two-tower <strong>3계열 동시 운영</strong></td>
-<td>two-tower는 한 지면(IG Explore)의 선택지, ads 쪽은 <strong>명시적으로 그걸 이기려 함</strong></td>
+<td>two-tower는 한 지면(IG Explore)의 선택지이고, ads 쪽은 <strong>명시적으로 그것을 이기려 한다</strong></td>
 </tr>
 <tr>
 <td>재미있는 엔지니어링의 위치</td>
@@ -463,86 +463,86 @@ score      = (x[:, 0, :] * translated).sum(-1)
 <td>유기적 피드의 소스별 후보 수 분해 (no primary source found)</td>
 </tr>
 </tbody></table>
-<p><code>[추정]</code> 이 대조는 <strong>실제 시스템 차이라기보다 공개 채널 차이</strong>일 가능성이 크다. X는 코드를 던졌고 Meta는 논문과 블로그를 쓴다. 코드는 상수를 노출하고 논문은 배율을 노출한다. <strong>&quot;X는 인코더 중심, Meta는 인덱스 중심&quot;으로 결론내면 안 되고, &quot;각자 공개한 절반이 다르다&quot;까지가 안전하다.</strong></p>
-<p>다만 하나는 자료 형태로 설명되지 않는다 <code>[추정]</code>: <strong>Meta는 two-tower + ANN을 이겨야 할 베이스라인이라고 직접 썼고 X는 2025~2026에 two-tower(DeepRetrieval, Phoenix retrieval)로 옮겨갔다.</strong> 같은 시점에 반대 방향이다.</p>
+<p><code>[추정]</code> 이 대조는 <strong>실제 시스템 차이라기보다 공개 채널 차이</strong>일 가능성이 크다. X는 코드를 공개했고 Meta는 논문과 블로그를 쓴다. 코드는 상수를 노출하고 논문은 배율을 노출한다. <strong>&quot;X는 인코더 중심, Meta는 인덱스 중심&quot;으로 결론내면 안 되고, &quot;각자 공개한 절반이 다르다&quot;까지가 안전하다.</strong></p>
+<p>다만 하나는 자료 형태로 설명되지 않는다 <code>[추정]</code>: <strong>Meta는 two-tower와 ANN을 이겨야 할 베이스라인이라고 직접 썼고, X는 2025~2026에 two-tower(DeepRetrieval, Phoenix retrieval)로 옮겨갔다.</strong> 같은 시점에 서로 반대 방향으로 움직였다.</p>
 <hr>
 <h2>이 케이스에서 일반화할 수 있는 것</h2>
 <ul>
 <li><strong>한 서비스가 임베딩 계열을 하나만 쓰지 않는다.</strong> X는 희소 그래프 분해(SimClusters), 그래프 임베딩(TwHIN), two-tower(DeepRetrieval)를 동시에 운영하고, 각각 인덱스 기술도 다르다. &quot;무슨 임베딩 쓰나&quot;는 질문 자체가 단수형이라 틀렸다.</li>
-<li><strong>벡터 검색은 순수 최근접이 아니다.</strong> 프로덕션에서는 payload 필터(품질·티어·카테고리)가 항상 붙는다. 논문의 recall@k와 프로덕션 동작이 다른 첫 번째 이유다.</li>
+<li><strong>벡터 검색은 순수 최근접이 아니다.</strong> 프로덕션에서는 payload 필터(품질·티어·카테고리)가 항상 함께 적용된다. 논문의 recall@k와 프로덕션 동작이 다른 첫 번째 이유다.</li>
 <li><strong>임베딩은 검색용과 랭킹 피처용으로 재사용된다.</strong> TwHIN이 대표적이다. 만드는 비용을 두 곳에서 나눠 갚는다.</li>
-<li><strong>희소 벡터면 역인덱스 스캔이 그래프 인덱스보다 낫다.</strong> SimClusters가 HNSW를 안 쓰는 이유다.</li>
-<li><strong>공개된 학습 코드는 프로덕션 코드가 아니다.</strong> X의 TwHIN 공개 코드는 검증 로더가 주석 처리되고 스케줄러가 꺼진 상태이며 관계 임베딩이 <code>.data</code>로 분리돼 있다. 이걸 &quot;X가 이렇게 학습한다&quot;로 읽으면 안 된다.</li>
-<li><strong>상수는 세 종류이고 셋 다 프로덕션이 아닐 수 있다.</strong> ① <code>args.int(name, default)</code>의 default는 폴백이지 실행값이 아니다 ② 벤치마크·warmup 코드의 리터럴은 아예 무관하다 ③ 모듈 트리에서 끊긴 파일의 상수는 안 돈다. X SimClusters는 같은 파일 주석에 실제 실행 명령이 남아 있어 ①을 잡아낼 수 있었지만, 그런 단서가 없으면 <strong>grep으로 나온 숫자는 인용하면 안 된다.</strong></li>
-<li><strong>시간 감쇠 상수가 계층마다 다르다.</strong> X는 취향 100일 / 콘텐츠 8시간. 하나의 반감기로 통일하지 않는다.</li>
+<li><strong>희소 벡터면 역인덱스 스캔이 그래프 인덱스보다 낫다.</strong> SimClusters가 HNSW를 쓰지 않는 이유다.</li>
+<li><strong>공개된 학습 코드는 프로덕션 코드가 아니다.</strong> X의 TwHIN 공개 코드는 검증 로더가 주석 처리되고 스케줄러가 꺼진 상태이며 관계 임베딩이 <code>.data</code>로 분리돼 있다. 이것을 &quot;X가 이렇게 학습한다&quot;로 읽으면 안 된다.</li>
+<li><strong>상수는 세 종류이고 셋 다 프로덕션이 아닐 수 있다.</strong> ① <code>args.int(name, default)</code>의 default는 폴백이지 실행값이 아니다. ② 벤치마크와 warmup 코드의 리터럴은 아예 무관하다. ③ 모듈 트리에서 끊긴 파일의 상수는 실행되지 않는다. X의 SimClusters는 같은 파일 주석에 실제 실행 명령이 남아 있어 ①을 확인할 수 있었지만, 그런 단서가 없으면 <strong>grep으로 나온 숫자는 인용하면 안 된다.</strong></li>
+<li><strong>시간 감쇠 상수가 계층마다 다르다.</strong> X는 취향이 100일, 콘텐츠가 8시간이다. 하나의 반감기로 통일하지 않는다.</li>
 </ul>
-<p>Meta 쪽을 붙이면 여기에 다섯 개가 더 붙는다.</p>
+<p>Meta 쪽을 함께 놓으면 여기에 다섯 개가 더 더해진다.</p>
 <ul>
-<li><strong>&quot;벡터 검색을 어디에 둘 것인가&quot;가 아키텍처 결정의 본체다.</strong> Meta는 ANN을 별도 서비스로 빼는 대신 기존 Boolean 역인덱스 안의 연산자(<code>(nn &lt;key&gt; :radius &lt;radius&gt;)</code>)로 넣었고 <code>[확인]</code>(<a href="https://arxiv.org/abs/2006.11632">EBR, arXiv 2006.11632</a>, KDD 2020), 5년 뒤 SilverTorch에서는 인덱스 자체를 모델 텐서로 접어 GPU에 올렸다 <code>[확인]</code>(<a href="https://arxiv.org/html/2511.14881v3">SilverTorch, arXiv 2511.14881</a>, 2025-11). 두 결정 모두 인코더를 바꾼 게 아니라 <strong>인덱스의 위치</strong>를 바꾼 것이다.</li>
-<li><strong>필터를 어디에 두느냐가 세대를 가른다.</strong> 2020 EBR은 필터를 인덱스 질의문 안에, 2020 IGQL은 질의 언어 안에, 2025 SilverTorch는 GPU 커널 안에 넣었다 <code>[확인]</code>(위 세 출처). X가 payload 필터를 ANN 호출에 붙이는 것과 같은 문제를 세 번 다르게 푼 셈이다.</li>
-<li><strong>서빙 비용 제약이 모델 구조를 지정하는 경우가 있다.</strong> Instagram이 2023 Explore에서 two-tower를 고른 이유로 명시한 건 정확도가 아니라 <strong>아이템 타워 출력이 캐시 가능하다</strong>는 점이다 <code>[확인]</code>(<a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/">Instagram Explore</a>, 2023). 자세한 인용은 <a href="instagram.html">instagram.md</a>.</li>
-<li><strong>Meta 문헌에서 two-tower는 목표가 아니라 이겨야 할 baseline이다.</strong> Andromeda·MoL·RankGraph 모두 자기 성과를 two-tower/ANN 대비로 서술한다 <code>[확인]</code>(아래 출처 3건). 반대로 X는 2025~2026에 two-tower 쪽으로 <strong>이동</strong>했다 <code>[확인]</code>(<a href="x.html">x.md</a>). 같은 기법이 한쪽에선 도착점, 한쪽에선 출발점이다.</li>
-<li><strong>공개 채널이 무엇을 알 수 있는지 정한다.</strong> 소스코드는 상수를 노출하고 비율을 숨기며, 논문·블로그는 비율(+6% recall, 23.7× RPS)을 노출하고 상수를 숨긴다. &quot;X는 상수가 있고 Meta는 없다&quot;가 아니라 <strong>각자 공개한 절반이 다르다.</strong> 이 노트의 X 절과 Meta 절의 문장 밀도가 다른 이유이기도 하다. <code>[추정]</code></li>
-<li><strong>retrieval 레이어의 존재는 코퍼스 크기의 함수다.</strong> 수억 아이템(X OON, Meta 비연결)이면 ANN이 필수고, 그래프로 제한되면(Facebook 연결) 그래프가 후보 집합이고, 수천~수만(Netflix)이면 브루트포스 전 채점이 된다. &quot;무슨 ANN 쓰세요&quot;는 세 번째 경우엔 성립하지 않는 질문이다.</li>
-<li><strong>콜드스타트 임베딩의 두 극단 — 버리기 vs 채우기.</strong> X TwHIN은 참여 16회 미만이면 0벡터, Netflix FM은 메타데이터로 초기화 + entity age 어텐션. UGC(메타데이터 빈약, 아이템 무한)와 편성 카탈로그(메타데이터 풍부, 아이템 유한)의 차이가 그대로 설계에 나온다.</li>
+<li><strong>&quot;벡터 검색을 어디에 둘 것인가&quot;가 아키텍처 결정의 본체다.</strong> Meta는 ANN을 별도 서비스로 빼는 대신 기존 Boolean 역인덱스 안의 연산자(<code>(nn &lt;key&gt; :radius &lt;radius&gt;)</code>)로 넣었고 <code>[확인]</code>(<a href="https://arxiv.org/abs/2006.11632">EBR, arXiv 2006.11632</a>, KDD 2020), 5년 뒤 SilverTorch에서는 인덱스 자체를 모델 텐서로 만들어 GPU에 올렸다 <code>[확인]</code>(<a href="https://arxiv.org/html/2511.14881v3">SilverTorch, arXiv 2511.14881</a>, 2025-11). 두 결정 모두 인코더를 바꾼 것이 아니라 <strong>인덱스의 위치</strong>를 바꾼 것이다.</li>
+<li><strong>필터를 어디에 두느냐가 세대를 나눈다.</strong> 2020 EBR은 필터를 인덱스 질의문 안에, 2020 IGQL은 질의 언어 안에, 2025 SilverTorch는 GPU 커널 안에 넣었다 <code>[확인]</code>(위 세 출처). X가 payload 필터를 ANN 호출에 붙이는 것과 같은 문제를 세 번 다르게 푼 셈이다.</li>
+<li><strong>서빙 비용 제약이 모델 구조를 지정하는 경우가 있다.</strong> Instagram이 2023 Explore에서 two-tower를 고른 이유로 명시한 것은 정확도가 아니라 <strong>아이템 타워 출력이 캐시 가능하다</strong>는 점이다 <code>[확인]</code>(<a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/">Instagram Explore</a>, 2023). 자세한 인용은 <a href="instagram.html">instagram.md</a>에 있다.</li>
+<li><strong>Meta 문헌에서 two-tower는 목표가 아니라 이겨야 할 baseline이다.</strong> Andromeda, MoL, RankGraph 모두 자기 성과를 two-tower/ANN 대비로 서술한다 <code>[확인]</code>(아래 출처 3건). 반대로 X는 2025~2026에 two-tower 쪽으로 <strong>이동</strong>했다 <code>[확인]</code>(<a href="x.html">x.md</a>). 같은 기법이 한쪽에서는 도착점이고 다른 쪽에서는 출발점이다.</li>
+<li><strong>공개 채널이 무엇을 알 수 있는지 정한다.</strong> 소스코드는 상수를 노출하고 비율을 숨기며, 논문과 블로그는 비율(+6% recall, 23.7× RPS)을 노출하고 상수를 숨긴다. &quot;X는 상수가 있고 Meta는 없다&quot;가 아니라 <strong>각자 공개한 절반이 다르다.</strong> 이 노트의 X 절과 Meta 절의 문장 밀도가 다른 이유이기도 하다. <code>[추정]</code></li>
+<li><strong>retrieval 레이어의 존재는 코퍼스 크기의 함수다.</strong> 수억 아이템(X OON, Meta 비연결)이면 ANN이 필수이고, 그래프로 제한되면(Facebook 연결) 그래프가 곧 후보 집합이며, 수천에서 수만(Netflix)이면 브루트포스로 전부 채점할 수 있다. &quot;무슨 ANN 쓰세요&quot;는 세 번째 경우에는 성립하지 않는 질문이다.</li>
+<li><strong>콜드스타트 임베딩에는 두 극단이 있다. 버리기와 채우기다.</strong> X의 TwHIN은 참여 16회 미만이면 0벡터를 쓰고, Netflix FM은 메타데이터로 초기화한 뒤 entity age 어텐션으로 섞는다. UGC(메타데이터 빈약, 아이템 무한)와 편성 카탈로그(메타데이터 풍부, 아이템 유한)의 차이가 그대로 설계에 나타난다.</li>
 </ul>
 <h2>누가 이걸 쓰는가</h2>
 <ul>
-<li><strong>X</strong> — SimClusters(2020~, 주 1회 갱신), TwHIN, DeepRetrieval(2025 주력), Phoenix retrieval(2026). 인코더 계열이 공개돼 있고 인덱스는 Qdrant/VecDB/FAISS 3계층. <code>[확인]</code> → <a href="x.html">x.md</a></li>
-<li><strong>Facebook</strong> — EBR의 원 발표처(검색)이고, 피드 쪽은 unconnected 콘텐츠 비중이 11.7%(2021 Q3) → 41.0%(2025 Q4)로 오르면서 retrieval 문헌이 쏟아진 시기와 겹친다. 다만 <strong>연결 콘텐츠 경로에는 ANN이 등장하지 않는다</strong> — 팔로우 그래프가 곧 후보 집합이다. <code>[확인]</code> → <a href="facebook.html">facebook.md</a></li>
-<li><strong>Instagram</strong> — IG2Vec 계정 임베딩 + IGQL 질의 언어(2020), Explore two-tower(2023, 캐시 가능성이 선정 이유). 이 저장소에서 &quot;서빙 비용이 모델을 정했다&quot;고 1차 출처로 말할 수 있는 유일한 사례. <code>[확인]</code> → <a href="instagram.html">instagram.md</a></li>
-<li><strong>Meta ads</strong> — SilverTorch, MoL + h-indexer, RankGraph/RankGraph-2, Andromeda + HILL/MoNN. 위 계층 1~4가 전부 여기 문헌이다. <strong>organic feed가 같은 스택을 쓴다는 1차 진술은 없다.</strong> <code>[확인]</code>(ads 한정) / <code>[추정]</code>(organic 적용 여부)</li>
-<li><strong>Threads</strong> — 임베딩 retrieval·ANN에 대한 진술이 <strong>하나도 없다.</strong> 후보 생성 방식 자체가 미공개. <code>[관찰]</code> 2026-08-09 (ig-threads-feed 카드 본문 + Threads 엔지니어링 블로그 2편) → <a href="threads.html">threads.md</a></li>
-<li><strong>Netflix</strong> — ANN 없음(전 카탈로그 채점). FM 임베딩 스토어(일 단위, 피처+후보 dual-use), 신규 타이틀은 메타데이터 초기화. → <a href="netflix.html">netflix.md</a> <code>[확인]</code></li>
+<li><strong>X</strong> — SimClusters(2020~, 주 1회 갱신), TwHIN, DeepRetrieval(2025 주력), Phoenix retrieval(2026)을 쓴다. 인코더 계열이 공개돼 있고 인덱스는 Qdrant/VecDB/FAISS 3계층이다. <code>[확인]</code> → <a href="x.html">x.md</a></li>
+<li><strong>Facebook</strong> — EBR의 원 발표처(검색)이고, 피드 쪽은 unconnected 콘텐츠 비중이 11.7%(2021 Q3) → 41.0%(2025 Q4)로 오르면서 retrieval 문헌이 크게 늘어난 시기와 겹친다. 다만 <strong>연결 콘텐츠 경로에는 ANN이 등장하지 않는다.</strong> 팔로우 그래프가 곧 후보 집합이다. <code>[확인]</code> → <a href="facebook.html">facebook.md</a></li>
+<li><strong>Instagram</strong> — IG2Vec 계정 임베딩과 IGQL 질의 언어(2020), Explore two-tower(2023, 캐시 가능성이 선정 이유)를 쓴다. 이 저장소에서 &quot;서빙 비용이 모델을 정했다&quot;고 1차 출처로 말할 수 있는 유일한 사례다. <code>[확인]</code> → <a href="instagram.html">instagram.md</a></li>
+<li><strong>Meta ads</strong> — SilverTorch, MoL과 h-indexer, RankGraph/RankGraph-2, Andromeda와 HILL/MoNN을 쓴다. 위 계층 1~4가 전부 여기 문헌이다. <strong>organic feed가 같은 스택을 쓴다는 1차 진술은 없다.</strong> <code>[확인]</code>(ads 한정) / <code>[추정]</code>(organic 적용 여부)</li>
+<li><strong>Threads</strong> — 임베딩 retrieval과 ANN에 대한 진술이 <strong>하나도 없다.</strong> 후보 생성 방식 자체가 공개되지 않았다. <code>[관찰]</code> 2026-08-09 (ig-threads-feed 카드 본문 + Threads 엔지니어링 블로그 2편) → <a href="threads.html">threads.md</a></li>
+<li><strong>Netflix</strong> — ANN이 없다(전 카탈로그를 채점한다). FM 임베딩 스토어를 일 단위로 만들어 피처와 후보에 dual-use로 쓰고, 신규 타이틀은 메타데이터로 초기화한다. → <a href="netflix.html">netflix.md</a> <code>[확인]</code></li>
 </ul>
-<p>인덱스 재구축·재학습 주기(SilverTorch, RankGraph-2 3시간, Instagram 일 단위 아이템 타워)는 <a href="model-freshness.html">model-freshness.md</a>에 정리돼 있다. 여기서 반복하지 않는다.</p>
-<h2>아직 확인 못한 것</h2>
-<p>X 쪽:</p>
+<p>인덱스 재구축과 재학습 주기(SilverTorch, RankGraph-2 3시간, Instagram 일 단위 아이템 타워)는 <a href="model-freshness.html">model-freshness.md</a>에 정리돼 있다. 여기서 반복하지 않는다.</p>
+<h2>아직 확인하지 못한 것</h2>
+<p>X 쪽은 다음과 같다.</p>
 <ul>
-<li>TwHIN 프로덕션 임베딩 차원과 실제 관계 집합 (공개된 건 장난감 설정 4개 관계뿐)</li>
-<li>DeepRetrieval의 모델 구조·손실·음성 샘플링 — 추론 호출만 공개</li>
-<li>레거시 HNSW ANN 서비스가 무엇을 인덱싱하는지 전체 목록</li>
-<li>GraphJet <code>TopSecondDegreeByCountForTweet</code>의 점수 계산식 — 외부 프로젝트, <a href="http://www.vldb.org/pvldb/vol9/p1281-sharma.pdf">VLDB 2016 p1281</a> 참조</li>
+<li>TwHIN의 프로덕션 임베딩 차원과 실제 관계 집합을 모른다 (공개된 것은 예제용 설정의 관계 4개뿐이다).</li>
+<li>DeepRetrieval의 모델 구조와 손실, 음성 샘플링을 모른다. 공개된 것은 추론 호출뿐이다.</li>
+<li>레거시 HNSW ANN 서비스가 무엇을 인덱싱하는지 전체 목록을 모른다.</li>
+<li>GraphJet <code>TopSecondDegreeByCountForTweet</code>의 점수 계산식을 모른다. 외부 프로젝트여서 <a href="http://www.vldb.org/pvldb/vol9/p1281-sharma.pdf">VLDB 2016 p1281</a>을 참조해야 한다.</li>
 </ul>
-<p>Meta 쪽:</p>
+<p>Meta 쪽은 다음과 같다.</p>
 <ul>
-<li><strong>organic feed의 소스별 후보 수.</strong> X는 소스마다 상수가 있는데 Meta는 Facebook/Instagram 퍼널 총량만 공개돼 있고 임베딩 소스가 그중 얼마인지 모른다.</li>
-<li><strong>Andromeda·HILL/MoNN이 organic feed도 서빙하는가.</strong> 전부 ads 문헌이다. 같은 인프라를 쓴다는 진술을 못 찾았다.</li>
-<li><strong>IG2Vec·IGQL의 현재 상태.</strong> 2020년 블로그 이후 언급이 없고, 원문 URL은 500을 반환한다(2026-08-09 실측). 폐기됐는지 이름만 바뀌었는지 불명.</li>
-<li><strong>SilverTorch의 인덱스 갱신 지연.</strong> 처리량·TCO 수치는 있는데 &quot;새 아이템이 몇 초 만에 검색 가능해지는가&quot;가 없다.</li>
-<li><strong>radius mode를 아직도 쓰는가.</strong> 2020 EBR의 핵심 선택인데 이후 문헌에 radius라는 단어가 다시 안 나온다.</li>
+<li><strong>organic feed의 소스별 후보 수를 모른다.</strong> X는 소스마다 상수가 있는데 Meta는 Facebook과 Instagram의 퍼널 총량만 공개돼 있고, 임베딩 소스가 그중 얼마인지 모른다.</li>
+<li><strong>Andromeda와 HILL/MoNN이 organic feed도 서빙하는지 모른다.</strong> 전부 ads 문헌이다. 같은 인프라를 쓴다는 진술을 찾지 못했다.</li>
+<li><strong>IG2Vec과 IGQL의 현재 상태를 모른다.</strong> 2020년 블로그 이후 언급이 없고, 원문 URL은 500을 반환한다(2026-08-09 실측). 폐기됐는지 이름만 바뀌었는지 알 수 없다.</li>
+<li><strong>SilverTorch의 인덱스 갱신 지연을 모른다.</strong> 처리량과 TCO 수치는 있는데 &quot;새 아이템이 몇 초 만에 검색 가능해지는가&quot;가 없다.</li>
+<li><strong>radius mode를 아직도 쓰는지 모른다.</strong> 2020 EBR의 핵심 선택인데 이후 문헌에 radius라는 단어가 다시 나오지 않는다.</li>
 </ul>
 <h2>출처</h2>
 <p><strong>X</strong></p>
 <ul>
-<li><a href="https://github.com/twitter/the-algorithm">twitter/the-algorithm</a> — 2025-09-03 커밋 <code>c54bec0</code>, 공개 소스코드. <code>simclusters_v2/</code>, <code>simclusters-ann/</code>, <code>ann/</code>, <code>tweet-mixer/</code>.</li>
-<li><a href="https://github.com/twitter/the-algorithm-ml">twitter/the-algorithm-ml</a> — 2023, 공개 소스코드. <code>projects/twhin/</code>.</li>
+<li><a href="https://github.com/twitter/the-algorithm">twitter/the-algorithm</a> — 2025-09-03 커밋 <code>c54bec0</code>, 공개 소스코드. <code>simclusters_v2/</code>, <code>simclusters-ann/</code>, <code>ann/</code>, <code>tweet-mixer/</code>를 참조했다.</li>
+<li><a href="https://github.com/twitter/the-algorithm-ml">twitter/the-algorithm-ml</a> — 2023, 공개 소스코드. <code>projects/twhin/</code>를 참조했다.</li>
 <li><a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0).</li>
-<li>SimClusters — KDD 2020 논문. <code>simclusters_v2/README.md:9</code>에서 인용. 레포에 재현되지 않은 수치는 논문에만 있다.</li>
+<li>SimClusters — KDD 2020 논문. <code>simclusters_v2/README.md:9</code>에서 인용했다. 레포에 재현되지 않은 수치는 논문에만 있다.</li>
 </ul>
 <p><strong>Meta — 인덱스 계층</strong></p>
 <ul>
-<li><a href="https://arxiv.org/abs/2006.11632">Embedding-based Retrieval in Facebook Search</a> — 2020, 논문 (KDD 2020). <code>(nn &lt;key&gt; :radius &lt;radius&gt;)</code> 연산자, radius vs top-K, OPQ/IMI 튜닝, hard negative mining의 1차 출처.</li>
-<li><a href="https://arxiv.org/abs/2306.04039">Revisiting Neural Retrieval on Accelerators</a> — 2023, 논문 (KDD 2023). MoL 정의와 <strong>h-indexer의 1차 출처</strong>.</li>
-<li><a href="https://arxiv.org/abs/2407.15462">Retrieval with Learned Similarities</a> — 2024, 논문. MoL 후속. ⚠ h-indexer라는 용어는 <strong>이 논문에 없다</strong> (v3·v4 HTML 전수 확인, 2026-08-09).</li>
-<li><a href="https://engineering.fb.com/2026/05/26/ml-applications/silvertorch-index-as-model-new-retrieval-paradigm-recommendation-systems/">SilverTorch: Index as Model</a> — 2026-05-26, 블로그 / <a href="https://arxiv.org/html/2511.14881v3">arXiv 2511.14881</a> — 2025-11 초판, 논문. OverArch·MoL 언급은 <strong>논문에만</strong> 있고 블로그에는 없다.</li>
-<li><a href="https://arxiv.org/abs/2509.02942">RankGraph</a> — 2025, 논문. co-engagement 그래프 retrieval.</li>
-<li><a href="https://arxiv.org/html/2606.18379">RankGraph-2</a> — 2026, 논문. U2U2I / U2I2I, 3시간 재구축.</li>
-<li><a href="https://engineering.fb.com/2024/12/02/production-engineering/meta-andromeda-advantage-automation-next-gen-personalized-ads-retrieval-engine/">Meta Andromeda</a> — 2024-12-02, 블로그. 학습되는 계층적 인덱스, two-tower/ANN을 baseline으로 명시.</li>
-<li><a href="https://arxiv.org/html/2604.12965v1">HILL / MoNN</a> — 2026-04-14, 논문. Andromeda 계열 인덱스의 구조 상세.</li>
+<li><a href="https://arxiv.org/abs/2006.11632">Embedding-based Retrieval in Facebook Search</a> — 2020, 논문 (KDD 2020). <code>(nn &lt;key&gt; :radius &lt;radius&gt;)</code> 연산자, radius와 top-K 비교, OPQ/IMI 튜닝, hard negative mining의 1차 출처다.</li>
+<li><a href="https://arxiv.org/abs/2306.04039">Revisiting Neural Retrieval on Accelerators</a> — 2023, 논문 (KDD 2023). MoL 정의와 <strong>h-indexer의 1차 출처</strong>다.</li>
+<li><a href="https://arxiv.org/abs/2407.15462">Retrieval with Learned Similarities</a> — 2024, 논문. MoL의 후속이다. ⚠ h-indexer라는 용어는 <strong>이 논문에 없다</strong> (v3·v4 HTML 전수 확인, 2026-08-09).</li>
+<li><a href="https://engineering.fb.com/2026/05/26/ml-applications/silvertorch-index-as-model-new-retrieval-paradigm-recommendation-systems/">SilverTorch: Index as Model</a> — 2026-05-26, 블로그 / <a href="https://arxiv.org/html/2511.14881v3">arXiv 2511.14881</a> — 2025-11 초판, 논문. OverArch와 MoL 언급은 <strong>논문에만</strong> 있고 블로그에는 없다.</li>
+<li><a href="https://arxiv.org/abs/2509.02942">RankGraph</a> — 2025, 논문. co-engagement 그래프를 retrieval에 쓴다.</li>
+<li><a href="https://arxiv.org/html/2606.18379">RankGraph-2</a> — 2026, 논문. U2U2I / U2I2I 경로와 3시간 재구축을 다룬다.</li>
+<li><a href="https://engineering.fb.com/2024/12/02/production-engineering/meta-andromeda-advantage-automation-next-gen-personalized-ads-retrieval-engine/">Meta Andromeda</a> — 2024-12-02, 블로그. 학습되는 계층적 인덱스를 설명하고, two-tower와 ANN을 baseline으로 명시한다.</li>
+<li><a href="https://arxiv.org/html/2604.12965v1">HILL / MoNN</a> — 2026-04-14, 논문. Andromeda 계열 인덱스의 구조를 상세히 다룬다.</li>
 </ul>
 <p><strong>Netflix</strong></p>
 <ul>
-<li><a href="https://dl.acm.org/doi/10.1145/2843948">The Netflix Recommender System (TMIS)</a> — 2015, 논문. PVR의 전 카탈로그 정렬.</li>
-<li><a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39">Foundation Model for Personalized Recommendation</a> — 2025, 블로그. 메타데이터 콜드스타트 초기화, entity age 어텐션.</li>
-<li><a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb">Integrating Netflix&#39;s Foundation Model</a> — 2025, 블로그. 임베딩 스토어 dual-use.</li>
+<li><a href="https://dl.acm.org/doi/10.1145/2843948">The Netflix Recommender System (TMIS)</a> — 2015, 논문. PVR의 전 카탈로그 정렬을 다룬다.</li>
+<li><a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39">Foundation Model for Personalized Recommendation</a> — 2025, 블로그. 메타데이터 콜드스타트 초기화와 entity age 어텐션을 다룬다.</li>
+<li><a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb">Integrating Netflix&#39;s Foundation Model</a> — 2025, 블로그. 임베딩 스토어의 dual-use를 다룬다.</li>
 </ul>
 <p><strong>Meta — 서비스 쪽 근거</strong> (인용 원문은 서비스 노트에 있다)</p>
 <ul>
-<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/">Scaling the Instagram Explore recommendations system</a> — 2023-08-09, 블로그. two-tower를 <strong>아이템 타워 캐시 가능성</strong> 때문에 골랐다는 진술.</li>
-<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system">Designing a Constrained Exploration System</a> — 2020-12-10, 블로그. IGQL 쿼리 예시. ⚠ engineering.fb.com에 다른 제목으로 중복 게재.</li>
-<li><a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/">The AI behind unconnected content recommendations</a> — 2023, 블로그. billions → thousands → hundreds 퍼널.</li>
-<li>⚠ IG2Vec·IGQL 명칭의 1차 원문(2019 &quot;Powered by AI&quot;)은 <strong>2026-08-09 기준 HTTP 500</strong>. 이 노트는 그 글을 근거로 쓰지 않았다. <code>[관찰]</code> 2026-08-09 (요청해 본 URL 3건)</li>
+<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/">Scaling the Instagram Explore recommendations system</a> — 2023-08-09, 블로그. two-tower를 <strong>아이템 타워 캐시 가능성</strong> 때문에 골랐다는 진술이 있다.</li>
+<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system">Designing a Constrained Exploration System</a> — 2020-12-10, 블로그. IGQL 쿼리 예시가 있다. ⚠ engineering.fb.com에 다른 제목으로 중복 게재됐다.</li>
+<li><a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/">The AI behind unconnected content recommendations</a> — 2023, 블로그. billions → thousands → hundreds 퍼널을 서술한다.</li>
+<li>⚠ IG2Vec과 IGQL 명칭의 1차 원문(2019 &quot;Powered by AI&quot;)은 <strong>2026-08-09 기준 HTTP 500</strong>을 반환한다. 이 노트는 그 글을 근거로 쓰지 않았다. <code>[관찰]</code> 2026-08-09 (요청해 본 URL 3건)</li>
 </ul>
 
 

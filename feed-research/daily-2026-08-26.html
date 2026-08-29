@@ -169,28 +169,28 @@ ul.rl .chip b { font-size: 13px; }
 <header class="cover">
   <div class="kicker">FEED RESEARCH · 일일 리포트</div>
   <h1>2026-08-26</h1>
-  <div class="wd">수요일 · 읽는 데 약 40분</div>
+  <div class="wd">수요일 · 읽는 데 약 43분</div>
   <ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일(services/x.md, radar.md)</li><li class="chip">레이더 <b>3</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+8번째 드랍(<a href="https://github.com/xai-org/x-algorithm/commit/d011592">d011592</a>, 2026-08-24) — <strong>VF 재작성 검증 하니스</strong>(reference_compare.rs, 812줄) + <strong>BrandSafetyVerdict HighRisk tier 신설</strong> + <strong>PTOS 심판이 3개 카테고리로 확장</strong>(4.5가 X_ALGO 엔드포인트로 판정 전용 재도입) + Phoenix 체크포인트 로더 다중 노드 하드닝. arXiv cs.IR triage에서 <strong>VK HEGM</strong>(짧은 비디오 watch-time 분포 예측, 프로덕션 1.5개월 A/B) + <strong>Ant Densing Law</strong>(billion-scale Alipay 데이터의 tokenization capacity 스케일링 법칙) + <strong>Spotify SID+CoT 부정 결과</strong>(reasoning trace가 offline effectiveness를 최대 −19% 저하 — Kuaishou PushDualGen의 반박점) 3건 통과. Meta·Netflix 신규 없음.</div>
+  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대에 여덟 번째 후속 커밋(4세대+7, <a href="https://github.com/xai-org/x-algorithm/commit/d011592">d011592</a>, 2026-08-24)이 올라왔다. <strong>VF 재작성 검증 하니스</strong>(reference_compare.rs, 812줄) 배선, <strong>BrandSafetyVerdict HighRisk tier 신설</strong>, <strong>PTOS 심판의 3개 카테고리 확장</strong>(4.5가 X_ALGO 엔드포인트로 판정 전용 재도입), Phoenix 체크포인트 로더 다중 노드 하드닝 네 가지가 핵심이다. arXiv cs.IR triage에서는 <strong>VK HEGM</strong>(짧은 비디오 watch-time 분포 예측, 프로덕션 1.5개월 A/B), <strong>Ant Densing Law</strong>(billion-scale Alipay 데이터의 tokenization capacity 스케일링 법칙), <strong>Spotify SID+CoT 부정 결과</strong>(reasoning trace가 offline effectiveness를 최대 −19%까지 떨어뜨려 Kuaishou PushDualGen의 반박점이 된다) 3건이 통과했다. Meta와 Netflix는 신규 자료가 없었다.</div>
 </header>
 <div class="wrap" id="content">
-<h2>1. X 4세대+7 드랍 — VF 레퍼런스 비교 하니스 + BrandSafetyVerdict HighRisk + PTOS 심판 3카테고리 확장</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/d011592a1c8c4bfb23781ff15577a68dc08bdde1">xai-org/x-algorithm@d011592</a> — 2026-08-24T18:51:34Z 커밋(파일 19, +1,428/−121). 커밋 메시지는 세대 시리즈 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄이라 커밋 내용은 파일 diff로만 판독.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>는 2026-08-13 헤드라인 드랍(47c1bcd, +363,246/−11,640) 이후 매일~격일 후속 커밋이 붙는 상태다. 이 문서 기준 여덟 번째 후속(4세대+7)이 오늘의 대상. 8월 25일(월) 자정 배치가 놓친 08-24 18:51 UTC 커밋을 24일 daily가 &quot;신규 없음&quot;으로 판정한 후 26일 배치에서 캐치업하는 것.</p></div>
-<p>이 드랍의 세 축은 <strong>VF 서브레포</strong>(visibility-filtering, 4세대 헤드라인의 하나로 통째로 공개된 안전 필터 스택), <strong>home-mixer의 브랜드 안전 판정</strong>(광고 인접성 게이팅), <strong>grox의 PTOS 파이프라인</strong>(Grok LLM 기반 policy-to-safety 재분류)이다. 각각이 서로 다른 방향으로 성숙 중인데 이번 커밋에서 세 축이 나란히 진화했다.</p>
-<h3>1-1. <code>visibility-filtering/reference_compare.rs</code> (812줄 신규) — dark_traffic 위에 얹힌 실측 canary</h3>
-<p>VF는 4세대 헤드라인 드랍에서 처음으로 소스가 통째로 공개된 서브레포다. 이전 세대(1·2세대 Scala)의 VF와 병존하며 재작성이 진행 중인데, 재작성은 <a href="x.html#%EC%86%8C%EC%8A%A4-%EC%9D%BD%EB%8A%94-%EB%B2%95--%ED%95%A8%EC%A0%95-%EB%AA%A9%EB%A1%9D">canon 함정 #1: fail-closed</a> 때문에 정책 변경 리스크가 큰 서브레포다(판정 없는 모든 결과가 drop으로 처리됨). 이 리스크에 대응하는 인프라가 세 단계로 배선됐다:</p>
+<h2>1. X 4세대+7 커밋: VF 레퍼런스 비교 하니스, BrandSafetyVerdict HighRisk, PTOS 심판 3카테고리 확장</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/d011592a1c8c4bfb23781ff15577a68dc08bdde1">xai-org/x-algorithm@d011592</a>: 2026-08-24T18:51:34Z에 올라온 커밋이고, 변경 규모는 파일 19, +1,428/−121이다. 커밋 메시지는 세대 시리즈의 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이므로, 커밋 내용은 파일 diff로만 판독했다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>는 2026-08-13 최초 공개(47c1bcd, +363,246/−11,640) 이후로 매일 또는 격일로 후속 커밋이 붙고 있다. 이 문서를 기준으로 여덟 번째 후속인 4세대+7이 오늘 살펴볼 대상이다. 8월 25일 월요일 자정 배치가 08-24 18:51 UTC 커밋을 놓쳤고 24일 daily도 &quot;신규 없음&quot;으로 판정했기 때문에, 26일 배치에서 뒤늦게 따라잡는다.</p></div>
+<p>이번 커밋의 세 축은 <strong>VF 서브레포</strong>(visibility-filtering이며, 4세대 최초 공개에서 통째로 공개된 안전 필터 스택이다), <strong>home-mixer의 브랜드 안전 판정</strong>(광고 인접성 게이팅을 담당한다), <strong>grox의 PTOS 파이프라인</strong>(Grok LLM으로 policy-to-safety를 재분류한다)이다. 세 축이 서로 다른 방향으로 성숙하고 있는데, 이번 커밋에서 나란히 진화했다.</p>
+<h3>1-1. <code>visibility-filtering/reference_compare.rs</code> (812줄 신규): dark_traffic 위에 추가된 실측 canary</h3>
+<p>VF는 4세대 최초 공개에서 소스 전체가 처음으로 공개된 서브레포다. 이전 세대인 1·2세대 Scala VF와 함께 돌아가면서 재작성이 진행 중인데, <a href="x.html#%EC%86%8C%EC%8A%A4-%EC%9D%BD%EB%8A%94-%EB%B2%95--%EC%A3%BC%EC%9D%98-%EB%AA%A9%EB%A1%9D">정본에 정리한 주의할 점 1번인 fail-closed</a> 때문에 정책을 바꿀 때 감수해야 하는 위험이 크다. 판정이 없는 결과를 모두 drop으로 처리하기 때문이다. 이 위험에 대응하는 인프라가 세 단계로 배선됐다.</p>
 <ul>
-<li><strong>4세대+4</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/aad7179">aad7179</a>, 2026-08-19): <code>dark_traffic_setup.rs</code>(109줄 신규)가 프로덕션 트래픽 요청을 <code>xai-vf-shadow.prod.visibility</code>로 병렬 미러링. <strong>트래픽 자원 소비</strong>만.</li>
-<li><strong>4세대+6</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/28e414f">28e414f</a>, 2026-08-21): dark_traffic 타깃이 <code>xai-vf-service.staging.visibility:grpc</code>로 리네이밍 — shadow prod가 아니라 <strong>staging</strong> 배포를 프로덕션 트래픽으로 검증.</li>
-<li><strong>4세대+7</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/d011592">d011592</a>, 2026-08-24): <code>reference_compare.rs</code>(812줄 신규)가 staging 배포 안에서 요청마다 <strong>Strato 기반 레퍼런스 VF</strong>(<code>StratoVfClient</code>)에 병렬 호출 → verdict 엄격 비교 → <strong>다른 결과만 JSON 라인으로 로깅</strong>. 즉 dark_traffic이 흘려보낸 프로덕션 트래픽이 staging VF에 도착하면 자기 verdict를 계산하면서 동시에 이전 세대(Strato-backed) 레퍼런스를 대조.</li>
+<li><strong>4세대+4</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/aad7179">aad7179</a>, 2026-08-19): <code>dark_traffic_setup.rs</code>(109줄 신규)가 프로덕션 트래픽 요청을 <code>xai-vf-shadow.prod.visibility</code>로 병렬 미러링한다. 이 단계에서는 <strong>트래픽 자원만 소비한다.</strong></li>
+<li><strong>4세대+6</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/28e414f">28e414f</a>, 2026-08-21): dark_traffic 타깃의 이름이 <code>xai-vf-service.staging.visibility:grpc</code>로 바뀌었다. shadow prod가 아니라 <strong>staging</strong> 배포를 프로덕션 트래픽으로 검증하겠다는 뜻이다.</li>
+<li><strong>4세대+7</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/d011592">d011592</a>, 2026-08-24): <code>reference_compare.rs</code>(812줄 신규)가 staging 배포 안에서 요청마다 <strong>Strato 기반 레퍼런스 VF</strong>(<code>StratoVfClient</code>)를 병렬로 호출하고, verdict를 엄격하게 비교한 다음, <strong>결과가 다른 경우만 JSON 라인으로 로깅한다.</strong> 즉 dark_traffic이 흘려보낸 프로덕션 트래픽이 staging VF에 도착하면, staging VF가 자기 verdict를 계산하면서 동시에 이전 세대인 Strato 기반 레퍼런스와 대조한다.</li>
 </ul>
-<p><code>begin_compare(viewer_id, country_code, safety_level, tweet_ids)</code>가 별도 tokio task를 spawn — main path는 자기 verdict를 <code>oneshot::channel</code>로 harness task에 흘려보내고 응답에는 영향 없음(read-only). Timeout 1.5초. <code>is_exact_match(&amp;VfAction, &amp;Option&lt;FilteredReason&gt;)</code>은 정규화 없이 엄격 비교(action 라벨 + FilteredReason 완전 일치)한다.</p>
-<p><strong>diff 로깅 포맷</strong> — 같은 (service_verdict, reference_verdict) 조합끼리 tweet_id를 그룹화 → 12KiB 라인 예산으로 청킹 → <code>println!(&quot;{line}&quot;)</code>으로 stdout에 흘림. 각 라인은:</p>
+<p><code>begin_compare(viewer_id, country_code, safety_level, tweet_ids)</code>는 별도의 tokio task를 spawn한다. main path는 자기 verdict를 <code>oneshot::channel</code>로 harness task에 넘기기만 하므로 응답에는 영향을 주지 않는다(read-only). 타임아웃은 1.5초다. <code>is_exact_match(&amp;VfAction, &amp;Option&lt;FilteredReason&gt;)</code>는 정규화를 거치지 않고 action 라벨과 FilteredReason이 완전히 일치하는지 엄격하게 비교한다.</p>
+<p><strong>diff 로깅 포맷</strong>: 같은 (service_verdict, reference_verdict) 조합끼리 tweet_id를 묶고, 12KiB 라인 예산에 맞춰 청킹한 다음, <code>println!(&quot;{line}&quot;)</code>으로 stdout에 내보낸다. 각 라인은:</p>
 <pre><code>{&quot;h&quot;:&quot;vf_reference_compare&quot;,&quot;v&quot;:1,&quot;batch&quot;:&quot;...&quot;,&quot;chunk&quot;:[1,1],&quot;build&quot;:&quot;&lt;12자 SHA&gt;&quot;,&quot;dc&quot;:&quot;atla&quot;,&quot;level&quot;:&quot;TimelineHome&quot;,&quot;viewer&quot;:&lt;u64&gt;,&quot;diffs&quot;:[[&quot;drop:AuthorIsSuspended&quot;,&quot;allow&quot;,[123, 456]], ...]}
 </code></pre>
-<p>메트릭 6종은 <code>xai_stats_receiver::global_stats_receiver()</code>로 노출: <code>vf_reference_compared</code>, <code>_exact_match</code>, <code>_differed</code>, <code>_error</code>(kind=timeout|reference_item|missing_result), <code>_skipped</code>(reason=level_unmapped|logged_out_viewer), <code>_enabled</code>. 모든 메트릭에 <code>build_sha</code> 라벨 부착 — 특정 빌드에서 diff율이 튀면 어느 배포가 원인인지 즉시 추적 가능.</p>
-<p><strong>Staging 강제:</strong></p>
+<p>메트릭 6종은 <code>xai_stats_receiver::global_stats_receiver()</code>를 통해 노출된다: <code>vf_reference_compared</code>, <code>_exact_match</code>, <code>_differed</code>, <code>_error</code>(kind=timeout|reference_item|missing_result), <code>_skipped</code>(reason=level_unmapped|logged_out_viewer), <code>_enabled</code>. 모든 메트릭에 <code>build_sha</code> 라벨이 붙기 때문에, 특정 빌드에서 diff 비율이 튀면 어느 배포가 원인인지 즉시 추적할 수 있다.</p>
+<p>부팅 시점에 <strong>staging 전용임을 강제한다.</strong></p>
 <pre><code class="language-rust">pub(crate) fn should_build_harness(
     flag_enabled: bool,
     app_env: Option&lt;&amp;str&gt;,
@@ -204,26 +204,26 @@ ul.rl .chip b { font-size: 13px; }
     }
 }
 </code></pre>
-<p>그리고 <code>server_deps.rs</code>의 <code>build_reference_compare_harness()</code>가 이 Err를 <code>panic!()</code>으로 승격 → <strong>부팅 실패</strong>. 즉 코드 레벨에서 staging 전용을 강제 — production에서 dual-call이 무리로 켜지는 사고 방지.</p>
+<p>그리고 <code>server_deps.rs</code>의 <code>build_reference_compare_harness()</code>가 이 Err를 <code>panic!()</code>으로 승격시켜 <strong>부팅을 실패시킨다.</strong> 즉 staging 전용이라는 제약을 코드 수준에서 강제하는 것이고, production에서 dual-call이 실수로 켜지는 사고를 막는다.</p>
 <blockquote>
 <p>&quot;the reference comparator is staging-only&quot;
 — <a href="https://github.com/xai-org/x-algorithm/blob/d011592/visibility-filtering/reference_compare.rs"><code>reference_compare.rs:31-33</code></a></p>
 </blockquote>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><strong>VF 검증 스택 3단 완성</strong> <code>[확인]</code> — dark_traffic(트래픽만) → dark_traffic 타깃이 staging(프로덕션 트래픽으로 staging 검증) → reference_compare(staging 안에서 verdict 대조). 정책 변경 리스크가 큰 fail-closed 안전 서브레포에 대해 프로덕션 트래픽 규모로 회귀 감사 가능해짐. VF 배선 리스크가 크게 감소.</li>
-<li><strong><code>StratoVfClient</code> = 레퍼런스 VF의 정체</strong> <code>[추정]</code> — Strato는 X의 실시간 스토리지/서비스 조회 레이어. <code>StratoVfClient</code>가 감싸는 실제 VF 스택이 1·2세대 Scala VF의 잔재인지, 별도의 참조 구현인지는 명시적으로 코드에 없음. <code>client_id = &quot;visibility-filtering-service.{APP_ENV}&quot;</code> 형식으로 identify하는 것을 보면 별도 인스턴스가 돌고 있는 것으로 보임 <code>[추정]</code>.</li>
-<li><strong>diff 그룹화 최적화</strong> <code>[확인]</code> — 같은 (service, reference) 조합끼리 tweet_id를 묶어 로그 라인 하나에 담고, 12KiB 예산을 넘으면 균등 분할. 즉 로그 라인 개수가 diff 조합 수에 비례하지 tweet_id 개수에 비례하지 않음 — 다수의 tweet이 같은 방식으로 divergent해도 로그 폭발 방지.</li>
+<li><strong>VF 검증 스택이 3단으로 완성됐다</strong> <code>[확인]</code>. dark_traffic이 트래픽만 흘려보내는 단계, dark_traffic 타깃을 staging으로 바꿔 프로덕션 트래픽으로 staging을 검증하는 단계, reference_compare가 staging 안에서 verdict를 대조하는 단계로 이어진다. 정책을 바꿀 때 위험이 큰 fail-closed 안전 서브레포를 프로덕션 트래픽 규모로 회귀 감사할 수 있게 됐고, VF 배선의 위험이 크게 줄었다.</li>
+<li><strong><code>StratoVfClient</code>가 레퍼런스 VF의 정체다</strong> <code>[추정]</code>. Strato는 X의 실시간 스토리지와 서비스 조회를 담당하는 레이어다. <code>StratoVfClient</code>가 감싸는 실제 VF 스택이 1·2세대 Scala VF의 잔재인지 별도의 참조 구현인지는 코드에 명시되어 있지 않다. <code>client_id = &quot;visibility-filtering-service.{APP_ENV}&quot;</code> 형식으로 자신을 식별하는 것을 보면 별도의 인스턴스가 돌고 있다고 보인다 <code>[추정]</code>.</li>
+<li><strong>diff를 조합별로 묶어 최적화했다</strong> <code>[확인]</code>. 같은 (service, reference) 조합끼리 tweet_id를 묶어 로그 라인 하나에 담고, 12KiB 예산을 넘으면 균등하게 나눈다. 즉 로그 라인 개수는 diff 조합의 수에 비례하고 tweet_id 개수에는 비례하지 않으므로, 많은 tweet이 같은 방식으로 divergent해도 로그가 폭증하지 않는다.</li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> 세 절에 반영:</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 세 절에 반영했다.</p></div>
 <ol>
-<li><a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 표에 +7 행 추가</a> — 파일 목록·+1,428/−121·핵심 8건 요약</li>
-<li><a href="x.html#%ED%95%9C-%EC%A4%84-%EC%9A%94%EC%95%BD">한 줄 요약 문단 확장</a> — 여덟 번째 후속 드랍 서술 추가</li>
-<li><a href="x.html#4%EC%84%B8%EB%8C%807-2026-08-24--vf-%EB%A0%88%ED%8D%BC%EB%9F%B0%EC%8A%A4-%EB%B9%84%EA%B5%90-%ED%95%98%EB%8B%88%EC%8A%A4-reference_comparers-%EB%B0%B0%EC%84%A0">안전성 절에 새 subsection &quot;4세대+7 (2026-08-24) — VF 레퍼런스 비교 하니스 (<code>reference_compare.rs</code>) 배선&quot;</a> — 동작·게이팅·의미 상세</li>
+<li><a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 표에 +7 행 추가</a>: 파일 목록과 +1,428/−121 규모, 핵심 8건을 요약했다.</li>
+<li><a href="x.html#%ED%95%9C-%EC%A4%84-%EC%9A%94%EC%95%BD">한 줄 요약 문단 확장</a>: 여덟 번째 후속 커밋에 대한 서술을 추가했다.</li>
+<li><a href="x.html#4%EC%84%B8%EB%8C%807-2026-08-24--vf-%EB%A0%88%ED%8D%BC%EB%9F%B0%EC%8A%A4-%EB%B9%84%EA%B5%90-%ED%95%98%EB%8B%88%EC%8A%A4-reference_comparers-%EB%B0%B0%EC%84%A0">안전성 절에 새 subsection &quot;4세대+7 (2026-08-24) — VF 레퍼런스 비교 하니스 (<code>reference_compare.rs</code>) 배선&quot;</a> 추가: 동작과 게이팅, 의미를 상세히 적었다.</li>
 </ol>
-<h3>1-2. <code>home-mixer/models/brand_safety.rs</code> — <code>BrandSafetyVerdict::HighRisk = 4</code> tier 신설</h3>
-<p>브랜드 안전 판정이 3단계(Safe/LowRisk/MediumRisk) → 4단계(+ HighRisk)로 확장됐다. 이전엔 medium risk 뭉치에 있던 라벨 5종이 승격됐고 새 라벨 1종이 추가됐다.</p>
-<p><strong>HighRisk로 승격/신설된 6종</strong> <code>[확인]</code>:</p>
+<h3>1-2. <code>home-mixer/models/brand_safety.rs</code>: <code>BrandSafetyVerdict::HighRisk = 4</code> tier 신설</h3>
+<p>브랜드 안전 판정이 3단계(Safe/LowRisk/MediumRisk)에서 HighRisk를 더한 4단계로 확장됐다. 이전에는 medium risk에 묶여 있던 라벨 5종이 승격됐고, 새 라벨 1종이 추가됐다.</p>
+<p><strong>HighRisk로 승격되거나 새로 만들어진 6종</strong> <code>[확인]</code>:</p>
 <pre><code class="language-rust">pub(crate) const HIGH_RISK_LABELS: &amp;[SafetyLabelType] = &amp;[
     SafetyLabelType::NSFW_HIGH_PRECISION,           // medium에서 승격
     SafetyLabelType::NSFW_HIGH_RECALL,              // medium에서 승격
@@ -233,8 +233,8 @@ ul.rl .chip b { font-size: 13px; }
     SafetyLabelType::SOFT_NSFW,                     // 신규
 ];
 </code></pre>
-<p><code>compute_verdict()</code>와 <code>compute_verdict_v2()</code> 둘 다 HighRisk 체크를 캐스케이드 최상단으로 이동. <code>worst_verdict()</code>의 <code>&gt;= 비교</code>가 자동 확장돼 HighRisk가 이제 최상위.</p>
-<p><strong>광고 유틸 <code>has_avoid()</code> 확장:</strong></p>
+<p><code>compute_verdict()</code>와 <code>compute_verdict_v2()</code> 모두 HighRisk 검사를 캐스케이드의 최상단으로 옮겼다. <code>worst_verdict()</code>의 <code>&gt;= 비교</code>가 자동으로 확장되므로 이제 HighRisk가 최상위 등급이 된다.</p>
+<p><strong>광고 유틸 <code>has_avoid()</code>도 확장됐다.</strong></p>
 <pre><code class="language-rust">pub(crate) fn has_avoid(post: &amp;ScoredPost) -&gt; bool {
     matches!(
         post.brand_safety_verdict(),
@@ -242,9 +242,9 @@ ul.rl .chip b { font-size: 13px; }
     )
 }
 </code></pre>
-<p>이전엔 <code>MediumRisk</code>만이었다 — 이제 High도 avoid 대상. <strong>인용 인접성 escalation도 승격</strong>: <code>ads_brand_safety_vf_hydrator.rs</code>에서 NSFW author인 조상 포스트를 인용한 경우 verdict를 <code>MediumRisk</code> → <code>HighRisk</code>로 escalate. 즉 인접성 판정에서 High가 Medium과 동일한 회피 대상이지만 (아직은) 추가 조치가 명시적으로 다르지 않다 — 강도는 실험 흐름·다운스트림 추적 목적으로 보인다.</p>
-<p><strong>V2 라벨 5종의 proto 노출 시작</strong> <code>[확인]</code> — <code>scored_posts_server.rs</code>의 <code>safety_label_to_proto</code> mapping에 다섯 개 신설: <code>GROK_SFA_V2</code> → <code>HM::GrokSfaV2</code>, <code>GROK_NSFA_LIMITED_V2</code> → <code>HM::GrokNsfaLimitedV2</code>, <code>GROK_NSFA_V2</code> → <code>HM::GrokNsfaV2</code>, <code>GROK_NSFA_EXPANDED_V2</code> → <code>HM::GrokNsfaExpandedV2</code>, <code>PTOS_REVIEWED</code> → <code>HM::PtosReviewed</code>. 이전엔 V2 라벨이 home-mixer 내부 판정에만 쓰이고 다운스트림 소비자(feed 응답을 받는 다른 서비스·클라이언트)에겐 감춰져 있었는데, 이제 실제로 실려 나감.</p>
-<p><strong>DDG experiment 트래킹</strong> <code>[확인]</code>:</p>
+<p>이전에는 <code>MediumRisk</code>만 대상이었지만 이제 HighRisk도 avoid 대상이 된다. <strong>인용 인접성 escalation도 함께 승격됐다.</strong> <code>ads_brand_safety_vf_hydrator.rs</code>는 NSFW author가 쓴 조상 포스트를 인용한 경우 verdict를 <code>MediumRisk</code>에서 <code>HighRisk</code>로 escalate한다. 즉 인접성 판정에서 HighRisk는 MediumRisk와 똑같이 회피 대상이고, 아직 추가 조치가 명시적으로 다르지는 않다. 강도를 따로 구분한 것은 실험을 진행하고 다운스트림에서 추적하려는 목적으로 보인다.</p>
+<p><strong>V2 라벨 5종이 proto로 노출되기 시작했다</strong> <code>[확인]</code>. <code>scored_posts_server.rs</code>의 <code>safety_label_to_proto</code> mapping에 다섯 개가 새로 들어갔다: <code>GROK_SFA_V2</code> → <code>HM::GrokSfaV2</code>, <code>GROK_NSFA_LIMITED_V2</code> → <code>HM::GrokNsfaLimitedV2</code>, <code>GROK_NSFA_V2</code> → <code>HM::GrokNsfaV2</code>, <code>GROK_NSFA_EXPANDED_V2</code> → <code>HM::GrokNsfaExpandedV2</code>, <code>PTOS_REVIEWED</code> → <code>HM::PtosReviewed</code>. 이전에는 V2 라벨이 home-mixer 내부 판정에만 쓰였고 다운스트림 소비자(feed 응답을 받는 다른 서비스와 클라이언트)에게는 감춰져 있었는데, 이제 실제로 응답에 실려 나간다.</p>
+<p><strong>DDG experiment 트래킹</strong> <code>[확인]</code>도 함께 들어왔다.</p>
 <pre><code class="language-rust">ddg_experiment_bucket: query
     .params
     .experiment_buckets(EnableAdsBrandSafetyVerdictV2)
@@ -252,47 +252,47 @@ ul.rl .chip b { font-size: 13px; }
     .map(|b| format!(&quot;{}:{}&quot;, b.experiment, b.bucket))
     .unwrap_or_default(),
 </code></pre>
-<p><code>ads_injection_logging_side_effect.rs</code>가 <code>EnableAdsBrandSafetyVerdictV2</code> experiment의 버킷을 로깅에 노출. DDG는 X의 광고 리포팅 파이프라인으로 추정 <code>[추정]</code> (Data Dashboard / Data 유사 시스템). V2 실험군의 매출/안전 metric을 관측 가능하게 함. <strong>V2 판정 로직이 experiment 단계</strong>라는 방증. 4세대+2(도입) → +3(재설계) → +7(experiment 실측 인프라 완비)의 8일 여정 완결.</p>
+<p><code>ads_injection_logging_side_effect.rs</code>가 <code>EnableAdsBrandSafetyVerdictV2</code> experiment의 버킷을 로깅에 노출한다. DDG는 X의 광고 리포팅 파이프라인으로 추정한다 <code>[추정]</code>(Data Dashboard 또는 그와 유사한 계열의 시스템으로 보인다). 이 로깅 덕분에 V2 실험군의 매출과 안전 metric을 관측할 수 있게 됐고, <strong>V2 판정 로직이 아직 experiment 단계</strong>라는 방증이기도 하다. 4세대+2에서 도입하고 +3에서 재설계한 다음 +7에서 experiment 실측 인프라를 갖추기까지, 8일에 걸친 과정이 마무리됐다.</p>
 <blockquote>
 <p>&quot;MEDIUM_RISK_LABELS_V2에서 위 5종 제거&quot;
 — <a href="https://github.com/xai-org/x-algorithm/blob/d011592/home-mixer/models/brand_safety.rs"><code>home-mixer/models/brand_safety.rs</code></a></p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#%EA%B4%91%EA%B3%A0">services/x.md 광고 절</a>의 브랜드 안전 서술을 갱신하고, 그 뒤에 <strong>&quot;4세대+7 HighRisk tier 신설&quot;</strong> subsection을 추가.</p></div>
-<h3>1-3. <code>grox/flows/ptos/classifier.py</code> — <code>SafetyPtosPolicyCrossValidator</code> 신설, Grok 4.5가 X_ALGO 엔드포인트로 재도입</h3>
-<p>PTOS(Policy-to-Safety) 심판 계층이 성인 컨텐츠 하나에서 세 카테고리(ChildSafety, ViolentMedia, IllegalAndRegulatedBehaviors)로 확장됐고, 3일 전(4세대+6) 완전 제거된 Grok 4.5가 <strong>다른 엔드포인트</strong>로 심판 전용 재도입됐다.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#%EA%B4%91%EA%B3%A0">services/x.md 광고 절</a>의 브랜드 안전 서술을 갱신하고, 그 뒤에 <strong>&quot;4세대+7 HighRisk tier 신설&quot;</strong> subsection을 추가했다.</p></div>
+<h3>1-3. <code>grox/flows/ptos/classifier.py</code>: <code>SafetyPtosPolicyCrossValidator</code> 신설과 Grok 4.5의 X_ALGO 엔드포인트 재도입</h3>
+<p>PTOS(Policy-to-Safety) 심판 계층이 성인 컨텐츠 하나에서 세 카테고리(ChildSafety, ViolentMedia, IllegalAndRegulatedBehaviors)로 확장됐다. 그리고 3일 전인 4세대+6에서 완전히 제거됐던 Grok 4.5가 <strong>다른 엔드포인트</strong>를 통해 심판 전용으로 다시 들어왔다.</p>
 <p><strong>Grok 4.5의 8일 진화:</strong></p>
 <ul>
-<li>4세대+2 (2026-08-17): <code>EAPI_GROK_4_5_INTERNAL</code>이 성인 컨텐츠 심판으로 도입 (<code>SafetyPtosAdultContentCrossValidationJudge</code>)</li>
-<li>4세대+4 (2026-08-19): Grok 4.6 internal 10% dial 도입(shadow)</li>
-<li>4세대+5 (2026-08-20): 4.6 dial 10% → 30%</li>
-<li>4세대+6 (2026-08-21): 4.6 dial 30% → 100%, <strong>4.5 internal 코드에서 완전 제거</strong>(breaker·sampler·dial 상수 모두 삭제)</li>
-<li>4세대+7 (2026-08-24): <strong><code>EAPI_GROK_4_5_X_ALGO</code>가 심판 전용으로 재도입</strong> — primary가 아니라 judge</li>
+<li>4세대+2 (2026-08-17): <code>EAPI_GROK_4_5_INTERNAL</code>이 성인 컨텐츠 심판으로 도입됐다(<code>SafetyPtosAdultContentCrossValidationJudge</code>).</li>
+<li>4세대+4 (2026-08-19): Grok 4.6 internal을 10% dial로 도입했다(shadow).</li>
+<li>4세대+5 (2026-08-20): 4.6 dial을 10%에서 30%로 올렸다.</li>
+<li>4세대+6 (2026-08-21): 4.6 dial을 30%에서 100%로 올리면서 <strong>4.5 internal을 코드에서 완전히 제거했다</strong>(breaker와 sampler, dial 상수를 모두 삭제).</li>
+<li>4세대+7 (2026-08-24): <strong><code>EAPI_GROK_4_5_X_ALGO</code>를 심판 전용으로 재도입했다.</strong> primary가 아니라 judge로만 쓴다.</li>
 </ul>
-<p>X_ALGO 접미사는 x-algorithm 도메인 튜닝 변형을 시사 <code>[추정]</code> — 4.5 base + x-algorithm 파인튜닝인지 완전 별개 모델인지 미공개. 회로차단기 <code>_eapi_4_5_x_algo_breaker</code> (window 600초·회복 600초·half-open 5회, 4.6 internal과 같은 파라미터).</p>
-<p><strong><code>SafetyPtosPolicyCrossValidator</code> 클래스 신규:</strong></p>
-<p>진입점 <code>validate(category, post, policy)</code>가 세 카테고리를 각 전용 메서드로 라우팅. 세 카테고리 모두 <strong>강등만 허용</strong> — cross-validator가 primary보다 엄격한 판정을 낼 수는 없고, primary가 오탐한 것을 심판이 풀어주는 방향으로만 작동. 이는 4세대+2의 성인 컨텐츠 judge와 같은 설계 철학.</p>
+<p>X_ALGO라는 접미사는 x-algorithm 도메인에 맞춰 튜닝한 변형임을 시사한다 <code>[추정]</code>. 4.5 base에 x-algorithm 파인튜닝을 더한 것인지 완전히 별개의 모델인지는 공개되지 않았다. 회로차단기는 <code>_eapi_4_5_x_algo_breaker</code>이고, window 600초에 회복 600초, half-open 5회로 4.6 internal과 파라미터가 같다.</p>
+<p><strong><code>SafetyPtosPolicyCrossValidator</code> 클래스가 새로 생겼다.</strong></p>
+<p>진입점인 <code>validate(category, post, policy)</code>가 세 카테고리를 각각의 전용 메서드로 라우팅한다. 세 카테고리 모두 <strong>강등만 허용한다.</strong> 즉 cross-validator는 primary보다 엄격한 판정을 낼 수 없고, primary가 잘못 잡아낸 것을 심판이 풀어주는 방향으로만 작동한다. 4세대+2에서 도입한 성인 컨텐츠 judge와 같은 설계 철학이다.</p>
 <ul>
-<li><strong>ChildSafety</strong> (<code>_validate_child_safety</code>): 4.5로 재확인 → policy type 일치면 유지, 불일치면 <code>NoViolation</code>으로 강등. 파싱 실패·에러도 <code>NoViolation</code> fallback. <code>_build_policy_convo</code>에 post creation date를 넣어 <code>child_safety_policy_prompt(post_creation_time)</code> 사용 — 즉 아동 안전은 시점 의존적인 요소가 있음.</li>
-<li><strong>ViolentMedia</strong> (<code>_validate_violent_media</code>): 4.5로 재확인 → 일치면 유지, <code>NoViolation</code>이면 강등, type_mismatch면 <code>ViolentMediaGraphicMedia</code>(약한 형)로 downgrade. <strong>강등 옵션이 3가지로 세분화</strong>.</li>
-<li><strong>IllegalAndRegulatedBehaviors</strong> (<code>_validate_illegal_and_regulated_behaviors</code>): 4.5로 재확인 → 일치면 policy type 유지하되 reason은 4.5가 준 것으로 덮어쓰기(더 정확한 사유 설명), 불일치면 <code>NoViolation</code>으로 강등.</li>
+<li><strong>ChildSafety</strong>(<code>_validate_child_safety</code>): 4.5로 다시 확인해서 policy type이 일치하면 판정을 유지하고, 일치하지 않으면 <code>NoViolation</code>으로 강등한다. 파싱에 실패하거나 에러가 나도 <code>NoViolation</code>으로 fallback한다. <code>_build_policy_convo</code>에 post creation date를 넣어 <code>child_safety_policy_prompt(post_creation_time)</code>를 사용하는데, 아동 안전 판정에는 시점에 따라 달라지는 요소가 있다는 뜻이다.</li>
+<li><strong>ViolentMedia</strong>(<code>_validate_violent_media</code>): 4.5로 다시 확인해서 일치하면 유지하고, <code>NoViolation</code>이면 강등하며, type_mismatch면 더 약한 유형인 <code>ViolentMediaGraphicMedia</code>로 downgrade한다. <strong>강등 선택지가 3가지로 세분화됐다.</strong></li>
+<li><strong>IllegalAndRegulatedBehaviors</strong>(<code>_validate_illegal_and_regulated_behaviors</code>): 4.5로 다시 확인해서 일치하면 policy type은 유지하되 reason은 4.5가 내놓은 것으로 덮어쓰고(사유 설명이 더 정확해진다), 일치하지 않으면 <code>NoViolation</code>으로 강등한다.</li>
 </ul>
-<p>메트릭 <code>safety_ptos.&lt;category&gt;_cross_model_validate_with_grok_4_5</code> 카운터가 세 카테고리별로 outcome 태그(<code>agreed</code>/<code>disagreed</code>/<code>unparseable</code>/<code>no_violation</code>/<code>type_mismatch</code>/<code>error</code>) 부착.</p>
-<p><strong><code>USE_REASONING_CATEGORIES = {ViolentSpeech, SuicideOrSelfHarm}</code></strong> — 이 두 카테고리에서만 <code>SafetyPtosPolicyClassifier.build_convo()</code>가 <code>_strip_thinking_restrictions</code>를 프롬프트에 적용(reasoning 활성) + assistant 메시지를 빈 상태로 두어 모델이 자유롭게 사고. 다른 카테고리는 여전히 <code>THINKING_CONTROL_END</code>로 사고 억제(빠르고 저렴한 응답).</p>
-<p><strong><code>USE_THREAD_RENDERER_CATEGORIES = {ViolentSpeech, SuicideOrSelfHarm}</code></strong> — 이 두 카테고리에서만 (post에 <code>ancestors</code>가 있으면) <code>ThreadRenderer</code>로 부모 스레드 전체를 사용자 메시지로 렌더. <strong>이유는 근본적:</strong> &quot;죽고 싶어&quot; 같은 문장은 스레드 문맥 없이 판정 불가 — 이전 발화가 게임에서 진 얘기면 무해, 자해 지원 스레드면 위중. 마찬가지로 폭력 발언도 인용/응답 맥락이 결정. 다른 카테고리(성인·NSFW 미디어·불법)는 대상 post 자체가 신호를 담아 스레드 확장 불필요.</p>
+<p>메트릭 <code>safety_ptos.&lt;category&gt;_cross_model_validate_with_grok_4_5</code> 카운터는 세 카테고리마다 outcome 태그(<code>agreed</code>/<code>disagreed</code>/<code>unparseable</code>/<code>no_violation</code>/<code>type_mismatch</code>/<code>error</code>)를 붙인다.</p>
+<p><strong><code>USE_REASONING_CATEGORIES = {ViolentSpeech, SuicideOrSelfHarm}</code></strong>: 이 두 카테고리에서만 <code>SafetyPtosPolicyClassifier.build_convo()</code>가 <code>_strip_thinking_restrictions</code>를 프롬프트에 적용해서 reasoning을 활성화하고, assistant 메시지를 비워 두어 모델이 자유롭게 사고하도록 한다. 다른 카테고리는 여전히 <code>THINKING_CONTROL_END</code>로 사고를 억제해서 빠르고 저렴하게 응답한다.</p>
+<p><strong><code>USE_THREAD_RENDERER_CATEGORIES = {ViolentSpeech, SuicideOrSelfHarm}</code></strong>: 이 두 카테고리에서만, post에 <code>ancestors</code>가 있으면 <code>ThreadRenderer</code>로 부모 스레드 전체를 사용자 메시지로 렌더한다. <strong>이유는 근본적이다.</strong> &quot;죽고 싶어&quot; 같은 문장은 스레드 문맥 없이는 판정할 수 없다. 이전 발화가 게임에서 졌다는 이야기라면 무해하지만, 자해를 지지하는 스레드라면 위중하다. 폭력 발언도 마찬가지로 인용과 응답의 맥락이 판정을 결정한다. 반면 성인 컨텐츠와 NSFW 미디어, 불법 행위 같은 다른 카테고리는 대상 post 자체가 신호를 담고 있어서 스레드까지 확장할 필요가 없다.</p>
 <blockquote>
 <p>&quot;USE_REASONING_CATEGORIES = { ViolentSpeech, SuicideOrSelfHarm }&quot;
 &quot;USE_THREAD_RENDERER_CATEGORIES = { ViolentSpeech, SuicideOrSelfHarm }&quot;
 — <a href="https://github.com/xai-org/x-algorithm/blob/d011592/grox/flows/ptos/classifier.py"><code>grox/flows/ptos/classifier.py:582-594</code></a></p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#grox--ptos-adult-content-cross-validation-4%EC%84%B8%EB%8C%802-%EC%8B%A0%EA%B7%9C-2026-08-17">services/x.md</a>의 PTOS 절 마지막에 <strong>&quot;4세대+7 (2026-08-24) — <code>SafetyPtosPolicyCrossValidator</code> 신설&quot;</strong> subsection 추가. 흐름 정리(4세대+2 → +7까지 8일)와 X가 primary·judge를 서로 다른 모델·튜닝으로 유지하는 이중 스택을 굳혔다는 해석 포함.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#grox--ptos-adult-content-cross-validation-4%EC%84%B8%EB%8C%802-%EC%8B%A0%EA%B7%9C-2026-08-17">services/x.md</a>의 PTOS 절 마지막에 <strong>&quot;4세대+7 (2026-08-24) — <code>SafetyPtosPolicyCrossValidator</code> 신설&quot;</strong> subsection을 추가했다. 4세대+2에서 +7까지 8일에 걸친 흐름을 정리했고, X가 primary와 judge를 서로 다른 모델과 튜닝으로 유지하는 이중 스택을 굳혔다는 해석도 함께 담았다.</p></div>
 <h3>1-4. Phoenix 체크포인트 로더 하드닝 (<code>xai_checkpointing/load.py</code>, +178/−36)</h3>
-<p>Muon + GB300 세대 이후 Phoenix 학습이 지금까지의 규모를 넘으면서 restore path의 실무 이슈가 정리됐다. <code>load_checkpoint</code>에 새 인자 3개:</p>
+<p>Muon과 GB300 세대 이후로 Phoenix 학습이 지금까지의 규모를 넘어서면서, restore path에서 겪던 실무 이슈가 정리됐다. <code>load_checkpoint</code>에 인자 3개가 새로 추가됐다.</p>
 <ul>
-<li><strong><code>domains: dict[str, Any] | None</code></strong> — per-tensor <code>ts.IndexDomain</code> 슬라이스. JSON 스펙 또는 인덱싱 표현식 두 형식 지원. 특정 tensor만 부분 로드하거나 로컬 shape이 체크포인트 shape과 다를 때 명시적 슬라이스.</li>
-<li><strong><code>tag: str | None = None</code></strong> — 기본 <code>&quot;orbax-ckpt&quot;</code>. 체크포인트 서브디렉토리 이름. 하나의 base path에 여러 tag의 체크포인트를 공존시키는 관행이 배선됨.</li>
-<li><strong><code>concurrent_gb: float | None</code></strong> — 동시 디코딩되는 tensor 바이트 상한(<code>int(concurrent_gb * 10**9)</code>). 배치 단위로 read를 끊음 — cur_bytes + nbytes가 예산을 넘으면 배치 flush → drain → 다음 배치. None이면 스로틀 없이 병렬 issue.</li>
+<li><strong><code>domains: dict[str, Any] | None</code></strong>: tensor마다 <code>ts.IndexDomain</code> 슬라이스를 지정한다. JSON 스펙과 인덱싱 표현식 두 가지 형식을 지원하며, 특정 tensor만 부분적으로 로드하거나 로컬 shape이 체크포인트 shape과 다를 때 슬라이스를 명시하는 용도다.</li>
+<li><strong><code>tag: str | None = None</code></strong>: 기본값은 <code>&quot;orbax-ckpt&quot;</code>이고, 체크포인트 서브디렉토리의 이름을 가리킨다. 하나의 base path에 여러 tag의 체크포인트를 함께 두는 관행이 코드에 배선됐다.</li>
+<li><strong><code>concurrent_gb: float | None</code></strong>: 동시에 디코딩되는 tensor의 바이트 상한이다(<code>int(concurrent_gb * 10**9)</code>). read를 배치 단위로 끊어서, cur_bytes와 nbytes의 합이 예산을 넘으면 배치를 flush하고 drain한 다음 다음 배치로 넘어간다. None이면 스로틀 없이 병렬로 issue한다.</li>
 </ul>
-<p><strong>노드 레벨 restore 직렬화:</strong></p>
+<p><strong>노드 레벨에서 restore를 직렬화한다.</strong></p>
 <pre><code class="language-python">_NODE_SERIALIZE_ENV = &quot;XAI_RESTORE_NODE_SERIALIZE&quot;
 _NODE_LOCK_FILE_ENV = &quot;XAI_RESTORE_NODE_LOCK_FILE&quot;
 
@@ -305,44 +305,44 @@ class _NodeBatchLock:
         fcntl.flock(self._fd, fcntl.LOCK_EX)
         ...
 </code></pre>
-<p>기본 락 파일 경로 <code>/dev/shm/xai_restore_node_lock</code> (없으면 <code>/tmp/...</code>). <strong>같은 노드의 여러 JAX 워커가 동시에 restore하는 것을 막아</strong> 노드 하나가 한 번에 한 배치만 처리하도록 강제. 1초 이상 대기 시 로그. 배치 사이에 <code>gc.collect()</code> + <code>ctypes.CDLL(&quot;libc.so.6&quot;).malloc_trim(0)</code> — glibc 할당자 슬랙 반환.</p>
-<div class="blk why"><p><span class="lbl">의미</span> 4세대+6(2026-08-21)이 TRAINING.md·README를 재작성해 flagship Muon + GB300 오버라이드가 export에 정식 포함됐는데, 그 세대의 배치 검증에서 다중 워커 restore가 노드 메모리를 초과하는 이슈를 발견했을 가능성 <code>[추정]</code>. Muon 이전엔 모델 크기가 작아 이런 인프라가 필요 없었지만 GB300 규모에서는 node-lock + concurrent_gb가 필수가 됨. 4세대의 훈련 스택 성숙 신호.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 Grox 절 뒤에 <strong>&quot;Phoenix 체크포인트 로더 다중 노드 하드닝 — 4세대+7 (2026-08-24)&quot;</strong> subsection 추가.</p></div>
+<p>락 파일의 기본 경로는 <code>/dev/shm/xai_restore_node_lock</code>이고, 이 경로가 없으면 <code>/tmp/...</code>를 쓴다. <strong>같은 노드의 여러 JAX 워커가 동시에 restore하는 것을 막아서</strong> 노드 하나가 한 번에 한 배치만 처리하도록 강제한다. 1초 이상 대기하면 로그를 남긴다. 배치 사이에는 <code>gc.collect()</code>와 <code>ctypes.CDLL(&quot;libc.so.6&quot;).malloc_trim(0)</code>을 호출해서 glibc 할당자가 쥐고 있던 여유 메모리를 반환한다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대+6(2026-08-21)이 TRAINING.md와 README를 다시 써서 flagship Muon과 GB300 오버라이드를 export에 정식으로 포함시켰는데, 그 세대의 배치 검증에서 여러 워커가 동시에 restore할 때 노드 메모리를 초과하는 문제를 발견했을 가능성이 있다 <code>[추정]</code>. Muon 이전에는 모델 크기가 작아서 이런 인프라가 필요 없었지만, GB300 규모에서는 node-lock과 concurrent_gb가 필수가 됐다. 4세대의 훈련 스택이 성숙하고 있다는 신호다.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 Grox 절 뒤에 <strong>&quot;Phoenix 체크포인트 로더 다중 노드 하드닝 — 4세대+7 (2026-08-24)&quot;</strong> subsection을 추가했다.</p></div>
 <h3>1-5. 소소한 변경 3건 (grox reply_spam · X Spaces 컨텍스트)</h3>
 <ul>
-<li><strong>grox reply_spam follower 임계 80k → 100k</strong> — <code>TaskSpamFilter</code>·<code>TaskReplyRankingFilter</code> 둘 다. 11일 5단계(15k → 30k → 60k → 80k → <strong>100k</strong>)로 계속 완화. 이 흐름 자체가 신호 — grox reply spam 검사 대상이 계속 좁혀지고 있는 것.</li>
-<li><strong><code>grox/flows/reply_spam/strato_loader.py</code>(49줄 신규)</strong> — <code>ReplyRankingScoreStratoLoader</code>가 reply ranking 점수를 Strato <code>put</code> + score ≤ 1.0이면 지역 캐시(Atla, Pdxa)에 병렬 팬아웃 + Kafka v2 emit. grox reply_spam 파이프라인의 오프라인 결과가 온라인 서빙 stack이 소비 가능하게 write-back 채널 완비. 스코어 임계 1.0 이상은 캐시 fanout 스킵 — 낮은 신뢰도 판정은 정본에만 남기고 서빙 캐시는 오염 방지 <code>[추정]</code>.</li>
-<li><strong>X Spaces(오디오) 컨텍스트가 grox에 유입</strong> — <code>SpaceMetadata</code> 클래스 신설(현재 <code>title</code> 하나), <code>Post.space_metadata</code> 필드, <code>post_mapper.py</code>가 매핑, <code>grox/core/lm/post.py</code> renderer가 <code>\n\nThis post has the following audio space card attached:\nAudio Space title: {title}</code>로 LLM 프롬프트에 포함. 오디오 자체는 안 듣지만 스페이스 제목이 브랜드 안전·성인 컨텐츠 판정 재료가 됨.</li>
+<li><strong>grox reply_spam의 follower 임계가 80k에서 100k로 올라갔다.</strong> <code>TaskSpamFilter</code>와 <code>TaskReplyRankingFilter</code> 둘 다 해당된다. 11일 동안 5단계(15k → 30k → 60k → 80k → <strong>100k</strong>)에 걸쳐 계속 완화됐다. 이 흐름 자체가 신호인데, grox reply spam의 검사 대상이 계속 좁아지고 있다는 뜻이다.</li>
+<li><strong><code>grox/flows/reply_spam/strato_loader.py</code>(49줄 신규)</strong>: <code>ReplyRankingScoreStratoLoader</code>가 reply ranking 점수를 Strato에 <code>put</code>하고, score가 1.0 이하이면 지역 캐시인 Atla와 Pdxa에 병렬로 팬아웃하면서 Kafka v2로도 emit한다. grox reply_spam 파이프라인의 오프라인 결과를 온라인 서빙 stack이 소비할 수 있도록 write-back 채널이 갖춰졌다. 스코어가 1.0을 넘으면 캐시 fanout을 건너뛰는데, 신뢰도가 낮은 판정은 정본에만 남기고 서빙 캐시가 오염되는 것을 막으려는 조치로 보인다 <code>[추정]</code>.</li>
+<li><strong>X Spaces(오디오) 컨텍스트가 grox로 들어오기 시작했다.</strong> <code>SpaceMetadata</code> 클래스가 새로 생겼고(현재 필드는 <code>title</code> 하나뿐이다), <code>Post.space_metadata</code> 필드가 추가됐으며, <code>post_mapper.py</code>가 이를 매핑한다. <code>grox/core/lm/post.py</code>의 renderer는 <code>\n\nThis post has the following audio space card attached:\nAudio Space title: {title}</code> 형태로 LLM 프롬프트에 포함시킨다. 오디오 자체를 듣지는 않지만, 스페이스 제목이 브랜드 안전과 성인 컨텐츠 판정의 재료가 된다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> 오늘 드랍의 세 축은 <strong>VF 재작성 검증</strong>(reference_compare) + <strong>브랜드 안전 판정의 tier 확장 + experiment 실측 인프라</strong>(HighRisk + DDG) + <strong>PTOS 심판 계층의 확장</strong>(3 카테고리 + 4.5 X_ALGO 재도입)로 요약된다. 4세대의 전체 이야기가 &quot;코드 공개 → 검증 인프라 배선 → experiment 트래킹 → 다운스트림 노출&quot;의 성숙 곡선을 그리는 걸 볼 수 있다. VF·브랜드 안전·PTOS 세 서브시스템이 이 순서로 나란히 성숙하고 있다는 것 자체가 <strong>X가 4세대 오픈소스 릴리스를 검증 가능한 상태로 만드는 데 조직 리소스를 여전히 투입하고 있다</strong>는 방증. 4세대+3부터 매일 커밋이 있는 흐름이 4세대+7(08-24)에도 이어졌다.</p></div>
-<h2>2. HEGM — VK 러시아, 짧은 비디오 watch-time 분포 예측, 프로덕션 1.5개월 A/B 상세 수치 (레이더)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.23356">Hierarchical Exponential-Gaussian Mixtures for Watch-Time Distribution Prediction</a> — arXiv 2608.23356, 2026-08-24 v1, 저자 4명 Sofia Gulevskaia, Mikhail Trapeznikov, Aleksandr Poslavsky, Alexander D&#39;yakonov (전원 <a href="https://ai.vk.com/">AI VK</a> + Lomonosov Moscow State University 겸직, HTML 판 affiliation 확인). 코드·모델 <a href="https://github.com/rw404/HEGM">github.com/rw404/HEGM</a> 공개.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 짧은 비디오 랭킹의 핵심 회귀 타깃은 <strong>watch time</strong>(사용자가 특정 비디오를 얼마나 오래 볼지)이다. 이 예측은 세 가지 특성이 겹쳐 어렵다: (a) <strong>near-zero-inflated</strong> — 사용자가 3초 이내에 스킵하는 비율이 매우 높아 분포가 0 근처에 큰 질량, (b) <strong>long-tailed</strong> — 소수 사용자는 아주 오래 시청, (c) <strong>multimodal</strong> — &quot;가볍게 훑기&quot; vs &quot;몰입 시청&quot; 등 여러 모드. 이 문제에 대한 SOTA는 <strong>EGMN</strong>(Exponential-Gaussian Mixture Network) — Gaussian mixture로 조건부 밀도 전체를 모델링해 단일 point estimate가 아니라 CDF 기반 이벤트(예: &quot;3초 이상 시청 확률&quot;) 예측을 지원.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 오늘 커밋의 세 축은 <strong>VF 재작성 검증</strong>(reference_compare), <strong>브랜드 안전 판정의 tier 확장과 experiment 실측 인프라</strong>(HighRisk와 DDG), <strong>PTOS 심판 계층의 확장</strong>(3개 카테고리와 4.5 X_ALGO 재도입)으로 요약된다. 4세대의 전체 이야기는 코드를 공개하고, 검증 인프라를 배선하고, experiment를 트래킹하고, 다운스트림에 노출하는 성숙 곡선을 그린다. VF와 브랜드 안전, PTOS 세 서브시스템이 이 순서로 나란히 성숙하고 있다는 사실 자체가 <strong>X가 4세대 오픈소스 릴리스를 검증 가능한 상태로 만드는 데 조직의 자원을 여전히 투입하고 있다</strong>는 방증이다. 4세대+3부터 매일 커밋이 이어지던 흐름이 4세대+7(08-24)에도 계속됐다.</p></div>
+<h2>2. HEGM: VK 러시아의 짧은 비디오 watch-time 분포 예측과 프로덕션 1.5개월 A/B 상세 수치 (레이더)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.23356">Hierarchical Exponential-Gaussian Mixtures for Watch-Time Distribution Prediction</a>: arXiv 2608.23356의 2026-08-24 v1이고, 저자는 Sofia Gulevskaia, Mikhail Trapeznikov, Aleksandr Poslavsky, Alexander D&#39;yakonov 4명이다. 네 사람 모두 <a href="https://ai.vk.com/">AI VK</a>와 Lomonosov Moscow State University를 겸직하고 있으며, affiliation은 HTML 판에서 확인했다. 코드와 모델은 <a href="https://github.com/rw404/HEGM">github.com/rw404/HEGM</a>에 공개되어 있다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 짧은 비디오 랭킹의 핵심 회귀 타깃은 <strong>watch time</strong>, 즉 사용자가 특정 비디오를 얼마나 오래 볼지다. 이 예측은 세 가지 특성이 겹쳐서 어렵다. (a) <strong>near-zero-inflated</strong>: 사용자가 3초 이내에 스킵하는 비율이 매우 높아서 분포의 질량이 0 근처에 크게 몰린다. (b) <strong>long-tailed</strong>: 소수의 사용자는 아주 오래 시청한다. (c) <strong>multimodal</strong>: 가볍게 훑어보는 시청과 몰입해서 보는 시청처럼 여러 모드가 존재한다. 이 문제의 SOTA는 <strong>EGMN</strong>(Exponential-Gaussian Mixture Network)인데, Gaussian mixture로 조건부 밀도 전체를 모델링해서 단일 point estimate가 아니라 &quot;3초 이상 시청할 확률&quot; 같은 CDF 기반 이벤트를 예측할 수 있게 해 준다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
 <li><p><strong>EGMN의 실패 모드 3종</strong> <code>[확인]</code>:</p>
 <ul>
-<li><strong>variance collapse</strong> — MLE 학습이 특정 컴포넌트의 σ_k(x)를 0으로 몰아 그 샘플에 likelihood spike를 만들고 분포는 무의미해짐</li>
-<li><strong>component redundancy</strong> — 여러 Gaussian이 μ_i≈μ_j, σ_i≈σ_j로 수렴해 사실상 동일 컴포넌트 복제</li>
-<li><strong>inactive components</strong> — 대부분 mixture weight가 0으로 붕괴, entropy regularizer가 있어도 발생</li>
+<li><strong>variance collapse</strong>: MLE 학습이 특정 컴포넌트의 σ_k(x)를 0으로 몰아붙여 그 샘플에 likelihood spike를 만들고, 그 결과 분포 자체가 무의미해진다.</li>
+<li><strong>component redundancy</strong>: 여러 Gaussian이 μ_i≈μ_j, σ_i≈σ_j로 수렴해서 사실상 같은 컴포넌트를 복제한다.</li>
+<li><strong>inactive components</strong>: 대부분의 mixture weight가 0으로 붕괴하며, entropy regularizer를 넣어도 발생한다.</li>
 </ul>
-<p>이 세 실패가 대규모 재현 연구에서 반복되는 것을 발견한 게 HEGM의 출발.</p>
+<p>이 세 가지 실패가 대규모 재현 연구에서 반복된다는 사실을 발견한 것이 HEGM의 출발점이다.</p>
 </li>
-<li><p><strong>HEGM의 다섯 가지 수정</strong> <code>[확인]</code>:</p>
+<li><p><strong>HEGM이 도입한 다섯 가지 수정</strong> <code>[확인]</code>:</p>
 <ul>
-<li><strong>Hierarchical skip-watch decomposition</strong> — sigmoid gate가 skip 확률 예측: <code>p_skip(x) = σ(W_skip · h + b_skip) ∈ (0, 1)</code>. 최종 밀도는 exponential × p_skip + Gaussian mixture × (1−p_skip). &quot;quick skip = 무관심&quot;과 &quot;engaged viewing&quot;을 판정 층에서 분리 — 해석 가능성 + 각각 다른 실패 모드를 다른 sub-model이 담당</li>
-<li>KL 기반 variance regularization (variance collapse 대응)</li>
-<li>Structured initialization</li>
-<li>Forced Gaussian shift 제거</li>
-<li>Entropy regularizer 제거</li>
+<li><strong>Hierarchical skip-watch decomposition</strong>: sigmoid gate가 skip 확률을 예측한다(<code>p_skip(x) = σ(W_skip · h + b_skip) ∈ (0, 1)</code>). 최종 밀도는 exponential × p_skip + Gaussian mixture × (1−p_skip)이다. &quot;quick skip = 무관심&quot;인 경우와 &quot;engaged viewing&quot;을 판정 층에서 분리하므로 해석하기 쉬워지고, 서로 다른 실패 모드를 각각 다른 sub-model이 담당하게 된다.</li>
+<li>KL 기반 variance regularization을 넣어 variance collapse에 대응한다.</li>
+<li>Structured initialization을 적용한다.</li>
+<li>Forced Gaussian shift를 제거한다.</li>
+<li>Entropy regularizer를 제거한다.</li>
 </ul>
 </li>
-<li><p><strong>프로덕션 A/B 상세</strong> <code>[확인]</code> — HTML 판 결과 절에서 매우 구체적으로 공개:</p>
+<li><p><strong>프로덕션 A/B의 상세 수치</strong> <code>[확인]</code>가 HTML 판 결과 절에 매우 구체적으로 공개되어 있다.</p>
 <ul>
-<li>지면: 짧은 비디오 (VK로 추정 <code>[추정]</code> — 저자가 명시하진 않지만 &quot;serving millions of active users&quot; + AI VK 소속으로 강한 시사)</li>
-<li>기간: 1.5개월 (1개월 forward + 2주 reverse swap)</li>
-<li>트래픽: 처리·대조군 각 5%, 일당 각 그룹 <strong>~11M 요청</strong></li>
-<li>결과 (모두 통계적 유의):<ul>
+<li>지면: 짧은 비디오다. VK로 추정한다 <code>[추정]</code>. 저자가 명시하지는 않았지만 &quot;serving millions of active users&quot;라는 표현과 AI VK 소속이라는 점이 강하게 시사한다.</li>
+<li>기간: 1.5개월이다(1개월 forward와 2주 reverse swap).</li>
+<li>트래픽: 처리군과 대조군이 각각 5%이고, 하루에 그룹마다 <strong>약 11M 요청</strong>이 들어온다.</li>
+<li>결과는 모두 통계적으로 유의하다.<ul>
 <li>session depth <strong>+9.26%</strong></li>
 <li>deep watch (≥10s) <strong>+5.75%</strong></li>
 <li>non-short watch (≥3s) <strong>+4.59%</strong></li>
@@ -358,51 +358,51 @@ class _NodeBatchLock:
 <p>&quot;A 1.5-month production A/B test confirms statistically significant engagement lifts.&quot;
 — <a href="https://arxiv.org/abs/2608.23356">HEGM abstract</a>, 2026-08-24</p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <code>### HEGM (VK 러시아) — 짧은 비디오 watch-time 분포 예측, 프로덕션 A/B 상세 수치 공개</code> 절 추가 (Densing Law보다 앞에 배치).</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 <code>### HEGM (VK 러시아) — 짧은 비디오 watch-time 분포 예측, 프로덕션 A/B 상세 수치 공개</code> 절을 추가했고, Densing Law보다 앞에 배치했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <ul>
-<li><strong>VK가 프로덕션 진술을 하나 더 쌓았다</strong> — 짧은 비디오 프로덕션 랭킹 논문은 최근 몇 달에 Kuaishou(<a href="radar.html#drem-kuaishou-%EB%8B%A8%ED%8E%B8-%EB%B9%84%EB%94%94%EC%98%A4--pxtr-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9D%B4%EC%A4%91-%EB%B3%B4%EC%A0%95-ensemble-ranking">DrEM</a>, <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">HD-Rec</a>, PushDualGen)와 <a href="radar.html#gryphon-v2-yandex-music--generate-and-rank-%EB%8B%A8%EC%9D%BC-%EB%AA%A8%EB%8D%B8%EC%9D%B4-%EC%BA%90%EC%8A%A4%EC%BC%80%EC%9D%B4%EB%93%9C%EB%A5%BC-%EB%8C%80%EC%B2%B4">Yandex Music Gryphon-v2/Sona</a>가 계속 나왔는데 이번에 VK가 또 다른 러시아 리서치 소스로 진술을 추가. AI VK의 프로덕션 규모(수천만 DAU 추정 <code>[추정]</code>)와 상세 수치 공개 관행은 이후 러시아 플랫폼 연구를 트래킹할 가치를 확인.</li>
-<li><strong>watch-time 예측이 두 갈래로 진화 중</strong> — (a) Netflix Foundation Model의 watch-time head + X Phoenix의 quantile head 5분위(4세대+4 P10/P25/P50/P75/P90)는 <strong>point estimate + quantile 조합</strong>, (b) EGMN 계열은 <strong>conditional density 전체 예측</strong>(HEGM은 그 계보의 최신). 두 접근이 어떤 트레이드오프(계산 비용, 해석성, CDF 이벤트 정확도)를 갖는지가 관전 포인트. 두 번째 회사(VK 외)의 EGMN 계열 프로덕션 진술이 나오면 <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a>에 절 후보.</li>
+<li><strong>VK가 프로덕션 진술을 하나 더 쌓았다.</strong> 짧은 비디오 프로덕션 랭킹 논문은 최근 몇 달 동안 Kuaishou(<a href="radar.html#drem-kuaishou-%EB%8B%A8%ED%8E%B8-%EB%B9%84%EB%94%94%EC%98%A4--pxtr-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9D%B4%EC%A4%91-%EB%B3%B4%EC%A0%95-ensemble-ranking">DrEM</a>, <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">HD-Rec</a>, PushDualGen)와 <a href="radar.html#gryphon-v2-yandex-music--generate-and-rank-%EB%8B%A8%EC%9D%BC-%EB%AA%A8%EB%8D%B8%EC%9D%B4-%EC%BA%90%EC%8A%A4%EC%BC%80%EC%9D%B4%EB%93%9C%EB%A5%BC-%EB%8C%80%EC%B2%B4">Yandex Music Gryphon-v2/Sona</a>에서 계속 나왔는데, 이번에는 VK가 또 다른 러시아 리서치 소스로서 진술을 추가했다. AI VK의 프로덕션 규모(수천만 DAU로 추정한다 <code>[추정]</code>)와 상세 수치를 공개하는 관행을 보면, 앞으로 러시아 플랫폼의 연구를 계속 추적할 가치가 있다.</li>
+<li><strong>watch-time 예측이 두 갈래로 진화하고 있다.</strong> (a) Netflix Foundation Model의 watch-time head와 X Phoenix의 quantile head 5분위(4세대+4의 P10/P25/P50/P75/P90)는 <strong>point estimate와 quantile을 조합한 방식</strong>이고, (b) EGMN 계열은 <strong>conditional density 전체를 예측하는 방식</strong>이며 HEGM이 그 계보의 최신이다. 두 접근의 트레이드오프가 계산 비용과 해석 가능성, CDF 이벤트 정확도에서 어떻게 갈리는지가 관전 포인트다. VK 외에 두 번째 회사가 EGMN 계열의 프로덕션 진술을 내놓으면 <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a>에 절을 신설할 후보가 된다.</li>
 </ul>
-<h2>3. User Behavioral Densing Law — Ant/Alipay가 유저 시퀀스 tokenization의 스케일링 법칙 정식화 (레이더)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.23392">Towards a Densing Law for User Representation Learning at Billion-Scale Capacity</a> — arXiv 2608.23392, 2026-08-24 v1, 저자 9명 (Bin Dou, Junru Zhang, Zhaoyi Yuan, Wuliang Huang, Letian Gong, Baokun Wang, Huan Li, Yu Cheng, Weiqiang Wang) — DeepFind Team @ Ant Group + Zhejiang University 협업. HTML 판에서 affiliation 확인 (Ant Group의 DeepFind Team이 유저 표현 학습 관련 라인).</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 산업 규모 유저 표현 학습은 세 축으로 스케일한다 — 사용자 수, 행동 시퀀스 길이, 모델 크기. 이 논문의 발견은 두 가지 근본 문제:</p></div>
+<h2>3. User Behavioral Densing Law: Ant/Alipay가 유저 시퀀스 tokenization의 스케일링 법칙을 정식화했다 (레이더)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.23392">Towards a Densing Law for User Representation Learning at Billion-Scale Capacity</a>: arXiv 2608.23392의 2026-08-24 v1이고, 저자는 9명이다(Bin Dou, Junru Zhang, Zhaoyi Yuan, Wuliang Huang, Letian Gong, Baokun Wang, Huan Li, Yu Cheng, Weiqiang Wang). Ant Group의 DeepFind Team과 Zhejiang University가 협업했고, affiliation은 HTML 판에서 확인했다. DeepFind Team은 Ant Group에서 유저 표현 학습과 관련된 라인으로 보인다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 산업 규모의 유저 표현 학습은 사용자 수와 행동 시퀀스 길이, 모델 크기라는 세 축으로 스케일한다. 이 논문이 짚는 근본 문제는 두 가지다.</p></div>
 <ul>
-<li><strong>raw text 스케일링의 병목</strong> — billion-scale에서 raw behavioral text 입력을 늘려도 성능이 diminishing return에 걸림. <strong>tokenization</strong>(behavior를 discrete token으로 변환)이 이를 완화하지만</li>
-<li><strong>tokenization 설정이 데이터 스케일과 어떻게 함께 커야 하는가는 정량적 분석이 없었음</strong></li>
+<li><strong>raw text 스케일링에 병목이 있다.</strong> billion-scale에서는 raw behavioral text 입력을 늘려도 성능이 diminishing return에 걸린다. behavior를 discrete token으로 변환하는 <strong>tokenization</strong>이 이를 완화해 주기는 한다.</li>
+<li><strong>tokenization 설정이 데이터 스케일과 함께 얼마나 커져야 하는지에 대한 정량적 분석이 없었다.</strong></li>
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>densing law 수식</strong> <code>[확인]</code> — 단일 차원(사용자 수 또는 시퀀스 길이 하나만 스케일):</p>
+<li><p><strong>densing law 수식</strong> <code>[확인]</code>. 사용자 수나 시퀀스 길이 가운데 하나만 스케일하는 단일 차원의 경우:</p>
 <pre><code>ln C*(s) = β + α ln(s / s_0)
 </code></pre>
-<p>다차원 (사용자 수 + 시퀀스 길이 동시 스케일):</p>
+<p>사용자 수와 시퀀스 길이를 동시에 스케일하는 다차원의 경우:</p>
 <pre><code>ln C*(s) = β + Σ_i α_i ln(s_i / s_{i,0})
 </code></pre>
-<p>여기서 C*는 <strong>최소 충분 tokenization capacity</strong>, s는 데이터 스케일, α는 데이터 특성·tokenization 방식에 의존하는 지수. 즉 <strong>데이터 스케일의 로그와 tokenization capacity의 로그가 대략 선형 관계</strong> — Densing Law(<a href="https://arxiv.org/abs/2412.04315">arXiv 2412.04315</a>)가 LLM에 대해 명명한 관계를 추천 도메인의 tokenization 축으로 옮긴 것.</p>
+<p>여기서 C*는 <strong>최소 충분 tokenization capacity</strong>를, s는 데이터 스케일을 뜻하고, α는 데이터 특성과 tokenization 방식에 따라 달라지는 지수다. 즉 <strong>데이터 스케일의 로그와 tokenization capacity의 로그가 대략 선형 관계를 이룬다.</strong> Densing Law(<a href="https://arxiv.org/abs/2412.04315">arXiv 2412.04315</a>)가 LLM에 대해 명명한 관계를 추천 도메인의 tokenization 축으로 옮긴 것이다.</p>
 </li>
-<li><p><strong>ALGN (Adaptive Length Group Nested)</strong> <code>[확인]</code> — 데이터 스케일에 따라 tokenization capacity를 적응적으로 조절하는 variable-length 방식. Densing Law가 지침. abstract에 <em>&quot;ALGN outperforms existing baselines&quot;</em> 라고만 언급, 구체 개선 수치는 abstract에 없음.</p>
+<li><p><strong>ALGN (Adaptive Length Group Nested)</strong> <code>[확인]</code>은 데이터 스케일에 따라 tokenization capacity를 적응적으로 조절하는 variable-length 방식이고, Densing Law가 그 지침 역할을 한다. abstract에는 <em>&quot;ALGN outperforms existing baselines&quot;</em> 라고만 적혀 있고, 구체적인 개선 수치는 없다.</p>
 </li>
-<li><p><strong>평가 규모</strong> <code>[확인]</code> — <strong>billion-scale Alipay PayBill dataset</strong>. 3가지 downstream task: classification, text-based retrieval, user-to-user retrieval. 각 held-out test는 0.5M user 규모.</p>
+<li><p><strong>평가 규모</strong> <code>[확인]</code>는 <strong>billion-scale Alipay PayBill dataset</strong>이다. downstream task는 classification과 text-based retrieval, user-to-user retrieval 3가지이고, 각 held-out test는 0.5M user 규모다.</p>
 </li>
-<li><p><strong>프로덕션 배포 진술은 없음</strong> <code>[확인]</code> — offline 벤치마크만. Alipay 서빙 스택에 ALGN이 반영됐다는 진술은 abstract·HTML 어디에도 없음. &quot;billion-scale Alipay dataset&quot;이라는 데이터 규모 진술만 있고 A/B 결과·uplift 숫자·서빙 지연 등 프로덕션 진술 부재.</p>
+<li><p><strong>프로덕션 배포에 대한 진술은 없다</strong> <code>[확인]</code>. offline 벤치마크만 제시한다. ALGN이 Alipay 서빙 스택에 반영됐다는 진술은 abstract에도 HTML 판에도 없다. &quot;billion-scale Alipay dataset&quot;이라는 데이터 규모 진술만 있을 뿐, A/B 결과와 uplift 숫자, 서빙 지연 같은 프로덕션 진술은 빠져 있다.</p>
 </li>
 </ul>
 <blockquote>
 <p>&quot;we conduct a pilot study on raw &amp; tokenized scaling comparison on billion-scale Alipay dataset&quot;
 — <a href="https://arxiv.org/abs/2608.23392">Densing Law abstract</a>, 2026-08-24</p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <code>### User Behavioral Densing Law (Ant/Alipay) — 3번째 회사의 스케일링 법칙 확인</code> 절 추가.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 <code>### User Behavioral Densing Law (Ant/Alipay) — 3번째 회사의 스케일링 법칙 확인</code> 절을 추가했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <ul>
-<li><strong>스케일링 법칙 스레드에 세 번째 회사가 다른 축으로 붙었다</strong> — Meta <a href="radar.html#%EC%B6%94%EC%B2%9C-%EB%AA%A8%EB%8D%B8-%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81-%EB%B2%95%EC%B9%99--%ED%9A%8C%EC%82%AC%EB%B3%84-%EB%8F%85%EB%A6%BD-%ED%99%95%EC%9D%B8%EC%9D%B4-%EC%8C%93%EC%9D%B4%EB%8A%94-%EC%A4%91">HSTU·Wukong·GEM</a>과 Netflix Foundation Model이 파라미터·데이터 스케일링 법칙을 진술했고, ByteDance 광고 <a href="radar.html#tm20k-bytedance-%EA%B4%91%EA%B3%A0--20k-%EC%8B%9C%ED%80%80%EC%8A%A4-%EB%9E%AD%ED%82%B9%EC%9D%84-teacherstudent-kd%EB%A1%9C-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-%EB%B0%B0%ED%8F%AC">TM20K</a>가 시퀀스 스케일링을 KD로 뽑았는데, 이번은 <strong>tokenization capacity 스케일링</strong> — 데이터 규모가 커질 때 얼마나 큰 tokenization 어휘·구조가 필요한지의 법칙. LLaTTE(&quot;semantic feature 필요 여부&quot;) vs HSTU(&quot;scaling만으로 됨&quot;) 미해소 논쟁의 세 번째 각도로 붙는다.</li>
-<li><strong>Ant Group의 유저 시퀀스 라인</strong> — DeepFind Team이 Ant Group의 유저 표현 학습 라인 이름으로 보임 <code>[추정]</code> — 이후 Ant Group의 다른 프로덕션 진술(예: 이 densing law가 Alipay 서빙 스택에 반영됐다는 후속, 또는 다른 downstream task의 A/B 결과)이 나오면 <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a> 승격 후보.</li>
-<li><strong>다만 offline만이라는 한계</strong> — 프로덕션 A/B 진술이 없어 &quot;실제 서빙에 얼마나 도움되는가&quot;는 미확인. 다음 논문 또는 tech report에서 온라인 결과가 나올 때까지 관찰 등급 유지.</li>
+<li><strong>스케일링 법칙 스레드에 세 번째 회사가 다른 축으로 합류했다.</strong> Meta의 <a href="radar.html#%EC%B6%94%EC%B2%9C-%EB%AA%A8%EB%8D%B8-%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81-%EB%B2%95%EC%B9%99--%ED%9A%8C%EC%82%AC%EB%B3%84-%EB%8F%85%EB%A6%BD-%ED%99%95%EC%9D%B8%EC%9D%B4-%EC%8C%93%EC%9D%B4%EB%8A%94-%EC%A4%91">HSTU·Wukong·GEM</a>과 Netflix Foundation Model이 파라미터와 데이터의 스케일링 법칙을 진술했고, ByteDance 광고의 <a href="radar.html#tm20k-bytedance-%EA%B4%91%EA%B3%A0--20k-%EC%8B%9C%ED%80%80%EC%8A%A4-%EB%9E%AD%ED%82%B9%EC%9D%84-teacherstudent-kd%EB%A1%9C-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-%EB%B0%B0%ED%8F%AC">TM20K</a>가 시퀀스 스케일링을 KD로 풀어냈는데, 이번 논문은 <strong>tokenization capacity 스케일링</strong>을 다룬다. 데이터 규모가 커질 때 얼마나 큰 tokenization 어휘와 구조가 필요한지를 정리한 법칙이다. LLaTTE가 제기한 &quot;semantic feature가 필요한가&quot;와 HSTU가 주장하는 &quot;scaling만으로 충분하다&quot; 사이의 미해소 논쟁에 세 번째 각도로 붙는다.</li>
+<li><strong>Ant Group의 유저 시퀀스 라인이 드러났다.</strong> DeepFind Team이 Ant Group에서 유저 표현 학습을 맡은 라인의 이름으로 보인다 <code>[추정]</code>. 이후 Ant Group이 다른 프로덕션 진술을 내놓으면, 예를 들어 이 densing law가 Alipay 서빙 스택에 반영됐다는 후속이나 다른 downstream task의 A/B 결과가 나오면 <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a>로 승격할 후보가 된다.</li>
+<li><strong>다만 offline 결과만 있다는 한계가 있다.</strong> 프로덕션 A/B 진술이 없어서 &quot;실제 서빙에 얼마나 도움이 되는가&quot;는 확인되지 않았다. 다음 논문이나 tech report에서 온라인 결과가 나올 때까지는 관찰 등급을 유지한다.</li>
 </ul>
 <h2>4. Spotify가 SID + reasoning trace의 프로덕션 라인에 첫 반박 실험을 제출했다 (레이더)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.23154">The Disconnect Between Better Descriptive Reasoning Trace Quality and Recommendation Effectiveness</a> — arXiv 2608.23154, 2026-08-24 v1, 저자 6명 전원 <a href="https://research.atspotify.com/">Spotify Research</a>: Gustavo Penha, Juan Elenter, Claudia Hauff, Hugues Bouchard, Paul Bennett, Mounia Lalmas (HTML 판에서 이메일 domain <code>@spotify.com</code> 확인).</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 최근 몇 달간 generative recommender 라인에서 <strong>Semantic ID(SID) prediction에 chain-of-thought 재추론 트레이스를 붙이는</strong> 흐름이 여러 논문·프로덕션 진술로 등장했다. 대표 사례가 <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">Kuaishou PushDualGen</a>(<a href="https://arxiv.org/abs/2608.07989">arXiv 2608.07989</a>) — SID를 먼저 뽑고 스킵 가능한 설명 텍스트(copy)를 붙이는 2단 생성 구조로 프로덕션 배포(effective play rate +8.50%, 불만족률 −37.70%). 다른 SIDReasoner 계열도 트레이스가 SID 추론을 개선한다고 주장. 문제는 이 라인들이 대체로 각자의 offline 지표 또는 프로덕션 A/B 하나로 주장을 뒷받침하지 controlled 비교는 부족.</p></div>
-<p>이 논문은 그 gap을 메운다 — <strong>2×2 factorial 통제 실험</strong>으로 (a) 아이템 표현이 SID인지 자연어 title인지, (b) reasoning trace가 있는지 없는지, 두 factor를 독립적으로 변화. 공통 backbone Qwen3-1.7B, 3개 Amazon product 도메인.</p>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.23154">The Disconnect Between Better Descriptive Reasoning Trace Quality and Recommendation Effectiveness</a>: arXiv 2608.23154의 2026-08-24 v1이고, 저자 6명 전원이 <a href="https://research.atspotify.com/">Spotify Research</a> 소속이다. Gustavo Penha, Juan Elenter, Claudia Hauff, Hugues Bouchard, Paul Bennett, Mounia Lalmas이며, HTML 판에서 이메일 domain이 <code>@spotify.com</code>인 것을 확인했다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 최근 몇 달 동안 generative recommender 라인에서 <strong>Semantic ID(SID) prediction에 chain-of-thought 추론 트레이스를 붙이는</strong> 흐름이 여러 논문과 프로덕션 진술로 등장했다. 대표 사례는 <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">Kuaishou PushDualGen</a>(<a href="https://arxiv.org/abs/2608.07989">arXiv 2608.07989</a>)인데, SID를 먼저 뽑고 건너뛸 수 있는 설명 텍스트(copy)를 붙이는 2단 생성 구조로 프로덕션에 배포했고 effective play rate가 +8.50%, 불만족률이 −37.70%를 기록했다. 다른 SIDReasoner 계열도 트레이스가 SID 추론을 개선한다고 주장한다. 문제는 이 라인들이 대체로 각자의 offline 지표나 프로덕션 A/B 하나로 주장을 뒷받침할 뿐, controlled 비교는 부족하다는 점이다.</p></div>
+<p>이 논문은 그 공백을 메운다. <strong>2×2 factorial 통제 실험</strong>으로 (a) 아이템 표현이 SID인지 자연어 title인지, (b) reasoning trace가 있는지 없는지라는 두 factor를 독립적으로 바꿔 가며 비교했다. backbone은 Qwen3-1.7B로 통일했고, Amazon product 도메인 3개를 사용했다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
 <li><p><strong>핵심 negative result</strong> <code>[확인]</code>:</p>
@@ -410,17 +410,17 @@ class _NodeBatchLock:
 <p>&quot;introducing explicit descriptive reasoning traces reduces traditional offline recommendation effectiveness under standard SFT and RL training&quot;
 — <a href="https://arxiv.org/abs/2608.23154">abstract</a></p>
 </blockquote>
-<p>구체 수치 (Office Products + Titles, SFT):</p>
+<p>Office Products 도메인에 Titles 표현과 SFT 학습을 조합한 구체적인 수치:</p>
 <ul>
-<li>R@10: <strong>.1587 → .1416</strong> (약 <strong>−11%</strong> 저하 trace 추가 시)</li>
-<li>전체 domain 범위: Titles는 <strong>−19% ~ 0%</strong>, SIDs는 <strong>−9% ~ 0%</strong></li>
+<li>R@10: <strong>.1587 → .1416</strong>으로, trace를 추가하면 약 <strong>−11%</strong> 떨어진다.</li>
+<li>전체 domain 범위로 보면 Titles는 <strong>−19% ~ 0%</strong>, SIDs는 <strong>−9% ~ 0%</strong> 구간이다.</li>
 </ul>
 </li>
-<li><p><strong>Title이 더 좋은 trace를 만들지만 지표는 안 나옴</strong> <code>[확인]</code> — SID는 opaque learned identifier이므로 LLM이 그 위에서 자연어처럼 reasoning하기 어렵고, extensive alignment(SID를 자연어와 정렬시키는 추가 학습)를 붙여야 겨우 trace가 grounded해짐. 자연어 title은 alignment 없이도 grounded·interpretable한 trace를 뽑음. 그런데 trace가 좋아도 recommendation R@10은 하락. <strong>trace quality와 recommendation effectiveness가 독립</strong>이라는 것.</p>
+<li><p><strong>Title이 더 좋은 trace를 만들지만 지표는 오히려 나빠진다</strong> <code>[확인]</code>. SID는 opaque learned identifier이기 때문에 LLM이 그 위에서 자연어처럼 reasoning하기 어렵고, SID를 자연어와 정렬시키는 추가 학습인 extensive alignment를 붙여야 겨우 trace가 grounded해진다. 자연어 title은 alignment가 없어도 grounded하고 해석 가능한 trace를 뽑아낸다. 그런데 trace가 좋아져도 recommendation R@10은 떨어진다. 즉 <strong>trace quality와 recommendation effectiveness는 서로 독립적이다.</strong></p>
 </li>
-<li><p><strong>Richer reward signal이 부분 완화</strong> <code>[확인]</code> — RL 학습에서 reward를 recommendation R@10 자체가 아니라 더 rich한 신호로 바꾸면 gap이 부분 축소. 하지만 여전히 no-reasoning baseline을 완전히 못 따라잡음.</p>
+<li><p><strong>더 풍부한 reward signal이 문제를 부분적으로 완화한다</strong> <code>[확인]</code>. RL 학습에서 reward를 recommendation R@10 자체가 아니라 더 rich한 신호로 바꾸면 격차가 일부 줄어든다. 하지만 여전히 no-reasoning baseline을 완전히 따라잡지는 못한다.</p>
 </li>
-<li><p><strong>industry 참조 언급 없음</strong> <code>[확인]</code> — 관련 연구 절에 SIDReasoner류는 등장하지만 Kuaishou PushDualGen이나 그 유사 프로덕션 배포에 대한 명시적 인용은 없음. 논문의 논조가 &quot;이 흐름이 옳은가&quot;를 묻는 것이 아니라 <strong>자체 controlled 실험으로 조건부 관찰</strong>을 정리하는 방식.</p>
+<li><p><strong>industry 사례에 대한 참조는 없다</strong> <code>[확인]</code>. 관련 연구 절에 SIDReasoner 계열은 등장하지만, Kuaishou PushDualGen이나 그와 유사한 프로덕션 배포를 명시적으로 인용하지는 않는다. 논문의 논조도 &quot;이 흐름이 옳은가&quot;를 따지기보다는 <strong>자체 controlled 실험으로 조건부 관찰</strong>을 정리하는 쪽이다.</p>
 </li>
 </ul>
 <blockquote>
@@ -428,20 +428,20 @@ class _NodeBatchLock:
 — Office Products domain, Titles condition
 <a href="https://arxiv.org/html/2608.23154v1">Section: Results, arXiv 2608.23154 HTML</a></p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <code>### Descriptive Reasoning Trace가 Recommendation Effectiveness를 떨어뜨린다 (Spotify Research) — SID+CoT 라인의 첫 반박 진술</code> 절 추가.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 <code>### Descriptive Reasoning Trace가 Recommendation Effectiveness를 떨어뜨린다 (Spotify Research) — SID+CoT 라인의 첫 반박 진술</code> 절을 추가했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <ul>
-<li><strong>negative result의 조건부 유효성이 중요</strong> — 두 자료의 조건이 다르다:<ul>
-<li>Kuaishou PushDualGen: <strong>push 지면 · 프로덕션 A/B · 실 카탈로그</strong> · reward 설계는 프로덕션 목적(effective play, 불만족률)</li>
-<li>Spotify: <strong>offline · Amazon reviews · Qwen3-1.7B backbone</strong> · reward 설계는 standard R@10
-즉 두 결과는 직접 모순이 아니라 <strong>다른 조건에서의 다른 관찰</strong>. 하지만 <strong>재현 가능한 반박점</strong>이 하나 생겼다는 게 중요 — 이후 SID+CoT 프로덕션 진술이 나올 때 이 조건들(backbone 크기, offline vs online, reward 설계)이 관건이 됨.</li>
+<li><strong>negative result가 어떤 조건에서 유효한지가 중요하다.</strong> 두 자료의 조건이 다르다.<ul>
+<li>Kuaishou PushDualGen: <strong>push 지면과 프로덕션 A/B, 실제 카탈로그</strong>를 사용했고, reward는 effective play와 불만족률처럼 프로덕션 목적에 맞춰 설계했다.</li>
+<li>Spotify: <strong>offline 환경에서 Amazon reviews와 Qwen3-1.7B backbone</strong>을 사용했고, reward는 standard R@10으로 설계했다.
+즉 두 결과는 직접 모순되는 것이 아니라 <strong>서로 다른 조건에서 얻은 다른 관찰</strong>이다. 하지만 <strong>재현 가능한 반박점</strong>이 하나 생겼다는 점이 중요하다. 이후 SID+CoT 프로덕션 진술이 나올 때 backbone 크기와 offline인지 online인지, reward 설계 같은 조건들이 관건이 된다.</li>
 </ul>
 </li>
-<li><strong>Spotify가 SID+CoT 라인을 프로덕션 배포하지 않는 이유</strong> — Spotify는 이미 SID(semantic tokenization) 라인에 진지하게 진출한 회사(<a href="netflix.html#%EC%97%B4%EB%A6%B0-%EC%A7%88%EB%AC%B8">PRS 2025 semantic tokenization 발표 참조</a>). 그런데 자체 실험이 negative를 보였다면 그 결과가 회사의 프로덕션 로드맵에 반영됐을 가능성 <code>[추정]</code> — 즉 Spotify 프로덕션은 SID는 채택하되 CoT는 안 붙일 것이라는 예측.</li>
-<li><strong>관전 포인트</strong> — 두 번째 회사의 유사 실험 진술이 나오면 <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>에 별도 절(SID + reasoning trace: production vs benchmark 논쟁) 후보.</li>
+<li><strong>Spotify가 SID+CoT 라인을 프로덕션에 배포하지 않는 이유를 짐작할 수 있다.</strong> Spotify는 이미 SID(semantic tokenization) 라인에 진지하게 진출한 회사다(<a href="netflix.html#%EC%97%B4%EB%A6%B0-%EC%A7%88%EB%AC%B8">PRS 2025 semantic tokenization 발표 참조</a>). 그런데 자체 실험에서 negative 결과가 나왔다면 그 결과가 회사의 프로덕션 로드맵에도 반영됐을 가능성이 있다 <code>[추정]</code>. Spotify의 프로덕션은 SID는 채택하되 CoT는 붙이지 않으리라는 예측이 가능하다.</li>
+<li><strong>지켜볼 지점</strong>은 두 번째 회사의 유사 실험 진술이다. 그런 진술이 나오면 <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>에 &quot;SID + reasoning trace: production vs benchmark 논쟁&quot;이라는 별도 절을 신설할 후보가 된다.</li>
 </ul>
 <h2>검증에서 뒤집힌 것</h2>
-<p>없음 — 이번 배치의 세 신규 자료(HEGM, Densing Law, Spotify SID+CoT)는 기존 정본을 뒤집지 않고 각 관찰 스레드(watch-time 예측, 스케일링 법칙, LLM-in-recsys)에 새 데이터 포인트로 붙는다. X 4세대+7은 4세대 시리즈의 자연스러운 연장.</p>
+<p>없다. 이번 배치의 신규 자료 세 건(HEGM, Densing Law, Spotify SID+CoT)은 기존 정본을 뒤집지 않고, 각각의 관찰 스레드인 watch-time 예측과 스케일링 법칙, LLM-in-recsys에 새로운 데이터 포인트로 붙는다. X 4세대+7도 4세대 시리즈의 자연스러운 연장이다.</p>
 <h2>레이더</h2>
 <ul>
 <li>신규 3건:<ul>
@@ -453,11 +453,11 @@ class _NodeBatchLock:
 </ul>
 <h2>다음에 볼 것</h2>
 <ul>
-<li><strong>X 4세대+8 (다음 커밋)</strong> — 지금까지 12일 연속(4세대 원본 08-13부터) 커밋 흐름. 관전 포인트: (a) VF reference_compare가 로깅에서 대시보드/알람으로 승격되는 시점, (b) BrandSafetyVerdict::HighRisk가 광고 avoid 외의 후속 조치(랭커 감쇠·유기 노출 차단)를 트리거하는지, (c) PTOS 심판이 스팸·혐오 발화 카테고리로 확장되는지, (d) V2 experiment의 승격/롤백 결정, (e) grox reply_spam follower 임계 다음 조정(100k → 120k? 150k?).</li>
-<li><strong>VK HEGM 후속</strong> — 오픈소스 코드가 있으므로 재현 실험이 다른 회사에서 나올 가능성. 특히 짧은 비디오 프로덕션 라인의 다음 회사(TikTok/ByteDance, Reels, Meta) 진술.</li>
-<li><strong>Ant/Alipay densing law의 서빙 반영 후속</strong> — 프로덕션 A/B 진술이 나오면 정본 승격.</li>
-<li><strong>Spotify SID+CoT의 정본 반영 여부</strong> — 두 번째 회사의 유사 실험이 필요. Netflix/Meta/Google 중 하나가 controlled 반박 실험을 내놓으면 <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>에 절 신설.</li>
-<li><strong>월요일(2026-08-31) 산업 블로그 스윕</strong> — Pinterest engineering(medium.com/pinterest-engineering), research.atspotify.com, Google Research blog.</li>
+<li><strong>X 4세대+8, 즉 다음 커밋을 확인한다.</strong> 4세대 원본이 올라온 08-13부터 지금까지 12일 연속으로 커밋이 이어지고 있다. 관전 포인트는 (a) VF reference_compare가 로깅에서 대시보드와 알람으로 승격되는 시점, (b) BrandSafetyVerdict::HighRisk가 광고 avoid 외에 랭커 감쇠나 유기 노출 차단 같은 후속 조치를 트리거하는지 여부, (c) PTOS 심판이 스팸과 혐오 발화 카테고리로 확장되는지 여부, (d) V2 experiment를 승격할지 롤백할지에 대한 결정, (e) grox reply_spam의 follower 임계를 다음에 어디까지 조정할지(100k에서 120k나 150k로 갈지)이다.</li>
+<li><strong>VK HEGM의 후속을 본다.</strong> 오픈소스 코드가 공개되어 있으므로 다른 회사에서 재현 실험이 나올 가능성이 있다. 특히 짧은 비디오 프로덕션 라인의 다음 회사인 TikTok/ByteDance나 Reels, Meta의 진술을 주목한다.</li>
+<li><strong>Ant/Alipay densing law가 서빙에 반영되는지 후속을 확인한다.</strong> 프로덕션 A/B 진술이 나오면 정본으로 승격한다.</li>
+<li><strong>Spotify SID+CoT를 정본에 반영할지 판단한다.</strong> 두 번째 회사의 유사 실험이 필요하다. Netflix와 Meta, Google 가운데 하나가 controlled 반박 실험을 내놓으면 <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>에 절을 신설한다.</li>
+<li><strong>월요일인 2026-08-31에 산업 블로그를 훑는다.</strong> 대상은 Pinterest engineering(medium.com/pinterest-engineering)과 research.atspotify.com, Google Research blog다.</li>
 </ul>
 
 
