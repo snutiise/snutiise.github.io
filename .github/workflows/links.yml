@@ -1,0 +1,47 @@
+name: 외부 링크 점검
+
+# 외부 링크는 남의 사이트가 죽으면 깨진다. CI에서 막으면 관계없는 PR이
+# 실패하므로, 주 1회 별도로 돌려 이슈로 남긴다.
+on:
+  schedule:
+    - cron: '0 0 * * 1'   # 매주 월요일 09:00 KST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  external-links:
+    name: 외부 링크 확인
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - run: bundle exec jekyll build
+      - name: 외부 링크 검사
+        id: check
+        continue-on-error: true
+        run: |
+          gem install html-proofer --no-document --silent
+          htmlproofer _site \
+            --ignore-missing-alt \
+            --ignore-urls "/^\/feed-research/" \
+            --no-enforce-https \
+            --typhoeus-config '{"timeout":20,"connecttimeout":10}' \
+            2>&1 | tee proofer.log
+      - name: 실패 시 이슈 생성
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # 같은 제목의 열린 이슈가 있으면 중복 생성하지 않는다.
+          TITLE="깨진 외부 링크 점검 실패"
+          if [ -z "$(gh issue list --search "$TITLE in:title" --state open --json number --jq '.[0].number')" ]; then
+            gh issue create --title "$TITLE ($(date +%Y-%m-%d))" \
+              --body "$(printf '주간 외부 링크 점검에서 실패가 나왔습니다.\n\n```\n%s\n```' "$(tail -40 proofer.log)")"
+          fi

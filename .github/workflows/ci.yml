@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+# 같은 브랜치에 새 푸시가 오면 이전 실행을 취소한다.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Jekyll 빌드 & 사이트 검사
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # github-pages gem 이 Pages 빌더와 같은 Jekyll/플러그인 버전을 고정한다.
+      # 즉 여기서 통과하면 실제 배포 빌드도 통과한다.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Jekyll 빌드
+        # JEKYLL_ENV=production 이어야 배포 때와 같은 경로를 탄다.
+        run: bundle exec jekyll build --trace
+        env:
+          JEKYLL_ENV: production
+
+      # 빌드 성공만으로는 아무것도 보장되지 않는다. site.url 미설정으로 모든
+      # 절대 URL이 깨져 있어도 Jekyll 빌드는 성공했다 — 그래서 산출물을 검사한다.
+      - name: 사이트 검사
+        run: ./scripts/test-site.sh _site
+
+      - name: 링크 검사 (내부)
+        # 외부 링크는 남의 사이트 사정으로 깜빡여서 CI를 불안정하게 만든다.
+        # 내부 링크·이미지 깨짐만 막는다.
+        run: |
+          gem install html-proofer --no-document --silent
+          htmlproofer _site \
+            --disable-external \
+            --ignore-missing-alt \
+            --ignore-urls "/^\/feed-research/" \
+            --swap-urls "^https://snutiise.github.io:" \
+            --no-enforce-https
+
+      - name: 산출물 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: _site
+          retention-days: 5
