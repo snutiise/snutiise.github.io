@@ -53,7 +53,8 @@ for f in "$HOME_HTML" "$POST_HTML"; do
   [[ -n "$f" && -f "$f" ]] || continue
   D=$(grep -o 'name="description" content="[^"]*"' "$f" | head -1 | sed 's/.*content="//;s/"$//')
   W=$(echo "$D" | wc -c | tr -d ' ')
-  if (( W > 20 )); then ok "description 채워짐 (${W}자, ${f#$SITE})"
+  # 사이트 설명("snutiise git blog")이 17자라 임계는 그보다 낮게 둔다 — 목적은 "비어 있음" 검출이다.
+  if (( W > 12 )); then ok "description 채워짐 (${W}바이트, ${f#$SITE})"
   else bad "description 이 비었거나 너무 짧다" "'${D}' (${f#$SITE})"; fi
 done
 
