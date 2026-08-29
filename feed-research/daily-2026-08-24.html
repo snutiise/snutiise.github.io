@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-08-24 — feed-research</title>
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-08-29 빌드</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-08-29 빌드</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-08-24</h1>
+  <div class="wd">월요일 · 읽는 데 약 9분</div>
+  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일(radar)</li><li class="chip">레이더 <b>1</b>건</li></ul>
+  <div class="lead"><span class="lb">한 줄 요약</span>추적 서비스(X·Meta·Netflix) 신규 없음. arXiv triage에서 어제 놓친 <strong>GateDiffInt</strong> (<a href="https://arxiv.org/abs/2608.18764">arXiv 2608.18764</a>, 2026-08-19 v1 / 2026-08-20 v2) — Xiaohongshu 프로덕션 primary traffic(hundreds of millions DAU)에 배포된 CVR 랭커로, <strong>diffusion으로 유저 행동 시퀀스를 denoise</strong>하고 <strong>LLM teacher가 4종 인텐트(long/short/latent/conversion)를 lightweight student로 증류</strong>하는 이중 메커니즘. 레이더에 추가. 월요일 산업 블로그 스윕에서도 피드·랭킹 신규 없음(Google Research / LinkedIn / Spotify는 각각 뉴스 있지만 orthogonal).</div>
+</header>
+<div class="wrap" id="content">
+<h2>1. GateDiffInt — Xiaohongshu가 diffusion + LLM 인텐트 증류로 CVR 랭커를 primary traffic에 배포 (레이더)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.18764">GateDiffInt: Gate-Mediated Controllable Diffusion and Multi-Intent LLM Distillation for User Behavior Modeling</a> — arXiv 2608.18764, 2026-08-19 v1 제출 / 2026-08-20 v2 개정, 저자 10명 (Jialong Duan, Zichen Zhang, Zirui Tu, Zheng Zhang, Zepeng Li, Qingyao Cui, Qinwen Wang, Yudan Liu, Luo Yang, Yao Hu — PDF 메타의 저자 이메일 도메인이 <code>xiaohongshu.com</code>으로 확인, abstract 페이지에는 소속 미표기).</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 산업 랭커의 CVR(conversion rate — 클릭·뷰가 실제 전환으로 이어질 확률) 예측은 유저의 최근 행동 시퀀스(방문·클릭·좋아요·저장·구매 등의 이벤트 열)를 인코더에 넣어 유저 상태 벡터를 뽑는 게 표준이다. 이 시퀀스에는 두 가지 근본 문제가 있다: (a) <strong>noise</strong> — 우발적 클릭, 실수, 세션 이탈 같은 신호가 진짜 인텐트를 희석한다, (b) <strong>인텐트가 명시적이지 않다</strong> — 시퀀스 자체는 &quot;무엇을 원하는가&quot;를 라벨링하지 않고 모델이 암묵적으로 뽑아내야 한다. 지금까지 이 분야의 접근은 대체로 attention pooling + 인텐트를 latent factor로 두는 SIM/DIN/BST 계보였는데, GateDiffInt는 여기에 <strong>생성 모델(diffusion)</strong> 과 <strong>LLM teacher</strong> 를 붙여 각각을 명시적으로 다룬다.</p></div>
+<p><strong>diffusion</strong>은 원래 이미지 생성에서 이미지를 노이즈로 파괴한 뒤 되돌리는 학습 방식으로 유명해진 계열인데, <strong>denoising 관점에서 시퀀스에 적용</strong>하면 원본을 정답으로 삼아 노이즈 낀 입력에서 원본을 복원하는 모델을 뽑을 수 있다. GateDiffInt의 표현으로 하면 &quot;controllable forward diffusion process with dual gating&quot; — 얼마나 노이즈를 넣을지, 어느 위치의 이벤트에 넣을지를 게이트가 제어한다. 이 게이트는 학습 대상이고, denoising 결과가 CVR 헤드로 흘러 들어가 최종 손실이 backprop된다.</p>
+<p><strong>LLM 인텐트 증류</strong>는 별개 축이다. LLM teacher(모델 크기 미공개)가 유저 시퀀스를 보고 네 종류의 구조화된 인텐트를 뽑는다: <strong>long-term</strong>(장기 취향), <strong>short-term</strong>(최근 세션의 초점), <strong>latent</strong>(암묵적으로 관측되는 관심), <strong>conversion</strong>(구매로 이어질 의도). 이 네 벡터를 lightweight student가 증류받고, attention으로 융합해 CVR 예측 헤드에 사용한다. LLM inference는 오프라인 학습에만 쓰고 서빙 경로에는 student만 남기는 구조라 서빙 지연은 기존 랭커와 비슷하게 유지된다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><strong>저자 소속</strong> <code>[확인]</code> — PDF 메타의 contact 이메일 도메인이 <code>xiaohongshu.com</code>. Xiaohongshu의 프로덕션 랭커 논문으로 확정.</li>
+<li><strong>배포 규모</strong> <code>[확인]</code> — abstract가 <em>&quot;deployed to primary traffic, confirming both effectiveness and production readiness&quot;</em> 와 <em>&quot;serving hundreds of millions of daily active users&quot;</em> 를 명시. 구체 uplift 숫자(예: CVR/GMV/CTR)는 abstract에 없음 — v3 또는 CIKM/KDD accepted 후 full paper에서 나올 것으로 보임 <code>[추정]</code>.</li>
+<li><strong>핵심 아이디어의 위치</strong> <code>[확인]</code> — &quot;gate-mediated controllable diffusion&quot;이 시퀀스 <strong>인코더 전단</strong> denoising 모듈, &quot;multi-intent LLM distillation&quot;이 인코더 병렬로 붙는 4벡터 인텐트 스트림. 두 스트림을 attention으로 융합한 표현이 CVR 예측 헤드로 들어감. 즉 랭커의 backbone 구조를 통째로 바꾸는 게 아니라 <strong>입력 표현 강화 층</strong>에서 두 새 메커니즘을 쌓는 접근.</li>
+</ul>
+<blockquote>
+<p>&quot;we propose GateDiffInt, a novel framework that couples a controllable forward diffusion process with dual gating to enhance and denoise behavior sequences ... A large language model then acts as teacher to distill four structured intents — long-term, short-term, latent, and conversion — into a lightweight student model.&quot;
+— <a href="https://arxiv.org/abs/2608.18764">GateDiffInt abstract</a>, 2026-08-20 v2</p>
+</blockquote>
+<blockquote>
+<p>&quot;GateDiffInt delivers substantial GMV improvements ... deployed to primary traffic, confirming both effectiveness and production readiness.&quot;
+— 같은 abstract</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <code>### GateDiffInt (Xiaohongshu) — 유저 행동 시퀀스에 diffusion 노이즈 제거 + LLM 다중 인텐트 증류를 얹은 CVR 랭커</code> 절 추가 (OneModel 절 바로 앞에 배치 — 같은 회사, 다른 계층).</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 두 층위의 신호가 겹친다:</p></div>
+<ol>
+<li><strong>Xiaohongshu가 짧은 기간에 두 편 프로덕션 진술</strong> — <a href="radar.html#onemodel-xiaohongshu--%EC%9C%A0%EA%B8%B0%EA%B4%91%EA%B3%A0%EC%83%81%EC%A0%90-3%EA%B0%9C-%EC%A7%80%EB%A9%B4%EC%9D%84-%ED%95%98%EB%82%98%EC%9D%98-%EB%9E%AD%EC%BB%A4%EB%A1%9C-%ED%86%B5%ED%95%A9">OneModel</a>이 유기·광고·상점 3개 지면의 <strong>랭커를 통합</strong>하는 각도라면, GateDiffInt는 같은 회사의 <strong>CVR 서브태스크에 특화된 시퀀스 인코더</strong> 각도로 독립적인 실험선. Xiaohongshu가 랭킹 스택 여러 계층에서 동시에 프로덕션 논문을 내고 있다는 신호 — Kuaishou(HD-Rec + PushDualGen + DrEM)와 유사한 회사 차원 리소스 투입 패턴.</li>
+<li><strong>LLM을 서빙 밖에 두는 접근이 하나 더 축적됨</strong> — LLM inference는 오프라인 teacher로만 쓰고 서빙 경로에는 student(diffusion + attention)만 남긴다. <a href="radar.html#metastrategy-alibabataobao--llm%EC%9D%B4-%EC%B1%84%EC%A0%90%ED%95%98%EC%A7%80-%EC%95%8A%EA%B3%A0-%EC%8B%A4%ED%96%89-%EA%B0%80%EB%8A%A5%ED%95%9C-%EB%9E%AD%ED%82%B9-%EC%A0%84%EB%9E%B5-json%EC%9D%84-%EB%B1%89%EB%8A%94%EB%8B%A4">MetaStrategy</a>의 &quot;LLM이 서빙에 없는 nearline 정책 컴파일러&quot; 각도와 사촌이지만 방향이 다르다 — MetaStrategy는 LLM이 정책 파라미터를 뱉고 결정론적 컴파일러가 후단을 만드는 구조, GateDiffInt는 LLM이 인텐트 표현을 뱉고 student가 그걸 증류받아 서빙하는 구조. <a href="netflix.html">Netflix GenRec</a>·<a href="facebook.html">Meta ConnectionMind</a>이 &quot;LLM이 서빙 hot path에 있다&quot;의 두 사례라면, MetaStrategy·GateDiffInt는 &quot;LLM이 서빙 밖 teacher/compiler로 남는다&quot;의 두 사례. <strong><a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 랭킹 스레드</a>에 두 갈래(hot-path LLM vs offline LLM)가 정착 중</strong>.</li>
+<li><strong>어제 daily의 arXiv triage 오판정</strong> — 어제 daily는 &quot;arXiv cs.IR 8/19~8/20 신규 30건 triage — 통과 0&quot;이라 기록했는데, 실제로는 이 논문이 통과 기준(플랫폼 기업 저자 + 프로덕션 배포·A/B 주장 + 메커니즘 신규성 + 스케일)을 모두 만족한다. 놓친 이유는 abstract만 훑을 때 &quot;hundreds of millions of DAU&quot;와 &quot;primary traffic&quot; 문구를 캐치하지 못한 것 — 향후 triage에서 이 두 문구를 명시 필터로 넣어야 한다.</li>
+</ol>
+<h2>검증에서 뒤집힌 것</h2>
+<ul>
+<li>어제 daily(<a href="2026-08-23.html">daily/2026-08-23.md</a>)의 arXiv triage 라인 <em>&quot;cs.IR 8/19~8/20 신규 30건 triage — 통과 0&quot;</em> 은 부분적으로 오판정. GateDiffInt(2608.18764) 1건이 실제로 통과 기준을 만족했다. 오늘 radar 반영으로 정정 — 다만 어제의 daily 파일 자체는 그날의 델타 로그로 남기고 손대지 않는다(정본은 radar이고 daily는 시점 기록).</li>
+</ul>
+<h2>레이더</h2>
+<ul>
+<li>신규 1건: <strong>GateDiffInt</strong> (Xiaohongshu, <a href="https://arxiv.org/abs/2608.18764">arXiv 2608.18764</a>, 2026-08-20 v2) — 위 절 참조.</li>
+</ul>
+<h2>다음에 볼 것</h2>
+<ul>
+<li><strong>GateDiffInt v3 또는 CIKM/KDD accepted full paper</strong> — 구체 A/B uplift 숫자(CVR/GMV/CTR 등)와 diffusion 스텝 수, LLM teacher 모델 크기·서빙 오프라인 배치 리소스가 공개될 여지. 이 세부가 나오면 <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a> 또는 신규 topic(behavior sequence denoising) 후보로 승격 검토.</li>
+<li><strong>Xiaohongshu 세 번째 프로덕션 논문</strong> — OneModel·GateDiffInt로 랭킹 스택 두 계층이 나왔으니 다음은 retrieval 또는 다양성/재순위 쪽 발표 여부. Xiaohongshu 정본(services/xiaohongshu.md)을 언제 신설할지의 임계점.</li>
+<li><strong>월요일 산업 스윕 잔여 확인</strong> — Pinterest engineering 블로그(medium.com/pinterest-engineering, 오늘 WebFetch 403)와 research.atspotify.com은 다음 주 스윕에서 다시. LinkedIn 8/6 &quot;AI-Powered Job Search 8× multi-teacher distillation&quot;은 job search 도메인이고 피드/랭킹 backbone 변화가 아니라 스킵.</li>
+</ul>
+
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-08-23.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-23</div></a><a class="r" href="daily-2026-08-26.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-26</div></a></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>

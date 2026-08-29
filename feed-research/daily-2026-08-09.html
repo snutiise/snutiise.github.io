@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-08-09 — feed-research</title>
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-08-29 빌드</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-08-29 빌드</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-08-09</h1>
+  <div class="wd">일요일 · 읽는 데 약 19분</div>
+  <ul class="chips"></ul>
+  
+</header>
+<div class="wrap" id="content">
+<p>Meta 착수. Facebook / Instagram / Threads 세 지면 + 교차 topics 8개 정비.</p>
+<p>로그다. 근거 등급과 인용은 전부 <code>services/</code>·<code>topics/</code>에 있고 여기서 반복하지 않는다.</p>
+<h2>읽은 것</h2>
+<ul>
+<li>Meta Transparency Center AI 시스템 카드 — <code>fb-feed</code>, <code>fb-video</code>, <code>fb-reels</code>, <code>fb-feed-recommendations</code>, <code>ig-feed</code>, <code>ig-explore</code>, <code>ig-reels-chaining</code>, <code>ig-threads-feed</code></li>
+<li><code>engineering.fb.com</code> / <code>ai.meta.com</code> 엔지니어링 블로그 — Explore 2020·2023, Journey to 1000 models, UTIS(2026-01-14), IG Notifications 다양성(2025-09-02), SilverTorch, RankGraph-2, Andromeda</li>
+<li>논문(전부 HTML 렌더링으로) — HSTU, ULTRA-HSTU, Wukong, InterFormer, DHEN, GEM, MARM, LLaTTE, DV365(KDD 2025), Epinet, MoL/h-indexer, HILL</li>
+<li>Meta IR 실적 발표 트랜스크립트 Q1 2024 ~ Q1 2026, Widely Viewed Content Report Q4 2025</li>
+<li>특허 US 10,345,993 B2 (광고·오가닉 통합 랭킹), 형제 특허 US 9,729,495</li>
+<li>Adam Mosseri 게시물 (Threads 랭킹 변경 날짜별), Meta 뉴스룸 (Dear Algo / Your Algorithm)</li>
+<li>EU DSA VLOP 지정 목록, Meta DSA 제출 문서 (3자 호스팅 PDF — 검증 실패, 아래 참조)</li>
+</ul>
+<h2>새로 알게 된 것 (오늘의 큰 것 6개)</h2>
+<ol>
+<li><strong>X와 Meta의 &quot;공개&quot;는 종류가 다르다.</strong> Meta는 <em>설계</em>를 공개했고 X는 <em>설정</em>을 공개했다. X 후보 수는 코드에서 나온 정확한 값이고 Meta 후보 수는 시스템 카드에서 나온 반올림 값이다 — 공시가 무엇을 위한 것인지가 숫자 모양에 드러난다.</li>
+<li><strong>멀티태스크 결합식이 하나가 아니다.</strong> &quot;멀티태스크 랭킹 = 가중합&quot;이라는 통념이 Meta 안에서 깨진다. Facebook Feed는 가산 <code>Vijt = Σ w·Y</code>(i=포스트, j=뷰어), Instagram Suggested Posts 2020은 곱셈 <code>(P_like)^w × (1−P_not_interested)^w</code>, Explore 2023은 음수항 포함 가산, Notifications 2025는 곱셈 페널티 <code>Score = R(c)×D(c)</code>. 가중치를 정하는 방법도 갈린다 — Facebook은 설문, Instagram은 offline tuning + Bayesian optimization, X는 소스 코드 상수.</li>
+<li><strong>Meta의 통합 모델은 아직 없다.</strong> 오가닉(HSTU → ULTRA-HSTU)과 광고(DHEN·Wukong·InterFormer → GEM, 서빙 MARM, 유저 모델 LLaTTE)는 별도 계보다. GEM·MARM·LLaTTE 본문에 &quot;HSTU&quot;가 0회 나온다. 자주 오독되는 Q4 2025 &quot;consolidation&quot; 발언은 <strong>광고 품질 모델</strong> 이야기고 오가닉이 아니다.</li>
+<li><strong>Meta의 진짜 엔지니어링은 인코더가 아니라 인덱스에 있다.</strong> EBR은 ANN을 별도 서비스로 빼지 않고 Boolean 역색인 안에 <code>(nn &lt;key&gt; :radius &lt;radius&gt;)</code> 연산자로 넣었다. SilverTorch는 &quot;index as model&quot;로 인덱스를 모델 서빙에 흡수한다. X 문헌은 인코더를 보여주고 Meta 문헌은 인덱스를 보여준다.</li>
+<li><strong>서빙 비용이 아키텍처를 정한다.</strong> Instagram Explore가 two-tower를 고른 이유가 정확도가 아니라 <strong>item tower 출력이 캐시 가능</strong>하기 때문이다. 그리고 캐싱이 곧 그 타워의 재학습 주기를 인덱스 재빌드 비용에 묶는다 — 랭킹은 시간 단위 파인튜닝인데 item tower만 일 단위인 이유가 여기 있다.</li>
+<li><strong>다양성은 부재가 곧 발견이다.</strong> 메인 피드의 diversity/dedup에 대해 Meta는 알고리즘 수준에서 거의 아무것도 공개하지 않는다 (Threads는 0건). 유일한 예외가 2025 Instagram <strong>알림</strong> 다양성 프레임워크다 — 피드가 아니다.</li>
+</ol>
+<p>부수적으로: Threads 시스템 카드는 슬러그가 <code>ig-threads-feed</code>인데 본문 시그널 50개가 전부 <code>Text Post App</code> 네임스페이스이고 <code>Instagram</code>은 0회 — 인프라는 100% 재사용, 랭킹 시그널은 100% 분리. Threads는 EU VLOP가 <strong>아니고</strong>, Threads API 9개 엔드포인트에 피드 읽기가 없어 랭커를 외부에서 감사할 수 없다. Facebook의 강등 유형은 2021년 ~24종에서 2025년 4종(한 페이지)/7종(다른 페이지)으로 줄었고 Meta 자기 페이지 둘이 지금 서로 안 맞는다. Widely Viewed Content Report에서 미연결 콘텐츠 비중이 11.7% → 15.2% → 41.0%로 뛰었다. Meta는 AI 추천 비율(FB 30% / IG 50%+)을 Q1 2024 이후로 보고하지 않는다.</p>
+<h2>검증에서 뒤집힌 것 (중요)</h2>
+<p>적대적 검증 2판을 돌렸고 실제 결함이 나왔다.</p>
+<ul>
+<li><p><strong>조작된 인용문 1건.</strong> Explore 2023 블로그에 없는 문장(&quot;offline replay tools along with Bayesian optimization tools…&quot;)이 초안에 들어가 있었다. &quot;replay&quot;는 그 글에 0회 나온다. 실제 문장으로 교체했고, 이 인용을 쓰던 표·요약 4곳을 연쇄 수정했다.</p>
+</li>
+<li><p><strong>공식 첨자가 반대였다.</strong> <code>Vijt</code>의 i·j를 뷰어·포스트로 적었는데 원문은 <em>&quot;for each post i, we estimate Yijt&quot;</em> / <em>&quot;the post X_it toward viewer j&quot;</em> — i가 포스트다.</p>
+</li>
+<li><p><strong>부재 주장이 반증됐다.</strong> &quot;네 개 광고 블로그에 Llama 0회&quot;를 근거로 &quot;Meta의 LLM 언급은 비유다&quot;라고 썼는데, LLaTTE 논문이 *&quot;dense content embeddings produced by fine-tuned LLaMA models&quot;*라고 명시한다. → LLM을 **표현(representation)**으로 쓰는 것과 &quot;LLM-style scaling law&quot;를 <strong>아키텍처 비유</strong>로 쓰는 것은 다른 이야기다. 노트가 둘을 뭉개고 있었다.</p>
+</li>
+<li><p><strong>살아있다고 적은 페이지가 404였고</strong>, Mosseri 인용 링크 하나는 홈으로 리다이렉트되며, Clegg 2023 기사에 없는 문구가 그 기사에 인용돼 있었다. 인용문 3건은 생략 부호가 결론을 바꾸는 위치에 있었다 (Q4 2025 12% 개선은 *&quot;along with a series of back-end improvements&quot;*가 붙어 있어 모델 통합 단독 효과가 아니다).</p>
+</li>
+<li><p><strong>새 규칙 — 부재의 등급.</strong> 오늘 정한 정책이다. &quot;페이지 X를 D일에 받아봤더니 Y가 없다&quot;는 재현 가능한 1차 관찰이므로 <code>[관찰]</code> + 날짜 + 대상. &quot;Meta가 Z를 공개한 적 없다&quot; 같은 무한 부정은 <code>[추정]</code>이고 <strong>검색한 코퍼스를 문장에 밝힌다.</strong> 핀 고정된 커밋의 소스 코드 grep만 <code>[확인]</code>으로 남긴다 — 코퍼스가 유한하고 전수 검색이 가능하기 때문.</p>
+</li>
+<li><p><strong>새 규칙 — arXiv PDF 금지.</strong> WebFetch로 PDF를 받으면 <strong>없는 숫자를 지어낸다.</strong> SilverTorch에서 AWS 인스턴스 타입, &quot;Recall@100 &gt;95%&quot;, &quot;~40% infra savings&quot;를 만들어냈는데 HTML판 실제 값은 A100 40G, Recall@20 +28.2%였다. 이후 <code>arxiv.org/html/</code> 또는 ar5iv만 쓴다. PDF만 있는 주장은 확인도 부정도 하지 않고 미검증으로 남긴다.</p>
+</li>
+</ul>
+<h2>반영</h2>
+<ul>
+<li><code>services/facebook.md</code> 신규 — Vijt 공식, 지면별 후보 수, 강등 유형 축소사, 광고 특허, Epinet 콜드스타트, dwell-time 정규화, DSA</li>
+<li><code>services/instagram.md</code> 신규 — 결합식 3형태, IG2Vec/IGQL, Explore 2023 스케일링, DV365, 알림 다양성 공식, &quot;연속 3개&quot; 반박</li>
+<li><code>services/threads.md</code> 신규 — Mosseri 날짜별 변경 타임라인, 시스템 카드 실측(헤드 10 / 시그널 50 / Instagram 0), VLOP 비지정, API에 피드 읽기 없음, Dear Algo·Your Algorithm</li>
+<li><code>topics/survey-signals.md</code> 신규 — 설문 신호가 랭커를 움직이는 4가지 레버리지 패턴 (Meta 2021 / YouTube 2021 / Meta UTIS 2026 / TikTok USM 2024)</li>
+<li><code>topics/model-freshness.md</code> 신규 — 지면별 재학습 주기, 인덱스 신선도(도달 가능성)와 랭커 신선도(완만한 열화)의 경제학 차이</li>
+<li><code>topics/multi-task-ranking.md</code> — Meta 결합식 4종 표, 가중치 출처 비교, 헤드 수 19~22 vs ~10이 비교 가능한 숫자가 아닌 이유</li>
+<li><code>topics/candidate-allocation.md</code> — Meta 지면별 pass-0 표, 광고·오가닉 공통 단위(픽셀 높이) 인터리브</li>
+<li><code>topics/feed-diversity.md</code> — 부재를 발견으로 기록, 알림 다양성 공식, 반박</li>
+<li><code>topics/embedding-retrieval.md</code> — EBR 역색인 하이브리드, SilverTorch, RankGraph-2, Andromeda/HILL, IG2Vec/IGQL, 캐시성 제약</li>
+<li><code>topics/sequence-transformer-ranking.md</code> — HSTU 상세, ULTRA-HSTU, 광고 계보, DV365, 계보 분리 근거</li>
+<li><code>topics/llm-in-recsys.md</code> — 표현 vs 비유 구분, LLaTTE</li>
+</ul>
+<hr>
+<h1>같은 날 2부 — Netflix 착수·완료 + 기존 작업 재검증 + 일일 배치 구축</h1>
+<h2>읽은 것 (2부)</h2>
+<ul>
+<li>TMIS 2015 (Gomez-Uribe &amp; Hunt) — 고전 세대 시스템 서술의 정본</li>
+<li>netflixtechblog — Foundation Model(2025-03), FM 통합 3모드(2025-11), GenRec(2026-07), 장기 만족 보상(2024), 아트워크 밴딧(2017), AVA(2018), 인터리빙(2017), FM-Intent(2025), 라이브 이벤트 전달(2025), Ads 파이프라인(2025), 2013 3계층 아키텍처</li>
+<li>about.netflix.com — Goodbye Stars Hello Thumbs(2017), Two Thumbs Up(2022), 새 TV 경험·대화형 검색 베타(2025), Upfront 2025</li>
+<li>논문 — Calibrated Recommendations(Steck, RecSys 2018), UniCoRn(RecSys 2024), GenPage(RecSys 2026), 1B 스케일링(2026, shadow), 라이브 콜드스타트(RecSys 2025), 임베딩 안정화(RecSys 2025), Artwork LLM post-training(2026, 연구)</li>
+<li>help.netflix.com 추천 문서, SIGIR 2019 검색 논문, AI Magazine 2021 초록</li>
+</ul>
+<h2>새로 알게 된 것 (Netflix의 큰 것 5개)</h2>
+<ol>
+<li><strong>retrieval 레이어가 없다.</strong> PVR이 카탈로그 전체를 회원별로 정렬한다 — 코퍼스 수천~수만이라 브루트포스 전 채점이 성립. &quot;무슨 ANN 쓰나&quot;라는 질문 자체가 무효인 첫 표본. 배분 문제는 아이템이 아니라 <strong>행 선택</strong>(수만 후보 행 → 약 40행)으로 이동하고, 2015년에 이미 템플릿(비율 배분)을 버렸다.</li>
+<li><strong>목적함수가 <code>Σ w·P</code>가 아니다.</strong> 컨텍스추얼 밴딧 + 프록시 보상 <code>r(user,item)=f(play,complete,thumb)</code>. north star는 retention인데 월 1회 신호라 직접 최적화를 포기하고 reward engineering 루프로 접근. 지연 피드백은 예측 모델로 메운다. 가중합 프레임이 광고형 지면의 관행일 수 있다는 첫 반례.</li>
+<li><strong>업계에서 가장 구체적인 재학습 주기 공개.</strong> FM은 &quot;월 단위 처음부터 사전학습 + 매일 파인튜닝&quot;. 신규 아이템이 스케줄로 오는 편성 카탈로그라 신선도 압력 자체가 UGC와 다르다 — 콜드스타트가 커버리지 문제가 아니라 프로모션 문제(빌보드 incrementality 밴딧).</li>
+<li><strong>GenRec이 llm-in-recsys의 자리 3 공백을 깼다.</strong> 유기 랭킹 경로에 LLM(내부 LLM post-training, vLLM prefill-only, ~10% 트래픽 4주 A/B 유의미 승리)이 들어갔다는 업계 최초급 1차 진술. X(심판)·Meta(피처 인코더)와 달리 랭커 그 자체다. &quot;context window becomes our new &#39;feature budget&#39;&quot;.</li>
+<li><strong>다양성의 다섯 번째 방식 — calibration.</strong> 시청 이력의 장르 분포를 추천 리스트에 보존(Steck RecSys 2018, 수식 공개). 단 <strong>배포 진술이 없어</strong> &quot;Netflix가 쓴다&quot;고 쓰면 안 된다. 다양성 자체는 행 선택 단계에 있고(&quot;관련성+다양성 최적화&quot;), 아트워크 개인화가 지각적 다양성의 별도 레버.</li>
+</ol>
+<p>부수: 명시 평점의 1차 출처 확보(2017 thumbs 전환·활동 200%↑·% Match는 표시용, 2022 two thumbs) — survey-signals의 Netflix 절을 2차 보도에서 1차로 승격. 광고는 파이프라인·타겟팅 상품만 공개돼 있고 <strong>랭킹 모델 공개물이 0</strong> — Meta처럼 오가닉/광고 계보 서술이 불가능한 상태. 인구통계 미사용 명시. &quot;Hydra&quot; 통합 시스템명과 semantic ID설은 1차 출처 없음(후자는 Spotify 토크와의 흔한 혼동).</p>
+<h2>검증에서 뒤집힌 것 (2부 — 기존 X·Meta 파일 재검증)</h2>
+<p>X 노트 2차 적대 검증(44 OK / 3 DEFECT / 3 MINOR), Meta 노트 2차(58 OK / 4 DEFECT). 전부 수정 반영:</p>
+<ul>
+<li><strong>x.md 조작 인용 1건</strong>: &quot;our decision not to release training data or model weights&quot; — 2023 블로그 아카이브 전문에 없는 문장이었다. 실재하는 문장(recap README의 학습 데이터 비공개 사유)으로 교체.</li>
+<li><strong>x.md 2023 가중치 범위 오류</strong>: &quot;0.0~100.0, 음수 표현 불가&quot;가 틀렸다 — Report −20000..0 등 음수 전용 4종이 2023부터 있었고, 2025 경계값은 2023과 동일(신규 신호 아님). multi-task-ranking의 표까지 연쇄 수정.</li>
+<li><strong>x.md 카운트 오류</strong>: &quot;나머지 default 203개 전부 실제값&quot; → 실제는 173개 중 25개가 0.0. 방향은 유지, 수치 정정.</li>
+<li><strong>facebook.md</strong>: 데모션 &quot;약 24종&quot;의 출처로 단 2021 발표문에 개수가 없다 → <code>[추정]</code> 강등.</li>
+<li><strong>instagram.md 2건</strong>: 팔로워 수 인용 3문장째가 현행 페이지와 다름(재복사), 원본성 복구 조건은 &quot;최근 30일 콘텐츠 구성&quot;이지 &quot;위반 후 30일 경과&quot;가 아님.</li>
+<li><strong>model-freshness.md</strong>: RankGraph-2 인용 &quot;constraining&quot; → 원문 &quot;filtering&quot; (한 단어).</li>
+<li>사소: bulk topic은 7개 &quot;이상&quot;(<code>&gt;6</code>), 50/50 인용 출처 정밀화, e414c17은 &quot;187파일 변경&quot;(레포 총 216).</li>
+</ul>
+<p>netflix.md 자체도 같은 방식의 적대 검증을 걸었다 — <strong>54 OK / 결함 0 / 사소 3</strong> (헤드라인 수치 전부 생존: 40행×75, 80%/20%, $1B, GenRec 10% 트래픽·+1.6% MRR·40×, 월+일 주기, 200%, 2-6개월·200만/셀, 라이브 1억 디바이스/1분). 사소 3건 반영: FM 소비 3모드의 출처를 두 글로 분리 표기, UniCoRn 7%/10%에 &quot;오프라인 지표&quot; 한정, TMIS &quot;이틀 전 데이터&quot;는 실험 프로토콜 예시이지 프로덕션 학습 주기 진술이 아님을 명시.</p>
+<h2>반영 (2부)</h2>
+<ul>
+<li><code>services/netflix.md</code> 신규 — 세대 구분(고전 2015-22 / 통합 2023-24 / FM 2025 / LLM-네이티브 2026), 전 절 근거 등급 포함</li>
+<li><code>topics/feed-diversity.md</code> — calibration 5번째 방식 추가, 다양성 단위(리스트 vs 페이지), 수식 공개≠배포</li>
+<li><code>topics/candidate-allocation.md</code> — &quot;배분 레이어의 존재는 코퍼스 크기의 함수&quot;, 행 단위 배분, GenPage</li>
+<li><code>topics/embedding-retrieval.md</code> — &quot;retrieval 없음&quot; 극단 2번째 표본, 콜드스타트 버리기(X TwHIN 0벡터) vs 채우기(FM 메타데이터)</li>
+<li><code>topics/model-freshness.md</code> — FM 월+일 이중 주기, 신선도 압력은 아이템 유입 형태의 함수, 프리컴퓨트 극단 사례</li>
+<li><code>topics/multi-task-ranking.md</code> — 보상 함수 프레임(밴딧), north star 직접 최적화 포기의 이유</li>
+<li><code>topics/sequence-transformer-ranking.md</code> — (Netflix FM은 GPT식 autoregressive — X·Meta 대비는 netflix.md에서)</li>
+<li><code>topics/llm-in-recsys.md</code> — GenRec으로 자리 3 테제 수정, 코퍼스 크기와 LLM 투입 지점 가설</li>
+<li><code>topics/survey-signals.md</code> — Netflix 절 1차 출처 승격(thumbs·two thumbs·온보딩 픽커)</li>
+<li><code>scripts/daily-research.sh</code> + <code>scripts/daily-research-prompt.md</code> 신규 — <strong>일일 배치</strong>: 매일 09:30 각 서비스 신규 공개물 체크 → 있으면 분석·정본 갱신·daily 기록·푸시, 없으면 Slack 보고만. pm2 cron 등록.</li>
+</ul>
+<h2>반영 (3부) — GenRec 원문 재독 + 적대 검증</h2>
+<p>&quot;GenRec 설명&quot; 요청을 계기로 블로그를 다시 받아 읽고 적대 검증을 걸었다. 기존 수치는 전부 생존했는데 <strong>정본에 빠져 있던 사실 두 개가 나왔고 둘 다 그림을 바꾼다.</strong></p>
+<ol>
+<li><strong>채점 구조가 생성이 아니다.</strong> <em>&quot;we extract a pooled hidden state h&quot;</em> → 아이템 임베딩 eᵢ와 scoring head ϕ(dot product 또는 small MLP)로 sᵢ, softmax. 백본·헤드·아이템 임베딩 공동 학습. 즉 LLM은 유저 표현 인코더이고 채점기는 여전히 임베딩 내적이다. <strong>&quot;LLM 랭커&quot;를 semantic ID 생성형 retrieval과 혼동하기 딱 좋은 지점</strong>이라 <code>llm-in-recsys.md</code>에 경고 블록을 넣었다. prefill 1패스가 후보당이 아니라 <strong>후보 집합 전체</strong>라는 것도 이 구조 때문이다.</li>
+<li><strong>A/B가 <em>&quot;batch-compute recommendation surfaces&quot;</em> 한정.</strong> 원문에 명시돼 있다. 다만 글은 &quot;실시간엔 안 갔다&quot;고 쓰지 않는다 — 그건 우리 추론이므로 <code>[추정]</code>으로 분리했고, X·Meta와 한 줄에 세울 때 지면 성격 차이를 지우지 말라는 ⚠를 테제 옆에 달았다.</li>
+</ol>
+<p>검증 부산물로 잡은 정밀화 3건: ① 컨텍스트 1/3 압축의 &quot;negligible degradation&quot;은 <strong>오프라인 랭킹 지표 한정</strong> ② 40×/+1.6%는 오프라인 MRR 진술에 묶어 써야 한다 — 프로덕션 대등/상회 쪽은 별도로 <em>&quot;10–40× ... depending on configuration&quot;</em> ③ Limitations 절은 없지만 전망 문장은 흩어져 있어(natural-language steering, 추천 이유 설명 등) &quot;GRPO가 유일한 미래 과제&quot;는 틀린 요약.</p>
+<p><code>[관찰]</code> 2026-08-09 GenRec 후속 글 없음 — 롤아웃 열린 질문 유지. 단 netflixtechblog 인덱스가 JS 렌더링이라 검색 결과 기준이다. 열린 질문 2개 추가: 실시간 지면 적용 여부, <strong>후보 집합의 생성 주체</strong>(글이 안 밝힘).</p>
+<h2>다음에 볼 것</h2>
+<ul>
+<li><strong>Transparency Center 재검증</strong> — 시스템 카드 페이지 자동 fetch 차단(400/429). 카드 기반 주장은 전부 2026-08-09 스냅샷. 브라우저로 재확인 필요.</li>
+<li><strong>Meta DSA 제출 문서 원문</strong> / <strong>Que2Search ACM판</strong> — 이전과 동일.</li>
+<li><strong>Netflix 열린 질문들</strong> — GenRec/GenPage 전면 롤아웃 여부 추적(이후 blog 후속 글), calibration 배포 여부, FM 파라미터 수, 광고 랭킹 모델 공개 시작 여부.</li>
+<li><strong>sequence-transformer-ranking에 Netflix FM 절 추가 검토</strong> — 토큰화(BPE 비유)·이질 피처 토큰·multi-token 목적이 X(ID-only)·Meta(HSTU) 대비 세 번째 좌표. 이번엔 netflix.md에만 실었다.</li>
+<li>다음 서비스 후보: YouTube(공개 문헌 밀도 높음) 또는 TikTok(USM 계보).</li>
+</ul>
+
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-08-08.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-08</div></a><a class="r" href="daily-2026-08-10.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-10</div></a></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-08-15 — feed-research</title>
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-08-29 빌드</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-08-29 빌드</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-08-15</h1>
+  <div class="wd">토요일 · 읽는 데 약 40분</div>
+  <ul class="chips"><li class="chip">읽은 자료 <b>2</b>건 (X 4세대 드랍 1건</li><li class="chip">arXiv triage <b>30</b>건 중 관찰 1건)</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 대폭 개정)</li><li class="chip">다이어그램 갱신 <b>1</b>건 (x-pipeline.svg)</li><li class="chip">레이더 갱신 <b>1</b>건</li></ul>
+  <div class="lead"><span class="lb">한 줄 요약</span>⚠ <strong>테제 대량 변경</strong> — X가 2026-08-13에 4세대 코드를 공개했다. <strong>가중치가 처음 값으로 공개됐고</strong>(reply 5.0, favorite 0.5, report −234, ...), OON 배수(0.75)·저자 다양성(decay 0.5, floor 0.25)·VMRanker DPP(θ=0.65, K=150) 상수 전부 나왔으며, SimClusters가 <strong>home-mixer 안에</strong> OON retrieval 소스로 들어왔고, visibility-filtering 서브레포와 labeling 파이프라인(Grox·agatha·bdsm·user-cred-v2·pnsfwmedia·scarecrow/botmaker·abuse-enforcement-service·safety-label-user-agg·under-the-hood 등 20+ 서브시스템)이 통째로 열렸다. Phoenix는 학습 코드·합성 데이터 생성기까지 포함해 end-to-end 실행 가능해졌다.</div>
+</header>
+<div class="wrap" id="content">
+<h2>1. X 알고리즘 4세대 드랍 — 가중치·SimClusters·visibility-filtering·labeling 파이프라인 통째 공개 (⚠ 테제 대량 변경)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/47c1bcd">xai-org/x-algorithm @ 47c1bcd — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-13 17:09 UTC (뒤이어 <code>.gitattributes</code> 정리 <a href="https://github.com/xai-org/x-algorithm/commit/a389166">a389166</a>), 공개 소스코드. 커밋 하나로 <strong>+363,246 / −11,640</strong> (총 파일 300개+, GitHub API 페이지네이션 한계로 정확한 파일수는 트리에서 재구성). <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#latest-update--august-13th-2026">README.md <code>#latest-update--august-13th-2026</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/docs/BIDIRECTIONAL_BOOST_CHANGE.md">docs/BIDIRECTIONAL_BOOST_CHANGE.md</a>, <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/visibility-filtering/rules/registry.rs"><code>visibility-filtering/rules/registry.rs</code></a>.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>이 저장소의 <a href="x.html">services/x.md</a>는 지난 3개월 동안 &quot;공개 소스 3세대&quot;를 정본으로 유지해 왔다 — 2023 Scala 초판 → 2025 Scala 리프레시(<code>c54bec0</code>, tweet-mixer 신설) → 2026 Rust 재작성(<code>aaa167b</code>·<code>e414c17</code>·<code>0bfc279</code>, 총 216파일). 그리고 정본의 가장 큰 미해소 절이 두 개 있었다.</p>
+<p>첫째, <strong>가중치</strong>. 목적함수의 형태(가중합)는 확인됐지만 실제 값은 세 세대 어디에도 없었다. 2026 Rust에서는 <code>crate::params</code> 모듈 자체가 레포에서 빠져 있어 <code>FavoriteWeight</code> 같은 심볼이 호출부에만 있고 정의가 없었다. 널리 인용되는 &quot;reply 13.5 / good_profile_click 12.0 / report −369&quot; 표는 2023-04-05 스냅샷 하나뿐이고, 그것도 저자가 직접 &quot;프로덕션과 작은 차이 있을 수 있다&quot;고 단서를 붙여 놓은 문서였다.</p>
+<p>둘째, <strong>안전성/visibility-filtering·labeling 파이프라인</strong>. 홈미서 코드에는 <code>VFFilter</code>·<code>AncillaryVFFilter</code>가 fail-closed로 걸려 있었지만, 그 필터가 참고하는 라벨을 <strong>누가 언제 어떻게 붙이는가</strong>는 완전한 블랙박스였다. <code>grox/</code> 서브레포는 부분 공개(주석 파이프라인 골격만), 그 외 계정 레벨 판단·PageRank·인위적 행동 탐지·NSFW 미디어 분류·규칙 엔진·집행 서비스는 아예 언급이 없었다.</p>
+<p>이번 드랍이 두 절을 통째로 뒤집었다. 새 README가 **&quot;Adds key configuration parameters (including weights used to blend predicted action values into a score for a post)&quot;**로 시작해 <code>home-mixer/params/param.rs</code> 1084줄이 새로 붙었고, **&quot;Adds code for systems that impact whether a post is filtered from the For You feed&quot;**로 이어 서브시스템 15개+가 신설됐다. Phoenix는 학습 코드·synthetic 데이터 생성기·QUICKSTART까지 얹혀 end-to-end 실행 가능해졌고, 새 SimClusters 서브레포가 홈미서의 OON retrieval 소스로 배선됐다.</p>
+<p>새 README가 커밋 메시지에서 자평하듯 이 릴리즈의 성격은 이제 &quot;로직의 형태를 보여주는 것&quot;에서 &quot;값과 규칙을 검증 가능한 형태로 붙이는 것&quot;으로 넘어왔다. 그와 짝으로 <a href="https://x.com/i/under_the_hood">x.com/i/under_the_hood</a> 라는 <strong>계정 단위 라벨 투명성 툴</strong>이 파일럿 공개됐다 — 유저가 자기 계정과 포스트에 붙은 visibility 라벨을 조회할 수 있고 그 라벨 → 이 레포 코드로 왜 그런 취급을 받는지를 대조할 수 있게 설계됐다는 것이 새 README의 주장이다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — 가중치</span></p></div>
+<p><code>home-mixer/params/param.rs</code>가 코드에 박힌 프로덕션 기본값을 담는다. 파일 헤더의 주석이 이 파일의 성격을 정확히 규정한다:</p>
+<blockquote>
+<p><code>// mirrored from config feature-switch defaults; last sync 2026-08-12T04:09:22Z</code>
+— <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs#L1"><code>home-mixer/params/param.rs:1</code></a></p>
+</blockquote>
+<p>새 README의 &quot;Experiments and Configuration&quot; 절이 이 미러링의 의미를 못박는다:</p>
+<blockquote>
+<p>&quot;To help people understand the production defaults, we run cron scripts that set the defaults in this repository&#39;s code to be the primary production values, for example in <code>home-mixer/params/param.rs</code>.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#experiments-and-configuration">README.md <code>#experiments-and-configuration</code></a></p>
+</blockquote>
+<p>즉 이 파일의 숫자는 &quot;예시&quot;나 &quot;데모 기본값&quot;이 아니라 <strong>프로덕션 primary value를 크론이 매일 밀어 넣는 미러</strong>다. 정확도의 상한은 마지막 sync 시각(2026-08-12 04:09 UTC).</p>
+<p><strong>엔게이지먼트 헤드 가중치 (26개, 정렬은 파일 등장 순)</strong> <code>[확인]</code> — 위 URL:</p>
+<table>
+<thead>
+<tr>
+<th>헤드</th>
+<th>param 심볼</th>
+<th align="right">기본값</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>favorite</td>
+<td><code>FavoriteWeight</code></td>
+<td align="right"><strong>0.5</strong></td>
+<td>2023-04-05 스냅샷의 0.5와 일치</td>
+</tr>
+<tr>
+<td>reply</td>
+<td><code>ReplyWeight</code></td>
+<td align="right"><strong>5.0</strong></td>
+<td>2023 스냅샷의 13.5와 상이</td>
+</tr>
+<tr>
+<td>↳ +상호팔로우 원본 boost</td>
+<td><code>BidirectionalFollowReplyWeightBoost</code></td>
+<td align="right"><strong>15.0</strong></td>
+<td>2026-07-13 도입 20 → 2026-07-24 15로 하향 (아래 사례 참조)</td>
+</tr>
+<tr>
+<td>retweet</td>
+<td><code>RetweetWeight</code></td>
+<td align="right"><strong>1.0</strong></td>
+<td>2023 스냅샷과 일치</td>
+</tr>
+<tr>
+<td>photo_expand</td>
+<td><code>PhotoExpandWeight</code></td>
+<td align="right">0.05</td>
+<td></td>
+</tr>
+<tr>
+<td>video_open</td>
+<td><code>VideoOpenWeight</code></td>
+<td align="right">0.05</td>
+<td></td>
+</tr>
+<tr>
+<td>click (포스트)</td>
+<td><code>ClickWeight</code></td>
+<td align="right"><strong>0.4</strong></td>
+<td>2023 <code>good_click</code> 11·<code>good_click_v2</code> 10과 스케일 상이 — 다른 헤드일 가능성</td>
+</tr>
+<tr>
+<td>open_link</td>
+<td><code>OpenLinkWeight</code></td>
+<td align="right">0.2</td>
+<td></td>
+</tr>
+<tr>
+<td>profile_click</td>
+<td><code>ProfileClickWeight</code></td>
+<td align="right"><strong>0.0</strong></td>
+<td>2023 스냅샷 <code>good_profile_click</code> 12에서 완전 제거</td>
+</tr>
+<tr>
+<td>video quality view (vqv)</td>
+<td><code>VqvWeight</code></td>
+<td align="right">0.05</td>
+<td></td>
+</tr>
+<tr>
+<td>share</td>
+<td><code>ShareWeight</code></td>
+<td align="right">2.0</td>
+<td></td>
+</tr>
+<tr>
+<td>share via DM</td>
+<td><code>ShareViaDmWeight</code></td>
+<td align="right"><strong>5.0</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>share via copy link</td>
+<td><code>ShareViaCopyLinkWeight</code></td>
+<td align="right"><strong>20.0</strong></td>
+<td>최고 양수 개별 헤드</td>
+</tr>
+<tr>
+<td>dwell</td>
+<td><code>DwellWeight</code></td>
+<td align="right">0.0</td>
+<td>실전 dwell 신호는 연속형 아래</td>
+</tr>
+<tr>
+<td>↳ +상호팔로우 원본 boost</td>
+<td><code>BidirectionalFollowDwellWeightBoost</code></td>
+<td align="right">0.0</td>
+<td>코드는 있으나 미배포</td>
+</tr>
+<tr>
+<td>quote</td>
+<td><code>QuoteWeight</code></td>
+<td align="right">5.0</td>
+<td></td>
+</tr>
+<tr>
+<td>quoted_click</td>
+<td><code>QuotedClickWeight</code></td>
+<td align="right">0.05</td>
+<td></td>
+</tr>
+<tr>
+<td>quoted_vqv</td>
+<td><code>QuotedVqvWeight</code></td>
+<td align="right">0.0</td>
+<td></td>
+</tr>
+<tr>
+<td>follow_author</td>
+<td><code>FollowAuthorWeight</code></td>
+<td align="right">4.0</td>
+<td></td>
+</tr>
+<tr>
+<td>post_unexplored</td>
+<td><code>PostUnexploredWeight</code></td>
+<td align="right">0.02</td>
+<td>새-작성자 부스트, 아래 참조. <code>PostUnexploredWeightInNetworkOnly = true</code></td>
+</tr>
+<tr>
+<td>연속형 dwell time</td>
+<td><code>ContDwellTimeWeight</code></td>
+<td align="right">0.004</td>
+<td></td>
+</tr>
+<tr>
+<td>연속형 click dwell time</td>
+<td><code>ContClickDwellTimeWeight</code></td>
+<td align="right">0.0</td>
+<td></td>
+</tr>
+<tr>
+<td>연속형 active_secs 5분 residual</td>
+<td><code>ContActiveSecs5mResidualNormWeight</code></td>
+<td align="right">0.0</td>
+<td>새 README &quot;Attention&quot; 카테고리</td>
+</tr>
+</tbody></table>
+<p><strong>부정 헤드 가중치 (5개)</strong> <code>[확인]</code>:</p>
+<table>
+<thead>
+<tr>
+<th>헤드</th>
+<th>param 심볼</th>
+<th align="right">기본값</th>
+<th>2023 스냅샷 대응</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>not_interested</td>
+<td><code>NotInterestedWeight</code></td>
+<td align="right"><strong>−43.2</strong></td>
+<td>대응 없음 (당시 없던 헤드)</td>
+</tr>
+<tr>
+<td>block_author</td>
+<td><code>BlockAuthorWeight</code></td>
+<td align="right"><strong>−31.2</strong></td>
+<td>대응 없음</td>
+</tr>
+<tr>
+<td>mute_author</td>
+<td><code>MuteAuthorWeight</code></td>
+<td align="right"><strong>−58.8</strong></td>
+<td>대응 없음</td>
+</tr>
+<tr>
+<td>report</td>
+<td><code>ReportWeight</code></td>
+<td align="right"><strong>−234.0</strong></td>
+<td>2023 <code>report</code> −369 → 완화 방향</td>
+</tr>
+<tr>
+<td>not_dwelled</td>
+<td><code>NotDwelledWeight</code></td>
+<td align="right">−0.02</td>
+<td>대응 없음 (canon이 유일하게 잡아냈던 새 부정 헤드)</td>
+</tr>
+</tbody></table>
+<p>파일 헤더 위 주석 세 줄이 부호·크기 규모의 의미를 규정한다:</p>
+<blockquote>
+<p>&quot;These weights reflect a combination of how much an action is valued in ranking and typical propensities of these actions across the X network (e.g. negative feedback is overall rare).&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs"><code>home-mixer/params/param.rs:281</code></a></p>
+</blockquote>
+<p>즉 report −234의 크기는 &quot;리포트 한 번의 상대 중요도&quot;가 아니라 <strong>가치 × 1/propensity</strong>의 곱이다 — 리포트가 워낙 드무니까 큰 절대값이 붙어 있는 것.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — 가중치 밖 상수</span></p></div>
+<p>정본이 오래 &quot;네 값 전부 비공개&quot;라고 못박아 왔던 <strong>OON 배수·다양성·VMRanker</strong> 상수가 전부 나왔다:</p>
+<ul>
+<li><code>OonWeightFactor = 0.75</code> <code>[확인]</code> — OON 포스트에 곱하는 감쇠 (2023-04-05 스냅샷의 <code>out_of_network_scale_factor</code> 0.75와 일치)</li>
+<li><code>TopicOonWeightFactor = 0.5</code> <code>[확인]</code> — 토픽 요청일 때 더 엄격</li>
+<li><code>NewUserAgeThresholdSecs = 0</code> <code>[확인]</code> — 신규 유저 라우팅 임계가 0초라는 것은 사실상 코드 경로가 비활성 상태로 미러링돼 있다는 뜻 <code>[추정]</code></li>
+<li><code>AuthorDiversityDecay = 0.5</code>, <code>AuthorDiversityFloor = 0.25</code>, <code>EnableAuthorDiversity = true</code> <code>[확인]</code> — 같은 작성자의 2번째 포스트에는 <code>(1−0.25)·0.5¹+0.25=0.625</code> 배, k번째에는 (1−0.25)·0.5ᵏ+0.25 배가 곱해진다</li>
+<li><code>VMRankerDppTheta = 0.65</code>, <code>VMRankerDppMaxSelectedRank = 150</code>, <code>EnableVMRanker = true</code>, <code>VMRankerValueModelId = &quot;dpp&quot;</code>, <code>VMRankerClusterId = &quot;Experiment3&quot;</code>, <code>VMRankerEnableFallback = false</code> <code>[확인]</code> — 정본이 남긴 열린 질문 <strong>&quot;VMRanker/DPP가 켜져 있는가&quot;</strong> 에 대한 직접 답: 켜져 있다, DPP를 씀, 폴백 없음. 즉 실패 시 fail-open 조용 스킵이라는 canon 관찰이 그대로 유효</li>
+<li><code>PhoenixMaxResults = 1000</code>, <code>ThunderMaxResults = 1200</code>, <code>TweetMixerMaxResults = 800</code>, <code>EnableTweetMixerSource = false</code>, <code>EnableSimclustersSource = true</code>, <code>EnablePhoenixSource = true</code> <code>[확인]</code> — <strong>레거시 tweet-mixer는 기본 off</strong>로 미러링됐다. SimClusters가 그 자리를 대체</li>
+<li><code>ShadowTrafficDefaultPercent = 0.3</code> <code>[확인]</code> — 새 Phoenix 클러스터에 30% shadow 트래픽이 기본</li>
+<li><code>ColdStartImpressionThreshold = 1000</code> <code>[확인]</code> — canon이 &quot;신규 아이템에 아무 장치 없다&quot;고 했던 지점 — 실은 임프레션 임계로 정의된다. 임프레션 1000회 미만이면 &quot;새 작성자/포스트&quot;로 분류. 아래 <code>PostUnexploredWeight</code>로 부스트</li>
+</ul>
+<p><strong>새-작성자 부스트 (New-Author Boost) — 세 번째 조정 인자</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#scoring-and-ranking">README.md <code>#scoring-and-ranking</code></a>:</p>
+<p>새 README가 스코어링 조정 인자를 세 개로 명시한다:</p>
+<blockquote>
+<p>&quot;Author Diversity ... Out-of-Network Discount ... New-Author Boost: posts from authors whose impressions are below a threshold are lifted toward a target position.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#scoring-and-ranking">README.md <code>#scoring-and-ranking</code></a></p>
+</blockquote>
+<p>정본은 조정 인자를 (1) 작성자 다양성 감쇠 (2) OON 배수 두 개로만 기록해 왔다. 세 번째로 <strong>새-작성자 부스트</strong>가 있고, param.rs에 <code>PostUnexploredWeight = 0.02</code>·<code>PostUnexploredWeightInNetworkOnly = true</code>·<code>EnableMultiplicativePostUnexplored = false</code>·<code>MultiplicativePostUnexploredAlpha = 0.0</code>·<code>ColdStartImpressionThreshold = 1000</code>로 정의된다. 즉 기본은 <strong>가산형</strong> 부스트고 곱셈형은 비활성, 인네트워크에만 적용. <code>[확인]</code></p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — 파이프라인 구조</span></p></div>
+<p>정본이 오래 &quot;SimClusters, TwHIN, UTEG/GraphJet, FRS, Earlybird, Lists, Communities — 이 이름들은 home-mixer/ 어디에도 안 나온다&quot;고 못박아 왔다. <strong>SimClusters가 뒤집혔다.</strong> 새 README:</p>
+<blockquote>
+<p>&quot;In-Network <code>thunder/</code> keeps recent posts from the accounts a viewer follows in memory · Out-of-Network <code>phoenix/</code> retrieval and <code>simclusters/</code> find posts from accounts the viewer does not follow&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#overview">README.md <code>#overview</code></a></p>
+</blockquote>
+<p>즉 후보 소스가 <strong>Thunder(인네트워크) + Phoenix retrieval + SimClusters + (기본 off된 tweet-mixer 레거시)</strong> 로 재편됐다. SimClusters 서브레포가 새로 생겼고, <code>simclusters/</code> 코어 알고리즘(SVD 기반 sparse 저차원 임베딩, 2020 KDD)이 여기 들어와 있다는 뜻이다. 세부는 <a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/simclusters">simclusters/</a> 통째 심층 분석 필요.</p>
+<p><strong>필터도 14 → 17로 늘었다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#filtering">README.md <code>#filtering</code></a>:</p>
+<p>새 3개 필터가 붙었다.</p>
+<ul>
+<li><code>OONRetweetReplyFilter</code> — 팔로우 안 하는 계정의 리트윗·답글 + 부모 없는 답글 (기존 <code>RetweetDeduplicationFilter</code>와 별개)</li>
+<li><code>OONNsfwSimclustersFilter</code> — <strong>SimClusters 소스에서 나온 성인 컨텐츠 계정의 포스트</strong>를 팔로우 안 하는 유저에게 드롭. SimClusters 도입에 짝지어 신설된 필터</li>
+<li><code>NewUserMinEngagementFilter</code> — 신규 유저에게 OON 포스트 중 참여 임계 미달인 것 제거. 관련 param: <code>NewUserMinEngagementThreshold</code>, <code>NewUserMinEngagementFilterMetric</code>, <code>NewUserMinEngagementFilterUseRatio</code>, <code>NewUserMinEngagementFilterMaxAccountAgeSecs</code>, <code>NewUserMinEngagementFilterMaxResurrectionAgeSecs</code></li>
+<li><code>InventoryHoldoutFilter</code> — <strong>결정론적 유저×포스트 해싱으로 설정된 %의 인벤토리를 홀드아웃</strong> (정본 미기재였고 canon이 놓친 필터)</li>
+</ul>
+<p>canon이 기록한 <code>BackupFilter</code> no-op, <code>TopicIdsFilter</code> 하드코딩 supertopic 등의 관찰은 유효.</p>
+<p><strong>새로 알게 된 것 — 예측 헤드 (문서상) 24개</strong></p>
+<p>새 README가 헤드를 <strong>카테고리 5개, 총 24개</strong>로 재배치했다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#scoring-and-ranking">README.md <code>#scoring-and-ranking</code></a>:</p>
+<ul>
+<li>Engagement (7): favorite · reply · repost · quote · share · share via DM · share via copy link</li>
+<li>Clicks (6): post · profile · link · photo expand · video open · quoted post</li>
+<li>Attention (5): video quality view · dwell · dwell time · click dwell time · active seconds</li>
+<li>Author (1): follow author</li>
+<li>Negative (5): not interested · mute author · block author · report · not dwelled</li>
+</ul>
+<p>정본은 세 가지 헤드 카운트가 갈린다고 기록해 왔다 — 공개 체크포인트 19 / Rust 스코어러 22 / VMRanker proto 21. 새 README는 문서 상 24를 못박고, param.rs의 weight 심볼도 25개(공제 = 헤드 예측값이 아닌 heuristic weight)와 일치. 소스 코드 상 실 개수는 새 phoenix 학습 코드 심층 분석 필요.</p>
+<p><strong>새로 알게 된 것 — visibility-filtering 서브레포</strong></p>
+<p><code>visibility-filtering/rules/registry.rs</code> 912줄이 <strong>정책 세 개</strong>를 정의한다: <code>FilterAll</code>(모든 것 드롭), <code>TimelineHome</code>(팔로잉 대상 기본 규칙), <code>TimelineHomeRecommendations</code>(추천 대상 = 기본 규칙 + OON 전용 드롭). <code>[확인]</code></p>
+<p><strong><code>base_home_rules()</code> — 팔로잉·추천 공통 28개 규칙</strong> <code>[확인]</code>:</p>
+<p>계정 상태(<code>SUSPENDED_AUTHOR_DROP</code>, <code>DEACTIVATED_AUTHOR_DROP</code>, <code>ERASED_AUTHOR_DROP</code>, <code>OFFBOARDED_AUTHOR_DROP</code>, <code>ProtectedAuthorDropRule</code>) → 뷰어 관계(<code>ViewerBlocksAuthorRule</code>, <code>ViewerMutesAuthorRule</code>, <code>MutedRetweetsRule</code>) → 트윗 라벨(<code>PDNA_DROP</code>, <code>BOUNCE_DROP</code>, <code>SPAM_DROP</code>, <code>FOR_EMERGENCY_USE_ONLY_DROP</code>, <code>FOSNR_HATEFUL_CONDUCT_DROP</code>, <code>FOSNR_VIOLENT_SPEECH_DROP</code>, <code>FOSNR_ABUSE_DROP</code>, <code>FOSNR_CIVIC_INTEGRITY_DROP</code>) → 트윗 상태(<code>NullcastedTweetDropRule</code>, <code>DropStaleTweetsRule</code>, <code>DropLegalTakendownPostRule</code>, <code>DropLocalLawsTakendownPostRule</code>) → NSFW 뷰어 게이팅(<code>SensitiveViewerLoggedOutDropRule</code>, <code>SensitiveViewerUnderageDropRule</code>, <code>SensitiveViewerNoStatedAgeDropRule</code>) → 배제 트윗(<code>DropExclusiveTweetContentRule</code>) → NSFW 인터스티셜(<code>NSFW_HIGH_PRECISION_INTERSTITIAL</code>, <code>GORE_AND_VIOLENCE_INTERSTITIAL</code>, <code>NSFW_CARD_IMAGE_INTERSTITIAL</code>, <code>NsfwAuthorInterstitialRule</code>).</p>
+<p><strong><code>timeline_home_recommendations_policy()</code> — 위 28개 + OON 전용 26개 추가 = 54개</strong> <code>[확인]</code>:</p>
+<p>DMCA/지리 제한 미디어(2) → NSFW 계정(4) → NSFW/폭력/DoNotAmplify/스팸 라벨 트윗(9) → NSFW/스팸/impersonation/deactivated/adult 관련 유저 라벨(11).</p>
+<p>정본이 canon 함정 절 #2에서 이미 관찰했던 &quot;인네트워크와 OON에 다른 안전 레벨&quot;의 실체가 여기 있다 — 팔로잉 유저에게는 28개 규칙만, OON 추천에는 54개 규칙. <strong>첫 번째 드롭 판정에서 평가 종료</strong>(short-circuit), 그리고 OON 전용 규칙군은 캐치업 드롭만 가능하고 인터스티셜/알로우는 없음(canon 함정 #2와 일치).</p>
+<p><strong>canon 함정 #1 (fail-closed)의 실체 확인.</strong> <code>visibility-filtering/rules/registry.rs</code>의 정책 반환값은 <code>Verdict</code> 구조체지만, README가 <code>interstitial</code>은 UI 처리로 넘기고 <code>drop</code>이 실제 필터링이라고 명시. <code>[확인]</code> <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#labeling-path">README.md <code>#labeling-path</code></a>:</p>
+<blockquote>
+<p>&quot;interstitial ──► the post stays in the feed; nothing in this repository draws the interstitial&quot;</p>
+</blockquote>
+<p><strong>새로 알게 된 것 — labeling 파이프라인</strong></p>
+<p>새 README가 4단계 &quot;Labeling Path&quot;로 정리한다: <strong>Content Understanding → Labeling Rules → Storage → Visibility Filtering</strong>. 각 서브시스템의 역할이 처음 공식 문서화됐다 <code>[확인]</code>:</p>
+<ul>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/grox"><code>grox/</code></a> — nearline 컨텐츠 분류기. 정본에는 이미 부분 반영</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/media-model-proxy"><code>media-model-proxy/</code></a> — 이미지·비디오 모델(NSFW, 폭력/고어, 혐오 심볼, 주제 분류, 알려진 미디어 매칭) 서빙 프록시</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/clip"><code>clip/</code></a> — CLIP 이미지·텍스트 임베딩 모델 학습 (미디어 분류기 입력)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/adult-content"><code>adult-content/</code></a> — 성인 미디어 분류기 학습·캘리브레이션</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/pnsfwmedia"><code>pnsfwmedia/</code></a> — CLIP 임베딩 + 계정 스코어 결합 성인 미디어 판별기</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/agatha"><code>agatha/</code></a> — 오프라인 배치. <strong>다른 계정이 이 계정 포스트에 어떻게 반응했나</strong> 기반 라벨(블록·리포트·스팸 리포트 대비 favorite 비율)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/bdsm"><code>bdsm/</code></a> — 계정의 시계열 행동 시퀀스에서 <strong>inauthentic/abusive</strong> 신호 추출 (Rust + proto + training + tests 서브디렉토리)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/user-cred-v2"><code>user-cred-v2/</code></a> — 팔로우+엔게이지먼트 엣지 위 PageRank로 계정 신뢰도 스코어</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/scarecrow"><code>scarecrow/</code></a> — 이벤트 반응형 규칙 러너. <a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/botmaker"><code>botmaker/</code></a>를 규칙 엔진으로 임베드</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/botmaker"><code>botmaker/</code></a> — 규칙 DSL·컴파일러·런타임</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/botmaker-rules"><code>botmaker-rules/</code></a> — scarecrow가 로드하는 실제 규칙 (일부는 게이밍 방지 목적 미공개)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/abuse-enforcement-service"><code>abuse-enforcement-service/</code></a> — 모델 스코어 기반 계정 조치(라벨링·챌린지·서스펜션)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/safety-label-user-agg"><code>safety-label-user-agg/</code></a> — 계정 소유 포스트가 받은 라벨을 계정 레벨로 집계</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/visibility-filtering-client"><code>visibility-filtering-client/</code></a> — visibility-filtering 서비스 클라이언트 라이브러리</li>
+<li><a href="https://github.com/xai-org/x-algorithm/tree/47c1bcd/under-the-hood"><code>under-the-hood/</code></a> — 계정 단위 라벨 투명성 리포트 빌더 (일일 배치 + 서빙 층 집계)</li>
+</ul>
+<p>이 15개 서브시스템은 오늘까지 canon에 <strong>한 줄도</strong> 안 들어와 있었다.</p>
+<p><strong>새로 알게 된 것 — Phoenix가 실행 가능해졌다</strong></p>
+<p>새 README:</p>
+<blockquote>
+<p>&quot;Elsewhere, code may not necessarily include build- or deployment-related files or generally self-explanatory infrastructure imports (e.g. <code>xai_service_runner</code> or <code>xai_kafka</code>). ... <code>phoenix/</code> ships a Cargo workspace, a <code>pyproject.toml</code>, a <a href="phoenix/QUICKSTART.md">quickstart</a> and synthetic data generation, so a small model can be trained and served end-to-end.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#deployment-related-code">README.md <code>#deployment-related-code</code></a></p>
+</blockquote>
+<p>정본이 canon 함정 절 #1에서 관찰했던 &quot;레포 전체가 빌드되지 않는다&quot;의 부분 해소. <strong>Phoenix만은</strong> 학습·서빙까지 end-to-end 실행 가능한 형태로 배포됐다. 나머지 크레이트는 여전히 <code>crate::params</code>·<code>crate::util</code>·<code>crate::clients</code>·<code>xai_service_runner</code>·<code>xai_kafka</code> 등의 미공개 의존이 남아 있다. <code>[확인]</code> — 새 커밋의 <code>Cargo.toml</code> 개수는 여러 개 (phoenix 서브트리에 집중).</p>
+<p><strong>Phoenix retrieval을 위한 새 인덱스 서비스도 열렸다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/README.md#retrieval-index">README.md <code>#retrieval-index</code></a>:</p>
+<ul>
+<li><code>phoenix-rankall/</code> — Phoenix retrieval이 조회하는 포스트 인덱스 유지. 이벤트 도착에 따라 업데이트</li>
+<li><code>phoenix-rankall-strato/</code> — 어떤 인덱스에 포스트가 속하는지 결정하는 이벤트 층. <strong>visibility-filtering을 먼저 참조</strong>함</li>
+</ul>
+<p>즉 인덱싱 파이프라인이 랭킹 쪽 visibility 규칙과 이미 sync — 인덱스에 들어가기 전에 이미 visibility 판단이 붙는다. 이건 정본이 완전히 몰랐던 아키텍처 사실이다.</p>
+<p><strong>⚠ 이 진술을 다룰 때 반드시 붙일 caveat 다섯 가지</strong></p>
+<ol>
+<li><strong>가중치 크론 sync는 매일 밀리는 미러라 시차가 있다.</strong> 헤더가 밝히는 sync 시각 이후의 프로덕션 변경은 아직 반영 안 됐을 수 있다. <code>[확인]</code></li>
+<li><strong>가중치 부호·크기의 해석은 propensity를 감안해야 한다.</strong> 파일의 자체 주석이 &quot;값 = 가치 × 1/propensity&quot;라고 명시. 즉 리포트 −234와 favorite 0.5의 절대값 비율(468배)이 그대로 &quot;리포트가 favorite보다 468배 중요&quot;를 뜻하는 게 아니다.</li>
+<li><strong>미러링 범위는 <code>home-mixer</code> 안 param만이다.</strong> VMRanker 원격 서비스의 내부 상수, phoenix 학습 hyperparameter, botmaker 규칙 상수, <code>crate::util</code> 안 상수(score normalizer, vqv weight 임계 등)는 여전히 레포 밖. <code>[확인]</code></li>
+<li><strong>Phoenix 학습 코드는 &quot;학습 가능한&quot; 것이지 &quot;프로덕션과 같은&quot; 것이 아니다.</strong> README가 명시적으로 *&quot;a small model can be trained and served end-to-end&quot;*라고 규모를 다르게 못박음. 실 프로덕션 checkpoint·데이터·infra는 미공개.</li>
+<li><strong>일부 botmaker rules는 게이밍 방지 목적 미공개.</strong> README가 명시. 즉 visibility-filtering이 참조하는 라벨 중 어떤 것들은 규칙이 열려 있지 않다. <code>[확인]</code></li>
+</ol>
+<p><strong>새로 알게 된 것 — 실제 파라미터 변경 사례 문서화</strong></p>
+<p>새 파일 <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/docs/BIDIRECTIONAL_BOOST_CHANGE.md"><code>docs/BIDIRECTIONAL_BOOST_CHANGE.md</code></a>가 향후 코드 diff로 파라미터 변경을 어떻게 문서화할지의 견본을 제시한다. 사례는 <strong>양방향 팔로우 답글 부스트</strong> (2026-07):</p>
+<ul>
+<li>2026-07-10 A/B 시작: <code>BidirectionalFollowReplyWeightBoost</code> 값 5/10/15/20 랜덤 배정, 대다수는 0</li>
+<li>2026-07-13 초기 광범위 롤아웃: 20으로 확장</li>
+<li>2026-07-24: X에서 유저 피드백(월드컵 진행 중인데 관련 포스트 부족) 반영해 <strong>20 → 15로 하향</strong></li>
+</ul>
+<p>문서가 그대로 인용하는 요약:</p>
+<blockquote>
+<p>&quot;In plain language, the bidirectional follow boost boosts original posts from people you mutually follow by increasing the weight on the predicted probability that you&#39;ll reply to a post from one of those authors who you mutually follow.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/docs/BIDIRECTIONAL_BOOST_CHANGE.md"><code>docs/BIDIRECTIONAL_BOOST_CHANGE.md</code></a></p>
+</blockquote>
+<p>코드 대응:</p>
+<ul>
+<li><code>home-mixer/candidate_hydrators/bidirectional_follow_hydrator.rs</code> (신규) — SocialGraphClient로 상호팔로우 여부 조회, <code>PostCandidate.is_mutual_follow_author</code>에 세팅</li>
+<li><code>home-mixer/models/candidate.rs</code> — 필드 하나 추가</li>
+<li><code>home-mixer/scorers/ranking_scorer.rs</code> — <code>bidirectional_boost_eligible(c)</code> 정의: <code>in_reply_to_tweet_id.is_none() &amp;&amp; retweeted_tweet_id.is_none() &amp;&amp; is_mutual_follow_author == Some(true)</code> → 조건 만족 시 reply/dwell 가중치에 boost 더함</li>
+<li>조건 순수 원본에만, 답글·리트윗 제외, 상호팔로우 아니면 pass-through</li>
+</ul>
+<p>즉 <strong>원본 포스트에 한해서만</strong> 부스트가 붙는다. 답글·리트윗은 대상 아님. 이 규칙은 canon에는 없던 매우 구체적 로직이다. <code>[확인]</code></p>
+<div class="blk app"><p><span class="lbl">정본 반영</span></p></div>
+<ul>
+<li><a href="x.html">services/x.md</a> 대폭 개정. 주요 변경:<ul>
+<li>&quot;공개 소스 3세대&quot; 표에 <strong>4세대</strong> 행 추가 (2026-08-13, +363k/−12k 라인, 파일 300+, visibility-filtering·labeling 서브레포 15개 신설, <code>phoenix/</code> 학습 코드 포함)</li>
+<li>후보 소스 표에 <strong>SimClusters</strong> 추가, <code>TweetMixer</code> 기본 off 표시, <code>EnableSimclustersSource=true</code>·<code>EnablePhoenixSource=true</code> 값 삽입</li>
+<li>후보 배분 절 갱신: <code>TweetMixerMaxResults=800</code>, <code>PhoenixMaxResults=1000</code>, <code>ThunderMaxResults=1200</code> 값 삽입, <code>OonWeightFactor=0.75</code>, <code>TopicOonWeightFactor=0.5</code> 값 삽입 — canon의 &quot;네 값 전부 비공개&quot;를 &quot;세 값 공개(신규 유저 하나는 임계 0으로 사실상 비활성)&quot;로 재작성</li>
+<li>랭킹 절: Phoenix 예측 헤드 표를 새 README의 24개 카테고리 배치로 재작성, param.rs의 25개 weight 심볼과 대응</li>
+<li><strong>가중치 절 전면 재작성</strong> — &quot;결론: 값 미공개&quot;를 &quot;결론: 2026-08-13 이후 프로덕션 미러 공개&quot;로 뒤집음. 상세 표 (favorite 0.5, reply 5.0, +상호팔로우 원본 15.0, retweet 1.0, ..., report −234) 삽입. 2023 스냅샷과의 세부 대비 절 추가</li>
+<li>VMRanker 절: <code>EnableVMRanker=true</code>, <code>VMRankerDppTheta=0.65</code>, <code>VMRankerDppMaxSelectedRank=150</code>, <code>VMRankerValueModelId=&quot;dpp&quot;</code> 값 삽입, 열린 질문 &quot;VMRanker/DPP가 켜져 있는가&quot;를 해소로 이동</li>
+<li>필터 절: 14 → 17로 갱신. <code>OONRetweetReplyFilter</code>, <code>OONNsfwSimclustersFilter</code>, <code>NewUserMinEngagementFilter</code>, <code>InventoryHoldoutFilter</code> 신규 항목 추가</li>
+<li><strong>새-작성자 부스트</strong> 서브절 신규 (Author Diversity Decay·OON Discount에 이은 세 번째 조정 인자)</li>
+<li><strong>visibility-filtering / labeling 파이프라인</strong> 신규 절 — base 28 규칙 + OON 추가 26 = 54, <code>agatha</code>·<code>bdsm</code>·<code>user-cred-v2</code>·<code>pnsfwmedia</code>·<code>scarecrow</code>·<code>botmaker</code>·<code>abuse-enforcement-service</code>·<code>safety-label-user-agg</code>·<code>under-the-hood</code>·<code>clip</code>·<code>media-model-proxy</code> 서브레포 표 삽입</li>
+<li><strong>Phoenix 학습·인덱스</strong> 신규 절 — Cargo workspace + pyproject.toml + QUICKSTART + synthetic data · phoenix-rankall / phoenix-rankall-strato · 인덱싱이 visibility 판단을 먼저 참조한다는 아키텍처 사실</li>
+<li><code>docs/BIDIRECTIONAL_BOOST_CHANGE.md</code> 사례를 &quot;가중치가 어떻게 바뀌는가&quot; 서브절로 반영 (2026-07-10 A/B → 07-13 롤아웃 → 07-24 20→15)</li>
+<li>&quot;소스 읽는 법 — 함정 목록&quot;의 canon 함정 #1(레포 빌드 안 됨) 절반 해소 — Phoenix는 이제 빌드된다</li>
+<li>열린 질문 대량 해소: 가중치 실값 · VMRanker on/off · <code>has_cached_posts</code> 비중(여전히 미해소) · Phoenix 헤드 개수(24로 확정) · SimClusters 부활 여부(부활)</li>
+<li><strong>새 열린 질문 추가</strong>: SimClusters 서브레포 코어 알고리즘 세부(SVD 파이프라인·k) · agatha·bdsm·user-cred-v2 각각의 스코어링 세부·업데이트 주기 · <code>phoenix/</code> 학습 파이프라인의 loss·negative sampling·optimizer · Under the Hood 툴이 노출하는 라벨 taxonomy · InventoryHoldoutFilter의 홀드아웃 비율 param</li>
+</ul>
+</li>
+<li><a href="../assets/x-pipeline.svg">assets/x-pipeline.svg</a> 갱신: (1) 후보 소스에 SimClusters 추가, tweet-mixer 기본 off 표시 (2) 필터 개수 14 → 17 (3) 가중치 절 &quot;값 비공개&quot;를 &quot;정본 참조 (예: reply 5.0 + 상호팔로우 부스트 15.0)&quot;로 수정 (4) 예측 헤드 24로 갱신 (5) VMRanker &quot;실패 시 조용히 스킵&quot;에 &quot;DPP θ=0.65 · K=150 · 기본 on&quot; 값 추가</li>
+<li><a href="radar.html">radar.md</a> 갱신: 이번 드랍은 추적 서비스(X) 직접 반영이므로 레이더를 거치지 않음(정본에 바로). 아래 arXiv triage 관련 1건만 추가</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<p>⚠ <strong>테제 대량 변경.</strong> 오늘 이전까지 X 정본의 가장 큰 미해소 절 두 개(가중치 값·labeling 파이프라인)가 하루에 동시에 해소됐다. 이 저장소의 성격상 이런 규모의 canon 재작성은 드물다 — 정본 x.md의 300줄 넘게가 오늘 바뀌었거나 새로 쓰였다.</p>
+<p>첫 번째 의미는 <strong>연구 방향의 재정렬</strong>이다. 지난 3개월간 x.md의 열린 질문들이 다른 서비스(Meta·Netflix)의 관측을 이끌어 왔다 — &quot;X 광고 스택은 어디까지 공개됐나&quot;, &quot;SimClusters의 실 부활 여부&quot;, &quot;VMRanker DPP의 배포 상태&quot; 같은 질문이 topics/ 노트 여러 개의 방향타였다. 오늘 이 질문들이 답을 얻은 만큼, 이 저장소는 이제 <strong>&quot;X가 공개한 값이 왜 이런가 / 다른 회사의 대응 지점은 무엇인가&quot;</strong> 라는 다음 층의 질문으로 옮겨간다. 예를 들어 X의 report 가중치 −234와 Netflix GenRec의 catalog softmax는 완전히 다른 손실 함수의 두 극단이고, 이 두 숫자가 나란히 정본에 있다는 사실 자체가 다음 topics 확장의 좌표가 된다.</p>
+<p>두 번째 의미는 <strong>투명성 아키텍처의 산업 표준화 시작 신호</strong>다. <code>docs/BIDIRECTIONAL_BOOST_CHANGE.md</code>가 보여주는 문서화 스타일 — A/B 시작 → 결과 관찰 → 파라미터 조정을 3주 안에 코드 diff로 공개 — 은 다른 회사(Meta·Netflix·YouTube 어느 곳)에서도 지금까지 사례가 없었다. X가 이걸 &quot;example algorithm diff&quot;라고 부르며 반복할 예고를 붙였다면, <strong>비교 가능한 프로덕션 diff 시계열</strong>이 처음으로 존재하게 되는 것이다. 이 저장소가 앞으로 X 커밋 로그를 매일 추적하는 것의 가치가 상당히 커진다. 다음 커밋에서 어떤 param이 어떻게 바뀌는지가 곧 A/B 결과의 지연 지표가 된다.</p>
+<p>세 번째 의미는 <strong>정본 함정 목록의 일부 재조정</strong>이다. canon의 함정 #1(레포 빌드 안 됨) 중 Phoenix 부분은 해소됐지만, 나머지(<code>crate::params</code> 이전 판이 지금은 이 파일로 채워짐, <code>crate::util</code>·<code>crate::clients</code>는 여전히 미공개)는 부분적으로만 해소. 함정 #2(README 지목 스코어러 3개가 죽은 파일)는 아직 검증 필요 — 새 릴리즈에서 정리됐을 수 있다. 함정 #6(has_cached_posts 비중)은 미해소. <strong>canon 함정 목록은 다음 배치에서 파일별로 재검증 예정 (심층 분석 필요).</strong></p>
+<p><strong>심층 분석 필요 (사람이 트리거)</strong> — 이 드랍의 규모상 파일별 검증은 오늘 배치 예산을 넘는다. 아래 항목은 개별 세션에서 파야 한다:</p>
+<ol>
+<li><code>simclusters/</code> 서브레포 — 코어 알고리즘(SVD? MinHash?), 인덱스 형식, <code>home-mixer</code>가 부르는 API surface, 2020 KDD 논문과의 diff</li>
+<li><code>agatha/</code> / <code>bdsm/</code> / <code>user-cred-v2/</code> — 각 계정 스코어러의 실 모델·업데이트 주기·라벨 임계</li>
+<li><code>pnsfwmedia/</code> 캘리브레이션 — CLIP 임베딩 + agatha 스코어를 어떻게 결합하는가</li>
+<li><code>phoenix/</code> 학습 코드 — loss, negative sampling, optimizer, synthetic data 형식</li>
+<li><code>phoenix-rankall/</code>·<code>phoenix-rankall-strato/</code> — 인덱싱 파이프라인·visibility 사전 참조 로직</li>
+<li><code>abuse-enforcement-service/</code> — 어떤 스코어가 어떤 조치(라벨/챌린지/서스펜션)로 매핑되는가</li>
+<li><code>scarecrow/</code>·<code>botmaker/</code>·<code>botmaker-rules/</code> — 규칙 DSL·컴파일러, 공개된 규칙 vs 미공개된 규칙의 비율과 카테고리</li>
+<li><code>under-the-hood/</code> — 유저에게 노출되는 라벨 taxonomy와 규칙 코드 링킹</li>
+<li><code>home-mixer/</code> 나머지 신규 파일 — 새 hydrator·filter·scorer·side-effect (canon 함정 목록 재검증)</li>
+<li><code>visibility-filtering/rules/</code> 개별 규칙 파일 — 각 규칙의 판정 조건, canon 함정 #2 최종 검증</li>
+</ol>
+<h2>2. arXiv cs.IR triage — 관찰 1건, 정본 반영 0건</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="http://export.arxiv.org/api/query?search_query=cat:cs.IR&sortBy=submittedDate&sortOrder=descending&max_results=30">arXiv API cs.IR 최근 30건 (2026-08-12~13)</a></p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 매일 배치 규칙 — arXiv cs.IR 신규 30건을 제목·초록으로 훑고, 프로덕션 저자·A/B 주장·메커니즘 신규성·스케일 결과 중 하나라도 걸리는 것만 원문 확인. 오늘은 30건 중 대부분 RAG/QA/text-to-SQL/멀티모달 벤치마크 등 학술 증분이나 도메인 한정(음악·POI·의료 등). 통과 후보 3건 원문 확인.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><strong>STAR (2608.12986)</strong> — &quot;Structured Tokenization and Target-Aware Interest Representation for PCVR Prediction&quot;. 초록에 &quot;KDD Cup 2026 Tencent UniRec Challenge를 위한 프레임워크&quot;로 자기 규정. 프로덕션 배포 진술 없음. <strong>탈락</strong> — 대회 프레임워크는 프로덕션 진술이 아님</li>
+<li><strong>HCGRec (2608.11980)</strong> — &quot;Hint-Conditioned Generative Recommendation with Semantic IDs&quot;. 저자 소속 미공개(arXiv 페이지에 affiliation 없음), CIKM 2026 accepted 표기, GitHub 링크 있음. 프로덕션 배포 진술 없음. <strong>탈락</strong> — SID 계열 학술 증분</li>
+<li><strong>DrEM (2608.12778)</strong> — &quot;Dual-Side Robust Ensemble Ranking from Noisy User Preference Predictions in Video Recommendation&quot;. 저자 소속 미공개이나 초록에 *&quot;large-scale online A/B tests&quot;*로 실 배포 주장. 저자 이름(Xiaoxiao Xu, Kaiqiao Zhan 등)이 Kuaishou 계열과 통계적으로 일치할 가능성 <code>[추정]</code>. <strong>관찰 통과</strong> — radar.md의 &quot;이번 달 신규&quot;에 2줄 포인터 추가 (심층 분석 없이). 회사 확정과 프로덕션 지면 확정은 다음 배치에서 크로스체크</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span></p></div>
+<ul>
+<li><a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <strong>DrEM (video rec, unknown company)</strong> 항목 신규. 3~4줄 포인터: A/B 주장 있음·저자 소속 미확인·Kuaishou 라인 가능성 <code>[추정]</code></li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<p>레이더의 하루 통과 0~2건 기대치 안. 이번 주는 SID/생성형 랭킹 계열이 계속 증분되고 있으나(Alibaba·Kuaishou·Yandex 라인이 이미 정본에서 관찰 중) 새 회사·새 메커니즘 진술은 아직 없다.</p>
+<h2>검증에서 뒤집힌 것</h2>
+<ul>
+<li>x.md canon의 &quot;<strong>가중치 값</strong>은 어느 세대에서도 1차 출처가 없다. 유일한 수치 출처는 2023년 4월 5일 시점 스냅샷 하나뿐&quot; — <strong>2026-08-13 뒤집힘.</strong> <code>home-mixer/params/param.rs</code>가 프로덕션 크론 미러로 26개 헤드 가중치·5개 부정 헤드·OON 배수·다양성 상수 전부를 값으로 공개</li>
+<li>x.md canon의 &quot;<strong>SimClusters</strong> ... 이 이름들은 <code>home-mixer/</code> 어디에도 안 나온다&quot; — <strong>2026-08-13 부분 뒤집힘.</strong> <code>simclusters/</code> 서브레포가 OON retrieval 소스로 홈미서에 배선됨. 단 canon의 &quot;2023 세대에서 살아남은 retrieval은 사실상 tweet-mixer 하나뿐&quot;은 이제 <strong>&quot;2023 세대에서 살아남은 retrieval은 tweet-mixer(기본 off로 미러) + SimClusters(부활)&quot;</strong> 로 재작성</li>
+<li>x.md canon의 &quot;가중치 값·params 모듈은 레포 밖 — 비공개&quot; 진술을 담은 pipeline 다이어그램(assets/x-pipeline.svg) 갱신 필요 — 완료</li>
+<li>x.md canon의 열린 질문 &quot;VMRanker/DPP가 켜져 있는가&quot; — <strong>켜져 있음이 param으로 확인</strong>, DPP θ=0.65 K=150. 열린 질문에서 제거</li>
+<li>x.md canon의 &quot;필터 17개(스코어링 전 14 + 후 3)&quot; — <strong>20개(스코어링 전 17 + 후 3)로 갱신</strong></li>
+<li>x.md canon의 &quot;2026 코드에 [신규 아이템 콜드스타트] 아무 장치가 없다&quot; — <strong>뒤집힘.</strong> <code>PostUnexploredWeight = 0.02</code> + <code>ColdStartImpressionThreshold = 1000</code> + <code>NewUserMinEngagementFilter</code>(신규 유저용) 각각 존재. canon의 &quot;부재&quot; 관찰이 3개월 전 스냅샷 기준이었을 뿐</li>
+</ul>
+<h2>레이더</h2>
+<ul>
+<li><a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 DrEM (2608.12778) 관찰 항목 신규 추가 — video rec A/B 주장, 소속 미확인</li>
+</ul>
+<h2>다음에 볼 것</h2>
+<ul>
+<li><strong>X 4세대 드랍 심층 분석</strong> — 위 심층 분석 필요 10개 항목 중 우선순위: (1) <code>home-mixer/</code> 신규 파일로 canon 함정 목록 재검증 (2) <code>simclusters/</code> 서브레포로 canon SimClusters &quot;부활&quot; 진술 확정 (3) <code>abuse-enforcement-service/</code> + <code>visibility-filtering/rules/</code> 개별 규칙으로 안전 파이프라인 재구성</li>
+<li><strong>DrEM 저자 소속 확정</strong> — Kuaishou 계열이면 이미 정본 관찰 중인 회사, 다른 곳이면 radar 신규 스레드 후보</li>
+<li><strong>BIDIRECTIONAL_BOOST_CHANGE 이후 X 커밋 추적</strong> — 다음 param diff가 언제 어떤 형태로 올지 — 저장소 매일 배치가 X 커밋을 이미 체크하므로 자동 감지 예정</li>
+<li>EU DSA 투명성 보고서에 X가 이번 8-13 공개 뒤 무엇을 새로 제출/삭제하는지 — 규제 문서와 코드의 sync 여부가 새로운 검증 각도</li>
+</ul>
+
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-08-13.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-13</div></a><a class="r" href="daily-2026-08-16.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-16</div></a></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-08-08 — feed-research</title>
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-08-29 빌드</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-08-29 빌드</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-08-08</h1>
+  <div class="wd">토요일 · 읽는 데 약 6분</div>
+  <ul class="chips"></ul>
+  
+</header>
+<div class="wrap" id="content">
+<p>X 착수. 저장소 셋업 + X 3세대 공개 소스 전수 해부.</p>
+<p>아래는 로그다. 근거 등급과 file:line 인용은 전부 <code>services/x.md</code>와 <code>topics/*.md</code>에 있고, 여기서는 반복하지 않는다.</p>
+<h2>읽은 것</h2>
+<ul>
+<li><code>xai-org/x-algorithm</code> (2026-01-20 <code>aaa167b</code>, 2026-05-15 <code>e414c17</code>·<code>0bfc279</code>) — <code>home-mixer/</code>, <code>thunder/</code>, <code>phoenix/</code>, <code>grox/</code>, <code>candidate-pipeline/</code> 전체</li>
+<li><code>twitter/the-algorithm</code> @ <code>c54bec0</code> (2025-09-03 리프레시) — <code>home-mixer/</code>, <code>tweet-mixer/</code></li>
+<li><code>twitter/the-algorithm</code> @ <code>72eda9a</code> (2023) — <code>simclusters_v2/</code>, <code>simclusters-ann/</code>, <code>ann/</code>, <code>cr-mixer/</code></li>
+<li><code>twitter/the-algorithm-ml</code> (2023) — <code>projects/home/recap/</code>, <code>projects/twhin/</code></li>
+</ul>
+<h2>새로 알게 된 것 (오늘의 큰 것 5개)</h2>
+<ol>
+<li><strong>1세대와 2세대 사이 26개월 공백, 2세대는 삭제가 0건.</strong> 2023 파일 집합이 2025의 진부분집합이다. → 레포에 파일이 있다는 게 현역이라는 뜻이 전혀 아니다. 폐기는 README 한 줄을 바꾸는 방식으로만 드러난다.</li>
+<li><strong>&quot;인네트워크 50:50&quot;은 코드에 없다.</strong> 2026엔 배분기 자체가 없고, OON은 쿼터가 아니라 <strong>점수 배수</strong>(<code>effective_oon</code>)로 조절된다. 배분 문제가 랭킹 문제로 이사했다.</li>
+<li><strong><code>xai-org/x-algorithm</code>은 빌드되지 않는다.</strong> <code>Cargo.toml</code> 0개, <code>crate::params</code>/<code>util</code>/<code>clients</code> 통째 부재. 60개 파일이 <code>params</code>를 참조하는데 정의가 없다 — <strong>로직의 형태만 공개하고 값과 배선은 뺐다.</strong> 우연이 아니라 일관된 설계다.</li>
+<li><strong>README가 지목하는 스코어러 3개가 모듈 트리에서 끊겨 있다.</strong> 진짜 배선은 <code>vec![phoenix_scorer, ranking_scorer, vm_ranker]</code>. 죽은 파일 11개를 목록으로 확정했고, <code>models/</code> vs <code>candidate_pipeline/</code> 이중 레이아웃이 세대 차이 판별법이라는 걸 찾았다.</li>
+<li><strong>가중치 값은 어느 세대에도 1차 출처가 없다.</strong> 널리 인용되는 &quot;reply 13.5 / report −369&quot; 표는 블로그가 아니라 <code>the-algorithm-ml</code>의 README이고, 문서 스스로 &quot;2023-04-05 기준, 언제든 바뀔 수 있다&quot;고 못박는다. 2025 Scala는 <code>ModelWeights</code> 30개를 <strong>전부 <code>default = 0.0</code>으로 지웠다</strong> (같은 파일 나머지 203개 default는 실제값을 가진다 — 스타일이 아니라 의도적 삭제).</li>
+</ol>
+<p>부수적으로: <code>has_cached_posts</code> 하나가 모든 소스·하이드레이터·Phoenix를 끄는 최대 스위치라는 것, <code>PreviouslySeenPostsBackupFilter</code>가 영구 no-op이라는 것, VMRanker 실패가 로그 없이 삼켜져 다양성이 조용히 사라진다는 것, <code>grox/</code> 파이썬 두 파일이 리터럴 치환 때문에 import 자체가 안 된다는 것.</p>
+<h2>검증에서 뒤집힌 것 (중요)</h2>
+<p>초안을 verifier로 되짚었더니 결론 하나가 반대로 나왔고, 상수 인용 규칙 하나를 새로 배웠다.</p>
+<ul>
+<li><strong>뒤집힘:</strong> &quot;2025 tweet-mixer의 u2i 후보는 상한 절단 뒤에 붙어 특혜를 받는다&quot;는 <strong>틀렸다.</strong> <code>DropMaxResults</code>가 <code>result</code>만 자르고 <code>remainingCandidates</code>를 남겨서 u2i는 꼬리에 놓이는데, 그 뒤 최종 절단선이 400(라이트랭커 상한 500보다 작다)이라 <strong>앞이 다 차면 u2i가 먼저 사라진다.</strong> 절단선을 하나만 보고 결론내면 방향이 반대로 나온다.</li>
+<li><strong>새 규칙:</strong> grep으로 나온 숫자를 프로덕션 값으로 쓰면 안 된다. 세 가지 함정이 다 실재했다 — ① <code>args.int(name, default)</code>의 default(SimClusters <code>maxNeighbors</code> 코드 400 vs 같은 파일이 적어둔 프로덕션 명령 <code>--maxNeighbors 100</code>, <code>maxEpochs</code> 3 vs 4) ② 벤치마크·warmup 리터럴(HNSW <code>efConstruction=200</code>/<code>maxM=16</code>은 <code>experimental/Runner.scala</code>의 장난감, <code>ef=800</code>은 <code>warmup()</code> 안) ③ 모듈 트리에서 끊긴 파일의 상수(2026 죽은 스코어러의 <code>p::AUTHOR_DIVERSITY_DECAY</code>).</li>
+<li><strong>수확:</strong> 2026 <code>offset_score</code>가 2025 <code>RerankerUtil.weightedScoresSum</code>의 직역이라 <strong>비공개 상수 <code>NEGATIVE_SCORES_OFFSET</code>을 2025의 <code>Epsilon = 0.001</code>로 복원했다.</strong> &quot;두 레포는 코드 중복 0&quot;이라는 통설의 예외. 다른 비공개 상수도 같은 방법이 통할 수 있다.</li>
+<li>그 외 수정: <code>FailOpenPolicy.Always</code>가 9개 중 8개뿐이라 ContentExploration만 fail-closed, 2025 MMR은 리스트 앞 <code>(1-diversityRatio)×n</code>개엔 다양성을 아예 안 건다, <code>QuoteDeduplicationFilter</code>는 인용문이 아니라 인용당한 원본을 지운다, tweet-mixer 파이프라인은 35개가 아니라 34개.</li>
+</ul>
+<h2>반영</h2>
+<ul>
+<li><code>services/x.md</code> 신규 — 3세대 비교표, 지면, retrieval 11소스, Phoenix 22헤드, 필터 17개, 광고 블렌딩, 콜드스타트, <strong>함정 목록 11개</strong></li>
+<li><code>topics/sequence-transformer-ranking.md</code> 신규 — Phoenix 구조·마스크</li>
+<li><code>topics/llm-in-recsys.md</code> 신규 — Grok/Grox 주석 파이프라인</li>
+<li><code>topics/multi-task-ranking.md</code> 신규 — 세대별 헤드 목록, 가중치 불투명성</li>
+<li><code>topics/candidate-allocation.md</code> 신규 — 비율/상한/인터리브, &quot;50:50&quot; 반박</li>
+<li><code>topics/feed-diversity.md</code> 신규 — 감쇠/MMR/DPP/dedup</li>
+<li><code>topics/embedding-retrieval.md</code> 신규 — SimClusters·TwHIN·two-tower·ANN 인덱스</li>
+</ul>
+<h2>다음에 볼 것</h2>
+<ul>
+<li><strong>EU DSA 투명성 보고서</strong> — 가중치 실값이 규제 제출 문서에 있는지. 오늘 못 봤다.</li>
+<li><code>e414c17</code>(2026-05-15) 디프 — Phoenix 헤드가 19→22로 늘어난 시점이 여기인지</li>
+<li>Meta 쪽 착수 (Instagram / Facebook / Threads) — 엔지니어링 블로그부터. X와 달리 코드가 없으니 근거 등급 관리가 더 중요해진다.</li>
+</ul>
+
+
+</div>
+<div class="wrap"><div class="pager"><span></span><a class="r" href="daily-2026-08-09.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-09</div></a></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>

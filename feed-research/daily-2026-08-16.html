@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-08-16 — feed-research</title>
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-08-29 빌드</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-08-29 빌드</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-08-16</h1>
+  <div class="wd">일요일 · 읽는 데 약 36분</div>
+  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건 (X 4세대+1 드랍 후속 커밋 1개</li><li class="chip">Meta/Netflix 블로그 신규 <b>0</b></li><li class="chip">arXiv triage <b>30</b>건 중 통과 1건 [DrEM])</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 5개 절 갱신 + sources 6건 추가)</li><li class="chip">다이어그램 갱신 <b>1</b>건 (x-pipeline.svg 필터 17→18)</li><li class="chip">레이더 갱신 <b>1</b>건 (DrEM 소속 확정 및 A/B 수치 반영)</li></ul>
+  <div class="lead"><span class="lb">한 줄 요약</span>X가 4세대 초대형 드랍(2026-08-13, 47c1bcd) 다음날 후속 커밋 <a href="https://github.com/xai-org/x-algorithm/commit/c65aa17">c65aa17</a>을 넣어 (1) <strong>가중치 비율을 raw-count 등가로 읽지 말라</strong>는 해석 규칙을 param.rs·ranking_scorer.rs 주석 및 README에 못박고 (2) <strong>브라질 2026 총선 관련 계정 665개를 하드코딩한 <code>Brazil2026ElectionFilter</code></strong> 신설(팔로잉 예외, 브라질 선거법원 조치 대응) (3) 콜드스타트에 <strong>Beta 사전분포 Thompson sampling</strong>을 A/B용으로 배선(기본 off) (4) Phoenix 랭커에 <strong><code>IS_STALE_POST14D</code>·<code>IS_AUTHOR_FOLLOWED/FOLLOWING_BY_VIEWER_SEQ</code> bool 시퀀스 3개</strong>를 처음 채우고 stale post는 engagement count 자체를 0으로 stamp (5) <strong>BDSM enforcement note 생성기</strong>의 gate·dominant-head 로직 부분 공개(템플릿 문자열은 <code>&lt;redacted&gt;</code> 센티널) — 4세대의 성격(&quot;값과 규칙을 검증 가능한 형태로 붙이는 것&quot;)을 하루 뒤에 곧바로 이어간 후속 드랍.</div>
+</header>
+<div class="wrap" id="content">
+<h2>1. X 알고리즘 4세대+1 후속 드랍 — 가중치 해석 규칙 명시 + 브라질 선거 필터 + Phoenix bool 3종 + Thompson sampling + BDSM enforcement note</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/c65aa17">xai-org/x-algorithm @ c65aa17 — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-14 20:55 UTC, 공개 소스코드. 파일 21개, +2,271/−32. 어제(4세대) 대비 규모는 작지만 <strong>성격이 매우 다양</strong> — 문서화(가중치 해석)·규제 대응(브라질 필터)·A/B 배선(Thompson sampling)·모델 입력(Phoenix bool 3종)·labeling 파이프라인(BDSM note)이 한 커밋에 섞여 있다. 관련 README 갱신 <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/README.md#august-14th-2026"><code>#latest-updates</code> → <code>#august-14th-2026</code></a>.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>어제 <a href="./2026-08-15.md">daily/2026-08-15.md</a>에서 다룬 4세대 드랍(47c1bcd, 2026-08-13)은 파일 300개+·+363K줄로 파라미터 미러링·visibility-filtering·labeling 서브레포 15개를 통째 열었다. 그 다음날 X는 커밋 하나를 더 추가했는데, 이는 4세대의 후속 정리와 확장이다. 4세대의 성격을 새 README가 자평하듯 이 릴리즈는 이제 &quot;로직의 형태를 보여주는 것&quot;에서 &quot;값과 규칙을 검증 가능한 형태로 붙이는 것&quot;으로 넘어왔고, 오늘 커밋은 그 성격을 하루 만에 다섯 방향으로 확장한 셈이다.</p>
+<p>특히 세 방향이 canon에 직접적 영향을 준다.</p>
+<p>첫째, <strong>가중치 비율의 해석 규칙이 코드 안에 못박혔다.</strong> canon은 3세대까지 인용해온 &quot;reply 13.5 vs favorite 0.5 → 27배&quot; 유의 서술을 여러 곳에서 사용했는데(예: <a href="multi-task-ranking.html">multi-task-ranking.md</a>), 이는 원리적으로 잘못된 프레이밍이라는 것이 X 스스로의 주석으로 확정됐다. 가중치는 <strong>예측 확률</strong>에 곱해지므로 raw count 비율이 아니다. 이 규칙은 4세대의 미러 공개와 짝지어 판독 가이드가 없으면 오히려 오해를 낳는다는 점을 X가 명시적으로 인정한 것.</p>
+<p>둘째, <strong>관할권 필터가 코드 안에서 그대로 관찰되는 첫 사례가 나왔다.</strong> DSA·GDPR·NetzDG 등 규제 대응은 지금까지 대부분 규제 제출 문서(EU 투명성 리포트)로만 확인 가능했다. <code>Brazil2026ElectionFilter</code>는 브라질 선거법원(TSE)이 조치한 계정 665개를 코드 상수 <code>FxHashSet&lt;u64&gt;</code>로 하드코딩하고, <code>@username</code>을 각 ID 옆 주석으로 남기며, <strong>뷰어가 그 계정을 팔로우 중이면 예외</strong>로 처리한다(균일한 정치적 대칭). 이 관행이 유지된다면 각국 선거 사이클마다 유사 필터가 코드에서 확인 가능해진다는 뜻이고, X가 4세대 README에서 강조한 *&quot;a benefit of open-source is that you can see that changes like this exist, and exactly how they work&quot;*가 규제 대응에도 적용된다는 신호다.</p>
+<p>셋째, <strong>Phoenix 랭커의 입력 피처 표기가 처음 채워졌다.</strong> 4세대 초까지 코드에서 관찰된 <code>bool_features: vec![false; ...]</code>는 canon의 &quot;죽은 필드&quot; 함정 목록에 남아 있었다. 4세대+1에서 3개(stale post 14일·author↔viewer 팔로우 방향 2개)가 처음 실제 값으로 채워진다. 특히 <strong>stale post 시그널이 count zeroing과 짝지어 들어간다</strong>는 점이 흥미롭다 — 랭커에게 &quot;이 카운트가 낮은 이유는 인기 없어서가 아니라 오래돼서 노출이 끊긴 것&quot;이라고 명시 라벨을 붙여, 3세대까지 canon이 관찰해온 <a href="multi-task-ranking.html">snowball 문제</a>(오래된 포스트의 낮은 count가 낮은 랭킹을 낳고 그것이 다시 낮은 count를 낳는 자기강화 루프)를 랭커가 학습으로 우회하게 하는 설계.</p>
+<p><strong>새로 알게 된 것 — 가중치 해석 규칙 (canon 정정)</strong></p>
+<p>파일 헤더 주석이 이 규칙을 최우선으로 못박는다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/params/param.rs"><code>home-mixer/params/param.rs:281-306</code></a>:</p>
+<blockquote>
+<p>&quot;Each weight multiplies the <em>predicted</em> probability of that action (P(favorite), P(repost), …) or a continuous value e.g. watch time -- the weights do not multiply raw engagement counts. One common misinterpretation is that you can read these weight ratios as count equivalences, e.g. the incorrect statement that &#39;one report cancels 468 likes&#39; -- this is incorrect because the weights apply to the predicted probabilities rather than raw counts.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/params/param.rs"><code>home-mixer/params/param.rs:283-292</code></a></p>
+</blockquote>
+<p>그리고 <strong>왜 그 절대값이 그렇게 커 보이는지</strong>를 이어서 설명한다:</p>
+<blockquote>
+<p>&quot;And the baseline probability of a Report is more than 1000x lower than a Like, so it&#39;s weighted more to allow the prediction to affect the final ranking at all.&quot;</p>
+</blockquote>
+<p>즉 report −234의 크기는 <strong>가치 × 1/propensity의 곱</strong>이며, 리포트 propensity가 like 대비 1000분의 1 이하라 절대값이 큰 것이다. 어제의 정본에서 이미 이 방향으로 caveat을 걸어놨지만 이번엔 코드 안에서 X 스스로 이렇게 서술했다.</p>
+<p>같은 주석이 <strong>mass reporting 오해</strong>도 두 가지 이유로 부정한다:</p>
+<blockquote>
+<p>&quot;It&#39;s predicting your likelihood of the action, not summing up raw weights on counts. Also, recommendations are personalized, so reports from bad actors will primarily affect recommendations for users who are similar to the bad actors, rather than having the same effect on the post&#39;s ranking to everyone.&quot;</p>
+</blockquote>
+<p>즉 봇 계정의 대량 리포트는 (1) 스코어가 <strong>당신의</strong> 예측 확률이므로 그 봇들과 유사한 유저의 추천에만 우선적으로 영향을 주며 (2) Home Timeline에 서빙된 포스트에서 이뤄진 액션만 랭킹 신호로 반영되므로, 그룹채팅으로 링크 공유해 나타난 반응은 랭킹에 영향이 없다.</p>
+<p>같은 주석 블록이 <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/scorers/ranking_scorer.rs"><code>home-mixer/scorers/ranking_scorer.rs:415-446</code></a>에도 중복 배치됐고, <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/README.md#scoring-and-ranking">README <code>#scoring-and-ranking</code> 절</a>에도 문단이 삽입됐다. 세 곳에 같은 서술을 배치해서 코드/문서 어디를 읽더라도 오해를 피하게 했다.</p>
+<p><strong>새로 알게 된 것 — 브라질 2026 선거 필터</strong></p>
+<p>X 공지가 근거를 설명한다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/README.md#august-14th-2026">README.md <code>#august-14th-2026</code></a>:</p>
+<blockquote>
+<p>&quot;As announced by X, in accordance with Brazilian electoral law, For You now runs Brazil2026ElectionFilter, which removes posts from accounts reported to Brazil&#39;s Electoral Court for the 2026 election, unless the viewer explicitly follows the account. A benefit of open-source is that you can see that changes like this exist, and exactly how they work — take a look at the code.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/README.md#august-14th-2026">README.md</a>, 공지 링크 <a href="https://x.com/XBR/status/2088341967864320507">@XBR</a></p>
+</blockquote>
+<p>필터 본체 <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/filters/brazil_2026_election_filter.rs"><code>home-mixer/filters/brazil_2026_election_filter.rs</code></a>는 1,573줄로, 그중 대부분이 계정 ID 상수 + 주석 username이다. 핵심 로직은 10줄 남짓:</p>
+<pre><code class="language-rust">static BRAZIL_2026_ELECTION_USER_IDS: LazyLock&lt;FxHashSet&lt;u64&gt;&gt; = ...;  // 665개
+
+impl Brazil2026ElectionFilter {
+    fn is_excluded_author(user_id: u64, followed_user_ids: &amp;FxHashSet&lt;u64&gt;) -&gt; bool {
+        BRAZIL_2026_ELECTION_USER_IDS.contains(&amp;user_id) &amp;&amp; !followed_user_ids.contains(&amp;user_id)
+    }
+    fn should_remove(candidate: &amp;PostCandidate, followed_user_ids: &amp;FxHashSet&lt;u64&gt;) -&gt; bool {
+        let is_excluded = |user_id: u64| Self::is_excluded_author(user_id, followed_user_ids);
+        if is_excluded(candidate.author_id) { return true; }
+        if candidate.retweeted_user_id.is_some_and(is_excluded) { return true; }
+        if candidate.quoted_user_id.is_some_and(is_excluded) { return true; }
+        candidate.ancestor_users.iter().copied().any(is_excluded)
+    }
+}
+</code></pre>
+<p>즉 (a) 후보의 작성자, (b) 리트윗 원저자, (c) 인용 원저자, (d) 답글 스레드의 조상 작성자 넷 중 하나라도 리스트에 있고 <strong>뷰어가 팔로우하지 않으면</strong> 드롭. 팔로우 예외는 유저 개인 그래프 기반이라 정치적 스펙트럼과 관계없이 대칭적이다.</p>
+<p>파일 헤더 주석이 근거를 밝힌다 <code>[확인]</code>:</p>
+<blockquote>
+<p>&quot;Application providers that use a recommendation system for users must exclude from the results the channels and profiles reported to the Electoral Court under the terms of § 1º of this article and, except in cases of paid boosting, the content posted on them.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/filters/brazil_2026_election_filter.rs"><code>home-mixer/filters/brazil_2026_election_filter.rs:9-11</code></a></p>
+</blockquote>
+<p>그리고 리스트의 근거 데이터셋 <code>[확인]</code>:</p>
+<blockquote>
+<p>&quot;<a href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026">https://dadosabertos.tse.jus.br/dataset/candidatos-2026</a>&quot;</p>
+</blockquote>
+<p>배선 지점은 <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs"><code>phoenix_candidate_pipeline.rs:356-368</code></a> — <code>AuthorSocialgraphFilter</code> 직후, <code>VideoFilter</code> 직전. 즉 사회그래프 필터가 뮤트·차단을 처리한 뒤 곧바로 이 관할권 필터가 붙는 흐름이다.</p>
+<p>리스트에는 다양한 정당 소속 인물이 포함돼 있다. 몇 개만 코드에서 발췌:</p>
+<ul>
+<li><code>40053694 // @FlavioBolsonaro</code> (Flavio Bolsonaro, 자유당 상원의원)</li>
+<li><code>21069302 // @marcelvanhattem</code> (Marcel van Hattem, 신자유당 하원의원)</li>
+<li><code>48298703 // @eduardopaes</code> (Eduardo Paes, 사회민주당, 리우데자네이루 시장)</li>
+<li><code>25858078 // @ManuelaDavila</code> (Manuela D&#39;Avila, 공산당)</li>
+<li><code>33374761 // @cirogomes</code> (Ciro Gomes, 민주노동당)</li>
+</ul>
+<p>코드 상단에 이례적인 주석이 있다 <code>[확인]</code>:</p>
+<blockquote>
+<p>&quot;OmarAzizSenador deleted his account at the time this code was written.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/filters/brazil_2026_election_filter.rs"><code>home-mixer/filters/brazil_2026_election_filter.rs:15</code></a></p>
+</blockquote>
+<p>즉 TSE 리스트에 있으나 X 상 계정이 삭제된 인물은 예외적으로 명시 주석으로 남기는 정도의 세밀함까지 문서화한 것.</p>
+<p><strong>의미 (관할권 필터 코드 공개의 관전 포인트)</strong></p>
+<p>이 필터의 정본 위치는 <a href="x.html#%ED%95%84%ED%84%B0-21%EA%B0%9C-2026-08-4%EC%84%B8%EB%8C%801--%EC%8A%A4%EC%BD%94%EC%96%B4%EB%A7%81-%EC%A0%84-18--%ED%9B%84-3">services/x.md 필터 21개 절</a>에 4세대+1 신규 1개로 반영. 향후 3가지가 관전 포인트다:</p>
+<ol>
+<li><strong>선거 사이클이 지나면 필터가 어떻게 정리되는가.</strong> 브라질 2026 선거는 특정 시점 이벤트이므로 이 필터는 시한부다. X가 필터를 (a) 제거하는지 (b) 상수만 비우고 남기는지 (c) 별도 아카이브로 남기는지가 open-source 관행의 지속성을 판단할 지표.</li>
+<li><strong>다른 국가 선거·규제 대응이 같은 관행으로 붙는가.</strong> EU 의회 선거·인도 총선·미국 대선 등에 유사 필터가 코드로 나타나는지가 다음 6개월의 관전 포인트.</li>
+<li><strong><code>docs/BIDIRECTIONAL_BOOST_CHANGE.md</code>가 예고한 diff 문서화 관행과의 연동.</strong> 어제 다룬 그 문서가 향후 파라미터 변경을 code diff로 문서화하는 견본이었는데, Brazil 필터의 665개 계정 리스트 변경(추가/삭제)이 미래 커밋에서 어떻게 문서화될지도 이 관행의 성숙도를 보여줄 지표.</li>
+</ol>
+<p><strong>새로 알게 된 것 — 콜드스타트 Thompson sampling</strong></p>
+<p><code>author_cold_start.rs</code>가 갱신됐다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs:151-190</code></a>. 콜드스타트 대상 후보 집합 안에서 &quot;슬롯을 어느 후보로 채울지&quot; 선택이 <strong>greedy max-score</strong>와 <strong>Beta reward Thompson sampling</strong> 두 갈래로 분기 (Thompson sampling — 후보별로 Bayesian posterior에서 한 번 샘플해서 그 값으로 선택; exploration을 확률적으로 유도하는 표준 밴딧 기법).</p>
+<p>새 파라미터 6개 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/params/param.rs"><code>home-mixer/params/param.rs:687-724</code></a>:</p>
+<ul>
+<li><code>EnableColdStartThompsonSampling = false</code> — 기본 off. 즉 실 프로덕션은 여전히 greedy</li>
+<li><code>ColdStartBetaAlpha0 = 0.75</code> — Beta(α₀, β₀) 사전분포의 α (likes 사전관측치)</li>
+<li><code>ColdStartBetaBeta0 = 49.25</code> — β₀ (non-like 사전관측치). α₀ + β₀ = 50이 &quot;사전 유효표본 크기&quot;. 대략 &quot;50 impression 중 0.75 like&quot;라는 사전</li>
+<li><code>ColdStartTsTopK = 5</code> — Beta 샘플링으로 상위 K를 뽑은 뒤 실제 스코어로 tie-break</li>
+<li><code>ColdStartImpressionScale = 1.0</code> — view_count 스케일</li>
+<li><code>ColdStartTrackedIds = &quot;&quot;</code> — 콤마 분리 계정/포스트 ID 리스트, 서빙 통계 계측 대상</li>
+</ul>
+<p>샘플링 규칙 <code>[확인]</code> — 같은 파일:</p>
+<pre><code class="language-rust">fn sample_reward&lt;R: Rng + ?Sized&gt;(candidate: &amp;PostCandidate, alpha0: f64, beta0: f64, scale: f64, rng: &amp;mut R) -&gt; f64 {
+    let n = scale * candidate.view_count.unwrap_or(0) as f64;
+    let x = (candidate.fav_count.unwrap_or(0).max(0) as f64).min(n);
+    let alpha = alpha0 + x;
+    let beta = beta0 + (n - x).max(0.0);
+    Beta::new(alpha, beta).map(|d| d.sample(rng)).unwrap_or(0.5)
+}
+</code></pre>
+<p>즉 각 후보 i에 대해 posterior <code>Beta(α₀ + likes, β₀ + max(views − likes, 0))</code>에서 한 번 샘플 → 상위 K를 골라 그 안에서 원래 스코어 최대치 선택.</p>
+<p><strong>의미 (Thompson sampling A/B 배선)</strong></p>
+<p>기본 off라는 사실이 중요하다. 이 릴리즈 시점에서 실제 유저에게 노출되는 콜드스타트는 여전히 max-score greedy다. Thompson sampling은 A/B 인프라만 배선된 상태이며, 실 반영은 향후 A/B 결과에 따라 결정될 것.</p>
+<p><code>ColdStartTrackedIds</code>는 특정 계정/포스트 ID를 등록해두면 <code>home_mixer.cold_start_tracked_ids_total{id, source}</code> 카운터가 그 계정이 콜드스타트 파이프라인의 어느 소스에서 몇 번 등장했는지 추적한다 — 즉 <strong>특정 계정을 A/B에서 손으로 관찰 가능한 개별 관찰 훅</strong>. 예를 들어 정치인 계정 하나를 등록해두면 그 계정 포스트가 어느 콜드스타트 라우팅으로 몇 번 노출됐는지 셀 수 있다는 뜻. 이 계측 훅의 존재는 4세대의 under-the-hood 투명성 라인과 결이 통한다 (계정 단위 라벨 조회) — 다만 이건 X 내부용 계측이지 외부 공개는 아님.</p>
+<p><strong>새로 알게 된 것 — Phoenix bool feature 3개 신설</strong></p>
+<p>3세대~4세대 초 코드에서 <code>bool_features</code>는 <code>vec![false; ...]</code>로 통째 stamp돼 있어 입력 자체가 실효 없었다 (canon 함정 목록의 &quot;죽은 필드&quot; 계열). 4세대+1에서 세 개가 처음 채워졌다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/phoenix/crates/common/xai-recsys/src/util.rs"><code>phoenix/crates/common/xai-recsys/src/util.rs:456-540, 728-900</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/phoenix/crates/common/xai-recsys/src/model_config.rs"><code>phoenix/crates/common/xai-recsys/src/model_config.rs:40</code></a>:</p>
+<table>
+<thead>
+<tr>
+<th>bool feature</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>IS_STALE_POST14D</code></td>
+<td><code>enable_stale_post = true</code>일 때 <code>now - creation_ts &gt; STALE_POST_14D_TTL_SEC</code> 이면 <strong>fav/reply/retweet/quote/view count를 전부 0으로 stamp</strong> + 이 bool을 true로 셋. 즉 14일 지난 포스트의 engagement 신호는 통째로 무시하고 랭커에게 &quot;stale&quot;만 알린다.</td>
+</tr>
+<tr>
+<td><code>IS_AUTHOR_FOLLOWED_BY_VIEWER_SEQ</code></td>
+<td>뷰어가 이 후보의 작성자를 팔로우 중인가 (후보·이력 시퀀스별)</td>
+</tr>
+<tr>
+<td><code>IS_AUTHOR_FOLLOWING_VIEWER_SEQ</code></td>
+<td>후보의 작성자가 뷰어를 팔로우 중인가 (bidirectional 감지 입력)</td>
+</tr>
+</tbody></table>
+<p>핵심은 코드 diff에서 <code>vec![false; candidate_seq_len * n_post_bool]</code> → <code>candidate_bool_features</code> 교체 지점 두 곳. 후보 시퀀스와 이력 시퀀스 양쪽에 같이 적용됐다.</p>
+<p><strong>stale post 처리의 두 신호가 짝지어 들어간다</strong> <code>[확인]</code>:</p>
+<pre><code class="language-rust">let creation_valid = candidate_post_creation_ts_sec[j] &gt; 0;
+let original_age_sec = now_sec as i64 - candidate_post_creation_ts_sec[j] as i64;
+let is_stale = stale_post_enabled &amp;&amp; creation_valid &amp;&amp; original_age_sec &gt; STALE_POST_14D_TTL_SEC;
+candidate_is_stale_post[j] = is_stale;
+if is_stale {
+    stamp_engagement_counts(..., 0, 0, 0, 0, 0);
+} else {
+    stamp_engagement_counts(..., candidate.fav_count, candidate.reply_count, ...);
+}
+</code></pre>
+<p>즉 stale이면 count zero + bool set, stale이 아니면 실제 count. 랭커 입장에서 &quot;count=0 + is_stale=true&quot;인 후보와 &quot;count=0 + is_stale=false&quot;인 후보를 명시적으로 다른 케이스로 학습할 수 있다.</p>
+<p><strong>의미 (snowball 완화 + bidirectional 신호의 모델화)</strong></p>
+<p>canon이 3세대에서 관찰해온 &quot;<strong>오래된 포스트의 낮은 카운트가 낮은 랭킹을 낳고 그것이 다시 낮은 카운트를 낳는 자기강화 루프</strong>&quot; 문제를 랭커가 학습으로 우회하게 하는 설계 <code>[추정]</code> — X 스스로는 이 설계 목적을 문서화하지 않았지만 count zeroing과 bool set을 짝지은 구조가 그 방향을 강력히 시사한다. 4세대에서 인용된 <code>is_mutual_follow</code> 부스트(reply +15)는 <strong>스코어러의 하드코딩된 조건</strong>이었는데, 이제 <strong>모델이 팔로우 방향을 개별 입력 bool로 받아</strong> 학습으로 유사한 패턴을 잡을 수 있게 됐다는 점도 중요. 하드코딩 부스트에서 학습 신호로의 이행은 3세대 → 4세대의 전반적 방향(수작업 게이팅에서 모델 학습으로 무게 이동)과 결이 맞는다.</p>
+<p><strong>새로 알게 된 것 — BDSM enforcement note 생성기 부분 공개</strong></p>
+<p>3세대~4세대 초 <code>bdsm/runtime/score_results_sink_focal.py:78</code>의 <code>build_enforcement_note</code>는 <code>return None</code>뿐인 스텁이었다. 4세대+1에서 <strong>gate 로직과 dominant-head 선택 로직</strong>이 공개됐고, <strong>템플릿 문자열만</strong> <code>&quot;&lt;redacted&gt;&quot;</code> 센티널로 남았다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/bdsm/runtime/score_results_sink_focal.py"><code>bdsm/runtime/score_results_sink_focal.py:78-128</code></a>:</p>
+<pre><code class="language-python">def build_enforcement_note(head_scores_list, action_hist_list):
+    if not head_scores_list: return None
+    total = sum(h[&quot;cnt&quot;] for h in (action_hist_list or ()))
+    if total &lt; 30: return None                       # MIN_ACTIONS gate
+    bot_heads = [(h[&quot;head_name&quot;], h[&quot;score&quot;]) for h in head_scores_list
+                 if h[&quot;head_name&quot;] != &quot;LegitimateUser&quot; and h[&quot;score&quot;] &gt; 0.5]
+    if not bot_heads: return None
+    bot_heads.sort(key=lambda x: x[1], reverse=True)
+    dominant_name, dominant_score = bot_heads[0]
+    note = _ENFORCEMENT_TEMPLATES.get(dominant_name, _REDACTED_TEMPLATE)
+    note += f&quot; [model: {dominant_name}={dominant_score:.2f}&quot;
+    if len(bot_heads) &gt; 1:
+        secondary = &quot;, &quot;.join(f&quot;{n}={s:.2f}&quot; for n, s in bot_heads[1:3])
+        note += f&quot;, also: {secondary}&quot;
+    note += &quot;]&quot;
+    return note
+</code></pre>
+<p>7개 봇 헤드가 정식 노출: <code>FollowBot</code>, <code>LikeBot</code>, <code>EngagementAmplifier</code>, <code>ReplySpamBot</code>, <code>TweetSpamBot</code>, <code>RTBot</code>, <code>MultiActionBot</code>. 각 헤드의 템플릿 문자열은 <code>_REDACTED_TEMPLATE = &quot;&lt;redacted&gt;&quot;</code>.</p>
+<p>즉 최종 노트 예시: <code>&quot;&lt;redacted&gt; [model: FollowBot=0.91, also: ReplySpamBot=0.60, LikeBot=0.53]&quot;</code>. 어떤 봇 계열에 얼마나 걸렸는지는 노트에 그대로 나가지만, <strong>왜(어떤 액션 패턴 때문에)</strong> 라는 텍스트 설명은 미공개.</p>
+<p>README가 이 절반 공개의 이유를 명시한다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/bdsm/README.md"><code>bdsm/README.md</code></a>:</p>
+<blockquote>
+<p>&quot;The public package keeps the gates (MIN_ACTIONS, dominant-head pick) and the enforcement_note proto field. The template strings and the per-head key_actions interpolator are the sentinel &#39;<redacted>&#39; — same idea as the 9.99 operating points.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/bdsm/README.md">bdsm/README.md</a></p>
+</blockquote>
+<p>같은 원리(구조·이름·게이트는 공개, 튜닝된 실수·프롬프트 문자열은 미공개)가 <code>sink_policy.yaml</code>의 operating point 9.99 센티널과 짝을 이룬다. 어제 정본에 SafetyLevel 3-tier와 54 규칙을 반영했는데, 오늘 그 규칙을 참조하는 상위 계정 스코어러의 노트 생성 로직 절반이 열린 셈이다.</p>
+<p><strong>Proto 필드 문서화 갱신</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/bdsm/proto/abuse_inference.proto"><code>bdsm/proto/abuse_inference.proto:98-102</code></a>:</p>
+<blockquote>
+<p>&quot;Optional human-readable note. In this release templates and key_actions are the sentinel &#39;<redacted>&#39; (see README); production fills the real appeal paragraph. ActionName enums are unchanged.&quot;</p>
+</blockquote>
+<p><strong>의미 (labeling 파이프라인의 관찰 가능한 표층 확대)</strong></p>
+<p>X의 4세대+1 패턴은 &quot;구조 공개, 프롬프트/문자열/튜닝 실수 미공개&quot;의 일관성이 매우 높다. sink_policy의 9.99 sentinel, enforcement note의 <code>&lt;redacted&gt;</code> template, botmaker-rules의 일부 게이밍 방지 미공개가 모두 같은 원리로 배치됐다. 즉 게이밍 저항성을 유지하면서 구조·이름·게이트·헤드 조합의 검증 가능성은 최대화하는 방향. abuse-enforcement-service가 이 노트를 받아 실제 조치(label/challenge/suspension)를 판단하는 흐름의 인풋 표층이 오늘 절반 열렸다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — 잔여 변경</span></p></div>
+<ul>
+<li><strong>grox 답글 스팸 임계 상향</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/grox/flows/reply_spam/task_filter.py"><code>grox/flows/reply_spam/task_filter.py:17, 185</code></a>: <code>TaskSpamFilter.FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION</code>과 <code>TaskReplyRankingFilter.FOLLOWER_COUNT_THRESHOLD_FOR_REPLY_RANKING</code>을 <strong>15,000 → 30,000</strong>으로 두 배 상향. 팔로워 30k 미만인 계정의 답글에만 grok으로 스팸/답글 랭킹을 채점한다는 뜻으로, 임계를 올려 grok 리소스를 태우는 답글 범위를 두 배로 확대. 리소스 배분 조정.</li>
+<li><strong>phoenix-rankall에 <code>video_14day</code> SID window 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/phoenix-rankall/src/config/mod.rs"><code>phoenix-rankall/src/config/mod.rs:177-180</code></a>: 기존 <code>video_48h</code>·<code>video_96h</code>·<code>nsfw_video_48h/168h/14day</code>에 <code>video_14day</code>가 짝지어 추가. Phoenix retrieval의 SID 기반 인기도 시그널에 2주 시간창 비디오가 포함된다는 뜻.</li>
+<li><strong><code>abuse-enforcement-service</code> 목 픽스처 1줄 수정</strong> <code>[확인]</code> — 룰 필드값 하나 변경, 실 로직 영향 없음.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> — 5개 절 갱신:</p></div>
+<ul>
+<li>&quot;한 줄 요약&quot; 절: 4세대+1 후속 드랍 요약 추가, 필터 총 20→21로 갱신</li>
+<li>&quot;공개 소스 4세대&quot; 세대 테이블: <strong>4세대+1</strong> 행 신설 (커밋 c65aa17, +2,271/−32)</li>
+<li>&quot;가중치 — 4세대 드랍으로 값이 공개됐다&quot; 절: 해석 규칙 (raw-count 오해 방지) 인용 삽입</li>
+<li>&quot;필터 21개&quot; 절 (헤딩 개정, 이전 &quot;필터 20개&quot;): <code>Brazil2026ElectionFilter</code> 신규 항목 및 배선 위치 명시</li>
+<li>&quot;콜드스타트&quot; 절: Thompson sampling 6개 param 및 샘플링 규칙 신설</li>
+<li>&quot;Phoenix 학습·인덱스&quot; 절: bool feature 3개 신설 및 stale post count zeroing 로직</li>
+<li>&quot;Grox (LLM 주석) — 3세대 그대로&quot; 헤딩을 &quot;+ 2026-08-14 임계 상향&quot;으로 변경, 임계 조정 신설</li>
+<li><strong>&quot;BDSM (계정 행동 시퀀스 부정 계정 탐지) — 4세대+1에서 enforcement note 생성 로직 부분 공개&quot;</strong> 새 절 신설</li>
+<li>열린 질문 절: &quot;4세대+1 드랍으로 해소된 것 (2026-08-16)&quot; 하위절 신설, 5개 항목</li>
+<li>출처: 5건 추가 (c65aa17 커밋, README <code>#latest-updates</code>, Brazil 필터, TSE 데이터셋, @XBR 공지, BDSM sink)</li>
+</ul>
+<p><a href="../assets/x-pipeline.svg">assets/x-pipeline.svg</a> — 필터 라벨 &quot;17 → 18&quot;, 신규 라벨 &quot;4 → 5 (Brazil2026 포함)&quot;.</p>
+<p><strong>의미 (4세대의 성격을 하루 만에 다섯 방향으로 확장)</strong></p>
+<p>4세대 드랍의 성격이 <strong>하루 뒤에 곧바로 확장됐다</strong>. 어제 관찰한 &quot;코드 diff로 파라미터 변경을 문서화하는 관행&quot;이 오늘 처음 실제로 작동한 것 — README <code>#latest-updates</code>가 이제 날짜별 하위섹션 구조를 가지며 (8월 14일 → 8월 13일 역시간순), 각 하위섹션이 (1) 변경 요약 (2) 관련 파일 링크 (3) 근거 문서·공지 링크 세 요소를 갖춘다. 향후 X 커밋 로그를 매일 추적하는 것의 가치가 확실히 커지는 방향이다. 다음 커밋에서 어떤 param이 바뀌면 그 자체가 A/B 결과의 지연 지표가 되고, 어떤 필터가 새로 붙거나 사라지면 규제 대응의 실시간 관찰 지표가 된다.</p>
+<p><strong>심층 분석 필요 항목</strong> (오늘 처리하지 않음):</p>
+<ul>
+<li>Thompson sampling의 A/B가 언제 실 활성화되고 결과 지표가 어떻게 나오는지 (레이더성 지속 관찰)</li>
+<li>브라질 선거 필터의 665개 계정 리스트 갱신 이력 (커밋 히스토리 별도 tracking)</li>
+<li>BDSM <code>_ENFORCEMENT_TEMPLATES</code>에 다른 봇 헤드(<code>FollowBot</code> 등 7개 이외)가 추후 추가되는지</li>
+<li>Phoenix bool feature slot 나머지가 언제 채워지는지</li>
+</ul>
+<h2>2. arXiv triage — DrEM 소속 확정 (Kuaishou)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.12778">DrEM: Dual-Side Robust Ensemble Ranking from Noisy User Preference Predictions in Video Recommendation — arXiv:2608.12778</a> — 2026-08-13 제출, 저자 8명 (Canwei Huang, Tiantian He, Xiaoxiao Xu, Jun Zhang, Ziran Deng, Weike Pan, Chunjie Chen, Kaiqiao Zhan), 논문. HTML 판 확인 결과 <strong>Kuaishou Technology Beijing + Shenzhen University 협업</strong>으로 확정 (Kaiqiao Zhan / Xiaoxiao Xu / Tiantian He / Jun Zhang / Chunjie Chen이 Kuaishou 이메일 도메인, Weike Pan / Canwei Huang / Ziran Deng이 Shenzhen University 소속).</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>어제 <a href="radar.html#drem--%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9E%88%EB%8A%94-%EC%9C%A0%EC%A0%80-%EC%84%A0%ED%98%B8-%EC%98%88%EC%B8%A1%EC%9D%84-%EC%9D%B4%EC%A4%91-%EA%B0%95%EA%B1%B4-%EC%95%99%EC%83%81%EB%B8%94-%EB%9E%AD%ED%82%B9%EC%9C%BC%EB%A1%9C">radar.md</a>에서 이 논문을 소속 미확정 상태(<code>[추정]</code> Kuaishou 계열 통계적 가능성)로 등록했다. 오늘 arXiv HTML 판을 열어 저자 affiliation 표기를 확인한 결과 Kuaishou 이메일 도메인이 5명 확인돼 이 회사의 프로덕션 논문임이 확정됐다.</p>
+<p>Kuaishou는 이번 달에 이미 두 편의 프로덕션 논문을 냈다 (HD-Rec 2026-08-11 <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">radar.md</a>, PushDualGen 2026-08-12). 이번이 세 편째이며, 세 편이 모두 다른 알고리즘 계열(SID cross-domain / SID+CoT 푸시 / ensemble ranking noise robustness)이라는 점이 특징이다. 회사 차원에서 여러 팀·라인이 동시에 프로덕션 SOTA 논문을 낼 수 있는 리소스가 확인된 셈이다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — 문제와 해법</span></p></div>
+<p>논문은 <strong>ensemble ranking stage의 특유한 문제</strong>를 다룬다. 산업 비디오 추천 파이프라인의 다단계 구조에서, 상위의 멀티태스크 모델(멀티태스크 랭커; 여기서 pctr·pvtr·pcmtr·pftr 등 여러 태스크의 예측 확률을 pxtr로 통칭)이 출력한 예측을 하위의 앙상블 랭커가 <strong>입력 피처로도, proxy preference 라벨의 소스로도</strong> 함께 쓰는 상황을 상정한다. 그런데 pxtr는 상위 모델의 출력이므로 노이즈를 포함할 수밖에 없고, 이 노이즈가 (a) proxy preference 라벨을 뒤집고 (supervision-side 노이즈) (b) feature-side 입력으로 유입돼 순위 스코어를 흔든다 (feature-side 노이즈).</p>
+<p>기존 앙상블 랭킹 방법들은 pxtr를 신뢰 가능한 신호로 간주하고 노이즈를 무시했지만, DrEM은 이 노이즈를 <strong>양쪽에서 동시에 보정</strong>한다:</p>
+<ul>
+<li><strong>Supervision side (라벨 노이즈):</strong> pairwise <strong>flip probability</strong>(어떤 쌍의 진짜 preference가 뒤집혔을 확률)를 추정하고, empirical risk를 그 확률로 정정하는 <strong>risk-denoising robust loss</strong>를 도입. 이론적으로 flip probability 추정 오차가 있더라도 basic pairwise loss보다 우월함을 증명 (Theorem 1).</li>
+<li><strong>Feature side (입력 노이즈):</strong> pxtr의 예측 노이즈 분포에서 perturbation을 샘플링하고, <strong>preference-preserving ranking consistency regularizer</strong>로 perturbation에 대한 출력 안정성을 학습.</li>
+</ul>
+<p>핵심은 두 correction이 <strong>공유 노이즈 모델</strong>에서 유도된다는 것 — supervision과 feature 양쪽의 correction target이 같은 노이즈 근원에 정렬되므로 파라미터를 공유해 동기화된 보정이 가능하다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — 프로덕션 A/B 결과</span></p></div>
+<p><a href="https://arxiv.org/html/2608.12778">HTML 판</a> 5.4 절 (RQ3)이 A/B 세팅을 명시 <code>[확인]</code>:</p>
+<blockquote>
+<p>&quot;To answer RQ3 and validate real-world performance, we conduct online A/B tests on the industrial short-video platform. We set up two parallel experiment groups to verify the generalization of our DrEM on both representative backbones, applying our DrEM on top of production-grade EMER and EASQ backbone. The experiment runs for 7 days with 5.1% of the main traffic randomly split at the user level via hash-based assignment to each group.&quot;
+— <a href="https://arxiv.org/html/2608.12778">arXiv 2608.12778</a>, 5.4절</p>
+</blockquote>
+<p><strong>메인 A/B 결과</strong> <code>[확인]</code> — 5.4절 Table 2, 모든 p &lt; 0.005:</p>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th align="right">EMER w/ DrEM</th>
+<th align="right">EASQ w/ DrEM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Comment</strong></td>
+<td align="right"><strong>+1.388%</strong></td>
+<td align="right">+0.178%</td>
+</tr>
+<tr>
+<td><strong>Follow</strong></td>
+<td align="right"><strong>+1.197%</strong></td>
+<td align="right">+0.460%</td>
+</tr>
+<tr>
+<td>Video View</td>
+<td align="right">+0.691%</td>
+<td align="right">+0.117%</td>
+</tr>
+<tr>
+<td>Forward</td>
+<td align="right">+0.683%</td>
+<td align="right">+0.181%</td>
+</tr>
+<tr>
+<td>Like</td>
+<td align="right">+0.625%</td>
+<td align="right">+0.048%</td>
+</tr>
+<tr>
+<td>Long View</td>
+<td align="right">+0.401%</td>
+<td align="right">+0.043%</td>
+</tr>
+<tr>
+<td>App Stay Time</td>
+<td align="right">+0.116%</td>
+<td align="right">+0.124%</td>
+</tr>
+<tr>
+<td>LT7</td>
+<td align="right">+0.017%</td>
+<td align="right">+0.020%</td>
+</tr>
+</tbody></table>
+<p>저자 관찰 (동일 절, 요약): <strong>sparse behavior가 dense behavior보다 gain이 크다.</strong> 팔로우(+1.20%)·댓글(+1.39%)이 뷰(+0.69%)·롱뷰(+0.40%)보다 압도적으로 크다. 이론과 일치 — 스파스 태스크(pcmtr, pftr)의 pxtr는 예측 분산이 크므로 flip probability도 크고, robust correction의 여지도 크다. 5.5절 (RQ4)의 flip-probability 스트라티피케이션 heatmap도 같은 결론을 시각화 — 낮은 flip prob 구간에서는 dense 태스크(pctr, pvtr)의 개선이 0 또는 살짝 음수인데, 높은 flip prob 구간에서는 급격히 양수로 상승.</p>
+<p><strong>두 백본의 gain 격차 해석</strong>: EASQ가 EMER보다 gain이 작은 이유는 EASQ가 이미 자체 questionnaire-signal alignment로 supervision-side 노이즈를 부분 완화하고 있어 DrEM의 supervision correction 여지가 적기 때문이라고 저자가 명시. 즉 supervision 정정이 훨씬 실속 있는 개선을 낳고, 이미 그 부분을 다룬 백본에서는 feature-side 정정만 남는다는 계층적 이해.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html#drem-kuaishou-%EB%8B%A8%ED%8E%B8-%EB%B9%84%EB%94%94%EC%98%A4--pxtr-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9D%B4%EC%A4%91-%EB%B3%B4%EC%A0%95-ensemble-ranking">radar.md DrEM 절</a> — 소속 확정 <code>[추정]</code>→<code>[확인]</code> 갱신, A/B 세팅(5.1% 7일)·8개 지표 실수·이론적 관찰(sparse &gt; dense) 추가. 정본(services/*) 반영은 아직 없음 — Kuaishou 서비스는 정본 추적 대상이 아님.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<p>Kuaishou가 이번 달 세 편의 프로덕션 논문 중 이 논문이 canon과 가장 밀접하다. <strong>다른 어느 서비스도 이런 노이즈 이슈를 겪는다</strong> — X의 26개 헤드 가중합, Meta의 다목적 랭킹, Netflix의 멀티태스크 FM 모두 상위 pxtr가 하위 스코어러의 입력이자 라벨이 되는 구조를 갖는다. 다만 DrEM이 다루는 특정 문제(앙상블 랭킹 단계의 pxtr 노이즈)가 X·Meta·Netflix에서 별도 컴포넌트로 존재하는지, 다른 방식으로 완화되고 있는지는 문헌으로 확인이 안 된다. 두 번째 회사의 유사 진술이 나오면 <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a>에 절 신설 후보.</p>
+<h2>다음에 볼 것</h2>
+<ul>
+<li><strong>c65aa17 후속 커밋</strong> — X의 하루 단위 커밋 리듬이 확립됐다면 매일 배치가 계속 통과분을 뽑아낼 것. Thompson sampling A/B 결과, 브라질 필터 계정 리스트 diff, Phoenix bool feature 채움 진행이 우선 관찰 대상.</li>
+<li><strong>Kuaishou 라인 지속 관찰</strong> — 이번 달 세 편이 각기 다른 알고리즘 계열이라 회사 차원 리소스가 늘어난 신호. 8월 나머지 arXiv triage에서 Kuaishou 라인 통과분이 더 나올 가능성.</li>
+<li><strong>관할권 필터의 두 번째 사례</strong> — 다른 국가 선거·규제 대응이 같은 open-source 관행으로 붙는지 다음 6개월 관전.</li>
+</ul>
+
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-08-15.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-15</div></a><a class="r" href="daily-2026-08-19.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-19</div></a></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>

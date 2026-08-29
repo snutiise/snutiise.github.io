@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-08-12 — feed-research</title>
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-08-29 빌드</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-08-29 빌드</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-08-12</h1>
+  <div class="wd">수요일 · 읽는 데 약 15분</div>
+  <ul class="chips"><li class="chip">읽은 자료 <b>4</b>건 (모두 레이더 후보)</li><li class="chip">정본 반영 <b>0</b></li><li class="chip">레이더 신규 <b>2</b>건 + 오픈 스레드 갱신 2건</li></ul>
+  <div class="lead"><span class="lb">한 줄 요약</span>추적 서비스(X·Meta·Netflix) 신규 발표는 없었다 — arXiv triage에서 Alibaba/Taobao 세 편(MetaStrategy·DREAM·IntHQ) + Kuaishou 한 편(PushDualGen)이 같은 사흘 안에 프로덕션 진술을 담고 통과했다. 중국 대형 플랫폼이 서로 다른 각도로 LLM/SID 계열을 서빙하는 방식이 하나의 배치로 쏟아진 셈이다.</div>
+</header>
+<div class="wrap" id="content">
+<h2>1. MetaStrategy (Taobao) — LLM이 채점하지 않고 &quot;랭킹 전략 JSON&quot;을 뱉는다 — 레이더</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.09440">MetaStrategy: Generative Ranking with Executable LLM Strategies</a> — arXiv 2608.09440, 2026-08-10, 논문 (Alibaba/Taobao, 저자 15인)</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>지금까지 이 저장소가 추적하는 &quot;LLM을 서빙 경로에 넣는 방법&quot;의 프로덕션 진술은 두 계열이다. <strong>Netflix GenRec</strong>은 LLM 자체가 채점 함수가 되어 아이템에 스코어를 매기고 (<a href="netflix.html">services/netflix.md</a> GenRec 절), <strong>Yandex Music Gryphon-v2</strong>는 LLM이 Semantic-ID 시퀀스를 생성해 retrieval+ranking을 한 번에 대체한다 (<a href="radar.html">radar.md</a> 이번 달 신규). 둘 다 공통점은 LLM이 <strong>온라인 서빙 경로의 실시간 함수</strong>라는 것이다 — 요청이 들어오면 LLM이 돌아야 한다.</p>
+<p>Taobao MetaStrategy는 세 번째 각도를 낸다. LLM은 서빙 경로에 있지 않고, <strong>랭킹 전략 자체를 짜서 배포</strong>한다. 요청 컨텍스트를 받아 &quot;이번 슬롯에서는 목적 함수 가중치를 이렇게, 카테고리 선호를 이렇게, 위치 정책은 이렇게&quot; 하는 typed JSON 번들을 만들어 내면, 결정론적 validator/compiler가 그걸 격리된 Generator로 인스턴스화해서 기존 인컴번트와 원자적으로 경쟁시킨다. LLM 추론은 요청과 동기가 아니다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><p><strong>LLM이 뱉는 것은 스코어가 아니라 실행 가능한 정책 번들</strong>이다 <code>[확인]</code> — objective weights, content/category preferences, experience constraints, position policies가 담긴 typed JSON. Generator-Evaluator(GE) 아키텍처의 Generator 자리에 결정론적으로 컴파일돼 들어가고, list-level Evaluator가 인컴번트와 경쟁시킨다.</p>
+<blockquote>
+<p>&quot;a large language model (LLM) policy emits a typed JSON bundle controlling objective weights, content and category preferences, experience constraints, and position policies. A deterministic validator and compiler instantiate an isolated Generator that competes atomically with incumbents under the list-level Evaluator of the Generator-Evaluator (GE) architecture.&quot;
+— <a href="https://arxiv.org/abs/2608.09440">MetaStrategy 초록</a>, 2026-08-10</p>
+</blockquote>
+</li>
+<li><p><strong>LLM 추론은 nearline이라 동기 랭킹 RT에 영향이 없다</strong> <code>[확인]</code> — Taobao 홈페이지 &quot;Guess You Like&quot;에 diff-triggered nearline generation으로 배포. LLM은 서빙 요청 밖에서 돌고, 컴파일된 전략만 온라인에 반영된다.</p>
+<blockquote>
+<p>&quot;We deploy MetaStrategy in Taobao Homepage Guess You Like through diff-triggered nearline generation; LLM inference remains outside synchronous ranking, with no observable increase in response time (RT).&quot;
+— <a href="https://arxiv.org/abs/2608.09440">같은 초록</a>, 2026-08-10</p>
+</blockquote>
+</li>
+<li><p><strong>7일 유저 랜덤화 A/B 결과</strong> <code>[확인]</code>: 처리군 GE 콜의 27.93%를 MetaStrategy가 이김, click PV +2.11%, item-detail PV +3.12%, 거래액 +2.83%. 프로덕션 진술이다.</p>
+</li>
+<li><p><strong>훈련 파이프라인</strong>: production-path replay 환경(실제 로그된 요청을 유저 노출 없이 현재 re-ranking 스택으로 재실행)에서 정책을 학습한다 <code>[확인]</code>. reward는 selection·relative-rank·baseline-lift 세 종류를 조합. 자기 자신을 강한 경쟁자로 다시 넣는 self-competitive curriculum + Evaluator-routed on-policy distillation으로 4B teacher 두 개를 0.8B student로 압축.</p>
+<blockquote>
+<p>&quot;self-competitive curriculum that feeds frequent strategies back as competitors, and Evaluator-routed reward-augmented on-policy distillation that transfers complementary 4B-parameter Teachers into a compact 0.8B-parameter Student.&quot;
+— <a href="https://arxiv.org/abs/2608.09440">같은 초록</a>, 2026-08-10</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> 없음. <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 새 엔트리로 추가했고, <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 랭킹 오픈 스레드</a>에 &quot;GenRec/Gryphon과 다른 세 번째 각도&quot; 한 줄을 붙였다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 우리 <a href="llm-in-recsys.html">LLM-in-recsys topic</a>은 지금까지 LLM을 서빙 경로에 넣는 두 가지 방식(채점 함수/생성기)을 다뤘다. MetaStrategy는 <strong>LLM을 오프라인 정책 컴파일러</strong>로 두는 세 번째 방식을 프로덕션 진술로 낸다. 이 각도의 매력은 명확하다: LLM 지연이 사용자에게 노출되지 않으니 크고 느린 모델을 써도 되고, 출력이 typed JSON이라 기존 랭킹 스택의 결정론적 가드레일과 자연스럽게 어울린다. 반대급부는 LLM이 요청별 세부 맥락에 반응할 수 없다는 것 — 세션 내 실시간 인텐트를 읽는 능력은 GenRec/Gryphon 쪽이 강할 수밖에 없다.</p></div>
+<p>같은 사흘 안에 Taobao에서 나온 <a href="#3-dream-taobao--%EA%B8%B0%EC%A1%B4-%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8-%EC%9C%84%EC%97%90-agentic-%EB%A9%94%ED%83%80-%EC%A0%9C%EC%96%B4-%EB%A0%88%EC%9D%B4%EC%96%B4%EB%A5%BC-%EC%96%B9%EB%8A%94%EB%8B%A4--%EB%A0%88%EC%9D%B4%EB%8D%94">DREAM</a>이 그 반대급부(실시간 인텐트)를 다른 방식으로 풀어서 대칭이 흥미롭다.</p>
+<h2>2. PushDualGen (Kuaishou) — SID + 스킵 가능한 설명 텍스트 — SID 오픈 스레드 갱신</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.07989">PushDualGen: Enabling LLMs to Generate Semantic IDs with Interpretable Copy for Industrial Push Recommendation</a> — arXiv 2608.07989, 2026-08-08, 논문 (Kuaishou, 저자 12인)</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>Kuaishou는 프로덕션 LLM-native 추천을 공개적으로 밀고 있는 몇 안 되는 플랫폼이다. <strong>OneRec</strong>(SID로 end-to-end 유저 개인화)이 첫 세대, <strong>OneRec-Thinking</strong>(SID 생성 전에 CoT를 얹어 추론 흔적을 남김)이 두 번째 세대다. OneRec-Thinking의 문제는 자명하다 — CoT는 토큰을 많이 뽑고 추론 비용이 크다. 그래서 대규모 푸시 추천처럼 요청량이 큰 지면엔 부담이 크다.</p>
+<p>PushDualGen은 그 자리를 채우는 세 번째 세대다. &quot;SID를 뽑고 그 다음에 스킵 가능한 설명 텍스트(copy)를 붙여라&quot; — 설명은 서빙에서 스킵할 수 있는 잔가지라 lightweight generator로 유지된다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><p><strong>duo 생성: SID를 먼저, 설명 텍스트를 나중에</strong> <code>[확인]</code> — 설명은 skippable, 즉 서빙에서 필요할 때만 생성. 이 구조가 CoT처럼 매 요청 비용을 지불하지 않으면서도 &quot;왜 이 아이템이 추천됐나&quot;를 추적 가능하게 만든다.</p>
+<blockquote>
+<p>&quot;PushDualGen, a lightweight generator, which first generates the SID and then produces a copy as a skippable explanation.&quot;
+— <a href="https://arxiv.org/abs/2608.07989">PushDualGen 초록</a>, 2026-08-08</p>
+</blockquote>
+</li>
+<li><p><strong>프로덕션 배포 진술</strong> <code>[확인]</code> — Kuaishou 푸시 추천에 배포됨. 온라인 A/B에서 effective play rate 상대 +8.50%, 불만족률(dissatisfaction rate) 상대 −37.70%. 장기적으로 롱테일 비디오 노출도 개선.</p>
+<blockquote>
+<p>&quot;The effective play rate for videos recommended to users has relatively increased by 8.50%, while the dissatisfaction rate has relatively fallen by 37.70%. In the long term, PushDualGen optimises the content ecosystem, providing more exposure for long-tail videos.&quot;
+— <a href="https://arxiv.org/abs/2608.07989">같은 초록</a>, 2026-08-08</p>
+</blockquote>
+</li>
+<li><p><strong>어제 HD-Rec과 함께 Kuaishou의 SID 확장 라인이 이틀 연속 통과</strong>했다. HD-Rec은 cross-domain SID(계층 코드북 + domain sparse MoE, 벤치마크만) — PushDualGen은 프로덕션 배포. 두 편은 같은 라인의 서로 다른 진화 방향이다.</p>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> 없음. <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">radar.md 생성형 retrieval / semantic ID 오픈 스레드</a>에 &quot;2026-08-12 추가 근거&quot; 한 줄로 붙였다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> Kuaishou가 SID 라인(OneRec → OneRec-Thinking → PushDualGen)을 세대별로 계속 공개한다는 신호가 강해진다. HD-Rec의 저자 라인(Ruiming Tang, Guorui Zhou, Han Li)과 PushDualGen의 저자 라인이 겹치는지는 확인 안 함 — 겹치면 하나의 팀이, 안 겹치면 회사 차원의 두 개 축이 SID를 밀고 있다는 이야기가 된다. 이 라인이 유지되면 Netflix GenRec만이 대규모 A/B로 검증됐다는 <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 스레드</a>의 초기 그림이 얼마 안 가 바뀌게 된다.</p></div>
+<h2>3. DREAM (Taobao) — 기존 파이프라인 위에 agentic 메타 제어 레이어를 얹는다 — 레이더</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.09408">DREAM Technical Report</a> — arXiv 2608.09408, 2026-08-10, 논문 (Alibaba/Taobao, 저자 75인)</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>기존 산업 추천 파이프라인의 고전적 병목: retrieval → ranking → re-ranking이 모듈로 쪼개져 있어 정보와 목적이 파편화되고, 규칙이 뻣뻣하고, 실시간 인텐트에 무감각하다. DREAM은 이걸 <strong>파이프라인을 바꾸지 않고</strong> 위에 얹는 정책 레이어로 푼다. 세 층 인텐트 엔진(L0/L1/L2)이 온디바이스 신호를 구조화된 인텐트로 압축해 클라우드로 올리고, MetaModel이 그 인텐트를 요약→전략 계획→파라미터 번역으로 M1-M2-M3 추론한 뒤, 파이프라인 파라미터를 조정한다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><p><strong>엣지-클라우드 트리거 체인이 리포팅 볼륨을 ~8.7%로 압축</strong> <code>[확인]</code> — 온디바이스 신호를 다 올리지 않고 트리거 조건으로 필터링. 클라우드 쪽 부담을 크게 줄인 게 배포 가능성의 전제.</p>
+</li>
+<li><p><strong>A/B 결과</strong> <code>[확인]</code>: re-ranking 제어만 적용 시 IPV +2.06%, Core IPV +2.39%, GMV +0.88%. fine ranking까지 확장 시 각각 +2.71%, +3.06%, +1.31%, PV는 +1% 이상 일관 개선. <strong>모델 교체 없이, 서빙 안정성 훼손 없이</strong>.</p>
+<blockquote>
+<p>&quot;Large-scale A/B tests on Taobao&#39;s homepage feed show that re-ranking control alone improves IPV by 2.06%, Core IPV by 2.39%, and GMV by 0.88%. Extending control to fine ranking raises these gains to 2.71%, 3.06%, and 1.31%, respectively... These gains require neither replacement of pipeline models nor compromise of serving stability, supporting agentic meta-control as a viable paradigm for industrial recommendation.&quot;
+— <a href="https://arxiv.org/abs/2608.09408">DREAM 초록</a>, 2026-08-10</p>
+</blockquote>
+</li>
+<li><p><strong>Reward Dual Loop</strong>: 오프라인 시뮬레이션(전략 공간 탐색) + 온라인 피드백(결과 보정) 이중 루프로 인텐트 엔진과 MetaModel을 동시 최적화 <code>[확인]</code>.</p>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> 없음. <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 새 엔트리로 추가.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> DREAM과 MetaStrategy는 같은 회사(Taobao), 같은 지면(홈페이지 피드) 근처에서 나온 두 접근이라 대칭이 뚜렷하다. MetaStrategy는 LLM이 <strong>정책 JSON</strong>을 nearline으로 컴파일해서 랭킹 스택 안에 부어넣는 방식, DREAM은 <strong>agentic MetaModel</strong>이 온디바이스 인텐트를 받아 파이프라인 파라미터를 조정하는 방식. 하나는 정책 컴파일러, 하나는 실시간 튜너다. 저자 명단이 상당 부분 겹치는 것으로 봐서(예: Chengyu Lai, Jiuning Lin, Bin Zhang, Han Zhu 등이 두 논문 공통) 같은 조직이 두 갈래로 실험 중일 가능성이 크다. 향후 두 접근이 하나로 수렴할지, 별도로 병렬 배포될지 지켜볼 만하다.</p></div>
+<h2>검증에서 뒤집힌 것</h2>
+<p>없음.</p>
+<h2>레이더</h2>
+<ul>
+<li>오늘 arXiv cs.IR 신규 30건 triage. <strong>4건이 수용 기준 통과</strong>했다 (Alibaba 3 + Kuaishou 1). 같은 회사(Alibaba)에서 사흘 사이 세 편이 나온 건 흔치 않은 배치라 별도로 기록한다.<ul>
+<li><strong>MetaStrategy</strong> — 위 1번, <a href="radar.html#%EC%9D%B4%EB%B2%88-%EB%8B%AC-%EC%8B%A0%EA%B7%9C">radar.md 이번 달 신규</a>에 새 엔트리, <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 스레드</a> 한 줄 추가.</li>
+<li><strong>PushDualGen</strong> — 위 2번, <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">SID 스레드</a> &quot;2026-08-12 추가 근거&quot; 한 줄.</li>
+<li><strong>DREAM</strong> — 위 3번, <a href="radar.html#%EC%9D%B4%EB%B2%88-%EB%8B%AC-%EC%8B%A0%EA%B7%9C">radar.md 이번 달 신규</a>에 새 엔트리.</li>
+<li><strong>IntHQ</strong> (<a href="https://arxiv.org/abs/2608.09634">arXiv 2608.09634</a>, 2026-08-10) — Amap(Alibaba 지도, 여행 추천). 생성형 추천에 multi-task를 융합하는 세 갈래(Dual-Stream Decoupling, Task-Interactive Modeling, Hierarchical Querying). 프로덕션 A/B에서 UVCTR +1.60%. 메커니즘 신규성은 상대적으로 낮다 — 이미 존재하는 generative + multi-task 조합을 정돈한 것에 가깝다. 그래서 radar 엔트리는 만들지 않고 daily에 기록만 남긴다. 같은 계열 논문이 더 쌓이면 승격 판단.</li>
+</ul>
+</li>
+<li>나머지 26건은 순수 학술 증분(RAG 최적화, 학술 retrieval, medical/legal/edu 도메인, POI, RISC-V ANNS 등)이라 탈락.</li>
+<li>산업 블로그 스윕은 월요일 스캔 — 오늘(화)은 안 함. 다음 스윕은 2026-08-17(월).</li>
+</ul>
+<h2>다음에 볼 것</h2>
+<ul>
+<li><strong>MetaStrategy 본문 정독</strong> — 4B teacher가 두 개인 이유(서로 다른 강점을 combine한다고 함), production-path replay 환경 구현, self-competitive curriculum 세부. LLM 지연이 nearline에서 얼마나 되는지도 초록에 없다. <strong>심층 분석 필요</strong> (사람이 트리거).</li>
+<li><strong>DREAM 본문 정독</strong> — 인텐트 L0/L1/L2 스키마, MetaModel M1-M2-M3 단계별 프롬프트/출력, 온디바이스 트리거 체인 세부. 75인 저자 규모라 팀 구조도 파악 필요. <strong>심층 분석 필요</strong>.</li>
+<li><strong>Kuaishou OneRec/OneRec-Thinking/PushDualGen 계보 정리</strong> — HD-Rec까지 포함해 SID 라인이 두 편 연속 통과했다. <code>topics/llm-in-recsys.md</code>에 Netflix GenRec과 나란히 놓을 절이 필요해지고 있다. 다음 산업 블로그 스윕(2026-08-17) 때 Kuaishou 엔지니어링 리소스도 훑기.</li>
+<li><strong>Taobao 홈피드 두 접근(MetaStrategy vs DREAM) 관계 재구성</strong> — 두 논문이 같은 지면을 겨냥하는데 별개 팀인지 같은 팀의 두 실험인지 저자 리스트로 재확인. 겹침이 확인되면 topic 후보(정책 컴파일 vs 실시간 튜닝).</li>
+</ul>
+
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-08-11.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-11</div></a><a class="r" href="daily-2026-08-13.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-13</div></a></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>
