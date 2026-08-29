@@ -174,7 +174,7 @@ ul.rl .chip b { font-size: 13px; }
   <div class="lead"><span class="lb">한 줄 요약</span>추적 서비스(X·Meta·Netflix)의 신규 발표는 없었으나, arXiv triage에서 Alibaba/Taobao 세 편(MetaStrategy·DREAM·IntHQ)과 Kuaishou 한 편(PushDualGen)이 같은 사흘 안에 프로덕션 진술을 담은 채로 수용 기준을 통과했다. 중국 대형 플랫폼이 서로 다른 각도에서 LLM/SID 계열을 서빙하는 방식이 한 묶음으로 공개된 셈이다.</div>
 </header>
 <div class="wrap" id="content">
-<h2>1. MetaStrategy (Taobao) — LLM이 채점하지 않고 &quot;랭킹 전략 JSON&quot;을 출력한다 — 레이더</h2>
+<h2 id="1-metastrategy-taobao--llm이-채점하지-않고-랭킹-전략-json을-출력한다--레이더">1. MetaStrategy (Taobao) — LLM이 채점하지 않고 &quot;랭킹 전략 JSON&quot;을 출력한다 — 레이더</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.09440">MetaStrategy: Generative Ranking with Executable LLM Strategies</a> — arXiv 2608.09440, 2026-08-10, 논문 (Alibaba/Taobao, 저자 15인)</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>지금까지 이 저장소가 추적해 온 &quot;LLM을 서빙 경로에 넣는 방법&quot;의 프로덕션 진술은 두 계열로 나뉜다. <strong>Netflix GenRec</strong>에서는 LLM 자체가 채점 함수가 되어 아이템에 스코어를 매기고(<a href="netflix.html">services/netflix.md</a> GenRec 절), <strong>Yandex Music Gryphon-v2</strong>에서는 LLM이 Semantic-ID 시퀀스를 생성해 retrieval+ranking을 한 번에 대체한다(<a href="radar.html">radar.md</a> 이번 달 신규). 두 계열의 공통점은 LLM이 <strong>온라인 서빙 경로의 실시간 함수</strong>라는 점이다. 즉 요청이 들어올 때마다 LLM을 실행해야 한다.</p>
@@ -205,7 +205,7 @@ ul.rl .chip b { font-size: 13px; }
 <div class="blk app"><p><span class="lbl">정본 반영</span> 없음. <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 새 엔트리로 추가했고, <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 랭킹 오픈 스레드</a>에는 &quot;GenRec/Gryphon과 다른 세 번째 각도&quot;라는 한 줄을 덧붙였다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> 우리 저장소의 <a href="llm-in-recsys.html">LLM-in-recsys topic</a>은 지금까지 LLM을 서빙 경로에 넣는 두 가지 방식(채점 함수와 생성기)을 다뤘다. MetaStrategy는 <strong>LLM을 오프라인 정책 컴파일러</strong>로 두는 세 번째 방식을 프로덕션 진술과 함께 제시한다. 이 접근의 장점은 두 가지다. LLM 지연이 사용자에게 노출되지 않으므로 크고 느린 모델을 써도 되고, 출력이 typed JSON이라 기존 랭킹 스택의 결정론적 가드레일과 자연스럽게 결합된다. 대신 LLM이 요청별 세부 맥락에 반응할 수 없다는 대가를 치른다. 세션 안에서 실시간 인텐트를 읽어 내는 능력은 GenRec/Gryphon 쪽이 앞설 수밖에 없다.</p></div>
 <p>같은 사흘 안에 Taobao에서 공개된 <a href="#3-dream-taobao--%EA%B8%B0%EC%A1%B4-%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8-%EC%9C%84%EC%97%90-agentic-%EB%A9%94%ED%83%80-%EC%A0%9C%EC%96%B4-%EB%A0%88%EC%9D%B4%EC%96%B4%EB%A5%BC-%EC%B6%94%EA%B0%80%ED%95%9C%EB%8B%A4--%EB%A0%88%EC%9D%B4%EB%8D%94">DREAM</a>은 바로 그 대가로 남은 문제, 곧 실시간 인텐트를 다른 방식으로 풀기 때문에 두 접근의 대칭이 흥미롭다.</p>
-<h2>2. PushDualGen (Kuaishou) — SID + 스킵 가능한 설명 텍스트 — SID 오픈 스레드 갱신</h2>
+<h2 id="2-pushdualgen-kuaishou--sid--스킵-가능한-설명-텍스트--sid-오픈-스레드-갱신">2. PushDualGen (Kuaishou) — SID + 스킵 가능한 설명 텍스트 — SID 오픈 스레드 갱신</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.07989">PushDualGen: Enabling LLMs to Generate Semantic IDs with Interpretable Copy for Industrial Push Recommendation</a> — arXiv 2608.07989, 2026-08-08, 논문 (Kuaishou, 저자 12인)</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>Kuaishou는 프로덕션 환경의 LLM-native 추천을 공개적으로 추진하는 몇 안 되는 플랫폼이다. 첫 세대는 SID로 end-to-end 유저 개인화를 수행하는 <strong>OneRec</strong>이고, 두 번째 세대는 SID를 생성하기 전에 CoT를 덧붙여 추론 흔적을 남기는 <strong>OneRec-Thinking</strong>이다. OneRec-Thinking의 문제는 분명하다. CoT는 토큰을 많이 생성하기 때문에 추론 비용이 크고, 그래서 대규모 푸시 추천처럼 요청량이 많은 지면에서는 부담이 커진다.</p>
@@ -229,7 +229,7 @@ ul.rl .chip b { font-size: 13px; }
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> 없음. <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">radar.md 생성형 retrieval / semantic ID 오픈 스레드</a>에 &quot;2026-08-12 추가 근거&quot;라는 한 줄을 덧붙였다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> Kuaishou가 SID 계열(OneRec → OneRec-Thinking → PushDualGen)을 세대별로 계속 공개한다는 신호가 강해진다. HD-Rec의 저자진(Ruiming Tang, Guorui Zhou, Han Li)과 PushDualGen의 저자진이 겹치는지는 아직 확인하지 않았다. 겹친다면 하나의 팀이 SID를 추진하는 것이고, 겹치지 않는다면 회사 차원에서 두 갈래로 SID를 추진하는 것이 된다. 이 계열이 계속 이어진다면, Netflix GenRec만 대규모 A/B로 검증되었다는 <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 스레드</a>의 초기 판단은 머지않아 바뀌게 된다.</p></div>
-<h2>3. DREAM (Taobao) — 기존 파이프라인 위에 agentic 메타 제어 레이어를 추가한다 — 레이더</h2>
+<h2 id="3-dream-taobao--기존-파이프라인-위에-agentic-메타-제어-레이어를-추가한다--레이더">3. DREAM (Taobao) — 기존 파이프라인 위에 agentic 메타 제어 레이어를 추가한다 — 레이더</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.09408">DREAM Technical Report</a> — arXiv 2608.09408, 2026-08-10, 논문 (Alibaba/Taobao, 저자 75인)</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>기존 산업 추천 파이프라인에는 고전적인 병목이 있다. retrieval → ranking → re-ranking이 모듈로 나뉘어 있어서 정보와 목적이 파편화되고, 규칙이 경직되어 있으며, 실시간 인텐트에 반응하지 못한다. DREAM은 이 문제를 <strong>파이프라인을 바꾸지 않고</strong> 그 위에 추가하는 정책 레이어로 해결한다. 세 층으로 이루어진 인텐트 엔진(L0/L1/L2)이 온디바이스 신호를 구조화된 인텐트로 압축해 클라우드로 전송하면, MetaModel이 그 인텐트를 요약, 전략 계획, 파라미터 번역이라는 M1-M2-M3 단계로 추론한 뒤에 파이프라인 파라미터를 조정한다.</p>
@@ -248,9 +248,9 @@ ul.rl .chip b { font-size: 13px; }
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> 없음. <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 새 엔트리로 추가했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> DREAM과 MetaStrategy는 같은 회사(Taobao)에서 같은 지면(홈페이지 피드) 부근을 대상으로 나온 두 접근이라 대칭이 뚜렷하다. MetaStrategy는 LLM이 <strong>정책 JSON</strong>을 nearline으로 컴파일해서 랭킹 스택 안에 주입하는 방식이고, DREAM은 <strong>agentic MetaModel</strong>이 온디바이스 인텐트를 받아 파이프라인 파라미터를 조정하는 방식이다. 하나는 정책 컴파일러이고, 다른 하나는 실시간 조정기다. 저자 명단이 상당 부분 겹치는 것으로 보아(예를 들어 Chengyu Lai, Jiuning Lin, Bin Zhang, Han Zhu 등이 두 논문에 공통으로 이름을 올렸다) 같은 조직이 두 갈래로 실험하고 있을 가능성이 크다. 앞으로 두 접근이 하나로 수렴할지, 아니면 각각 병렬로 배포될지 지켜볼 만하다.</p></div>
-<h2>검증에서 뒤집힌 것</h2>
+<h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
 <p>없음.</p>
-<h2>레이더</h2>
+<h2 id="레이더">레이더</h2>
 <ul>
 <li>오늘 arXiv cs.IR 신규 30건을 triage했고, 그 가운데 <strong>4건이 수용 기준을 통과</strong>했다 (Alibaba 3건 + Kuaishou 1건). 같은 회사(Alibaba)에서 사흘 사이에 세 편이 나온 것은 흔치 않은 묶음이라 따로 기록해 둔다.<ul>
 <li><strong>MetaStrategy</strong> (위의 1번 절) — <a href="radar.html#%EC%9D%B4%EB%B2%88-%EB%8B%AC-%EC%8B%A0%EA%B7%9C">radar.md 이번 달 신규</a>에 새 엔트리를 만들었고, <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 스레드</a>에 한 줄을 추가했다.</li>
@@ -262,14 +262,13 @@ ul.rl .chip b { font-size: 13px; }
 <li>나머지 26건은 순수 학술 증분(RAG 최적화, 학술 retrieval, medical/legal/edu 도메인, POI, RISC-V ANNS 등)이라 수용 기준에서 탈락했다.</li>
 <li>산업 블로그 스윕은 월요일에 수행하는 작업이라, 수요일인 오늘은 하지 않았다. 다음 스윕은 2026-08-17(월)에 진행한다.</li>
 </ul>
-<h2>다음에 볼 것</h2>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
 <ul>
 <li><strong>MetaStrategy 본문 정독</strong> — 4B teacher를 두 개 쓰는 이유(서로 다른 강점을 결합한다고 서술한다), production-path replay 환경의 구현 방식, self-competitive curriculum의 세부 내용을 확인해야 한다. nearline에서 LLM 지연이 얼마나 되는지도 초록에는 나오지 않는다. <strong>심층 분석 필요</strong> (사람이 트리거한다).</li>
 <li><strong>DREAM 본문 정독</strong> — 인텐트 L0/L1/L2 스키마, MetaModel M1-M2-M3 단계별 프롬프트와 출력, 온디바이스 트리거 체인의 세부 내용을 확인해야 한다. 저자가 75인 규모라서 팀 구조도 파악할 필요가 있다. <strong>심층 분석 필요</strong>.</li>
 <li><strong>Kuaishou OneRec/OneRec-Thinking/PushDualGen 계보 정리</strong> — HD-Rec까지 포함하면 SID 계열이 두 편 연속으로 통과했다. <code>topics/llm-in-recsys.md</code>에 Netflix GenRec과 나란히 놓을 절이 필요해지고 있다. 다음 산업 블로그 스윕(2026-08-17) 때 Kuaishou의 엔지니어링 자료도 함께 살펴본다.</li>
 <li><strong>Taobao 홈피드의 두 접근(MetaStrategy vs DREAM) 관계 재구성</strong> — 두 논문이 같은 지면을 겨냥하는데, 별개의 팀에서 나온 것인지 같은 팀의 두 실험인지를 저자 목록으로 다시 확인해야 한다. 저자가 겹치는 것이 확인되면 topic 후보로 올린다(정책 컴파일 vs 실시간 튜닝).</li>
 </ul>
-
 
 </div>
 <div class="wrap"><div class="pager"><a href="daily-2026-08-11.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-11</div></a><a class="r" href="daily-2026-08-13.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-13</div></a></div></div>

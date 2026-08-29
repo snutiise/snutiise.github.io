@@ -99,20 +99,20 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
   <ul id="toc"></ul>
 </nav>
 <main id="content">
-<h1>시퀀스 트랜스포머 랭킹 (in-context candidate scoring)</h1>
+<h1 id="시퀀스-트랜스포머-랭킹-in-context-candidate-scoring">시퀀스 트랜스포머 랭킹 (in-context candidate scoring)</h1>
 <p><strong>최종 갱신:</strong> 2026-08-09</p>
 <p>유저의 행동 이력을 토큰 시퀀스로 놓고, 점수를 매길 후보들을 <strong>같은 시퀀스 뒤에 붙여서</strong> 한 번의 forward pass로 전부 채점하는 랭킹 구조다.
 전통적인 &quot;피처 벡터 → MLP/DCN/MaskNet&quot; 랭커와 대비된다.</p>
 <p>이 노트는 X(Phoenix)와 Meta(HSTU 계보 / ads 계보) 둘을 함께 다룬다. <strong>두 회사가 독립적으로 같은 결론에 도달한 부분</strong>(후보를 시퀀스에 넣고 마스크로 격리해서 점수를 캐시할 수 있게 만든다)과 <strong>갈라진 부분</strong>(Meta는 계보가 둘인데 서로를 인용하지 않는다), 이 두 가지가 이 노트를 관통하는 기준이다.</p>
-<h2>왜 이 구조인가</h2>
+<h2 id="왜-이-구조인가">왜 이 구조인가</h2>
 <ul>
 <li>피처 엔지니어링을 어텐션으로 대체한다. 유저×아이템 cross feature를 손으로 만드는 대신, 후보 토큰이 이력 토큰을 직접 어텐션으로 참조한다. <code>[추정]</code> — X가 &quot;hand-engineered feature를 전부 없앴다&quot;고 주장하는 근거가 이 구조다.</li>
 <li>후보 N개를 한 시퀀스에 담으면 이력 인코딩 비용을 N개가 공유한다. 후보마다 따로 forward를 돌리는 것보다 비용이 적다. <code>[추정]</code> — 어텐션 마스크 설계상 그렇게 되며, X가 후보 블록을 시퀀스에 넣는 이유로 달리 설명하기 어렵다.</li>
 </ul>
-<h2>핵심 설계 요소</h2>
-<h3>1. 시퀀스 레이아웃</h3>
+<h2 id="핵심-설계-요소">핵심 설계 요소</h2>
+<h3 id="1-시퀀스-레이아웃">1. 시퀀스 레이아웃</h3>
 <p><code>[user] + [history × S] + [candidates × C]</code> 를 하나의 flat 시퀀스로 만드는 것이 X의 방식이다. <code>[확인]</code> xai-org/x-algorithm, 2026 — <code>phoenix/recsys_model.py:617-624</code></p>
-<h3>2. 어텐션 마스크 — 설계에서 가장 중요한 부분</h3>
+<h3 id="2-어텐션-마스크--설계에서-가장-중요한-부분">2. 어텐션 마스크 — 설계에서 가장 중요한 부분</h3>
 <p>후보끼리 서로 볼 수 있게 하느냐가 <strong>pointwise 랭킹이냐 slate 최적화냐</strong>를 가른다.</p>
 <p>X는 후보 블록에서 <strong>대각선만 남긴다</strong>(self-attend only). <code>[확인]</code> — <code>phoenix/grok.py:39-71</code>, 유닛테스트 <code>phoenix/test_recsys_model.py:94-121</code></p>
 <pre><code>        user  h1  h2  c1  c2  c3
@@ -130,13 +130,13 @@ c3    [  1    1   1   0   0   1 ]
 <li>X의 <code>phoenix/README.md:158</code>은 &quot;User + History: Full bidirectional attention among themselves&quot;라고 쓰는데 <strong>코드는 strictly causal이다.</strong> README와 코드가 정면으로 어긋난다. <code>[확인]</code> — <code>grok.py:62</code> (<code>jnp.tril</code>) vs <code>phoenix/README.md:158</code></li>
 <li>마스크가 배치 독립성을 보장해도 <strong>RoPE가 깨뜨린다.</strong> <code>right_anchored_rope=False</code>(기본값)면 후보 슬롯 0과 슬롯 40이 서로 다른 회전을 받아 점수가 달라진다. 이를 고치는 헬퍼(<code>right_anchored_rope_positions</code>)가 코드에 있는데, 공개된 파이프라인은 그 헬퍼를 켜지 않는다. <code>[확인]</code> — <code>grok.py:88-109</code>, <code>recsys_model.py:362</code>, <code>run_pipeline.py:132-162</code></li>
 </ul>
-<h3>3. 파라미터가 어디에 있는가</h3>
+<h3 id="3-파라미터가-어디에-있는가">3. 파라미터가 어디에 있는가</h3>
 <p>X Phoenix의 경우 <strong>99.8%가 ID 임베딩 테이블이고 트랜스포머는 0.8M</strong>에 그친다. <code>[추정]</code> — 공개 mini config(128-dim, 4-layer, vocab 1M×3)로 계산한 값이며, 체크포인트가 Git LFS에 있어서 직접 세어 보지는 못했다. 근거 수치는 <code>phoenix/README.md:222-230</code>이 밝힌 파일 크기(<code>model_params.npz</code> 3MB, <code>embedding_tables.npz</code> 1.4GB)와 일치한다.</p>
 <p>이것이 함의하는 바는 다음과 같다. 임베딩 테이블은 별도 서비스나 호스트 메모리에 두고 <strong>트랜스포머만 가속기에서 돌리는</strong> 서빙 구조가 자연스럽다. 실제로 공개 코드는 임베딩 lookup을 모델 바깥에서 numpy fancy-indexing으로 처리한다. <code>[확인]</code> — <code>recsys_model.py:103-116</code>, <code>run_pipeline.py:292-297</code></p>
-<h3>4. 콘텐츠는 들어가지 않는다</h3>
+<h3 id="4-콘텐츠는-들어가지-않는다">4. 콘텐츠는 들어가지 않는다</h3>
 <p>X Phoenix에는 텍스트도 이미지도 들어가지 않는다. 토큰은 <strong>해시된 ID + 소수의 categorical/scalar 채널</strong>뿐이다. <code>[확인]</code> — <code>recsys_model.py:238-250</code>, <code>:307-314</code></p>
 <p>들어가는 것은 post ID 해시 2개, author ID 해시 2개, 행동 multi-hot, product surface(16종), post age 버킷, dwell time이다. 들어가지 않는 것은 팔로워 수, 참여 수, 작성자 평판, 텍스트/토픽/언어, cross feature다.</p>
-<h2>&quot;hand-engineered feature 제거&quot; 주장의 실제 범위</h2>
+<h2 id="hand-engineered-feature-제거-주장의-실제-범위">&quot;hand-engineered feature 제거&quot; 주장의 실제 범위</h2>
 <p>X README는 &quot;We have eliminated <strong>every single</strong> hand-engineered feature and most heuristics from the system&quot;이라고 쓴다. <code>[확인]</code> — <code>README.md:55</code></p>
 <p><strong>문자 그대로는 거짓이다.</strong> 모델 안에 손으로 만든 것이 다음과 같이 남아 있다.</p>
 <ul>
@@ -149,9 +149,9 @@ c3    [  1    1   1   0   0   1 ]
 <p>정확한 표현은 **&quot;콘텐츠·작성자 피처를 없앴다&quot;**이다. 시간·표면·해싱 처리는 그대로 남아 있다.
 그리고 이것은 모델 안의 이야기이고, 그 바깥 서빙 레이어에는 필터 17개와 손으로 튜닝한 상수가 많이 있다. <a href="x.html">x.md</a>를 참조하라.</p>
 <hr>
-<h1>Meta — 트랜스포머 계보가 하나가 아니라 둘이다</h1>
+<h1 id="meta--트랜스포머-계보가-하나가-아니라-둘이다">Meta — 트랜스포머 계보가 하나가 아니라 둘이다</h1>
 <p>&quot;Meta의 시퀀스 모델&quot;을 단수로 말하면 틀린다. <strong>유기(organic) 쪽 HSTU 계보</strong>와 <strong>광고 쪽 DHEN→GEM 계보</strong>가 따로 있으며, 아래에서 확인한 대로 <strong>서로를 인용하지 않는다.</strong></p>
-<h2>계보 A (organic) — HSTU → ULTRA-HSTU</h2>
+<h2 id="계보-a-organic--hstu--ultra-hstu">계보 A (organic) — HSTU → ULTRA-HSTU</h2>
 <p><code>[확인]</code> <a href="https://arxiv.org/html/2402.17152v3">Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations</a>, ICML 2024 (arXiv 2024-02)</p>
 <p>X의 Phoenix가 &quot;기존 랭커를 트랜스포머로 바꾼다&quot;라면 HSTU는 <strong>문제 정의 자체를 바꾼다.</strong></p>
 <p><strong>(1) 피처 전체를 하나의 시계열로 합친다</strong></p>
@@ -184,7 +184,7 @@ c3    [  1    1   1   0   0   1 ]
 <p><strong>⚠ 지면이 익명화되어 있다.</strong> 논문은 *&quot;a large internet platform&quot;*이라고만 쓴다. Facebook Feed에 적용되었는지는 확인하지 못했다. <a href="facebook.html">facebook.md</a>의 열린 질문 5를 보라.</p>
 <p><strong>ULTRA-HSTU (2026)</strong> <code>[확인]</code> <a href="https://arxiv.org/abs/2602.16986">arXiv 2602.16986</a>, 2026-02-19. 후속작인데 <strong>직전 세대를 비판하면서 시작한다</strong>: <em>&quot;many recent approaches rely heavily on cross-attention mechanisms to address the quadratic computational bottleneck in sequential modeling, which can limit the representational power gained from self-attention.&quot;</em> 결과로는 <em>&quot;over 5x faster training scaling and 21x faster inference scaling&quot;</em>, <em>&quot;serving billions of users daily&quot;</em>, *&quot;4% to 8% consumption and engagement improvements&quot;*를 제시한다.</p>
 <p><code>[추정]</code> cross-attention 비판은 DV365처럼 &quot;미리 압축해서 덧붙이는&quot; 접근을 견제하는 말로 읽힌다. 같은 회사 안에서 초장기 히스토리를 처리하는 두 전략이 경쟁하고 있다는 뜻이다. 다만 논문이 DV365를 직접 지목하지는 않는다.</p>
-<h2>계보 B (ads) — DHEN → Wukong → InterFormer → GEM, 서빙은 MARM</h2>
+<h2 id="계보-b-ads--dhen--wukong--interformer--gem-서빙은-marm">계보 B (ads) — DHEN → Wukong → InterFormer → GEM, 서빙은 MARM</h2>
 <p>광고 쪽은 <strong>피처 상호작용(feature interaction) 계보</strong>에서 출발해 뒤늦게 시퀀스를 추가했다. HSTU와 출발점이 다르다. <code>[추정]</code> — 아래 표의 발표 순서(2022 DHEN·2024 Wukong은 interaction, 2024 InterFormer부터 시퀀스)가 근거다.</p>
 <table>
 <thead>
@@ -257,7 +257,7 @@ c3    [  1    1   1   0   0   1 ]
 <li><strong>함의</strong>: 이 글로 계보 표의 GEM 항목이 처음으로 <strong>훈련 인프라 쪽에 구체적 수치</strong>를 갖게 된다. 지금까지 GEM은 아키텍처 통합(Wukong+InterFormer)만 알려져 있었다.</li>
 </ul>
 <p><strong>MARM은 GEM을 서빙한다고 말하지 않는다.</strong> MARM 블로그 본문에 GEM은 <strong>등장하지 않는다</strong> (사이드바 &quot;Related Posts&quot; 링크에만 있다. 2026-08-09 전문 확인). 자기 규정은 <em>&quot;replaces a &#39;one-size-fits-all&#39; inference approach with intelligent request routing&quot;</em> + O(1T) 파라미터 스케일링이다. <strong>&quot;MARM이 GEM을 서빙한다&quot;는 그럴듯하지만 1차 출처가 없다.</strong> <code>[추정]</code> — 근거는 같은 조직, 같은 시기, 같은 광고 지면이라는 정황뿐이다.</p>
-<h2>두 계보가 서로를 인용하지 않는다 — 실측</h2>
+<h2 id="두-계보가-서로를-인용하지-않는다--실측">두 계보가 서로를 인용하지 않는다 — 실측</h2>
 <p><code>[관찰]</code> 2026-08-09 — 검사한 코퍼스는 아래 표의 세 블로그 <strong>본문 3건</strong>이며(사이드바·Related Posts 제외), 각 본문을 받아 문자열을 센 결과다. 재현 방법은 다음과 같다. 각 URL의 본문을 받아 <code>HSTU</code>/<code>Wukong</code>/<code>InterFormer</code>/<code>GEM</code>의 등장 횟수를 센다. 이 코퍼스 밖(논문·내부 문서)에 대해서는 아무 말도 하지 않는다.</p>
 <table>
 <thead>
@@ -293,19 +293,19 @@ c3    [  1    1   1   0   0   1 ]
 </tbody></table>
 <p><strong>독립된 세 문서에서 0이다.</strong> 광고 쪽이 자기 계보를 밝힐 때 HSTU를 한 번도 언급하지 않는다.</p>
 <p><code>[추정]</code> <strong>&quot;Meta에 통합 추천 트랜스포머가 하나 있다&quot;는 흔한 오해다.</strong> 최소한 2026-08 시점 공개 문헌상으로는 organic 계보와 ads 계보가 별개의 논문 계통·별개의 인용 그래프를 갖는다. 다만 인용이 없다는 사실이 코드를 공유하지 않는다는 점을 증명하지는 않는다. 블로그는 원래 인용이 드물다.</p>
-<h2>DV365 — 시퀀스를 늘리는 대신 미리 압축한다 (Instagram)</h2>
+<h2 id="dv365--시퀀스를-늘리는-대신-미리-압축한다-instagram">DV365 — 시퀀스를 늘리는 대신 미리 압축한다 (Instagram)</h2>
 <p><code>[확인]</code> <a href="https://arxiv.org/abs/2506.00450">DV365: Extremely Long User History Modeling at Instagram</a>, KDD 2025. 수치와 운영 상세는 <a href="instagram.html">instagram.md</a>에 있다. 여기서는 <strong>구조적 위치</strong>만 정리한다.</p>
 <p>최대 70,000 / 평균 40,000 인터랙션을 다루는데, <strong>모델의 시퀀스 길이를 늘리지 않는다.</strong> offline에서 multi-slicing + pooling으로 200개 임베딩을 만들어 downstream 15개 모델에 공급한다. 논문의 주장은 기존 attention 계열 시퀀스 모델(HSTU 포함)에 추가로 적용해도 incremental하다는 것이다. 즉 <strong>attention은 40K 길이에서 수확이 체감한다</strong>고 본다. <code>[확인]</code></p>
 <p><code>[추정]</code> <strong>Meta 안에 &quot;초장기 히스토리&quot;의 답이 셋 있다.</strong> ① HSTU는 시퀀스를 그대로 길게 쓰고, 비용은 Stochastic Length와 M-FALCON으로 상각한다. ② DV365는 오프라인에서 압축해 피처로 만든다. ③ LLaTTE는 비동기 upstream user model로 분리한다. ②와 ③은 &quot;무거운 계산을 랭커 밖으로 뺀다&quot;는 같은 형태이고, ULTRA-HSTU는 그 접근을 명시적으로 비판한다. <strong>세 방향이 동시에 프로덕션에 있다.</strong></p>
 <p>X에는 이런 구분 자체가 없다. Phoenix 공개 설정의 이력 길이는 훨씬 짧고, 이력을 압축하는 장치도 코드에 없다. <code>[확인]</code> xai-org/x-algorithm, 2026</p>
-<h2>&quot;통합 모델&quot; 주장을 읽는 법</h2>
+<h2 id="통합-모델-주장을-읽는-법">&quot;통합 모델&quot; 주장을 읽는 법</h2>
 <p>이 노트를 쓰는 동안 가장 많이 잘못 인용된 부분이라 분명히 적어 둔다. 원문과 상세한 내용은 <a href="facebook.html">facebook.md</a>에 있다.</p>
 <ul>
 <li><code>[확인]</code> Zuckerberg Q3 2025: <em>&quot;there are <strong>three giant transformers</strong> that run Facebook, Instagram, and ads recommendations&quot;</em> 그리고 통합은 <em>&quot;working on&quot;</em> 단계라고 말한다. 따라서 <strong>현재 셋은 별개다.</strong> 또한 이 목록에 <strong>Threads가 없다.</strong> <a href="threads.html">threads.md</a>를 보라.</li>
 <li><code>[확인]</code> <strong>⚠ Susan Li Q4 2025의 &quot;consolidation&quot; 발언은 organic이 아니다.</strong> 문장에 &quot;Facebook Feed&quot;가 나오지만 성과 지표가 *&quot;a 12% increase in <strong>ads quality</strong>&quot;*다. 광고 랭킹 모델의 지면별 통합이지 유기 Feed 랭킹 통합이 아니다.</li>
 </ul>
 <p><code>[추정]</code> 위 실측(HSTU 인용 0회)과 이 두 발언은 같은 방향을 가리킨다. <strong>통합은 목표로 선언되었고, 아직 문헌상 증거가 없다.</strong></p>
-<h2>X vs Meta — 이 주제에서의 대조</h2>
+<h2 id="x-vs-meta--이-주제에서의-대조">X vs Meta — 이 주제에서의 대조</h2>
 <table>
 <thead>
 <tr>
@@ -354,7 +354,7 @@ c3    [  1    1   1   0   0   1 ]
 </tbody></table>
 <p><code>[추정]</code> <strong>&quot;dense feature를 없앤다&quot;는 같은 슬로건을 세 시스템이 서로 다른 정도로 실행한다.</strong> 그리고 ads 계보는 아예 반대 방향으로 간다. LLaTTE는 semantic feature가 scaling의 전제조건이라고 말한다. 하나의 업계 트렌드로 묶어 서술하면 이 대립이 지워진다.</p>
 <hr>
-<h2>누가 이걸 쓰는가</h2>
+<h2 id="누가-이걸-쓰는가">누가 이걸 쓰는가</h2>
 <ul>
 <li><strong>X</strong> — Phoenix가 현행 프로덕션 랭커다. <code>[확인]</code> xai-org/x-algorithm, 2026-01 공개</li>
 <li><strong>X (2025 Scala 세대)</strong> — 같은 이름 <code>Phoenix</code>가 Scala home-mixer에도 rescorer로 들어가 있었다. 즉 트랜스포머 랭커가 기존 heavy ranker 옆에 붙는 형태로 먼저 들어갔고, 2026에 전면 교체되었다. <code>[확인]</code> twitter/the-algorithm <code>c54bec0</code>, 2025-09-03 — <code>PhoenixScorer</code> 외 7개 파일이 이 커밋에서 새로 추가되었다.</li>
@@ -365,7 +365,7 @@ c3    [  1    1   1   0   0   1 ]
 <li><strong>그 외 서비스</strong> — 아직 조사하지 않았다. Pinterest TransAct와 Kuaishou 쪽이 같은 계열에 속할 가능성이 높지만, 이 저장소에서 아직 1차 출처로 확인하지 않았다. <strong>열린 질문이다.</strong></li>
 </ul>
 <p>재학습·신선도 쪽(GEM continuous online training, DV365 6시간 갱신)은 <a href="model-freshness.html">model-freshness.md</a>에 있다. 여기서 반복하지 않는다.</p>
-<h2>아직 확인하지 못한 것</h2>
+<h2 id="아직-확인하지-못한-것">아직 확인하지 못한 것</h2>
 <ul>
 <li><strong>HSTU가 어느 지면에 돌아가는가.</strong> <em>&quot;a large internet platform&quot;</em>. ULTRA-HSTU가 *&quot;a large-scale production <strong>video serving platform</strong> that reaches billions of users daily&quot;*로 좁힌 것이 현재로서는 가장 구체적인 정보다. <a href="facebook.html">facebook.md</a>의 열린 질문 5를 보라.</li>
 <li><strong>두 계보가 실제로 코드를 공유하는가.</strong> 인용이 없다는 것은 실측했지만(위 표), 그것이 인프라 분리를 증명하지는 않는다.</li>
@@ -374,7 +374,7 @@ c3    [  1    1   1   0   0   1 ]
 <li><strong>Meta 쪽 어텐션 마스크 형태.</strong> X는 코드로 마스크를 볼 수 있는데 Meta는 M-FALCON이 마스크를 *&quot;수정한다&quot;*는 데까지만 공개했다. 후보 간 격리가 정확히 어떤 형태인지는 확인하지 못했다.</li>
 <li><strong>Phoenix의 프로덕션 시퀀스 길이.</strong> 공개된 것은 mini config뿐이다. Meta의 8192 / 40K와는 직접 비교할 수 없다.</li>
 </ul>
-<h2>출처</h2>
+<h2 id="출처">출처</h2>
 <p><strong>X</strong></p>
 <ul>
 <li><a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). <code>phoenix/</code> 전체.</li>
@@ -400,7 +400,6 @@ c3    [  1    1   1   0   0   1 ]
 <ul>
 <li>Zuckerberg Q3 2025 / Susan Li Q4 2025 실적발표 — 원문 인용은 <a href="facebook.html">facebook.md</a>에 있다.</li>
 </ul>
-
 
 </main>
 </div>

@@ -99,7 +99,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
   <ul id="toc"></ul>
 </nav>
 <main id="content">
-<h1>멀티태스크 랭킹 — 참여 확률 여러 개를 하나의 점수로</h1>
+<h1 id="멀티태스크-랭킹--참여-확률-여러-개를-하나의-점수로">멀티태스크 랭킹 — 참여 확률 여러 개를 하나의 점수로</h1>
 <p><strong>최종 갱신:</strong> 2026-08-09</p>
 <p>랭커가 &quot;이 유저가 이 아이템을 좋아할까&quot;를 스칼라 하나로 예측하지 않고, <strong>행동 종류별로 확률을 따로 예측한 뒤 하나의 점수로 합쳐서</strong> 정렬하는 구조다.</p>
 <p>⚠ 이 노트에서 Meta system card에 기반한 주장(예측 헤드 개수 등)은 전부 2026-08-09에 열람한 스냅샷이다. 전체 주의 사항은 <a href="facebook.html">../services/facebook.md</a>의 &quot;system card 인용의 유효기간&quot; 절에 정리해 두었다.</p>
@@ -107,13 +107,13 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </code></pre>
 <p><strong>단, 이 가중합은 여러 결합 형태 중 하나일 뿐이다.</strong> Meta는 같은 회사 안에서 지면마다 덧셈형·곱셈형·곱셈 페널티를 <strong>각각 다른 글에서 수식으로</strong> 공개했다(아래 표를 보라). &quot;멀티태스크 랭킹 = 가중합&quot;은 관찰이 아니라 가정이다.</p>
 <p>여기서 진짜 설계 결정은 네 가지다. <strong>어떤 행동을 헤드로 둘 것인가</strong>, <strong>어떤 형태로 결합할 것인가</strong>, <strong>음수 행동을 어떻게 섞을 것인가</strong>, <strong>가중치 w_k를 어디서 가져올 것인가.</strong></p>
-<h2>왜 이 구조인가</h2>
+<h2 id="왜-이-구조인가">왜 이 구조인가</h2>
 <ul>
 <li>목적 함수를 코드 배포 없이 바꿀 수 있다. 모델은 확률만 출력하고, 제품 판단(리트윗이 좋아요보다 몇 배 중요한가)은 가중치로 분리된다. <code>[추정]</code> X가 가중치를 전부 런타임 주입으로 분리한 구조가 이 해석과 일치한다.</li>
 <li>희소한 행동(신고, 차단)을 별도 헤드로 두면 학습 신호가 사라지지 않는다. 단일 스칼라 하나로 합치면 흔한 행동에 가려진다. <code>[추정]</code></li>
 <li>대가도 있다. <strong>가중치가 곧 제품 정책이 되는데, 그 값은 공개 소스에 남지 않는다.</strong> 아래 X 사례가 이 문제를 가장 잘 보여 준다.</li>
 </ul>
-<h2>케이스: Meta — 결합 형태가 지면마다 다르다</h2>
+<h2 id="케이스-meta--결합-형태가-지면마다-다르다">케이스: Meta — 결합 형태가 지면마다 다르다</h2>
 <p>Facebook이 공개한 결합 형태는 선형 하나인데, Instagram은 세 가지를 서로 다른 문제에 쓴다고 공개했다. <strong>한 회사 안에서 최소 3종이다.</strong></p>
 <table>
 <thead>
@@ -151,7 +151,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </tbody></table>
 <p><code>[확인]</code> 순서대로 — <a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/">How machine learning powers Facebook&#39;s News Feed ranking algorithm</a>(2021) / <a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system">Designing a Constrained Exploration System</a>(2020) / <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/">Scaling the Instagram Explore recommendations system</a>(2023) / <a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/">A New Ranking Framework for Better Notification Quality on Instagram</a>(2025)</p>
 <p>지면별 맥락은 <a href="facebook.html">facebook.md</a> · <a href="instagram.html">instagram.md</a>에 있다. 여기서는 형태 비교만 한다.</p>
-<h3>읽는 법</h3>
+<h3 id="읽는-법">읽는 법</h3>
 <ul>
 <li><strong>Facebook 수식의 <code>w</code>는 <code>(i,j,t)</code>로 인덱싱된다</strong> — 포스트·유저·시점별로 개인화된 가중치라는 뜻이다. <code>[확인]</code> 2021. 원문이 <em>&quot;for each <strong>post i</strong>, we estimate Yijt&quot;</em>, *&quot;the characteristics of the post X_it toward <strong>viewer j</strong> at time t&quot;*이므로 <strong><code>i</code>=포스트, <code>j</code>=뷰어</strong>다. 다만 심볼릭 수식뿐이라 실제 구현이 정말 <code>i</code>(포스트)에 의존하는지는 확인할 수 없다 <code>[추정]</code>.</li>
 <li><strong>곱셈형과 덧셈형은 음수 신호에 주는 권한이 다르다.</strong> 곱셈형은 <code>P(not_interested) → 1</code>이면 value가 0으로 붕괴하므로 사실상 hard veto이고, 덧셈형은 음수항이 아무리 커도 다른 항이 이를 넘어설 수 있으므로 교환 가능한 비용이다. <code>[추정]</code> 이 판단은 수식 형태에서 직접 따라 나온다.</li>
@@ -159,7 +159,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><strong>⚠ 2020 곱셈 → 2023 덧셈을 &quot;전환&quot;으로 읽으면 안 된다.</strong> 지면이 다르다(Suggested Posts vs Explore). 같은 지면의 전후를 비교한 자료가 없다. <code>[추정]</code></li>
 <li>네 번째(Notifications)는 결합이라기보다 <strong>다양성 페널티</strong>다. 상세한 내용은 → <a href="feed-diversity.html">feed-diversity.md</a>에 있다.</li>
 </ul>
-<h3>X와 정반대인 부분 — 음수를 곱하는가</h3>
+<h3 id="x와-정반대인-부분--음수를-곱하는가">X와 정반대인 부분 — 음수를 곱하는가</h3>
 <p><strong>같은 문제에 두 회사가 반대 방향으로 갔다.</strong></p>
 <ul>
 <li>Instagram 2020은 <strong>음수 확률을 곱해서 거부권을 준다</strong>(<code>(1 - P_not_interested)^w</code>). <code>[확인]</code> 2020</li>
@@ -167,7 +167,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>X 2026은 곱하되 <strong>음수 총점을 <code>0.001</code> 스케일로 압축</strong>해 양수 후보와 절대 섞이지 않게 한다. <code>[확인]</code></li>
 </ul>
 <p><code>[추정]</code> X는 음수 헤드가 순위를 크게 바꾸는 것을 막는 데 두 세대를 썼고, Instagram은 그 붕괴를 오히려 기능으로 활용한다. 코드에도 블로그에도 이유는 적혀 있지 않다.</p>
-<h3>가중치를 어디서 가져오는가 — 회사 간 진짜 분기점</h3>
+<h3 id="가중치를-어디서-가져오는가--회사-간-진짜-분기점">가중치를 어디서 가져오는가 — 회사 간 진짜 분기점</h3>
 <table>
 <thead>
 <tr>
@@ -199,7 +199,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><strong>세 주체 모두 숫자는 공개하지 않는다.</strong> Meta는 <em>방법</em>을 공개하고 값은 감추었으며, X는 <em>주입 지점과 범위</em>를 공개하고 값은 감추었다. 공개하는 항목이 다를 뿐 결론은 같다. 즉 <strong>목적 함수의 값은 제품 정책이고, 제품 정책은 공개되지 않는다.</strong></li>
 <li>Meta에도 X의 <code>ModelWeights</code> 목록에 대응하는 자료가 하나 있다. Transparency Center가 예측을 <strong>사용 빈도 3단계</strong>(<em>Used most frequently</em> / <em>occasionally</em> / <em>less frequently</em>)로 계층화한 것이다. <strong>가중치 대신 서열만 공개한 형태다.</strong> <code>[확인]</code> <a href="https://transparency.meta.com/features/ranking-and-content/">Our Approach to Facebook Feed Ranking</a> (2025-06-11 갱신)</li>
 </ul>
-<h3>헤드 수 19~22 vs ~10 — 비교하면 안 되는 두 숫자</h3>
+<h3 id="헤드-수-1922-vs-10--비교하면-안-되는-두-숫자">헤드 수 19~22 vs ~10 — 비교하면 안 되는 두 숫자</h3>
 <table>
 <thead>
 <tr>
@@ -258,8 +258,8 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><strong>그리고 X 쪽 숫자도 하나로 정해지지 않는다.</strong> 한 레포 안에서 19/21/22, 이전 세대에서는 13/15/17이 나온다. → 결론은 양쪽 모두 같다. <strong>&quot;헤드 수&quot;라는 단일 값은 존재하지 않는다. 어느 파일과 어느 카드를 봤는지 반드시 같이 적어야 한다.</strong></li>
 </ul>
 <p>부정 헤드가 있는지 여부는 Meta 안에서도 갈린다. Instagram은 <strong>수식 안에 항으로 명시해서</strong> 공개했고(<code>– W_see_less·P(see less)</code>), Facebook은 <strong>본문 서술로만</strong> 밝혔으며, <strong>Threads 카드에는 부정 예측 헤드가 하나도 없다.</strong> <code>[관찰]</code> 2026-08-09 (ig-threads-feed 카드 본문 1건) X 2026은 5개(not_interested/block/mute/report/not_dwelled)를 둔다. <code>[확인]</code></p>
-<h2>케이스: X — 설계 결정 6가지</h2>
-<h3>1. 가중치는 코드에 없다</h3>
+<h2 id="케이스-x--설계-결정-6가지">케이스: X — 설계 결정 6가지</h2>
+<h3 id="1-가중치는-코드에-없다">1. 가중치는 코드에 없다</h3>
 <p>X는 세 세대 모두 가중치를 <strong>FeatureSwitch(런타임 설정)</strong> 로 분리했다. 레포에 있는 것은 default 값이고, 프로덕션 값은 레포 밖에 있다.</p>
 <table>
 <thead>
@@ -294,7 +294,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <p>2025에서 default가 전부 <code>0.0</code>인 것은 &quot;좋아요 가중치가 0&quot;이라는 뜻이 <strong>아니다.</strong> &quot;가중치는 전부 런타임에 주입되고 레포에는 없다&quot;는 뜻이다. 이것을 잘못 읽으면 정반대 결론이 나온다.</p>
 <p>범위 자체에 정책이 명시된 경우는 있다. <code>ReportParam</code>은 min <code>-20000.0</code> / max <code>0.0</code>이고, <code>WeakNegativeFeedbackParam</code>·<code>StrongNegativeFeedbackParam</code>은 min <code>-1000.0</code> / max <code>0.0</code>이다. 셋 다 <strong>음수 전용으로 잠겨 있다.</strong> 운영자가 실수로도 양수를 넣을 수 없다. 이 경계는 2023부터 동일하다(2025에 신설된 것이 아니다). <code>[확인]</code> <code>HomeGlobalParams.scala:924-946</code>과 2023 <code>72eda9a</code>를 대조했다.</p>
 <p>→ 널리 인용되는 X 가중치 표(fav 0.5, retweet 1.0, reply 13.5, report −369.0 …)의 출처와 신뢰도는 <a href="x.html">x.md</a>의 &quot;가중치 — 무엇이 공개됐고 무엇이 아닌가&quot; 절을 참조하라. 요약하면 그 표의 출처는 <strong>2023-04-05 시점 ML 레포 README 한 곳뿐이고, 서빙 레포 31개 커밋 어디에도 나온 적이 없다.</strong></p>
-<h3>2. 음수 헤드를 곱셈에 넣는가 넣지 않는가</h3>
+<h3 id="2-음수-헤드를-곱셈에-넣는가-넣지-않는가">2. 음수 헤드를 곱셈에 넣는가 넣지 않는가</h3>
 <p>가장 크게 갈리는 부분이다. X 2025는 <strong>곱하지 않는다.</strong></p>
 <pre><code class="language-scala">// 양수 가중치
 combinedScore + score * weight
@@ -329,7 +329,7 @@ else combinedScoreSum + Epsilon
 <p>→ <strong>그래서 공개되지 않은 상수 하나를 복원할 수 있다.</strong> 2026 <code>NEGATIVE_SCORES_OFFSET</code>은 <code>crate::params</code>에 있어서 값이 보이지 않지만, 2025의 대응 상수는 <code>val Epsilon = 0.001</code>로 코드에 그대로 남아 있다 <code>[확인]</code> <code>RerankerUtil.scala:16</code>. 두 레포는 &quot;코드 중복 0&quot;이라고 알려져 있지만 <strong>점수 집계 수식만은 포팅되었고, 그 덕분에 2025 값이 2026 상수를 추정하는 하한 근거가 된다</strong> <code>[추정]</code>.</p>
 <p>이 식의 의미는 이렇다. 음수 총점은 <code>0.001</code> 스케일로 눌린다. 양수 후보의 최솟값이 <code>0 + 0.001 = 0.001</code>이므로 <strong>음수 후보는 항상 모든 양수 후보 아래로 간다.</strong> 순서는 보존하되 두 무리가 섞이지 않는 설계다.</p>
 <p>같은 식이 더 이상 쓰이지 않는 파일 <code>weighted_scorer.rs:87-89</code>에도 남아 있다. 거기서는 <code>p::NEGATIVE_WEIGHTS_SUM</code> / <code>p::WEIGHTS_SUM</code>을 상수로 읽는다. 즉 <strong>가중치 합을 요청별로 계산하는 구조로 바뀌기 전 세대</strong>의 형태다 <code>[추정]</code>.</p>
-<h3>3. 헤드 목록은 세대마다 다르고, 레포 안에서도 여러 벌이 함께 존재한다</h3>
+<h3 id="3-헤드-목록은-세대마다-다르고-레포-안에서도-여러-벌이-함께-존재한다">3. 헤드 목록은 세대마다 다르고, 레포 안에서도 여러 벌이 함께 존재한다</h3>
 <p>2026 Rust 랭커가 읽는 헤드는 <strong>22개</strong>다 <code>[확인]</code> <code>ranking_scorer.rs:12-39,146-170</code>:</p>
 <table>
 <thead>
@@ -372,21 +372,21 @@ else combinedScoreSum + Epsilon
 </ul>
 <p>Navi는 음수 헤드가 <code>negative_feedback_v2</code> <strong>하나뿐</strong>이다. 2026의 5개(not_interested/block/mute/report/not_dwelled)로 세분화된 것은 세대 간 변화다. <code>[확인]</code></p>
 <p><strong>주의할 점:</strong> 2025 레포에는 <code>PredictedScoreFeature</code>라는 <strong>같은 이름의 파일이 두 개</strong> 있고 헤드 세트가 서로 다르다. 하나는 <code>model/</code>(15개 <code>Seq</code>, 실사용)이고, 다른 하나는 <code>product/scored_tweets/scorer/</code>(17개 <code>Set</code>, Report·StrongNegativeFeedback·VideoPlayback50 등 포함)다. 실제 스코어러가 import하는 것은 <code>model/</code> 쪽이다. <code>scorer/</code> 쪽을 근거로 &quot;X는 report 헤드를 쓴다&quot;고 쓰면 틀린다. <code>[확인]</code> <code>RerankerUtil.scala:4</code>의 import 경로가 근거다.</p>
-<h3>4. 가중치 주입 경로가 요청 단위일 수 있다</h3>
+<h3 id="4-가중치-주입-경로가-요청-단위일-수-있다">4. 가중치 주입 경로가 요청 단위일 수 있다</h3>
 <p>2025 Navi는 가중치를 param이 아니라 <strong>query feature</strong>에서 읽는다.</p>
 <pre><code class="language-scala">weight = query.features.get(feature.weightQueryFeature).getOrElse(0.0)
 </code></pre>
 <p><code>[확인]</code> <code>RerankerUtil.scala:28-29</code>. 헤드마다 <code>weightQueryFeatureName</code> / <code>biasQueryFeatureName</code> / <code>debiasQueryFeatureName</code> 3종이 있다 <code>[확인]</code> <code>PredictedScoreFeature.scala:43-56</code>.</p>
 <p><strong>즉 목적 함수가 요청마다 달라질 수 있다.</strong> 유저 세그먼트별·실험별로 다른 가중치를 주입하는 구조로 보이지만, 값을 채우는 upstream 서비스는 레포에 없다 <code>[추정]</code>.</p>
 <p>같은 레포에서 Phoenix 쪽은 param에서 직접 읽는다(<code>query.params(feature.modelWeightParam)</code>). 두 랭커의 주입 경로가 서로 다르다. <code>[확인]</code> <code>PhoenixModelRerankingScorer.scala:51</code></p>
-<h3>5. 부적격 헤드는 0이 아니라 bias로 대체된다</h3>
+<h3 id="5-부적격-헤드는-0이-아니라-bias로-대체된다">5. 부적격 헤드는 0이 아니라 bias로 대체된다</h3>
 <p>영상이 없는 포스트에 vqv 헤드를 쓸 수 없다. X 2025는 이때 0을 넣지 않고 <strong>bias 값</strong>을 넣는다.</p>
 <pre><code class="language-scala">score = if (isEligible) predictedScoreOpt.getOrElse(0.0) else bias
 </code></pre>
 <p><code>[확인]</code> <code>RerankerUtil.scala:34-37</code>. 0을 넣으면 영상이 없는 포스트가 구조적으로 불리해지기 때문으로 보인다 <code>[추정]</code>.</p>
 <p>자격 조건도 사람이 직접 정한 값이다. 영상 헤드에는 <code>duration &gt;= 10초</code> 조건이 붙고, <code>EnableDwellOrVQVParam</code>을 켜면 <strong>Dwell과 VQV가 상호 배타</strong>가 된다. <code>[확인]</code> <code>PredictedScoreFeature.scala:154-164,220-232,273-279</code></p>
 <p>임계값 클리핑도 있다. VQV 점수가 <code>ScoreThresholdForVQVParam</code> 미만이면 <code>0.0</code>으로 잘리고, binary scheme을 켜면 상수로 대체된다. <code>[확인]</code> <code>:176-188</code></p>
-<h3>6. 가중합 이후에도 점수가 계속 바뀐다</h3>
+<h3 id="6-가중합-이후에도-점수가-계속-바뀐다">6. 가중합 이후에도 점수가 계속 바뀐다</h3>
 <p>가중합은 끝이 아니다. 2026 Rust에서 점수가 바뀌는 순서는 다음과 같다.</p>
 <ol>
 <li>헤드별 가중합을 구한 뒤 <code>offset_score</code>를 적용한다 (<code>ranking_scorer.rs:146-183</code>)</li>
@@ -398,7 +398,7 @@ else combinedScoreSum + Epsilon
 <p><code>[확인]</code> <code>ranking_scorer.rs:248-284</code>, <code>phoenix_candidate_pipeline.rs:300</code></p>
 <p>2025 Scala도 같은 성격이지만 <strong>덧셈</strong>이다. <code>DiversityRescoringFeatureHydrator</code>가 MMR로 <code>score = relevance + diversityWeight · minDistance</code>를 계산해 <code>ScoreFeature</code>를 <strong>덮어쓴다</strong>. <code>[확인]</code> <code>DiversityRescoringFeatureHydrator.scala:70,102</code></p>
 <p>→ 다양성 레이어의 상세한 내용은 <a href="feed-diversity.html">feed-diversity.md</a>에 있다.</p>
-<h2>케이스: Netflix — 헤드×가중치 프레임 자체를 벗어난다</h2>
+<h2 id="케이스-netflix--헤드가중치-프레임-자체를-벗어난다">케이스: Netflix — 헤드×가중치 프레임 자체를 벗어난다</h2>
 <p>X·Meta의 <code>Σ w·P(action)</code> 프레임에 Netflix를 넣으면 맞지 않는다. <strong>공개된 목적함수가 가중합이 아니라 보상 함수다.</strong></p>
 <p><code>[확인]</code> <a href="https://netflixtechblog.com/recommending-for-long-term-member-satisfaction-at-netflix-ac15cada49ef">Recommending for Long-Term Member Satisfaction at Netflix</a>, 2024:</p>
 <ul>
@@ -409,7 +409,7 @@ else combinedScoreSum + Epsilon
 </ul>
 <p><strong>다만 프레임이 다르다고 해서 헤드가 없는 것은 아니다.</strong> FM은 multi-token과 다중 예측 헤드를 갖고 <code>[확인]</code> <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39">FM 블로그 2025</a>, 가중 목적함수도 쓴다(<em>&quot;5분 트레일러와 2시간 완주가 같을 수 없다&quot;</em>). 차이는 <strong>그 가중이 학습 목적함수 안에 있고, 서빙 시점의 <code>Σ w·P</code> 결합층이 공개 문헌에 없다</strong>는 점이다. GenRec(2026)은 아예 reward-weighted loss로 학습한 LLM이 직접 랭킹한다 <code>[확인]</code> <a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3">GenRec 블로그</a>. 결합이 모델 파라미터로 흡수된 형태다.</p>
 <p>덧붙이면, 화면에 보이는 <strong>% Match는 랭킹 점수가 아니라 표시용</strong>이다. <em>&quot;시청 습관·행동 분석만으로&quot;</em> 산출한다 <code>[확인]</code> <a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs">2017 발표</a>. 유저에게 보이는 숫자와 정렬에 쓰는 숫자가 다른 시스템을 명시적으로 보여 주는 사례다. → <a href="netflix.html">netflix.md</a></p>
-<h2>이 케이스에서 일반화할 수 있는 것</h2>
+<h2 id="이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</h2>
 <ul>
 <li><strong>&quot;가중합&quot;은 가정이지 관찰이 아니다.</strong> Meta 한 회사만 봐도 덧셈·곱셈·덧셈+음수항·곱셈 페널티 4종이 지면별로 공개돼 있다. 새 서비스를 볼 때 <code>Σ w·P</code>를 기본 가정으로 놓고 시작하면 안 된다.</li>
 <li><strong>&quot;모델이 무엇을 예측하는가&quot;는 공개해도 &quot;무엇을 중요하게 보는가&quot;는 공개하지 않는다.</strong> X는 헤드 목록이 코드에 있고 가중치가 설정에 있다. Meta는 헤드 목록이 카드에 있고, 가중치를 정하는 <em>방법</em>이 블로그에 있으며, 값은 어디에도 없다. <strong>공개하는 항목이 다를 뿐 감추는 것은 같다.</strong></li>
@@ -419,7 +419,7 @@ else combinedScoreSum + Epsilon
 <li><strong><code>Σ w·P</code> 프레임은 보편이 아니라 광고형 지면의 관행일 수 있다.</strong> Netflix는 같은 문제(여러 행동 신호의 통합)를 보상 함수와 밴딧으로 푼다. 사업 모델이 구독(retention)이면 목적함수도 세션 참여 극대화가 아니라 장기 만족 프록시 쪽으로 기운다. 프레임 선택이 기술이 아니라 <strong>수익 모델의 함수</strong>일 가능성이 있다. <code>[추정]</code></li>
 <li><strong>north star를 직접 최적화하지 않는 이유는 신호 밀도다.</strong> retention(월 1회)이나 설문(희소) 같은 진짜 목표는 프록시 보상과 가중치 결정 레이어로 밀려나고, 랭커는 밀도 높은 행동 신호를 다룬다. Facebook의 설문 correlation과 Netflix의 reward engineering이 같은 구조의 두 구현이다.</li>
 </ul>
-<h2>누가 이걸 쓰는가</h2>
+<h2 id="누가-이걸-쓰는가">누가 이걸 쓰는가</h2>
 <ul>
 <li><strong>X</strong> — 2023·2025·2026 세 세대 모두 이 구조를 쓴다. 헤드 수는 세대와 파일에 따라 다르다(19~22, 위 설계 결정 3 참조). 가중치는 FeatureSwitch와 query feature로 주입한다. → <a href="x.html">x.md</a> <code>[확인]</code></li>
 <li><strong>Facebook</strong> — <code>Vijt = Σ wijtk·Yijtk</code>라는 덧셈형을 쓰고, pass 1은 포인트와이즈 멀티태스크 신경망이며, 가중치는 설문 correlation으로 정한다. Feed 카드에 헤드 10종이 있고, 본문에만 있는 부정 예측이 더 있다. → <a href="facebook.html">facebook.md</a> <code>[확인]</code></li>
@@ -428,14 +428,14 @@ else combinedScoreSum + Epsilon
 <li><strong>Netflix</strong> — <code>Σ w·P</code> 형태가 아니다. 밴딧에 프록시 보상 <code>r=f(play, complete, thumb)</code>과 지연 피드백 예측을 결합한다. north star는 retention이다. → <a href="netflix.html">netflix.md</a> <code>[확인]</code></li>
 <li><strong>그 외 서비스</strong> — 아직 조사하지 않았다. YouTube의 multi-gate MoE(2019 RecSys)와 Pinterest 계열이 같은 범주에 있을 가능성이 높지만, 이 저장소에서 아직 1차 출처로 확인하지 않았다. <strong>열린 질문이다.</strong></li>
 </ul>
-<h2>출처</h2>
-<h3>공개 소스코드</h3>
+<h2 id="출처">출처</h2>
+<h3 id="공개-소스코드">공개 소스코드</h3>
 <ul>
 <li><a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). <code>home-mixer/scorers/</code>, <code>phoenix/</code>.</li>
 <li><a href="https://github.com/twitter/the-algorithm">twitter/the-algorithm</a> — 2025-09-03 커밋 <code>c54bec0</code>, 공개 소스코드. <code>home-mixer/</code>.</li>
 <li><a href="https://github.com/twitter/the-algorithm-ml">twitter/the-algorithm-ml</a> — 2023-04-05 <code>projects/home/recap/README.md</code>. 가중치 숫자가 나오는 <strong>유일한</strong> 1차 출처다.</li>
 </ul>
-<h3>Meta 엔지니어링 블로그 (결합 수식의 1차 출처)</h3>
+<h3 id="meta-엔지니어링-블로그-결합-수식의-1차-출처">Meta 엔지니어링 블로그 (결합 수식의 1차 출처)</h3>
 <ul>
 <li><a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/">How machine learning powers Facebook&#39;s News Feed ranking algorithm</a> — 2021, 블로그. <code>Vijt = Σ w·Y</code>와 3-pass 구조를 설명한다.</li>
 <li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system">Designing a Constrained Exploration System</a> — 2020, 블로그. 곱셈형 value model과 Bayesian optimization을 다룬다. ⚠ <a href="https://engineering.fb.com/2020/12/10/web/how-instagram-suggests-new-content/">How Instagram suggests new content</a>와 같은 글인데 제목만 다르다.</li>
@@ -443,19 +443,18 @@ else combinedScoreSum + Epsilon
 <li><a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/">A New Ranking Framework for Better Notification Quality on Instagram</a> — 2025, 블로그. <code>Score = R×D</code> 곱셈 페널티를 다룬다.</li>
 <li><a href="https://engineering.fb.com/2025/05/21/production-engineering/journey-to-1000-models-scaling-instagrams-recommendation-system/">Journey to 1000 models: Scaling Instagram&#39;s recommendation system</a> — 2025, 블로그. <code>ig_stories_tray_mtml</code> 명명 규칙이 나온다.</li>
 </ul>
-<h3>Meta Transparency Center (규제 대응 1차 문서)</h3>
+<h3 id="meta-transparency-center-규제-대응-1차-문서">Meta Transparency Center (규제 대응 1차 문서)</h3>
 <ul>
 <li><a href="https://transparency.meta.com/features/ranking-and-content/">Our Approach to Facebook Feed Ranking</a> — 2025-06-11 갱신. 예측의 <strong>사용 빈도 3단계</strong>가 나온다.</li>
 <li><a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/">fb-feed</a> · <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed-recommendations/">fb-feed-recommendations</a> · <a href="https://transparency.meta.com/features/explaining-ranking/ig-threads-feed/">ig-threads-feed</a> — AI system card, 지면별 예측 헤드 목록.</li>
 </ul>
-<h3>Netflix</h3>
+<h3 id="netflix">Netflix</h3>
 <ul>
 <li><a href="https://netflixtechblog.com/recommending-for-long-term-member-satisfaction-at-netflix-ac15cada49ef">Recommending for Long-Term Member Satisfaction at Netflix</a> — 2024, 블로그. <strong>보상 함수 프레임의 1차 출처다.</strong></li>
 <li><a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39">Foundation Model for Personalized Recommendation</a> — 2025, 블로그. 다중 헤드와 가중 목적함수를 다룬다.</li>
 <li><a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3">GenRec</a> — 2026, 블로그. reward-weighted loss를 다룬다.</li>
 <li><a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs">Goodbye Stars, Hello Thumbs</a> — 2017, 발표. % Match는 표시용이다.</li>
 </ul>
-
 
 </main>
 </div>

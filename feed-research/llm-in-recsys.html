@@ -99,7 +99,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
   <ul id="toc"></ul>
 </nav>
 <main id="content">
-<h1>추천 파이프라인 안의 LLM</h1>
+<h1 id="추천-파이프라인-안의-llm">추천 파이프라인 안의 LLM</h1>
 <p><strong>최종 갱신:</strong> 2026-08-13</p>
 <p>LLM/VLM이 추천 시스템에 들어가는 자리는 여섯 군데다. 섞어서 말하면 혼동되니 자리별로 나누어 본다.</p>
 <ol>
@@ -151,10 +151,10 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </tbody></table>
 <p><strong>두 회사가 정확히 반대 칸을 채웠다.</strong> X는 1·2, Meta는 5·6이다. <code>[추정]</code> — 위 표의 각 칸이 아래에서 1차 출처로 뒷받침되지만, &quot;반대&quot;라는 대조 자체는 공개된 것만 놓고 본 해석이다. 표의 <em>&quot;진술 없음&quot;</em> 칸도 전부 <code>[추정]</code>이다. 검사한 코퍼스는 아래 출처 목록(2026-08-09 열람)이고, 미공개 시스템에 대해서는 아무 말도 하지 않는다.</p>
 <p><strong>그리고 자리 3의 공백은 2026-07에 처음 깨졌고(Netflix GenRec, 아래 케이스 절), 2026-08 Meta ConnectionMind가 두 번째 진술을 냈다.</strong> ⚠ <strong>명제 변경(2026-08-13)</strong> — 이전에는 *&quot;유기 피드 랭킹 경로에 LLM이 들어간다는 1차 진술은 X·Meta 어느 쪽에도 없다&quot;*고 썼는데, ConnectionMind가 그 진술을 내면서 절반이 뒤집혔다. 다만 두 회사의 형태가 근본적으로 다르다: Netflix GenRec은 <strong>랭커 그 자체</strong>(LLM 백본 + catalog softmax 헤드)이고, Meta ConnectionMind는 <strong>그래프 경로 추론기</strong>다(LLM이 JSON으로 path 확장을 emit하고 F1 기반 GRPO로 정렬한다). 그리고 ConnectionMind는 서빙 층에서 <strong>하이브리드</strong>를 택했다: 대다수 트래픽은 LLM이 오프라인에서 발굴한 meta-path로 학습된 GNN이 서빙하고, LLM은 헤비 유저 5–10%의 온라인 hot path만 커버한다. 두 사례에서 <strong>&quot;LLM이 랭킹한다&quot;의 실체가 다르다는 점</strong>이 이 자리에서 가장 주목할 부분이다.</p>
-<h2>케이스: X의 Grox (2026)</h2>
+<h2 id="케이스-x의-grox-2026">케이스: X의 Grox (2026)</h2>
 <p><code>grox/</code>는 Kafka 기반 nearline 콘텐츠 주석 파이프라인이다. 요청 경로에는 들어가지 않는다. <code>[확인]</code> xai-org/x-algorithm, 2026 — <code>grox/main.py</code>, <code>grox/data_loaders/kafka_loader.py</code></p>
 <p>프로세스 3개(<code>grox-engine</code> / <code>grox-dispatcher</code> / gRPC 서버)가 <code>multiprocessing.Manager</code> 큐로 통신한다. <code>[확인]</code> — <code>grox/main.py</code>, <code>grox/schedules/context.py:19-28</code></p>
-<h3>무엇을 뽑는가 — plan 9개</h3>
+<h3 id="무엇을-뽑는가--plan-9개">무엇을 뽑는가 — plan 9개</h3>
 <table>
 <thead>
 <tr>
@@ -188,35 +188,35 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </tr>
 </tbody></table>
 <p><code>[확인]</code> — <code>grox/plans/plan_master.py</code> 및 각 plan 파일</p>
-<h3>slop score — LLM이 &quot;저품질 콘텐츠&quot;를 정수로 매긴다</h3>
+<h3 id="slop-score--llm이-저품질-콘텐츠를-정수로-매긴다">slop score — LLM이 &quot;저품질 콘텐츠&quot;를 정수로 매긴다</h3>
 <p><code>slop_score: int | None</code>이 분류기 출력 스키마의 1급 필드이고, <code>slopScore</code>로 영속화되며, 값별 카운터까지 붙어 있다(<code>task.publish_unified_post_annotations.slop_score_3.count</code>). 실험이 아니라 계측된 프로덕션 기능이다. <code>[확인]</code> — <code>grox/classifiers/content/banger_initial_screen.py:33-41</code>, <code>grox/tasks/task_pub.py:317</code>, <code>:175-178</code></p>
 <p>같은 VLM 호출 하나가 <strong>두 종류의 결과</strong>를 낸다: 품질 스크리닝(<code>BANGER_INITIAL_SCREEN</code>)과 랭킹 시그널(<code>GROK_RANKER</code>)이다. <code>[확인]</code> — <code>banger_initial_screen.py:49-52,157</code></p>
-<h3>안전 라벨은 fail-closed, 답글 품질은 fail-open</h3>
+<h3 id="안전-라벨은-fail-closed-답글-품질은-fail-open">안전 라벨은 fail-closed, 답글 품질은 fail-open</h3>
 <p>같은 서비스 안에서 처리 방식이 정반대다. 설계 의도가 뚜렷하다.</p>
 <ul>
 <li><strong>브랜드 안전성</strong>: Grok이 채점하지 않은 포스트는 그냥 <code>MediumRisk</code>로 분류된다. 광고를 붙이지 않는다는 뜻이다. <code>[확인]</code> — <code>home-mixer/models/brand_safety.rs:47-51</code></li>
 <li><strong>답글 랭킹</strong>: 결과가 없으면 점수가 <strong>최댓값 3.0</strong>으로 기본값 처리된다. <code>[확인]</code> — <code>grox/tasks/task_pub.py:451</code></li>
 </ul>
 <p>특정 snowflake ID(<code>2_054_275_414_225_846_272</code>) 이후의 포스트는 <code>PTOS_REVIEWED</code> 라벨이 없으면 무조건 MediumRisk다. 즉 <strong>어느 시점부터 LLM 안전 심사를 광고 인접성의 전제 조건으로 명시했다.</strong> <code>[확인]</code> — <code>home-mixer/models/brand_safety.rs:37,53</code></p>
-<h3>hallucination 가드</h3>
+<h3 id="hallucination-가드">hallucination 가드</h3>
 <p>LLM이 출력한 토픽 ID를 <strong>fetch해온 allow-list와 대조해서</strong> 모르는 ID는 버리고 카운터를 올린다. <code>[확인]</code> — <code>grox/tasks/task_pub.py:232-265</code></p>
 <p>JSON 파싱은 3단 fallback이다: pydantic <code>model_validate_json</code> → <code>json_repair</code> → 정규식 → 예외 순서다. <code>[확인]</code> — <code>grox/classifiers/content/reply_ranking.py</code></p>
 <p><code>temperature = 0.000001</code>. 0이 아니라 0에 아주 가까운 값을 쓴다. <code>[추정]</code> — zero-temperature 코드 경로를 피하려는 것으로 보이나 코드에 이유는 없다. <code>[확인]</code>(값 자체) <code>banger_initial_screen.py:45-47</code></p>
 <p>reasoning API 호출이 실패하면 <strong>아무 예외에서나 조용히 VLM으로 폴백한다.</strong> 모델 등급이 요청마다 달라질 수 있다는 뜻이다. <code>[확인]</code> — <code>grox/classifiers/content/safety_ptos.py:269-280</code></p>
-<h3>안전성 2단계 구조</h3>
+<h3 id="안전성-2단계-구조">안전성 2단계 구조</h3>
 <p>카테고리 7종을 지원하고, 그중 AdultContent/ViolentMedia 2종만 &quot;deluxe 4.2&quot; 경로를 거친다. deluxe 모드에서는 <strong>AdultContent 재검사를 무조건 한 번 더 주입</strong>했다가 위반 없으면 제거한다: 가장 리스크가 큰 카테고리에 의도적으로 적용한 high-recall 2차 패스다. <code>[확인]</code> — <code>safety_ptos.py:217-230</code>, <code>grox/tasks/task_safety_ptos_policy.py:39-61</code></p>
-<h2>이 케이스에서 일반화할 수 있는 것</h2>
+<h2 id="이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</h2>
 <ul>
 <li><strong>LLM 주석은 nearline이 정석이다.</strong> 요청 경로에 LLM을 넣지 않고 Kafka로 미리 처리해서 KV에 적어둔다. X는 dedup 캐시 9개를 전부 <code>TTLCache(maxsize=10_000, ttl=60)</code>로 두고 60초 창에서 중복 요청을 막는다. <code>[확인]</code> — <code>grox/tasks/task_rate_limit.py:59…174</code></li>
 <li><strong>LLM 출력은 랭커에 직접 들어가지 않고 필터와 광고 레이어로 전달된다.</strong> X에서 Grok 안전 라벨은 필터와 브랜드 안전성 판정으로 전달되고, 토픽은 유저 쪽 multi-hot 피처로 전달된다. 랭킹 트랜스포머(Phoenix)는 여전히 ID 임베딩만 입력으로 받는다. <code>[확인]</code> — <code>home-mixer/models/query.rs:78-79</code>, <code>phoenix/runners.py:130-144</code></li>
 <li><strong>멀티모달 임베딩은 만들었지만 홈 랭킹은 쓰지 않는다.</strong> <code>multimodal</code>은 <code>grox/</code> 밖에서 한 번도 나오지 않는다. 싱크 이름(<code>StratoPostMultimodalEmbeddingMhSearchAi</code>)이 검색을 가리킨다. <code>[확인]</code> — repo-wide grep, <code>grox/tasks/task_write_mm_embedding_sink.py:47</code>. 단 <code>RECSYS_EMBED_V4</code>라는 이름의 변종이 있으므로 공개되지 않은 recsys 소비자가 내부에 있을 가능성은 높다 <code>[추정]</code>.</li>
 </ul>
-<h2>아직 확인 못한 것 — 유저 관심사 요약</h2>
+<h2 id="아직-확인-못한-것--유저-관심사-요약">아직 확인 못한 것 — 유저 관심사 요약</h2>
 <p><code>inferred_grok_topics</code>(유저별 추론 관심 토픽, 32비트 multi-hot)를 home-mixer가 Strato에서 <strong>읽기만</strong> 한다. 그것을 만드는 서비스는 공개 레포에 없다. <code>[확인]</code> — <code>home-mixer/query_hydrators/inferred_grok_topics_query_hydrator.rs:22-27</code></p>
 <p>Grox 안에는 유저 요약 태스크가 없다. <code>TaskContext</code>에 유저 필드가 아예 없고, <code>TaskWithUser</code> 추상 클래스는 있는데 구현체가 없다. <code>[확인]</code> — <code>grox/schedules/types.py:56-69</code>, <code>grox/tasks/task.py</code></p>
 <p>→ <strong>X가 LLM으로 유저 프로파일을 만드는지는 공개 소스만으로는 판정할 수 없다.</strong></p>
 <hr>
-<h1>Meta — 두 가지가 섞여 있다: LLM <strong>표현</strong>(실재)과 LLM <strong>비유</strong>(수사)</h1>
+<h1 id="meta--두-가지가-섞여-있다-llm-표현실재과-llm-비유수사">Meta — 두 가지가 섞여 있다: LLM <strong>표현</strong>(실재)과 LLM <strong>비유</strong>(수사)</h1>
 <p>Meta 추천 문헌에서 LLM이라는 단어는 <strong>서로 다른 두 가지</strong>를 가리킨다. 섞으면 결론이 정반대가 된다.</p>
 <table>
 <thead>
@@ -242,7 +242,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </tbody></table>
 <p><code>[확인]</code> A는 아래 &quot;자리 1&quot;·&quot;자리 3&quot;의 인용문, B는 바로 아래 표의 인용문이 각각 1차 출처다.</p>
 <p><strong>따라서 &quot;Meta 광고 스택은 LLM 파생 피처를 실제로 소비한다&quot;와 &quot;Meta의 랭킹 모델은 LLM이 아니다&quot;는 동시에 참이다.</strong> <code>[추정]</code> — 이 노트가 이전에 B만 보고 A까지 비유로 묶었던 것이 오류였다. 정정해 둔다.</p>
-<h2>주의할 점 — &quot;LLM-scale&quot; ≠ &quot;랭커가 LLM이다&quot; (B의 문제)</h2>
+<h2 id="주의할-점--llm-scale--랭커가-llm이다-b의-문제">주의할 점 — &quot;LLM-scale&quot; ≠ &quot;랭커가 LLM이다&quot; (B의 문제)</h2>
 <p><code>[확인]</code> 문서 본문 전수 확인, 2026-08-09:</p>
 <table>
 <thead>
@@ -271,7 +271,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <p><strong>&quot;Llama&quot;라는 단어는 GEM·LLaTTE·MARM 블로그 <strong>본문</strong> 어디에도 0회 등장한다.</strong> <code>[관찰]</code> 2026-08-09 — 검사한 코퍼스는 위 표의 블로그 3편 본문이고, 각 본문을 받아 <code>Llama</code>/<code>LLaMA</code> 문자열을 센 결과가 0이다.</p>
 <p>⚠ <strong>단, 블로그 한정이다.</strong> LLaTTE <strong>논문</strong>(arXiv 2601.20083)에는 *&quot;dense content embeddings produced by <strong>fine-tuned LLaMA models</strong>&quot;*가 명시돼 있다 <code>[확인]</code>(아래 자리 3). <strong>블로그가 B(비유)만 말하고 A(실재하는 LLM 피처)는 논문에만 남긴 사례다.</strong></p>
 <p><code>[추정]</code> 언론과 요약글이 이 세 표현을 &quot;Meta가 <strong>피드</strong> 랭킹에 LLM을 쓴다&quot;로 옮기는 것을 여러 번 봤다. 두 군데가 틀렸다: LLM이 들어가는 건 랭커가 아니라 <strong>입력 피처</strong>이고, 지면은 피드가 아니라 <strong>광고</strong>다.</p>
-<h2>자리 1 — 콘텐츠 주석: 광고 엔티티에만 있다</h2>
+<h2 id="자리-1--콘텐츠-주석-광고-엔티티에만-있다">자리 1 — 콘텐츠 주석: 광고 엔티티에만 있다</h2>
 <p><code>[확인]</code> <a href="https://engineering.fb.com/2026/07/15/ai-research/exploring-hierarchical-interest-representation-for-meta-ads-deep-funnel-optimization/">Exploring Hierarchical Interest Representation For Meta Ads Deep Funnel Optimization</a>, 2026-07-15</p>
 <blockquote>
 <p><em>&quot;We retrieve the multimodal information in summary text, images, and video and process it through a <strong>customized LLM inference engine</strong> that produces encoded feature inputs for our representation learning.&quot;</em>
@@ -281,7 +281,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <p><strong>X의 Grox와 구조는 같고 대상이 다르다.</strong> Grox는 유저가 올린 포스트를 주석하고, HIR은 <strong>광고주·상품 엔티티</strong>를 주석한다. 그리고 목적이 다르다: Grox는 품질/안전 판정(필터·광고 인접성 게이팅)이고 HIR은 <strong>콜드스타트 일반화</strong>다(<em>&quot;rare and unseen entities&quot;</em>).</p>
 <p><code>[추정]</code> <strong>이것이 두 회사의 LLM 용도를 가르는 핵심이다.</strong> X는 LLM을 <em>심판</em>으로 쓰고 Meta(광고)는 <em>피처 인코더</em>로 쓴다. 같은 &quot;content understanding&quot;이라는 말이 정반대 역할을 가리킨다.</p>
 <p><code>[추정]</code> 유기 피드(Facebook Feed / Instagram Feed / Reels / Threads) 콘텐츠를 LLM으로 주석한다는 Meta의 1차 진술은 <strong>찾지 못했다.</strong> 검사한 코퍼스는 아래 출처 목록의 Meta 블로그·논문과 Transparency Center 시스템 카드 15종(2026-08-09 열람)이다. HIR은 명시적으로 ads deep funnel 문헌이다.</p>
-<h2>자리 3 — LLaTTE의 &quot;semantic feature&quot; = A의 결정적 증거</h2>
+<h2 id="자리-3--llatte의-semantic-feature--a의-결정적-증거">자리 3 — LLaTTE의 &quot;semantic feature&quot; = A의 결정적 증거</h2>
 <p><code>[확인]</code> <a href="https://arxiv.org/abs/2601.20083">LLaTTE (arXiv 2601.20083)</a>, 2026-01-27:</p>
 <blockquote>
 <p><em>&quot;semantic features <strong>bend the scaling curve</strong>: they are a prerequisite for scaling, enabling the model to effectively utilize the capacity of deeper and longer architectures.&quot;</em></p>
@@ -294,7 +294,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </blockquote>
 <p>즉 &quot;semantic feature = LLM 출력&quot;은 추정이 아니라 확인이다. <strong>블로그는 이 사실을 말하지 않고 논문만 말한다.</strong> 그리고 이것이 A와 B를 가르는 부분이다: **LLaTTE 모델 자체는 LLM이 아니지만(B: <em>&quot;Unlike LLMs…&quot;</em>), 그 입력에는 LLaMA가 만든 벡터가 들어간다(A).** 두 문장이 같은 글에 있다.</p>
 <p>이것은 <a href="sequence-transformer-ranking.html">sequence-transformer-ranking.md</a>의 대립과 직결된다: HSTU는 *&quot;raw categorical engagement feature&quot;*만으로 충분하다고 하고, LLaTTE는 semantic feature가 스케일링의 <strong>전제조건</strong>이라고 한다. <strong>같은 회사의 두 계보가 반대로 말한다.</strong></p>
-<h2>자리 5 — Meta가 <strong>블로그에서</strong> Llama를 이름으로 부르는 유일한 곳</h2>
+<h2 id="자리-5--meta가-블로그에서-llama를-이름으로-부르는-유일한-곳">자리 5 — Meta가 <strong>블로그에서</strong> Llama를 이름으로 부르는 유일한 곳</h2>
 <p><code>[확인]</code> <a href="https://engineering.fb.com/2026/04/21/ml-applications/modernizing-the-facebook-groups-search-to-unlock-the-power-of-community-knowledge/">Modernizing the Facebook Groups Search</a>, 2026-04-21</p>
 <blockquote>
 <p>*&quot;We utilize <strong>Llama 3 with multimodal capabilities as an automated judge to grade search results against queries.</strong>&quot;*</p>
@@ -306,7 +306,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <em>&quot;Adaptive Retrieval: <strong>We are exploring</strong> LLM-driven adaptive retrieval strategies...&quot;</em></p>
 </blockquote>
 <p><strong>즉 2026-08 시점 Meta의 공개 문헌에서 &quot;LLM을 랭킹 단계에 직접 넣는다&quot;는 계획이지 배포가 아니다.</strong> <code>[추정]</code> — 위 인용문의 미래형은 <code>[확인]</code>이지만, &quot;공개 문헌 전체에 배포 진술이 없다&quot;는 부분은 같은 코퍼스(블로그·논문·카드 15종) 한정이다. 그것도 피드가 아니라 Groups <strong>검색</strong> 이야기다. ⚠ 여기서 &quot;직접&quot;이 중요하다: LLM <strong>출력을 피처로</strong> 넣는 것은 ads 쪽에서 이미 배포돼 있다(위 A).</p>
-<h2>자리 6 — 제품은 있는데 모델을 안 밝힌다</h2>
+<h2 id="자리-6--제품은-있는데-모델을-안-밝힌다">자리 6 — 제품은 있는데 모델을 안 밝힌다</h2>
 <p>Meta에는 X에 없는 것이 하나 있다. <strong>유저가 자연어로 랭킹에 지시하는 표면이다.</strong></p>
 <ul>
 <li><strong>Threads Dear Algo / Your Algo</strong> — <em>&quot;Just type &#39;Dear Algo&#39; in a public Threads post, followed by what you&#39;d like to see more or less of.&quot;</em> 적용 창은 3일(공개) / 1·3·7일(비공개)이다. <code>[확인]</code> 상세 → <a href="threads.html">threads.md</a></li>
@@ -315,7 +315,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <p><strong>둘 다 무슨 모델이 자연어를 파싱하는지 밝히지 않는다.</strong> Instagram은 *&quot;AI&quot;*라고만 쓴다. <code>[관찰]</code> 2026-08-09 (검사한 코퍼스: 위 뉴스룸 글 2건 본문)</p>
 <p><code>[추정]</code> 자유 텍스트를 받아 토픽 선호로 바꾸는 구조라 LLM이거나 최소한 텍스트 분류기가 있어야 한다. 하지만 <strong>경량 토픽 분류기로도 구현할 수 있으므로</strong> &quot;LLM일 것&quot;이라고 단정할 근거가 없다.</p>
 <p><code>[추정]</code> 이것은 자리 4(유저 관심사 요약)의 <strong>제품화된 형태</strong>이기도 하다. Instagram이 &quot;AI가 요약한 당신의 관심 토픽&quot;을 유저에게 <strong>보여준다</strong>는 것은 그 프로파일이 내부에 존재한다는 뜻이다. X의 <code>inferred_grok_topics</code>(읽기만 하고 생산자는 공개되지 않았다)와 같은 대상의 반대편이다. 즉 <strong>X는 파이프라인만 보이고 제품이 안 보이며, Meta는 제품만 보이고 파이프라인이 안 보인다.</strong></p>
-<h2>케이스: Meta ConnectionMind — 자리 3(LLM을 랭커로)의 Meta 첫 프로덕션 A/B 진술 (2026-08)</h2>
+<h2 id="케이스-meta-connectionmind--자리-3llm을-랭커로의-meta-첫-프로덕션-ab-진술-2026-08">케이스: Meta ConnectionMind — 자리 3(LLM을 랭커로)의 Meta 첫 프로덕션 A/B 진술 (2026-08)</h2>
 <p><code>[확인]</code> <a href="https://arxiv.org/abs/2608.10187">ConnectionMind: Leveraging Social Networks and Large Language Models for Personalized Recommendation at Meta (arXiv 2608.10187)</a>, 2026-08-10 — 저자는 6명이고, 1저자 Haoyu Han은 Michigan State University 인턴이며, 나머지 5명은 Meta Platforms(Menlo Park) 소속이다. 내부 팀명(Core Ranking / GenAI 등) 소속 각주는 없다.</p>
 <p><strong>핵심 세 가지:</strong></p>
 <ol>
@@ -334,7 +334,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><strong>서빙 비용과 latency는 전면 미공개다</strong>. 8B LLM이 헤비 유저 hot path에서 실제로 어떤 SLO를 견디는지, GPU 비용과 QPS와 p99 지연이 얼마인지 논문 어디에도 없다. Netflix GenRec 서빙 층 블로그가 vLLM·MSS·FSx pre-materialization까지 서술한 것과 크게 대비된다.</li>
 </ul>
 <p><strong>그럼에도 이 자리에 대한 판단의 중심을 흔든다.</strong> 2026-08까지 *&quot;Meta는 LLM을 랭킹 자체에는 안 쓴다&quot;*가 이 노트의 명제였다. 헤비 유저 코호트에 한정되더라도 온라인 hot path에 8B LLM이 들어가는 것은 그 명제의 절반을 뒤집는다. <strong>다만 형태는 Netflix와 다르다</strong>: Netflix는 채점 함수 자체를 LLM 백본으로 바꿨고, Meta는 그래프 위 경로 탐색기로 LLM을 넣었다. 자리 3의 실체가 회사마다 다른 대상이라는 점이 새로 드러난 사실이다.</p>
-<h2>케이스: Netflix — 자리 3(LLM을 랭커로)의 첫 배포급 1차 진술</h2>
+<h2 id="케이스-netflix--자리-3llm을-랭커로의-첫-배포급-1차-진술">케이스: Netflix — 자리 3(LLM을 랭커로)의 첫 배포급 1차 진술</h2>
 <p><code>[확인]</code> <a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3">GenRec: Towards LLM-Native Recommendation at Netflix</a>, 2026-07:</p>
 <ul>
 <li><strong>내부 LLM을 Netflix 데이터로 post-training한 모델이 직접 랭킹한다.</strong> 2단계로 나뉘는데, Netflix-adapted LLM(드물게 갱신)과 랭킹 post-training(자주 갱신)이다. 랭킹 백본은 ~1B-10B다.</li>
@@ -355,7 +355,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><strong>자리 6 (자연어 지시)</strong>: 대화형 검색 베타가 있다. 자연어로 기분과 의도를 말하면 추천한다 <code>[확인]</code> <a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience">About Netflix 2025</a> (OpenAI 협업설은 2차 보도이고 1차 출처는 확인하지 못했다 <code>[추정]</code>).</li>
 </ul>
 <p><strong>X·Meta와 나란히 놓으면:</strong> X는 LLM을 <em>심판</em>(주석·안전)으로, Meta는 <em>피처 인코더</em>(ads)와 <em>오프라인 심판</em>으로, Netflix는 <strong>랭커 그 자체</strong>로 넣었다. 셋 중 Netflix만 서빙 경로의 채점 함수가 LLM이다. 단 공개된 실험은 배치 연산 지면에 한정된다. <code>[추정]</code> 코퍼스 크기가 이 순서를 설명할 수 있다: 후보가 수천 개면 LLM 추론 비용이 감당되고, X·Meta처럼 수억 코퍼스에 ms 단위 예산이면 자리 1·2(오프라인)부터 들어가는 것이 자연스럽다. → <a href="netflix.html">netflix.md</a></p>
-<h2>프레이밍 검증 — &quot;X는 제품 표면, Meta는 업스트림&quot;이 맞는가</h2>
+<h2 id="프레이밍-검증--x는-제품-표면-meta는-업스트림이-맞는가">프레이밍 검증 — &quot;X는 제품 표면, Meta는 업스트림&quot;이 맞는가</h2>
 <p>이 노트를 시작할 때의 가설이었는데 <strong>절반만 맞다.</strong> 정정해 둔다.</p>
 <ul>
 <li><strong>틀린 절반</strong>: X의 Grok은 유저에게 보이는 제품 표면이 아니다. Grox는 <strong>nearline 파이프라인</strong>이고 유저는 slop score도 PTOS 판정도 보지 못한다. 오히려 <strong>유저 대면 자연어 표면을 가진 쪽은 Meta다</strong>(Dear Algo, Your Algorithm). 가설이 이 부분을 거꾸로 봤다.</li>
@@ -367,7 +367,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </blockquote>
 <p>⚠ 이 프레이밍이 흔들릴 수 있는 부분은 다음과 같다. ① Meta는 유기 피드 스택을 거의 공개하지 않는다: 부재가 곧 미사용은 아니었고, 실제로 ConnectionMind가 나오면서 이 부분이 확인됐다. ② X는 소스가 공개돼서 있는 것을 다 볼 수 있다. ③ Netflix의 진술은 <em>batch-compute</em> 지면 한정이고, Meta의 진술은 헤비 유저 5–10% 한정이다: 두 회사 모두 &quot;전면 hot path 100% LLM&quot;은 아니다. ④ 세 회사를 한 줄에 세울 때 지면 성격과 서빙 코호트 차이를 지워서는 안 된다. <strong>공개 비대칭이 결론처럼 보일 위험이 여전히 이 노트의 최대 리스크다.</strong></p>
 <p><code>[추정]</code>(secondhand) Digiday 2026 기사가 *&quot;Meta&#39;s LLM bet has yet to touch its core ads business&quot;*라는 제목으로 같은 방향을 보도했다. <strong>2차 보도이므로 근거로 쓰지 않았고, 위 결론은 Meta 1차 문서만으로 세웠다.</strong></p>
-<h2>Meta 쪽 아직 확인 못한 것</h2>
+<h2 id="meta-쪽-아직-확인-못한-것">Meta 쪽 아직 확인 못한 것</h2>
 <ul>
 <li><strong>Dear Algo / Your Algorithm의 자연어 파서.</strong> LLM인지 분류기인지, 파이프라인 어디에 붙는지(후보 필터 / 스코어 부스트) 공개된 정보가 전혀 없다.</li>
 <li><strong>유기 피드 콘텐츠의 LLM 주석 존재 여부.</strong> ads 쪽(HIR)만 확인됐다.</li>
@@ -376,7 +376,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><strong>Meta에 X의 PTOS에 해당하는 LLM 안전 판정이 있는가.</strong> Meta는 콘텐츠 정책 집행을 추천 문헌과 분리해 다뤄서 이 저장소 범위에서는 확인하지 못했다.</li>
 </ul>
 <hr>
-<h2>누가 이걸 쓰는가</h2>
+<h2 id="누가-이걸-쓰는가">누가 이걸 쓰는가</h2>
 <ul>
 <li><strong>X</strong> — Grox. 2026 세대에서 전용 서비스로 분리됐다. <code>[확인]</code></li>
 <li><strong>X (2025 Scala 세대)</strong> — Grok 기반 필터와 피처가 home-mixer/tweet-mixer에 먼저 들어갔다. <code>GrokGoreFilter</code>, <code>GrokNsfwFilter</code>, <code>GrokSpamFilter</code>, <code>GrokViolentFilter</code>, <code>GrokSlopScoreRescorer</code>, <code>GrokAnnotationsFeatureHydrator</code> 등 24개 Grok 관련 파일이 전부 2025-09-03 커밋에서 신규 추가됐다(2023 스냅샷에는 0개다). <code>[확인]</code> twitter/the-algorithm <code>c54bec0</code>, 2025 — <code>git ls-tree -r --name-only c54bec0 | grep -ci grok</code> = 24, 같은 명령이 2023 tip <code>72eda9a</code>에서는 0이다<ul>
@@ -391,7 +391,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><strong>Netflix</strong> — <strong>GenRec: LLM이 랭커 자체다</strong> (10% 트래픽 A/B, 2026). 대화형 검색은 베타이고, 아트워크 LLM은 연구 단계다. → <a href="netflix.html">netflix.md</a> <code>[확인]</code></li>
 <li><strong>그 외 서비스</strong> — 아직 조사하지 않았다. <strong>열린 질문이다.</strong></li>
 </ul>
-<h2>출처</h2>
+<h2 id="출처">출처</h2>
 <p><strong>X</strong></p>
 <ul>
 <li><a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). <code>grox/</code> 아래 파일이 60개다.</li>
@@ -416,7 +416,6 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience">Unveiling Our Innovative New TV Experience</a> — 2025, 발표. 대화형 검색 베타를 소개한다.</li>
 <li><a href="https://arxiv.org/abs/2601.02764">Artwork LLM Post-training</a> — 2026-01, 논문. 연구 단계다.</li>
 </ul>
-
 
 </main>
 </div>

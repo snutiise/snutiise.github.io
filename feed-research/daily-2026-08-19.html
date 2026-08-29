@@ -174,7 +174,7 @@ ul.rl .chip b { font-size: 13px; }
   <div class="lead"><span class="lb">한 줄 요약</span>X가 4세대 이후 세 번째로 내놓은 후속 공개(<a href="https://github.com/xai-org/x-algorithm/commit/b089ce6">b089ce6</a>, 2026-08-17)에서 다음 세 가지를 확인했다. (1) <strong>광고 브랜드 안전 판정에 V2 경로를 나란히 추가</strong>해서 Grok 라벨 6종을 <code>_V2</code> 버전으로 옮기고, V1 라벨 가운데 <code>PROMPT_OWNED_RULES</code>(botmaker rule id 7개)에 속하는 것을 강제로 제거하는 <code>compute_verdict_v2</code>를 새로 만들었다. (2) <strong>성인 컨텐츠 판정이 서로 엇갈릴 때 Grok 4.5를 심판으로 호출하는 cross-validation 태스크</strong>를 추가해서, safemodel(자체 비전 모델)이 positive라고 판정했지만 PtOS 정책이 hard 위반을 잡아내지 못하거나 그 반대인 경우에 Grok 4.5가 다시 판단해서 hard에서 soft로 강등할 수 있게 만들었다. (3) <strong><code>phoenix-rankall</code>의 인덱싱 게이트 두 개(<code>build1FavIndex</code>·<code>buildMMEmbMetadataDump</code>)에서 <code>favoriteCount &gt;= 1</code> 조건을 제거</strong>해서, 이제 후보 전체가 &quot;1fav&quot; 인덱스와 멀티모달 임베딩 메타데이터 덤프로 흘러가고 fav 없이 도착한 경우는 <code>1fav_uec_count_race</code> 카운터로 관측만 하도록 바꾸었다. 커밋 규모는 파일 34개에 +751/−162로 4세대+1(2026-08-14)보다 작지만, <strong>광고 브랜드 안전과 성인 컨텐츠 판정이 하나의 커밋에서 각각 다른 방향으로 정교화되었다</strong>는 점이 특징이다. V2 마이그레이션은 라벨 스키마를 정정하는 작업이고, cross-validation은 판정 계층을 확장하는 작업이다.</div>
 </header>
 <div class="wrap" id="content">
-<h2>1. X 알고리즘 4세대+2 후속 공개 — 광고 브랜드 안전 V2 + Grok 4.5 성인 컨텐츠 심판 + Phoenix retrieval 인덱싱 게이트 제거</h2>
+<h2 id="1-x-알고리즘-4세대2-후속-공개--광고-브랜드-안전-v2--grok-45-성인-컨텐츠-심판--phoenix-retrieval-인덱싱-게이트-제거">1. X 알고리즘 4세대+2 후속 공개 — 광고 브랜드 안전 V2 + Grok 4.5 성인 컨텐츠 심판 + Phoenix retrieval 인덱싱 게이트 제거</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/b089ce6">xai-org/x-algorithm @ b089ce6 — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-17 20:20 UTC, 공개 소스코드. 파일 34개, +751/−162. 4세대+1(2026-08-14)보다 규모는 작지만, <strong>광고 안전과 성인 컨텐츠 심판, retrieval 인덱싱</strong>이라는 서로 다른 세 축을 하나의 커밋에 함께 담았다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>4세대(2026-08-13, 47c1bcd)의 초대형 공개가 파라미터와 안전 파이프라인, labeling 서브레포 15개를 통째로 열었고, 바로 다음 날 나온 4세대+1(2026-08-14, c65aa17)이 가중치 해석 규칙과 브라질 선거 필터, Thompson sampling, Phoenix bool 3종, BDSM enforcement note 생성기 부분 공개까지 다섯 방향으로 확장했다 (상세한 내용은 <a href="./2026-08-16.md">daily/2026-08-16.md</a>에 정리해 두었다). 그 흐름에서 사흘 뒤에 나온 이 커밋(2026-08-17)은 규모가 훨씬 작은 대신 <strong>광고와 성인 컨텐츠 판정 계층</strong>에 초점을 명확하게 맞추고 있다. X가 4세대의 공개 리듬을 &quot;대형 공개 → 후속 하루짜리 정리 → 며칠 뒤 계층별 정교화&quot;로 잡아가고 있다고 볼 근거가 하나 더 늘었다 <code>[관찰]</code> 2026-08-19.</p>
@@ -383,7 +383,7 @@ user_msg.content.append(
 <li><code>1fav_uec_count_race</code> 카운터의 실제 관측 비율. 외부에서 직접 관측할 수는 없지만, 후속 커밋에서 임계값을 조정하는 것을 보고 간접적으로 관찰할 수 있다.</li>
 <li>멀티모달 임베딩 v3/v5_1/v6_dev 세 버전을 소비하는 쪽이 어디인지 확인해야 한다. 홈 랭킹이 아니라는 사실은 canon에 이미 반영했지만, 어디로 가는지는 아직 확인하지 못했다.</li>
 </ul>
-<h2>2. arXiv triage — SDF (Google Discover가 2년 동안 프로덕션에서 운영한 staleness 필터)</h2>
+<h2 id="2-arxiv-triage--sdf-google-discover가-2년-동안-프로덕션에서-운영한-staleness-필터">2. arXiv triage — SDF (Google Discover가 2년 동안 프로덕션에서 운영한 staleness 필터)</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.15780">Decomposing Staleness in Recommender Systems: A Dual-Filter Framework for Supersession and Decay — arXiv:2608.15780</a> — 2026-08-16 제출, 논문, 저자 6명 전원이 Google LLC 소속이다 (<a href="https://arxiv.org/html/2608.15780v1">HTML 판</a>에서 저자 affiliation 표기를 확인했다: <a href="mailto:vivianbai@google.com">vivianbai@google.com</a>·<a href="mailto:bladehan@google.com">bladehan@google.com</a>·<a href="mailto:lilvjosephtang@google.com">lilvjosephtang@google.com</a>·<a href="mailto:liujintao@google.com">liujintao@google.com</a>·<a href="mailto:luoshu@google.com">luoshu@google.com</a>·<a href="mailto:jialu@google.com">jialu@google.com</a>). CIKM Applied Research Track 2026에 accepted되었다 (DOI <a href="https://doi.org/10.1145/3799682.3840082">10.1145/3799682.3840082</a>).</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>Google Discover는 Android 홈스크린과 Google 앱에서 제공되는 개인화 피드 지면이며, DAU는 수억 명, MAU는 수십억 명 규모이다 <code>[확인]</code> (논문 abstract). canon은 지금까지 Google Discover를 추적 서비스로 등록하지 않았는데, Google이 Discover의 알고리즘과 랭킹, retrieval 계층을 통째로 공개한 적이 없었기 때문이다. 이 논문은 그 지면의 <strong>staleness 필터</strong>만 다루므로 전면적인 아키텍처 공개가 아니라 단일 컴포넌트 공개에 그치지만, 프로덕션에 2년 동안 배포했고 유저 피드백 지표가 54.9% 개선되었다는 실제 A/B 결과 진술이 있어서 레이더 수용 기준(플랫폼 기업 저자, 프로덕션 배포, 대규모 스케일)을 충족한다.</p>
@@ -419,13 +419,12 @@ user_msg.content.append(
 <li><strong>Google Discover를 추적 서비스로 등록할 것인가?</strong> 지금은 등록하지 않는다. 이 논문은 단일 컴포넌트인 staleness 필터만 공개했고, retrieval과 ranking, 다양성을 비롯한 나머지 알고리즘 스택은 여전히 공개되지 않았다. 그 상태에서 정본 파일을 만드는 것은 canon의 &quot;서비스 정본은 압축된 결론&quot;이라는 원칙과 맞지 않는다. 레이더에 올려 두었다가 두 번째 컴포넌트가 공개되면 다시 검토한다.</li>
 </ol>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> — &quot;이번 달 신규&quot; 절에 <strong>SDF (Google Discover — 2년 프로덕션 staleness 필터, supersession + decay 이중 학습)</strong> 항목을 새로 넣었다. 상태는 &quot;관찰&quot;로 적었다.</p></div>
-<h2>다음에 볼 것</h2>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
 <ul>
 <li><strong>X 4세대+3 후속</strong> — 사흘 간격의 공개 리듬(8-13 → 8-14 → 8-17)이 유지된다면, 다음 커밋에서 나올 만한 후보는 (a) 브라질 필터의 계정 리스트 갱신 diff, (b) V1에서 V2로 가는 라벨 마이그레이션의 다음 단계(V1 함수 제거 또는 다른 라벨 세트 추가), (c) Grok 4.5 심판 계층을 다른 카테고리로 확장하는 변경, (d) <code>phoenix-rankall</code>의 인덱스 커버리지 확대와 짝을 이루는 param 게이트이다.</li>
 <li><strong>SDF 후속 진술 관찰</strong> — Google Discover가 다른 컴포넌트(retrieval, ranking, 다양성)를 CIKM/WWW 2027 사이클에 공개하는지 확인한다. Discover를 추적 서비스로 승격할지는 두 번째 컴포넌트가 공개된 다음에 판단한다.</li>
 <li><strong>Kuaishou/Alibaba/ByteDance 라인 지속 관찰</strong> — 이번 달에 프로덕션 논문을 꾸준히 내고 있는 세 회사이다. 8월 나머지 기간의 arXiv triage에서도 통과하는 자료를 계속 관찰한다.</li>
 </ul>
-
 
 </div>
 <div class="wrap"><div class="pager"><a href="daily-2026-08-16.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-16</div></a><a class="r" href="daily-2026-08-20.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-20</div></a></div></div>

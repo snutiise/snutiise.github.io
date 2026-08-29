@@ -176,14 +176,14 @@ ul.rl .chip b { font-size: 13px; }
 <div class="wrap" id="content">
 <p>X 조사를 시작했다. 저장소를 새로 만들었고, X 3세대 공개 소스를 전부 해부했다.</p>
 <p>아래는 로그다. 근거 등급과 file:line 인용은 전부 <code>services/x.md</code>와 <code>topics/*.md</code>에 정리해 두었고, 여기서는 반복하지 않는다.</p>
-<h2>읽은 것</h2>
+<h2 id="읽은-것">읽은 것</h2>
 <ul>
 <li><code>xai-org/x-algorithm</code> (2026-01-20 <code>aaa167b</code>, 2026-05-15 <code>e414c17</code>·<code>0bfc279</code>) — <code>home-mixer/</code>, <code>thunder/</code>, <code>phoenix/</code>, <code>grox/</code>, <code>candidate-pipeline/</code> 전체</li>
 <li><code>twitter/the-algorithm</code> @ <code>c54bec0</code> (2025-09-03 리프레시) — <code>home-mixer/</code>, <code>tweet-mixer/</code></li>
 <li><code>twitter/the-algorithm</code> @ <code>72eda9a</code> (2023) — <code>simclusters_v2/</code>, <code>simclusters-ann/</code>, <code>ann/</code>, <code>cr-mixer/</code></li>
 <li><code>twitter/the-algorithm-ml</code> (2023) — <code>projects/home/recap/</code>, <code>projects/twhin/</code></li>
 </ul>
-<h2>새로 알게 된 것 (오늘 가장 중요한 5가지)</h2>
+<h2 id="새로-알게-된-것-오늘-가장-중요한-5가지">새로 알게 된 것 (오늘 가장 중요한 5가지)</h2>
 <ol>
 <li><strong>1세대와 2세대 사이에 26개월의 공백이 있고, 2세대에서 삭제된 파일은 0건이다.</strong> 2023 파일 집합은 2025 파일 집합의 진부분집합이다. 따라서 저장소에 파일이 남아 있다는 사실은 그 파일이 현역이라는 뜻이 전혀 아니다. 폐기 여부는 README 한 줄이 바뀌는 방식으로만 드러난다.</li>
 <li><strong>&quot;인네트워크 50:50&quot;이라는 규칙은 코드에 존재하지 않는다.</strong> 2026 코드에는 배분기 자체가 없고, OON은 쿼터가 아니라 <strong>점수 배수</strong>(<code>effective_oon</code>)로 조절된다. 배분 문제가 랭킹 문제로 옮겨 간 셈이다.</li>
@@ -192,7 +192,7 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>가중치 값은 어느 세대에도 1차 출처가 없다.</strong> 널리 인용되는 &quot;reply 13.5 / report −369&quot; 표는 블로그가 아니라 <code>the-algorithm-ml</code>의 README에서 나왔고, 그 문서는 &quot;2023-04-05 기준, 언제든 바뀔 수 있다&quot;고 스스로 명시한다. 2025 Scala는 <code>ModelWeights</code> 30개를 <strong>전부 <code>default = 0.0</code>으로 지웠다.</strong> 같은 파일에 있는 나머지 203개 default는 실제 값을 가지고 있으므로, 이것은 코딩 스타일이 아니라 의도적인 삭제로 보아야 한다.</li>
 </ol>
 <p>부수적으로: <code>has_cached_posts</code> 하나가 모든 소스와 하이드레이터, Phoenix를 한꺼번에 끄는 가장 큰 스위치다. <code>PreviouslySeenPostsBackupFilter</code>는 영구 no-op이다. VMRanker가 실패해도 로그가 남지 않고 조용히 넘어가기 때문에 다양성이 사라진 것을 알아채기 어렵다. <code>grox/</code>에 있는 파이썬 파일 두 개는 리터럴 치환 때문에 import 자체가 되지 않는다.</p>
-<h2>검증에서 뒤집힌 것 (중요)</h2>
+<h2 id="검증에서-뒤집힌-것-중요">검증에서 뒤집힌 것 (중요)</h2>
 <p>초안을 verifier로 다시 검증했더니 결론 하나가 반대로 나왔고, 상수를 인용할 때 지켜야 할 규칙도 하나 새로 배웠다.</p>
 <ul>
 <li><strong>뒤집힘:</strong> &quot;2025 tweet-mixer의 u2i 후보는 상한 절단 뒤에 붙어서 특혜를 받는다&quot;는 결론은 <strong>틀렸다.</strong> <code>DropMaxResults</code>가 <code>result</code>만 자르고 <code>remainingCandidates</code>는 남기기 때문에 u2i는 뒤쪽에 놓이는데, 그 뒤의 최종 절단선이 400(라이트랭커 상한 500보다 작다)이라 <strong>앞이 다 차면 u2i가 먼저 사라진다.</strong> 절단선을 하나만 보고 결론을 내리면 방향이 반대로 나온다.</li>
@@ -200,7 +200,7 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>얻은 것:</strong> 2026 <code>offset_score</code>는 2025 <code>RerankerUtil.weightedScoresSum</code>을 그대로 옮긴 코드다. 그래서 <strong>비공개 상수 <code>NEGATIVE_SCORES_OFFSET</code>을 2025의 <code>Epsilon = 0.001</code>로 복원했다.</strong> 두 저장소 사이에 코드 중복이 0이라는 통설의 예외다. 다른 비공개 상수도 같은 방법으로 복원할 수 있을 것으로 보인다.</li>
 <li>그 외 수정: <code>FailOpenPolicy.Always</code>는 9개 가운데 8개에만 적용되어 ContentExploration만 fail-closed이고, 2025 MMR은 리스트 앞쪽 <code>(1-diversityRatio)×n</code>개에는 다양성을 전혀 적용하지 않으며, <code>QuoteDeduplicationFilter</code>는 인용문이 아니라 인용당한 원본을 지우고, tweet-mixer 파이프라인은 35개가 아니라 34개다.</li>
 </ul>
-<h2>반영</h2>
+<h2 id="반영">반영</h2>
 <ul>
 <li><code>services/x.md</code> 신규 — 3세대 비교표, 지면, retrieval 11소스, Phoenix 22헤드, 필터 17개, 광고 블렌딩, 콜드스타트, <strong>주의 목록 11개</strong></li>
 <li><code>topics/sequence-transformer-ranking.md</code> 신규 — Phoenix 구조·마스크</li>
@@ -210,13 +210,12 @@ ul.rl .chip b { font-size: 13px; }
 <li><code>topics/feed-diversity.md</code> 신규 — 감쇠/MMR/DPP/dedup</li>
 <li><code>topics/embedding-retrieval.md</code> 신규 — SimClusters·TwHIN·two-tower·ANN 인덱스</li>
 </ul>
-<h2>다음에 볼 것</h2>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
 <ul>
 <li><strong>EU DSA 투명성 보고서</strong> — 가중치의 실제 값이 규제 제출 문서에 들어 있는지 확인한다. 오늘은 보지 못했다.</li>
 <li><code>e414c17</code>(2026-05-15) diff — Phoenix 헤드가 19에서 22로 늘어난 시점이 여기인지 확인한다.</li>
 <li>Meta 조사 착수 (Instagram / Facebook / Threads) — 엔지니어링 블로그부터 읽는다. X와 달리 코드가 공개되어 있지 않으니 근거 등급을 관리하는 일이 더 중요해진다.</li>
 </ul>
-
 
 </div>
 <div class="wrap"><div class="pager"><span></span><a class="r" href="daily-2026-08-09.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-09</div></a></div></div>
