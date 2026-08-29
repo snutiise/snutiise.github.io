@@ -92,3 +92,38 @@ table tr:hover td {
 	background: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#f0f0f0));
 	background: -moz-linear-gradient(top,  #f2f2f2,  #f0f0f0);	
 }
+/* ────────────────────────────────────────────────────────────────────────
+   오버라이드 — main.css 는 src/styl 에서 빌드되지만 2018년 산출물이고,
+   지금 재빌드하면 kouto-swiss 가 딸려오는 normalize.css 버전이 바뀌어
+   전 페이지 기준 스타일이 흔들린다. 그래서 스타일 소스를 고치는 대신
+   main.css 뒤에 로드되는 이 파일에서 필요한 규칙만 덮어쓴다.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* 모바일 슬라이드 메뉴가 height:163px 로 고정돼 있어 항목이 늘면 잘린다.
+   내용에 맞춰 늘리되 화면을 넘지 않게 하고, 넘치면 스크롤한다. */
+aside {
+  height: auto;
+  max-height: 70vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 좁은 화면에서 table 을 통째로 display:none 처리해 표 내용이 사라졌다.
+   숨기는 대신 가로 스크롤로 보여준다. */
+@media only screen and (max-width: 37.5rem) {
+  table { display: table; width: 100%; margin: 1em 0; font-size: 12px; }
+  .post-content > table,
+  .page-content > table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+/* 키보드 포커스가 보이지 않아 탭 이동 위치를 알 수 없었다.
+   :focus-visible 이라 마우스 클릭에는 테두리가 생기지 않는다. */
+:focus-visible {
+  outline: 2px solid #7f8cff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* 본문 이미지가 컨테이너를 넘지 않게. 원본이 1920px 인 스크린샷이 여럿이다. */
+.post-content img,
+.page-content img { max-width: 100%; height: auto; }
