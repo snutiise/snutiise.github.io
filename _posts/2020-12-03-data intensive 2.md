@@ -10,7 +10,7 @@ categories:
 - Architecture
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
 
 데이터 모델은 소프트웨어 개발에서 제일 중요한 부분이다. 소프트웨어가 어떻게 작성됐는지 뿐만 아니라 해결하려는 문제를 어떻게 생각해야 하는지에 대해서도 많은 영향을 미치기 때문이다.
 

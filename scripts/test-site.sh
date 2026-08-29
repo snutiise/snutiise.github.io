@@ -72,6 +72,11 @@ if [[ -f "$SM" ]]; then
   N=$(grep -c '<loc>' "$SM"); P=$(find "$SITE" -name index.html -path '*/*/*' | wc -l | tr -d ' ')
   (( N > 0 )) && ok "사이트맵 URL ${N}개" || bad "사이트맵이 비었다" "포스트 ${P}개"
   grep -q '<loc>https://' "$SM" && ok "사이트맵 절대경로" || bad "사이트맵이 상대경로" "검색엔진이 색인 못 함"
+  # feed-research 리포트는 front matter 가 없어 site.pages 가 아니라
+  # site.static_files 루프로만 사이트맵에 들어간다. 그 루프가 깨지면 사이트에서
+  # 가장 자주 갱신되는 페이지 30여 개가 통째로 색인 밖으로 사라진다.
+  R=$(grep -c '<loc>[^<]*/feed-research/' "$SM")
+  (( R > 0 )) && ok "사이트맵에 feed-research ${R}개 포함" || bad "사이트맵에 feed-research 리포트가 없다" "sitemap.xml 의 site.static_files 루프 확인"
 else bad "sitemap.xml 이 빌드되지 않음" "$SM"; fi
 
 head_ "7. Liquid 누수"

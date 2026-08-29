@@ -11,6 +11,30 @@ layout: null
     </url>
     {%- endunless -%}
   {% endfor %}
+  {%- comment -%}
+    feed-research/*.html 은 front matter 가 없어 Jekyll 이 Page 가 아닌
+    StaticFile 로 읽는다. 위의 site.html_pages 루프에 잡히지 않아 사이트에서
+    가장 자주 갱신되는 리포트 34개가 사이트맵 밖에 있었다.
+  {%- endcomment -%}
+  {% for f in site.static_files %}
+    {%- if f.path contains '/feed-research/' and f.extname == '.html' -%}
+    <url>
+      {%- comment -%}
+        index.html 을 지워 디렉터리 URL 로 만든다. 위 html_pages 루프가 같은 처리를
+        하고, 메뉴도 /feed-research/ 로 링크한다. 그대로 두면 사이트맵이 가리키는
+        URL 과 내부 링크가 갈리고, GitHub Pages 는 둘 다 200 으로 주는데 이 페이지엔
+        canonical 이 없어 중복 URL 을 제출하는 꼴이 된다.
+      {%- endcomment -%}
+      <loc>{{ f.path | replace: 'index.html', '' | prepend: site.url }}</loc>
+      {%- comment -%}
+        lastmod 를 일부러 뺐다. StaticFile 의 modified_time 은 파일 mtime 인데 CI 와
+        Pages 는 매번 새로 체크아웃하므로 34개 리포트 전부 '빌드한 날' 로 찍힌다.
+        6개월 전 리포트가 매 푸시마다 '오늘 수정됨' 이 되면 크롤러는 이 사이트의
+        lastmod 를 통째로 무시하기 시작한다. 없는 편이 틀린 것보다 낫다.
+      {%- endcomment -%}
+    </url>
+    {%- endif -%}
+  {% endfor %}
   {% for post in site.posts %}
     <url>
       <loc>{{ post.url | prepend: site.url }}</loc>
