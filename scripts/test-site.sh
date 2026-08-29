@@ -70,7 +70,8 @@ head_ "7. 404 페이지"
 
 head_ "8. 죽은 서비스 참조"
 for dead in 'plus.google.com' 'lovelyzfan.xyz'; do
-  H=$(grep -rl "$dead" "$SITE" --include='*.html' 2>/dev/null | grep -v '/feed-research/' | head -1)
+  # 템플릿은 모든 페이지에 렌더되므로 홈 하나만 보면 충분하다.
+  H=$(grep -l "$dead" "$HOME_HTML" 2>/dev/null | head -1)
   [[ -z "$H" ]] && ok "$dead 참조 없음" || bad "죽은 서비스 참조가 남아 있다" "$dead → $H"
 done
 
@@ -78,7 +79,9 @@ head_ "9. 내부 링크/이미지 무결성"
 MISS=0
 while IFS= read -r f; do
   while IFS= read -r ref; do
-    [[ -z "$ref" || "$ref" == http* || "$ref" == "#"* || "$ref" == "mailto:"* || "$ref" == "//"* ]] && continue
+    [[ -z "$ref" || "$ref" == "#"* || "$ref" == "//"* ]] && continue
+    # http(s) 포함 모든 URI 스킴(mailto:, spotify:, data: …)은 내부 참조가 아니다
+    [[ "$ref" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]] && continue
     t="${ref%%#*}"; t="${t%%\?*}"; [[ -z "$t" ]] && continue
     [[ "$t" == /* ]] && p="$SITE$t" || p="$(dirname "$f")/$t"
     [[ -e "$p" || -e "${p%/}/index.html" ]] || { echo "     누락: $t (in ${f#$SITE})"; MISS=$((MISS+1)); }
