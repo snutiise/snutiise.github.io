@@ -102,11 +102,11 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="svc-netflix">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-08-29 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-08-30 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-08-29 기준</div>
+  <div class="gendate">2026-08-30 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
@@ -309,15 +309,21 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>아트워크와 비디오 프리뷰 개인화는 지각된 다양성을 조절하는 별도 수단이다. 같은 타이틀이라도 회원마다 다른 이미지와 비디오 프리뷰를 본다. 2017 밴딧에서 2026 MediaFM tri-modal foundation model로 세대가 바뀌었다 (아래 절을 참조한다)</li>
 <li>GenPage(2026)는 페이지 구성 자체를 단일 트랜스포머의 autoregressive 생성으로 대체한다. 엔드투엔드 지연이 20% 줄었고 핵심 참여 지표가 개선됐다. 아직 실험 단계다 <code>[확인]</code> <a href="https://arxiv.org/abs/2606.31031">arXiv 2606.31031</a></li>
 </ul>
-<h2 id="아트워크비디오-프리뷰-개인화--mediafm-tri-modal-fm-2026-08-프로덕션">아트워크·비디오 프리뷰 개인화 — MediaFM tri-modal FM (2026-08 프로덕션)</h2>
-<p>세대 흐름은 이렇게 이어진다. <strong>2017 밴딧</strong>(<a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76">Artwork Personalization</a>, 전면 배포)에서 <strong>2026 CLIP two-tower + MediaFM</strong>(<a href="https://arxiv.org/abs/2608.18322">Multimedia Asset Personalization via Multimodal Embeddings at Netflix</a>, 2026-08-18)으로 넘어갔다. 확장 방향은 둘이다.</p>
+<h2 id="아트워크비디오-프리뷰-개인화--maps-multimodal-asset-personalization-at-scale-2026-08-프로덕션">아트워크·비디오 프리뷰 개인화 — MAPS (Multimodal Asset Personalization at Scale, 2026-08 프로덕션)</h2>
+<p>세대 흐름은 이렇게 이어진다. <strong>2017 밴딧</strong>(<a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76">Artwork Personalization</a>, 전면 배포)에서 <strong>2026 CLIP two-tower + MediaFM</strong>으로 넘어갔다. 2026-08-18 arXiv 논문(<a href="https://arxiv.org/abs/2608.18322">Multimedia Asset Personalization via Multimodal Embeddings at Netflix</a>)이 정량치를 담고, 2026-08-28 <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">블로그</a>에서 <strong>MAPS</strong>라는 시스템 이름과 아키텍처 맥락을 공개했다. 확장 방향은 둘이다.</p>
 <h3 id="clip-기반-통합-two-tower--5개-캔버스-타입-단일-모델">CLIP 기반 통합 two-tower — 5개 캔버스 타입 단일 모델</h3>
 <p>아트워크 캔버스 5종(billboard / vertical box / horizontal panel / short panel / landscape panel)마다 별도 모델을 학습하고 서빙하던 구조가 <strong>CLIP 이미지 임베딩(768-d)을 item tower에 concat한 단일 two-tower</strong>로 통합됐다 <code>[확인]</code> §3.</p>
 <ul>
 <li><strong>Reward-weighted 학습</strong>: 캔버스별 학습 예제를 reward 가중치로 균형 잡는다 (특정 캔버스로 쏠리는 것을 막는다)</li>
 <li><strong>콜드스타트</strong>: 신규 타이틀과 에셋이 상호작용 이력 없이도 CLIP 임베딩만으로 &quot;day zero&quot;부터 서빙된다. ID-only 모델이 원천적으로 갖던 한계를 해소한다</li>
 <li><strong>온라인 A/B 결과</strong> <code>[확인]</code> §5.1: 코어 discovery 메트릭이 상대적으로 <strong>+0.127%</strong> 올랐다 (p&lt;0.005). Eclipse UI 홀드백 대비로는 discovery가 <strong>+0.233%</strong>, streaming hours가 <strong>+0.184%</strong> 늘었고, 저자는 연간 <strong>≈350M streaming hours</strong>가 추가된다고 추산한다</li>
-<li><strong>검색 확장</strong>: CLIP의 joint text-image space를 재활용해 <strong>query-aware artwork</strong>를 검색 캔버스에 적용했고, playthrough rate가 <strong>+0.36%</strong> 올랐다 (p&lt;0.05) <code>[확인]</code></li>
+<li><strong>Ablation은 V1·V2 단독은 온라인에서 안 움직였다</strong> <code>[확인]</code> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">MAPS 블로그 2026-08-28</a>. V1(이미지 임베딩만)·V2(캔버스 통합만) 단독은 오프라인·온라인 둘 다 non-significant flat이었고, 두 아이디어를 합친 V3만이 통계적으로 유의한 리프트를 얻어 프로덕션에 배포됐다. short-panel에서 V3 오프라인 IPS 상대 리프트는 **+5.691%**로 V1+V2 합보다 컸다. &quot;content feature 하나만 켜서는 안 움직이더라&quot;라는 관찰이 명시적으로 서술된 사례다<blockquote>
+<p>&quot;Neither idea moved our online core member metrics on its own. V1 and V2 were both flat and non-significant, and only V3 won a statistically significant lift.&quot;
+— <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">MAPS 블로그</a>, 2026-08-28</p>
+</blockquote>
+</li>
+<li><strong>2025 TV 홈스크린 대개편 홀드백</strong> <code>[확인]</code> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">MAPS 블로그</a>, 2026-08-28. UI 개편으로 short-panel이 갑자기 지배적 캔버스가 되는 콜드스타트 상황이었는데, 개편 직전에 V3를 배포하고 한 달간 홀드백 A/B(소규모 대조군은 이전 캔버스별 모델 유지)를 돌렸다. <strong>core discovery 지표와 streaming hours 둘 다 통계적으로 유의한 리프트</strong>를 얻었고, 정상 상태의 ablation보다 더 큰 리프트였다. 단일 모델의 캔버스 간 신호 전이가 실측된 사례다</li>
+<li><strong>검색 확장</strong>: CLIP의 joint text-image space를 재활용해 <strong>query-aware artwork</strong>를 검색 캔버스에 적용했고, playthrough rate가 <strong>+0.36%</strong> 올랐다 (p&lt;0.05) <code>[확인]</code>. 랭킹 점수 = α · personalization + (1−α) · cos(text_emb(query), image_emb(asset))로 blend하고 α를 온라인 A/B로 튜닝한다. <strong>추가 모델링 노력이 사실상 0</strong>이라고 블로그는 명시한다(CLIP 임베딩이 이미 asset 표현에 있으므로) <code>[확인]</code> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">MAPS 블로그</a></li>
 </ul>
 <h3 id="mediafm--자체-tri-modal-foundation-model-비디오-프리뷰용">MediaFM — 자체 tri-modal foundation model (비디오 프리뷰용)</h3>
 <p>Netflix가 자체 학습한 <strong>shot-level tri-modal FM</strong>을 프로덕션에서 서빙한다 <code>[확인]</code> §4.</p>
@@ -344,6 +350,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><strong>일일 materialization</strong> — 프로필별 상위 ~500 타이틀 선택을 미리 계산한다</li>
 </ul>
 <p>이 3단 캐싱이 저지연 서빙과 값싼 스크리닝을 동시에 가능하게 만들었다. FM 시대에 이미 회원 임베딩의 배치 생산이 프로덕션에 들어가 있었는데(위 retrieval 절), MediaFM은 <strong>아이템 쪽 임베딩 파이프라인</strong>을 같은 방식으로 확립했다. 두 흐름이 서로 대응한다.</p>
+<p>2026-08-28 <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">MAPS 블로그</a>가 이 저장소를 <strong>Netflix Embedding Store</strong>라는 이름으로 명명하고 두 속성을 명시했다. <code>[확인]</code></p>
+<ul>
+<li><strong>Training-serving skew 없음</strong> — 학습 시점과 온라인 추론 시점에 정확히 같은 임베딩을 서빙한다. Embedding Store가 유일한 source of truth이므로 학습·서빙 파이프라인이 다른 값을 볼 여지가 없다</li>
+<li><strong>Foundation-model 업데이트와 personalization-model 배포의 decouple</strong> — 새 임베딩(또는 기존 임베딩의 새 버전)이 나오면 register → 카탈로그 전체 backfill → 자체 검증까지 마친 뒤 config 한 줄로 downstream이 스위치할 수 있다. downstream 모델의 학습·서빙 코드 변경 없이 임베딩 세대 전환이 이뤄진다<blockquote>
+<p>&quot;Its key property is that it decouples foundation-model updates from personalization-model deployments. A new embedding, or a new version of an existing one, can be registered, backfilled across the catalog, and validated entirely on its own, without touching the training or serving code of any model that consumes it.&quot;
+— <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">MAPS 블로그</a>, 2026-08-28</p>
+</blockquote>
+</li>
+</ul>
+<p>블로그는 다음 단계로 image·text·video를 하나의 <strong>shared semantic space</strong>로 통합해 cross-modal retrieval과 통합 asset 랭킹을 열겠다고 명시했다 <code>[확인]</code>. 회원 쪽 FM과 아이템 쪽 MediaFM이 같은 저장소에서 흐르는 그림이 앞으로도 유지될 것을 뜻한다.</p>
 <h3 id="의미--아트워크프리뷰가-개인화-스택의-별개-축이-됐다">의미 — 아트워크·프리뷰가 개인화 스택의 별개 축이 됐다</h3>
 <p>지금까지 이 정본은 아트워크 개인화를 &quot;재순위·다양성&quot;에서 한 줄로만 언급했다 (2017 밴딧 이후 큰 갱신이 없었기 때문이다). 2026-08 MediaFM 논문이 이 축을 <strong>별도의 프로덕션 시스템</strong>으로 확립했다:</p>
 <ol>
@@ -426,6 +442,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><a href="https://arxiv.org/abs/2601.02764">Artwork LLM Post-training</a> — 2026, 논문 (연구 단계)</li>
 <li><a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c">In-House LLM Serving at Netflix</a> — 2026-07-17, 블로그. GenRec의 서빙 층(vLLM + Triton + Java control plane, MSS, constrained decoding scaling)을 다룬다</li>
 <li><a href="https://arxiv.org/abs/2608.10257">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a> — 2026-08-10, 논문. GenRec 블로그의 학술판이다. 손실 수식, Phase 1/2 기여 분해, 컨텍스트 5000→1700 예시, +0.006% 코어 지표, GRPO preliminary, 팀 구조 등 블로그가 밝히지 않은 정량치를 담았다</li>
+<li><a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">MAPS: Netflix&#39;s Multimodal Asset Personalization at Scale</a> — 2026-08-28, 블로그. 위 arXiv 2608.18322와 같은 시스템에 <strong>MAPS</strong>라는 이름을 부여한다. 정량치는 논문 쪽에 있고, 블로그가 새로 더하는 것은 (a) 시스템 이름과 세 프로덕트(CLIP 아트워크·query-aware 아트워크·MediaFM 비디오 프리뷰) 묶음, (b) 2025 TV 홈스크린 개편 홀드백 실측, (c) V1·V2 단독 flat vs V3 유의 ablation, (d) <strong>Netflix Embedding Store</strong>의 이름과 두 속성(training-serving skew 없음 + FM 업데이트와 personalization 배포 decouple), (e) 다음 단계로 image·text·video 공통 semantic space 확장 계획이다</li>
 <li><a href="https://arxiv.org/abs/2608.18322">Multimedia Asset Personalization via Multimodal Embeddings at Netflix (arXiv 2608.18322)</a> — 2026-08-18, 논문. 아트워크 CLIP two-tower와 MediaFM tri-modal(SeqCLIP + wav2vec 2.0 + text-embedding-3-large)의 프로덕션 배포, +0.127%/+0.193% A/B lift, popularity-based winner 프록시로 체크포인트를 gating하는 방식을 다룬다</li>
 </ul>
 
