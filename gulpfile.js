@@ -8,7 +8,6 @@ var gulp        = require('gulp'),
 	rupture     = require('rupture'),
 	koutoSwiss  = require('kouto-swiss'),
 	prefixer    = require('autoprefixer-stylus'),
-	imagemin    = require('gulp-imagemin'),
 	cp          = require('child_process');
 
 var messages = {
@@ -20,81 +19,84 @@ var jekyllCommand = (/^win/.test(process.platform)) ? 'jekyll.bat' : 'jekyll';
 /**
  * Build the Jekyll Site
  */
-gulp.task('jekyll-build', function (done) {
+function jekyllBuild(done) {
 	browserSync.notify(messages.jekyllBuild);
 	return cp.spawn(jekyllCommand, ['build'], {stdio: 'inherit'})
 		.on('close', done);
-});
+}
 
 /**
- * Rebuild Jekyll & do page reload
+ * Reload the browser after a rebuild
  */
-gulp.task('jekyll-rebuild', ['jekyll-build'], function () {
+function reload(done) {
 	browserSync.reload();
-});
-
-/**
- * Wait for jekyll-build, then launch the Server
- */
-gulp.task('browser-sync', ['jekyll-build'], function() {
-	browserSync({
-		server: {
-			baseDir: '_site'
-		}
-	});
-});
+	done();
+}
 
 /**
  * Stylus task
  */
-gulp.task('stylus', function(){
-		gulp.src('src/styl/main.styl')
+function styles() {
+	return gulp.src('src/styl/main.styl')
 		.pipe(plumber())
 		.pipe(stylus({
-			use:[koutoSwiss(), prefixer(), jeet(),rupture()],
+			use: [koutoSwiss(), prefixer(), jeet(), rupture()],
 			compress: true
 		}))
 		.pipe(gulp.dest('_site/assets/css/'))
-		.pipe(browserSync.reload({stream:true}))
-    .pipe(gulp.dest('assets/css'));
-});
+		.pipe(browserSync.reload({stream: true}))
+		.pipe(gulp.dest('assets/css'));
+}
 
 /**
  * Javascript Task
  */
-gulp.task('js', function(){
+function scripts() {
 	return gulp.src('src/js/**/*.js')
 		.pipe(plumber())
 		.pipe(concat('main.js'))
 		.pipe(uglify())
 		.pipe(gulp.dest('assets/js/'))
-		.pipe(browserSync.reload({stream:true}))
-    .pipe(gulp.dest('_site/assets/js/'));
-});
+		.pipe(browserSync.reload({stream: true}))
+		.pipe(gulp.dest('_site/assets/js/'));
+}
 
 /**
- * Imagemin Task
+ * Wait for jekyll-build, then launch the Server
  */
-gulp.task('imagemin', function() {
-	return gulp.src('src/img/**/*.{jpg,png,gif}')
-		.pipe(plumber())
-		.pipe(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true }))
-		.pipe(gulp.dest('assets/img/'));
-});
+function serve(done) {
+	browserSync({
+		server: {
+			baseDir: '_site'
+		}
+	});
+	done();
+}
 
 /**
  * Watch stylus files for changes & recompile
  * Watch html/md files, run jekyll & reload BrowserSync
  */
-gulp.task('watch', function () {
-	gulp.watch('src/styl/**/*.styl', ['stylus']);
-	gulp.watch('src/js/**/*.js', ['js']);
-	gulp.watch('src/img/**/*.{jpg,png,gif}', ['imagemin']);
-	gulp.watch(['*.html', '_includes/*.html', '_layouts/*.html', '_posts/*'], ['jekyll-rebuild']);
-});
+function watch() {
+	gulp.watch('src/styl/**/*.styl', styles);
+	gulp.watch('src/js/**/*.js', scripts);
+	gulp.watch(['*.html', '_includes/*.html', '_layouts/*.html', '_posts/*'],
+		gulp.series(jekyllBuild, reload));
+}
+
+gulp.task('jekyll-build', jekyllBuild);
+gulp.task('stylus', styles);
+gulp.task('js', scripts);
+gulp.task('watch', watch);
+gulp.task('serve', gulp.series(jekyllBuild, serve));
 
 /**
- * Default task, running just `gulp` will compile the stylus,
- * compile the jekyll site, launch BrowserSync & watch files.
+ * Default task: compile assets, build the Jekyll site,
+ * launch BrowserSync and watch for changes.
  */
-gulp.task('default', ['js', 'stylus', 'browser-sync', 'watch']);
+gulp.task('default', gulp.series(
+	gulp.parallel(scripts, styles),
+	jekyllBuild,
+	serve,
+	watch
+));
