@@ -46,7 +46,18 @@ if [[ -n "$POST_HTML" ]]; then
   [[ "$PV" == https://*.* ]] && ok "포스트 og:image 채워짐" || bad "포스트 og:image 가 비었거나 경로 없음" "실제값: '$PV' ($POST_HTML)"
 else bad "포스트 페이지를 찾지 못함" "빌드 산출물 구조 확인 필요"; fi
 
-head_ "5. RSS / 사이트맵"
+head_ "5. meta description"
+# front matter 의 description: '' 가 Liquid 에서 truthy 라 전 페이지 description 이
+# 비어 나간 적이 있다. 비어 있으면 검색결과 스니펫·링크 미리보기가 망가진다.
+for f in "$HOME_HTML" "$POST_HTML"; do
+  [[ -n "$f" && -f "$f" ]] || continue
+  D=$(grep -o 'name="description" content="[^"]*"' "$f" | head -1 | sed 's/.*content="//;s/"$//')
+  W=$(echo "$D" | wc -c | tr -d ' ')
+  if (( W > 20 )); then ok "description 채워짐 (${W}자, ${f#$SITE})"
+  else bad "description 이 비었거나 너무 짧다" "'${D}' (${f#$SITE})"; fi
+done
+
+head_ "6. RSS / 사이트맵"
 FEED="$SITE/feed.xml"
 if [[ -f "$FEED" ]]; then
   L=$(grep -o '<link>[^<]*</link>' "$FEED" | head -1 | sed 's/<[^>]*>//g')
@@ -60,22 +71,22 @@ if [[ -f "$SM" ]]; then
   grep -q '<loc>https://' "$SM" && ok "사이트맵 절대경로" || bad "사이트맵이 상대경로" "검색엔진이 색인 못 함"
 else bad "sitemap.xml 이 빌드되지 않음" "$SM"; fi
 
-head_ "6. Liquid 누수"
+head_ "7. Liquid 누수"
 # 렌더되지 않은 {{ }} / {% %} 가 남아 있으면 템플릿 오류다.
 LEAK=$(grep -rl --include='*.html' --include='*.xml' -E '\{\{|\{%' "$SITE" 2>/dev/null | grep -v '/feed-research/' | head -3)
 [[ -z "$LEAK" ]] && ok "미렌더 Liquid 없음" || bad "렌더되지 않은 Liquid 구문" "$(echo "$LEAK" | tr '\n' ' ')"
 
-head_ "7. 404 페이지"
+head_ "8. 404 페이지"
 [[ -f "$SITE/404.html" ]] && ok "404.html 존재" || bad "404.html 없음" "GitHub 기본 404가 노출된다"
 
-head_ "8. 죽은 서비스 참조"
+head_ "9. 죽은 서비스 참조"
 for dead in 'plus.google.com' 'lovelyzfan.xyz'; do
   # 템플릿은 모든 페이지에 렌더되므로 홈 하나만 보면 충분하다.
   H=$(grep -l "$dead" "$HOME_HTML" 2>/dev/null | head -1)
   [[ -z "$H" ]] && ok "$dead 참조 없음" || bad "죽은 서비스 참조가 남아 있다" "$dead → $H"
 done
 
-head_ "9. 내부 링크/이미지 무결성"
+head_ "10. 내부 링크/이미지 무결성"
 MISS=0
 while IFS= read -r f; do
   while IFS= read -r ref; do

@@ -3,6 +3,14 @@ layout: null
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>{{ site.url }}/</loc></url>
+  {% for page in site.html_pages %}
+    {%- unless page.url contains '404' or page.sitemap == false -%}
+    <url>
+      <loc>{{ page.url | replace:'index.html','' | prepend: site.url }}</loc>
+    </url>
+    {%- endunless -%}
+  {% endfor %}
   {% for post in site.posts %}
     <url>
       <loc>{{ post.url | prepend: site.url }}</loc>

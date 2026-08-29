@@ -1,17 +1,28 @@
 <head>
+    {%- comment -%}
+      description 을 한 번만 계산해 아래 5곳(meta/twitter/og/itemprop)에서 재사용한다.
+      포스트 19개가 전부 front matter 에 description: '' 을 갖는데 Liquid 는 빈
+      문자열을 truthy 로 보므로 {% if page.description %} 만으로는 항상 빈 값이
+      나갔다. 빈 값이면 본문 발췌로, 그것도 없으면 사이트 설명으로 떨어진다.
+    {%- endcomment -%}
+    {%- capture page_description -%}
+      {%- if page.description and page.description != '' -%}{{ page.description }}
+      {%- elsif page.excerpt and page.excerpt != '' -%}{{ page.excerpt | strip_html | normalize_whitespace }}
+      {%- else -%}{{ site.description }}{%- endif -%}
+    {%- endcapture -%}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
 
-    <meta name="description" content="{% if page.description %}{{ page.description | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta name="description" content="{{ page_description | strip_newlines | truncate: 160 }}">
 
     <!-- Social Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@{{site.twitter_username}}">
     <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-    <meta name="twitter:description" content="{% if page.description %}{{ page.description | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta name="twitter:description" content="{{ page_description | strip_newlines | truncate: 160 }}">
 
     {% if page.image and page.image != '' %}
     <meta property="twitter:image:src" content="{{ site.url }}{{page.image }}">
@@ -27,12 +38,12 @@
     {% else %}
     <meta property="og:image" content="{{ "/assets/img/og-default.png" | prepend: site.baseurl | prepend: site.url }}">
     {% endif %}
-    <meta property="og:description" content="{% if page.description %}{{ page.description | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="og:description" content="{{ page_description | strip_newlines | truncate: 160 }}">
     <meta property="og:site_name" content="{{ site.title }}">
 
     <!-- Social Google+/Schema.org  -->
     <meta itemprop="name" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}"/>
-    <meta itemprop="description" content="{% if page.description %}{{ page.description | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta itemprop="description" content="{{ page_description | strip_newlines | truncate: 160 }}">
     <meta itemprop="image" content="{{ "/assets/img/og-default.png" | prepend: site.baseurl | prepend: site.url }}"/>
 
     <!-- Favicon 
