@@ -78,12 +78,15 @@
     <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}" />
     
     <!-- Naver Analytics -->
-    <script type="text/javascript" src="https://wcs.naver.net/wcslog.js" async></script>
     <script type="text/javascript">
-        if(!wcs_add) var wcs_add = {};
+        // 설정을 먼저 정의해 두고, 스크립트는 렌더를 막지 않게 async 로 받은 뒤
+        // onload 에서 호출한다. async 만 붙이고 wcs_do() 를 인라인에 두면
+        // 로드 전에 실행돼 ReferenceError 로 추적 자체가 죽는다.
+        var wcs_add = wcs_add || {};
         wcs_add["wa"] = "a4fc7be0d37ba";
-        wcs_do();
     </script>
+    <script type="text/javascript" src="https://wcs.naver.net/wcslog.js" async
+            onload="if (window.wcs_do) { wcs_do(); }"></script>
 
     <!-- custom scrollbar -->
     <style>

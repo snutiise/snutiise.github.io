@@ -35,7 +35,7 @@ categories:
 
 현재 서비스에서 L1캐시와 L2캐시를 운영중인데 L1캐시(API 서버에서 서브되는 캐시)가 몇 초 늦게 캐싱된 값을 받아서 투표가 끝난후에 투표수가 올라가는걸 해외 사용자가 녹화해서 부정투표 제보를 했었다.
 
-<center><video controls autoplay loop muted playsinline preload="metadata" src="{{ "/assets/img/2020-11-05-2.mp4"}}" alt="" width="300" height="600"/></center>
+<center><video controls loop muted playsinline preload="none" src="{{ "/assets/img/2020-11-05-2.mp4"}}" alt="" width="300" height="600"/></center>
 <center>(사용자가 제보한 영상)</center>
 
 <br/>
