@@ -17,7 +17,9 @@ head_() { printf '\n\033[1m%s\033[0m\n' "$1"; }
 [[ -d "$SITE" ]] || { echo "FATAL: $SITE 없음 — jekyll build 를 먼저 실행"; exit 1; }
 
 HOME_HTML="$SITE/index.html"
-POST_HTML="$(find "$SITE" -name index.html -path '*/*/*' | head -1)"
+# 목록 페이지(/posts/, /tags/ …)가 아니라 실제 글을 고른다 — 포스트에만 있는
+# datePublished 마크업으로 판별한다.
+POST_HTML="$(grep -rl 'itemprop="datePublished"' "$SITE" --include=index.html 2>/dev/null | grep -v '/feed-research/' | head -1)"
 
 head_ "1. 절대 URL 메타데이터"
 # site.url 이 비면 상대경로로 렌더돼 링크 미리보기·정규 URL·RSS가 전부 깨진다.
