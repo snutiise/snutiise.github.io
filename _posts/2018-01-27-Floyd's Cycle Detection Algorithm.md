@@ -11,7 +11,7 @@ categories:
 - Algorithm
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
 
 어떤 연결리스트가 주어졌을때 해당 연결리스트가 null로 끝나는지 순환이 되는지를 검사하는 방법엔 무엇이 있을까?
 

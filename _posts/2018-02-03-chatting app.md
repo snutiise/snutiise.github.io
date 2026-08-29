@@ -12,7 +12,7 @@ categories:
 - Programming
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
 
 주말에 한가롭게 놀다가 electron으로 채팅앱을 만들기로 마음 먹었다.
 

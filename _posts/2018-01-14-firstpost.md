@@ -11,7 +11,7 @@ categories:
 - Git
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
 
 ## Github ? why ?
 

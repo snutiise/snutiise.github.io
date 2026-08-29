@@ -13,7 +13,7 @@ categories:
 - Programming
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async">
+<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
 
 내 개인서버에는 여러 종류에 크롤러가 구동되고 있다. 러블리즈 이미지 크롤러랑 디시인사이드 키워드 크롤러 등...
 
@@ -272,7 +272,7 @@ parse_img에 경우 이미 parse에서 완전한 이미지 url이 넘어왔기�
 
 이제 scrapy crawl twitter을 통해 크롤러를 구동해보자.
 
-<img src="{{ "/assets/img/2018-01-20-1.png"}}" alt="" loading="lazy" decoding="async">
+<img src="{{ "/assets/img/2018-01-20-1.png"}}" alt="" loading="lazy" decoding="async" width="1920" height="1080">
 
 성공적으로 이미지를 크롤링한 것을 확인할 수 있다.
 
