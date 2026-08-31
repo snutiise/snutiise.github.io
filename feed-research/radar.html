@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-08-30 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-01 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-08-30 기준</div>
+  <div class="gendate">2026-09-01 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="분야-레이더--추적-서비스-밖의-논문트렌드">분야 레이더 — 추적 서비스 밖의 논문·트렌드</h1>
-<p><strong>최종 갱신:</strong> 2026-08-29</p>
+<p><strong>최종 갱신:</strong> 2026-09-01</p>
 <p>추적 서비스(X·Meta·Netflix) 정본에 아직 반영하지 않은 것들을 모아 두는 워치리스트다. 엔트리 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a>를 참조한다: 2~4줄 포인터, 프로덕션 관련성 기준, ~3개월 수명(승격 또는 졸업).</p>
 <p>수집 주기는 다음과 같다. arXiv cs.IR 신규 제출은 매일 triage하고, 산업 블로그(Google Research, Pinterest, Spotify, LinkedIn 등)와 학회 accepted 목록은 주 1회 살펴본다. 이 수집은 일일 배치가 수행한다.</p>
 <h2 id="관찰-중-오픈-스레드">관찰 중 (오픈 스레드)</h2>
@@ -138,6 +138,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: Google/YouTube 계열 TIGER 후속 연구의 프로덕션 배포 진술을 기다린다 <code>[추정]</code> TIGER 원논문(RecSys 2023)은 아직 이 저장소에서 1차로 확인하지 않았고, 다음 수집 때 확인할 예정이다.</li>
 <li><strong>2026-08-11 추가 근거:</strong> HD-Rec (<a href="https://arxiv.org/abs/2608.06997">arXiv 2608.06997</a>, 2026-08-07) — Kuaishou 시니어 라인(Ruiming Tang, Guorui Zhou, Han Li)이 참여했다. SID를 cross-domain으로 확장하려고 계층 코드북(global coarse + domain-adaptive fine)과 domain sparse MoE를 함께 쓴다. <strong>공개 벤치마크 결과뿐이라 프로덕션 진술은 아직 없다.</strong> 그래서 Kuaishou 라인이 SID 계열에 합류했다는 신호로만 기록한다.</li>
 <li><strong>2026-08-12 추가 근거:</strong> Kuaishou <strong>PushDualGen</strong> (<a href="https://arxiv.org/abs/2608.07989">arXiv 2608.07989</a>, 2026-08-08) — OneRec에서 OneRec-Thinking으로 이어지는 다음 세대다. CoT의 서빙 비용을 피하려고 <strong>SID를 먼저 뽑고 건너뛸 수 있는 설명 텍스트(copy)를 붙이는 2단 생성</strong> 구조를 쓴다. Kuaishou 푸시 추천에 프로덕션 배포했고, 온라인 A/B에서 effective play rate가 상대적으로 +8.50% 올랐으며 불만족률이 상대적으로 −37.70% 내려갔고 롱테일 노출도 개선했다 <code>[확인]</code>. <strong>HD-Rec에 이어 이틀 연속으로 Kuaishou SID 라인이 레이더를 통과했다.</strong> 회사 차원에서 SID 라인이 계속 진화하고 있다는 신호다. Netflix GenRec 말고 대규모 A/B 진술이 쌓이는 두 번째 회사이기도 하다.</li>
+<li><strong>2026-09-01 추가 근거:</strong> Alibaba <strong>PailitaoGR</strong> (<a href="https://arxiv.org/abs/2608.26658">arXiv 2608.26658</a>, 2026-08-27 v1) — 저자 9인 전원이 Alibaba Group Hangzhou 소속이고, Pailitao는 Taobao의 이미지 검색 지면이다(<a href="https://arxiv.org/html/2608.26658v1">HTML 판</a>에서 소속을 확인했다). SID 생성형 retrieval을 상품 검색에서 <strong>이미지 검색으로 확장</strong>하는 시도다. 실사 이미지가 검색 타깃과 보조 근거(예: 사진 안의 텍스트), 무관한 시각 요소를 함께 담는다는 문제를 두 축으로 다룬다. <strong>target enhancer</strong>는 crop 없이 full image에서 검색 타깃 토큰만 집중적으로 강조해서 &quot;Zooming without Cropping&quot;을 구현하고, <strong>auxiliary enhancer</strong>는 OCR 없이 이미지 안의 관련 텍스트 근거를 선택적으로 뽑아 &quot;Reading without OCR&quot;을 구현한다. 훈련은 on-policy distillation과 contrastive strategy를 조합한다. <strong>오프라인에서 baseline 대비 평균 +13.8% 개선</strong>을 냈다고 진술했지만 <strong>프로덕션 A/B 수치는 공개하지 않았다</strong> <code>[확인]</code>. 훈련·검증 셋은 Pailitao 실제 이미지 검색 로그에서 샘플링했다고 밝혔다. Kuaishou HD-Rec/PushDualGen(단편 비디오·푸시)과 Yandex Music Gryphon-v2/Sona(음악)에 이어 <strong>SID 라인의 네 번째 회사, 그리고 이미지 검색 modality의 첫 진술</strong>이라는 위치다. 프로덕션 지표가 없어서 스레드에 붙는 세기는 약하다.</li>
 </ul>
 <h3 id="학습되는-인덱스-index-as-model--유기-피드로-넘어오나">학습되는 인덱스 (index-as-model) — 유기 피드로 넘어오나</h3>
 <ul>
