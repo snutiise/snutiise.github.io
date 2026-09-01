@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-01 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-02 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-01 기준</div>
+  <div class="gendate">2026-09-02 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="분야-레이더--추적-서비스-밖의-논문트렌드">분야 레이더 — 추적 서비스 밖의 논문·트렌드</h1>
-<p><strong>최종 갱신:</strong> 2026-09-01</p>
+<p><strong>최종 갱신:</strong> 2026-09-02</p>
 <p>추적 서비스(X·Meta·Netflix) 정본에 아직 반영하지 않은 것들을 모아 두는 워치리스트다. 엔트리 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a>를 참조한다: 2~4줄 포인터, 프로덕션 관련성 기준, ~3개월 수명(승격 또는 졸업).</p>
 <p>수집 주기는 다음과 같다. arXiv cs.IR 신규 제출은 매일 triage하고, 산업 블로그(Google Research, Pinterest, Spotify, LinkedIn 등)와 학회 accepted 목록은 주 1회 살펴본다. 이 수집은 일일 배치가 수행한다.</p>
 <h2 id="관찰-중-오픈-스레드">관찰 중 (오픈 스레드)</h2>
@@ -147,6 +147,12 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="camie-snap-dpa--i2i-retrieval의-공유-인코더--공동참여-신호">CAMIE (Snap DPA) — I2I retrieval의 공유 인코더 + 공동참여 신호</h3>
+<ul>
+<li>무엇: Snap Dynamic Product Ads(광고)의 item-to-item 검색에서 별개로 학습된 시각·텍스트·멀티모달 인코더가 임베딩 공간을 분절시켜 서로 다른 아이템 유형 사이의 검색 품질이 떨어지고, co-engagement 신호(같은 유저가 두 아이템을 함께 본 관계)를 대칭 대조로만 다루면 아이템의 상호작용 문맥을 반영하지 못한다는 두 문제를 다룬다. abstract에서 프로덕션 DPA 배포를 진술했다 <code>[확인]</code> <a href="https://arxiv.org/abs/2608.30255">arXiv 2608.30255</a>, 2026-08-31 제출, Snap 저자 5인(Xiaodong Liu, Siman Wang, Congfei Zhang, Hsiang-wei Chao, Xiao Bai 외).</li>
+<li>왜 주목: 광고 도메인의 I2I retrieval에서 Snap이 프로덕션 진술을 낸 최근 사례가 드물다. 같은 그룹이 유사 시점에 <a href="https://arxiv.org/abs/2608.30251">SetMIR</a>(multi-interest retrieval as set prediction)도 냈지만 SetMIR abstract에는 Snap 프로덕션 진술이 명시되지 않아 그쪽은 보류한다. Snap의 다음 진술이 이 라인을 이어갈지가 다음 관전 포인트다.</li>
+<li>상태: <strong>관찰</strong> — I2I retrieval 스레드가 아직 정본에 없다. Snap이 후속 진술을 내거나, 두 번째 회사(Pinterest·Meta 광고 등)에서 유사한 공유 인코더 + co-engagement 진술이 나오면 topic 승격 후보가 된다.</li>
+</ul>
 <h3 id="vk-friend-recommendation-gnn--194m-유저28b-엣지-프로덕션-소셜-그래프에서-message-passing-gnn을-스케일한-사례">VK Friend Recommendation GNN — 194M 유저·28B 엣지 프로덕션 소셜 그래프에서 message-passing GNN을 스케일한 사례</h3>
 <ul>
 <li>무엇: 친구 추천은 다중 홉 소셜 컨텍스트가 유저 속성보다 결정적이라서 message-passing GNN이 자연스러운데, 프로덕션 규모(수억 유저·수백억 엣지)에서 학습과 서빙을 붙일 때 부딪히는 시스템 문제와 모델링 문제 두 가지를 정면으로 푼다. <strong>Multi-hash user embeddings</strong>는 각 유저 ID를 여러 해시 함수의 임베딩 lookup으로 조합해 <strong>ID 임베딩 테이블 크기를 98% 이상 줄이면서도</strong> ranking quality를 유지한다. <strong>Temporal neighbor sampling</strong>은 timestamp-sorted CSR 저장과 binary search로 이웃 샘플링을 <code>O(deg(v) + k)</code>에서 <code>O(log(deg(v)) + k)</code>로 단축해, 슈퍼노드(팔로우가 극단적으로 많은 계정)의 이웃 순회 비용을 시간 로그로 억제한다 <code>[확인]</code> <a href="https://arxiv.org/abs/2608.27413">arXiv 2608.27413</a>, 2026-08-27 v1, CIKM 2026 accepted, 저자 3명(Maksim Utushkin·Andrei Ovsiannikov·Alexander D&#39;yakonov)이며, 이름과 본문에 언급된 규모로 보아 VK로 추정한다 <code>[추정]</code> (HTML abstract에는 소속 표기가 없고, 코드 릴리스는 언급되어 있다).</li>
