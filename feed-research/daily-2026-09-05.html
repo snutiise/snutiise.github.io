@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-09-05 — feed-research</title>
+<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
+     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
+     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
+<meta name="description" content="한 줄: X 4세대+15(2026-09-04, 9b0dc31)에서 (1) grox에 스레드 chain 단위 답글 스팸 판정 파이프라인 PlanMultiStepReplySpam이 신설됐다 — Gemma 2 한 번에 답글 스레드 전체를 넣고 &quot;스팸 인덱스 집합&quot;을 뽑아내되 진입…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-05.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:title" content="일일 리포트 2026-09-05 — feed-research">
+<meta property="og:description" content="한 줄: X 4세대+15(2026-09-04, 9b0dc31)에서 (1) grox에 스레드 chain 단위 답글 스팸 판정 파이프라인 PlanMultiStepReplySpam이 신설됐다 — Gemma 2 한 번에 답글 스레드 전체를 넣고 &quot;스팸 인덱스 집합&quot;을 뽑아내되 진입…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-05.html">
+<meta name="twitter:card" content="summary">
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-09-05 기준</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-09-05 기준</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-09-05</h1>
+  <div class="wd">토요일 · 읽는 데 약 43분</div>
+  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+15(2026-09-04, <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">9b0dc31</a>)에서 (1) <strong>grox에 스레드 chain 단위 답글 스팸 판정 파이프라인 <code>PlanMultiStepReplySpam</code>이 신설</strong>됐다 — Gemma 2 한 번에 답글 스레드 전체를 넣고 &quot;스팸 인덱스 집합&quot;을 뽑아내되 진입 조건이 &quot;<strong>한 저자가 자기 답글에 자기가 답한 chain으로 root 노출을 훔치는</strong> 패턴&quot;을 정의한다. root 팔로워 ≥ 1,000만 진입해서 단발성 판정(100k)보다 훨씬 넓은 대상. (2) <strong>PTOS 심판 스택의 카테고리별 모델 분화가 첫 실체</strong>로 확인됐다 — IllegalAndRegulatedBehaviors 카테고리 심판만 Grok 4.5-X_ALGO → Grok 4.1-fast-X_ALGO로 이관됐고 같은 카테고리가 first-pass에서도 Gemma 100%(확률 dial 제거)로 승격됐다. (3) <strong>Phoenix 서빙 엔진의 SID retrieval 사이드카가 완전 제거</strong>됐다(189줄 + 17줄 + CLI + proto dep 통째) — 히스토리 SID는 이제 요청에 직접 실려 들어온다는 계약으로 이관. (4) <strong>Phoenix 학습 remat에 <code>SAVE_H100_RECSYS = 32</code>가 신설</strong>돼 GB300 외에 H100에서도 학습이 도는 첫 코드 신호가 나왔다. (5) FA4 attention 커널이 가변 길이 히스토리를 원생 지원하도록 재작성됐다(캐시 제거, jax.numpy 이관). (6) visibility-filtering이 800+ 줄 순 감소로 hydration·safety-label 스택이 얇아졌다. Meta·Netflix 신규 없음, arXiv cs.IR 30건 파싱 성공 0건 통과.</div>
+</header>
+<div class="wrap" id="content">
+<h2 id="1-grox에-스레드-chain-단위-두-번째-답글-스팸-판정-경로가-정식으로-배선됐다--x-4세대15">1. grox에 스레드 chain 단위 두 번째 답글 스팸 판정 경로가 정식으로 배선됐다 — X 4세대+15</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">xai-org/x-algorithm@9b0dc31</a> — 공개 소스코드, 2026-09-04 00:37 UTC, X.AI Corp.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> grox는 X의 nearline LLM 주석 파이프라인이다. 답글 품질 관리 축에서 grox는 지금까지 두 판정 흐름을 가졌다: (a) <code>PlanReplyRanking</code>이 답글 하나에 점수를 매기고, (b) <code>PlanCoordinatedSpam</code>이 여러 계정이 담합한 반복 답글을 잡는다. 두 흐름 모두 4세대에서 통합 이력이 길다 — 4세대+3(2026-08-18, <a href="https://github.com/xai-org/x-algorithm/commit/11a71f8">11a71f8</a>)에서 별개였던 spam·comment·reply-ranking generator가 <code>ReplyRankingTaskGenerator</code> 하나로 흡수됐고, follower 게이팅 임계가 15k → 30k → 60k → 80k → 100k로 11일간 5단계 상향됐다. Kafka-first 저장 순서, Manhattan monotone-only write, LM 프롬프트에 팔로워 카운트·bio 주입 옵션 등 신뢰성 축이 4세대+9(45b48ba)·+10(24c6094)에서 다져졌다. 오늘의 커밋이 이 흐름에 세 번째 판정 경로를 붙였다: <strong><code>PlanMultiStepReplySpam</code></strong>. Multi-step이라는 이름은 &quot;판정 단위가 개별 답글이 아니라 답글 chain 여러 개&quot;라는 뜻이다. 이번 절에서 이 파이프라인의 진입 조건·프롬프트 형태·후처리·저장 계약을 한 번에 정리한다.</p></div>
+<p>같은 커밋이 grox PTOS 심판 스택과 Phoenix 서빙·학습 스택에서도 크게 움직였다. Multi-step reply spam이 오늘의 헤드라인이지만 대응하는 canon 갱신 5건이 더 있으므로 각각 절을 나눠 서술한다.</p>
+<p><strong>새로 알게 된 것: <code>PlanMultiStepReplySpam</code> 파이프라인 형태</strong></p>
+<ul>
+<li><p><strong>파이프라인 6파일 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/tree/9b0dc31/grox/flows/reply_spam"><code>grox/flows/reply_spam/</code></a>. <code>task_multi_step_reply_spam.py</code>(206줄) + <code>plan_multi_step_reply_spam.py</code>(29줄) + <code>classifier_multi_step_reply_spam.py</code>(226줄) + <code>state_multi_step_reply_spam.py</code>(13줄) + <code>prompts.py</code> +5줄(<code>multi_step_reply_spam_system_prompt</code>) + <code>generators.py</code> +7줄(두 스트림 generator의 <code>PLANS_TO_INJECT</code>에 이 plan key 주입). 총 500여 줄.</p>
+</li>
+<li><p><strong>진입 게이팅 8축 (<code>TaskMultiStepReplySpamFilter</code>)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/task_multi_step_reply_spam.py"><code>task_multi_step_reply_spam.py</code></a>. 다음 조건이 모두 통과해야 판정에 진입한다:</p>
+<ol>
+<li><code>post.ancestors</code>가 있고 그 중 삭제(None)된 게 없다 — 즉 답글이며 스레드가 온전하다.</li>
+<li>대상 포스트·직계 부모·스레드 root의 user가 모두 살아 있다.</li>
+<li>답글 작성자 ≠ 스레드 root 작성자 — 원 포스터가 자기 스레드에 다는 답글은 스킵.</li>
+<li><code>GROK_USER_ID</code>·<code>GORK_USER_ID</code> 스킵 — Grok/Gork 자체가 다는 답글은 대상 밖.</li>
+<li>스레드 깊이 ≥ 2 — &quot;root → 첫 답글&quot; 한 단계에는 안 들어온다.</li>
+<li><strong>직계 부모 작성자 = 대상 포스트 작성자</strong> — 같은 사람이 자기 답글에 자기가 또 답글을 다는 chain만 진입 대상.</li>
+<li><strong>root 작성자 팔로워 ≥ 1,000</strong> (&quot;blast radius&quot;) — root 노출이 유의미한 스레드만.</li>
+<li>답글 작성자가 high page-rank v2 유저나 grey badge 유저면 스킵 — 확립된 계정은 대상 밖. <code>UserStratoLoader.is_high_page_rank_v2_user</code>와 <code>is_grey_badge_user</code>를 <code>asyncio.gather</code>로 병렬 조회.</li>
+</ol>
+<p>이 8축 중 특히 6번이 이 파이프라인의 도메인을 정의한다: <strong>자기 대화 chain을 통해 root 노출을 훔치는 답글 스팸 chain</strong>. 예를 들어 유명인의 트윗에 A가 답글을 달고, 그 답글에 다시 A가 답글을 달고, 다시 A가 답글을 다는 식으로 chain을 이어 root 트윗의 노출을 자기 광고·유인으로 끌어당기는 패턴이 대상이다. 7번의 임계 1,000은 단발성 판정의 100k보다 두 자릿수 낮다 — root 노출이 상당한 스레드에 광범위하게 도는 파이프라인이다.</p>
+<blockquote>
+<pre><code class="language-python">class TaskMultiStepReplySpamFilter(TaskFilterWithPost):
+    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 1000
+    ...
+    if post.ancestors[-1].user.id != post.user.id:
+        Metrics.counter(&quot;task.filter.skipped.count&quot;).add(
+            1, attributes={&quot;filter&quot;: cls.FILTER_NAME, &quot;reason&quot;: &quot;parent_not_same_author&quot;},
+        )
+        return False
+    root_user_follower_count = post.ancestors[0].user.follower_count or 0
+    if root_user_follower_count &lt; cls.FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION:
+        Metrics.counter(&quot;task.filter.skipped.count&quot;).add(
+            1, attributes={&quot;filter&quot;: cls.FILTER_NAME, &quot;reason&quot;: &quot;low_blast_radius&quot;},
+        )
+        return False
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/task_multi_step_reply_spam.py"><code>task_multi_step_reply_spam.py</code></a>, 2026-09-04</p>
+</blockquote>
+</li>
+<li><p><strong>LM 프롬프트 (<code>MultiStepReplySpamScorer._to_convo</code>)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/classifier_multi_step_reply_spam.py"><code>classifier_multi_step_reply_spam.py</code></a>. 시스템 프롬프트는 export에서 제외(README 정책: 게이밍 방지). 그러나 human 메시지 구조는 코드에 그대로 드러난다:</p>
+<ul>
+<li>&quot;Reply Author Info&quot; 절 — 답글 작성자의 유저 프로필(handle, follower count, name, bio) 렌더링.</li>
+<li>&quot;Thread&quot; 절 — <code>#### Post N</code> 형식으로 스레드 전 포스트를 인덱스 번호 붙여 나열, root에는 &quot;(root post — never flag)&quot; 태그, 마지막에는 &quot;(the reply being evaluated)&quot; 태그.</li>
+<li>스레드가 <code>MAX_THREAD_SIZE = 10</code>을 넘으면 <strong>앞 5 + 뒤 5</strong>만 유지(중간 잘라내기).</li>
+<li>각 포스트에 <code>include_follower_count=True</code>, root만 <code>include_bio=True</code>, <code>max_media=2</code>.</li>
+</ul>
+<p>즉 이 파이프라인은 LM에게 개별 포스트가 스팸이냐를 묻는 게 아니라 <strong>스레드 전체를 보고 스팸 인덱스 집합을 뽑아내라</strong>는 태스크 형태를 취한다. 응답은 JSON <code>{&quot;spam_post_indexes&quot;: [1, 2, 3], &quot;reason&quot;: &quot;...&quot;}</code>.</p>
+<blockquote>
+<pre><code class="language-python">content.append(
+    &quot;\n\n# Thread\n\nThe reply thread is listed below; each post is labeled with a `#### Post N` index. &quot;
+    &quot;Post 0 is the original (root) post and the highest-numbered post is the reply being evaluated. &quot;
+    &quot;Refer to posts only by their integer index.\n\n&quot;
+)
+for i, p in enumerate(posts):
+    if i == 0:
+        tag = &quot; (root post — never flag)&quot;
+    elif i == last:
+        tag = &quot; (the reply being evaluated)&quot;
+    else:
+        tag = &quot;&quot;
+    content.append(f&quot;\n\n#### Post {i}{tag}\n\n&quot;)
+    content.extend(
+        PostRenderer.render(
+            p,
+            max_media=MAX_MEDIA_PER_POST,
+            include_follower_count=True,
+            include_bio=i == 0,
+        )
+    )
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/classifier_multi_step_reply_spam.py"><code>classifier_multi_step_reply_spam.py</code></a>, 2026-09-04</p>
+</blockquote>
+</li>
+<li><p><strong>LM은 Gemma 2</strong> <code>[확인]</code> — <code>model_name = GEMMA_2</code>, <code>OaiSampler</code>로 호출. 4세대+9(45b48ba)에서 grox의 <code>USE_GEMMA_CATEGORIES</code>에 Spam이 들어간 이후로 grox가 Gemma를 밀고 있는 흐름의 연장이다. Multi-step reply spam이 처음부터 Gemma 전용이라는 점이 grok API 예산 절감 방향과 정합적이다 <code>[추정]</code>.</p>
+</li>
+<li><p><strong>후처리 3단 안전장치</strong> <code>[확인]</code> — LM 출력을 그대로 신뢰하지 않고 다음 세 단계로 필터한다:</p>
+<ol>
+<li><strong><code>_drop_if_newest_reply_not_flagged</code></strong> — LM이 지목한 인덱스 집합에 판정 대상(스레드 마지막 포스트)이 없으면 결과 전체 폐기. Task 진입 조건이 &quot;이 반응이 스팸일 수 있어야 파이프라인이 도는 것&quot;이라 마지막 반응이 스팸이 아니라고 판정된 결과는 정합성 위반.</li>
+<li><strong><code>_drop_other_author_posts</code></strong> — LM이 스레드의 다른 저자 포스트를 스팸으로 지목했으면 이를 제거. 이 파이프라인의 도메인이 &quot;같은 저자가 자기 답글에 자기가 답한 chain&quot;이라 다른 저자 포스트가 결과에 나오면 무시.</li>
+<li><strong><code>_drop_singleton</code></strong> — 결과가 정확히 1개면 폐기. Chain 스팸의 정의상 &quot;여러 후속 답글&quot;이 대상이라 하나만 잡히는 건 유효한 결과가 아니다.</li>
+</ol>
+</li>
+<li><p><strong>저장 계약 (<code>TaskWriteMultiStepReplySpamReplyRanking</code>)</strong> <code>[확인]</code>:</p>
+<ul>
+<li>지목된 각 포스트에 <code>_apply_reply_spam_label(post_id, author_id)</code> (단발성 판정과 동일 헬퍼).</li>
+<li><code>save_reply_ranking_score(..., ReplyRankingScore(score=0.0, reasoning=reasoning[-500:]))</code> — <strong>점수를 0.0으로 강제 저장</strong> (가장 낮은 신뢰). reasoning은 마지막 500자만.</li>
+<li><code>save_reply_ranking_kafka_v2(...)</code> — v2 Kafka에 emit.</li>
+<li><code>DISABLE_RULES = [DisableTaskForNonProd]</code> — dev·staging에서 실제 label을 붙이지 않음.</li>
+</ul>
+</li>
+<li><p><strong>Plan DAG</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/plan_multi_step_reply_spam.py"><code>plan_multi_step_reply_spam.py</code></a>:</p>
+<pre><code>task_multi_step_reply_spam_filter →
+  task_media_hydration →
+    task_multi_step_reply_spam_detection →
+      task_write_multi_step_reply_spam_reply_ranking
+</code></pre>
+<p><code>TaskMediaHydration</code>을 filter 통과 후에만 태우는 순서가 관심 지점: media hydration은 비용이 크므로 filter가 상당 부분을 잘라낸 뒤에만 실행된다.</p>
+</li>
+<li><p><strong>흐름 통합</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/generators.py"><code>generators.py</code></a>. <code>ReplyRankingTaskGenerator</code>(kafka <code>TOPIC_UNIFIED_POSTS_V3</code>)와 <code>ReplyRankingRecoveryTaskGenerator</code> 두 스트림 generator가 이 새 Plan을 <code>PLANS_TO_INJECT</code>에 추가한다. 즉 기존 세 판정(단발성 reply_spam, coordinated_spam, spam_comment)과 함께 이 multi-step 판정이 같은 v3 이벤트 소스에서 병렬로 돈다.</p>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> &quot;4세대+15 공개로 해소된 것 / 신규 (2026-09-04)&quot; 절 신설 + &quot;Grox (LLM 주석)&quot; 아래에 새 subsection &quot;<code>### 4세대+15 (2026-09-04, 9b0dc31) — grox 스레드 단위 multi-step reply spam 분류기 신설 + PTOS ...&quot;이 추가됐고, 헤더의 </code>최종 갱신`이 2026-09-04 → 2026-09-05로 갱신됐다. 출처 절에도 신설 파일 6개 링크가 추가됐다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> — canon 이전 판은 (i) 답글 스팸이 개별 답글 대상 판정이고 (ii) coordinated_spam이 &quot;여러 계정이 담합한 반복 답글&quot; 대상이라는 두 흐름을 알았다. 이번이 세 번째 축을 붙인다: <strong>한 저자가 자기 답글 chain으로 root 노출을 훔치는 시간축 담합 스팸</strong>. Coordinated_spam이 계정 담합축이라면 multi-step은 시간축 chain 담합. 게이팅이 root 팔로워 1k라는 낮은 임계로 잡히면서 이 파이프라인이 root 저자의 노출 자산이 상당한 스레드에 광범위하게 도는 것으로 보인다. 그리고 판정을 Gemma에 밀어서 grok API 예산을 절감하는 방향과 정합적이다.</p></div>
+<p>기존 grox reply_spam 정본 이해와 상충하지 않는다 — 오히려 (a) 정본이 다뤄온 단발성 판정의 follower ≥ 100k 임계가 유지되면서 (b) 훨씬 낮은 임계(≥ 1k) chain 판정이 새 층으로 붙는 두 층 구조로 확장된 것으로 이해할 수 있다.</p>
+<h2 id="2-ptos-심판-스택의-카테고리별-모델-분화가-첫-실체-확인--illegalandregulatedbehaviors만-grok-45--grok-41-fast로-이관--x-4세대15">2. PTOS 심판 스택의 카테고리별 모델 분화가 첫 실체 확인 — IllegalAndRegulatedBehaviors만 Grok 4.5 → Grok 4.1-fast로 이관 — X 4세대+15</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">xai-org/x-algorithm@9b0dc31</a> — 같은 커밋의 <code>grox/flows/ptos/classifier.py</code>와 <code>grox/flows/ptos/task_safety_ptos_policy.py</code>.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> grox의 PTOS(Policy-based ToS 위반) 판정 스택은 4세대에서 first-pass 분류기 위에 심판(cross-validator) 계층이 진화적으로 붙어 왔다. 4세대+2(2026-08-17, <a href="https://github.com/xai-org/x-algorithm/commit/b089ce6">b089ce6</a>)에서 성인 컨텐츠 disagreement 심판(<code>SafetyPtosAdultContentCrossValidationJudge</code>, Grok 4.5 internal)이 도입됐고, 4세대+4~+6(2026-08-19~21)에서 Grok 4.6 internal shadow가 10% → 30% → 100%로 4일 만에 primary를 대체하며 4.5 internal이 코드에서 완전 삭제됐다. 그리고 4세대+7(2026-08-24, <a href="https://github.com/xai-org/x-algorithm/commit/d011592">d011592</a>)에서 **다른 4.5 엔드포인트인 <code>EAPI_GROK_4_5_X_ALGO</code>**가 judge 전용으로 재도입되면서 <code>SafetyPtosPolicyCrossValidator</code>가 신설됐고, 이 심판이 ChildSafety + ViolentMedia + IllegalAndRegulatedBehaviors 3개 카테고리를 모두 단일 모델(4.5-X_ALGO)로 처리했다. 정본은 이 상태를 &quot;X는 primary(4.6-internal)와 judge(4.5-X_ALGO)를 서로 다른 모델 세대·튜닝으로 유지하는 이중 스택&quot;이라고 요약했고, 심판 stack의 카테고리별 모델 분화가 다음 관측 포인트가 될 것이라고 남겨 뒀다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><p><strong><code>EAPI_GROK_4_1_FAST_X_ALGO</code> 심판 등록</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/classifier.py"><code>grox/flows/ptos/classifier.py</code></a>:</p>
+<blockquote>
+<pre><code class="language-python">eapi_4_1 = grox_config.get_eapi_model(ModelName.EAPI_GROK_4_1_FAST_X_ALGO)
+self.eapi_4_1_x_algo = EapiSampler(EapiModelConfig(**eapi_4_1.model_dump()))
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/classifier.py"><code>grox/flows/ptos/classifier.py</code></a>, 2026-09-04</p>
+</blockquote>
+<p><code>SafetyPtosPolicyCrossValidator.__init__</code>이 4.5-X_ALGO sampler 옆에 4.1-fast-X_ALGO sampler를 나란히 초기화한다.</p>
+</li>
+<li><p><strong>IllegalAndRegulatedBehaviors 카테고리만 4.1-fast로 이관</strong> <code>[확인]</code> — <code>_validate_illegal_and_regulated_behaviors</code>가 이렇게 바뀌었다:</p>
+<blockquote>
+<pre><code class="language-python">-        metric = &quot;safety_ptos.illegal_and_regulated_behaviors_cross_model_validate_with_grok_4_5&quot;
++        metric = &quot;safety_ptos.illegal_and_regulated_behaviors_cross_model_validate_with_grok_4_1&quot;
+         ...
+-            async with _eapi_4_5_x_algo_breaker.guard():
+-                raw = await self.eapi_4_5_x_algo.sample(
+-                    convo.interleaveToEapi(), conversation_id=convo.conversation_id
+-                )
++            raw = await self.eapi_4_1_x_algo.sample(
++                convo.interleaveToEapi(), conversation_id=convo.conversation_id
++            )
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/classifier.py"><code>grox/flows/ptos/classifier.py</code></a>, 2026-09-04</p>
+</blockquote>
+<p>서킷브레이커 guard도 사라졌다 — 4.1-fast는 breaker 없이 직접 호출한다. 4.5-X_ALGO는 <code>_eapi_4_5_x_algo_breaker</code>로 감쌌던 것과 대비된다. ChildSafety·ViolentMedia는 여전히 4.5-X_ALGO를 breaker와 함께 호출한다. 즉 카테고리별로 심판 모델이 서로 다르게 배정됐다.</p>
+</li>
+<li><p><strong><code>USE_GEMMA_CATEGORIES</code>에 IllegalAndRegulatedBehaviors 승격 + Gemma 확률 dial 통째 제거</strong> <code>[확인]</code>:</p>
+<blockquote>
+<pre><code class="language-python"> USE_GEMMA_CATEGORIES = {
+     SafetyPolicyCategory.Spam,
++    SafetyPolicyCategory.IllegalAndRegulatedBehaviors,
+ }
+</code></pre>
+</blockquote>
+<p>그리고 first-pass 라우팅에서 확률 게이트가 통째 걷어졌다:</p>
+<blockquote>
+<pre><code class="language-python">-        if (
+-            sample_for_gemma
+-            and not self.deluxe
+-            and self.use_gemma
+-            and random.random() &lt; self.use_oai_gemma4_dial
+-        ):
++        if sample_for_gemma:
+             try:
+                 return await self.oai_gemma4.sample(
+                     convo.to_openai_messages(), conversation_id=convo.conversation_id
+                 )
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/classifier.py"><code>grox/flows/ptos/classifier.py</code></a>, 2026-09-04</p>
+</blockquote>
+<p>즉 Spam과 IllegalAndRegulatedBehaviors 두 카테고리는 100% Gemma로 first-pass가 라우팅되고 grok는 폴백만 담당한다. <code>self.use_oai_gemma4_dial = 1.0</code> 상수 초기화도 삭제됐다.</p>
+</li>
+<li><p><strong><code>task_safety_ptos_policy.py</code>도 재분류 트리거에 IllegalAndRegulatedBehaviors 추가</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/task_safety_ptos_policy.py"><code>task_safety_ptos_policy.py</code></a>:</p>
+<blockquote>
+<pre><code class="language-python">-            elif violation.category == SafetyPolicyCategory.ViolentMedia:
++            elif violation.category in (
++                SafetyPolicyCategory.ViolentMedia,
++                SafetyPolicyCategory.IllegalAndRegulatedBehaviors,
++            ):
+                 policy = await active_classifier.classify_policy_for_violation(
+                     post, violation
+                 )
+</code></pre>
+</blockquote>
+<p>이전엔 ViolentMedia만 이 재분류 경로(deluxe 4.3 카테고리 판정 재확인)였다. 즉 IllegalAndRegulatedBehaviors 카테고리 흐름이 이번 커밋으로 <strong>(a) first-pass Gemma → (b) deluxe cross-model 재분류(비쌈) → (c) 심판 Grok 4.1-fast</strong> 세 층 스택이 됐다.</p>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> &quot;4세대+15 공개로 해소된 것 / 신규&quot; 절에 이 3건이 추가됐다. 카테고리별 심판 모델 분화가 첫 실체로 확인된 사실은 4세대+7 canon 정리 아래의 &quot;심판 확장의 다음 카테고리&quot; 관측 포인트를 갱신한다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> — canon 이전 판은 &quot;X가 primary와 judge를 서로 다른 모델로 유지&quot;까지 알았다. 이번이 그 층 안에서 <strong>카테고리마다 심판 모델이 별개 튜닝된다</strong>는 사실을 확정한다. Judge 모델의 선택 기준은 (a) 카테고리별 판정 난도, (b) 심판 latency 요구, (c) primary와 judge의 disagreement 특성 셋에 따라 결정되는 것으로 보인다 <code>[추정]</code>. <code>fast</code> 접미사가 4.1 심판에 붙고 breaker 없이 호출하는 걸 보면 IllegalAndRegulatedBehaviors는 판정이 상대적으로 명확해서(예: 마약·무기·아동 노출같이 라벨 자체가 강한 신호를 담고 있어) 빠르고 저렴한 심판으로 충분하다는 판단 <code>[추정]</code>. 반면 ChildSafety·ViolentMedia는 판정이 미묘해서(예: violent media에서 만화·게임 vs 실제) 4.5 심판이 필요하다는 정책. Spam·IllegalAndRegulatedBehaviors의 first-pass Gemma 100% 승격은 grok API 예산 절감 방향과 정합적이고, 다음 카테고리 승격 후보로 폭력·혐오 발화가 남아 있는 것으로 관측된다.</p></div>
+<h2 id="3-phoenix-서빙-엔진에서-sid-retrieval-사이드카가-완전-제거--히스토리-sid가-요청에-직접-실려-들어옴--x-4세대15">3. Phoenix 서빙 엔진에서 SID retrieval 사이드카가 완전 제거 — 히스토리 SID가 요청에 직접 실려 들어옴 — X 4세대+15</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">xai-org/x-algorithm@9b0dc31</a> — 같은 커밋의 <code>phoenix/crates/serving/xai-recsys-engine/</code> 서브트리와 <code>phoenix/xrex/inference/</code>.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> Semantic ID(SID)는 RQ-VAE 계열의 계층 코드북으로 post embedding을 이산 코드워드로 표현하는 기법이다. X에서는 4세대+3(2026-08-18, <a href="https://github.com/xai-org/x-algorithm/commit/11a71f8">11a71f8</a>)에서 VMRanker 요청에 SID 필드 7개(<code>sid_known</code>, <code>sid_k_l1/l2/l3</code>, <code>sid_gap_l1/l2/l3</code>)가 배선되면서 3-level 계층 코드북의 존재가 처음 확인됐고, 4세대+13(2026-09-01, <a href="https://github.com/xai-org/x-algorithm/commit/7ba7768">7ba7768</a>)에서 <code>phoenix/xrex/models/recsys_sid.py</code>(72줄 신규)가 오프라인 <code>.safetensors</code>에서 RQ-VAE 형태 stacked residual codebook을 로드해 랭커 post tower에 dense reconstruction을 주입하는 배선(wired-but-off, <code>sid_embedding_mode=&quot;learned&quot;</code> 기본)이 공개됐다. 그리고 Phoenix 서빙 엔진에는 <code>sid_client.rs</code>라는 사이드카 gRPC 클라이언트가 있었다 — 유저 히스토리의 각 post_id에 대해 SID 서비스에 별도 조회를 걸어 코드워드를 채우는 옵션 경로였다. 4세대+3의 canon 정리에서 이 사이드카는 &quot;옵션&quot;으로만 기록됐다. 이번 커밋이 이 사이드카를 완전히 걷어냈다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><p><strong><code>sid_client.rs</code>(189줄) + <code>sid_retrieval_runner.py</code>(17줄) 통째 삭제</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">xai-org/x-algorithm@9b0dc31</a>. <code>SemanticIdClient</code> Rust 클라이언트와 Python 바인딩(<code>PySemanticIdClient</code>)이 모두 사라졌다. <code>Cargo.toml</code>·<code>pyproject.toml</code>에서 <code>xai-recsys-sid-proto</code> 의존성이 제거됐고, <code>src/lib.rs</code>의 <code>pub mod sid_client;</code> 선언도 삭제됐다.</p>
+</li>
+<li><p><strong>Python struct와 매크로에서 SID 필드 제거</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/crates/serving/xai-recsys-engine/src/python.rs"><code>phoenix/crates/serving/xai-recsys-engine/src/python.rs</code></a>. <code>RecsysPredictorImpl</code>과 <code>RecsysRetrievalPredictorImpl</code> 두 struct에서 <code>sid_client: Option&lt;Arc&lt;crate::sid_client::SemanticIdClient&gt;&gt;</code> 필드가 제거됐고, <code>server_impl</code> 매크로가 받던 <code>sid_client: Option&lt;&amp;crate::sid_client::PySemanticIdClient&gt;</code> 인자와 <code>add_class::&lt;PySemanticIdClient&gt;()</code> 등록도 함께 삭제됐다.</p>
+</li>
+<li><p><strong>CLI에서 <code>--sid_endpoint</code> 제거 + 남은 로그 시맨틱</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/inference/launch_inference.py"><code>phoenix/xrex/inference/launch_inference.py</code></a>에서 <code>--sid_endpoint</code> argparse 인자와 <code>runner.sid_endpoint = args.sid_endpoint</code> 대입이 제거됐다. <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/inference/model_runner.py"><code>phoenix/xrex/inference/model_runner.py</code></a>에서는 <code>sid_endpoint: str | None = None</code> 필드가 제거되고, <code>create_server</code>의 SID client 조립 코드 12줄이 사라졌다. 남은 로그가 새 계약을 드러낸다:</p>
+<blockquote>
+<pre><code class="language-python">-        if _use_post_sid and self.sid_endpoint and sid_num_levels &gt; 0:
+-            sid_client = xai_recsys_engine.PySemanticIdClient(
+-                self.sid_endpoint,
+-                sid_num_levels,
+-            )
+-            logger.info(
+-                &quot;SID client connected: endpoint=%s, sid_num_levels=%d&quot;,
+-                self.sid_endpoint,
+-                sid_num_levels,
+-            )
+-        elif _use_post_sid:
+-            logger.info(
+-                &quot;Parsing history SIDs from the request (sid_num_levels=%d); no sid_endpoint&quot;,
+-                sid_num_levels,
+-            )
++        user_tower = self.model_config.user_tower_config
++        sid_num_levels = user_tower.sid_num_levels if user_tower.use_post_sid else 0
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/inference/model_runner.py"><code>phoenix/xrex/inference/model_runner.py</code></a>, 2026-09-04</p>
+</blockquote>
+<p>즉 두 가지 실행 모드(SID client 연결 or request에서 파싱) 중 앞의 것이 사라지고 후자만 남았다. <strong>히스토리 SID는 요청에 실려 들어온다</strong>는 것이 새 계약이다.</p>
+</li>
+<li><p><strong><code>use_pinned_d2h</code> default가 False → True로 flip</strong> <code>[확인]</code> — 같은 파일에서 부수적으로 CUDA pinned host memory D2H 전송 flag가 default on으로 바뀌었다. 도움말 텍스트: <em>&quot;Use CUDA pinned host memory for D2H transfer (~50 GB/s vs JAX&#39;s ~3 GB/s). Saves ~29ms/inference. Default True; pass False to opt out.&quot;</em> 4세대+6에서 옵션 도입, 12일 만에 default 승격.</p>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> &quot;4세대+15 공개로 해소된 것 / 신규&quot;에 이 사실이 추가됐다. 4세대+3에서 &quot;Phoenix serving SID 사이드카는 옵션&quot;이라고 기록됐던 것을 &quot;옵션이 완전히 제거, SID는 request 계약&quot;으로 갱신한다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> — Phoenix retrieval SID 파이프라인 아키텍처가 상당히 정리됐다. Canon 이전 판이 (i) phoenix-rankall이 SID 인덱스 window(<code>video_14day</code> 등)를 관리하고 (ii) VMRanker에 SID 필드 7개가 배선되고 (iii) 서빙 엔진에는 옵션인 SID 사이드카가 있다고 알았다. 이번 커밋으로 (iv) 서빙 엔진에서 SID 사이드카가 완전 소거되고 요청에 직접 SID가 실린다는 사실이 확정된다. 즉 <strong>SID codeword 조회 책임이 online serving 밖으로 이관</strong>됐다 — home-mixer(또는 candidate hydration 층)가 candidate hydration 단계에서 SID를 미리 뽑아 request에 담고, phoenix-rankall이 그걸 그대로 소비한다. 요청당 추가 gRPC 호출 하나가 사라지고, SID 인프라의 fault domain이 좁아진다. 다만 이번 diff에서는 home-mixer 쪽의 SID hydrator 명세가 아직 확인되지 않았다 — SID를 채우는 hydrator의 이름·소스, storage 백엔드(Manhattan? Strato? phoenix-rankall 자체?)가 후속 관측 포인트다.</p></div>
+<h2 id="4-phoenix-학습이-gb300-외에-h100에서도-돈다는-첫-코드-신호--fa4-attention이-가변-길이-히스토리-원생-지원--x-4세대15">4. Phoenix 학습이 GB300 외에 H100에서도 돈다는 첫 코드 신호 + FA4 attention이 가변 길이 히스토리 원생 지원 — X 4세대+15</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">xai-org/x-algorithm@9b0dc31</a> — 같은 커밋의 <code>phoenix/xrex/models/remat.py</code>(+17줄)와 <code>phoenix/xrex/cutedsl/ranker_attention_fa4.py</code>(+139/−75).</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> Phoenix 학습 하드웨어에 대한 canon은 4세대+6(2026-08-21, <a href="https://github.com/xai-org/x-algorithm/commit/28e414f">28e414f</a>)에서 <code>_GB300_OVERRIDES</code>가 등장하며 &quot;Phoenix 프로덕션 학습이 GB300에서 돈다&quot;는 것이 확정된 상태였다. Rematerialization 정책은 <code>SAVE_GB300_RECSYS = 29</code> 하나였고, GB300 override는 <code>bs_per_device=512</code>·<code>attn_impl=&quot;cutedsl_ranker_varlen_attn&quot;</code>·<code>remat_policy=RematType.SAVE_GB300_RECSYS</code>로 GB300 하드웨어에 최적화된 프리셋을 배정했다. FA4(NVIDIA CUTLASS/CUTe DSL 기반 flash attention v4) 커널은 histor tile이 항상 tile 크기(128)의 배수로 채워진다는 가정 아래 layout을 python-호스트에서 미리 만들어 캐시(<code>_DENSE_BS_LAYOUT_CACHE</code>)에 담아 쓰는 구조였다. 이번 커밋이 두 지점을 동시에 움직였다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><p><strong><code>SAVE_H100_RECSYS = 32</code> remat 정책 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/models/remat.py"><code>phoenix/xrex/models/remat.py</code></a>:</p>
+<blockquote>
+<pre><code class="language-python">class RematType(enum.IntEnum):
+    WHOLE = 0
+    SAVE_GB300_RECSYS = 29
++    SAVE_H100_RECSYS = 32
+</code></pre>
+</blockquote>
+<p><code>custom_remat_policy(policy)</code>에 새 분기가 붙어 GB300과 동일한 이름 리스트(<code>attn_outputs</code>·<code>dense_outputs</code>·<code>dense_outputs_individual</code>·<code>attn</code>·<code>gate_up_proj</code>·<code>dense_up_proj</code>·<code>query_heads_rope</code>·<code>key_heads_rope</code>·<code>cutedsl_attn_outputs</code>·<code>query_heads</code>·<code>key_heads</code>·<code>value_heads</code>·<code>scalar_stats</code>)를 rematerialization checkpoint 대상으로 저장한다. 두 정책이 이름 리스트는 동일하지만 별개 enum 값을 갖는 것은 GB300과 H100에서 각각 다른 튜닝(예: 저장 텐서 우선순위 프리셋)이 뒤에 붙을 가능성을 열어 둔 배선이다. <code>_H100_OVERRIDES</code> 같은 hardware-specific config block은 아직 이 커밋에 없다.</p>
+</li>
+<li><p><strong>FA4 attention 커널이 가변 길이 히스토리 원생 지원</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/cutedsl/ranker_attention_fa4.py"><code>phoenix/xrex/cutedsl/ranker_attention_fa4.py</code></a>. <code>build_dense_block_sparse_layout</code> 시그니처가 이렇게 바뀌었다:</p>
+<blockquote>
+<pre><code>-def build_dense_block_sparse_layout(batch_size, seq_len, hist_len, num_q_heads):
++def build_dense_block_sparse_layout(seq_len, hist_len, num_q_heads, hist_valid_len):
+</code></pre>
+</blockquote>
+<p>새 인자 <code>hist_valid_len</code>이 배치의 각 아이템별 실제 유효 히스토리 토큰 수를 받는다. 계산이 <code>import numpy as np</code> 기반 호스트 사전 계산에서 <code>jnp.where</code>·<code>jnp.arange</code>·<code>jnp.broadcast_to</code> 기반 JIT-friendly 코드로 이관됐고, <code>_DENSE_BS_LAYOUT_CACHE</code> 캐시가 통째 제거됐다. 이유는 명확: <code>hist_valid_len</code>이 배치마다 달라지므로 layout이 결정 함수가 아니라 배치 데이터의 함수가 됐고 캐싱이 무의미해진다.</p>
+<p>새 필드 <code>valid_block_upper</code>·<code>valid_block_lower</code>가 attention mask에 상한·하한을 배치별로 넘겨 partial-history block(히스토리 tile 안에서 실제 유효 토큰이 tile 크기 이하일 때)의 정확한 마스킹을 커널이 처리한다. <code>is_partial = is_hist &amp; (t == n_full) &amp; (has_partial == 1)</code>가 partial block의 위치를 마킹한다.</p>
+<p><code>ranker_attention_fa4</code> 시그니처가 <code>valid_block_upper=None</code>·<code>valid_block_lower=None</code> 두 optional 인자를 받도록 확장됐고, <code>custom_vjp</code>가 새 인자들도 gradient 계산에 포함시키기 위해 <code>bs_args</code>로 압축·분해된다. <code>input_output_aliases</code>가 <code>{12: 0, 13: 1, 14: 2}</code> → <code>{14: 0, 15: 1, 16: 2}</code>로 shift.</p>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> &quot;4세대+15 공개로 해소된 것 / 신규&quot;에 이 두 사실이 추가됐다. 4세대+6에서 &quot;Phoenix 프로덕션 학습이 GB300에서 돈다&quot;고 확정한 canon 아래에 &quot;H100에서도 도는 첫 신호&quot;가 추가된다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> — X 학습 하드웨어 스택이 GB300만이 아니라는 사실이 이번에 코드로 잠혔다. GB300은 flagship 학습, H100은 secondary·backfill·research용일 가능성 <code>[추정]</code>. <code>_H100_OVERRIDES</code>가 다음 커밋에서 등장하면 H100 vs GB300 배치·attention·remat 튜닝 차이가 드러난다. FA4 attention의 가변 길이 히스토리 지원은 4세대+6의 <code>cutedsl_ranker_varlen_attn</code> varlen 시맨틱을 histor 축까지 확장한 것으로 이해할 수 있다. 신규 유저·짧은 세션에서의 학습·추론 정확성이 개선된다 — 이전엔 짧은 히스토리를 tile 크기까지 padding해 attend 대상이 늘어나거나 attention 시맨틱이 오염됐을 가능성이 있었다. <code>sequence-transformer-ranking</code> 정본 노트의 attn 커널 축에 이 관찰이 붙는다.</p></div>
+<h2 id="5-visibility-filtering-800-줄-순-감소--hydrationsafety-label-스택이-통째-얇아짐-개요-수준만-확인--x-4세대15">5. visibility-filtering 800+ 줄 순 감소 — hydration·safety-label 스택이 통째 얇아짐 (개요 수준만 확인) — X 4세대+15</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">xai-org/x-algorithm@9b0dc31</a> — 같은 커밋의 <code>visibility-filtering/</code> 서브트리 여러 파일.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> Visibility filtering은 X의 fail-close 필터 스택이다. 4세대에서 이 서브트리는 크게 두 흐름으로 진화해 왔다: (a) 규칙 리팩터(4세대+11의 <code>RuleContext</code> 분리, +14의 Box<dyn Rule> 소거) — 데이터 지향 표현으로 정책을 옮기는 방향, (b) 안전망 제거(4세대+8의 VMRanker 128줄 삭제, +9의 media fallback cache 292줄 삭제) — 재작성 초기 안전 코드가 실증 이후 걷어지는 방향. 이번 커밋이 (b) 방향으로 대규모 이어간다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">xai-org/x-algorithm@9b0dc31</a>의 파일 delta:</p></div>
+<table>
+<thead>
+<tr>
+<th>파일</th>
+<th>+/−</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>visibility-filtering/config.rs</code></td>
+<td>+7/−118</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/rules/registry.rs</code></td>
+<td>+8/−378</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/rules/tweet_rules.rs</code></td>
+<td>+50/−129</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/mod.rs</code></td>
+<td>+11/−90</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/fallback_cache.rs</code></td>
+<td>+25/−87</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/batch.rs</code></td>
+<td>0/−19</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></td>
+<td>+36/−42</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/tes_hydrator.rs</code></td>
+<td>+3/−33</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/get_safety_labels.rs</code></td>
+<td>0/−40</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/safety_label_source/codec.rs</code></td>
+<td>+15/−206</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/safety_label_source/manhattan.rs</code></td>
+<td>0/−10</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/models/safety_labels.rs</code></td>
+<td>+13/−19</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/filter_tweets.rs</code></td>
+<td>+17/−65</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/rules/author_rules.rs</code></td>
+<td>+3/−27</td>
+</tr>
+</tbody></table>
+<p>같은 커밋에서 <code>visibility-filtering/rules/fixtures.rs</code>(+81)·<code>golden_corpus.rs</code>(+102)로 회귀 방어망은 더 두꺼워졌다. <strong>단순화 vs 회귀 방어</strong>의 균형은 유지됐다.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> &quot;4세대+15 공개로 해소된 것 / 신규&quot;에 개요 수준만 추가했다. 각 삭제 지점의 시맨틱(어떤 wire 포맷·라벨 소스가 걷어졌는지, 어떤 hydrator entry가 제거됐는지)은 심층 분석 필요 항목으로 남겼다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> — 재작성 안정화 뒤 안전망을 걷어내는 흐름이 확실한 패턴으로 자리잡았다. 4세대+8·+9·+11·+14·+15 다섯 커밋에 걸쳐 visibility-filtering이 통제된 순 감소로 얇아지고 있다. 이는 canon 이전 판이 &quot;4세대 VF는 Rust 재작성 초기라 안전망이 많다&quot;고 봤던 것이 이제는 &quot;재작성이 성숙해 안전망이 걷어지는 단계&quot;로 갱신됐다는 관찰이다. <code>safety_label_source/codec.rs</code>의 206줄 삭제는 wire 포맷 축의 통합을 시사하므로 후속 심층 분석 대상이다.</p></div>
+<h2 id="6-brazil2026electionfilter-정기-갱신--외부-기여-pr-88-머지--x-4세대15">6. Brazil2026ElectionFilter 정기 갱신 + 외부 기여 PR #88 머지 — X 4세대+15</h2>
+<div class="blk src"><p><span class="lbl">자료 A</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">xai-org/x-algorithm@9b0dc31</a> — <code>home-mixer/filters/brazil_2026_election_filter.rs</code>.</p></div>
+<div class="blk src"><p><span class="lbl">자료 B</span> <a href="https://github.com/xai-org/x-algorithm/commit/e4dcedd">xai-org/x-algorithm@e4dcedd</a> — PR #88 머지, 외부 기여 (joshs1017dev), 2026-09-03 20:28 UTC.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 정본은 4세대+1(2026-08-14)에서 Brazil2026ElectionFilter 신설(665 계정), 4세대+8(2026-08-25)에서 TSE dadosabertos 2026-08-25 판 반영(+3,379줄), 4세대+10(2026-08-28)에서 주석 재정리를 기록했다. 이 필터는 브라질 선거관리위원회(TSE)에 신고된 계정을 홈 피드에서 필터하는 정치·규제 대응 필터로, X의 정기 유지 보수가 매주 이어진다는 관찰의 근거다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span> — 오늘 커밋 patch에서:</p></div>
+<ul>
+<li>신규 하드코딩 계정 몇 개 추가: @nanacachen, @AecioNeves, @lgmbrasilia, @crismonteirosp, @rodrigolimamdh, @samiabomfim, @gabrielmagno_13 등(obfuscated user_id + 주석의 @username).</li>
+<li>&quot;not the candidate&#39;s actual account&quot; 판정 3~4명 신설 (@BENICIODIAS, @CARLOSSAMPAIO 등 — 계정 주인이 후보자가 아닌 것으로 판단됐다는 X 내부 검증 결과).</li>
+<li>&quot;no live account found&quot; 목록에서 몇 개 제거(계정이 살아났다는 뜻)·몇 개 추가(계정이 사라졌다는 뜻).</li>
+</ul>
+<p>파일 시맨틱(팔로우 예외 유지, obfuscated user_id 노출, @username 주석 공개)은 그대로다.</p>
+<p><strong>PR #88 (e4dcedd)</strong> — 외부 기여자 joshs1017dev가 <code>home-mixer/candidate_hydrators/vf_candidate_hydrator.rs</code>에 <code>in_network_ids</code> VF lookup 전 dedup 두 줄을 추가한 PR. 4세대의 오픈소스 태도가 실제로 외부 PR을 받는다는 증거. 성능 최적화 하나짜리라 canon 시맨틱 변경은 없다.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> &quot;4세대+15 공개로 해소된 것 / 신규&quot;에 두 건 모두 추가.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> — 정치인 X 계정 매핑을 매주 계속 검증한다는 관행이 이어지고 있다. 정기 갱신 관행 자체가 이 필터가 활성 프로덕션 코드 경로임을 확인한다. 외부 PR 머지 관행은 4세대가 &quot;코드 던지고 방치&quot;가 아니라 실제 외부 기여를 받는 유지형 오픈소스임을 재확인한다.</p></div>
+<h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
+<p>없음. 오늘 커밋은 canon 확장 방향이지 기존 canon 뒤집기가 아니다. 다만 4세대+3에서 &quot;Phoenix serving SID 사이드카는 옵션&quot;이라고 기록됐던 것을 &quot;옵션이 완전히 제거, SID는 request 계약&quot;으로 갱신한다(뒤집기라기보다 시점 발전).</p>
+<h2 id="레이더">레이더</h2>
+<p>없음. arXiv cs.IR 30건 파싱 성공, 산업 블로그는 토요일이라 스킵. 30건 triage 결과 통과 0건.</p>
+<ul>
+<li>CORE, EPIC, LLM4AIGQ, HypRQ-VAE, UniCon CTR, Slow-Fast Thinkers Rec, SelfDR, DoPR 등 8건이 추천/CTR 관련이지만 모두 학술 institution 저자 위주로 프로덕션 배포·A/B 주장 없음 → 탈락.</li>
+<li>나머지 22건은 (a) benchmark·평가 방법론(SHELF, MultiGhostBench, Incremental Pooled Eval, Training seeds stability), (b) 도메인 제한(POI·법률·의료·과학·야구), (c) LLM 사용 방법론(RAG·private retrieval·essay grading) → 탈락.</li>
+</ul>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
+<ul>
+<li><strong><code>PlanMultiStepReplySpam</code>의 초기 activate 시점과 판정 metric</strong> — 이번 diff에 experiment 게이팅이 안 보인다. 이 파이프라인이 프로덕션 트래픽 100%에서 도는지, <code>multi_step_reply_spam.scored.count</code>·<code>newest_not_flagged_dropped.count</code>·<code>other_author_dropped.count</code>·<code>singleton_dropped.count</code>·<code>json_repaired.count</code>·<code>invalid.count</code> 카운터의 실 배분(어느 필터가 얼마나 발동하는지)이 다음 관측 포인트다. 후처리 3단이 어느 정도 자주 발동하는지에 따라 LM의 원 정확도 vs 후처리가 만드는 최종 정확도의 차이가 드러난다.</li>
+<li><strong>home-mixer(또는 candidate hydration 층)에서 SID를 채우는 hydrator의 이름·소스</strong> — <code>sid_client</code> 제거 이후 SID를 request에 담는 지점이 어디인지. SID codeword storage 백엔드(Manhattan? Strato? phoenix-rankall 자체?). 이관에 dual-write 기간이 있었는지 이력.</li>
+<li><strong><code>_H100_OVERRIDES</code> 등장 시점과 H100 vs GB300 튜닝 차이</strong> — 이번엔 remat 정책만 등록됐다. batch size·attention impl·checkpoint 주기·LR 등이 H100에 어떻게 다르게 배정되는지가 다음 커밋에서 나온다.</li>
+<li><strong><code>EAPI_GROK_4_1_FAST_X_ALGO</code>가 4.5 X_ALGO와 어떻게 다른지</strong> — latency·비용·정확도 trade-off. 왜 IllegalAndRegulatedBehaviors만 4.1-fast로 이관됐는지의 정책 근거. ChildSafety·ViolentMedia 심판도 4.1-fast로 이관되는 시점.</li>
+<li><strong>safety_label_source/codec.rs 206줄 삭제의 실체</strong> — 어떤 wire 포맷·라벨 소스를 걷어냈는지. safety_labels codec 통합 방향이 canon으로 잠기려면 다음 관측이 필요하다.</li>
+<li><strong>다음 Gemma 승격 카테고리</strong> — Spam·IllegalAndRegulatedBehaviors 다음은 폭력 발화·혐오 발화·성인 컨텐츠 순서일지. Gemma 대체가 어디까지 확장되는지가 grok API 예산과 판정 정확성의 trade-off를 드러낸다.</li>
+</ul>
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-09-04.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-04</div></a><span></span></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>
