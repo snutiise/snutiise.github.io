@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-09-07 — feed-research</title>
+<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
+     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
+     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
+<meta name="description" content="한 줄: 월요일 산업 블로그 훑기에서 지난 배치들이 놓친 세 플랫폼의 프로덕션 배포 진술을 확인했다. Pinterest Home Feed의 Conditional Learned Retrieval(CLR) 재설계는 조건부 임베딩 retrieval을 통합 아키텍처로 확장하면서 p90…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-07.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:title" content="일일 리포트 2026-09-07 — feed-research">
+<meta property="og:description" content="한 줄: 월요일 산업 블로그 훑기에서 지난 배치들이 놓친 세 플랫폼의 프로덕션 배포 진술을 확인했다. Pinterest Home Feed의 Conditional Learned Retrieval(CLR) 재설계는 조건부 임베딩 retrieval을 통합 아키텍처로 확장하면서 p90…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-07.html">
+<meta name="twitter:card" content="summary">
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-09-07 기준</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-09-07 기준</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-09-07</h1>
+  <div class="wd">월요일 · 읽는 데 약 29분</div>
+  <ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>4</b>건</li></ul>
+  <div class="lead"><span class="lb">한 줄 요약</span>월요일 산업 블로그 훑기에서 지난 배치들이 놓친 세 플랫폼의 프로덕션 배포 진술을 확인했다. <strong>Pinterest Home Feed</strong>의 <a href="https://medium.com/pinterest-engineering/scaling-conditional-learned-retrieval-for-pinterest-home-feed-ecfba7e5a426">Conditional Learned Retrieval(CLR)</a> 재설계는 조건부 임베딩 retrieval을 통합 아키텍처로 확장하면서 p90 지연을 80ms에서 12ms로 85% 줄이고 7-figure 비용 절감을 냈다. <strong>LinkedIn</strong>은 <a href="https://www.linkedin.com/blog/engineering/ai/rebuilding-linkedins-follows-recommendations-with-llm-based-semantic-retrieval-and-ranking">Follows Recommendations</a>의 후보 생성을 fine-tuned bi-encoder LLM의 embedding-based retrieval로 재작성해 MyNetwork·Home Feed 두 지면에 배포했다. <strong>Spotify</strong>는 Home 팟캐스트 지면에 1B LLM 기반 <a href="https://research.atspotify.com/2026/8/from-models-to-products-llms-for-recommendation-at-spotify-scale/">GLIDE</a> 후보 생성기를 배포했고, <a href="https://research.atspotify.com/2026/8/balancing-multiple-objectives-in-generative-recommendations-with-adaptive-decoding/">SPDD</a> 라는 inference-time multi-objective 디코딩을 SASRec 위에 얹었다. X 오픈소스 미러와 Meta·Netflix 엔지니어링 블로그에는 신규 자료가 없다.</div>
+</header>
+<div class="wrap" id="content">
+<h2 id="1-pinterest-clr--home-feed-retrieval을-조건-임베딩-통합-아키텍처로-확장하고-서빙-p90을-85-줄였다--pinterest-레이더">1. Pinterest CLR — Home Feed retrieval을 조건 임베딩 통합 아키텍처로 확장하고 서빙 p90을 85% 줄였다 — Pinterest (레이더)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://medium.com/pinterest-engineering/scaling-conditional-learned-retrieval-for-pinterest-home-feed-ecfba7e5a426">Scaling Conditional Learned Retrieval for Pinterest Home Feed</a> — Pinterest Engineering Blog, 2026-08-26, 블로그. 저자 6인(Devin Kreuzer·Yichi Wang·Sujan Reddy Ale·Zelun Wang·Hongtao Lin·Piyush Maheshwari).</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> Pinterest Home Feed의 후보 생성(candidate generation)은 대규모 User-to-Pin retrieval 문제다. 흔한 접근은 two-tower 모델이다: user tower가 유저를 벡터로 인코딩하고 item tower가 후보 Pin을 인코딩한 뒤, approximate nearest neighbor 검색으로 유저 임베딩과 가까운 Pin을 뽑는다. 그런데 Pinterest 유저는 리노베이션 계획과 레시피 저장, 패션 탐색, 여행 아이디어 정리를 동시에 진행하는 식으로 여러 의도를 병렬로 가지고 있다. 단일 유저 임베딩 하나로는 이 다양성을 담기 어렵다.</p></div>
+<p>**Conditional Learned Retrieval(CLR)**는 two-tower 셋업을 확장해서 user tower를 <strong>명시적인 retrieval 컨텍스트</strong>로 조건화(condition)한다. 유저 임베딩을 하나만 뽑지 않고, 유저의 전반적인 행동에 근거를 두면서도 여러 의도 축을 반영하는 <strong>조건 인식 임베딩을 여러 개</strong> 생성한다. Pinterest는 이 접근을 두 편의 사전 논문에서 다뤘다: RecSys&#39;24 <a href="https://dl.acm.org/doi/10.1145/3640457.3688108">Bootstrapping Conditional Retrieval for User-to-Item Recommendations</a>에서 관심 기반 알림에 처음 적용했고, KDD&#39;25 <a href="https://dl.acm.org/doi/10.1145/3711896.3737174">Synergizing Implicit and Explicit User Interests: A Multi-Embedding Retrieval Framework at Pinterest</a>에서 명시 의도와 암묵 의도를 결합하는 Home Feed 다중 임베딩 프레임워크로 넓혔다. 이번 블로그는 초기 관심 조건에서 시작한 CLR이 어떻게 <strong>Pinterest Home Feed의 통합 retrieval 시스템</strong>으로 진화했는지를 사용 사례 확장, 모델 확장, 서빙 인프라 재설계 세 축으로 정리한다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h3 id="a-조건-유형이-세-축interestpinboard으로-확장됐고-조건-예산은-에이전트가-튜닝한다-확인">A. 조건 유형이 세 축(Interest·Pin·Board)으로 확장됐고, 조건 예산은 에이전트가 튜닝한다 <code>[확인]</code></h3>
+<ul>
+<li><strong>Interest Conditions</strong>: Pinterest가 이미 유지하는 사전 정의된 관심 taxonomy를 조건으로 쓴다. 초기 CLR은 user-to-interest 신호에서 몇 개의 관심을 뽑아 조건화했고, 이후에는 <strong>LLM이 생성한 새 유저 관심 신호</strong>를 조건 소스에 편입시켰다.</li>
+<li><strong>Pin Conditions</strong>: 유저의 최근 engaged Pin을 클러스터링하고 각 클러스터의 medoid(중심점)를 골라 조건으로 쓰며, pre-training 임베딩으로 표현한다. 이 조건으로 <strong>레거시 heuristic candidate generator를 제거하고 CLR로 대체</strong>했다.</li>
+<li><strong>Board Conditions</strong>: Pin과 Board는 Pinterest에서 이분 그래프를 이룬다. random walk로 이 그래프를 순회해서 Pin뿐 아니라 Board도 유저에게 추천할 수 있고, Board 조건을 Pin과 동일한 사전학습 임베딩 공간으로 표현한다. 이때에도 heuristic 대체와 서빙 스택 단순화가 함께 있었다.</li>
+<li><strong>Agentic Condition Budget Tuning</strong>: GPU 서빙으로 전환해 지연과 용량 여유가 생긴 뒤, Pinterest는 <strong>Claude Code를 활용해 자동화된 실험 튜닝 정책</strong>을 구성했다. 요청당 유추할 조건 개수(Interest·Pin·Board 각각)를 실험 피드백을 지속적으로 읽어서 최적화했고, &quot;low cost increase&quot;로 주요 engagement 지표를 개선했다고 진술한다.</li>
+</ul>
+<blockquote>
+<p>&quot;Following the migration to GPU-based serving, which significantly reduced latency and freed capacity, the team leveraged Claude Code to automate experimentation by continually reading experiment feedback to optimize the number of conditions inferred per request for CLR across Interest, Pin and Board conditions.&quot;
+— <a href="https://medium.com/pinterest-engineering/scaling-conditional-learned-retrieval-for-pinterest-home-feed-ecfba7e5a426">Scaling Conditional Learned Retrieval for Pinterest Home Feed</a>, 2026-08-26</p>
+</blockquote>
+<h3 id="b-pin-tower는-이미지-서명--semantic-id-이중-임베딩으로-강화됐고-semantic-id는-5단계-계층에-각-2048-코드-확인">B. Pin tower는 이미지 서명 + semantic ID 이중 임베딩으로 강화됐고, semantic ID는 5단계 계층에 각 2048 코드 <code>[확인]</code></h3>
+<p>Pin tower의 ID 임베딩은 초기에 이미지 서명(image signature) 기반으로 학습됐다(hash처럼 무작위 분포). ID 공간이 십억 규모여서 memorization과 tolerable collision을 위해 <strong>20GB 크기의 pretraining ID 임베딩 테이블</strong>을 학습했고, TorchRec으로 여러 GPU에 샤딩했다.</p>
+<p>여기에 <strong>semantic ID</strong>를 이미지 서명과 병치했다. semantic ID는 <strong>PinClip fusion</strong>의 정적 콘텐츠 임베딩을 <strong>residual-quantized VAE</strong>(RQ-VAE)로 양자화해서 만든 계층 코드로, 시각적·의미적으로 비슷한 Pin이 가까운 코드를 공유한다. Long-tail Pin은 콜드스타트 문제와 학습 데이터 부족을 겪는데, semantic ID 덕분에 인기 Pin과 같은 ID 임베딩 공간을 공유해서 collaborative signal을 빌려 쓸 수 있다.</p>
+<ul>
+<li>계층 수: <strong>5 layers</strong></li>
+<li>각 계층 코드 수: <strong>2048</strong></li>
+<li>임베딩 구조: 대형 테이블 대신 계층별로 작은 임베딩 테이블 5개를 두고, MLP 5층 스택으로 순차 융합한다.</li>
+<li>최종 결합: 이미지 서명 임베딩과 semantic ID 임베딩을 Pin tower의 <strong>feature cross layer</strong>에 함께 입력한다.</li>
+</ul>
+<h3 id="c-user-tower는-conditioned-user-sequence-transformer에서-foundation-model-기반-clr로-승격됐다-확인">C. User tower는 Conditioned User Sequence Transformer에서 Foundation Model 기반 CLR로 승격됐다 <code>[확인]</code></h3>
+<p>초기 CLR의 user tower는 정적·집계 피처 위주였고, 어떤 부분의 최근 이력이 특정 조건(Interest·Board·Pin)에 유효한지를 판단하기 어려웠다. Pinterest는 이를 <strong>Conditioned User Sequence Transformer</strong>로 바꿨다:</p>
+<ol>
+<li>raw 조건 피처를 <strong>condition token</strong>으로 변환한다.</li>
+<li>그 condition token을 user sequence에 붙인다.</li>
+<li>Transformer가 결합된 시퀀스 전체를 인코딩한다.</li>
+</ol>
+<p>Condition token은 최근 유저 액션에 대한 query처럼 작동해서, 모델이 retrieval 컨텍스트에 가장 유의미한 시퀀스 신호에 집중하게 한다. Transformer 출력은 (a) 인코딩된 condition token, (b) 인코딩된 최근 유저 시퀀스 token, (c) residual path로 통과한 raw 조건 피처의 세 흐름으로 나뉘어 User Tower의 <strong>DHEN layer</strong>로 전달된다.</p>
+<p>이 시퀀스 인코더를 다시 <strong>PinFM Foundation Model</strong>로 교체했다. PinFM은 여러 Pinterest 지면의 글로벌 유저 액션 시퀀스로 사전 학습한 대형 Transformer로, Unified CLR 프레임워크 안에서 fine-tune된다. PinFM은 OmniSage 임베딩에 더해 <strong>대형 ID 임베딩 테이블</strong>을 함께 사용해 Pin의 engagement 지향 표현을 memorization하고, <strong>같은 ID 임베딩 테이블이 Pin tower의 후보 Pin 인코딩에도 재사용</strong>된다. 저자들의 의도는 tower 양쪽에서 Pin의 일관된 표현을 두면 정렬이 쉬워진다는 것이다.</p>
+<p>세부적으로는 (a) fine-tuning에도 다음 토큰 loss를 유지해서 CLR 데이터셋에 적응시키고(positive action = saves·repins·sends·downloads), (b) 시퀀스 pooling과 조건 pooling 외에 유저 시퀀스 Transformer 출력의 <strong>attention pooling</strong>을 추가해 feature cross에 시퀀스 전체 관점을 제공하며, (c) <strong>contrastive alignment loss</strong>를 condition token 표현과 후보 Pin 표현 사이에 부여해서 condition token이 Pin 임베딩 공간과 가깝게 정렬되도록 유도한다. 이 alignment는 cross-attention의 Query-key 유사도를 이해할 수 있게 만드는 실용적 근거로 제시된다.</p>
+<h3 id="d-condition-표현은-unified-clr과-slot-architecture로-스케일한다-확인">D. Condition 표현은 Unified CLR과 Slot Architecture로 스케일한다 <code>[확인]</code></h3>
+<p>각 조건 유형별로 별도 모델을 유지하면 새 조건을 도입할 때마다 학습 파이프라인, 피처 업그레이드, 실험, 서빙 설정, 인덱싱이 중복된다. Pinterest는 두 단계로 이 문제를 해결했다.</p>
+<p><strong>Unified CLR</strong> — Interest CLR과 Board CLR을 하나의 모델로 통합했고, 여러 조건 유형을 받되 없는 조건 피처는 기본값으로 imputation하며, 학습에서는 conditional filtering으로 유효 조건이 있는 예시에만 집중한다.</p>
+<p><strong>Router Simplification</strong> — condition-specific 라우팅이 새 조건 유형(Board·Interest·Pin)을 도입할 때마다 bespoke 피처와 zero-padding을 요구하는 병목이었다. 이를 <strong>Slot Architecture</strong>로 치환했다:</p>
+<ul>
+<li><code>condition_os slot</code>: OmniSage 호환 임베딩(Pin OS, Board OS, interest text embedding 등)을 담는다.</li>
+<li><code>condition_id slot</code>: 특정 식별자 임베딩(Interest ID, Semantic ID 등)을 담는다.</li>
+<li><code>condition_type_id slot</code>: 조건 유형을 32차원 학습 임베딩으로 인코딩해 candidate generator의 정체성을 보존한다.</li>
+</ul>
+<h3 id="e-학습-효율-2배-request-level-training과-m-falcon-확인">E. 학습 효율 2배: Request-level Training과 M-Falcon <code>[확인]</code></h3>
+<p>Foundation Model을 user tower에 통합하면서 학습 계산량이 크게 늘어났다. 두 가지 손실 없는(lossless) 인프라 최적화로 <strong>학습 처리량을 2배로</strong> 끌어올렸다.</p>
+<p><strong>Request-level training</strong> — 같은 학습 batch 안에서 유저 피처는 서로 다른 후보 조건에 걸쳐 반복되는 경우가 잦다. <code>(user_id, condition identifiers)</code>의 unique 조합으로 유저 피처를 중복 제거하고, user tower를 통과하는 실제 배치 크기를 크게 줄인다. Forward pass 이후에는 contrastive loss 계산을 위해 생성된 임베딩을 원래 batch 크기로 re-duplicate한다.</p>
+<p><strong>M-Falcon</strong> — causal attention을 쓰는 덕분에 user sequence 표현은 항상 조건 token에 독립적이다. 따라서 batch 안에서 한 유저의 모든 조건을 한 user sequence 뒤에 이어 붙이고, 같은 user sequence가 batch 안에서 중복 계산되지 않게 한다. <strong>커스텀 block attention mask</strong>로 조건 token 사이의 상호 attend는 막고, 조건 token이 underlying user sequence에는 완전히 attend하도록 허용한다. Transformer layer를 통과하는 유효 배치를 크게 줄여 ID 임베딩과 activation 양쪽의 GPU 메모리 footprint를 낮췄다.</p>
+<h3 id="f-서빙-재설계-단일-요청-통합--gpu-서빙--nvembed-확인">F. 서빙 재설계: 단일 요청 통합 → GPU 서빙 + NVEmbed <code>[확인]</code></h3>
+<p>초기 CLR은 각 조건을 유저 레벨 피처처럼 다뤄서 조건마다 별도 모델 요청을 보냈다. 조건 수가 늘면서 컴퓨트 클러스터 비용이 급증했다. 두 단계로 재설계했다.</p>
+<p><strong>Single Model Request</strong> — 백엔드 요청 하나에 담긴 여러 CLR 모델 요청을 request-level에서 중복 제거하고 <strong>하나의 모델 요청으로 통합</strong>했다. 이를 위해 모델의 TorchScript를 수정해 내부에서 피처를 배치하고, Torch JIT으로 forward pass를 병렬화했다. 병목이 네트워크에서 CPU로 이동했고 지연은 중립을 유지했다.</p>
+<p><strong>GPU Serving + NVEmbed</strong> — CLR을 <strong>조건의 랭커</strong>로 재정의해서 조건을 아이템처럼 다루고 유저 레벨 피처를 이들에 broadcast했다. 이렇게 하면 CLR 추론이 L2 랭커 구조와 정렬된 &quot;1 query — N doc&quot; 패러다임으로 통합된다. CUDA 호환 모델을 export해 <strong>g6e.4xlarge</strong>에 배포했고, 모델 쪽 배치 형성 로직을 제거하고 출력 파싱을 개선했다. Foundation Model 이후 늘어난 대형 ID 임베딩 테이블을 함께 서빙·실험하기 위해 <strong>NVEmbed</strong>(임베딩 테이블과 dense 모델을 하나의 서빙 가능한 TorchScript artifact로 통합하는 프레임워크)를 채택했다.</p>
+<h3 id="g-프로덕션-임팩트-수치-확인">G. 프로덕션 임팩트 수치 <code>[확인]</code></h3>
+<ul>
+<li><strong>재무·성능</strong>: 7-figure 비용 절감, p90 모델 지연 <strong>80ms → 12ms</strong>(85% 감소).</li>
+<li><strong>스케일러빌리티</strong>: CLR FM(Foundation Model), Search CLR 등 후속 이니셔티브를 언블록. 유저당 더 많은 조건 지원 가능.</li>
+<li><strong>개발 속도</strong>: 인프라 단순화로 기술 부채가 줄고 새 조건 확장의 진입 장벽이 낮아짐.</li>
+</ul>
+<blockquote>
+<p>&quot;Financial &amp; Performance: 7 figure cost savings and reduced p90 model latency by 85% (80ms to 12ms) Scalability: Unblocked major initiatives, including CLR FM and Search CLR, while enabling more conditions per user.&quot;
+— <a href="https://medium.com/pinterest-engineering/scaling-conditional-learned-retrieval-for-pinterest-home-feed-ecfba7e5a426">Scaling Conditional Learned Retrieval for Pinterest Home Feed</a>, 2026-08-26</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> 이번 달 신규 절에 항목 추가. Pinterest는 현재 canon 추적 서비스가 아니라서 <code>services/</code> 정본은 만들지 않는다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> Pinterest CLR은 <strong>조건부 임베딩 검색을 두 개의 축으로 스케일한 프로덕션 사례</strong>다. 첫째, 조건의 축을 확장한다(Interest → Pin → Board, LLM이 새 관심 신호를 생성해 조건 소스에 편입). 둘째, condition 아키텍처를 통합한다(Unified CLR + Slot Architecture). Netflix Foundation Model이 채점 함수 위로 통합했다면, Pinterest CLR은 <strong>retrieval의 조건화 축으로 통합</strong>했다. 두 방향이 다른 층에서 같은 결론(하나의 프레임워크로 여러 지면·조건을 지탱한다)에 도달한다.</p></div>
+<p>또 하나의 관찰 포인트는 <strong>에이전트 기반 하이퍼파라미터 튜닝</strong>의 프로덕션 진술이다. Pinterest가 Claude Code로 요청당 조건 예산을 실험 피드백을 읽어 자동 튜닝했다고 밝힌 것은 <strong>AI 에이전트를 recsys 프로덕션 파이프라인의 튜닝 루프에 붙인 사례</strong>다. Meta AMBER나 X Phoenix에는 아직 유사 진술이 없어서, 앞으로 다른 회사도 유사한 흐름을 낼지가 지켜볼 지점이다.</p>
+<h2 id="2-linkedin-follows-recommendations--llm-bi-encoder-ebr을-mynetworkhome-feed-두-지면의-후보-생성기로-배포--linkedin-레이더">2. LinkedIn Follows Recommendations — LLM bi-encoder EBR을 MyNetwork·Home Feed 두 지면의 후보 생성기로 배포 — LinkedIn (레이더)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://www.linkedin.com/blog/engineering/ai/rebuilding-linkedins-follows-recommendations-with-llm-based-semantic-retrieval-and-ranking">Rebuilding LinkedIn&#39;s Follows Recommendations with LLM-Based Semantic Retrieval and Ranking</a> — LinkedIn Engineering Blog, 2026-08-24, 블로그. 저자 Haohua Wan.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> LinkedIn의 Follows Recommendations는 유저가 팔로우할 만한 크리에이터를 추천하는 지면으로, MyNetwork tab의 좌측 사이드바와 Home Feed의 우측 두 곳에 나타난다. 기존 시스템은 그래프 기반과 인기 기반 후보 생성기에 의존해 왔고, 특히 새 멤버는 첫 세션에서 sparse·popularity-based fallback만 얻는 문제가 있었다. LinkedIn은 이를 <strong>LLM 기반 semantic retrieval + dense L2 랭킹</strong>의 3단 파이프라인으로 재작성했다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h3 id="a-llm-기반-후보-생성-bi-encoder--narrative-prompting-확인">A. LLM 기반 후보 생성: bi-encoder + narrative prompting <code>[확인]</code></h3>
+<p>파이프라인의 첫 단계는 **Embedding-Based Retrieval(EBR)**로, fine-tuned bi-encoder가 멤버와 크리에이터의 프로필을 각각 임베딩으로 인코딩한다. 프로필 필드를 <strong>narrative prompting</strong> 방식(프로필 필드를 자연어 문장으로 재구성해서 LLM 입력으로 제공)으로 인코더에 준다. 이 EBR 채널은 기존 graph 기반과 popularity 기반 candidate generator와 병렬로 돈다.</p>
+<ul>
+<li>백본: 중간 규모 instruction-tuned 오픈소스 모델(구체적 이름은 공개하지 않음).</li>
+<li>임베딩 차원: 1024–4096(서빙 시 supervised projection layer로 64–128차원으로 압축).</li>
+<li>크리에이터 후보 풀: <strong>1000만 명 미만</strong>의 eligible creator.</li>
+<li>멤버 규모: &quot;billions of LinkedIn members&quot;.</li>
+</ul>
+<h3 id="b-임베딩-저장과-검색-오프라인-faiss--온라인-proxima-확인">B. 임베딩 저장과 검색: 오프라인 FAISS + 온라인 Proxima <code>[확인]</code></h3>
+<ul>
+<li><strong>오프라인</strong>: 크리에이터 임베딩은 Ray 분산 GPU 클러스터에서 batch 추론으로 야간에 사전 계산되고, <strong>FAISS IndexFlatIP</strong> exact K-NN 인덱스에 적재된다(~10M).</li>
+<li><strong>온라인</strong>: 멤버 온보딩 순간에 <strong>Proxima</strong>(LinkedIn의 모델 호스팅 인프라)에서 viewer 임베딩을 실시간으로 추론한다. 그 임베딩을 hosted vector search service에 질의한다.</li>
+</ul>
+<p>즉 LLM은 <strong>크리에이터 쪽은 오프라인 batch, 뷰어 쪽은 온라인 실시간 추론</strong>의 이중 배치 구조로 서빙 경로에 들어간다.</p>
+<h3 id="c-l2-랭킹-층-확인">C. L2 랭킹 층 <code>[확인]</code></h3>
+<p>FC + ReLU + batch norm + dropout의 dense NN이 후보를 점수 매긴다. 피처는 behavioral, categorical, collaborative-filtering + <strong>task-aware projected embeddings</strong>(supervised projection layer로 1024–4096차원을 64–128차원으로 축소한 것)이다.</p>
+<h3 id="d-ab와-프로덕션-결과-확인">D. A/B와 프로덕션 결과 <code>[확인]</code></h3>
+<blockquote>
+<p>&quot;After the redesign shipped, in production A/B tests, the new pipeline delivered statistically significant lifts in follow rate across member segments, with the strongest gains for new members, who now get relevant matches from their first session instead of the sparse, popularity-based suggestions the old system fell back on.&quot;
+— <a href="https://www.linkedin.com/blog/engineering/ai/rebuilding-linkedins-follows-recommendations-with-llm-based-semantic-retrieval-and-ranking">Rebuilding LinkedIn&#39;s Follows Recommendations</a>, 2026-08-24</p>
+</blockquote>
+<p>구체적인 uplift 백분율, 지연 수치, 절대 engagement 숫자는 블로그에 공개하지 않았다. 세그먼트별로 통계적으로 유의미한 follow rate lift가 있었고, <strong>새 멤버 세그먼트가 가장 크다</strong>는 점만 밝혔다.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> 이번 달 신규 절에 항목 추가. LLM-native ranking의 확산 스레드에 LinkedIn을 추가 근거로 편입.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> LinkedIn Follows는 <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">radar.md의 &quot;LLM-native ranking의 확산&quot; 스레드</a>에 <strong>여섯 번째 회사</strong>가 붙는 자리다. 지금까지 이 스레드에는 Netflix GenRec(채점 함수), Yandex Gryphon-v2/Sona(생성 retrieval+rank), Alibaba MetaStrategy(오프라인 정책 컴파일러), Meta ConnectionMind(그래프 경로 추론기), Meta AMBER(입력 tokenization)가 있었다. LinkedIn은 이 가운데 어디에도 정확히 대응하지 않는 **&quot;Bi-encoder embedding retrieval을 LLM으로 fine-tune해서 후보 생성기 채널로 추가&quot;**라는 자리를 차지한다. 이는 Pinterest CLR이 조건화된 EBR로 진화한 방향과 상보적이다(Pinterest는 조건을 붙였고, LinkedIn은 자연어 profile prompting을 붙였다).</p></div>
+<p>LinkedIn의 진술은 구체적 수치가 부족한 것이 약점이다. <strong>콜드스타트 세그먼트에서 개선이 가장 크다</strong>는 정성적 표현은 EBR이 popularity fallback을 대체할 때 신규 유저 지표가 좋아진다는 관찰과 정합적인데(같은 흐름을 X Phoenix cold-start author boost와 대비할 수 있다), 세그먼트별 lift 숫자가 다음 자료에 공개되는지가 관전 포인트다.</p>
+<h2 id="3-spotify-glide--spdd--home-팟캐스트에-1b-llm-후보-생성기-배포-sasrec-위-spdd-다중-목표-디코딩--spotify-레이더">3. Spotify GLIDE + SPDD — Home 팟캐스트에 1B LLM 후보 생성기 배포, SASRec 위 SPDD 다중 목표 디코딩 — Spotify (레이더)</h2>
+<div class="blk src"><p><span class="lbl">자료 (1)</span> <a href="https://research.atspotify.com/2026/8/from-models-to-products-llms-for-recommendation-at-spotify-scale/">From Models to Products: LLMs for Recommendation at Spotify Scale</a> — Spotify Research, 2026-08-03, 블로그.</p></div>
+<div class="blk src"><p><span class="lbl">자료 (2)</span> <a href="https://research.atspotify.com/2026/8/balancing-multiple-objectives-in-generative-recommendations-with-adaptive-decoding/">Balancing Multiple Objectives in Generative Recommendations with Adaptive Decoding</a> — Spotify Research, 2026-08-07, 블로그.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> Spotify Research는 LLM과 generative recommender를 프로덕션에 어떻게 통합했는지를 두 편의 블로그로 정리했다. 첫 편은 <strong>GLIDE</strong>를 Home의 팟캐스트 발견 지면에 배포한 사례이고, 두 번째 편은 <strong>SPDD</strong>(Stochastic Primal-Dual Decoding)를 SASRec 기반 플레이리스트 랭킹의 디코딩 층에 붙인 사례다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h3 id="a-glide-1b-llm--semantic-id-후보-생성기-home-팟캐스트-지면에-배포-확인">A. GLIDE: 1B LLM + Semantic ID 후보 생성기, Home 팟캐스트 지면에 배포 <code>[확인]</code></h3>
+<ul>
+<li>지면: <strong>Spotify Home</strong>의 팟캐스트 발견 카드.</li>
+<li>메커니즘: <strong>추가 candidate generator</strong>로 작동하며, 후단 랭킹 파이프라인에 후보를 공급한다.</li>
+<li>모델 크기: <strong>1B parameter LLM</strong>.</li>
+<li>아이템 표현: <strong>Semantic ID</strong>(카탈로그 아이템을 짧은 token 시퀀스로 표현해서 LLM이 실제 카탈로그 참조를 생성하게 만든다. 텍스트 hallucination 방지).</li>
+<li>A/B: <strong>21일 테스트, 약 2000만 impression 규모</strong>.</li>
+<li>결과: <strong>non-habitual podcast listening +5.4%</strong>, <strong>new-show discovery +14.3%</strong>, 지연·engagement 요구사항 유지.</li>
+</ul>
+<p>이 블로그는 또한 <strong>NEO</strong> 프레임워크를 언급하는데, 검색·추천·추론을 하나의 모델로 통합하는 &quot;language-steerable&quot; 아키텍처다. 1000만+ 아이템과 1500만 유저 규모로 테스트했지만 <strong>프로덕션 배포는 언급하지 않았다</strong> (연구 단계).</p>
+<h3 id="b-spdd-sasrec-위-inference-time-multi-objective-디코딩-확인">B. SPDD: SASRec 위 inference-time multi-objective 디코딩 <code>[확인]</code></h3>
+<ul>
+<li>위치: 사전 학습된 generative recommender의 <strong>디코딩(생성/추론) 시점에만</strong> 개입하는 lightweight layer.</li>
+<li>대상 모델: 프로덕션 A/B는 <strong>SASRec</strong>(autoregressive sequential recommender)로 플레이리스트 랭킹에 적용. 논문에서는 TransAct(Home shelf 랭킹)에도 평가했지만 라이브 배포는 SASRec 쪽이다.</li>
+<li>메커니즘: <strong>auxiliary objective(예: relevance + diversity, 또는 relevance + novelty)에 대한 동적 가중치 튜닝</strong>을 생성 단계에서 수행하고, 재학습 없이 목표를 조정한다.</li>
+<li>A/B: <strong>~100만 유저 × 60만 플레이리스트</strong>의 대규모 실험.</li>
+<li>결과: auxiliary stream-share 지표에서 <strong>SPDD +5.44% (control 대비)</strong> vs <strong>fixed-weight +3.60%</strong>, 약 1.8pp 차. <strong>유저 소비 감소 없이</strong> 달성했고 skip rate 증가폭도 더 낮았다.</li>
+</ul>
+<p>Spotify는 &quot;generative recommender&quot;를 <strong>autoregressive 시스템</strong>으로 정의한다(한 번에 아이템 하나를 골라, 그 선택이 이후 위치의 점수에 영향을 주면서 sequential dependency를 잡는 시스템).</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> 이번 달 신규 절에 두 항목 추가. LLM-native ranking 스레드에 Spotify GLIDE를 일곱 번째 회사로 편입. 생성형 retrieval / semantic ID 스레드에 GLIDE(Semantic ID + LLM 후보 생성기)와 SPDD(multi-objective adaptive decoding)를 함께 편입.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> Spotify GLIDE는 <strong>Netflix GenRec 이후 미국 서비스에서 LLM을 랭킹 파이프라인에 붙인 두 번째 프로덕션 진술</strong>이다(콘텐츠 도메인이 다르지만, 서빙 경로에서 LLM을 후보 생성기로 두는 자리가 새롭다). Yandex와 Alibaba, Meta, Kuaishou가 그동안 이 스레드를 채웠는데, 미국 서비스가 다시 붙었다는 점이 관찰 축이 된다.</p></div>
+<p>SPDD는 <strong>decoding time에만 개입하는 multi-objective 컨트롤러</strong>라는 자리를 새로 만든다. 지금까지 SID + LLM 계열 논쟁은 (a) architecture(HSTU vs Transformer vs SID+CoT)와 (b) training objective(next-token vs contrastive vs distillation)에 집중돼 있었는데, SPDD는 <strong>serving-side 디코딩 정책이 계산을 늘리지 않고 auxiliary objective를 조정한다</strong>는 방향의 실증을 더한다. Kuaishou PushDualGen이 서빙 비용을 피하려고 SID + skippable copy 구조로 갔다면, SPDD는 서빙 모델을 그대로 두고 디코딩 정책만 바꾼다는 대안 각도다.</p>
+<h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
+<p>없음. 세 자료 모두 기존 radar 스레드에 정합하고 확장한다.</p>
+<h2 id="레이더">레이더</h2>
+<p>이번 4건은 오늘의 Monday 산업 블로그 스캔에서 발견됐고, 지난 배치들이 놓친 항목들이다. 모두 <code>radar.md</code>의 이번 달 신규 절에 추가한다.</p>
+<ul>
+<li><strong>Pinterest CLR</strong> (<a href="https://medium.com/pinterest-engineering/scaling-conditional-learned-retrieval-for-pinterest-home-feed-ecfba7e5a426">Scaling Conditional Learned Retrieval for Pinterest Home Feed</a>, 2026-08-26) — Home Feed retrieval 조건화 프레임워크의 통합. 프로덕션에서 p90 지연 80ms → 12ms.</li>
+<li><strong>LinkedIn Follows LLM</strong> (<a href="https://www.linkedin.com/blog/engineering/ai/rebuilding-linkedins-follows-recommendations-with-llm-based-semantic-retrieval-and-ranking">Rebuilding LinkedIn&#39;s Follows Recommendations</a>, 2026-08-24) — bi-encoder LLM EBR을 MyNetwork·Home Feed 두 지면에 배포.</li>
+<li><strong>Spotify GLIDE</strong> (<a href="https://research.atspotify.com/2026/8/from-models-to-products-llms-for-recommendation-at-spotify-scale/">From Models to Products: LLMs for Recommendation at Spotify Scale</a>, 2026-08-03) — 1B LLM + Semantic ID 후보 생성기, Spotify Home 팟캐스트, 21일 20M impression A/B, non-habitual listening +5.4%.</li>
+<li><strong>Spotify SPDD</strong> (<a href="https://research.atspotify.com/2026/8/balancing-multiple-objectives-in-generative-recommendations-with-adaptive-decoding/">Balancing Multiple Objectives in Generative Recommendations with Adaptive Decoding</a>, 2026-08-07) — SASRec 위 inference-time multi-objective 디코딩. 100만 유저 A/B, aux stream-share +5.44% vs fixed-weight +3.60%.</li>
+</ul>
+<p>arXiv cs.IR triage: 30건 파싱, 통과 0건. 대부분 학술 기관 저자의 offline 벤치마크 연구(CORE MLLM reranker distill, EPIC SID diffusion, HypRQ-VAE hyperbolic long-tail, SelfDR LLM reasoning distill, DoPR LLM reranker prefix, UniCon CTR, Recommender as Slow/Fast Thinkers, Training seeds stability 등)이거나 도메인 제한(POI·법률·의료·야구·music·finance QA·essay grading·RAG·private retrieval). 프로덕션 배포·A/B 진술이 있는 후보는 없음.</p>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
+<ul>
+<li><strong>Pinterest CLR의 조건 예산 튜닝에서 사용한 Claude Code 파이프라인의 세부</strong> — 어떤 metric을 목적 함수로 삼았는지, feedback loop 주기가 어떻게 되는지가 후속 블로그나 발표에서 공개될지 지켜본다. AI 에이전트를 recsys 튜닝 루프에 붙인 프로덕션 사례로 다른 회사가 유사 진술을 낼지가 두 번째 관전 포인트다.</li>
+<li><strong>LinkedIn Follows의 구체적 uplift 수치</strong> — 블로그는 세그먼트별 lift만 정성적으로 진술했다. LinkedIn이 후속 논문(RecSys/CIKM 등)이나 발표에서 세그먼트별 절대 수치를 공개하는지 확인한다. 특히 new-member 세그먼트의 개선폭은 콜드스타트 논쟁에서 유의미한 데이터 포인트다.</li>
+<li><strong>Spotify NEO 프레임워크의 프로덕션 진술</strong> — GLIDE는 candidate generator로 배포됐지만 NEO(unified search + recommendation + reasoning)는 아직 연구 단계다. Spotify가 NEO를 어느 지면에 언제 배포하는지가 다음 관전 포인트다.</li>
+<li><strong>PinFM Foundation Model의 상세 아키텍처와 크기</strong> — Pinterest CLR 블로그는 PinFM을 참조(ref)로만 표기하고 상세를 공개하지 않았다. Meta의 GEM/HSTU와 Netflix Foundation Model에 대응하는 Pinterest 진술이 별도 자료로 나오는지 확인한다.</li>
+</ul>
+<p>조회 실패: ai.meta.com/blog/rss/ curl exit 56 (RSS는 접근 불가, 브라우저 UA로 blog 페이지 fetch는 성공), linkedin.com/blog/engineering/rss.xml HTTP 404 (RSS URL 자체가 없음, blog 페이지에서 직접 확인).</p>
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-09-06.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-06</div></a><span></span></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>
