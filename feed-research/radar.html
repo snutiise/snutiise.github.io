@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-07 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-08 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-07 기준</div>
+  <div class="gendate">2026-09-08 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="분야-레이더--추적-서비스-밖의-논문트렌드">분야 레이더 — 추적 서비스 밖의 논문·트렌드</h1>
-<p><strong>최종 갱신:</strong> 2026-09-07</p>
+<p><strong>최종 갱신:</strong> 2026-09-08</p>
 <p>추적 서비스(X·Meta·Netflix) 정본에 아직 반영하지 않은 것들을 모아 두는 워치리스트다. 엔트리 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a>를 참조한다: 2~4줄 포인터, 프로덕션 관련성 기준, ~3개월 수명(승격 또는 졸업).</p>
 <p>수집 주기는 다음과 같다. arXiv cs.IR 신규 제출은 매일 triage하고, 산업 블로그(Google Research, Pinterest, Spotify, LinkedIn 등)와 학회 accepted 목록은 주 1회 살펴본다. 이 수집은 일일 배치가 수행한다.</p>
 <h2 id="관찰-중-오픈-스레드">관찰 중 (오픈 스레드)</h2>
@@ -150,6 +150,12 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="ptdg-huawei-appgallery--mmoe-대체용-personalized-task-dependency-graph-100m-dau-프로덕션-ab에서-cvr-12--ecpm-19">PTDG (Huawei AppGallery) — MMoE 대체용 personalized task dependency graph, 100M+ DAU 프로덕션 A/B에서 CVR +1.2% / eCPM +1.9%</h3>
+<ul>
+<li>무엇: <strong>Personalized Task Dependency Graphs</strong>는 industrial recommender의 multi-task learning 아키텍처에서 conversion funnel 안의 task 간 dependency를 아이템별로 rewiring한다. 기존 MMoE 계열은 dependency strength가 트래픽 전반에 동일하다고 가정하지만, 아이템 특성에 따라 task correlation이 다르다는 관찰이 출발점이다. Low-rank approximation으로 dependency pathway의 강도를 아이템마다 다르게 만들되, Click→Pay 같은 causal constraint는 hard masking으로 지킨다. **Adaptive Progressive Masking(APM)**을 함께 넣어서 sparse task와 dense task의 파라미터를 분리 학습하고 최적화 불안정을 억제한다 <code>[확인]</code> <a href="https://arxiv.org/abs/2609.04862">arXiv 2609.04862</a>, 2026-09-04 v1, CIKM 2026 accepted, 저자 11인 전원이 Huawei Technologies Shanghai / Nanjing / Dongguan / Beijing 소속임을 <a href="https://arxiv.org/html/2609.04862v1">HTML 판</a> affiliation 표기와 <code>@huawei.com</code> 도메인으로 확인했다.</li>
+<li>왜 주목: <strong>&quot;a mainstream app distribution platform, serving over 100 million daily active users&quot;</strong>, 즉 Huawei AppGallery로 추정되는 지면의 랭킹 모델로 배포됐다. 2주 A/B에서 10%×10% split(나머지 80%는 원 프로덕션 모델 유지)로 <strong>CVR +1.2%, eCPM +1.9% relative to the deployed MMoE baseline</strong>을 얻었고, 오프라인에서는 KuaiRand1K와 자체 industrial dataset의 sparse conversion task AUC가 최대 +1.45%였다 <code>[확인]</code>. Meta HSTU/Wukong·Netflix Foundation Model·Alibaba TransRetrieval 같은 파라미터·시퀀스 축 스케일링과 다르게, <strong>static conversion funnel의 dependency 구조 자체를 학습 가능한 personalized graph로 재정의한</strong> 각도라는 점이 특징이다. 함께 등장한 <a href="#gatediffint-xiaohongshu--%EC%9C%A0%EC%A0%80-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4%EC%97%90-diffusion-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%A0%9C%EA%B1%B0--llm-%EB%8B%A4%EC%A4%91-%EC%9D%B8%ED%85%90%ED%8A%B8-%EC%A6%9D%EB%A5%98%EB%A5%BC-%EC%A0%81%EC%9A%A9%ED%95%9C-cvr-%EB%9E%AD%EC%BB%A4">Xiaohongshu GateDiffInt</a>와 마찬가지로 CVR head 자체의 재설계가 관찰 대상에 새로 추가된다.</li>
+<li>상태: <strong>관찰</strong> — Huawei는 canon 추적 서비스가 아니라 services 정본은 만들지 않는다. 두 번째 회사가 유사한 personalized task dependency 진술(GCN + causal masking + APM)을 내면 <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a>에 절 신설 후보다. CIKM 2026 발표 슬라이드에서 industrial dataset 규모와 KuaiRand1K vs 자체 데이터의 절대 수치 차이를 공개하는지, HiSuite/Petal Ads 등 Huawei의 다른 지면으로 확장하는지가 다음 관전 포인트다. 자세한 분석: <a href="daily-2026-09-08.html">daily/2026-09-08.md</a>.</li>
+</ul>
 <h3 id="pinterest-clr--home-feed-조건-임베딩-retrieval을-통합-아키텍처로-확장-p90-지연-85-감소">Pinterest CLR — Home Feed 조건 임베딩 retrieval을 통합 아키텍처로 확장, p90 지연 85% 감소</h3>
 <ul>
 <li>무엇: **Conditional Learned Retrieval(CLR)**는 Pinterest Home Feed의 two-tower 후보 생성기의 user tower를 명시적 retrieval 컨텍스트(Interest·Pin·Board)로 조건화해 조건 인식 임베딩을 여러 개 생성한다. 이번 자료는 초기 관심 조건에서 시작한 CLR이 (a) 조건 유형 확장(Interest→Pin→Board, LLM이 새 관심 신호 생성), (b) 모델 확장(Conditioned User Sequence Transformer → PinFM Foundation Model 기반 CLR, contrastive alignment loss 도입), (c) 조건 표현 통합(Unified CLR + Slot Architecture로 condition_os·condition_id·condition_type_id 세 슬롯), (d) 학습 효율(Request-level Training과 M-Falcon으로 2x throughput), (e) 서빙 재설계(단일 요청 통합 → GPU 서빙 + NVEmbed) 다섯 축으로 진화했음을 정리했다 <code>[확인]</code> <a href="https://medium.com/pinterest-engineering/scaling-conditional-learned-retrieval-for-pinterest-home-feed-ecfba7e5a426">Scaling Conditional Learned Retrieval for Pinterest Home Feed</a>, 2026-08-26, Pinterest Engineering, 저자 6인. 사전 논문: <a href="https://dl.acm.org/doi/10.1145/3640457.3688108">RecSys&#39;24 Bootstrapping Conditional Retrieval</a>, <a href="https://dl.acm.org/doi/10.1145/3711896.3737174">KDD&#39;25 Synergizing Implicit and Explicit User Interests</a>.</li>
