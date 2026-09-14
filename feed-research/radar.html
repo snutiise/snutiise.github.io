@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-13 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-15 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-13 기준</div>
+  <div class="gendate">2026-09-15 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="분야-레이더--추적-서비스-밖의-논문트렌드">분야 레이더 — 추적 서비스 밖의 논문·트렌드</h1>
-<p><strong>최종 갱신:</strong> 2026-09-12</p>
+<p><strong>최종 갱신:</strong> 2026-09-15</p>
 <p>추적 서비스(X·Meta·Netflix) 정본에 아직 반영하지 않은 것들을 모아 두는 워치리스트다. 엔트리 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a>를 참조한다: 2~4줄 포인터, 프로덕션 관련성 기준, ~3개월 수명(승격 또는 졸업).</p>
 <p>수집 주기는 다음과 같다. arXiv cs.IR 신규 제출은 매일 triage하고, 산업 블로그(Google Research, Pinterest, Spotify, LinkedIn 등)와 학회 accepted 목록은 주 1회 살펴본다. 이 수집은 일일 배치가 수행한다.</p>
 <h2 id="관찰-중-오픈-스레드">관찰 중 (오픈 스레드)</h2>
@@ -152,6 +152,18 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="pindco-pinterest--광고-창의-소재를-whole-page-손익까지-반영해-실시간-선택하는-프로덕션-dco-pinterest-ads에-launched-ad-ctr-309-relative">PinDCO (Pinterest) — 광고 창의 소재를 whole-page 손익까지 반영해 실시간 선택하는 프로덕션 DCO, Pinterest Ads에 launched, Ad CTR +3.09% relative</h3>
+<ul>
+<li>무엇: <strong>PinDCO</strong>는 Pinterest 광고 파이프라인에 붙는 dynamic creative optimization 시스템이다. **Creative Component Fusion Network(CCFN)**가 이미지·타이틀·레이아웃 각 컴포넌트별 tower를 두고 컴포넌트별 하이퍼파라미터(예: dropout rate)로 수렴 속도를 정렬한 뒤 컴포넌트 fusion layer가 광고 랭킹 모델의 logit에 더해질 delta score를 낸다. **Pixel-aware Adjustment Module(PAM)**은 waterfall grid에서 세로가 긴 크리에이티브가 주변 슬롯의 노출 공간을 밀어내는 카니벌라이제이션을 aspect ratio penalty $P(ar_{rel}) = \mathrm{clip}(1 - \tanh(k(ar_{rel} - 1)), 0, 1)$로 반영한다. 광고 랭킹과 병렬로 실행돼 지연이 랭킹 upper bound에 갇힌다. 서빙에서는 크리에이티브 id 기반 샤딩 캐싱, dynamic batching(제거 시 P99 +87%, P90 +114%)으로 QPS를 소화한다 <code>[확인]</code> — <a href="https://arxiv.org/abs/2609.11943">arXiv 2609.11943</a>, 2026-07-21 제출, RecSys 2026 accepted, 저자 8인 전원 Pinterest Inc. 소속 이메일 도메인 <code>@pinterest.com</code> <a href="https://arxiv.org/html/2609.11943v1">HTML 판</a>에서 확인.</li>
+<li>왜 주목: <strong>Pinterest Ads 프로덕션 A/B에서 광고 CTR +3.09% relative, Successful Session +0.04% relative로 whole-page metric을 양(+)으로 유지하면서 플랫폼에 launched</strong> <code>[확인]</code>. Baseline인 Lightweight-Only(+1.49% CTR, −0.24% Session)와 Peri-CR(+1.70% CTR, −0.12% Session)이 광고 CTR을 올리는 동안 whole-page metric을 깎는 반면 PinDCO는 두 축을 동시에 양으로 유지한다. 저장소 코퍼스에서 DCO를 별도 랭킹 시스템으로 다룬 첫 프로덕션 진술이고, waterfall grid 지면의 whole-page-aware creative ranking에 대한 첫 프로덕션 진술이다. Pinterest <a href="#pinterest-clr--home-feed-%EC%A1%B0%EA%B1%B4-%EC%9E%84%EB%B2%A0%EB%94%A9-retrieval%EC%9D%84-%ED%86%B5%ED%95%A9-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98%EB%A1%9C-%ED%99%95%EC%9E%A5-p90-%EC%A7%80%EC%97%B0-85-%EA%B0%90%EC%86%8C">CLR (Home Feed 유기 후보 생성 조건 임베딩)</a>과는 자리가 다르다(유기 candidate generation vs 광고 creative selection).</li>
+<li>상태: <strong>관찰</strong> — Pinterest는 canon 추적 서비스가 아니라 services 정본은 만들지 않는다. RecSys 2026 발표에서 컴포넌트 확장(description·CTA·landing)과 whole-page metric 세부 계측 진술이 나오는지, 두 번째 회사가 waterfall 지면의 광고 creative optimization을 whole-page-aware로 다루는 진술을 내는지가 다음 관전 포인트다. 자세한 분석: <a href="daily-2026-09-15.html">daily/2026-09-15.md</a>.</li>
+</ul>
+<h3 id="chroniclerec-tencent-pcg--weixin-moments-ads-pcvr에-ultra-long-유저-행동-시퀀스를-target-independent-chronicle-token으로-사전-압축-gmv-161-95-ci-0678-2547">ChronicleRec (Tencent PCG) — Weixin Moments Ads pCVR에 ultra-long 유저 행동 시퀀스를 target-independent Chronicle Token으로 사전 압축, GMV +1.61% (95% CI [0.678%, 2.547%])</h3>
+<ul>
+<li>무엇: <strong>ChronicleRec</strong>은 lifelong user modeling을 위한 pre-train-and-transfer 프레임워크다. Ultra-long 행동 시퀀스를 target-independent한 <strong>Chronicle Token</strong>으로 유저당 한 번 압축해 캐시로 랭커에 공급한다. <strong>Recency-aware multi-granularity merge</strong>로 최근 이벤트를 fine-grained로 남기고 오래된 이벤트는 coarse하게 병합한다. <strong>Interleaved causal encoding</strong>은 학습 가능한 query token을 병합 시퀀스에 분산 배치하고 causal attention을 쓰며 각 query가 자기 temporal anchor 이전 이력만 요약한다. <strong>Multi-horizon 병렬 브랜치</strong>로 서로 다른 recent-history window 마스킹을 조합해 상보적 long-range 관심을 학습하고, mask-and-predict 사전 학습과 Chronicle Alignment로 historical signal을 near-present intent에 정렬한다 <code>[확인]</code> — <a href="https://arxiv.org/abs/2609.12375">arXiv 2609.12375</a>, 2026-09-11 제출, 저자 12인은 Weixin Moments Ads의 pCVR 지면 배포 진술과 Junwei Pan·Chao Zhou·Chengguo Yin·Jie Jiang 등 반복 등장 이름으로 보아 Tencent PCG 광고 라인이라 판단 <code>[추정]</code>(HTML 판에서 이메일 도메인은 노출되지 않는다).</li>
+<li>왜 주목: <strong>Weixin Moments Ads의 pCVR 예측 지면(MixFormer 랭커 백본에 Chronicle Token을 NS-Token·S-Token 두 경로에 편입)에서 7일 A/B로 GMV +1.61%, 95% CI [0.678%, 2.547%]가 0을 배제하는 통계적 유의 결과</strong> <code>[확인]</code>. Tencent AdLive 데이터셋의 ablation에서 interleaved-causal 구성이 0.8034 GAUC로 최고이고 Chronicle Alignment를 빼면 −0.0086 GAUC로 가장 크게 저하된다. KuaiRand에서 최근 1,000 이벤트를 완전히 마스킹해도 GAUC가 recent-window Short-Attn(0.5307)을 크게 상회하는 0.5499로 유지된다. Meta HSTU/Wukong 계보와 Netflix Foundation Model이 시퀀스 인코더를 스케일하는 접근이었다면, ChronicleRec는 <strong>랭커 백본을 그대로 두고 lifelong 표현만 캐시로 넣는 target-independent 계열</strong>이라 도입 비용이 낮다는 새 데이터 포인트다. <a href="#">TGR (Tencent PCG)</a> 라인이 랭킹·retrieval·slate·reason의 4-in-1 프레임워크였다면, ChronicleRec는 랭킹의 입력으로 들어가는 lifelong user 표현 자체를 다룬다.</li>
+<li>상태: <strong>관찰</strong> — Tencent PCG는 canon 추적 서비스가 아니라 services 정본은 만들지 않는다. Weixin Moments Ads 이외의 Tencent PCG 지면(뉴스·비디오·음악·웹소설)으로 이식된다는 후속 진술, target-independent compression을 다른 회사(Meta·Alibaba·ByteDance)가 프로덕션에 채택한다는 진술이 나오면 <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a>에 절 신설 후보다. 자세한 분석: <a href="daily-2026-09-15.html">daily/2026-09-15.md</a>.</li>
+</ul>
 <h3 id="unirec-kuaishou--캐스케이드-pre-ranking--ranking-fusion을-two-stage-joint-learning으로-정렬-app-usage-duration-0616">UniRec (Kuaishou) — 캐스케이드 pre-ranking + ranking fusion을 two-stage joint learning으로 정렬, app usage duration +0.616%</h3>
 <ul>
 <li>무엇: **UniRec (Unified Cross-stage Recommendation Fusion)**은 industrial recommender의 캐스케이드 두 stage(pre-ranking, ranking) fusion agent가 input embedding을 부분 공유하고 single computation graph에서 함께 학습되어 gradient가 stage 사이를 흐르게 한다. Dual-axis preference alignment로 (vertical) downstream pairwise preference를 upstream fusion score에 전이하고, (horizontal) 이질적 prior signal에 대한 수십 개 pairwise objective를 bidirectional preference evidence로 재편한다. Attribute group-relative regularization으로 unconstrained end-to-end fusion이 고보상 attribute 그룹에 과집중하는 부작용을 억제 <code>[확인]</code> — <a href="https://arxiv.org/abs/2609.11052">arXiv 2609.11052</a>, 2026-09-10 v1 제출, 저자 8인은 Kuaishou 라인으로 보이지만 소속은 아직 확인되지 않았다(HTML 판에서 affiliation 확인 필요) <code>[추정]</code>.</li>
