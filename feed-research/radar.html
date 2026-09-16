@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-16 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-17 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-16 기준</div>
+  <div class="gendate">2026-09-17 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="분야-레이더--추적-서비스-밖의-논문트렌드">분야 레이더 — 추적 서비스 밖의 논문·트렌드</h1>
-<p><strong>최종 갱신:</strong> 2026-09-15</p>
+<p><strong>최종 갱신:</strong> 2026-09-17</p>
 <p>추적 서비스(X·Meta·Netflix) 정본에 아직 반영하지 않은 것들을 모아 두는 워치리스트다. 엔트리 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a>를 참조한다: 2~4줄 포인터, 프로덕션 관련성 기준, ~3개월 수명(승격 또는 졸업).</p>
 <p>수집 주기는 다음과 같다. arXiv cs.IR 신규 제출은 매일 triage하고, 산업 블로그(Google Research, Pinterest, Spotify, LinkedIn 등)와 학회 accepted 목록은 주 1회 살펴본다. 이 수집은 일일 배치가 수행한다.</p>
 <h2 id="관찰-중-오픈-스레드">관찰 중 (오픈 스레드)</h2>
@@ -152,6 +152,12 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="pcap-meta-facebook-marketplace--retrieval-stage-다양성-캡핑을-유저별-shannon-entropy-버킷으로-개인화-marketplace-feed에-launched-vpv-030--pdp-022--sessions-017">PCap (Meta Facebook Marketplace) — retrieval-stage 다양성 캡핑을 유저별 Shannon entropy 버킷으로 개인화, Marketplace Feed에 launched, VPV +0.30% + PDP +0.22% + Sessions +0.17%</h3>
+<ul>
+<li>무엇: <strong>PCap</strong>은 <strong>Meta Facebook Marketplace</strong>의 후보 생성 단계에서 유저별 다양성 제약을 카테고리별 상한(cap)으로 강제하는 프레임워크다. (1) 유저 u의 최근 클릭 카테고리 분포로 Shannon entropy $S(u) = -\sum p(c|u)\log p(c|u)$를 계산해 다양성 선호도의 프록시로 삼고, (2) 유저를 6개 버킷으로 정렬해서 bucket-1(가장 좁게 클릭)에서 bucket-6(가장 넓게 클릭)까지 나눈 뒤, (3) multi-source 인덱서 shard마다 카테고리별 상한을 <code>retrieval source fetch count × 튜닝된 multiplier fk × 유저 버킷의 다양성 multiplier mu</code>로 걸어 scanning과 aggregation 두 단계에서 함께 캡핑한다. 카테고리 그룹핑 키는 **Facebook Product Taxonomy (FPT)**의 수백 개 카테고리다. 파라미터 탐색은 새 방법 <strong>Parameter Tuning Sequence (PTS)</strong> — control arm을 고정한 상태에서 후보 arm들에 트래픽 소량을 며칠씩 노출하는 sequential range-narrowing A/B 절차로, 온라인 grid search를 대체한다 <code>[확인]</code> — <a href="https://arxiv.org/abs/2609.16452">arXiv 2609.16452</a>, 2026-09-15 제출, 저자 11인 전원 Meta(Menlo Park·Boston) <code>@meta.com</code> <a href="https://arxiv.org/html/2609.16452">HTML 판</a>에서 확인.</li>
+<li>왜 주목: <strong>Marketplace Feed 프로덕션 A/B에서 Phase 1(uniform cap vs 무캡)이 VPV +0.3088%(p&lt;0.01) · Latency +8.6 ms, Phase 2(PCap vs uniform cap)가 VPV +0.2243% · PDP clicks +0.2250% · Marketplace Sessions +0.1708% · Latency +0.8 ms</strong>로 유의미한 lift를 유지하면서 <strong>carrier metric인 Marketplace Sessions까지 함께 오른다</strong> <code>[확인]</code>. 버킷별로 갈리는 다양성 점수 변화(bucket-1 −1.05%, bucket-6 +0.25%)가 &quot;좁게 클릭하는 유저는 좁게, 넓게 클릭하는 유저는 넓게&quot;로 개인화됐다는 근거. Facebook Marketplace는 이 저장소의 서비스 정본이 아니지만, 저장소가 이미 추적하는 <a href="feed-diversity.html">feed-diversity.md</a>와 candidate allocation 논의에 <strong>retrieval-stage cap을 다양성 축으로 개인화한 첫 프로덕션 진술</strong>이라는 위치. 서빙 지연 팽창이 0.8ms에 그친다는 점, capping이 랭킹 단계가 아니라 retrieval scanning에 붙는다는 점이 축이 새로운 각도다(기존 MMR·DPP는 랭킹/재순위 층).</li>
+<li>상태: <strong>관찰</strong> — Meta의 다른 지면(Facebook Feed, Instagram, Reels)에 같은 스택이 확장됐다는 진술이 나오는지, retrieval-stage cap의 다양성 개인화를 두 번째 회사가 채택하는지, PTS가 다른 튜닝 시나리오(랭킹 하이퍼파라미터 등)로 확장되는지를 다음 관전 포인트로 둔다. Marketplace가 이 저장소의 정본 서비스가 아니어서 승격 대상은 아니지만, 다음 관측이 붙으면 <a href="feed-diversity.html">topics/feed-diversity.md</a> 승격 후보. 자세한 분석: <a href="daily-2026-09-17.html">daily/2026-09-17.md</a>.</li>
+</ul>
 <h3 id="pindco-pinterest--광고-창의-소재를-whole-page-손익까지-반영해-실시간-선택하는-프로덕션-dco-pinterest-ads에-launched-ad-ctr-309-relative">PinDCO (Pinterest) — 광고 창의 소재를 whole-page 손익까지 반영해 실시간 선택하는 프로덕션 DCO, Pinterest Ads에 launched, Ad CTR +3.09% relative</h3>
 <ul>
 <li>무엇: <strong>PinDCO</strong>는 Pinterest 광고 파이프라인에 붙는 dynamic creative optimization 시스템이다. **Creative Component Fusion Network(CCFN)**가 이미지·타이틀·레이아웃 각 컴포넌트별 tower를 두고 컴포넌트별 하이퍼파라미터(예: dropout rate)로 수렴 속도를 정렬한 뒤 컴포넌트 fusion layer가 광고 랭킹 모델의 logit에 더해질 delta score를 낸다. **Pixel-aware Adjustment Module(PAM)**은 waterfall grid에서 세로가 긴 크리에이티브가 주변 슬롯의 노출 공간을 밀어내는 카니벌라이제이션을 aspect ratio penalty $P(ar_{rel}) = \mathrm{clip}(1 - \tanh(k(ar_{rel} - 1)), 0, 1)$로 반영한다. 광고 랭킹과 병렬로 실행돼 지연이 랭킹 upper bound에 갇힌다. 서빙에서는 크리에이티브 id 기반 샤딩 캐싱, dynamic batching(제거 시 P99 +87%, P90 +114%)으로 QPS를 소화한다 <code>[확인]</code> — <a href="https://arxiv.org/abs/2609.11943">arXiv 2609.11943</a>, 2026-07-21 제출, RecSys 2026 accepted, 저자 8인 전원 Pinterest Inc. 소속 이메일 도메인 <code>@pinterest.com</code> <a href="https://arxiv.org/html/2609.11943v1">HTML 판</a>에서 확인.</li>
