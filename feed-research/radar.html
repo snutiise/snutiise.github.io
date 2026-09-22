@@ -102,11 +102,11 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-22 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-23 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-22 기준</div>
+  <div class="gendate">2026-09-23 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
@@ -152,6 +152,18 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="unique-baidu--beihang--cityu--산업-mobile-feed의-unified-retrieval--ranking--single-layer-flat-quantization-recsys-2026-accepted">UNIQUE (Baidu + Beihang + CityU) — 산업 mobile feed의 unified retrieval + ranking + single-layer flat quantization, RecSys 2026 accepted</h3>
+<ul>
+<li>무엇: <strong>UNIQUE</strong>는 산업 mobile feed의 retrieval-ranking pipeline이 갖는 두 문제 — (a) 후보 retrieval에서 hierarchical(RQ-VAE 계열) quantization의 instability, (b) 분리된 retrieval과 ranking stage 사이의 정보 손실 — 를 두 축의 개선으로 겨눈다. generative code-based retrieval과 target-aware ranking을 early-fusion single architecture로 통합해 shared representation 위에서 end-to-end로 학습하되 후보 생성의 효율은 유지한다는 접근이다. 저자는 이 접근이 long-tail·cold-start 추천을 함께 개선하고 서빙 효율을 낮춘다고 주장한다 <code>[확인]</code> <a href="https://arxiv.org/abs/2609.23718">arXiv 2609.23718</a>, 2026-09-20 v1, RecSys 2026 accepted. 저자 소속을 <a href="https://arxiv.org/html/2609.23718v1">HTML 판</a>에서 확인 — Baidu Inc. + Beihang University + Hong Kong Institute of AI for Science (CityU).</li>
+<li>왜 주목: Baidu는 canon 추적 서비스는 아니지만 대규모 산업 mobile feed(Baidu App)를 운영하는 플랫폼 기업이다. 이번 자료는 <strong>RQ-VAE 계열의 hierarchical quantization 불안정성을 single-layer flat quantization로 대체하는 각도</strong>로, 저장소의 <a href="#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">생성형 retrieval / semantic ID 스레드</a>에서 SID를 채택한 회사들(Google PLUM, Kuaishou OneRec, Spotify GLIDE, Meta AMBER, Yandex Gryphon 등)이 대부분 hierarchical codebook을 쓰는 것과 다른 방향이다. 또한 retrieval과 ranking을 early-fusion으로 묶는 각도가 Kuaishou UniRec의 cross-stage joint learning과 다른 지점(UniRec는 두 stage를 소프트하게 정렬, UNIQUE는 하나의 architecture로 통합)이라는 데이터 포인트를 더한다.</li>
+<li>상태: <strong>관찰 (심층 분석 필요)</strong> — abstract가 배포 진술과 A/B 수치를 명시하지 않으므로 본문 정독 필요. RecSys 2026 발표에서 Baidu App feed 지면 명시와 프로덕션 수치가 나오는지, single-layer flat quantization이 다른 회사에도 채택되는지가 다음 관측 지점. 자세한 분석: <a href="daily-2026-09-23.html">daily/2026-09-23.md</a>.</li>
+</ul>
+<h3 id="muser-kuaishou--mgs-위에서-104105-규모-유저-이력을-hierarchical-temporal-compression으로-압축하는-multi-interest-시퀀스-retrieval">MuSeR (Kuaishou) — MGS 위에서 10^4~10^5 규모 유저 이력을 hierarchical temporal compression으로 압축하는 multi-interest 시퀀스 retrieval</h3>
+<ul>
+<li>무엇: **MuSeR (Multi-interest Sequence Representation)**은 Kuaishou의 <strong>deployed MGS</strong> 시스템 위에 얹혀 있는 retrieval 프레임워크로, 세 축을 결합한다 — (i) hierarchical temporal compression(최근 액션은 full resolution 유지, 오래된 세그먼트는 점진 pooling으로 압축해 fixed serving budget 안에서 10⁴~10⁵ per-user history를 담음), (ii) multi-interest representation(뉴스·Q&amp;A·짧은 비디오 등 이질 modality에 걸친 유저의 다중 인텐트를 sparse ID embedding만으로는 부족하기 때문에 별도 축으로 모델링), (iii) MGS 배포 시스템과의 통합. Abstract 수준의 진술 <code>[확인]</code> <a href="https://arxiv.org/abs/2609.23677">arXiv 2609.23677</a>, 2026-09-20 v1. HTML 판에서 저자 도메인이 Kuaishou로 확인됨.</li>
+<li>왜 주목: <strong>Ultra-long behavior sequence 사전 압축</strong>이라는 각도는 <a href="#chroniclerec-tencent-pcg--weixin-moments-ads-pcvr%EC%97%90-ultra-long-%EC%9C%A0%EC%A0%80-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4%EB%A5%BC-target-independent-chronicle-token%EC%9C%BC%EB%A1%9C-%EC%82%AC%EC%A0%84-%EC%95%95%EC%B6%95-gmv-161-95-ci-0678-2547">ChronicleRec (Tencent PCG)</a>와 인접하지만, ChronicleRec는 랭킹 백본의 입력 캐시(Chronicle Token, target-independent)에 집중하고 MuSeR는 <strong>retrieval 계층</strong>에 압축을 배치하는 점이 다르다. Kuaishou는 이미 <a href="#swim-kuaishou-%EB%A9%94%EC%9D%B8-%ED%94%BC%EB%93%9C--generator-evaluator-%EC%9E%AC%EC%88%9C%EC%9C%84%EC%9D%98-evaluator%EB%A5%BC-%EC%84%B8%EC%85%98-survival-process%EB%A1%9C-%EC%9E%AC%EC%84%A4%EA%B3%84">SWIM (evaluator)</a>·<a href="#unirec-kuaishou--%EC%BA%90%EC%8A%A4%EC%BC%80%EC%9D%B4%EB%93%9C-pre-ranking--ranking-fusion%EC%9D%84-two-stage-joint-learning%EC%9C%BC%EB%A1%9C-%EC%A0%95%EB%A0%AC-app-usage-duration-0616">UniRec (cross-stage)</a>·<a href="#drem-kuaishou-%EB%8B%A8%ED%8E%B8-%EB%B9%84%EB%94%94%EC%98%A4--pxtr-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9D%B4%EC%A4%91-%EB%B3%B4%EC%A0%95-ensemble-ranking">DrEM (pxtr noise)</a>·PushDualGen·HD-Rec·OneRec-Thinking 라인이 있고, MuSeR는 lifelong user modeling 축의 데이터 포인트를 하나 더한다.</li>
+<li>상태: <strong>관찰</strong> — Kuaishou는 canon 추적 서비스가 아니라 services 정본은 만들지 않는다. MGS 배포 시스템의 A/B 수치와 fixed serving budget의 실제 크기(계산 예산 상한)가 본문에 있는지, target-independent 스타일(ChronicleRec)과 대비되는 target-aware 스타일 사이의 정확한 위치가 어떤지가 다음 관전 포인트. 저장소의 lifelong user modeling 각도가 세 회사(Tencent PCG·Kuaishou + Meta HSTU 계보)로 벌어지면 <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a>에 절 신설 후보. 자세한 분석: <a href="daily-2026-09-23.html">daily/2026-09-23.md</a>.</li>
+</ul>
 <h3 id="meta-search-hybrid-gpu-cpu-retrieval--trillion-doc-source-corpus를-gpu-billion--cpu-tens-of-billions-두-경로로-co-serving-deployed-in-production">Meta Search Hybrid GPU-CPU Retrieval — trillion-doc source corpus를 GPU billion / CPU tens-of-billions 두 경로로 co-serving, deployed in production</h3>
 <ul>
 <li>무엇: Meta의 personalized search retrieval 계층에 대한 첫 프로덕션 아키텍처 진술이다. multi-trillion 규모 source corpus에서 policy·quality·language·freshness·dedup을 통과한 뒤 하드웨어별 selector가 GPU snapshot(billion-scale)과 CPU snapshot(tens-of-billions, 대략 20배)을 독립으로 만든다. GPU pathway는 two-tower retrieval과 interaction pre-ranking을 fuse해 인터랙션 pre-ranking을 서빙 경로에 넣고 224 후보를 shared ranker에 넘긴다. CPU pathway는 dense embedding index + eager term-at-a-time scoring + bulk scanning + finer clustering을 조합하고 dot product만 쓴다. 두 경로는 요청마다 하나만 켜거나 둘 다 켜거나 disable할 수 있고 aggregator에서 dedupe된다. legacy CPU-only 대비 full-system A/B에서 model-scored relevance와 substantive engagement가 함께 오른다는 진술과 함께, dense retrieval baseline 대비 CPU pathway 4배 capacity 개선(vector op 한정) 주장 <code>[확인]</code> — <a href="https://arxiv.org/abs/2609.21281">arXiv 2609.21281</a>, 2026-09-18 v1 제출, KDD 2027 accepted, 저자 21인 전원 Meta Platforms(Menlo Park) <a href="https://arxiv.org/html/2609.21281">HTML 판</a>에서 확인.</li>

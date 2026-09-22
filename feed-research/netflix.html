@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="svc-netflix">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-22 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-23 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-22 기준</div>
+  <div class="gendate">2026-09-23 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="netflix">Netflix</h1>
-<p><strong>최종 갱신:</strong> 2026-08-21</p>
+<p><strong>최종 갱신:</strong> 2026-09-23</p>
 <h2 id="한-줄-요약">한 줄 요약</h2>
 <p>편성 카탈로그(수천~수만 타이틀) 위에서 &quot;소스별 후보 배분&quot;이 아니라 <strong>페이지(행×열) 구성</strong>을 최적화하는 시스템이다. 2015년부터 템플릿 없는 ML 페이지 생성을 적용했고 <code>[확인]</code>, 2025년에는 Foundation Model로 회원 표현을 중앙화했으며 <code>[확인]</code>, 2026년에는 GenRec(LLM 랭커)과 GenPage(페이지 전체를 트랜스포머 하나로 생성)로 세대 전환이 진행 중이다 <code>[확인]</code>.</p>
 <p><figure class="diagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 0 900 578" font-family="-apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif" role="img" aria-label="Netflix 추천 파이프라인 다이어그램">
@@ -391,6 +391,32 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>평가는 2단계다. interleaving(team-draft 방식, 시청시간 점유율로 판정하며, A/B 대비 &quot;100× 적은 인원으로 95% power&quot;)으로 후보를 줄인 뒤, 2-6개월 동안 셀당 ~200만 명 규모의 A/B로 넘어간다 <code>[확인]</code> <a href="https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55">2017 블로그</a> + TMIS 2015</li>
 <li>오프라인 지표의 한계를 정직하게 인정한다. &quot;A/B 결과를 원하는 만큼 예측하지 못한다&quot;(2015)에서 &quot;오프라인 개선이 온라인 flat/음수&quot;(2024)로 이어지는데, 10년째 같은 고백이다 <code>[확인]</code></li>
 </ul>
+<h3 id="counterfactual-observability-프레임워크-2026-09-recsys-2026">Counterfactual observability 프레임워크 (2026-09, RecSys 2026)</h3>
+<p><code>[확인]</code> <a href="https://arxiv.org/abs/2609.22747">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a>, 2026-09-19, RecSys 2026 accepted. 저자 4인 전원 Netflix Los Gatos.</p>
+<p>Netflix가 &quot;몇 년에 걸쳐 여러 recommender 위에 구축·배포&quot;한 counterfactual measurement 프레임워크의 첫 학술 진술이다. <strong>오프라인 gating</strong>(MediaFM의 popularity-based winner)이 배포 전 선발이라면, 이 프레임워크는 <strong>배포 후 관측(observability)</strong> 축이다 — 위치가 다르다.</p>
+<ul>
+<li><p><strong>관측성을 counterfactual measurement 문제로 재정의</strong>한다: <em>&quot;estimating what the recommender would have done, and what engagement would have followed, in the absence of a specific content item or model decision&quot;</em>. 청중은 두 층 — content creator(콘텐츠 창작자)와 model developer(모델 개발자).</p>
+</li>
+<li><p><strong>측정 축이 세 개다</strong>(§3.1) — bias reduction(SNIPS/self-normalized IPS), relativity(정책 vs 정책, 아이템 vs 아이템 position-adjusted 비교), incrementality(counterfactual leave-one-out). 세 축이 하나의 measurement foundation 위에서 두 청중을 동시에 지원한다는 것이 저자들이 강조하는 통합점이다.</p>
+</li>
+<li><p><strong>Cascading recommender에 대한 확장이 있다</strong>(§3.3). Upstream model developer용 metric은 target action을 set으로 두고 Jaccard 등 set-similarity로 match function을 재정의한다. Content creator용 metric은 아이템 i의 전체 pipeline 기여도를 두 값으로 분해한다:</p>
+<p>Incrementality(i) = Irreplaceability(i) · Universality(i)</p>
+<p>Irreplaceability는 i가 후보 pool에 있을 때의 조건부 causal lift(self-normalized Hájek IPS estimator), Universality는 i가 eligible한 확률이다.</p>
+</li>
+<li><p><strong>Row Curators A/B alignment R²=0.8212</strong> <code>[확인]</code> §4.2. Netflix 홈페이지의 Row Curator(콘텐츠 큐레이터가 만드는 title collection row)에 대한 오프라인 incrementality 측정을 실제 A/B(해당 row 시리즈를 recommender에서 제거하고 user engagement 손실을 측정) ground truth와 비교. 11개 A/B에서 R² = 0.8212. 프로덕션 detail — propensity를 [0.0001, 0.9999]로 clip, row당 최소 100 observation 요구, 서로 다른 길이의 홈페이지에 걸쳐 aggregate.</p>
+<blockquote>
+<p>&quot;Across 11 A/B tests, the R² between our proposed row-incrementality measurement and the A/B-test ground truth is 0.8212, providing strong validation of our approach.&quot;
+— <a href="https://arxiv.org/abs/2609.22747">arXiv 2609.22747</a>, 2026-09-19</p>
+</blockquote>
+</li>
+<li><p><strong>Label misattribution 자동 감지 케이스</strong> <code>[확인]</code> §4.3. Incrementality 시계열 모니터링이 특정 콘텐츠 A의 성능 dip를 유사 콘텐츠는 안정된 상황에서 감지 → root cause가 모델의 positive label misattribution으로 밝혀졌다. Raw engagement로는 놓칠 발견을 이 프레임워크가 잡아냈다는 사례.</p>
+</li>
+<li><p><strong>Exploration이 전제조건이다</strong> <code>[확인]</code> §3.1. 프레임워크는 contextual bandit·RL setup 위에 얹혀 있고 logged propensity가 있어야 한다. Netflix는 이 조건이 자체 recommender 대부분에 이미 충족돼 있다고 서술하지만, <strong>exploration 없이 서빙되는 라인(예: pure Foundation Model shadow 배포)에는 그대로 얹을 수 없다</strong>는 제약이 함께 붙는다 <code>[추정]</code>(논문이 이 제약을 명시적으로 다루지는 않는다).</p>
+</li>
+<li><p><strong>공개하지 않은 것</strong> <code>[관찰]</code> 논문 정독. (a) 프레임워크가 배포된 recommender의 이름(Row Curators만 명시). (b) core online metric 절대값. (c) FM·GenRec·GenPage·MediaFM/MAPS 세대 라인과의 관계 — 이 프레임워크가 GenRec의 batch-compute A/B 결과 검증에 쓰였는지가 후속 확인 대상. (d) 11개 A/B의 개별 결과(R² 하나로만 aggregate). (e) exploration 없는 recommender에 대한 대응책.</p>
+</li>
+</ul>
+<p><strong>저장소 안에서의 위치.</strong> Netflix는 이 저장소가 추적하는 서비스 중 오프라인/온라인 alignment의 한계를 지속적으로 공개해 온 유일한 회사다(&quot;A/B 결과를 원하는 만큼 예측하지 못한다&quot;, 2015 → &quot;오프라인 개선이 온라인 flat/음수&quot;, 2024 → 이번 counterfactual measurement 프레임워크, 2026). 그동안의 진술이 문제 인정 쪽이었다면 이번 자료는 그 문제의 한 축(&quot;프로덕션 관측성&quot;)에 대한 자체 방법론이다. 저장소 코퍼스 안에서 recommender 측정 방법론을 별도 논문으로 공개한 회사·연도 조합의 첫 진술이며, <a href="#popularity-based-winner--%EC%98%A4%ED%94%84%EB%9D%BC%EC%9D%B8-%ED%94%84%EB%A1%9D%EC%8B%9C-%ED%83%9C%EC%8A%A4%ED%81%AC">MediaFM의 popularity-based winner</a>와는 목적(gating vs monitoring)과 시점(배포 전 vs 후)이 다르므로 두 축이 상보적이다.</p>
 <h2 id="광고">광고</h2>
 <ul>
 <li>2022-11 Microsoft 파트너십에서 2024-01 인하우스 결정을 거쳐, 2025년에 Ads Suite가 12개국 전체에서 라이브됐다 <code>[확인]</code> <a href="https://about.netflix.com/en/news/netflix-upfront-2025-the-center-of-attention">Upfront 2025</a> + <a href="https://netflixtechblog.com/behind-the-scenes-building-a-robust-ads-event-processing-pipeline-e4e86caf9249">파이프라인 블로그</a></li>
@@ -444,6 +470,7 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li><a href="https://arxiv.org/abs/2608.10257">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a> — 2026-08-10, 논문. GenRec 블로그의 학술판이다. 손실 수식, Phase 1/2 기여 분해, 컨텍스트 5000→1700 예시, +0.006% 코어 지표, GRPO preliminary, 팀 구조 등 블로그가 밝히지 않은 정량치를 담았다</li>
 <li><a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e">MAPS: Netflix&#39;s Multimodal Asset Personalization at Scale</a> — 2026-08-28, 블로그. 위 arXiv 2608.18322와 같은 시스템에 <strong>MAPS</strong>라는 이름을 부여한다. 정량치는 논문 쪽에 있고, 블로그가 새로 더하는 것은 (a) 시스템 이름과 세 프로덕트(CLIP 아트워크·query-aware 아트워크·MediaFM 비디오 프리뷰) 묶음, (b) 2025 TV 홈스크린 개편 홀드백 실측, (c) V1·V2 단독 flat vs V3 유의 ablation, (d) <strong>Netflix Embedding Store</strong>의 이름과 두 속성(training-serving skew 없음 + FM 업데이트와 personalization 배포 decouple), (e) 다음 단계로 image·text·video 공통 semantic space 확장 계획이다</li>
 <li><a href="https://arxiv.org/abs/2608.18322">Multimedia Asset Personalization via Multimodal Embeddings at Netflix (arXiv 2608.18322)</a> — 2026-08-18, 논문. 아트워크 CLIP two-tower와 MediaFM tri-modal(SeqCLIP + wav2vec 2.0 + text-embedding-3-large)의 프로덕션 배포, +0.127%/+0.193% A/B lift, popularity-based winner 프록시로 체크포인트를 gating하는 방식을 다룬다</li>
+<li><a href="https://arxiv.org/abs/2609.22747">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a> — 2026-09-19, 논문(RecSys 2026 accepted). Counterfactual measurement 기반 observability 프레임워크. 세 축(bias reduction/relativity/incrementality), single-stage + cascading 지원, Row Curators A/B alignment R²=0.8212, label misattribution 자동 감지 케이스</li>
 </ul>
 
 </main>
