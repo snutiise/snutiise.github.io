@@ -102,11 +102,11 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-23 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-24 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-23 기준</div>
+  <div class="gendate">2026-09-24 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
@@ -152,6 +152,12 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="spotify-robust-fusion--qss--dual-sample-dropout으로-llm-reranker의-behavioral-과의존을-억제">Spotify Robust Fusion — QSS + dual-sample dropout으로 LLM reranker의 behavioral 과의존을 억제</h3>
+<ul>
+<li>무엇: <strong>Robust Fusion</strong>은 Spotify 개인화 검색의 LLM cross-encoder reranker가 semantic 신호와 behavioral 신호를 융합할 때 발생하는 shortcut learning을 억제하는 학습 절차다. **QSS (Query Slice Stats)**는 쿼리-후보 쌍의 과거 성공률을 요약한 상호작용 유래 피처인데, 이걸 프롬프트에 그냥 실으면 QSS가 있는 슬라이스에서는 랭킹이 올라가지만 QSS가 없는 rare/unseen 쿼리에서는 성능이 떨어진다. 저자들은 <strong>deterministic dual-sample feature-dropout</strong>을 제안한다 — 각 학습 예를 QSS 포함 1회·QSS 제거 1회 두 번 넣는다. <strong>오프라인: QSS가 있을 때 랭킹 품질 +13.3%, QSS-removed 슬라이스에서 naive QSS 대비 +4.0% 개선. 온라인 A/B: QSS-aware 두 변형 모두 live search success ≈+2%.</strong> aggregate test는 dual-sample과 features-only 학습을 구분하지 못하지만 cold-start 비교는 오프라인 결과와 방향이 일치한다는 진술 <code>[확인]</code> <a href="https://arxiv.org/abs/2609.25825">arXiv 2609.25825</a>, 2026-09-22 v1, USRW Workshop @ RecSys 2026 accepted. 저자 7명 전원의 이메일 도메인이 <code>@spotify.com</code>이다(<a href="https://arxiv.org/html/2609.25825v1">HTML 판</a>에서 확인).</li>
+<li>왜 주목: <strong>cross-encoder LLM reranker가 프로덕션 검색에서 A/B로 검증됐다</strong>는 진술 자체가 흔치 않다(다수 논문이 오프라인 지표에서 멈춘다). Spotify는 <a href="#spotify-glide--home-%ED%8C%9F%EC%BA%90%EC%8A%A4%ED%8A%B8%EC%97%90-1b-llm--semantic-id-%ED%9B%84%EB%B3%B4-%EC%83%9D%EC%84%B1%EA%B8%B0-%EB%B0%B0%ED%8F%AC">GLIDE</a>에서 LLM candidate generator를, <a href="#spotify-spdd--sasrec-%EC%9C%84-inference-time-multi-objective-%EB%94%94%EC%BD%94%EB%94%A9">SPDD</a>에서 inference-time decoding을 배포한 데 이어, 이번엔 LLM reranker에서의 shortcut learning 대응책까지 프로덕션 A/B로 옮겨진다. dual-sample dropout이라는 조절 수단은 <strong>behavioral feature가 없거나 stale한 슬라이스에서의 robustness와 있을 때의 이득을 동시에 확보하는 프로덕션 방법론</strong>으로, LLM reranker를 도입하려는 다른 회사에도 그대로 적용 가능한 형태다.</li>
+<li>상태: <strong>관찰</strong> — Spotify는 canon 추적 서비스가 아니므로 services 정본은 만들지 않는다. behavioral feature의 dropout이 유기 피드 recommendation의 LLM reranker에도 이관되는지, 다른 검색 엔지니어링 조직(Amazon·eBay·Booking 등)에서 유사 dual-sample 학습이 발표되는지가 관측 지점. 자세한 분석: <a href="daily-2026-09-24.html">daily/2026-09-24.md</a>.</li>
+</ul>
 <h3 id="unique-baidu--beihang--cityu--산업-mobile-feed의-unified-retrieval--ranking--single-layer-flat-quantization-recsys-2026-accepted">UNIQUE (Baidu + Beihang + CityU) — 산업 mobile feed의 unified retrieval + ranking + single-layer flat quantization, RecSys 2026 accepted</h3>
 <ul>
 <li>무엇: <strong>UNIQUE</strong>는 산업 mobile feed의 retrieval-ranking pipeline이 갖는 두 문제 — (a) 후보 retrieval에서 hierarchical(RQ-VAE 계열) quantization의 instability, (b) 분리된 retrieval과 ranking stage 사이의 정보 손실 — 를 두 축의 개선으로 겨눈다. generative code-based retrieval과 target-aware ranking을 early-fusion single architecture로 통합해 shared representation 위에서 end-to-end로 학습하되 후보 생성의 효율은 유지한다는 접근이다. 저자는 이 접근이 long-tail·cold-start 추천을 함께 개선하고 서빙 효율을 낮춘다고 주장한다 <code>[확인]</code> <a href="https://arxiv.org/abs/2609.23718">arXiv 2609.23718</a>, 2026-09-20 v1, RecSys 2026 accepted. 저자 소속을 <a href="https://arxiv.org/html/2609.23718v1">HTML 판</a>에서 확인 — Baidu Inc. + Beihang University + Hong Kong Institute of AI for Science (CityU).</li>
