@@ -102,11 +102,11 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-24 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-25 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-24 기준</div>
+  <div class="gendate">2026-09-25 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
@@ -152,6 +152,12 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="comcast-technology-ai--llm-based-user-profiling-for-streaming-recommendation-offline-production-comparison">Comcast Technology AI — LLM-based user profiling for streaming recommendation (offline production comparison)</h3>
+<ul>
+<li>무엇: <strong>Comcast Peacock/Xfinity의 프로덕션 컨텐츠 기반 추천 데이터셋</strong>에서 유저 임베딩을 만드는 두 패러다임을 factorial로 비교한 논문이다 — (a) <strong>aggregate</strong>: 유저의 최근 vs 과거 아이템 임베딩을 수치적으로 집계, (b) <strong>LLM-generated</strong>: 유저 이력을 LLM에 넣어 자연어 요약을 얻고 텍스트 인코더로 벡터화. 두 방식 × temporal disentanglement(recent vs historical) on/off = 4개 조합을 비교한다. LLM 방식이 훨씬 비싸므로 &quot;언제 그 비용이 정당화되는가&quot;를 묻는 것이 핵심이다. 결과는 유저 행동 유형별로 갈리고, accuracy·beyond-accuracy(다양성 등) 축에서 서로 다른 트레이드오프가 관찰된다는 진술. <strong>온라인 A/B는 없다. 어느 Peacock/Xfinity 제품 데이터셋인지도 명시되지 않았다.</strong> <code>[확인]</code> <a href="https://arxiv.org/abs/2609.27183">arXiv 2609.27183</a>, 2026-09-23 v1. <a href="https://arxiv.org/html/2609.27183v1">HTML 판</a>에서 저자 4명 중 3명(Neeraj Sharma·Sardar Hamidian·Shaghayegh Agah)의 소속이 Comcast Technology AI(Sunnyvale·Washington DC), 1저자 Milad Sabouri는 DePaul University + Comcast Technology AI 듀얼 소속임을 확인.</li>
+<li>왜 주목: Comcast(Peacock 스트리밍·Xfinity)는 이 저장소의 canon 추적 서비스가 아니었고, 이번이 프로덕션 스택의 <strong>첫 공개 신호</strong>다. LLM으로 유저 프로파일을 생성하는 접근은 <a href="#spotify-spdd--sasrec-%EC%9C%84-inference-time-multi-objective-%EB%94%94%EC%BD%94%EB%94%A9">Spotify SPDD</a>·<a href="#spotify-glide--home-%ED%8C%9F%EC%BA%90%EC%8A%A4%ED%8A%B8%EC%97%90-1b-llm--semantic-id-%ED%9B%84%EB%B3%B4-%EC%83%9D%EC%84%B1%EA%B8%B0-%EB%B0%B0%ED%8F%AC">GLIDE</a> 같은 검색·추천에서의 LLM 응용과 다른 각도 — <strong>디코딩·retrieval이 아니라 유저 표현 자체를 자연어 요약으로 얻는 것</strong>. 저자들이 factorial 비교로 답하는 &quot;LLM 프로파일이 aggregate보다 얼마나·언제 낫나&quot;라는 질문은 실제로 LLM 프로파일을 프로덕션에 얹으려는 다른 스트리밍 서비스(Disney+·Paramount+·Hulu 등)가 참조할 수 있는 형태다.</li>
+<li>상태: <strong>관찰</strong> — 온라인 A/B가 없으므로 프로덕션 검증 강도가 낮다. Comcast가 후속으로 프로덕션 배포와 A/B 결과를 공개하는지, LLM 프로파일 방향이 다른 스트리밍 서비스로 확산되는지가 관측 지점. 자세한 분석: <a href="daily-2026-09-25.html">daily/2026-09-25.md</a>.</li>
+</ul>
 <h3 id="spotify-robust-fusion--qss--dual-sample-dropout으로-llm-reranker의-behavioral-과의존을-억제">Spotify Robust Fusion — QSS + dual-sample dropout으로 LLM reranker의 behavioral 과의존을 억제</h3>
 <ul>
 <li>무엇: <strong>Robust Fusion</strong>은 Spotify 개인화 검색의 LLM cross-encoder reranker가 semantic 신호와 behavioral 신호를 융합할 때 발생하는 shortcut learning을 억제하는 학습 절차다. **QSS (Query Slice Stats)**는 쿼리-후보 쌍의 과거 성공률을 요약한 상호작용 유래 피처인데, 이걸 프롬프트에 그냥 실으면 QSS가 있는 슬라이스에서는 랭킹이 올라가지만 QSS가 없는 rare/unseen 쿼리에서는 성능이 떨어진다. 저자들은 <strong>deterministic dual-sample feature-dropout</strong>을 제안한다 — 각 학습 예를 QSS 포함 1회·QSS 제거 1회 두 번 넣는다. <strong>오프라인: QSS가 있을 때 랭킹 품질 +13.3%, QSS-removed 슬라이스에서 naive QSS 대비 +4.0% 개선. 온라인 A/B: QSS-aware 두 변형 모두 live search success ≈+2%.</strong> aggregate test는 dual-sample과 features-only 학습을 구분하지 못하지만 cold-start 비교는 오프라인 결과와 방향이 일치한다는 진술 <code>[확인]</code> <a href="https://arxiv.org/abs/2609.25825">arXiv 2609.25825</a>, 2026-09-22 v1, USRW Workshop @ RecSys 2026 accepted. 저자 7명 전원의 이메일 도메인이 <code>@spotify.com</code>이다(<a href="https://arxiv.org/html/2609.25825v1">HTML 판</a>에서 확인).</li>
