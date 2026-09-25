@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-25 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-26 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-25 기준</div>
+  <div class="gendate">2026-09-26 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="분야-레이더--추적-서비스-밖의-논문트렌드">분야 레이더 — 추적 서비스 밖의 논문·트렌드</h1>
-<p><strong>최종 갱신:</strong> 2026-09-22</p>
+<p><strong>최종 갱신:</strong> 2026-09-26</p>
 <p>추적 서비스(X·Meta·Netflix) 정본에 아직 반영하지 않은 것들을 모아 두는 워치리스트다. 엔트리 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a>를 참조한다: 2~4줄 포인터, 프로덕션 관련성 기준, ~3개월 수명(승격 또는 졸업).</p>
 <p>수집 주기는 다음과 같다. arXiv cs.IR 신규 제출은 매일 triage하고, 산업 블로그(Google Research, Pinterest, Spotify, LinkedIn 등)와 학회 accepted 목록은 주 1회 살펴본다. 이 수집은 일일 배치가 수행한다.</p>
 <h2 id="관찰-중-오픈-스레드">관찰 중 (오픈 스레드)</h2>
@@ -152,6 +152,12 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="onetrans-v2--산업-추천의-retrieval--pre-rank--fine-rank-캐스케이드를-단일-transformer로-통합-gmv-974--throughput-32">OneTrans-V2 — 산업 추천의 retrieval + pre-rank + fine-rank 캐스케이드를 단일 Transformer로 통합, GMV +9.74% · throughput 3.2×</h3>
+<ul>
+<li>무엇: <strong>OneTrans-V2</strong>는 산업 추천 시스템의 3단 캐스케이드(retrieval → pre-rank → fine-rank)를 <strong>하나의 Transformer로 통합</strong>하는 접근이다. user behavior sequence를 shared context로 한 번만 인코딩하고 stage별 candidate feature와 computation은 유지한다. Joint training으로 세 stage가 상호 강화되며 in-model knowledge distillation이 fine-rank에서 pre-rank로 흐른다. 백본은 sparse MoE로 확장하고 μP-style parameterization으로 스케일링을 안정화. 별도의 objective별 retrieval 채널을 두는 대신 <strong>DCGR (Decision-Conditioned Generative Retrieval)</strong> — decision prefix를 먼저 예측한 뒤 그 prefix에 조건화해 아이템을 생성 — 로 통합. <strong>SNT (Sequence-Native Training)</strong> 로 시퀀스 인코딩을 노출마다 amortize <code>[확인]</code> <a href="https://arxiv.org/abs/2609.28589">arXiv 2609.28589</a>, 2026-09-23 v1. 저자 15인(Hannan Cao·Jun Guo·Haolei Pei 등), 소속은 arXiv 메타데이터·HTML 판·Semantic Scholar 어디에서도 명시적으로 확인되지 않는다(2026-09-26 확인). GMV 지표를 쓰는 e-commerce 플랫폼의 프로덕션 팀 자료로 판단 <code>[추정]</code>.</li>
+<li>왜 주목: <strong>프로덕션 A/B에서 GMV +9.74%, 3.2× throughput under same hardware budget</strong> <code>[확인]</code>. 저장소 코퍼스에서 stage 간 통합을 다룬 최근 프로덕션 진술은 <a href="#unique-baidu--beihang--cityu--%EC%82%B0%EC%97%85-mobile-feed%EC%9D%98-unified-retrieval--ranking--single-layer-flat-quantization-recsys-2026-accepted">UNIQUE (Baidu, RecSys 2026)</a>와 <a href="#unirec-kuaishou--%EC%BA%90%EC%8A%A4%EC%BC%80%EC%9D%B4%EB%93%9C-pre-ranking--ranking-fusion%EC%9D%84-two-stage-joint-learning%EC%9C%BC%EB%A1%9C-%EC%A0%95%EB%A0%AC-app-usage-duration-0616">UniRec (Kuaishou)</a>가 있었는데, OneTrans-V2는 여기에 <strong>3-stage 전체를 하나의 Transformer로 묶었다</strong>는 세 번째 각도를 더한다. A/B 수치도 두 편 대비 훨씬 크다(UniRec는 app usage duration +0.616%, UNIQUE는 A/B 수치 abstract 미공개).</li>
+<li>상태: <strong>관찰 (affiliation 확인 대기)</strong> — HTML 판이 발행되지 않아 저자 소속이 확인되지 않은 채로 편입한다. 학회 accepted 통지나 v2에서 affiliation이 확인되면 정본 반영을 재검토. 두 번째 회사가 3-stage 전체 통합을 프로덕션에 넣었다는 진술이 나오면 새 topic 승격 후보. 자세한 분석: <a href="daily-2026-09-26.html">daily/2026-09-26.md</a>.</li>
+</ul>
 <h3 id="comcast-technology-ai--llm-based-user-profiling-for-streaming-recommendation-offline-production-comparison">Comcast Technology AI — LLM-based user profiling for streaming recommendation (offline production comparison)</h3>
 <ul>
 <li>무엇: <strong>Comcast Peacock/Xfinity의 프로덕션 컨텐츠 기반 추천 데이터셋</strong>에서 유저 임베딩을 만드는 두 패러다임을 factorial로 비교한 논문이다 — (a) <strong>aggregate</strong>: 유저의 최근 vs 과거 아이템 임베딩을 수치적으로 집계, (b) <strong>LLM-generated</strong>: 유저 이력을 LLM에 넣어 자연어 요약을 얻고 텍스트 인코더로 벡터화. 두 방식 × temporal disentanglement(recent vs historical) on/off = 4개 조합을 비교한다. LLM 방식이 훨씬 비싸므로 &quot;언제 그 비용이 정당화되는가&quot;를 묻는 것이 핵심이다. 결과는 유저 행동 유형별로 갈리고, accuracy·beyond-accuracy(다양성 등) 축에서 서로 다른 트레이드오프가 관찰된다는 진술. <strong>온라인 A/B는 없다. 어느 Peacock/Xfinity 제품 데이터셋인지도 명시되지 않았다.</strong> <code>[확인]</code> <a href="https://arxiv.org/abs/2609.27183">arXiv 2609.27183</a>, 2026-09-23 v1. <a href="https://arxiv.org/html/2609.27183v1">HTML 판</a>에서 저자 4명 중 3명(Neeraj Sharma·Sardar Hamidian·Shaghayegh Agah)의 소속이 Comcast Technology AI(Sunnyvale·Washington DC), 1저자 Milad Sabouri는 DePaul University + Comcast Technology AI 듀얼 소속임을 확인.</li>
