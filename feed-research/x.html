@@ -102,11 +102,11 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="svc-x">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-26 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-27 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-26 기준</div>
+  <div class="gendate">2026-09-27 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
@@ -2269,6 +2269,102 @@ message EngagementCounts {
 <li><strong>인터페이스가 함수에서 데이터로.</strong> 어제 구조에서 실행은 여전히 hydrator variant마다 별도 함수/파일이었다면, 오늘은 실행도 데이터가 됐다. rule을 추가할 때 hydrator 함수를 새로 쓸 필요 없이 <code>NodeSpec</code> 테이블에 한 줄 더한다.</li>
 <li><strong>RPC 그룹 병합 자동화.</strong> gizmoduck의 SAFETY와 LABELS 필드 조회, socialgraph의 Follows·Blocks·Mutes·MuteRetweets 4-edge 조회처럼 같은 backend·같은 입력을 갖는 hydrator들이 자동으로 한 RPC로 병합된다. hydration 예산이 gizmoduck·socialgraph 같은 fan-out 서비스에 몰리는 X 구조에서 P99에 직접 영향.</li>
 <li><strong><code>ViewerCountry</code>가 hydration 예산에 정식 편입.</strong> country 정보를 요청 컨텍스트에 실어 오던 이전 방식에서, <code>about_this_account/tfe_top_country.User</code> Strato 컬럼을 hydration이 직접 조회해 채우는 방식으로 이관. About This Account 투명성 UI의 백엔드가 VF 판정 경로에 붙었다.</li>
+</ol>
+<h3 id="4세대30-2026-09-26-4c5cfe8--abuse-enforcement에-overturn-hold-게이트-신설-5270줄--vf-hydration이-executestore-분리--safety_label_hydratorrstes_hydratorrs-완전-삭제--wingman-follows-클라이언트-신설--rules-registry가-static-policy로-잠김--phoenix-광고-구매액-target-카탈로그-event--level-6조합--phoenix-cold-retrieval-채널이-cold-start-arm-gate에-편입">4세대+30 (2026-09-26, 4c5cfe8) — abuse-enforcement에 overturn-hold 게이트 신설 (5,270줄) + VF hydration이 execute/store 분리 + <code>safety_label_hydrator.rs</code>·<code>tes_hydrator.rs</code> 완전 삭제 + wingman follows 클라이언트 신설 + rules registry가 static <code>Policy</code>로 잠김 + Phoenix 광고 구매액 target 카탈로그 (event × level 6조합) + Phoenix Cold retrieval 채널이 cold-start arm-gate에 편입</h3>
+<p>파일 80개, +9,130/−2,652 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/commit/4c5cfe8">xai-org/x-algorithm@4c5cfe8</a>.</p>
+<p><strong>A. Overturn-hold 게이트 — abuse-enforcement에 신설된 마지막 프리체크.</strong> <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/abuse-enforcement-service/service-lib/src/overturn_hold.rs"><code>abuse-enforcement-service/service-lib/src/overturn_hold.rs</code></a> 5,270줄 신규. 목적은 사람 검토자가 이의제기 처리 중 뒤집은(overturned) 정지 또는 라벨을 그 hold가 유효한 동안 자동화 판정이 다시 걸지 못하게 막는 것이다. 파일 상단 주석이 &quot;the last precheck before a suspend (or a gated label) is dispatched. It exists so we do not re-apply an enforcement that a human reviewer already overturned on appeal&quot;이라고 목적을 그대로 밝힌다.</p>
+<p>구조는 다음과 같다.</p>
+<ul>
+<li><strong>세 게이트 모드</strong> <code>GateMode::Off | Shadow | Enforce</code>. Shadow는 판정만 실행하고 조치를 dispatch하지 않으며, Enforce는 실제로 차단한다.</li>
+<li><strong>두 게이트 종류</strong> <code>GateKind::Suspend</code>(정지 재적용 차단)와 <code>GateKind::Label</code>(라벨 재적용 차단). 정지는 임시(<code>GatedAction::Suspend</code>)와 영구(<code>GatedAction::PermSuspend</code>) 두 종류를 별도로 판정한다.</li>
+<li><strong>원격 ledger</strong> HTTP 클라이언트가 <code>/v1/holds/lookup</code>으로 활성 hold를 받는다. <code>CONNECT_TIMEOUT</code> 200ms, <code>DEFAULT_TIMEOUT_MS</code> 200ms(10~5000ms 튜닝), positive cache 60초(최대 3,600초), 응답 본문 상한 64 KiB, moka 캐시 <code>CACHE_MAX_WEIGHT</code> 100,000, <code>CONFIG_PUBLISH_INTERVAL</code> 15초.</li>
+<li><strong>회로 차단기</strong> <code>BREAKER_FAILURES=5</code> 실패 시 열림, 열린 뒤 <code>DEFAULT_BREAKER_OPEN=10s</code> 대기. 도달 가능한 에러(예: HTTP 5xx) 5회 연속에서 <code>REACHABLE_ERROR_BACKOFF=5s</code> back-off.</li>
+</ul>
+<p>AES lib.rs 통합은 두 지점이다 <code>[확인]</code> <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/abuse-enforcement-service/service-lib/src/lib.rs"><code>abuse-enforcement-service/service-lib/src/lib.rs:166-509</code></a>. 시작 시 <code>HoldGate::from_url(cfg.overturn_hold_ledger_url, ..., cfg.overturn_hold_env)</code>로 만들고 <code>Arc&lt;HoldGate&gt;</code>를 <code>EnforcementCtx</code>에 주입. 실행 경로에서는 <code>gated_actions(&amp;specs, &amp;cfg)</code>가 dispatch 후보 중 gate 대상 액션을 골라 반환하고 <code>strip_held_labels(&amp;mut specs, &amp;gate.strip_labels)</code>가 이미 뒤집힌 라벨 이름을 spec에서 제거한다.</p>
+<p>판정 결과 두 상태:</p>
+<ul>
+<li><code>STATUS_HOLD_OVERTURNED = &quot;hold_overturned&quot;</code> — hold 활성으로 실제 차단.</li>
+<li><code>STATUS_HOLD_LOOKUP_FAILED = &quot;hold_lookup_failed&quot;</code> — ledger 조회 실패.</li>
+</ul>
+<p>동일 outcome dict에 <code>overturn_hold_id</code>·<code>overturn_hold_mode</code>·<code>overturn_hold_head</code>·<code>overturn_hold_expires_at</code>·<code>overturn_hold_labels_stripped</code> 5개 진단 키가 실린다. dedup retention 계층도 두 상태를 별도로 소지: <code>dedup_retention_for(STATUS_HOLD_OVERTURNED)</code>와 <code>dedup_retention_for(STATUS_HOLD_LOOKUP_FAILED)</code> 항목이 신설 <code>[확인]</code> <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/abuse-enforcement-service/service-lib/src/lib.rs"><code>lib.rs:2469-2501</code></a>.</p>
+<p><strong>B. VF hydration이 <code>execute.rs</code>(상태+실행)에서 <code>store.rs</code>(상태) + <code>execute.rs</code>(실행)로 분리.</strong> <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/visibility-filtering/hydration/store.rs"><code>visibility-filtering/hydration/store.rs</code></a> 339줄 신규. <code>execute.rs</code>는 −141줄(+394/−535). <code>store.rs</code>가 hydration 실행 중 in-flight 결과를 소지하는 <code>Store</code> 구조체를 정의한다.</p>
+<p>필드는 <code>Option&lt;...&gt;</code> 8개다: <code>pure_cores</code>(트윗 골격) <code>tweets</code>(TweetForVisibility) <code>controls</code>(ConversationControl arm) <code>labels</code>(SafetyLabelMap) <code>viewer</code>(ViewerProfile) <code>authors</code>(DecodedAuthor) <code>edges</code>(<code>Vec&lt;(Hydrators, RawHydrationBatch&lt;Hydrators&gt;)&gt;</code>) <code>viewer_country</code>(Arc<str>). <code>Store::keys(origin: KeyOrigin) -&gt; Vec&lt;u64&gt;</code>가 하위 hydrator가 필요한 입력 키를 origin 축(RequestTweets·Viewer·ViewerForCoAllowedList·PureCoreAuthor·PureCoreReplyRoot·ExclusiveConversationAuthor 등)으로 뽑아 리졸브한다. <code>Store::callable: Hydrators</code> 필드는 이번 요청의 실행 가능 hydrator를 bitset으로 잠근다.</p>
+<p>같은 커밋에서 4세대+29의 두 잔재가 삭제됐다.</p>
+<ul>
+<li><code>visibility-filtering/hydration/safety_label_hydrator.rs</code> −167줄, 파일 삭제.</li>
+<li><code>visibility-filtering/hydration/tes_hydrator.rs</code> −79줄, 파일 삭제.</li>
+</ul>
+<p>두 파일 모두 어제 데이터 기반 스케줄러로 옮겨질 때 기능이 필요 없어졌지만 24시간 유예된 채 남아 있다가 오늘 완전 제거됐다.</p>
+<p><strong>C. Wingman follows 클라이언트 신설 — socialgraph 직접 호출을 wingman 경로로 이관.</strong> <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/visibility-filtering/clients/wingman_client.rs"><code>visibility-filtering/clients/wingman_client.rs</code></a> 54줄 신규 <code>[확인]</code>.</p>
+<pre><code class="language-rust">const FOLLOWS_GRAPH: u32 = 1;
+const FOLLOWS_FLEET: Fleet&lt;&#39;static&gt; = Fleet {
+    wily_path: &quot;/s/wingman/wingman-api-follows&quot;,
+    authority_template: &quot;wingman.wingman-api-follows.prod.{datacenter}.s2s.twttr.net&quot;,
+    ...
+};
+</code></pre>
+<p>인터페이스는 <code>WingmanClient::batch_exists_intersect(viewer_id, root_author_ids) -&gt; Option&lt;Vec&lt;Exists&gt;&gt;</code>가 유일하고 <code>IntersectMode::FwdXRev</code>를 쓴다. FwdXRev는 정방향(viewer → author)과 역방향(author → viewer)을 동시 확인하는 모드로 &quot;reply root 작성자와 뷰어가 서로 팔로우인가&quot;를 한 번의 RPC로 판정한다. <code>socialgraph_client.rs</code>(+43/−27)에서 이 관련 코드가 감량됐다. <code>FOLLOWS_GRAPH=1</code> 상수에서 wingman이 다중 그래프를 소지함을 알 수 있으나 2번 이후는 이번 공개에서 확인되지 않는다.</p>
+<p><strong>D. rules registry가 static <code>Policy</code>로 잠기고 rules 전용 metrics 모듈 신설.</strong> <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/visibility-filtering/rules/registry.rs"><code>visibility-filtering/rules/registry.rs</code></a> +206/−203로 사실상 완전 재작성. 핵심은 SafetyLevel마다 규칙 세트를 담는 <code>Policy&lt;&#39;a&gt;</code> 구조체다.</p>
+<pre><code class="language-rust">pub(super) struct Policy&lt;&#39;a&gt; { base: &amp;&#39;a [RuleClause], additional: &amp;&#39;a [RuleClause] }
+static FILTER_ALL_POLICY: Policy = Policy::new(&amp;[tweet_rules::FILTER_ALL]);
+static TIMELINE_HOME_POLICY: Policy = Policy::new(&amp;TIMELINE_HOME_SHARED_RULES);
+static TIMELINE_HOME_RECOMMENDATIONS_POLICY: Policy = Policy::with_additional(...);
+static TIMELINE_HOME_HYDRATION_POLICY: Policy = Policy::new(&amp;[...]);
+static IMMERSIVE_EXPANDED_RECOMMENDATIONS_POLICY: Policy = Policy::new(&amp;[...]);
+</code></pre>
+<p><code>RuleEngine::select(level) -&gt; &amp;&#39;static Policy</code>가 요청된 SafetyLevel마다 5개 static 중 하나를 참조한다. <code>Policy::with_additional(base, additional)</code>이 두 슬라이스를 합쳐 파생 정책을 만든다. <code>RuleEngine::wired_rule_names(level)</code>이 정책에 wired된 rule 이름 목록을 반환해 골든 테스트로 pin(등록된 다섯 SafetyLevel 각각에 대해 <code>wired_rule_names</code>가 리스트를 반환하고 assertion에 잠긴다) <code>[확인]</code> <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/visibility-filtering/rules/registry.rs"><code>registry.rs:346-460</code></a>.</p>
+<p><a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/visibility-filtering/rules/metrics.rs"><code>visibility-filtering/rules/metrics.rs</code></a> 58줄 신규. 어제까지는 hydration의 <code>metrics.rs</code>가 rule 판정 관련 metric까지 소지했으나, 판정과 하이드레이션이 분리되면서 metric도 분리됐다. <code>rule_spec.rs</code>(+149/−74)에서 <code>RuleClause</code>·<code>ActionSpec</code> refactor. <code>filter.rs</code>는 −94줄(+26/−120)로 감량, <code>context.rs</code>는 −53줄(+9/−62)로 감량 — Verdict 트리가 안착하면서 필터 계층이 rule 실행 조율을 놓아 준다.</p>
+<p><strong>E. Phoenix 광고 구매액 target 카탈로그.</strong> <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs"><code>phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs</code></a> +230/−4. 광고 구매액 continuous head의 event × level 조합이 데이터 구조로 명시됐다.</p>
+<pre><code class="language-rust">pub const ACTION_INDEX: usize = ContinuousActionName::AdsWebCtPurchaseValue as usize;
+pub const MAX_EVENT_USD: f64 = 100_000.0;
+pub fn is_countable_usd(usd: f64) -&gt; bool {
+    usd.is_finite() &amp;&amp; usd &gt; 0.0 &amp;&amp; usd &lt;= MAX_EVENT_USD
+}
+pub enum ValueEvent { Purchase, ContentView, AddToCart }
+pub enum ValueLevel { ClickThrough, ViewThrough }
+pub struct ValueTarget { event: ValueEvent, level: ValueLevel }
+impl ValueTarget {
+    pub const ALL: [ValueTarget; 6] = [ ... ];
+    pub const PUBLISHED: [ValueTarget; 4] = [ ... ];
+    pub const REQUIRED: [ValueTarget; 2] = [Self::PURCHASE_CT, Self::PURCHASE_VT];
+}
+</code></pre>
+<p>카탈로그는 다음과 같다 <code>[확인]</code>:</p>
+<ul>
+<li><strong>ValueEvent 3종</strong>: <code>Purchase</code>(conversion_type 2, clickhouse <code>purchase</code>), <code>ContentView</code>(19, <code>content_view</code>), <code>AddToCart</code>(12, <code>add_to_cart</code>).</li>
+<li><strong>ValueLevel 2종</strong>: <code>ClickThrough</code>(광고 클릭 후 발생), <code>ViewThrough</code>(노출만 있고 클릭 없이 발생).</li>
+<li><strong>REQUIRED 2 target</strong>: purchase_ct, purchase_vt — 모델이 반드시 예측.</li>
+<li><strong>PUBLISHED 4 target</strong>: purchase_ct, purchase_vt, content_view_ct, add_to_cart_ct — 광고주 웹훅 대상.</li>
+<li><strong>is_countable_usd</strong>: 이벤트 하나가 $100,000 USD를 넘거나 NaN·음수·무한대이면 학습·평가에서 제외.</li>
+<li><code>ValueTarget::mean(&amp;PurchaseValueBaseline)</code>이 target별 mean을 baseline에서 읽음(4세대+21에서 신설된 <code>PurchaseValueBaseline</code> request 필드의 소비 계약이 이번에 확정).</li>
+</ul>
+<p>4세대+21(2026-09-15, <code>ADS_WEB_CT_PURCHASE_VALUE</code> 신설), 4세대+22(2026-09-16, purchase-value loss 정식 배선), 4세대+24(2026-09-18, purchase-value loss가 early-relabel 슬라이스로 좁혀짐)에서 파편적으로 공개된 구매액 예측 계층의 target 축이 오늘 데이터로 잠긴다.</p>
+<p><strong>F. Phoenix Cold retrieval 채널이 cold-start arm-gate에 편입.</strong> <code>home-mixer/scorers/author_cold_start.rs</code> +45/−6에서 헬퍼 함수 <code>is_phoenix_moe</code>가 <code>is_arm_gated_retrieval</code>로 개명되면서 대상 served_type이 확장됐다 <code>[확인]</code>.</p>
+<pre><code class="language-rust">fn is_arm_gated_retrieval(c: &amp;PostCandidate) -&gt; bool {
+    matches!(
+        c.served_type,
+        Some(
+            pb::ServedType::ForYouPhoenixRetrievalMoe | pb::ServedType::ForYouPhoenixRetrievalCold
+        )
+    )
+}
+</code></pre>
+<p>4세대+28(2026-09-24, 44d37eb)에서 Phoenix retrieval에 <code>HOME_COLD=14</code> 채널이 <code>HOME_HOT</code> 옆에 신설됐고 <code>1fav_1day.parquet</code> 소스를 <code>fav&lt;8 &amp; views&lt;500</code> 마스크로 분리했다. 오늘부터 이 Cold 채널의 후보가 cold-start 실험의 Holdout/Control/Treatment 세 팔 중 <strong>Treatment 팔에게만</strong> 노출된다(MoE와 동일한 arm-gating). 신규 테스트 <code>cold_retrieval_is_gated_like_moe</code>가 Holdout·Control에서 Cold 후보 점수 0, Treatment에서 5.0로 잔존함을 검증한다.</p>
+<p><strong>G. 부수 변경.</strong></p>
+<ul>
+<li>Phoenix async embedding CUDA 계층 감량: <code>async_emb_api.cc</code> +123/−191, <code>async_emb_comm.cc</code> +86/−63. gradient 교환 API surface가 데이터 중심으로 정리되는 방향.</li>
+<li>Phoenix <code>trainer_recsys.py</code> +48/−200, <code>rowwise_adagrad.py</code> +51/−120로 optimizer·trainer boilerplate 감량. <code>phoenix/xrex/utils/recsys_async_emb.py</code>가 rename+54.</li>
+<li><code>visibility-filtering/hydration/tes_composite.rs</code> +29/−32, <code>hydration/plan.rs</code> +48/−12(wingman 편입 대응), <code>hydration/mod.rs</code> +22/−29, <code>hydration/batch.rs</code> +40/−64, <code>hydration/metrics.rs</code> +140/−180(rule metrics 분리 반작용).</li>
+<li><code>visibility-filtering/evaluate_tweets.rs</code> +57/−51, <code>filter.rs</code> +26/−120, <code>server.rs</code> +35/−21 — 하이드레이션·규칙 개편에 맞춘 dispatch 정리.</li>
+<li><code>abuse-enforcement-service/service-lib/src/lib.rs</code> +612/−4, <code>service-lib/src/metrics.rs</code> +79/−3 — overturn-hold 통합 반작용.</li>
+</ul>
+<p><strong>의미</strong> — VF 개편의 24시간 반감기 패턴이 계속된다(어제까지 함수였던 <code>safety_label_hydrator</code>·<code>tes_hydrator</code>가 오늘 삭제, 어제 신설된 <code>execute.rs</code>의 상태 로직이 오늘 <code>store.rs</code>로 분리). 진짜 헤드라인은 abuse-enforcement의 overturn-hold gate 신설이다.</p>
+<ol>
+<li><strong>자동화 판정과 사람 판정의 우선순위가 데이터로 잠긴다.</strong> 자동화 dispatch 경로에서 정지 spec이 만들어질 때마다 hold ledger 조회로 &quot;이 조치가 사람 손에서 취소된 적이 있는가&quot;를 확인해 gate하는 마지막 문이 코드로 명시됐다.</li>
+<li><strong>정지의 취소가 지속 상태로 취급된다.</strong> hold는 만료 시각(<code>expires_at</code>)을 갖는 시간 창이고, 그동안 특정 대상(계정·라벨)에 대한 자동화 조치가 막힌다. 사람 검토자의 이의제기 승인이 &quot;1회성 취소&quot;가 아니라 &quot;이후 시간 T까지의 재적용 금지&quot;라는 정책 항목이 된다.</li>
+<li><strong>wingman follows 이관.</strong> socialgraph 직접 호출이 wingman 경로로 옮겨지면서 hydration RPC의 fan-out 구성이 다시 정리된다. <code>FOLLOWS_GRAPH=1</code>이 상수로 잠긴 것은 wingman이 다중 그래프(2·3···)를 소지함을 시사하지만 나머지는 이번 공개에서 확인되지 않는다.</li>
+<li><strong>Phoenix 광고 구매액 target이 데이터로 잠긴다.</strong> ValueEvent 3 × ValueLevel 2 = 6 조합에서 REQUIRED 2·PUBLISHED 4가 명시됐고 $100k 이벤트 상한이 학습·평가 계약에 잠긴다.</li>
+<li><strong>cold-start Cold retrieval 편입.</strong> Phoenix retrieval의 새 Cold 채널이 cold-start 실험 Treatment 팔로 흐르는 경로가 데이터(matches! 패턴)로 잠긴다.</li>
 </ol>
 <h3 id="4세대10-2026-08-28-24c6094--multiriskadsblender-신설-bsr-high-광고-tier--medium-risk-폴백-슬롯">4세대+10 (2026-08-28, 24c6094) — <code>MultiRiskAdsBlender</code> 신설 (BSR-high 광고 tier + medium-risk 폴백 슬롯)</h3>
 <p>이전에 3개(<code>safe_gap</code>·<code>partition_organic</code>·<code>time_gap</code>)였던 광고 블렌더 세트에 네 번째 변종 <code>multi_risk</code>가 추가됐다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/multi_risk_blender.rs"><code>home-mixer/ads/multi_risk_blender.rs</code></a> (332줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/tests/multi_risk_blender_tests.rs"><code>home-mixer/ads/tests/multi_risk_blender_tests.rs</code></a> (215줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/selectors/blender_selector.rs"><code>home-mixer/selectors/blender_selector.rs</code></a> (+8/−4). <code>AdsBlenderType</code> param이 <code>&quot;multi_risk&quot;</code> 문자열을 받으면 이 블렌더가 선택됨. 같은 커밋에서 <code>&quot;partition_organic_low_risk&quot;</code> 앨리어스가 <code>PartitionOrganicAdsBlender</code>에 추가돼 총 5개 옵션(<code>safe_gap</code> / <code>partition_organic</code> / <code>partition_organic_low_risk</code> / <code>time_gap</code> / <code>multi_risk</code>).</p>
