@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-27 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-09-28 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-09-27 기준</div>
+  <div class="gendate">2026-09-28 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="분야-레이더--추적-서비스-밖의-논문트렌드">분야 레이더 — 추적 서비스 밖의 논문·트렌드</h1>
-<p><strong>최종 갱신:</strong> 2026-09-27</p>
+<p><strong>최종 갱신:</strong> 2026-09-28</p>
 <p>추적 서비스(X·Meta·Netflix) 정본에 아직 반영하지 않은 것들을 모아 두는 워치리스트다. 엔트리 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a>를 참조한다: 2~4줄 포인터, 프로덕션 관련성 기준, ~3개월 수명(승격 또는 졸업).</p>
 <p>수집 주기는 다음과 같다. arXiv cs.IR 신규 제출은 매일 triage하고, 산업 블로그(Google Research, Pinterest, Spotify, LinkedIn 등)와 학회 accepted 목록은 주 1회 살펴본다. 이 수집은 일일 배치가 수행한다.</p>
 <h2 id="관찰-중-오픈-스레드">관찰 중 (오픈 스레드)</h2>
@@ -152,6 +152,12 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="pinterest-3-tower-engagement-co-train--광고-lightweight-ranking을-two-tower-밖으로-프로덕션-ab에서-ctrgctr30octr-각-1-상승cpc-1-감소로-launched">Pinterest 3-Tower Engagement Co-Train — 광고 lightweight ranking을 two-tower 밖으로, 프로덕션 A/B에서 CTR·gCTR30·oCTR 각 ~1% 상승·CPC ~1% 감소로 launched</h3>
+<ul>
+<li>무엇: <strong>Pinterest 광고 스택의 표준 광고 lightweight ranking 모델</strong>이다. 기존 two-tower 모델의 query·Pin 두 tower는 그대로 두고 <strong>cross tower와 inter module</strong>을 얹어, 같은 모델이 후보 전량에 대해 <strong>빠른 two-tower 점수</strong>와 최상위 서브셋에 대해 <strong>정확한 three-tower 점수</strong>를 동시에 낸다. Cross tower는 세 종류의 유저 시퀀스(organic engagement, ads engagement, search history)와 네 종류의 후보 피처(advertiser ID, campaign ID, GraphSAGE 임베딩, Pin PinnerSAGE 임베딩)를 입력으로 받아, 후보 피처로 만든 query token이 유저 시퀀스와 cross-attention을 수행한다. Inter module은 query·Pin·cross 세 임베딩을 shared-bottom MLP로 합쳐 세 태스크(<strong>pCTR·pGCTR30·pOCTR</strong>: 클릭 확률·30초 이상 지속되는 good click 확률·광고주 사이트로의 outbound click 확률)의 logit을 생성한다. 서빙은 <strong>두 stage</strong>로 나뉜다 — Stage 1은 co-train된 two-tower head로 후보 전량을 채점하고, Stage 2는 utility 상위 40K(Home Feed·Related Pins 70퍼센타일, Search 90퍼센타일 수준)만 three-tower로 재채점한 뒤 두 점수를 blending해 최종 top-K를 뽑는다. Loss는 <code>L = (100·L_main_ctr + 5·L_main_gctr30 + 1·L_main_octr) + (10·L_cotrain_ctr + 5·L_cotrain_gctr30 + 1·L_cotrain_octr)</code>로 main(three-tower)에 강한 가중치, co-train(two-tower)에 보조 가중치를 준다 <code>[확인]</code> — <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14">Beyond Two Towers: Launching the 3-Tower Engagement Co-Train Model (Part 2)</a>, 2026-09-17, Pinterest Engineering, 저자 8인(Longyu Zhao·Gwendolyn Zhao·Peng Yan·Yuanlu Bai·Yuan Wang·Yao Cheng·Ang Xu·Zhaohong Han, 마지막 저자는 Manager II, Ads Lightweight Ranking).</li>
+<li>왜 주목: <strong>표준 광고 프로덕션 A/B에서 CTR·gCTR30·oCTR 각 ~1% 상승 + CPC ~1% 감소, GPU 지출은 modest 증가로 launched</strong> <code>[확인]</code>. 오프라인 손실이 three-tower 예측에서 ~30% 감소(baseline은 기존 프로덕션 two-tower 모델). 서빙 최적화 결과는 정량으로 나온다: BF16 도입으로 50K 후보 기준 P99 103ms → 56ms, 20K 후보 기준 45ms → 26ms. user feature의 late expansion으로 100K 후보에서 -15ms, pre-layer normalization으로 -3ms, Pin 전처리를 Pin tower로 이동해 -2ms. 이들을 합쳐 <strong>P99 모델 추론이 200ms 이상 → 30ms</strong>로 줄었고 프로덕션 대비 1-2ms 지연 증가에 그쳤다. 저장소 코퍼스에서 <a href="#pinterest-clr--home-feed-%EC%A1%B0%EA%B1%B4-%EC%9E%84%EB%B2%A0%EB%94%A9-retrieval%EC%9D%84-%ED%86%B5%ED%95%A9-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98%EB%A1%9C-%ED%99%95%EC%9E%A5-p90-%EC%A7%80%EC%97%B0-85-%EA%B0%90%EC%86%8C">Pinterest CLR</a>이 유기 Home Feed의 <strong>후보 생성</strong> 축을, <a href="#pindco-pinterest--%EA%B4%91%EA%B3%A0-%EC%B0%BD%EC%9D%98-%EC%86%8C%EC%9E%AC%EB%A5%BC-whole-page-%EC%86%90%EC%9D%B5%EA%B9%8C%EC%A7%80-%EB%B0%98%EC%98%81%ED%95%B4-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%84%A0%ED%83%9D%ED%95%98%EB%8A%94-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-dco-pinterest-ads%EC%97%90-launched-ad-ctr-309-relative">PinDCO</a>가 광고 <strong>creative 선택</strong> 축을 다뤘다면, 3-Tower Co-Train은 광고 <strong>lightweight ranking</strong> 축의 진술로 자리가 다르다. 특히 &quot;co-train으로 fast + slow 두 헤드를 한 모델에 담고 서빙에서 두 stage로 나누는&quot; 패턴은 저장소에서 lightweight ranking 자리에서는 처음 나온 프로덕션 진술이다. Nexus 서빙 스택(Part 1)이 candidate generation과 scoring을 분리한 위에서 이번 Part 2가 스코어링을 확장했다는 시퀀스로 읽힌다.</li>
+<li>상태: <strong>관찰</strong> — Pinterest는 canon 추적 서비스가 아니므로 services 정본은 만들지 않는다. Part 1(Nexus)은 저장소에서 아직 다루지 않았다. Nexus의 candidate generation·scoring 분리 아키텍처가 다음 관측 지점이다. 두 번째 회사가 광고 lightweight ranking 자리에서 co-train fast+slow 패턴을 진술하는지, 그리고 3-Tower의 후속 방향(더 긴 시퀀스, engagement 이외 objective로의 확장)에 대한 회사 후속 진술이 나오는지도 지켜본다. 자세한 분석: <a href="daily-2026-09-28.html">daily/2026-09-28.md</a>.</li>
+</ul>
 <h3 id="agentx-model-kuaishou-추정--산업-recommender-리서치-루프를-dual-agentresearch--model로-자동화-프로덕션-ab-5건에서-acquisition-10-15--ad-spend-15-20--watch-time-03-08--flops-10">AgentX-Model (Kuaishou 추정) — 산업 recommender 리서치 루프를 dual-agent(Research + Model)로 자동화, 프로덕션 A/B 5건에서 acquisition +10-15% · ad spend +15-20% · watch time +0.3-0.8% · FLOPs −10%</h3>
 <ul>
 <li>무엇: <strong>AgentX-Model</strong>은 프로덕션 recommender 팀의 리서치 순환(제안 → 실험 → 다음 질문)을 두 에이전트로 자동화하는 프레임워크다. <strong>Research Agent</strong>가 논문·이전 실험에서 독립적으로 리뷰된 제안을 만들고, <strong>Model Agent</strong>가 그 제안을 코드·측정·미해소 질문으로 옮긴다. Research Agent가 다시 결과를 받아 시작 구현을 선택하고 다음 질문을 짜서 후속 실험이 이전 결과 위에 쌓이게 만든다. 리서치 액션은 4개다 — <strong>Reproduce</strong>(재현), <strong>Follow-up</strong>(확장), <strong>Composition</strong>(결합), <strong>Diagnose</strong>(온라인 평가에서 발견된 이슈나 PCOC로 측정된 예측 편향 같은 문제의 진단·수리 후보 근거 수집). 저자 23인의 소속은 v1 <a href="https://arxiv.org/html/2609.30001v1">HTML 판</a>에 렌더링되지 않지만, 저자에 Peng Jiang(Kuaishou VP)·Wenwu Ou·Zhaojie Liu가 포함되고 선행 <a href="https://arxiv.org/search/?searchtype=title&amp;query=AgentX">AgentX v1</a>에는 Kun Gai·Han Li도 포함돼 있어 Kuaishou 라인으로 판단 <code>[추정]</code> — <a href="https://arxiv.org/abs/2609.30001">arXiv 2609.30001</a>, 2026-09-24 v1, 37 페이지 technical report.</li>
