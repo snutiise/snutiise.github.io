@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-10-01 — feed-research</title>
+<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
+     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
+     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
+<meta name="description" content="한 줄: X 4세대+32가 어제 신설한 VF hydration 상태 저장소를 Fetcher&lt;V&gt; trait으로 재작성해 리트윗 소스 확장을 두 번 hydrate에서 한 번 hydrate + in-flight 확장으로 줄이고, Phoenix xrecsys_two_tower.py를…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-10-01.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:title" content="일일 리포트 2026-10-01 — feed-research">
+<meta property="og:description" content="한 줄: X 4세대+32가 어제 신설한 VF hydration 상태 저장소를 Fetcher&lt;V&gt; trait으로 재작성해 리트윗 소스 확장을 두 번 hydrate에서 한 번 hydrate + in-flight 확장으로 줄이고, Phoenix xrecsys_two_tower.py를…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-10-01.html">
+<meta name="twitter:card" content="summary">
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-01 기준</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-10-01 기준</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-10-01</h1>
+  <div class="wd">목요일 · 읽는 데 약 38분</div>
+  <ul class="chips"><li class="chip">읽은 자료 <b>3</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul>
+  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+32가 어제 신설한 VF hydration 상태 저장소를 <code>Fetcher&lt;V&gt;</code> trait으로 재작성해 리트윗 소스 확장을 두 번 hydrate에서 한 번 hydrate + in-flight 확장으로 줄이고, Phoenix <code>xrecsys_two_tower.py</code>를 registry에 카탈로그 6-preset(SID 6-level + seqpack + H100/GB300)으로 승격하고, 홈믹서 cold-start 파라미터 6개(Phoenix cold retrieval 0 → 200 posts, MaxPostAge 48h → 2h, FollowerCap 1000 → 50k, Thompson sampling on)를 프로덕션 값으로 잡았다.</div>
+</header>
+<div class="wrap" id="content">
+<h2 id="1-x-4세대32--vf-hydration을-fetcherv-trait으로-재작성-retweet-source가-한-번-hydrate--in-flight-확장으로-단순화--treatmentrs-사영-격리--phoenix-xrecsys_two_towerpy-카탈로그-6-preset-승격sid-6-level--seqpack--h100gb300--ads_head_masking-jax--numpy-로-이동하며-webapp-conversion-축-분리--홈믹서-cold-start-파라미터-6개-프로덕션-튜닝--x">1. X 4세대+32 — VF hydration을 <code>Fetcher&lt;V&gt;</code> trait으로 재작성, retweet source가 한 번 hydrate + in-flight 확장으로 단순화 · <code>treatment.rs</code> 사영 격리 · Phoenix <code>xrecsys_two_tower.py</code> 카탈로그 6-preset 승격(SID 6-level + seqpack + H100/GB300) · <code>ads_head_masking</code> JAX → numpy 로 이동하며 web/app conversion 축 분리 · 홈믹서 cold-start 파라미터 6개 프로덕션 튜닝 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/77d431a">xai-org/x-algorithm@77d431a</a> — 2026-09-30 03:53:42Z(UTC), +3,306/−1,489, 파일 69. 어제 <a href="https://github.com/xai-org/x-algorithm/commit/a707cc2">4세대+31 a707cc2</a>의 하루 뒤.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>visibility-filtering(VF, X의 트윗 필터 파이프라인)의 hydration 계층은 지난 나흘 사이에 세 번 뒤집혔다. 4세대+29(2026-09-25, bf7db1b)가 <code>Hydrator</code> enum을 7 → 17 variant로 확장하며 데이터 기반 plan/execute/sources 3-파일을 신설했고, 4세대+30(2026-09-26, 4c5cfe8)이 그 안의 상태와 실행을 <code>store.rs</code>(상태)와 <code>execute.rs</code>(실행)로 분리했으며, 어제 4세대+31(2026-09-29, a707cc2)가 <code>retweet.rs</code>를 별도 모듈로 추출하며 두 번-hydrate 패턴(요청 배치 hydrate 후 리트윗 소스만 두 번째 hydrate 호출로 별도 채움)으로 in-batch 소스와 fetched 소스를 병합했다. 오늘 4세대+32는 이 두 번-hydrate 패턴을 <strong>한 번-hydrate + in-flight 확장</strong> 패턴으로 단순화하고, Store의 8개 <code>Option&lt;HydrationBatch&gt;</code> 필드를 새 <code>Fetcher&lt;V&gt;</code> trait 어레이로 재작성해서 같은 hydrator가 재호출될 때에도 이미 클레임된 키는 재요청하지 않게 만들었다.</p>
+<p>동시에 두 축이 별도로 진화했다. Phoenix(4세대에서 신설된 학습·서빙 스택)의 <code>xrecsys_two_tower.py</code>가 registry에 정식 카탈로그로 편입되면서 SID(semantic ID — 포스트 임베딩 대신 codebook 여러 층으로 hash한 이산 코드) 기반 candidate tower와 sequence packing이 6개 preset으로 잠겼다. 광고 conversion 헤드 학습에 쓰던 <code>ads_head_masking</code>은 JAX 학습 그래프에서 numpy 데이터 로더로 이동하면서 web conversion과 app(MMP — Mobile Measurement Partner) conversion 두 축을 분리 학습할 수 있게 됐다. 홈믹서 cold-start(신규 유저 또는 exploration 대상)의 6개 파라미터가 크론 미러에서 움직였다 — Phoenix cold retrieval 채널이 0에서 200 posts로 켜지고, MaxPostAge가 48h에서 2h로 극단화, FollowerCap이 1000에서 50k로 사실상 해제, Thompson sampling도 켜졌다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><strong><code>visibility-filtering/hydration/fetcher.rs</code>(NEW +113)의 <code>Fetcher&lt;V&gt;</code> + <code>AnyFetcher</code> trait</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/fetcher.rs"><code>fetcher.rs</code></a>. 내부는 <code>HashMap&lt;u64, State&lt;V&gt;&gt;</code> 하나에 <code>enum State&lt;V&gt; { Pending, Landed(Hydrated&lt;V&gt;) }</code>. <code>claim(keys) -&gt; Vec&lt;u64&gt;</code>가 아직 없는 키만 Pending으로 잡아 실제 RPC로 보낼 키만 반환(dedup + 이전 콜과의 join), <code>land(&amp;[u64], HydrationBatch)</code>가 클레임된 키에 응답을 채우고 없는 응답은 <code>Hydrated::NotFound</code>로 채운다. <code>has_incomplete</code>/<code>is_incomplete</code>/<code>has_claimed</code>/<code>is_claimed</code>가 재호출 판별을 담당한다.</li>
+<li><strong><code>store.rs</code>의 8개 <code>Option&lt;...&gt;</code> 필드가 전부 <code>Fetcher&lt;V&gt;</code>로 교체</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/store.rs"><code>store.rs:54-84</code></a>. Edge(Follows/Blocks/Mutes/MuteRetweets/BlockedBy/SuperFollows/FollowedBy/SecondDegree 8-variant)마다 별도 <code>Fetcher&lt;bool&gt;</code> 어레이 <code>edges: [Fetcher&lt;bool&gt;; Edge::VARIANTS.len()]</code>. <code>CallRequest&lt;&#39;p&gt;</code> 구조체 신설로 한 그룹의 실제 발사 세부(group, is_first, keys, key_count, queries, viewer_id, batch_size, counts)를 캡슐화. <code>offer(&amp;mut self, group) -&gt; Option&lt;CallRequest&gt;</code>가 그룹의 키를 claim해 CallRequest를 만들어 스케줄러에 넘긴다. 두 번째 호출(is_first=false) 시 <code>record_expanded_batch</code> 메트릭 발생.</li>
+<li><strong><code>retweet.rs</code>(+562/−110)의 두 번-hydrate 패턴이 한 번-hydrate + in-flight 확장으로 단순화</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/retweet.rs"><code>retweet.rs</code></a>. 어제까지 <code>filter_tweets.hydrate(request)</code>로 원본 배치를 채운 다음 <code>source_ids</code>로 리트윗 소스 후보를 뽑아 요청 배치에 없는 소스에 두 번째 <code>filter_tweets.hydrate(...)</code>를 발사했다. 오늘은 <code>filter_tweets.hydrate_with_retweet_sources(request)</code> <strong>한 번</strong>만 호출한다. 이 호출이 내부에서 pure_cores가 land한 순간 <code>store.join_retweet_sources()</code>를 실행해 pure_cores의 <code>source_tweet_id</code> 중 이미 요청에 없는 것들을 <code>request_tweets</code>에 붙이고 <code>Landing::SourcesJoined</code>를 반환한다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/store.rs"><code>store.rs:308-330</code></a>.</li>
+<li><strong><code>execute.rs</code>가 <code>Landing::SourcesJoined</code>를 받으면 <code>inputless()</code> 그룹(pure_core 의존이 없는 최초 그룹들)을 다시 <code>ready</code>에 넣어 fetched 소스에 대해서만 확장 배치를 발사</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/execute.rs"><code>execute.rs:112-118</code></a>. Fetcher의 claim dedup 덕에 이미 요청 배치에 있던 키는 재요청하지 않는다.</li>
+<li><strong>새 메트릭 <code>RetweetSources::{NoSource, InBatch, Fetched}</code></strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/filter.rs"><code>filter.rs:62-79</code></a>. 테스트 <code>each_request_kind_labels_its_phase_samples</code>가 세 케이스([2] → NoSource, [1,2,3,5] → InBatch, [1,2,3,4] → Fetched)를 pin <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/retweet.rs"><code>retweet.rs:721-738</code></a>.</li>
+<li><strong><code>plan.rs</code>의 <code>Part::Edge(Graph, EdgeDirection)</code>이 <code>Part::Edge(Edge)</code> 8-variant enum으로 통합</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/plan.rs"><code>plan.rs:8-20</code></a>. <code>Edge::flock()</code>이 <code>Option&lt;(Graph, EdgeDirection)&gt;</code>로 flock RPC 파라미터를 반환하고 <code>SecondDegree</code>만 <code>None</code>(Wingman으로 통합 라우팅). 어제 <code>Hydrator::RootFollowsViewerSecondDegree</code>가 <code>Part::Column</code>이었는데 오늘 <code>Part::Edge(Edge::SecondDegree)</code>로 승격돼 fetcher array에 통일 라우팅. <code>Group</code>에 <code>position: usize</code>·<code>readers: Vec&lt;usize&gt;</code> 필드가 신설되어 offer→land→ready 스케줄이 매 그룹당 O(readers)로 계산 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/plan.rs"><code>plan.rs:172-207</code></a>.</li>
+<li><strong><code>visibility-filtering/treatment.rs</code>(NEW +119)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/treatment.rs"><code>treatment.rs</code></a>. rules가 뱉은 순수한 <code>Verdict</code>(Withheld / Shown{media, engagement})를 세 종류 다운스트림 표현으로 사영하는 함수 묶음이 여기로 격리됐다.<ul>
+<li><code>thrift_action(&amp;Verdict, SafetyLevel) -&gt; Action</code> — thrift <code>action::Action</code>(Allow / Drop / Tombstone / ComposedMediaVisibilityResults / Interstitial / LimitedEngagements / TweetInterstitial)로 사영.</li>
+<li><code>thrift_result_state(&amp;Verdict, SafetyLevel) -&gt; TweetFieldsResultState</code> — tweet-service 응답 상태(Found / Filtered). <code>FilteredReason::{TweetIsBounced, AuthorBlockViewer, AuthorIsProtected, AuthorIsSuspended}</code> 네 개만 레거시 arm 별도, 나머지는 <code>SafetyResult</code>로 감싸짐.</li>
+<li><code>proto_action(Verdict) -&gt; (vf_pb::Action, Option&lt;vf_pb::FilteredReason&gt;)</code> — VF proto용 3-way(Allow / Drop / Interstitial).</li>
+<li><code>metric_label(&amp;Verdict) -&gt; &amp;&#39;static str</code> — 6-way(<code>allow</code> / <code>drop</code> / <code>tombstone</code> / <code>interstitial</code> / <code>limited_engagement</code> / <code>tweet_interstitial</code>).</li>
+<li><code>decided_rows(&amp;Verdict)</code> — verdict를 (rule, phase) 튜플 열로 펼치는 이터레이터.</li>
+<li>상수 <code>AGE_VERIFICATION_OPTIONS = [SELFIE, PERSONA]</code>가 여기 잠긴다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/treatment.rs"><code>treatment.rs:120-123</code></a>. <code>blurred_media</code>가 blur prompt가 <code>AGE_VERIFICATION_PROMPT</code>일 때만 이 두 옵션을 응답에 심는다.</li>
+<li>테스트 <code>dashboard_generator_pins_the_rpc_and_verdict_mix_labels</code>가 <code>scripts/dashboard.py</code>를 실제로 읽어 <code>FT_VERDICT_ACTIONS</code>에 6개 라벨이 존재함을 assert. 메트릭 라벨과 dashboard가 골든으로 커플링된다.</li>
+</ul>
+</li>
+<li><strong>VF 클라이언트 계약 변경 — 응답이 Thrift <code>Action</code> → <code>TweetFieldsResultState</code>로 승격</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering-client/evaluated.rs"><code>evaluated.rs:22-33</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering-client/vf_client.rs"><code>vf_client.rs:35-41</code></a>. proto <code>Outcome::ActionThriftCompact</code> → <code>Outcome::ResultStateThriftCompact</code>, 상수 <code>MAX_ACTION_BYTES</code> → <code>MAX_RESULT_STATE_BYTES</code>(값은 여전히 64KB). VF가 이제 (Found | Filtered) 결과 상태 자체를 실어 caller가 tweet-service 응답을 직접 구성 가능한 형태.</li>
+<li><strong>응답 tweet.id 순서 검증 제거</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering-client/vf_client.rs"><code>vf_client.rs:35-46</code></a>. 어제까지 <code>tweet.as_ref() == Some(expected)</code> assert로 순서/quote context를 검증했다. 오늘 그 assert가 제거되고 응답 길이만 검증한다. wire format 최적화.</li>
+<li><strong>요청 헤더에 <code>metadata: &amp;tonic::metadata::MetadataMap</code> 매개변수 추가</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering-client/vf_client.rs"><code>vf_client.rs:8-25</code></a>. 각 chunk RPC에 caller metadata(<code>twittercontext</code> 등) forward.</li>
+<li><strong><code>phoenix/xrex/configs/xrecsys_two_tower.py</code>가 registry에 카탈로그로 승격</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>xrecsys_two_tower.py</code></a>. <code>MODEL_CFGS</code> 딕셔너리에 6개 preset:<ul>
+<li><code>xrecsys_two_tower</code> / <code>xrecsys_two_tower_immersive_only</code> / <code>xrecsys_two_tower_immersive_only_gb300</code> / <code>xrecsys_two_tower_combined</code> / <code>xrecsys_two_tower_combined_gb300</code> / <code>xrecsys_two_tower_nano</code>.</li>
+<li>공용 스케일(<code>_xrecsys_two_tower_combined_base</code>): <code>history_seq_len=1023</code> · <code>candidate_seq_len=64</code> · <code>num_layers=8</code> · <code>emb_size=1024</code> · <code>emb_table_width=1024</code> · <code>query_heads=16</code> · <code>kv_heads=4</code>(GQA 4:1) · <code>num_global_negatives_per_example=64</code> · <code>total_samples=1e11</code> · <code>item_hash_vocab_size=100_000_000</code> · <code>author_vocab_size=30_000_000</code> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>xrecsys_two_tower.py:466-475</code></a>.</li>
+<li><strong>SID만 쓰고 유저·포스트 임베딩은 안 씀</strong>: <code>use_user_embedding=False</code> · <code>use_post_embedding=False</code> · <code>use_post_sid=True</code> · <code>sid_num_levels=6</code> · <code>sid_codebook_size=256</code> · <code>sid_embed_dim=1024</code> · <code>sid_hash_level=True</code> · <code>sid_cross_attn=True</code> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>xrecsys_two_tower.py:311-318</code></a>.</li>
+<li><strong>Sequence packing</strong> + right-anchored RoPE: <code>use_seqpack=True</code> · <code>effective_sequence_len=513</code> · <code>BetaLengthDistribution(min=0, max=1023, mean=511, α=β=1.0, block_size=128)</code>.</li>
+<li><strong>Home + Immersive 두 candidate head 공유</strong>: <code>num_candidate_heads=2</code> · <code>head_names=[&quot;home&quot;, &quot;immersive&quot;]</code> · <code>head_dataset_mapping</code>이 HOME/HOME_COLD/HOME_HOT → head 0, IMMERSIVE4Day/IMMERSIVE2Day/IMMERSIVENSFW → head 1 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>xrecsys_two_tower.py:293-302</code></a>. <code>positive_actions</code>(home) = <code>[SERVER_TWEET_FAV]</code> 단일. <code>immersive_positive_actions</code> = FAV / REPLY / QUOTE / RETWEET / VIDEO_QUALITY_VIEW / FOLLOW_AUTHOR / BOOKMARK / SHARE 8종 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>xrecsys_two_tower.py:283-292</code></a>.</li>
+<li><strong>하드웨어 프리셋</strong>: <code>_H100_OVERRIDES = {bs_per_device: 480, ep: 128, attn_impl: &quot;cutedsl_ranker_varlen_attn&quot;}</code> · <code>_GB300_OVERRIDES = {bs_per_device: 960, ep: 64, ...}</code> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>xrecsys_two_tower.py:409-413</code></a>. GB300에서 per-device batch 두 배, EP 절반.</li>
+<li><strong>Optimizer / LR</strong>: <code>Adam(b1=0.95, b2=0.98, weight_decay=1e-3)</code> · <code>learning_rate=2e-3</code> · <code>emb_learning_rate=0.1</code>(embedding rowwise adagrad) · <code>apply_u2u_and_i2i_loss=False</code>(기본 off) · <code>empty_history_user_dropout_rate=0.1</code> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>xrecsys_two_tower.py:826-831, 271</code></a>.</li>
+<li><strong>Candidate max_posts</strong>: combined 28,672,000 · immersive 40,960,000 · <code>enable_linear_proj</code>은 combined/immersive False, nano True. <code>apply_u2u_and_i2i_loss</code>와 <code>enable_candidate_tower_linear_proj</code>는 상호 배타 assert <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>xrecsys_two_tower.py:611-618</code></a>.</li>
+</ul>
+</li>
+<li><strong><code>phoenix/xrex/data/recsys/ads_head_masking.py</code>(NEW +87)가 <code>phoenix/xrex/models/ads_head_masking.py</code>(−67)를 대체하며 JAX → numpy로 재작성</strong> <code>[확인]</code> — 삭제된 <code>models/ads_head_masking.py</code> patch에 <code>import jax; import jax.numpy as jnp</code>, 신설 <code>data/ads_head_masking.py</code>는 <code>numpy as np</code>만. 새 함수 <code>build_trained_candidate_mask(actions, sample_source, trained_actions_bits, *, ads_head_masking: bool) -&gt; npt.NDArray[np.bool_]</code>이 데이터 파이프에서 numpy bool 마스크를 미리 계산한다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/data/recsys/ads_head_masking.py"><code>phoenix/xrex/data/recsys/ads_head_masking.py:44-88</code></a>. 인자 이름 <code>source_id</code> → <code>sample_source</code>, <code>raw_targets</code> → <code>trained_actions_bits: uint8</code> 비트마스크. 신규 상수 <code>ADS_FAMILY_SLICE_HEADS</code>는 4개 슬라이스(<code>delayed_website_clicked</code> / <code>delayed_website_non_clicked</code> / <code>delayed_app_clicked</code> / <code>delayed_app_non_clicked</code>)의 대표 head index. MMP app-conversion 축이 붙어 masking이 <strong>web × app × early/late × click/view</strong> 격자로 확장.</li>
+<li><strong><code>recsys_model.py</code>에서 <code>masks[&quot;clicked&quot;]</code>가 web/app으로 분화</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/models/recsys_model.py"><code>recsys_model.py:1493-1520</code></a>. <code>website_clicked</code> / <code>non_negative_website_clicked</code> / <code>app_clicked</code> / <code>non_negative_app_clicked</code> 4-way. 새 검증 <code>validate_ads_head_masking</code>이 <code>ads_head_masking and use_seqpack</code>을 금지한다(packed layout에서 per-candidate/per-head trained_candidate_mask가 정의되지 않음) <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/models/recsys_model.py"><code>recsys_model.py:610-614</code></a>.</li>
+<li><strong><code>recsys_batch.py</code> 스키마 컬럼 이름 변경</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/data/recsys/recsys_batch.py"><code>phoenix/xrex/data/recsys/recsys_batch.py:471-479</code></a>. <code>conversionKeepMask: bool</code> → <code>conversionKeepBits: uint8</code>, null 시 fallback 값이 <code>True</code> → <code>CONVERSION_KEEP_WEB | CONVERSION_KEEP_APP = 0b11</code>. <code>sample_source</code> 컬럼 신규 수용(없으면 all zero).</li>
+<li><strong><code>constants.py</code>의 새 카탈로그</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/data/recsys/constants.py"><code>phoenix/xrex/data/recsys/constants.py</code></a>. <code>MMP_CLICK_ACTION_INDEX = ADS_MMP_CLICK</code>, <code>MMP_CLICK_CONDITIONED_ACTION_INDICES</code>(app click-through 7종), <code>MMP_CLICK_VIEW_THROUGH_ACTION_INDICES</code>(app view-through 7종, 어제까지 <code>VIEW_THROUGH_ACTION_INDICES</code>에 섞여 있던 것들이 분리), <code>CONVERSION_KEEP_WEB = 1 &lt;&lt; 0</code> · <code>CONVERSION_KEEP_APP = 1 &lt;&lt; 1</code> 비트 상수, <code>LineItemObjective(enum.IntEnum): WEBSITE_CLICKS = 5</code>(어제까지 <code>line_item_objective == 5</code> 매직 넘버였던 것을 enum으로 승격), 새 라벨 <code>IsCustomConversion</code> / <code>IsContentViewConversion</code>이 각각 <code>ADS_CUSTOM_CONVERSION</code> / <code>ADS_CONTENT_VIEW_CONVERSION</code>에 매핑.</li>
+<li><strong><code>recsys.proto</code>에 두 action 신규</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>: <code>ADS_ATTRIBUTED_MACT_MMP_CLICK_INSTALL = 194</code>, <code>ADS_ATTRIBUTED_MACT_MMP_VIEW_INSTALL = 195</code>.</li>
+<li><strong>홈믹서 cold-start 6개 파라미터가 크론 미러에서 이동</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>파라미터</th>
+<th>어제 값</th>
+<th>오늘 값</th>
+<th>배율</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PhoenixColdStartMaxResults</code></td>
+<td>0</td>
+<td>200</td>
+<td>0 → 200(Phoenix cold-start retrieval 배출량이 0에서 200으로 활성)</td>
+</tr>
+<tr>
+<td><code>ColdStartImpressionThreshold</code></td>
+<td>1000</td>
+<td>200</td>
+<td>×0.2(cold-start 대상 유저를 5배 넓힘)</td>
+</tr>
+<tr>
+<td><code>ColdStartFollowerCap</code></td>
+<td>1000</td>
+<td>50,000</td>
+<td>×50(author follower 상한 사실상 해제)</td>
+</tr>
+<tr>
+<td><code>ColdStartMaxPostAgeSecs</code></td>
+<td>172,800(48h)</td>
+<td>7,200(2h)</td>
+<td>1/24(post 신선도 극단화)</td>
+</tr>
+<tr>
+<td><code>LowImpressionsMaxPositionRatio</code></td>
+<td>0.85</td>
+<td>0.97</td>
+<td>+0.12(position boost 상한이 피드 뒷부분까지 확장)</td>
+</tr>
+<tr>
+<td><code>EnableColdStartThompsonSampling</code></td>
+<td>false</td>
+<td>true</td>
+<td>신규 ON</td>
+</tr>
+</tbody></table>
+<p>주석 헤더 <code>last sync</code>가 2026-09-28T16:00:35Z → 2026-09-29T17:02:52Z로 갱신.</p>
+<ul>
+<li><strong><code>home-mixer/util/composition.rs</code>(−63) 완전 삭제</strong> <code>[확인]</code>. 어제까지 이 파일은 <code>Composition {size, unique, max_count, hhi, entropy_norm}</code> 구조체와 <code>from_keys</code> / <code>from_counts</code> / <code>unique_ratio</code> / <code>max_share</code> API를 담은 diversity stats helper였다. <code>response_diversity_stats_side_effect.rs</code>의 사용부는 <code>use xai_candidate_pipeline::component_library::utils::Composition;</code> 으로 import path만 바뀜 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/side_effects/response_diversity_stats_side_effect.rs"><code>response_diversity_stats_side_effect.rs</code></a>. candidate-pipeline 공용 유틸에 이미 같은 이름의 Composition이 있어 자기 사본을 지우고 공용을 쓰는 중복 제거. rules/registry Policy(4세대+30)와 무관.</li>
+<li><strong>Brazil 2026 election filter에 9개 handle 추가</strong>, list 크기 2,786 → 2,795 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/filters/brazil_2026_election_filter.rs"><code>home-mixer/filters/brazil_2026_election_filter.rs:5849-5852</code></a>. 추가된 handle(주석 기준): @linoaa, @LPVellozo, @erikakokay, @douglascamargoo, @Anadelso_p, @zeosmaruniao, @siandrade11777, @tiagopiaui22, @gloriabsoares. 로직 변경 없음.</li>
+</ul>
+<blockquote>
+<p>&quot;Beta length distribution used for sequence packing: BetaLengthDistribution(min=0, max=1023, mean=511, alpha=1.0, beta=1.0, block_size=128).&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a>, 2026-09-30</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> — <code>### 4세대+32</code> 절 신설로 위 사실 요약, <code>## 출처</code>에 커밋 sha <code>77d431a</code> 추가, <code>최종 갱신</code>을 2026-10-01로 갱신.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<p>세 축이 겹친다.</p>
+<ol>
+<li><strong>VF hydration의 재확장 능력이 확보됐다.</strong> 4세대+29 → 4세대+30 → 4세대+31의 3일 흐름이 데이터 기반 파이프라인 골격과 <code>retweet.rs</code> 모듈 추출을 완성했고, 오늘 그 위에 <code>Fetcher&lt;V&gt;</code> trait이 얹혀 claim이 idempotent해졌다. 이 덕에 pure_cores가 land한 순간 in-flight로 request_tweets를 확장하고 inputless 그룹을 재발사하는 <code>Landing::SourcesJoined</code> 흐름이 성립한다. <code>retweet.rs</code>의 두 번-hydrate 패턴이 한 번-hydrate + in-flight 확장으로 단순해졌다. 메트릭 축(NoSource / InBatch / Fetched)이 라벨로 잡혀 확장 배치의 실제 발생률을 관측 가능. VF 클라이언트 응답도 Thrift <code>Action</code> → <code>TweetFieldsResultState</code> 로 승격되어 caller가 tweet-service 응답을 직접 구성 가능한 형태로 넘어왔다. treatment.rs가 rules → thrift/proto/metric 사영을 한 파일로 격리하고 dashboard.py와 6개 metric label을 골든 테스트로 커플링한 것도 이 단순화의 마무리다.</li>
+<li><strong>Phoenix retrieval two-tower가 카탈로그로 승격됐다.</strong> 지금까지 <code>xrecsys_two_tower.py</code>는 파일이 존재하며 여러 커밋에서 소품 수정(4세대+6에서 <code>qk_norm=True</code>·<code>attn_logit_cap=-1</code>·<code>right_anchored_rope=True</code> 3옵션 도입, 4세대+21에서 H100 attn 커널 <code>pallas_ranker_varlen_attn</code> → <code>cutedsl_ranker_varlen_attn</code> flip)이 있었으나 registry 카탈로그 자체는 잠기지 않은 상태였다. 오늘 6개 preset(H100/GB300 × single/combined + immersive-only + nano)이 <code>MODEL_CFGS</code>에 잠기면서 프로덕션 데이터 파이프에 연결되도록 이관됐다 <code>[추정]</code> — 근거는 파일 안의 유일한 in-file dataset이 <code>aggregated_kafka</code>이고 preset이 hardware-aware로 잘 정의돼 있다는 점. 특히 SID-only(포스트 임베딩 대신 6-level codebook hash)·seqpack·H100/GB300 하드웨어 프리셋·Home+Immersive 두 head 공유가 한 파일에 정리됐다는 점이 눈에 띈다. 4세대+13에서 관측된 &quot;DPA 광고 제품에도 <code>sid_codes</code> 배선&quot;과 짝을 이루면 SID 어휘 체계가 유기 post·광고 DPA·retrieval two-tower의 세 사용처를 하나로 묶을 잠재가 커진다.</li>
+<li><strong>광고 conversion 헤드가 web/app 축으로 분화됐다.</strong> 4세대+6에서 도입된 delayed feedback split과 4세대+24에서 통합된 <code>ads_head_masking</code> 노브가 오늘 학습 그래프 내부 float multiplier에서 데이터 로더가 미리 계산한 boolean mask로 이동했다. 이는 (a) 그래프가 sample_source에 의존하지 않게 하여 컴파일 안정성 확보, (b) 웹 conversion 헤드와 앱(MMP) conversion 헤드를 분리 학습해 <code>keep_web</code> / <code>keep_app</code> 두 축의 sample subset을 각기 다르게 사용 가능. Mask semantics는 여전히 동일한 late-window twin suppression 로직을 유지하지만 계산 위치만 바꾼 정확한 리팩터. <code>use_seqpack</code>과 상호 배타 assert가 새로 걸린 것은 seqpack이 candidate 슬롯 대응이 무너지기 때문. proto의 <code>ADS_ATTRIBUTED_MACT_MMP_{CLICK, VIEW}_INSTALL = 194, 195</code> 두 액션 신설이 MMP 측 app-install conversion을 정식으로 학습 헤드에 편입할 채널을 만든다.</li>
+<li><strong>홈믹서 cold-start가 프로덕션 파라미터로 세팅됐다.</strong> 4세대+30에서 신설된 HOME_COLD=14 채널의 코드 경로 추가에 이어 오늘 파라미터가 잡혔다 — Phoenix cold retrieval 채널이 0에서 200 posts로 열렸고, MaxPostAge가 48h에서 2h로 극단화됐다. FollowerCap이 1000에서 50k로 사실상 해제되어 author 풀이 폭증했고, ImpressionThreshold가 1000에서 200으로 낮아져 cold-start 대상 유저를 5배 넓혔다. Thompson sampling도 켜졌다. cold-start가 지금까지 tracked author나 신규 유저 대상 좁은 exploration이었다면 이 파라미터 세팅에서는 (신선도가 극단적으로 엄격한 2h) × (author 풀이 넓게 열림) 조합이 작동한다. 이 튜닝이 A/B에서 유지되는지가 다음 크론 sync에서 관측할 지점.</li>
+</ol>
+<p>Brazil 2026 election filter의 handle 9개 추가는 리스트 유지보수(로직 변경 없음). Composition.rs 삭제는 candidate-pipeline 공용 라이브러리 재사용으로 인한 중복 제거.</p>
+<h2 id="2-helix--tiktok-e-commerce-랭킹의-unified--purified-아키텍처가-ab에서-gmv-per-user-6">2. HELIX — TikTok e-commerce 랭킹의 &quot;unified &amp; purified&quot; 아키텍처가 A/B에서 GMV per user +~6%</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.37183">HELIX: Purified and Unified - Rethinking Feature Interaction and Sequence Modeling for Large-Scale Recommendation</a> — arXiv 2609.37183 v1, 2026-09-29(arXiv 제출), 논문.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>산업 추천 랭킹 모델은 대체로 두 축으로 스케일한다: (a) heterogeneous feature interaction(유저 / 아이템 / 컨텍스트 / 크로스 피처를 조합해서 상호작용), (b) sequence modeling(길고 다양한 유형의 유저 behavior 시퀀스를 인코딩). HELIX 저자들은 어느 한 축만 키우면 scaling-law slope가 서브옵티멀임을 관찰하고 두 축을 함께 확장하는 &quot;unified&quot; 랭킹 아키텍처를 제안한다. 저자는 21명이고 v1 HTML은 렌더링 404지만 초록에 &quot;Deployed in TikTok&#39;s e-commerce recommendation system&quot;이라는 문구가 있어 소속은 TikTok(ByteDance) [추정].</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><strong>프로덕션 배포 진술과 GMV A/B 수치</strong> <code>[확인]</code>(초록 직접 인용).</li>
+</ul>
+<blockquote>
+<p>&quot;Deployed in TikTok&#39;s e-commerce recommendation system, HELIX consistently improves offline CTR AUC, CVR AUC, and other ranking metrics. In online A/B tests, it achieves an approximately 6% increase in e-commerce video GMV per user.&quot;
+— <a href="https://arxiv.org/abs/2609.37183">HELIX abstract</a>, 2026-09-29</p>
+</blockquote>
+<ul>
+<li><strong>메커니즘 신규성</strong>: feature-interaction 축과 long/multi-type user-behavior sequence 축을 동시에 스케일링하는 &quot;purified and unified&quot; 랭킹 아키텍처. 둘을 함께 확장해야 scaling law가 서브옵티멀에서 벗어난다는 관찰이 논문의 핵심 관점 <code>[확인]</code>(초록 문구).</li>
+<li><strong>스케일</strong>: 명시 사용자·요청 수 없음. GMV per user 지표 사용은 대규모 e-commerce 트래픽 <code>[추정]</code>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> — &quot;이번 달 신규&quot;에 2줄 포인터 추가. 서비스 정본(X·Meta·Netflix)과 직결되지 않는다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<p>TikTok의 e-commerce recommendation은 그동안 EGA(Elastic Generative Auction, 광고 경매·랭킹) 계열과 GreenLightning(단일 인퍼런스 서비스) 계열 공개가 이어져 왔는데, feature-interaction + long sequence를 함께 스케일링하는 랭킹 아키텍처를 정식으로 이름 붙여 공개한 것은 이번이 처음이다. Scaling law가 두 축의 동시 확장을 요구한다는 관점은 (a) Meta HSTU / GEM 계열의 sequence-only 확장, (b) DCN·xDeepFM 계열의 feature-interaction 확장이 각각 서브옵티멀임을 시사한다. 다만 초록 기반 triage 단계라 세부 아키텍처(어떤 인터랙션 구조, 어떤 sequence 인코더, scaling law slope의 실측치)는 심층 분석 대상이다. 서비스 정본에는 반영하지 않고 radar에 둔다.</p>
+<h2 id="3-grp-v01--snap의-encoder-decoder-단일-모델이-retrieval--ranking--reward를-통합-프로덕션-ab-view-time-082--shares-256">3. GRP v0.1 — Snap의 encoder-decoder 단일 모델이 retrieval · ranking · reward를 통합, 프로덕션 A/B view time +0.82% · shares +2.56%</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.36688">GRP v0.1 Technical Report</a> — arXiv 2609.36688 v1, 2026-09-29(arXiv 제출), 논문.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
+<p>산업 추천 시스템은 대체로 retrieval → pre-ranking → fine-ranking → reward 재순위의 다단 cascade로 구성된다. 각 단계를 별도 모델로 학습·배포하다 보니 스택 전체를 함께 교체하기가 어렵다. GRP(Generative Recommendation Platform으로 추정)는 이 다단을 <strong>단일 encoder-decoder 모델</strong>로 통합하는 프레임워크를 제시한다. Snap Inc.의 v1 HTML 페이지 조직명 렌더링이 있어 소속은 Snap <code>[확인]</code>. multimodal Semantic ID를 생성하고, joint MHP(Multi-Head Prediction)가 후보 스코어링과 RL post-training의 frozen reward를 겸한다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<ul>
+<li><strong>A/B 직접 인용</strong> <code>[확인]</code>.</li>
+</ul>
+<blockquote>
+<p>&quot;In a retrieval-only comparison, view time increases by 0.46% and shares by 0.77% relative to production. A separate comparison combining bypass and source replacement yields increases of 0.82% in view time and 2.56% in shares, with neutral platform-level guardrails.&quot;
+— <a href="https://arxiv.org/abs/2609.36688">GRP v0.1</a>, 2026-09-29</p>
+</blockquote>
+<ul>
+<li><strong>추가 축</strong>: retrieval bypass 조합에서 &quot;+0.24% views, −0.24% view time, +2.30% shares (p&lt;0.05)&quot;.</li>
+<li><strong>메커니즘 신규성</strong>: retrieval · ranking · reward를 단일 encoder-decoder로 통합하는 generative recommendation 프레임워크. multimodal Semantic ID 생성 + joint multi-head prediction(MHP)이 후보 스코어링과 RL post-training(mGRPO — reference-anchored margin)의 frozen reward를 겸한다.</li>
+<li><strong>스케일 / 서빙</strong>: 명시 사용자·요청 수 없음. serving 최적화로 end-to-end retrieval latency −69%. 26 pages, 11 tables.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> — &quot;이번 달 신규&quot;에 2줄 포인터 추가. Snap이 추적 서비스 밖이라 서비스 정본에는 반영하지 않는다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<p>이번 달 초부터 관찰해 온 &quot;generative recommendation의 서빙 경로 통합&quot; 각도의 새 진술이다. Kuaishou OneTrans-V2가 retrieval + pre-rank + fine-rank 3단 cascade를 단일 Transformer로 묶어 GMV +9.74%를 얻었고(2026-09-28 radar), Tencent PCG TGR이 랭킹·retrieval·slate 생성·reason token을 한 프레임에 묶어 5개 지면에 배포한 것과 방향이 같다. GRP는 여기에 (a) reward까지 같은 모델 안에서 처리하는 mGRPO joint MHP 축, (b) multimodal Semantic ID 생성 축이 추가된다. 서빙 latency −69%는 다단 cascade 대비 큰 절감으로, encoder-decoder 통합이 latency 예산까지 정당화하는지가 industrial-scale generative recsys 채택의 핵심 기준이라는 신호. 서비스 정본에는 반영하지 않고 radar에 둔다.</p>
+<h2 id="레이더">레이더</h2>
+<ul>
+<li><strong>HELIX (TikTok [추정])</strong> (<a href="https://arxiv.org/abs/2609.37183">arXiv 2609.37183</a>): feature-interaction과 long user-behavior sequence 두 축을 함께 스케일링하는 unified 랭킹 아키텍처, TikTok e-commerce에 배포되어 A/B에서 GMV per user +~6%. <code>[확인]</code> 지표·<code>[추정]</code> 소속(v1 HTML 렌더링 404, 초록 문구 기반). radar.md 이번 달 신규 편입.</li>
+<li><strong>GRP v0.1 (Snap)</strong> (<a href="https://arxiv.org/abs/2609.36688">arXiv 2609.36688</a>): retrieval · ranking · reward를 단일 encoder-decoder로 통합하는 generative recommendation 프레임워크, multimodal Semantic ID + joint MHP + mGRPO. 프로덕션 A/B view time +0.82% · shares +2.56%, serving latency −69%. <code>[확인]</code> 소속·지표. radar.md 이번 달 신규 편입.</li>
+</ul>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
+<ul>
+<li><strong>VF <code>hydrate_with_retweet_sources</code> 확장 배치 발생률 분포</strong>: <code>RetweetSources::{NoSource, InBatch, Fetched}</code> 메트릭 라벨이 프로덕션에서 어떻게 나오는지가 이 재작성의 실효를 보여준다. 다음 커밋에서 metric 리포트가 담기면 정본에 반영한다.</li>
+<li><strong>Phoenix <code>xrecsys_two_tower.py</code> preset 채택</strong>: 6개 preset 중 어느 것이 실제 학습 잡에서 활성화되는지, <code>MODEL_CFGS</code> 등록만 되고 안 쓰이는지가 다음 관측 포인트. 현재는 카탈로그 승격만 확인됨.</li>
+<li><strong>홈믹서 cold-start 파라미터 6개의 지속 여부</strong>: PhoenixColdStartMaxResults 200·MaxPostAgeSecs 2h가 프로덕션 값으로 남는지 실험 값으로 되돌리는지가 다음 크론 sync에서 관측된다. 어제(4세대+31)의 홈믹서 가중치 이동도 함께 추적 대상.</li>
+<li><strong>HELIX 심층 분석</strong>: TikTok 프로덕션 GMV +~6% 진술이 충분히 큰 근거이므로 초록·소개·아키텍처 절 정독 필요. 심층 분석 필요.</li>
+<li><strong>GRP v0.1 심층 분석</strong>: Snap의 encoder-decoder 통합 프레임이 industrial-scale generative recsys의 세 번째 진술이므로 26 pages 정독 대상. 심층 분석 필요.</li>
+<li><strong>arXiv cs.IR triage</strong>: 30건 파싱, 통과 2건(HELIX·GRP). 나머지 28건은 학계 RAG / dense retrieval / semantic ID(생성 retrieval) / clinical QA / benchmark 등.</li>
+</ul>
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-09-30.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-30</div></a><span></span></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>
