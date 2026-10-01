@@ -102,16 +102,16 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="topic">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-10-01 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-10-02 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-10-01 기준</div>
+  <div class="gendate">2026-10-02 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
 <h1 id="분야-레이더--추적-서비스-밖의-논문트렌드">분야 레이더 — 추적 서비스 밖의 논문·트렌드</h1>
-<p><strong>최종 갱신:</strong> 2026-10-01</p>
+<p><strong>최종 갱신:</strong> 2026-10-02</p>
 <p>추적 서비스(X·Meta·Netflix) 정본에 아직 반영하지 않은 것들을 모아 두는 워치리스트다. 엔트리 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a>를 참조한다: 2~4줄 포인터, 프로덕션 관련성 기준, ~3개월 수명(승격 또는 졸업).</p>
 <p>수집 주기는 다음과 같다. arXiv cs.IR 신규 제출은 매일 triage하고, 산업 블로그(Google Research, Pinterest, Spotify, LinkedIn 등)와 학회 accepted 목록은 주 1회 살펴본다. 이 수집은 일일 배치가 수행한다.</p>
 <h2 id="관찰-중-오픈-스레드">관찰 중 (오픈 스레드)</h2>
@@ -152,6 +152,12 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 <li>지켜볼 것: organic feed에 같은 스택을 적용했다는 진술이 나오는지, 그리고 Meta가 아닌 회사가 학습형 인덱스를 채택하는지를 지켜본다.</li>
 </ul>
 <h2 id="이번-달-신규">이번 달 신규</h2>
+<h3 id="gear-douyin--bytedance--generative-end-to-end-ad-retrieval이-douyin-ads-수억-dau-프로덕션에-배포-representation-collapsebasisvq-orthogonal-basis와-item-collisioncontext-conditioned-reranking-head-두-병목-동시-해결">GEAR (Douyin / ByteDance) — generative end-to-end ad retrieval이 Douyin Ads 수억 DAU 프로덕션에 배포, representation collapse(BasisVQ orthogonal basis)와 item collision(context-conditioned reranking head) 두 병목 동시 해결</h3>
+<ul>
+<li>무엇: <strong>GEAR</strong>는 생성형 광고 retrieval 프레임워크다. 생성형 retrieval은 아이템을 ID 임베딩이 아니라 <strong>의미 토큰(Semantic ID) 시퀀스</strong>로 표현하고 autoregressive 생성으로 검색을 대체하는데, 산업 규모에서 두 알려진 병목이 있다. 첫째는 <strong>표현 붕괴</strong> — tokenizer가 분포 변화 아래 degenerate하게 수렴해 end-to-end 적응이 불안정해지는 문제. 둘째는 <strong>아이템 충돌</strong> — 거대한 후보 풀에서 서로 다른 아이템이 같은 토큰 시퀀스를 공유해 retrieval 정밀도가 떨어지는 문제. 두 문제는 결합돼 있어서 충돌을 완화하려 codebook 용량을 키우면 붕괴가 심화된다. GEAR는 <strong>tokenizer + generator + reranker를 함께 end-to-end 최적화</strong>하는 접근으로 두 축을 공략한다. <strong>BasisVQ</strong>가 codebook을 orthogonal basis로 reparameterization해서 global gradient sharing과 rigid spatial rotation of latent space를 가능하게 하고 gradient dynamics를 안정화한다. <strong>prefix-aware BasisRQ</strong>로 확장해 같은 asymptotic time complexity 안에서 codebook 표현력을 키운다. <strong>context-conditioned reranking head</strong>를 생성 프로세스 안에 넣어 충돌하는 아이템을 최소 overhead로 분리한다 <code>[확인]</code> — <a href="https://arxiv.org/abs/2609.39327">arXiv 2609.39327</a>, 2026-09-30 v1, 저자 11인 전원 Douyin(ByteDance) 소속(<a href="https://arxiv.org/html/2609.39327v1">HTML 판</a>에서 소속 확인).</li>
+<li>왜 주목: <strong>Douyin Ads 수억 DAU 프로덕션에 서빙</strong> 중 <code>[확인]</code>(직접 인용: &quot;It currently serves hundreds of millions of daily active users on Douyin Ads, yielding substantial empirical improvements in extensive online A/B tests&quot;). 구체 지표는 abstract에 공개되지 않았다. 저장소 코퍼스에서 생성형 retrieval이 광고 지면에 안착한 사례는 지금까지 Alibaba의 디스플레이 광고 <strong>TransRetrieval</strong>(2026-08-28, Transformer scaling)과 <strong>PailitaoGR</strong>(2026-09-01, 이미지 검색)이 있었는데, 전자는 SID 생성이 아니라 scaling 축이었고 후자는 프로덕션 A/B 수치가 공개되지 않았다. GEAR는 <strong>광고 지면에 SID 생성형 retrieval을 Douyin이라는 네 번째 회사에서 안착시킨 명시적 진술</strong>이고, representation collapse·item collision 두 축의 구조적 문제를 함께 다룬 첫 자료다. Snap GRP v0.1(2026-09-29, encoder-decoder 통합), Tencent PCG TGR(2026-09-01, 4-in-1 생성형 recsys), Kuaishou OneTrans-V2(2026-09-23, 3단 cascade 통합)에 이어 <strong>이번 달 산업 generative retrieval 각도의 네 번째 진술</strong>.</li>
+<li>상태: <strong>관찰 (심층 분석 필요)</strong> — Douyin(ByteDance)은 canon 추적 서비스가 아니라 services 정본은 만들지 않는다. BasisVQ의 orthogonal basis reparameterization 수식, prefix-aware BasisRQ 확장의 수학적 세부, context-conditioned reranking head가 생성 프로세스 안에 통합되는 방식, A/B 구체 지표(abstract에 수치가 없다), tokenizer·generator·reranker 세 컴포넌트의 joint training objective가 심층 분석 대상. 두 번째 회사(ByteDance 외)가 광고 지면에서 generative retrieval을 batch가 아닌 end-to-end tokenizer 최적화로 다루는지가 관측 지점. 자세한 분석: <a href="daily-2026-10-02.html">daily/2026-10-02.md</a>.</li>
+</ul>
 <h3 id="helix-추정-tiktok--feature-interaction과-long-user-behavior-sequence-두-축을-함께-스케일링하는-unified-랭킹-아키텍처-tiktok-e-commerce-프로덕션에-배포되어-ab에서-gmv-per-user-6">HELIX ([추정] TikTok) — feature interaction과 long user-behavior sequence 두 축을 함께 스케일링하는 unified 랭킹 아키텍처, TikTok e-commerce 프로덕션에 배포되어 A/B에서 GMV per user ~+6%</h3>
 <ul>
 <li>무엇: <strong>HELIX</strong>는 산업 추천 랭킹 모델을 두 축으로 함께 스케일링하는 &quot;purified and unified&quot; 아키텍처다. 산업 랭커는 대개 (a) heterogeneous feature interaction(user·item·context·cross feature 조합)과 (b) long/multi-type user-behavior sequence modeling의 두 축으로 확장하는데, 어느 한 축만 키우면 scaling-law slope가 서브옵티멀임을 관찰하고 둘을 함께 확장하는 프레임을 제안한다 <code>[확인]</code>(초록 문구) — <a href="https://arxiv.org/abs/2609.37183">arXiv 2609.37183</a>, 2026-09-29 v1, 저자 21인. v1 HTML 렌더링이 404여서 저자 소속은 초록의 &quot;Deployed in TikTok&#39;s e-commerce recommendation system&quot; 문구를 근거로 TikTok(ByteDance) <code>[추정]</code>.</li>
