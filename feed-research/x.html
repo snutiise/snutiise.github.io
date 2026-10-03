@@ -102,11 +102,11 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </style>
 </head>
 <body class="svc-x">
-<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-10-03 기준</span></div>
+<div class="topbar"><a class="home" href="index.html">◂ feed-research</a><span class="gendate">2026-10-04 기준</span></div>
 <div class="layout">
 <nav class="toc">
   <a class="home" href="index.html">◂ feed-research</a>
-  <div class="gendate">2026-10-03 기준</div>
+  <div class="gendate">2026-10-04 기준</div>
   <ul id="toc"></ul>
 </nav>
 <main id="content">
@@ -366,8 +366,13 @@ ul.log li a { font-weight: 600; font-variant-numeric: tabular-nums; margin-right
 </tr>
 <tr>
 <td><code>SidSource</code></td>
-<td><strong>SID generative retrieval microservice</strong>(4세대+34, 2026-10-02). 유저 positive engagement post ID들을 seed로 넘기면 <strong>6-level × 256-codebook SID beam search</strong>로 생성한 접두사가 공유되는 포스트들을 돌려 받는다. 응답 후보는 <code>served_type=ForYouPhoenixRetrievalMoe</code>로 라벨(PhoenixMOE와 <strong>같은 라벨</strong>)되고 <code>shared_prefix_depth</code>가 score로 전달. 300ms gRPC 데드라인, xDS P2C → DNS 폴백 2-경로</td>
-<td><code>EnableSidSource=false</code> <strong>기본 off</strong>, <code>SidSourceMaxResults=800</code>, <code>SidSourceMaxSeeds=50</code>, <code>SidSourceMaxPerSeed=100</code>, <code>SidSourceMinPrefixDepth=3</code>. seed는 <code>simclusters_source::post_signal_ids</code>와 <strong>동일 함수를 재사용</strong>해 유저 engagement 신호에서 추출</td>
+<td><strong>SID generative retrieval microservice</strong>(4세대+34~35, 2026-10-02 ~ 10-03). 유저 positive engagement post ID들을 seed로 넘기면 서비스는 (a) seed post가 로컬 SID 트라이에 있으면 트라이에서, 없으면 외부 <code>SidLookupService</code>에서 seed → 6-level 코드 변환 → (b) seed마다 <code>max_prefix_depth</code>에서 <code>min_prefix_depth</code>까지 <strong>깊이가 깊은 순으로</strong> 공유 접두사 범위에서 후보를 뽑아 (이미 더 깊은 수준에서 소비된 범위는 제외) → (c) 모든 seed의 후보 리스트를 <strong>round-robin 인터리브</strong>하고 중복 제거 후 반환. 각 Candidate에 <code>shared_prefix_depth</code>가 점수로 담긴다. 응답 후보는 <code>served_type=ForYouPhoenixRetrievalMoe</code>로 라벨(PhoenixMOE와 <strong>같은 라벨</strong>)됨. 300ms gRPC 데드라인, xDS P2C → DNS 폴백 2-경로. 서버는 parquet 스냅샷(<code>post_sid_snapshot.parquet</code>, 컬럼 <code>post_id/author_id/post_sid</code>)을 <strong>30초마다 폴링해 통째 재적재</strong>, 트라이는 <code>by_key(prefix 범위 이진탐색용)</code> + <code>by_post(seed lookup용)</code> 두 벡터로 구성</td>
+<td>홈믹서 측 <code>EnableSidSource=false</code> <strong>기본 off</strong>, <code>SidSourceMaxResults=800</code>, <code>SidSourceMaxSeeds=50</code>, <code>SidSourceMaxPerSeed=100</code>, <code>SidSourceMinPrefixDepth=3</code>. 서버 측 상한 <code>max_results=800 / max_per_seed=100 / min_prefix_depth=3 / max_prefix_depth=6 / max_seeds=200</code>, 하드캡 <code>MAX_RESULTS_CAP=5000 · MAX_PER_SEED_CAP=2000 · MAX_CALLER_LEN=64</code>. seed는 <code>simclusters_source::post_signal_ids</code>와 <strong>동일 함수를 재사용</strong>해 유저 engagement 신호에서 추출</td>
+</tr>
+<tr>
+<td><code>PopularPostsSource</code></td>
+<td><strong>4세대+35(2026-10-03) 신규</strong>. in-network/thunder 측 OON 보강용. (a) <strong>상위 K명 인기 작성자</strong> author_id 목록(기본 K=1000)을 Manhattan 백드 KV 스토어(<code>popular_authors_store_client.rs</code>)에서 1시간마다 비동기 리프레시 → (b) 그 K명을 <code>following_user_ids</code>에 넣고 <code>GetInNetworkPostsRequest</code>를 Thunder에 날려 포스트 수집(= <strong>유저가 그 인기 저자들을 팔로우하는 셈 치고</strong> Thunder의 in-network 인덱스를 조회) → (c) 응답을 <strong><code>ForYouPhoenixRetrieval</code></strong> 라벨로 리턴(PhoenixSource와 <strong>같은 라벨</strong>). 비게이트 조건은 <code>EnablePopularPostsSource &amp;&amp; !has_cached_posts &amp;&amp; !in_network_only</code></td>
+<td><code>EnablePopularPostsSource=false</code> <strong>기본 off</strong>, <code>PopularPostsTopAuthors=1000</code>, <code>PopularPostsMaxResults=500</code>, <code>PopularPostsMaxPerAuthor=3</code>, <code>PopularPostsMaxRepliesRepostsPerAuthor=0</code>. 리프레시 주기: 캐시 비어 있으면 60초, 비어 있지 않으면 60분. 저장 포맷은 자체 바이너리 v1(13바이트 헤더 + 16바이트/엔트리의 <code>author_id/follower_count</code> big-endian), 코덱이 <code>util/popular_authors.rs</code>에 함께 노출</td>
 </tr>
 <tr>
 <td><code>CachedPostsSource</code></td>
@@ -2768,6 +2773,142 @@ AND (action_kind = &#39;suspend&#39; OR (action_kind = &#39;label&#39; AND label
 </li>
 </ol>
 <p>LLM_JUDGE_* action의 재귀환은 별개의 흐름이다. 15일 전 vacate됐던 두 action이 <strong>번호를 바꿔</strong>(107/108 → 108/109) 재등장한 사실은 &quot;LLM judge를 action 축에 담아 학습 target 중 하나로 소비&quot;하려는 방향이 재조정 후 다시 올라왔음을 뜻한다. 번호 변경 이유는 <strong>그 사이 107 자리가 <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code>로 영구 점유</strong>됐기 때문이고, 108도 함께 비워 재사용. 모델 학습 config나 wire의 소비처는 이번 커밋에 안 나옴 — proto만 자리 선점. 어느 head 가중치에, 어느 config의 target list에 들어가는지는 다음 창의 관측 지점.</p>
+<h3 id="4세대35-2026-10-03-b412112--sid-retrieval-serving-crate-공개xai-recsys-sid-retrieval-신규-rust-크레이트-7-파일-parquet-스냅샷-폴링--6-level-트라이--round-robin-인터리브--home-mixer-popularpostssource-신설top-k-인기-저자--thunder-in-network-조회--oon-보강--광고-브랜드-안전-v2-verdict-기본-on-플립false--true--author-grok-라벨-fallback-신설enableadsauthorbrandsafetyfallback-기본-off--vf-staging-리플레이-서브시스템-신설visibility-filteringstaging-2350줄-recording--replay_corpus--capture--serve--phoenix-row-emb-체크포인트-복구-유틸row_embedding_restorepy-488줄--phoenix-grpc-server-지연-메트릭-분리grpc_server_latencyrs-361줄">4세대+35 (2026-10-03, b412112) — <strong>SID retrieval serving crate 공개</strong>(<code>xai-recsys-sid-retrieval</code> 신규 Rust 크레이트 7-파일, parquet 스냅샷 폴링 + 6-level 트라이 + round-robin 인터리브) + home-mixer <code>PopularPostsSource</code> 신설(top-K 인기 저자 → Thunder in-network 조회 → OON 보강) + 광고 브랜드 안전 V2 verdict 기본 ON 플립(false → true) + author Grok 라벨 fallback 신설(<code>EnableAdsAuthorBrandSafetyFallback</code>, 기본 off) + VF staging 리플레이 서브시스템 신설(<code>visibility-filtering/staging/*</code> 2,350줄, recording · replay_corpus · capture · serve) + Phoenix row-emb 체크포인트 복구 유틸(<code>row_embedding_restore.py</code> 488줄) + Phoenix gRPC server 지연 메트릭 분리(<code>grpc_server_latency.rs</code> 361줄)</h3>
+<p>파일 148개, +9,128/−2,356 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/commit/b412112">xai-org/x-algorithm@b412112</a>. 4세대+34(어제 76843a5)에서 하루 뒤.</p>
+<p><strong>A. <code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code> 7-파일 1,062줄 신설 — generative SID retrieval을 서빙하는 Rust 크레이트.</strong> 어제 공개(76843a5)에서 Phoenix 쪽 학습 config/모델/트레이너/러너와 home-mixer 쪽 <code>SidSource</code> 클라이언트가 공개됐지만 <strong>실제 요청을 받아 응답을 돌려줄 서버 코드는 비어 있었다</strong>. 오늘 그 자리가 공개됐다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/tree/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval"><code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code></a>.</p>
+<p>Gauge: <code>src/service.rs:208</code> · <code>src/index.rs:223</code> · <code>src/loader.rs:170</code> · <code>src/http_api.rs:109</code> · <code>src/main.rs:115</code> · <code>src/seed_sids.rs:114</code> · <code>src/metrics.rs:79</code> + 별도 proto 크레이트 <code>xai-recsys-sid-retrieval-proto</code> (<code>sid_retrieval.proto:46</code>).</p>
+<p>프로토 shape <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval-proto/proto/sid_retrieval.proto"><code>sid_retrieval.proto</code></a>:</p>
+<pre><code class="language-proto">service SidRetrievalService {
+  rpc Retrieve(RetrieveRequest) returns (RetrieveResponse);
+}
+message RetrieveRequest {
+  repeated int64 seed_post_ids = 1;
+  uint32 max_results = 2; uint32 max_per_seed = 3;
+  uint32 min_prefix_depth = 4; uint32 max_prefix_depth = 5;
+  string caller = 6;
+}
+message Candidate {
+  int64 post_id = 1; int64 author_id = 2;
+  int64 seed_post_id = 3; uint32 shared_prefix_depth = 4;
+}
+enum SeedSidSource { UNSPECIFIED=0; INDEX=1; SID_SERVICE=2; MISSING=3; }
+</code></pre>
+<p><strong>인덱스 자료구조</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs"><code>src/index.rs:5-110</code></a>:</p>
+<ul>
+<li><code>SID_LEVELS = 6</code>, <code>BITS_PER_LEVEL = 8</code> → 각 레벨의 코드 범위 0~255, 전체 SID를 48-bit u64 key에 패킹(<code>pack_full_key</code>가 왼쪽 shift로 상위 레벨부터 쌓음).</li>
+<li><code>IndexedPost {key, post_id, author_id}</code> 벡터 2개 유지: (i) <code>by_key</code>는 key 사전순으로 정렬(같은 key에서 post_id 역순) — <strong>접두사 범위 검색용</strong>, (ii) <code>by_post</code>는 post_id 오름차순 — <strong>seed post → SID 변환용 이진탐색</strong>.</li>
+<li><code>prefix_range(key, depth)</code>가 깊이 <code>d</code>의 상위 <code>d</code> 레벨만 보존하고 하위를 0으로 clear/채운 <code>[lo, hi)</code> 범위를 리턴. <code>by_key</code>에서 <code>partition_point</code>로 그 범위 안의 포스트를 뽑는다.</li>
+</ul>
+<p><strong>검색 알고리즘</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs"><code>src/index.rs:138-193</code></a>:</p>
+<pre><code class="language-rust">// retrieve_for_seed(seed_post_id, seed, params, excluded):
+//   depth := max_prefix_depth..=min_prefix_depth 역순
+//     level_range := prefix_range(seed.key, depth) 안의 by_key 슬라이스
+//     consumed := 어제 더 깊은 depth에서 쓴 inner_start..inner_end 영역
+//     level := level_range \ consumed \ excluded(seed post_id들)
+//     if level.len() &gt; remaining: select_nth_unstable_by(post_id DESC)로 자름
+//     level sort by post_id DESC
+//     emit Candidate(post_id, author_id, seed_post_id, shared_prefix_depth=depth)
+//     consumed := level_range
+</code></pre>
+<p>의미는 세 가지다. (i) <strong>각 포스트는 &quot;그 포스트가 공유한 가장 깊은 접두사 수준에서 한 번만&quot; emit된다</strong> — 깊이 6에서 매칭된 포스트는 깊이 5~3 레벨에서 다시 안 뽑힘. (ii) <strong>같은 depth 내에서는 post_id가 큰(=최근) 포스트를 우선</strong>. (iii) <strong>seed post 자신은 전역 excluded set로 걸러짐</strong>(다중 seed일 때 seed₁의 결과에 seed₂가 안 섞임).</p>
+<p><strong>복수 seed interleave</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs"><code>src/index.rs:196-222</code></a>: 각 seed의 후보 리스트를 <strong>round-robin</strong>(seed 1 → seed 2 → ... → seed N → seed 1 → ...)으로 뽑으면서 전역 dedup. <code>max_results</code>까지 또는 더 뽑을 게 없을 때까지. 결과: <strong>포지션 바이어스가 특정 seed로 쏠리지 않도록 균등화</strong>된다.</p>
+<p><strong>스냅샷 로더</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/loader.rs"><code>src/loader.rs:1-170</code></a>:</p>
+<ul>
+<li>입력 포맷: Arrow Parquet (<code>post_sid_snapshot.parquet</code>), 세 컬럼 — <code>post_id: int64</code>, <code>author_id: int64</code>, <code>post_sid: list&lt;int64&gt;</code>. 레코드 배치 크기 <code>BATCH_SIZE = 65_536</code>.</li>
+<li>파일명 suffix(<code>*_&lt;unix_ts&gt;.parquet</code>)에서 timestamp 추출(파싱 실패 시 <code>mtime</code> 폴백).</li>
+<li><code>watch_snapshots(path, poll_interval, index, ready_tx)</code>가 <strong>30초(기본)마다 <code>canonicalize(path)</code> 하고, 경로가 바뀌었으면 통째 재적재</strong> → <code>tokio::spawn_blocking</code>에서 build → 성공 시 <code>ArcSwapOption&lt;SidIndex&gt;</code>로 atomic swap → <code>ready_tx.send(true)</code>로 <code>/readyz</code>를 initial-ready로 올림.</li>
+<li>코드 검증: <code>pack_full_key(row_codes)</code>가 <code>len != 6</code> 또는 코드 하나라도 0..=255 범위 밖이면 <code>None</code> → <code>skipped</code> 카운터 증가. 즉 <strong>잘못된 SID는 조용히 drop</strong>.</li>
+<li>메트릭 <code>record_index_load(index, elapsed_s)</code>가 <code>sid_index_posts</code> 게이지, <code>sid_index_skipped_posts</code>, <code>sid_index_load_seconds</code> 히스토그램을 함께 발행.</li>
+</ul>
+<p><strong>seed → SID 변환</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/seed_sids.rs"><code>src/seed_sids.rs:1-114</code></a>:</p>
+<p>seed post_id가 로컬 트라이에 <strong>있으면</strong> 그대로 그 트라이 엔트리의 코드(valid_depth=6)로 사용. <strong>없으면</strong> 별도 gRPC 서비스 <code>SidLookupService</code>(<code>xai-recsys-sid-proto</code>, endpoint는 <code>--sid-endpoint</code> 플래그)에 batch 조회. <code>SidLookupService</code>는 4세대+15(2026-09-04, 9b0dc31)에서 Phoenix 서빙 엔진 내부 사이드카로 <strong>삭제</strong>됐던 그 lookup 서비스가 이번 자리에서 <strong>별도 외부 서비스</strong>로 환생한 셈이다. moka 캐시 2백만 엔트리, TTL 6시간. 응답에서 <code>codes.is_empty()</code>면 Missing으로 분류.</p>
+<p><strong>service 라우팅</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/service.rs"><code>src/service.rs:68-112</code></a>:</p>
+<ul>
+<li>요청의 <code>seed_post_ids</code>를 중복 제거 후 <code>max_seeds</code>(기본 200)까지 자름.</li>
+<li>전부 로컬 트라이에 대해 <code>lookup(post_id)</code> 시도 → 없는 것들만 <code>SidLookupService.lookup(missing)</code> batch 호출(병렬) → 세 경로(Index / SidService / Missing) 중 하나로 분류하고 메트릭에 라벨 발행.</li>
+<li>메트릭 3종 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/metrics.rs"><code>src/metrics.rs</code></a>: <code>sid_retrieve_requests{caller, result=ok|empty|unavailable}</code> 카운터, <code>sid_retrieve_seeds{source=index|sid_service|missing}</code> 카운터, <code>sid_retrieve_candidates{caller}</code>·<code>sid_retrieve_latency_seconds{caller}</code> 히스토그램.</li>
+</ul>
+<p><strong>main.rs 플래그 요약</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/main.rs"><code>src/main.rs:26-52</code></a>: <code>--grpc-port=9090</code>, <code>--http-port=8080</code>, <code>--snapshot-path=post_sid_snapshot.parquet</code>, <code>--snapshot-poll-secs=30</code>, <code>--sid-endpoint=http://localhost:50051</code>, <code>--sid-timeout-ms=200</code>, <code>--sid-cache-size=2_000_000</code>, <code>--max-seeds=200</code>, <code>--default-max-results=800</code>, <code>--default-max-per-seed=100</code>, <code>--default-min-prefix-depth=3</code>, <code>--default-max-prefix-depth=6</code>.</p>
+<p><strong>B. home-mixer <code>sources/popular_posts_source.rs</code>(+116 신규) + <code>util/popular_authors.rs</code>(+229 신규) + <code>clients/popular_authors_store_client.rs</code>(+79 신규) — top-K 인기 저자를 Thunder in-network 조회에 &quot;가짜 following&quot;으로 꽂아 OON 추천을 보강.</strong></p>
+<p><code>PopularPostsSource</code> 흐름 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/sources/popular_posts_source.rs"><code>popular_posts_source.rs:68-115</code></a>:</p>
+<ol>
+<li>비게이트: <code>!has_cached_posts &amp;&amp; !in_network_only &amp;&amp; EnablePopularPostsSource==true</code>.</li>
+<li><code>PopularAuthorsCache.maybe_spawn_refresh(now_ms)</code>를 호출해 <strong>백그라운드 리프레시 트리거</strong>(필요 시만 token-held AtomicBool 하나로 중복 방지).</li>
+<li><code>top_author_ids(top_k)</code>에서 상위 K(기본 1000)명 author_id 뽑기.</li>
+<li>Thunder에 <code>GetInNetworkPostsRequest { user_id, following_user_ids=[top K authors], max_results=500, per_author_limits: {3, 0}, exclude_tweet_ids=seen_ids, algorithm=ThunderAlgorithm, debug=false, is_video_request=false }</code>를 보냄 → Thunder가 <strong>그 K명을 유저가 팔로우하는 것처럼 간주해</strong> 자기 in-network 포스트 저장소에서 recency순으로 리턴.</li>
+<li>응답 포스트를 <code>served_type=ForYouPhoenixRetrieval</code> 라벨(PhoenixSource와 <strong>같은 라벨</strong>)로 PostCandidate에 담아 리턴.</li>
+</ol>
+<p><code>PopularAuthorsCache</code> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/util/popular_authors.rs"><code>util/popular_authors.rs:135-223</code></a>:</p>
+<ul>
+<li><code>RwLock&lt;Snapshot&gt;</code> + <code>AtomicBool refreshing</code> + <code>Arc&lt;dyn PopularAuthorsStore&gt;</code> 구성.</li>
+<li>리프레시 주기: <code>authors.is_empty() ? 60초 : 60분</code>. <strong>빈 상태일 때만 공격적으로 재시도</strong>하는 흔한 패턴.</li>
+<li>스토어의 바이트 포맷 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/util/popular_authors.rs"><code>util/popular_authors.rs:64-104</code></a>: <code>version=1(1B) + updated_at_ms(8B BE) + count(4B BE) + [author_id(8B BE), follower_count(8B BE)] * count</code>. 즉 1,000명이면 13 + 16,000 = 16,013바이트 → Manhattan 한 키에 통째로 저장.</li>
+<li><code>sort_by_followers</code>가 follower_count 내림차순(동률은 author_id 오름차순).</li>
+<li>메트릭: <code>PopularAuthorsCache.Refresh{result=ok|error}</code> 카운터, <code>PopularAuthorsCache.LoadedAuthors</code> 게이지.</li>
+</ul>
+<p>파라미터 5개 신설 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>:</p>
+<table>
+<thead>
+<tr>
+<th>파라미터</th>
+<th align="right">기본값</th>
+<th>역할</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>EnablePopularPostsSource</code></td>
+<td align="right"><strong>false</strong></td>
+<td>소스 자체 켜기</td>
+</tr>
+<tr>
+<td><code>PopularPostsTopAuthors</code></td>
+<td align="right">1000</td>
+<td>KV 스토어에서 상위 몇 명을 &quot;가상 following&quot;에 꽂을지</td>
+</tr>
+<tr>
+<td><code>PopularPostsMaxResults</code></td>
+<td align="right">500</td>
+<td>Thunder 응답 상한</td>
+</tr>
+<tr>
+<td><code>PopularPostsMaxPerAuthor</code></td>
+<td align="right">3</td>
+<td>저자 1명당 최대 포스트 수</td>
+</tr>
+<tr>
+<td><code>PopularPostsMaxRepliesRepostsPerAuthor</code></td>
+<td align="right">0</td>
+<td><strong>답글/리트윗은 소스에서 완전히 배제</strong></td>
+</tr>
+</tbody></table>
+<p><strong>설계 축</strong>: <code>ForYouPhoenixRetrieval</code> 라벨(= PhoenixSource의 라벨)을 재사용하므로 다운스트림 scorer·filter 입장에서는 &quot;Phoenix two-tower retrieval이 추가로 돌려준 OON 후보&quot;처럼 보인다. 그러나 메커니즘은 <strong>임베딩 유사도가 아니라 &quot;follow graph의 global popularity centroid&quot;</strong> — 사실상 <strong>follow graph의 cold-start/exploration용 global fallback</strong>. &quot;유저가 아무도 안 팔로우해도 Thunder가 뭔가 응답하도록&quot; 또는 &quot;유저 engagement 신호가 너무 적어서 다른 OON 소스가 결과를 못 돌려줄 때 공백을 메우도록&quot; 쓰이는 전형적 global popularity backfill 패턴이다 <code>[추정]</code>.</p>
+<p><strong>C. 광고 브랜드 안전 V2 verdict 기본값이 ON으로 플립됐다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>:</p>
+<ul>
+<li><code>EnableAdsBrandSafetyVerdictV2</code>: <strong>false → true</strong>. 4세대+2(2026-08-17, b089ce6)에서 <code>BrandSafetyVerdictV2</code> 로직이 공개되고 그간 꺼져 있던 자리인데, 어제까지 off였던 <strong>기본값이 오늘 처음으로 ON으로 플립</strong>. 미러 sync 시점 <code>last sync 2026-10-01T16:00:46Z → 2026-10-02T16:00:41Z</code>에서 올라온 것 — <strong>2026-10-02 중 어느 시점의 프로덕션 cron에서 올라간 상태를 미러한 것으로 보인다</strong>.</li>
+<li><code>EnableAdsAuthorBrandSafetyFallback</code> 신설(기본 off): 작성자 수준의 Grok 라벨(<code>GrokSfa</code>/<code>GrokNsfaLimited</code>/<code>GrokNsfa</code>)이 있는데 포스트 수준 라벨은 없을 때, <strong>작성자 라벨을 포스트 라벨로 fallback 삽입</strong>하는 경로.</li>
+</ul>
+<p>핵심 자료구조 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/models/brand_safety.rs"><code>home-mixer/models/brand_safety.rs:6-80</code></a>:</p>
+<pre><code class="language-rust">#[repr(i32)]
+pub enum BrandSafetyVerdict {
+  Unspecified = 0, Safe = 1, LowRisk = 2, MediumRisk = 3, HighRisk = 4,
+}
+pub enum AuthorBrandSafetyFallback { Sfa, NsfaLimited, Nsfa }
+</code></pre>
+<p>Verdict 4-tier(Safe / LowRisk / MediumRisk / HighRisk)는 <strong>광고 블렌더 측 <code>AdAdjacencyControl.brand_safety_risk</code>와 대응하는 인접성 매트릭스</strong>(4세대+10의 <code>MultiRiskAdsBlender</code> 참조)에 소비됨. 즉 광고 지면의 &quot;포스트 안전도 → 광고 삽입 가능 여부&quot; 결정 축이 오늘부로 <strong>기본 소스로 켜졌다</strong>.</p>
+<p><strong>D. VF staging 리플레이 서브시스템 신설(<code>visibility-filtering/staging/</code> 1,850+줄 신규).</strong> <code>recording.rs</code>(+744) · <code>replay_corpus.rs</code>(+299) · <code>capture.rs</code>(+221) · <code>reference/tweetypie.rs</code>(+204/-81 renamed) · <code>reference_compare.rs</code>(+63/-39 renamed) · <code>reference/mod.rs</code>(+35/-72 renamed) · <code>main.rs</code>(+39) · <code>serve.rs</code>(+29) · <code>mod.rs</code>(+6). 어제 4세대+34까지 <code>visibility-filtering/staging/</code> 폴더는 <strong>없었다</strong>. 오늘 생겼고, 메인 바이너리와 분리된 <strong>별도 crate 엔트리 포인트</strong>(<code>staging/main.rs</code>)를 가진다 — VF를 실 트래픽과 완전히 분리된 <strong>리플레이·캡처 모드</strong>로 돌리기 위한 서브시스템. 공유 referential 비교(Tweetypie reference) 코드가 이쪽으로 이사. <strong>심층 분석 필요</strong>: recording.rs 744줄이 무엇을 어떤 포맷으로 기록해 두는지(parquet/jsonl 추정), capture.rs가 라이브 트래픽을 어떻게 샘플링하는지, replay_corpus.rs의 재생 contract.</p>
+<p><strong>E. Phoenix row-emb 체크포인트 복구 유틸(<code>phoenix/xrex/train/row_embedding_restore.py</code> +488 신규).</strong> 어제 4세대+34에서 공개된 row-sharded 임베딩 CUDA 커널 묶음(<code>cuda/row_emb/</code>)의 체크포인트 복원 쪽이 Python으로 완성됐다. 공유 adapter(<code>recsys_async_emb.py</code>) + 복원 유틸이 함께 들어온 셈. 심층 분석 필요.</p>
+<p><strong>F. Phoenix gRPC 서버 레이턴시 분리(<code>phoenix/crates/serving/xai-recsys-engine/src/grpc_server_latency.rs</code> +361 신규).</strong> 기존 inflight metrics와 분리된 서버 측 레이턴시 전용 모듈. 운영적 관측 축 확장이고 모델 축은 아님.</p>
+<p><strong>G. 소소한 변경</strong>: <code>trainer_recsys.py</code>(+376/-853) 공용 트레이너에서 어제 분리된 SID retrieval trainer 지분을 걷어 <strong>공용 코드 순수 감소</strong>. <code>recsys_model.py</code>(+786/-431) 모델 축 재배치(어제 신설된 SID retrieval 모델이 공용 모델과 공유하던 유틸을 깨끗이 분리). <code>parquet_recsys.py</code>(+325/-1) 학습 데이터 파이프라인에 parquet 소스 추가. <code>ads_brand_safety_vf_hydrator.rs</code>(+275/-20) 어제까지 포스트 수준 라벨만 보던 자리가 <strong>작성자 수준 Grok 라벨</strong>(<code>author_brand_safety_client.rs</code> +281 신규를 거쳐 fetch) fallback 분기를 수용. VF <code>filter_tweets.rs</code>(+94/-22), <code>hydration/sources.rs</code>(+125/-22), <code>rules/tweet_rules.rs</code>(+84/-94), <code>rules/registry.rs</code>(+4), <code>rules/golden_corpus/trusted_friends.rs</code>(+31 신규)·<code>golden_corpus/mod.rs</code>(+2) 어제의 limited-actions 시스템 후속 소폭 리팩터. <code>vm-ranker/scoring/value_model.rs</code>(+96/-5)와 <code>scoring/mod.rs</code>(+85/-2) VMRanker에 pacing-input 축 선언(연계 param <code>VMRankerSendPacingInputs</code> 기본 off). <code>author_cold_start.rs</code>(+53) 어제 삭제됐던 <code>is_arm_gated_retrieval</code>이 작성자 cold-start 축에서 <strong>재사용</strong>(cold-start 특유의 다른 분기로 환생). <code>home-mixer/clients/simclusters_ann_cache_client.rs</code>(+211 신규)로 SimClusters ANN 캐시 클라이언트가 분리.</p>
+<p><strong>의미</strong></p>
+<p>세 겹의 사실이 겹친다.</p>
+<ol>
+<li><p><strong>어제 공개된 generative SID retrieval의 세 축(home-mixer source + Phoenix 모델/트레이너 + proto)에 &quot;실제 서버 크레이트&quot;가 오늘 붙었다.</strong> 어제까지는 <strong>학습 레시피와 홈믹서 소스 뼈대만</strong> 있었고 서버는 공란 상태였다. 오늘 공개된 <code>xai-recsys-sid-retrieval</code> 크레이트는 (a) parquet 스냅샷을 30초마다 통째 재적재하는 완전 정적 인덱스(즉 <strong>실시간 업서트 없음</strong> — 모델이 뽑은 코드 테이블을 배치로 밀어넣는 패턴), (b) 48-bit u64 key에 패킹된 6-level 트라이와 <code>partition_point</code> 기반 범위 검색, (c) 깊이 역순 + round-robin 인터리브로 recall을 자르는 알고리즘을 명시해, 이 서버의 <strong>실제 쿼리 복잡도를 공개된 코드만으로 측정 가능하게 만들었다</strong>. <strong><code>EnableSidSource=false</code>가 여전히 기본값</strong>이므로 실 트래픽 적용은 FeatureSwitches cron에서 ON 되는 날이 관측 지점이다.</p>
+</li>
+<li><p><strong>PopularPostsSource는 Thunder in-network 인덱스를 &quot;global popularity&quot; 축에서 재활용하는 각도이고, 결과를 <code>ForYouPhoenixRetrieval</code> 라벨로 담아 Phoenix two-tower retrieval 응답과 섞는다.</strong> 라벨 축에서 PhoenixSource와 <strong>구분되지 않도록 설계</strong>한 자리가 흥미롭다 — scorer/filter 입장에서는 &quot;Phoenix retrieval이 K명 더 돌려줬다&quot;처럼 보이게 되어 있어, 상위 랭킹 단계에서 PhoenixScore와 <strong>같은 분포로 섞여 섞인다</strong>. 메커니즘적으로는 임베딩 기반 retrieval이 아니라 <strong>follow graph의 global popularity centroid를 &quot;가상 following&quot;으로 Thunder에 꽂는</strong> 복고적 접근이다. <strong><code>EnablePopularPostsSource=false</code>가 여전히 기본값</strong>이므로 실제 활성 시점이 다음 창의 관측 지점.</p>
+</li>
+<li><p><strong>광고 측 변경 두 가지는 모두 &quot;SFA(Suitable For Advertising) 라벨링을 포스트 수준 → 작성자 수준으로 확장&quot;하는 축이다.</strong> <code>EnableAdsBrandSafetyVerdictV2=true</code> 플립과 <code>EnableAdsAuthorBrandSafetyFallback</code> 신설이 함께 올라온 것은 우연이 아니고, 포스트 수준 Grok 라벨이 아직 없는 포스트에 <strong>작성자의 과거 라벨 패턴을 fallback</strong>으로 쓰는 방향이다. 이는 Grok 분류기가 포스트 단위로는 커버가 성긴 상황(특히 신규 포스트)을 <strong>작성자 수준 집계로 보완</strong>하려는 신호다 <code>[추정]</code>.</p>
+</li>
+</ol>
 <h3 id="4세대10-2026-08-28-24c6094--multiriskadsblender-신설-bsr-high-광고-tier--medium-risk-폴백-슬롯">4세대+10 (2026-08-28, 24c6094) — <code>MultiRiskAdsBlender</code> 신설 (BSR-high 광고 tier + medium-risk 폴백 슬롯)</h3>
 <p>이전에 3개(<code>safe_gap</code>·<code>partition_organic</code>·<code>time_gap</code>)였던 광고 블렌더 세트에 네 번째 변종 <code>multi_risk</code>가 추가됐다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/multi_risk_blender.rs"><code>home-mixer/ads/multi_risk_blender.rs</code></a> (332줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/tests/multi_risk_blender_tests.rs"><code>home-mixer/ads/tests/multi_risk_blender_tests.rs</code></a> (215줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/selectors/blender_selector.rs"><code>home-mixer/selectors/blender_selector.rs</code></a> (+8/−4). <code>AdsBlenderType</code> param이 <code>&quot;multi_risk&quot;</code> 문자열을 받으면 이 블렌더가 선택됨. 같은 커밋에서 <code>&quot;partition_organic_low_risk&quot;</code> 앨리어스가 <code>PartitionOrganicAdsBlender</code>에 추가돼 총 5개 옵션(<code>safe_gap</code> / <code>partition_organic</code> / <code>partition_organic_low_risk</code> / <code>time_gap</code> / <code>multi_risk</code>).</p>
 <p><strong>핵심 시맨틱 — 광고 tier × 포스트 tier의 인접성 매트릭스</strong>:</p>
@@ -3673,7 +3814,7 @@ let copy_join = JoinOnDrop::new(tokio::task::spawn_blocking(move || {
 </ul>
 <h2 id="출처">출처</h2>
 <ul>
-<li><a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). 커밋 <code>aaa167b</code>(2026-01-20), <code>e414c17</code>·<code>0bfc279</code>(2026-05-15), <strong><code>47c1bcd</code>(2026-08-13, 4세대) + <code>a389166</code>(2026-08-13, .gitattributes 정리)</strong>, <strong><code>c65aa17</code>(2026-08-14, 4세대+1)</strong>, <strong><code>b089ce6</code>(2026-08-17, 4세대+2)</strong>, <strong><code>11a71f8</code>(2026-08-18, 4세대+3)</strong>, <strong><code>aad7179</code>(2026-08-19, 4세대+4)</strong>, <strong><code>d0cef2f</code>(2026-08-20, 4세대+5)</strong>, <strong><code>28e414f</code>(2026-08-21, 4세대+6)</strong>, <strong><code>d011592</code>(2026-08-24, 4세대+7)</strong>, <strong><code>0d3cdd8</code>(2026-08-25, 4세대+8)</strong>, <strong><code>45b48ba</code>(2026-08-26, 4세대+9)</strong>, <strong><code>24c6094</code>(2026-08-28, 4세대+10)</strong>, <strong><code>bc8e5f0</code>(2026-08-28, 4세대+11)</strong>, <strong><code>6384ca7</code>(2026-09-01, 4세대+12)</strong>, <strong><code>7ba7768</code>(2026-09-01, 4세대+13)</strong>, <strong><code>85ac72a</code>(2026-09-02, 4세대+14)</strong>, <strong><code>e4dcedd</code>(2026-09-03, PR #88 dedup 머지)</strong>, <strong><code>9b0dc31</code>(2026-09-04, 4세대+15)</strong>, <strong><code>902a06f</code>(2026-09-04, 4세대+16)</strong>, <strong><code>49815da</code>(2026-09-08, 4세대+17)</strong>, <strong><code>75d93d9</code>(2026-09-09, 4세대+18)</strong>, <strong><code>fee1d0f</code>(2026-09-10, 4세대+19)</strong>, <strong><code>6bb4594</code>(2026-09-12, 4세대+20)</strong>, <strong><code>2d4a03c</code>(2026-09-15, 4세대+21)</strong>, <strong><code>fad2f71</code>(2026-09-16, 4세대+22)</strong>, <strong><code>42266f3</code>(2026-09-17, 4세대+23)</strong>, <strong><code>c279172</code>(2026-09-18, 4세대+24)</strong>, <strong><code>8b25829</code>(2026-09-18, 4세대+25)</strong>, <strong><code>3aa0fa33</code>(2026-09-22, 4세대+26)</strong>, <strong><code>1b3fec20</code>(2026-09-23, 4세대+27)</strong>, <strong><code>44d37eb</code>(2026-09-24, 4세대+28)</strong>, <strong><code>bf7db1b</code>(2026-09-25, 4세대+29)</strong>, <strong><code>4c5cfe8</code>(2026-09-26, 4세대+30)</strong>, <strong><code>a707cc2</code>(2026-09-29, 4세대+31)</strong>, <strong><code>77d431a</code>(2026-09-30, 4세대+32)</strong>, <strong><code>b79b947</code>(2026-10-01, 4세대+33)</strong>, <strong><code>76843a5</code>(2026-10-02, 4세대+34)</strong>. git 로그 직접 확인 2026-10-03 기준, 4세대 이후 커밋 35개.</li>
+<li><a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). 커밋 <code>aaa167b</code>(2026-01-20), <code>e414c17</code>·<code>0bfc279</code>(2026-05-15), <strong><code>47c1bcd</code>(2026-08-13, 4세대) + <code>a389166</code>(2026-08-13, .gitattributes 정리)</strong>, <strong><code>c65aa17</code>(2026-08-14, 4세대+1)</strong>, <strong><code>b089ce6</code>(2026-08-17, 4세대+2)</strong>, <strong><code>11a71f8</code>(2026-08-18, 4세대+3)</strong>, <strong><code>aad7179</code>(2026-08-19, 4세대+4)</strong>, <strong><code>d0cef2f</code>(2026-08-20, 4세대+5)</strong>, <strong><code>28e414f</code>(2026-08-21, 4세대+6)</strong>, <strong><code>d011592</code>(2026-08-24, 4세대+7)</strong>, <strong><code>0d3cdd8</code>(2026-08-25, 4세대+8)</strong>, <strong><code>45b48ba</code>(2026-08-26, 4세대+9)</strong>, <strong><code>24c6094</code>(2026-08-28, 4세대+10)</strong>, <strong><code>bc8e5f0</code>(2026-08-28, 4세대+11)</strong>, <strong><code>6384ca7</code>(2026-09-01, 4세대+12)</strong>, <strong><code>7ba7768</code>(2026-09-01, 4세대+13)</strong>, <strong><code>85ac72a</code>(2026-09-02, 4세대+14)</strong>, <strong><code>e4dcedd</code>(2026-09-03, PR #88 dedup 머지)</strong>, <strong><code>9b0dc31</code>(2026-09-04, 4세대+15)</strong>, <strong><code>902a06f</code>(2026-09-04, 4세대+16)</strong>, <strong><code>49815da</code>(2026-09-08, 4세대+17)</strong>, <strong><code>75d93d9</code>(2026-09-09, 4세대+18)</strong>, <strong><code>fee1d0f</code>(2026-09-10, 4세대+19)</strong>, <strong><code>6bb4594</code>(2026-09-12, 4세대+20)</strong>, <strong><code>2d4a03c</code>(2026-09-15, 4세대+21)</strong>, <strong><code>fad2f71</code>(2026-09-16, 4세대+22)</strong>, <strong><code>42266f3</code>(2026-09-17, 4세대+23)</strong>, <strong><code>c279172</code>(2026-09-18, 4세대+24)</strong>, <strong><code>8b25829</code>(2026-09-18, 4세대+25)</strong>, <strong><code>3aa0fa33</code>(2026-09-22, 4세대+26)</strong>, <strong><code>1b3fec20</code>(2026-09-23, 4세대+27)</strong>, <strong><code>44d37eb</code>(2026-09-24, 4세대+28)</strong>, <strong><code>bf7db1b</code>(2026-09-25, 4세대+29)</strong>, <strong><code>4c5cfe8</code>(2026-09-26, 4세대+30)</strong>, <strong><code>a707cc2</code>(2026-09-29, 4세대+31)</strong>, <strong><code>77d431a</code>(2026-09-30, 4세대+32)</strong>, <strong><code>b79b947</code>(2026-10-01, 4세대+33)</strong>, <strong><code>76843a5</code>(2026-10-02, 4세대+34)</strong>, <strong><code>b412112</code>(2026-10-03, 4세대+35)</strong>. git 로그 직접 확인 2026-10-04 기준, 4세대 이후 커밋 36개.</li>
 <li><a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/visibility-filtering-client/vf_client.rs"><code>visibility-filtering-client/vf_client.rs</code></a> — 2026-09-09, <code>TweetVisibility.action</code> 필드 신설 + <code>TweetVisibility::to_visibility_reason()</code> 헬퍼 + <code>action_from_strato_reason()</code>가 Strato non-SafetyResult reason을 <code>Drop</code>으로 변환, <code>NotEvaluated</code>를 <code>Allow</code>로 승격 (+130/−62).</li>
 <li><a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/visibility-filtering-client/models.rs"><code>visibility-filtering-client/models.rs</code></a> — 2026-09-09, <code>FilteredReason::ViewerBlocksAuthor</code> variant 추가 + proto to/from 매핑 (+7).</li>
 <li><a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/filters/vf_filter.rs"><code>home-mixer/filters/vf_filter.rs</code></a> — 2026-09-09, <code>should_drop_action</code>이 <code>Drop(_)</code>·<code>Tombstone</code>·<code>NotEvaluated</code>만 drop, <code>Allow</code>·<code>Interstitial</code>·<code>Avoid</code>·<code>Downrank</code>는 keep; 테스트가 partition 매트릭스 8-case로 재작성 (+27/−69).</li>
