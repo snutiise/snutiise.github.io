@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-10-10 — feed-research</title>
+<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
+     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
+     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
+<meta name="description" content="한 줄: X의 랭킹 모델(Phoenix) 추론 요청에 &quot;이 피드 요청이 앱 실행인지, 새로고침인지, 아래로 스크롤한 것인지&quot;를 담는 필드 2개가 추가됐다. 나머지는 H100 학습 효율 개선이다.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-10-10.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:title" content="일일 리포트 2026-10-10 — feed-research">
+<meta property="og:description" content="한 줄: X의 랭킹 모델(Phoenix) 추론 요청에 &quot;이 피드 요청이 앱 실행인지, 새로고침인지, 아래로 스크롤한 것인지&quot;를 담는 필드 2개가 추가됐다. 나머지는 H100 학습 효율 개선이다.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-10-10.html">
+<meta name="twitter:card" content="summary">
+<style>
+:root {
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
+  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
+  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
+    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
+    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* 읽기 진행 바 */
+#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
+
+.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
+nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
+nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
+nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
+nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+nav.toc a.sub { padding-left: 30px; font-size: 12px; }
+
+main { padding: 0 0 100px; min-width: 0; }
+.wrap { padding: 0 56px; }
+
+/* 표지 */
+header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
+.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
+.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
+.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+
+/* 본문 */
+main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
+main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
+main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
+main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
+p { margin: .95em 0; }
+ul, ol { padding-left: 1.35em; }
+li { margin: .4em 0; }
+li > ul, li > ol { margin-top: .3em; }
+strong { font-weight: 700; }
+code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: 12.5px; }
+hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
+
+/* 라벨 블록 — 이 문서의 핵심 구조 */
+.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
+.blk > p { margin: 0; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
+.blk.src strong, .blk.src a { color: var(--fg); }
+.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
+.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
+.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
+.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
+
+/* 인용 */
+blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
+blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
+blockquote p { margin: .3em 0; }
+blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
+
+/* 표 */
+.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--code-bg); }
+
+/* 근거 등급 뱃지 */
+.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
+.badge.ok { color: var(--ok); background: var(--ok-bg); }
+.badge.obs { color: var(--obs); background: var(--obs-bg); }
+.badge.est { color: var(--est); background: var(--est-bg); }
+.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
+li.warn { list-style: none; margin-left: -1.35em; }
+
+/* 마무리 체크리스트 */
+.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
+.next ul { list-style: none; padding: 0; }
+.next li { padding-left: 26px; position: relative; margin: .7em 0; }
+.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
+
+/* 리포트 목록(daily.html) */
+ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
+ul.rl li { margin: 0; }
+ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
+ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
+ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
+ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
+ul.rl .rt { margin-left: auto; }
+ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+ul.rl .chips { margin-top: 11px; }
+ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
+ul.rl .chip b { font-size: 13px; }
+
+/* 하단 이동 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
+.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a:hover { text-decoration: none; border-color: var(--accent); }
+.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
+.pager .r { text-align: right; }
+
+.topbar { display: none; }
+@media (max-width: 940px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.toc { display: none; }
+  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
+  header.cover h1 { font-size: 32px; }
+  main h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc, #prog, .topbar, .pager { display: none; }
+  .layout { display: block; }
+  body { background: #fff; font-size: 11pt; }
+  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
+  main h2, main h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
+<div class="layout">
+<nav class="toc">
+  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
+  <div class="gendate">index.html · 2026-10-10 기준</div>
+  <div class="tl">목차</div>
+  <ul id="toc"></ul>
+</nav>
+<main>
+<header class="cover">
+  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
+  <h1>2026-10-10</h1>
+  <div class="wd">토요일 · 읽는 데 약 9분</div>
+  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+  <div class="lead"><span class="lb">한 줄 요약</span>X의 랭킹 모델(Phoenix) 추론 요청에 &quot;이 피드 요청이 앱 실행인지, 새로고침인지, 아래로 스크롤한 것인지&quot;를 담는 필드 2개가 추가됐다. 나머지는 H100 학습 효율 개선이다.</div>
+</header>
+<div class="wrap" id="content">
+<h2 id="1-4세대39--랭킹-요청에-피드-요청-맥락-필드-h100-학습-패킹-개선--x">1. 4세대+39 — 랭킹 요청에 피드 요청 맥락 필드, H100 학습 패킹 개선 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/cb45b5501423126adfc508052116c2d67c0e3fec">xai-org/x-algorithm@cb45b55</a> — xAI 공개 저장소, 2026-10-09 05:42 UTC 커밋, 코드. 파일 16개, +1,228/−218이다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span>
+X는 For You 피드 코드를 <code>xai-org/x-algorithm</code>에 매일 한 커밋씩 동기화해 공개한다. 이 저장소에서 Phoenix는 유저의 행동 히스토리와 후보 포스트를 하나의 Transformer 시퀀스에 넣어 좋아요·답글·체류 시간 같은 행동 확률을 예측하는 랭킹 모델이다. 이번 커밋은 피드 동작 자체보다는 (1) 랭킹 모델에 넘기는 요청 메시지와 (2) 모델 학습 속도를 다룬다.
+시퀀스 패킹(sequence packing)은 길이가 다른 여러 유저의 시퀀스를 하나의 긴 배열에 이어 붙여 패딩 낭비를 줄이는 학습 기법이다. 마이크로배치(microbatch)는 한 스텝의 배치를 몇 조각으로 나눠 순서대로 계산한 뒤 그래디언트를 합치는 방식으로, 메모리 한도 안에서 큰 배치를 쓰게 해 준다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — A. 랭킹 요청에 &quot;요청 맥락&quot;과 &quot;커서 방향&quot;이 들어갔다</span></p></div>
+<ul>
+<li>Phoenix의 추론 요청 메시지 <code>PredictNextActionsRequest</code>에 <code>feed_request_context</code>(25번)와 <code>feed_cursor_direction</code>(26번) 필드가 추가됐다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/python/common/xai-proto/proto/recsys.proto"><code>phoenix/python/common/xai-proto/proto/recsys.proto:27-50, 175-176</code></a>.</li>
+<li><code>FeedRequestContext</code>는 요청이 생긴 경위를 14가지로 구분한다. 앱 실행(<code>LAUNCH</code>), 포그라운드 복귀(<code>FOREGROUND</code>, <code>FOREGROUND_TRUNCATE</code>), 당겨서 새로고침(<code>PULL_TO_REFRESH</code>), 수동 새로고침(<code>MANUAL_REFRESH</code>), 화면 이동(<code>NAVIGATE</code>), 뷰포트 기반 새로고침, 폴링, 백그라운드 fetch, 타임라인 공백 메우기(<code>GAP</code>), 가입 직후(<code>SIGNUP</code>), 자기 스레드 보기, <code>AUTO</code>, 기타가 있다 <code>[확인]</code>.</li>
+<li><code>FeedCursorDirection</code>은 첫 요청(<code>INITIAL</code>), 위쪽 새 글 받기(<code>TOP</code>), 아래로 스크롤해 더 받기(<code>BOTTOM</code>), 공백(<code>GAP</code>)을 구분한다 <code>[확인]</code>.</li>
+<li>두 enum은 이전 커밋부터 proto 파일에 정의돼 있었지만 어떤 메시지에서도 쓰이지 않았다. 이번 diff는 필드 두 줄만 추가했다 <code>[확인]</code>.</li>
+<li>커밋 시점에는 이 값을 읽거나 채우는 코드가 공개 트리 어디에도 없다 <code>[확인]</code> — 저장소 전체를 grep했을 때 두 이름은 proto 두 벌(Python용, Rust 서빙 crate용)에서만 나온다.</li>
+</ul>
+<blockquote>
+<pre><code class="language-proto">  FeedRequestContext feed_request_context = 25;
+  FeedCursorDirection feed_cursor_direction = 26;
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/python/common/xai-proto/proto/recsys.proto"><code>recsys.proto</code></a> (코드), 2026-10-09</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — B. H100 홈 랭커 학습 프리셋이 바뀌었다</span></p></div>
+<ul>
+<li>기본 홈 랭커 프리셋 <code>home_direct_packed</code>는 <code>_home_direct_packed_base()</code>에 <code>_H100_OVERRIDES</code>를 합친 것이다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/configs/xrecsys.py"><code>phoenix/xrex/configs/xrecsys.py:324-345, 427-432</code></a>.</li>
+<li>디바이스당 배치(<code>bs_per_device</code>)가 256에서 512로 늘었고 <code>num_microbatch=2</code>가 들어왔다. 계산 단위는 256명으로 같지만 그래디언트 한 번에 쓰는 유저 수가 두 배가 됐다 <code>[확인]</code>.</li>
+<li>expert parallelism(<code>ep</code>)은 256에서 128로 줄었다. 비동기 임베딩 조회(<code>use_async_emb</code>), 호스트 작업 겹치기(<code>overlap_step_host_work</code>), 빈 후보 슬롯 제거(<code>seqpack_drop_empty_candidates</code>), H100 전용 재계산 정책(<code>SAVE_H100_QKV_ATTN_FFN</code>)이 켜졌다 <code>[확인]</code>.</li>
+<li>학습률 7.1e-4와 Muon optimizer 설정은 대부분 그대로다. Newton-Schulz 계산을 8개 단위로 샤딩하는 <code>muon_ns_shard_group_size=8</code>만 추가됐다 <code>[확인]</code>. GB300 프리셋은 바뀌지 않았다 <code>[확인]</code>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — C. 빈 후보 슬롯을 지우는 패킹과 전용 attention 커널</span></p></div>
+<ul>
+<li>기존 패킹은 유저마다 후보 슬롯 개수만큼 자리를 고정으로 잡았기 때문에, 후보가 적은 유저의 빈 슬롯도 attention 계산에 포함됐다. 새 레이아웃은 실제로 채워진 후보만 16개 단위로 올림해서 시퀀스 끝의 &quot;후보 영역&quot;에 모은다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/data/recsys/sequence_packing.py"><code>phoenix/xrex/data/recsys/sequence_packing.py:171-203, 579-754</code></a>.</li>
+<li>유저당 후보 토큰 예산은 32 또는 128 두 단계다(<code>seqpack_candidate_tokens_per_user</code>). 학습 프로세스 전체가 스텝마다 필요한 최댓값을 분산 KV 저장소로 합의한 뒤 이를 넘는 가장 작은 단계를 쓴다. 예산을 키운 만큼 히스토리 길이 분포의 평균(기본 510)을 줄여 총 길이를 맞춘다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/train/trainer_recsys.py"><code>phoenix/xrex/train/trainer_recsys.py:172-195, 291-292, 404-470</code></a>.</li>
+<li>128로도 모자라면 유저 안에서 뒤쪽 슬롯의 후보부터 그 배치의 학습에서 뺀다. 빠진 수는 <code>train/seqpack_dropped_candidate_slots</code>로 기록한다 <code>[확인]</code>.</li>
+<li>후보 영역 전용 FlashAttention 커널 <code>ranker_candidate_attention_fa4</code>(369줄, CuTe DSL)가 신설됐다. 각 후보 토큰은 자기 유저의 히스토리 구간만 attention하며, H100(SM90)에서만 동작한다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/cutedsl/ranker_candidate_attention_fa4.py"><code>phoenix/xrex/cutedsl/ranker_candidate_attention_fa4.py:31, 295</code></a>.</li>
+</ul>
+<blockquote>
+<pre><code class="language-python">if arch != 90:
+    raise NotImplementedError(&quot;ranker candidate attention: only SM90 (H100) is supported&quot;)
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/cutedsl/ranker_candidate_attention_fa4.py"><code>ranker_candidate_attention_fa4.py</code></a> (코드), 2026-10-09</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것 — D. 그 밖의 변경</span></p></div>
+<ul>
+<li>크론 미러 <code>home-mixer/params/param.rs</code>는 sync 시각만 <code>2026-10-08T16:00:35Z</code>로 바뀌었고 파라미터 값 변경은 없다 <code>[확인]</code>.</li>
+<li>grox(콘텐츠 분류 서비스)의 <code>Post</code> 타입에 멘션된 유저 목록 <code>mentioned_users</code>가 추가됐다. 이 필드를 읽는 분류기는 아직 없다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/grox/core/data_loaders/data_types.py"><code>grox/core/data_loaders/data_types.py:711, 862-866</code></a>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> — &quot;4세대+39&quot; 절을 새로 만들어 A~D를 정리했다. 열린 질문 절에 <code>FeedRequestContext</code>가 피처로 쓰이는지 확인하는 항목을 추가했고, 출처 절의 커밋 목록과 기준 sha에 <code>cb45b55</code>를 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span>
+기존 이해를 뒤집는 내용은 없다. 랭킹 모델이 요청 맥락을 받을 통로가 처음 생겼다는 점이 새롭다 <code>[확인]</code>. 같은 유저라도 앱을 막 열었을 때와 피드 깊숙이 스크롤했을 때 반응 확률이 다르므로, 이 값이 다음 단계에서 맥락 피처로 쓰일 가능성이 있다 <code>[추정]</code>(요청 메시지에 필드를 추가했다는 것 외의 근거는 없다).
+B·C는 모델 구조와 손실을 바꾸지 않는 학습 효율 변경이라 서빙 결과에 직접 영향을 주지 않는다고 본다 <code>[추정]</code>. 다만 예산을 넘는 배치에서는 후보 일부가 학습에서 빠지므로 학습 데이터 분포가 조금 달라질 수 있다 <code>[추정]</code>.</p></div>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
+<ul>
+<li><code>FeedRequestContext</code>·<code>FeedCursorDirection</code>을 home-mixer가 채우고 Phoenix가 피처로 읽는 코드가 공개되는지 본다. 공개되면 <code>[추정]</code>인 &quot;맥락 피처&quot; 해석을 확인하거나 뒤집을 수 있다.</li>
+<li>4세대+38 심층 분석 항목(영상 캐러셀 응답 크기, VF 위치 기반 판정)은 여전히 미해소다.</li>
+</ul>
+<h2 id="소스-점검-메모">소스 점검 메모</h2>
+<ul>
+<li>X: 2026-10-09 이후 커밋은 <code>cb45b55</code> 1건이다. 릴리스는 없다.</li>
+<li>Meta: engineering.fb.com 최신 글은 여전히 2026-10-06 &quot;NTS: Authenticated Time at Meta&quot;(피드와 무관)다. ai.meta.com/blog 최신 글은 2026-07로 신규가 없다. WebSearch 교차 확인에서 나온 Threads 팔로잉 우선 재조정과 Dear Algo는 이미 <a href="threads.html">services/threads.md</a>에 있다.</li>
+<li>Netflix: netflixtechblog.com RSS 최신 글은 2026-09-25로 신규가 없다. research.netflix.com 추천 영역 페이지는 목록이 렌더링되지 않아 대신 publications archive를 열었고, 2026-10-09 이후 항목은 없다.</li>
+<li>arXiv cs.IR: 30건을 파싱했고 수용 기준을 통과한 것은 0건이다. 근접 탈락은 <a href="https://arxiv.org/abs/2610.10920">2610.10920</a>(e-commerce 검색 페이지의 추천 모듈 삽입 위치를 LM으로 오프라인 평가: 소속 미표기, 배포 주장이 없다)과 <a href="https://arxiv.org/abs/2610.10441">2610.10441</a>(CrossWeave, 피드 옆 패널에 다른 커뮤니티 글을 보여 주는 브리징 시스템: 학술 프로토타입이다)이다.</li>
+</ul>
+
+</div>
+<div class="wrap"><div class="pager"><a href="daily-2026-10-09.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-10-09</div></a><span></span></div></div>
+</main>
+</div>
+<script>
+(function () {
+  var C = document.getElementById("content");
+  // 근거 등급 → 컬러 칩
+  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
+  C.querySelectorAll("code").forEach(function (c) {
+    var t = c.textContent.trim();
+    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
+  });
+  // ⚠ 경고 문단
+  C.querySelectorAll("p, li").forEach(function (el) {
+    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
+  });
+  // 표 스크롤 래퍼
+  C.querySelectorAll("table").forEach(function (t) {
+    var w = document.createElement("div"); w.className = "tablewrap";
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+  // "다음에 볼 것" 체크리스트화
+  C.querySelectorAll("h2").forEach(function (h) {
+    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
+    var box = document.createElement("div"); box.className = "next";
+    var n = h.nextElementSibling;
+    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
+    h.parentNode.insertBefore(box, h.nextSibling);
+  });
+  // 목차 — h2는 번호 배지, h3는 들여쓰기
+  var toc = document.getElementById("toc");
+  var heads = C.querySelectorAll("h2, h3");
+  heads.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i;
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
+    var txt = h.textContent.trim();
+    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
+    if (m && h.tagName === "H2") {
+      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
+      a.querySelector(".t").textContent = m[2];
+      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
+      h.querySelector("span:last-child").textContent = m[2];
+    } else {
+      a.innerHTML = '<span class="t"></span>';
+      a.querySelector(".t").textContent = m ? m[2] : txt;
+    }
+    li.appendChild(a); toc.appendChild(li);
+  });
+  // 스크롤 위치 하이라이트 + 진행 바
+  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
+  var obs = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
+    });
+  }, { rootMargin: "0px 0px -78% 0px" });
+  heads.forEach(function (h) { obs.observe(h); });
+  var bar = document.getElementById("prog");
+  addEventListener("scroll", function () {
+    var h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+  }, { passive: true });
+  // 외부 링크는 새 탭
+  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
+})();
+</script>
+</body>
+</html>
