@@ -19,11 +19,6 @@
             <a aria-label="My Github" title="Show my projects" target="_blank" href="https://github.com/{{site.github_username}}">
                 <svg class="icon icon-github-alt"><use xlink:href="#icon-github-alt"></use></svg>
             </a>
-            <!--
-            <a aria-label="My LinkedIn" title="Show my linkedin profile" target="_blank" href="https://www.linkedin.com/in/{{site.linkedin_public_url}}">
-                <svg class="icon icon-linkedin"><use xlink:href="#icon-linkedin"></use></svg>
-            </a>
-            -->
             <a aria-label="Use the RSS to get updated" title="Register for my RSS" target="_blank" href="{{ "/feed.xml" | prepend: site.baseurl }}">
                 <svg class="icon icon-rss"><use xlink:href="#icon-rss"></use></svg>
             </a>
@@ -33,7 +28,7 @@
              {% for post in site.posts limit:3%}
                 <li>
                     <a title="Will take a my recent post" href="{{ post.url | prepend: site.baseurl }}">
-                        <h2 class="post-title" itemprop="name">{{ post.title }}</h2>
+                        <h2 class="post-title">{{ post.title }}</h2>
                     </a>
                 </li>
               {% endfor %}
@@ -41,12 +36,19 @@
 
         <ul class="recent recent-research">
             <p>Feed research <span class="recent-sub">매일 갱신되는 추천 시스템 리서치</span></p>
+            {%- comment -%}
+              summary 는 외부 원문(arXiv 초록 등)에서 온 텍스트다. strip_html 은 닫히지 않은
+              태그 조각(예: 꺾쇠로 시작하는 img onerror)을 지우지 못하고 truncate 를 그대로
+              통과시키므로, 마지막에 escape_once 로 글자로만 내보낸다(head.html 의 description 과
+              같은 이유로 _once: strip_html 뒤에 남은 엔티티는 두 번 이스케이프하지 않는다).
+              h2 의 itemprop name 은 itemscope 밖에 떠 있어 아무 항목에도 붙지 않던 것이라 뺐다.
+            {%- endcomment %}
             {% for r in site.data.feed_research limit:3 %}
                 <li>
                     <a title="리포트 열기" href="{{ '/feed-research/daily-' | append: r.date | append: '.html' | prepend: site.baseurl }}">
-                        <h2 class="post-title" itemprop="name">
+                        <h2 class="post-title">
                             <span class="rr-date">{{ r.date }}</span>
-                            <span class="rr-sum">{{ r.summary | strip_html | truncate: 72 }}</span>
+                            <span class="rr-sum">{{ r.summary | strip_html | truncate: 72 | escape_once }}</span>
                         </h2>
                     </a>
                 </li>
