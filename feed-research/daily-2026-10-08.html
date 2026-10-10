@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-10-08 — feed-research</title>
 <!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
@@ -17,46 +18,62 @@
 <meta name="twitter:card" content="summary">
 <style>
 :root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #93939f; --line: #e3e3ea;
+  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
   --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
   --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #9a6700; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
+  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
   --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
   --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
+  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
+     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
+     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #7a7a86; --line: #2a2a33;
+    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
     --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
     --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
     --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
   }
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 2px; }
+/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
+   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
+   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
+main a { text-decoration: underline; text-underline-offset: 2px; }
 
 /* 읽기 진행 바 */
 #prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
 
 .layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
 nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
+nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
 nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
 nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
 nav.toc ul { list-style: none; margin: 0; padding: 0; }
 nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
 nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
 nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; opacity: .55; }
+/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
+nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
 nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 nav.toc a.sub { padding-left: 30px; font-size: 12px; }
 
 main { padding: 0 0 100px; min-width: 0; }
+/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
+   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
+   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
+main { overflow-wrap: anywhere; }
+main table { overflow-wrap: normal; }
 .wrap { padding: 0 56px; }
 
 /* 표지 */
@@ -74,6 +91,9 @@ header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter
 /* 본문 */
 main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
 main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
+   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
+@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
 main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
 main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
 main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
@@ -90,7 +110,8 @@ hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
 /* 라벨 블록 — 이 문서의 핵심 구조 */
 .blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
 .blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: nowrap; }
+.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
+/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
 .blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
 .blk.src strong, .blk.src a { color: var(--fg); }
 .blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
@@ -129,7 +150,7 @@ li.warn { list-style: none; margin-left: -1.35em; }
 /* 리포트 목록(daily.html) */
 ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
 ul.rl li { margin: 0; }
-ul.rl a { display: block; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
+ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
 ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
 ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
 ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
@@ -142,7 +163,7 @@ ul.rl .chip b { font-size: 13px; }
 
 /* 하단 이동 */
 .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
+.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
 .pager a:hover { text-decoration: none; border-color: var(--accent); }
 .pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
@@ -152,7 +173,7 @@ ul.rl .chip b { font-size: 13px; }
 @media (max-width: 940px) {
   .layout { grid-template-columns: 1fr; }
   nav.toc { display: none; }
-  .topbar { display: flex; gap: 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
+  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
   .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
   header.cover h1 { font-size: 32px; }
   main h2 { font-size: 20px; }
@@ -168,9 +189,11 @@ ul.rl .chip b { font-size: 13px; }
 </head>
 <body>
 <div id="prog"></div>
-<div class="topbar"><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
+<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
 <div class="layout">
 <nav class="toc">
+  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
+  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
   <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
   <div class="gendate">index.html · 2026-10-10 기준</div>
   <div class="tl">목차</div>
