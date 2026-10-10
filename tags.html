@@ -2,8 +2,13 @@
 layout: minimal
 title: "#Tags"
 permalink: /tags/index.html
-description: "Take a look at my tags."
+description: "태그별로 묶은 글 목록"
 ---
+{%- comment -%}
+  series.html 과 같은 정리: 태그 이름은 h3(제목 탐색·크기 계층), 날짜는 YYYY-MM-DD,
+  닫히지 않던 span.entry-date 를 닫고 소속 없는 itemprop="datePublished" 를 지웠다.
+  description 도 테마의 영어 문구('Take a look at my tags.')를 한국어로 바꿨다.
+{%- endcomment %}
 
 <h2>Tags</h2>
 <div class="tags">
@@ -21,13 +26,13 @@ description: "Take a look at my tags."
 </div>
 
 {% for tag in site.tags  %}
-    <span class="tag-title" id="{{ tag[0] | slugify }}">{{ tag[0] }}</span>
+    <h3 class="tag-title" id="{{ tag[0] | slugify }}">{{ tag[0] }}</h3>
     <ul class="post-list">
         {% assign pages_list = tag[1] %}
         {% for post in pages_list reversed %}
             {% if post.title != null %}
             {% if group == null or group == post.group %}
-            <li><a href="{{ site.url }}{{ post.url }}">{{ post.title }}<span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">{{ post.date | date: "%B %d, %Y" }}</time></a></li>
+            <li><a href="{{ site.url }}{{ post.url }}">{{ post.title }}<span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time></span></a></li>
             {% endif %}
             {% endif %}
         {% endfor %}

@@ -8,8 +8,13 @@ layout: null
     <description>{{ site.description | xml_escape }}</description>
     <link>{{ site.url }}{{ site.baseurl }}/</link>
     <atom:link href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}" rel="self" type="application/rss+xml"/>
-    <pubDate>{{ site.time | date_to_rfc822 }}</pubDate>
-    <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
+    {%- comment -%}
+      채널 날짜는 빌드 시각(site.time)이 아니라 최신 글의 날짜다. feed-research 일일 배치가
+      매일 푸시해 다시 빌드되면서 글이 없는 날에도 채널이 매일 바뀐 것처럼 보였다.
+    {%- endcomment %}
+    <language>ko</language>
+    <pubDate>{{ site.posts.first.date | date_to_rfc822 }}</pubDate>
+    <lastBuildDate>{{ site.posts.first.date | date_to_rfc822 }}</lastBuildDate>
     <generator>Jekyll v{{ jekyll.version }}</generator>
     {% for post in site.posts limit:10 %}
       <item>
