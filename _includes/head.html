@@ -1,6 +1,6 @@
 <head>
     {%- comment -%}
-      description 을 한 번만 계산해 아래 5곳(meta/twitter/og/itemprop)에서 재사용한다.
+      description 을 한 번만 계산해 아래 3곳(meta/twitter/og)에서 재사용한다.
       포스트 19개가 전부 front matter 에 description: '' 을 갖는데 Liquid 는 빈
       문자열을 truthy 로 보므로 if page.description 만으로는 항상 빈 값이
       나갔다. 빈 값이면 포스트는 본문 앞부분으로, 그 외 페이지는 사이트 설명으로 떨어진다.
@@ -11,45 +11,74 @@
       {%- elsif page.layout == 'post' -%}{{ page.content | strip_html | normalize_whitespace }}
       {%- else -%}{{ site.description }}{%- endif -%}
     {%- endcapture -%}
+    {%- comment -%}
+      속성값에 넣는 설명과 제목은 escape 한다. 본문 코드의 큰따옴표가 그대로 들어가
+      redis-dels 의 description 이 'KEYS ' 에서 끊기고 뒤가 가짜 속성이 됐다.
+      escape_once 는 strip_html 이 남긴 엔티티(코드블록의 lt/amp)를 두 번 이스케이프하지 않는다.
+      자르고 나서 이스케이프해야 엔티티가 중간에 잘리지 않는다.
+    {%- endcomment -%}
+    {%- assign meta_desc = page_description | strip_newlines | truncate: 160 | escape_once -%}
+    {%- assign meta_title = page.title | default: site.title | escape -%}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {%- comment -%}
+      CSP. 어떤 출처의 스크립트가 이 오리진에서 돌 수 있는지만 묶는다. 목록에 없는 출처는
+      브라우저가 막는다: Disqus 가 최상위 문서에 끌어오던 LiveIntent(d-code.liadm.com) 신원추적
+      스크립트가 여기서 걸린다. object/base/form 주입 표면도 닫는다.
+      한계: Naver 설정·카운터·Disqus 로더가 인라인 스크립트이고 wcslog 의 onload 와
+      share.html 의 onclick 이 인라인 이벤트 속성이라 unsafe-inline 이 빠질 수 없다.
+      그래서 이 정책은 XSS 방어가 아니라 서드파티 스크립트 출처 제한이다. 해시나 nonce 를
+      섞으면 브라우저가 unsafe-inline 을 무시해 위 인라인이 전부 죽으니 섞지 말 것.
+      GitHub Pages 는 응답 헤더를 못 바꾸고, frame-ancestors 는 meta 로 줄 수 없다.
+      default-src 를 두지 않아 이미지·스타일·iframe·XHR(카운터)은 제한하지 않는다.
+      새 서드파티 스크립트를 넣으면 script-src 에 출처를 더해야 한다.
+      ssl.pstatic.net 은 wcslog.js 가 받아 오는 Naver 광고 동기화 모듈이다. 분석을 계속 쓸지
+      정해지기 전까지는 지금 동작을 그대로 둔다.
+      feed-research 리포트는 head.html 을 쓰지 않아 이 정책 밖이다.
+    {%- endcomment %}
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://wcs.naver.net https://ssl.pstatic.net https://{{ site.disqus_username }}.disqus.com https://c.disquscdn.com">
 
-    <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+    <title>{{ meta_title }}</title>
 
-    <meta name="description" content="{{ page_description | strip_newlines | truncate: 160 }}">
+    <meta name="description" content="{{ meta_desc }}">
 
     <!-- Social Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@{{site.twitter_username}}">
-    <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-    <meta name="twitter:description" content="{{ page_description | strip_newlines | truncate: 160 }}">
+    <meta name="twitter:title" content="{{ meta_title }}">
+    <meta name="twitter:description" content="{{ meta_desc }}">
 
     {% if page.image and page.image != '' %}
-    <meta property="twitter:image:src" content="{{ site.url }}{{page.image }}">
+    <meta name="twitter:image" content="{{ site.url }}{{page.image }}">
     {% else %}
-    <meta property="twitter:image:src" content="{{ "/assets/img/og-default.png" | prepend: site.baseurl | prepend: site.url }}">
+    <meta name="twitter:image" content="{{ "/assets/img/og-default.png" | prepend: site.baseurl | prepend: site.url }}">
     {% endif %}
 
     <!-- Social Facebook/Open Graph -->
+    <meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}">
+    <meta property="og:locale" content="ko_KR">
     <meta property="og:url" content="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
-    <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+    <meta property="og:title" content="{{ meta_title }}">
     {% if page.image and page.image != '' %}
     <meta property="og:image" content="{{ site.url }}{{page.image }}">
     {% else %}
     <meta property="og:image" content="{{ "/assets/img/og-default.png" | prepend: site.baseurl | prepend: site.url }}">
     {% endif %}
-    <meta property="og:description" content="{{ page_description | strip_newlines | truncate: 160 }}">
+    <meta property="og:description" content="{{ meta_desc }}">
     <meta property="og:site_name" content="{{ site.title }}">
+    {%- comment -%}
+      포스트의 구조화 데이터. 예전에는 itemscope 밖에 떠 있는 itemprop 메타 3개뿐이라
+      아무 항목에도 붙지 않았고, BlogPosting 에는 headline·author 가 없었다.
+      값은 jsonify 로 넣는다(제목의 따옴표가 JSON 을 깨지 않게). 한 줄이라 compress 에도 안전하다.
+      author 이름은 footer.html 에 적힌 것과 같다.
+    {%- endcomment -%}
+    {%- if page.layout == 'post' %}
+    <meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":{{ page.title | jsonify }},"datePublished":"{{ page.date | date_to_xmlschema }}","author":{"@type":"Person","name":"Jeon Seung Hoon","url":"{{ '/about/' | absolute_url }}"},"image":"{% if page.image and page.image != '' %}{{ page.image | absolute_url }}{% else %}{{ '/assets/img/og-default.png' | absolute_url }}{% endif %}","mainEntityOfPage":"{{ page.url | absolute_url }}"}</script>
+    {%- endif %}
 
-    <!-- Social Google+/Schema.org  -->
-    <meta itemprop="name" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}"/>
-    <meta itemprop="description" content="{{ page_description | strip_newlines | truncate: 160 }}">
-    <meta itemprop="image" content="{{ "/assets/img/og-default.png" | prepend: site.baseurl | prepend: site.url }}"/>
-
-    <!-- Favicon 
-    <link rel="shortcut icon" href="{{site.baseurl}}/assets/img/icons/favicon.ico" type="image/x-icon" />
-    -->
+    <link rel="icon" href="{{site.baseurl}}/assets/img/icons/favicon.ico" sizes="32x32">
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="{{site.baseurl}}/assets/img/icons/apple-touch-icon.png" />
     <link rel="apple-touch-icon" sizes="57x57" href="{{site.baseurl}}/assets/img/icons/apple-touch-icon-57x57.png" />
@@ -61,31 +90,29 @@
     <link rel="apple-touch-icon" sizes="76x76" href="{{site.baseurl}}/assets/img/icons/apple-touch-icon-76x76.png" />
     <link rel="apple-touch-icon" sizes="152x152" href="{{site.baseurl}}/assets/img/icons/apple-touch-icon-152x152.png" />
 
-    <!-- Windows 8 Tile Icons -->
+    {%- comment -%}
+      Windows 타일 이미지 메타 4개(smalltile.png 등)는 지웠다. 상대경로라 페이지마다
+      /posts/smalltile.png 처럼 풀렸고, 파일은 산출물에서 빠진 src/img/icons 에만 있어 전부 404 였다.
+      타일·주소창 색은 2018 테마의 보라(#5d4d7a) 대신 지금 헤더 색(custom.css 의 --surface)에 맞춘다.
+    {%- endcomment %}
     <meta name="application-name" content="{{site.username}} Blog">
-    <meta name="msapplication-TileColor" content="#5d4d7a">
-    <meta name="msapplication-square70x70logo" content="smalltile.png" />
-    <meta name="msapplication-square150x150logo" content="mediumtile.png" />
-    <meta name="msapplication-wide310x150logo" content="widetile.png" />
-    <meta name="msapplication-square310x310logo" content="largetile.png" />
-
-    <!-- Android Lolipop Theme Color -->
-    <meta name="theme-color" content="#5d4d7a">
+    <meta name="msapplication-TileColor" content="#1b1d22">
+    <meta name="theme-color" content="#1b1d22">
 
     <link rel="stylesheet" href="{{ "/assets/css/main.css" | prepend: site.baseurl }}">
     <link rel="stylesheet" href="{{ "/assets/css/custom.css" | prepend: site.baseurl }}">
     <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
     <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}" />
-    
-    <!-- Naver Analytics -->
-    <script type="text/javascript">
-        // 설정을 먼저 정의해 두고, 스크립트는 렌더를 막지 않게 async 로 받은 뒤
-        // onload 에서 호출한다. async 만 붙이고 wcs_do() 를 인라인에 두면
-        // 로드 전에 실행돼 ReferenceError 로 추적 자체가 죽는다.
-        var wcs_add = wcs_add || {};
-        wcs_add["wa"] = "a4fc7be0d37ba";
-    </script>
-    <script type="text/javascript" src="https://wcs.naver.net/wcslog.js" async
+    {%- comment -%}
+      Naver Analytics. 설정을 먼저 정의해 두고, 스크립트는 렌더를 막지 않게 async 로 받은 뒤
+      onload 에서 호출한다. async 만 붙이고 wcs_do() 를 인라인에 두면 로드 전에 실행돼
+      ReferenceError 로 추적 자체가 죽는다.
+      이 설명이 예전에는 script 안의 // 주석이었다. compress 레이아웃(홈·목록·about·404)이
+      줄바꿈을 지우면서 첫 // 가 wcs_add 설정까지 주석으로 삼켜 계정 ID 없이 집계됐다.
+      인라인 JS 에는 // 주석을 쓰지 말 것. 설명은 이렇게 Liquid 주석으로 둔다.
+    {%- endcomment %}
+    <script>var wcs_add = wcs_add || {}; wcs_add["wa"] = "a4fc7be0d37ba";</script>
+    <script src="https://wcs.naver.net/wcslog.js" async
             onload="if (window.wcs_do) { wcs_do(); }"></script>
 
     <!-- custom scrollbar -->
@@ -95,41 +122,45 @@
         ::-webkit-scrollbar-track {background: #efefef; -webkit-border-radius: 10px; border-radius:10px; -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,.2)}
         ::-webkit-scrollbar-thumb {height: 50px; width: 50px; background: rgba(0,0,0,.2); -webkit-border-radius: 8px; border-radius: 8px; -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,.1)}
     </style>
-
-    <!-- firebase hit -->
+    {%- comment -%}
+      방문자 카운터(작성자가 /git-and-firebase/ 글에서 만든 Cloud Function). 응답은
+      '총계,요청자 IP,그 IP 의 횟수' 형식이다.
+      - IP 는 화면에 찍지 않는다. 예전에는 사이드바 #userip 에 'IP님 N PageView Hit!' 로 나갔다.
+      - 숫자가 아닌 값은 버리고 textContent 로만 넣는다. 예전에는 innerHTML 이라
+        함수 응답이 오염되면 그대로 전 페이지 XSS 였다.
+      - 운영 오리진이 아니면 호출하지 않는다. 로컬 미리보기·CI 산출물·감사 도구가
+        열 때마다 운영 카운터가 올라가 통계를 오염시켰다. site.url 대신 주소를 박아 둔다 —
+        jekyll serve 는 개발 환경에서 site.url 을 http://localhost:4000 으로 덮는다.
+      - 예전에는 100x100 박스에 24px h2 를 left/top 좌표로 박아 모바일에서 본문 줄을 덮었다.
+        한 줄짜리 작은 배지로 줄여 상단 바(검색 버튼 왼쪽, 같은 --surface 색)에 띄우고, 위로
+        빠지며 사라진다. 페이지를 막 연 순간에는 본문 위가 아니라 상단 바 위에 있다.
+        #ff5151 글자는 --surface 배경에서 5.26:1 로 읽힌다(흰 본문 위에서는 3.21:1 이었다).
+        장식이라 스크린리더에서는 숨긴다.
+      - 함수가 IP 를 저장하는 것은 이 저장소 밖(Firebase) 일이다.
+      인라인 JS 이므로 // 주석 금지(compress 레이아웃).
+    {%- endcomment %}
     <script>
-        var hit = document.createElement("div");
-        hit.setAttribute("id", "hitbox");
-        hit.style.left=window.innerWidth-120+"px";
-        hit.style.top=window.innerHeight-100+"px";
-        hit.style.opacity="1";
-        hit.style.position= "fixed";
-        hit.style.width= "100px";
-        hit.style.height= "100px";
-        hit.style.zIndex="100";
-
+    (function () {
+        if (location.origin !== 'https://snutiise.github.io') return;
         var req = new XMLHttpRequest();
-        req.onreadystatechange = function() {
-            if (req.readyState === req.DONE) {
-                if (req.status === 200 || req.status === 201) {
-                    let res=req.responseText.split(",");
-                    hit.innerHTML="<h2 id='hit' style='color: #ff5151;'>"+res[0]+" Hit!</h2>";
-                    hit.style.transitionDuration="4s";
-                    document.body.appendChild(hit);
-                    setTimeout(function(){
-                        hit.style.left=window.innerWidth-120+"px";
-                        hit.style.top="0px";
-                        hit.style.transitionDuration="4s";
-                        hit.style.opacity="0";
-                        hit.style.zIndex="-1";
-                    },4000);
-                    document.getElementById("userip").innerText=res[1]+"님 "+res[2]+" PageView Hit!";             
-                } else {
-                console.error(req.responseText);
-                }
+        req.onload = function () {
+            if (req.status !== 200 && req.status !== 201) return;
+            var res = req.responseText.trim().split(',');
+            var total = res[0], mine = res[2];
+            if (/^\d+$/.test(total)) {
+                var box = document.createElement('div');
+                box.id = 'hitbox';
+                box.setAttribute('aria-hidden', 'true');
+                box.textContent = total + ' Hit!';
+                box.style.cssText = 'position:fixed;top:18px;right:58px;z-index:100;padding:3px 8px;border-radius:10px;background:#1b1d22;color:#ff5151;font:bold 12px/1.4 sans-serif;white-space:nowrap;transition:opacity 4s,transform 4s';
+                document.body.appendChild(box);
+                setTimeout(function () { box.style.opacity = '0'; box.style.transform = 'translateY(-40px)'; }, 4000);
             }
+            var u = document.getElementById('userip');
+            if (u && /^\d+$/.test(mine)) u.textContent = mine + ' PageView Hit!';
         };
-        req.open("GET","https://us-central1-gitblog-885f6.cloudfunctions.net/countVisitor");
+        req.open('GET', 'https://us-central1-gitblog-885f6.cloudfunctions.net/countVisitor');
         req.send();
+    })();
     </script>
 </head>

@@ -11,8 +11,6 @@ categories:
 - Git
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 vs code에서 ssh를 연동하지 않고 github로 push를 하니 매번 아이디와 패스워드를 입력하는것이 귀찮아 졌다...
 
 그래서 ssh를 생성하여 github에 등록하고 remote 주소를 바꿔 편하게 인증하고자 한다!

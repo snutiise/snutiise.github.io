@@ -12,8 +12,6 @@ categories:
 - Git
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 깃 블로그 내에 방문자 카운트 같은 기능을 구현하고 싶어졌다. 
 
 하지만 깃 페이지는 static site이기 때문에 서버단의 구현을 기능하려면 개인 서버나 클라우드를 이용해야한다.

@@ -10,8 +10,6 @@ categories:
 - Architecture
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 데이터 모델은 소프트웨어 개발에서 제일 중요한 부분이다. 소프트웨어가 어떻게 작성됐는지 뿐만 아니라 해결하려는 문제를 어떻게 생각해야 하는지에 대해서도 많은 영향을 미치기 때문이다.
 
 대부분의 애플리케이션은 하나의 데이터 모델을 다른 데이터 모델 위에 계층을 둬서 만든다. 각 계층의 핵심적인 문제는 다음 하위 계층 관점에서 데이터 모델을 표현하는 방법이다. 예를들면 아래와 같다.

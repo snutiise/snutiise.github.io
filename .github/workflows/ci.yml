@@ -23,11 +23,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      # 액션은 커밋 SHA 로 고정한다. 태그(@v4)는 상류에서 다른 커밋으로 옮길 수
+      # 있어서, 태그가 침해되면 다음 실행부터 바로 러너에서 돈다. 옆 주석의
+      # 버전은 .github/dependabot.yml 이 SHA 와 함께 올린다.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # 이 워크플로는 git push 를 하지 않는다. 기본값(true)은 GITHUB_TOKEN 을
+          # .git/config 에 남겨 뒤 단계의 gem(매번 새로 해석된다)이 읽을 수 있다.
+          persist-credentials: false
 
       # github-pages gem 이 Pages 빌더와 같은 Jekyll/플러그인 버전을 고정한다.
       # 즉 여기서 통과하면 실제 배포 빌드도 통과한다.
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@e81a8fa391b11a595c1b7ed84177cc0fe02faf83 # v1.328.0
         with:
           ruby-version: '3.3'
           bundler-cache: true
@@ -64,7 +71,7 @@ jobs:
 
       - name: 산출물 업로드
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: site
           path: |

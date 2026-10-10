@@ -2,18 +2,25 @@
 <html lang="ko">
     {% include head.html %}
     <body>
+        {%- comment -%}
+          - 날짜는 series·tags·홈 feed-research 카드와 같은 YYYY-MM-DD 로 맞춘다
+            (예전 date_to_string 은 '05 Nov 2020', 목록은 'January 14, 2018' 이었다).
+          - BlogPosting microdata(itemscope/itemprop)를 지웠다. 글의 구조화 데이터는
+            head.html 의 JSON-LD 한 곳에서 낸다. 둘 다 두면 글마다 BlogPosting 이 2개 잡히고,
+            microdata 쪽에는 headline·author 가 없었다.
+        {%- endcomment %}
         {% include svg-icons.html %}
         {% include header-post.html %}
         {% include tree-posts.html %}
-        <section class="post" itemscope itemtype="http://schema.org/BlogPosting">
+        <section class="post">
             {% if page.date %}
                 <div class="time">
-                    <time itemprop="datePublished" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date_to_string }}</time>
+                    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
                 </div>
             {% endif %}
-            <h1 class="post-title" itemprop="name">{{ page.title }}</h1>
+            <h1 class="post-title">{{ page.title }}</h1>
 
-            <article id="scroll" class="post-content" role="main" itemprop="articleBody">
+            <article id="scroll" class="post-content" role="main">
                 {{ content }}
             </article>
 

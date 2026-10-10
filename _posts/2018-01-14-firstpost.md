@@ -11,8 +11,6 @@ categories:
 - Git
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 ## Github ? why ?
 
 새벽에 새로 구매한 도메인을 매핑하기위해 가상호스트로 프록시 작업을 하다가 블로그를 날려먹었다..! 

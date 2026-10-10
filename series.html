@@ -2,22 +2,34 @@
 layout: minimal
 title: "Series"
 permalink: /series/index.html
-image: '/assets/img/series.png'
-description: "Take a look at my series..."
+description: "카테고리(시리즈)별로 묶은 글 목록"
 ---
+{%- comment -%}
+  - 카테고리 이름을 front matter 그대로 쓴다. capitalize 는 첫 글자 뒤를 모두 소문자로
+    바꿔 'LogServer' 가 'Logserver', 'Data Structure' 가 'Data structure' 로 나왔다.
+  - 카테고리 이름을 span 에서 h3 로 바꿨다. 제목 탐색에 잡히고(h1 Series → h2 → h3),
+    글 본문 h3 와 같은 크기·여백 규칙(.post-content h3)을 그대로 받아 페이지 제목(h2)보다
+    작아진다. 예전 span 은 36px 로 페이지 제목(35px)보다 컸고 왼쪽 선도 20px 어긋났다.
+  - 날짜는 글 페이지·홈 feed-research 카드와 같은 YYYY-MM-DD 로 맞춘다.
+  - span.entry-date 가 닫히지 않던 것을 닫고, 어느 BlogPosting 에도 속하지 않던
+    itemprop="datePublished" 와 의미 없는 title 툴팁("Post's my title")을 지웠다.
+  - description 은 테마가 딸려 보낸 영어 문구('Take a look at my series...')를 한국어로 바꿨다.
+  - front matter 의 image: '/assets/img/series.png' 를 지웠다. 저장소에 없는 파일이라
+    og:image·twitter:image 가 404 였다. 없으면 head.html 이 og-default.png 로 떨어진다.
+{%- endcomment %}
 
 <h2>Series</h2>
 {% for tag in site.categories %}
-  <span class="tag-title" id="{{ tag[0] | slugify }}">{{ tag[0] | capitalize }}</span>
+  <h3 class="tag-title" id="{{ tag[0] | slugify }}">{{ tag[0] }}</h3>
   <ul class="post-list">
     {% assign pages_list = tag[1] %}
     {% for post in pages_list reversed %}
       {% if post.title != null %}
       {% if group == null or group == post.group %}
       <li>
-          <a title="Post's my title" href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}
+          <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}
               <span class="entry-date">
-              <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">{{ post.date | date: "%B %d, %Y" }}</time>
+              <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time></span>
           </a>
       </li>
       {% endif %}
