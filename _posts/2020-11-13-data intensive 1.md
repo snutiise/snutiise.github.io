@@ -10,15 +10,13 @@ categories:
 - Architecture
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 최근 "데이터 중심 애플리케이션 설계"라는 책을 읽고 있다.
 
 참 많은 내용을 담고 있는데 이책을 읽으면서 드는 생각은 왜 이책을 이제서야 읽게 되었을까라는 생각이다.
 
 내가 경험하고 고민했던 내용들이 많이 담겨져 있어서 이책을 읽어나가면서 내용을 블로그에 정리하고자 포스팅을 시작했다.
 
-<img src="{{ "/assets/img/2020-11-14-1.png"}}" alt="" loading="lazy" decoding="async" width="800" height="1023">
+<a href="{{ "/assets/img/2020-11-14-1.png"}}"><img src="{{ "/assets/img/2020-11-14-1.png"}}" alt="데이터 중심 애플리케이션 설계(마틴 클레프만 지음, 위키북스) 책 표지" loading="lazy" decoding="async" width="800" height="1023"></a>
 
 일반적으로 데이터 중심 애플리케이션은 공통으로 필요로 하는 기능을 제공하는 표준 구성 요소(stanard building block)로 만든다.
 
@@ -141,7 +139,7 @@ RAID 를 구성하고, 서버는 이중전원 디바이스와 핫스왑이 가�
 
 일반적으로 평균 값을 많이 사용할텐데 평균보다는 **백분위(percentile)**을 사용하는 편이 더 좋다. 응답 시간 목록을 가지고 가장 빠른 시간부터 제일 느린 시간까지 정렬하면 중간 지점이 **중간값(median)**이 된다. 예를들어, 중간값이 200ms면 사용자  요청의 반은 200ms미만으로 반환되고 나머지는 그보다 오래 걸린다는 뜻이다.
 
-<img src="{{ "/assets/img/2020-11-14-2.png"}}" alt="" loading="lazy" decoding="async" width="589" height="920">
+<a href="{{ "/assets/img/2020-11-14-2.png"}}"><img src="{{ "/assets/img/2020-11-14-2.png"}}" alt="ab -c 10 -n 500 https://github.com/ 실행 결과. 실패 312건, 평균 179.417ms 이고 백분위 응답 시간은 50% 179, 66% 195, 75% 209, 80% 224, 90% 274, 95% 293, 98% 309, 99% 323, 100% 762ms 다" loading="lazy" decoding="async" width="589" height="920"></a>
 
 apache ab test를 해보면 응답시간을 백분위로 표시해주는데 평균 값보다 더 많은 정보를 표시해주고 있다.
 (-e csv-file 옵션을 넣는다면 1~100%까지 확인할 수 있다.)

@@ -10,8 +10,6 @@ categories:
 - Database
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 레디스는 키를 삭제하기 위한 dels를 따로 지원하지 않는다.
 
 그렇기에 keys 패턴을 이용하여 삭제가 가능하다.

@@ -13,8 +13,6 @@ categories:
 - Programming
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 내 개인서버에는 여러 종류에 크롤러가 구동되고 있다. 러블리즈 이미지 크롤러랑 디시인사이드 키워드 크롤러 등...
 
 이번 시간에는 그중에서도 이미지 크롤러 특히 소스가 풍부한 트위터에 대한 이미지 크롤러를 공유하고자 한다!
@@ -43,7 +41,7 @@ selenium은 공식 api없이 트위터를 크롤링 하기 위해서는 가장 �
 
 ## Scrapy이란
 
-<img src="https://scrapy.org/img/scrapylogo.png" alt="" loading="lazy" decoding="async">
+<img src="{{ "/assets/img/scrapy-logo.png"}}" alt="" loading="lazy" decoding="async" width="322" height="100">
 
 python으로 만들어진 오픈소스 web crawling framework이다. 
 
@@ -272,7 +270,7 @@ parse_img에 경우 이미 parse에서 완전한 이미지 url이 넘어왔기�
 
 이제 scrapy crawl twitter을 통해 크롤러를 구동해보자.
 
-<img src="{{ "/assets/img/2018-01-20-1.png"}}" alt="" loading="lazy" decoding="async" width="1920" height="1080">
+<a href="{{ "/assets/img/2018-01-20-1.png"}}"><img src="{{ "/assets/img/2018-01-20-1.png"}}" alt="크롤러 실행 결과. 터미널에 Scrapy 통계(item_scraped_count 53, finish_reason finished)와 Spider closed (finished) 가 찍혀 있고, 옆의 파일 관리자 storage/twitter 폴더에 받은 이미지 썸네일이 가득하다" loading="lazy" decoding="async" width="1920" height="1080"></a>
 
 성공적으로 이미지를 크롤링한 것을 확인할 수 있다.
 

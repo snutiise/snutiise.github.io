@@ -10,8 +10,6 @@ categories:
 - Chat
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 근황 업데이트...
 
 소프트웨어 마에스트로를 수료하고 엑소더스이엔티라는 회사에서 일하고 있다.
@@ -22,7 +20,7 @@ categories:
 
 (매일밤 서버를 걱정하는 그 짜릿함...)
 
-<img src="{{ "/assets/img/2020-11-05-1.png"}}" alt="" loading="lazy" decoding="async" width="2022" height="688">
+<a href="{{ "/assets/img/2020-11-05-1.png"}}"><img src="{{ "/assets/img/2020-11-05-1.png"}}" alt="Firebase 활성 사용자 대시보드. 28일 484만, 7일 235만, 1일 109만이고 지난 30분 동안의 사용자는 255,138명이다" loading="lazy" decoding="async" width="2022" height="688"></a>
 <center>(firebase로 본 사용자)</center>
 <br/>
 미러서버가 밀리고 마스터는 힘들어하는 재밌는 경험

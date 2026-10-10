@@ -11,8 +11,6 @@ categories:
 - Algorithm
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 어떤 연결리스트가 주어졌을때 해당 연결리스트가 null로 끝나는지 순환이 되는지를 검사하는 방법엔 무엇이 있을까?
 
 주어진 연결리스트가 완전한 환형이라면 쉽게 순환 여부를 알 수 있을 것이다. 주어진 연결리스트가 완전 환형이 아니라면 순환을 찾기 위해서는 2개의 노드가 가리키는 노드를 찾는 것이 핵심이다.

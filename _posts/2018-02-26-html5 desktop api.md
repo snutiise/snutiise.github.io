@@ -12,8 +12,6 @@ categories:
 - Programming
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 지난번 채팅앱을 구현할 때 child window를 통해서 알림창을 구현했다.
 
 그때에는 언급하지 못했지만 electron의 경우 notification을 제공한다. 
@@ -68,4 +66,4 @@ function notifyMe() {
 
 renderer process에서 html5 api를 사용하면 알림창을 보다 쉽게 구현할 수 있다.
 
-html5 notification api에 대해서는 <a href="https://developer.mozilla.org/ko/docs/Web/API/notification">API 문서</a>를 눌러 확인해보자
+html5 notification api에 대해서는 <a href="https://web.archive.org/web/20171206155122/https://developer.mozilla.org/ko/docs/Web/API/notification">API 문서</a>를 눌러 확인해보자

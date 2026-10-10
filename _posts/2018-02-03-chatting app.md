@@ -12,8 +12,6 @@ categories:
 - Programming
 ---
 
-<img src="https://octodex.github.com/images/codercat.jpg" alt="" loading="lazy" decoding="async" width="896" height="896">
-
 주말에 한가롭게 놀다가 electron으로 채팅앱을 만들기로 마음 먹었다.
 
 react를 이용해서 앱의 기본 기능들은 만들었지만 os기능을 이용하고자 electron으로 빌드시 renderer process에서 socket이 최초 emit후 끊어지는 증상이 발생했다...
@@ -246,5 +244,5 @@ http.listen(8000, function(){
 
 좀 더 구현하자면 기존 채팅기록에 스크롤링이나 귓속말, 개인 프로필 등 더 작업이 가능하지만 일단은 electron renderer process socket 문제부터 해결해야 겠다.
 
-구현된 채팅앱은 <a href="http://sodeok.xyz:8000">이곳</a>에서 확인 가능하다.
+구현된 채팅앱은 당시 데모 서버에서 확인할 수 있었다. (2026-10 덧붙임: 데모 서버가 내려가고 도메인도 만료돼 링크를 뺐다.)
 
