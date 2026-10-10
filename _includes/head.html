@@ -128,8 +128,9 @@
       - IP 는 화면에 찍지 않는다. 예전에는 사이드바 #userip 에 'IP님 N PageView Hit!' 로 나갔다.
       - 숫자가 아닌 값은 버리고 textContent 로만 넣는다. 예전에는 innerHTML 이라
         함수 응답이 오염되면 그대로 전 페이지 XSS 였다.
-      - 운영 오리진(site.url)이 아니면 호출하지 않는다. 로컬 미리보기·CI 산출물·감사 도구가
-        열 때마다 운영 카운터가 올라가 통계를 오염시켰다.
+      - 운영 오리진이 아니면 호출하지 않는다. 로컬 미리보기·CI 산출물·감사 도구가
+        열 때마다 운영 카운터가 올라가 통계를 오염시켰다. site.url 대신 주소를 박아 둔다 —
+        jekyll serve 는 개발 환경에서 site.url 을 http://localhost:4000 으로 덮는다.
       - 예전에는 100x100 박스에 24px h2 를 left/top 좌표로 박아 모바일에서 본문 줄을 덮었다.
         한 줄짜리 작은 배지로 줄여 상단 바(검색 버튼 왼쪽, 같은 --surface 색)에 띄우고, 위로
         빠지며 사라진다. 페이지를 막 연 순간에는 본문 위가 아니라 상단 바 위에 있다.
@@ -140,7 +141,7 @@
     {%- endcomment %}
     <script>
     (function () {
-        if (location.origin !== {{ site.url | jsonify }}) return;
+        if (location.origin !== 'https://snutiise.github.io') return;
         var req = new XMLHttpRequest();
         req.onload = function () {
             if (req.status !== 200 && req.status !== 201) return;

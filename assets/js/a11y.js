@@ -86,13 +86,18 @@
 
   // simpleJekyllSearch 는 부를 때마다 search.json 을 새로 받고 입력칸에 keyup 핸들러를
   // 하나 더 붙인다. main.js 는 검색을 열 때마다 부르므로, 첫 호출만 통과시킨다.
-  // 대신 첫 요청이 실패하면 새로고침 전까지 다시 받지 않는다(전에는 열 때마다 재시도).
+  // 요청이 실패하면 다시 열 때 한 번 더 받게 되돌린다. keyup 핸들러는 성공 콜백에서만
+  // 붙으므로 실패한 호출은 아무것도 남기지 않는다. Zepto 는 ajaxError 를 document 에 쏜다.
   var $ = window.Zepto;
   if ($ && $.fn.simpleJekyllSearch) {
     var initSearch = $.fn.simpleJekyllSearch;
-    $.fn.simpleJekyllSearch = function () {
+    var once = function () {
       $.fn.simpleJekyllSearch = function () { return this; };
       return initSearch.apply(this, arguments);
     };
+    $.fn.simpleJekyllSearch = once;
+    $(document).on('ajaxError', function (e, xhr, opts) {
+      if (/search\.json/.test(opts.url)) $.fn.simpleJekyllSearch = once;
+    });
   }
 })();
