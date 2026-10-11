@@ -54,8 +54,8 @@ if (f) {
  });
 }
 
-// Disqus on click; no page.identifier
-const btn = $('load-comments');
+// Disqus on click; no page.identifier. Blog pages only: on research pages an SVG id could be named load-comments
+const btn = 'track' in b.dataset && $('load-comments');
 if (btn) btn.addEventListener('click', () => {
  const th = $('disqus_thread'), n = $('cm-note'), s = d.createElement('script');
  if (!prod) { n.textContent = '미리보기에서는 불러오지 않는다.'; n.hidden = false; return; }
