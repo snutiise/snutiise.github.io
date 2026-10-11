@@ -3,8 +3,8 @@
 const d = document, b = d.body, $ = i => d.getElementById(i),
   prod = location.origin == 'https://snutiise.github.io';
 
-// nav aria-current
-d.querySelector('.site-nav a[href="' + b.dataset.nav + '"]')?.setAttribute('aria-current', location.pathname == b.dataset.nav ? 'page' : 'true');
+// nav aria-current (x/index.html = x/)
+d.querySelector('.site-nav a[href="' + b.dataset.nav + '"]')?.setAttribute('aria-current', location.pathname.replace(/\/index\.html$/, '/') == b.dataset.nav ? 'page' : 'true');
 
 // TOC spy: raw href vs Hangul id (a.hash is encoded)
 const toc = d.querySelector('.toc');
