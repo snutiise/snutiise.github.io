@@ -252,14 +252,16 @@ head_ "15. 공통 머리·꼬리 바이트 일치"
 # 헤더(건너뛰기 링크~</header>)와 푸터(<footer class="site-foot">~</footer>)는 블로그와
 # feed-research 생성기가 같은 바이트를 낸다(spec: DESIGN.md §2.2·§2.3). 현재 메뉴 표시는
 # body[data-nav] 를 CSS 가 읽으므로 페이지마다 달라질 것이 없다.
-# feed-research 는 생성기가 새 템플릿으로 바뀌기 전까지 옛 머리를 쓰므로, 새 헤더가 없으면 건너뛴다.
+# feed-research 는 생성기가 새 템플릿으로 바뀌기 전까지 옛 머리를 쓴다. 옛 생성기만 site.css 를 안 걸므로
+# 그때만 건너뛴다(검사 대상인 헤더 글자로 고르면 헤더가 틀어진 페이지도 건너뛰어 통과한다).
+# fr#6 이 배포된 뒤 첫 블로그 커밋에서 이 건너뛰기를 지운다.
 if HF_BAD=$(node - "$SITE" "$POST_HTML" <<'JS'
 const fs = require('fs'), path = require('path');
 const [site, post] = process.argv.slice(2), out = [];
 const files = ['index.html', 'posts/index.html', post ? path.relative(site, post) : '', 'about/index.html', '404.html'];
 const fr = path.join(site, 'feed-research', 'index.html');
-if (fs.existsSync(fr) && fs.readFileSync(fr, 'utf8').includes('<header class="site-head">')) files.push('feed-research/index.html');
-else console.error('  (feed-research/index.html 은 아직 옛 템플릿이라 건너뜀)');
+if (fs.existsSync(fr) && fs.readFileSync(fr, 'utf8').includes('/assets/css/site.css')) files.push('feed-research/index.html');
+else console.error('  \x1b[33mWARN\x1b[0m feed-research/index.html 은 아직 옛 템플릿(site.css 없음)이라 건너뜀');
 const grab = (h, re) => (h.match(re) || [])[0];
 const seen = { head: new Map(), foot: new Map() };
 for (const rel of files) {

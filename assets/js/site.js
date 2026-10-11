@@ -13,14 +13,15 @@ if (toc) {
  let on = null, q = 0;
  for (const a of toc.querySelectorAll('a')) {
   const h = $(a.getAttribute('href').slice(1));
-  if (h) hs.push([h, a]);
+  if (h) { hs.push([h, a]); a.className = h.className; } // h2.part -> bold entry
  }
  const spy = () => {
   let a = null;
   q = 0;
   for (const [h, l] of hs) { if (h.getBoundingClientRect().top >= innerHeight / 4) break; a = l; }
+  if (scrollY && innerHeight + scrollY > d.documentElement.scrollHeight - 2) a = hs.at(-1)?.[1];
   if (a == on) return;
-  if (on) on.removeAttribute('aria-current');
+  on?.removeAttribute('aria-current');
   if (a) {
    a.setAttribute('aria-current', 'location');
    const t = a.offsetTop;
@@ -28,8 +29,10 @@ if (toc) {
   }
   on = a;
  };
- addEventListener('scroll', () => { if (!q) { q = 1; requestAnimationFrame(spy); } });
+ addEventListener('scroll', () => q ||= requestAnimationFrame(spy));
  spy();
+ const m = matchMedia('(min-width:64em)'), rail = () => toc.querySelector('summary').inert = m.matches && CSS.supports('selector(::details-content)');
+ m.onchange = rail; rail();
  d.addEventListener('click', e => { if (e.target.closest('a[href="#toc"]')) toc.open = true; });
 }
 
@@ -41,12 +44,11 @@ if (f) {
   const t = f.value.trim().toLowerCase();
   let n = 0;
   for (const ul of d.querySelectorAll('.ls[data-filter]')) {
-   let any = false;
    for (const li of ul.querySelectorAll('li')) {
-    li.hidden = !(li.textContent + ' ' + li.dataset.tags).toLowerCase().includes(t);
-    if (!li.hidden) { n++; any = true; }
+    li.hidden = !(li.textContent + ' ' + li.dataset.q).toLowerCase().includes(t);
+    if (!li.hidden) n++;
    }
-   ul.closest('section').hidden = !any;
+   ul.closest('section').hidden = !ul.querySelector('li:not([hidden])');
   }
   $('filter-count').textContent = t ? n + '편' : '';
  });
