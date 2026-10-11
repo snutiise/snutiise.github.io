@@ -214,6 +214,14 @@ JS
   [[ -z "$JS_BAD" ]] && ok "인라인 스크립트·이벤트 속성·javascript: URL 없음, JSON 데이터 블록 정상" || bad "CSP 가 막을 인라인 코드가 있다" "${JS_BAD//$'\n'/ / }"
 else bad "node 로 인라인 스크립트를 검사하지 못함" "node 가 설치돼 있는지 확인"; fi
 
+# jsonify 는 </script> 를 이스케이프하지 않는다. 지금 글 제목에는 < 가 없어 위 산출물 검사로는
+# 이스케이프가 빠져도 통과하므로 템플릿을 직접 본다: JSON-LD 의 jsonify 마다 replace: '<', '\u003c' 가 붙어야 한다.
+HEAD_T="$(dirname "$0")/../_includes/head.html"
+LD=$(grep 'application/ld+json' "$HEAD_T" 2>/dev/null)
+NJ=$(grep -o 'jsonify' <<<"$LD" | wc -l | tr -d ' ')
+NE=$(grep -oF "jsonify | replace: '<', '\u003c'" <<<"$LD" | wc -l | tr -d ' ')
+(( NJ > 0 && NJ == NE )) && ok "JSON-LD 의 jsonify ${NJ}곳 모두 '<' 이스케이프" || bad "JSON-LD 값에 '<' 이스케이프가 빠졌다" "jsonify ${NJ}곳 중 ${NE}곳만 replace: '<', '\u003c' ($HEAD_T)"
+
 head_ "14. 포스트 코드 예제"
 # 두 번 깨진 적이 있다. (1) 이미지 지연 로딩을 일괄 치환하다 코드 예제 안의 문자열
 # <img …> 에도 loading/decoding 속성을 끼워 넣었다(electron2, dcmacro). (2) electron3 의
