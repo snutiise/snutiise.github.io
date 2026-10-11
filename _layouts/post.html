@@ -1,33 +1,39 @@
-<!DOCTYPE html>
-<html lang="ko">
-    {% include head.html %}
-    <body>
-        {%- comment -%}
-          - 날짜는 series·tags·홈 feed-research 카드와 같은 YYYY-MM-DD 로 맞춘다
-            (예전 date_to_string 은 '05 Nov 2020', 목록은 'January 14, 2018' 이었다).
-          - BlogPosting microdata(itemscope/itemprop)를 지웠다. 글의 구조화 데이터는
-            head.html 의 JSON-LD 한 곳에서 낸다. 둘 다 두면 글마다 BlogPosting 이 2개 잡히고,
-            microdata 쪽에는 headline·author 가 없었다.
-        {%- endcomment %}
-        {% include svg-icons.html %}
-        {% include header-post.html %}
-        {% include tree-posts.html %}
-        <section class="post">
-            {% if page.date %}
-                <div class="time">
-                    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
-                </div>
-            {% endif %}
-            <h1 class="post-title">{{ page.title }}</h1>
-
-            <article id="scroll" class="post-content" role="main">
-                {{ content }}
-            </article>
-
-            {% include share.html %}
-            {% include comments.html %}
-            {% include footer.html %}
-            {% include scripts.html %}
-        </section>
-    </body>
-</html>
+---
+layout: base
+---
+{%- comment -%}
+  댓글: Disqus 는 '댓글 보기' 버튼을 눌렀을 때만 site.js 가 불러온다(누르기 전 서드파티 요청 0건).
+  설정은 #disqus_thread 의 data-url·data-title 로 넘긴다. url 은 운영 주소로 고정한다 — 쿼리스트링이나
+  로컬 미리보기 주소로 열어도 같은 스레드를 쓴다. absolute_url 은 쓰지 않는다(jekyll serve 가
+  site.url 을 localhost 로 덮는다). identifier 는 일부러 넣지 않는다. 기존 스레드는 identifier 없이
+  link 로만 묶여 있어서, 새로 주면 Disqus 가 빈 스레드를 만들어 기존 댓글이 떨어진다.
+  본문은 그대로 내보낸다. Rouge 의 <pre> 에 tabindex="0" 만 붙여 키보드로 가로 스크롤할 수 있게 한다.
+{%- endcomment -%}
+{%- assign cat = page.categories[0] -%}
+{%- assign mins = content | strip_html | normalize_whitespace | remove: ' ' | size | divided_by: 450.0 | round | at_least: 1 -%}
+{%- assign url = page.url | prepend: site.baseurl | prepend: 'https://snutiise.github.io' -%}
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="/series/#{{ cat | slugify }}">{{ cat | escape }}</a></p>
+<h1>{{ page.title | escape }}</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">날짜</span><time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: '%Y-%m-%d' }}</time></li>
+<li><span class="meta-k">읽는 시간</span>{{ mins }}분</li>
+<li><span class="meta-k">태그</span><span class="tags">{% for t in page.tags %}<a href="/tags/#{{ t | slugify }}">#{{ t | escape }}</a>{% endfor %}</span></li>
+</ul>
+{% include toc.html html=content %}
+<div class="prose">
+{{ content | replace: '<figure class="highlight"><pre>', '<figure class="highlight"><pre tabindex="0">' }}
+</div>
+<footer class="doc-foot">
+<p class="share">공유 <a href="https://twitter.com/intent/tweet?text={{ page.title | cgi_escape }}&amp;url={{ url | cgi_escape }}" target="_blank" rel="noopener noreferrer">X</a> &middot; <a href="https://www.facebook.com/sharer/sharer.php?u={{ url | cgi_escape }}" target="_blank" rel="noopener noreferrer">Facebook</a></p>
+<nav class="pager" aria-label="이전·다음 글">{% if page.previous %}<a class="pg-prev" href="{{ page.previous.url | prepend: site.baseurl }}" rel="prev"><span class="pg-k">← 이전 글</span><span class="pg-v">{{ page.previous.title | escape }}</span></a>{% endif %}{% if page.next %}<a class="pg-next" href="{{ page.next.url | prepend: site.baseurl }}" rel="next"><span class="pg-k">다음 글 →</span><span class="pg-v">{{ page.next.title | escape }}</span></a>{% endif %}</nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">댓글</h2>
+<button type="button" class="btn" id="load-comments">댓글 보기 (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="{{ url | escape }}" data-title="{{ page.title | escape }}"></div>
+</section>
+</footer>
+</article>

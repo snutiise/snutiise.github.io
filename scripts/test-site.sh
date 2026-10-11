@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 빌드된 _site 를 검사한다. 의존성은 bash/grep/find, 7·13·14번 검사만 node 18.17+
+# 빌드된 _site 를 검사한다. 의존성은 bash/grep/find, 7·13·14·15번 검사만 node 18.17+
 # (ubuntu-latest 러너에 기본 설치돼 있다).
 #   사용: scripts/test-site.sh [_site 경로]
 #
@@ -21,8 +21,8 @@ HOME_HTML="$SITE/index.html"
 # 목록 페이지(/posts/, /tags/ …)가 아니라 실제 글을 고른다. 전에는
 # itemprop="datePublished" 로 골랐는데 series.html·tags.html 에도 있어서
 # /series/ 가 '포스트'로 검사되고 있었다(grep 순회 순서에 따라 대상도 바뀌었다).
-# <div class="time"> 은 _layouts/post.html 에만 있다. sort 로 대상을 고정한다.
-POST_HTML="$(grep -rl '<div class="time">' "$SITE" --include=index.html 2>/dev/null | grep -v '/feed-research/' | sort | head -1)"
+# og:type article 은 head.html 이 layout 'post' 에만 낸다. sort 로 대상을 고정한다.
+POST_HTML="$(grep -rl 'property="og:type" content="article"' "$SITE" --include=index.html 2>/dev/null | grep -v '/feed-research/' | sort | head -1)"
 
 head_ "1. 절대 URL 메타데이터"
 # site.url 이 비면 상대경로로 렌더돼 링크 미리보기·정규 URL·RSS가 전부 깨진다.
@@ -60,6 +60,7 @@ else bad "포스트 페이지를 찾지 못함" "빌드 산출물 구조 확인 
 head_ "5. meta description"
 # front matter 의 description: '' 가 Liquid 에서 truthy 라 전 페이지 description 이
 # 비어 나간 적이 있다. 비어 있으면 검색결과 스니펫·링크 미리보기가 망가진다.
+SITE_DESC=$(grep -o 'name="description" content="[^"]*"' "$HOME_HTML" | head -1 | sed 's/.*content="//;s/"$//')
 for f in "$HOME_HTML" "$POST_HTML"; do
   [[ -n "$f" && -f "$f" ]] || continue
   D=$(grep -o 'name="description" content="[^"]*"' "$f" | head -1 | sed 's/.*content="//;s/"$//')
@@ -68,6 +69,16 @@ for f in "$HOME_HTML" "$POST_HTML"; do
   if (( W > 12 )); then ok "description 채워짐 (${W}바이트, ${f#$SITE})"
   else bad "description 이 비었거나 너무 짧다" "'${D}' (${f#$SITE})"; fi
 done
+# 포스트는 본문 앞부분이 설명이어야 한다. page.layout == 'post' 판별이 깨지면 포스트도
+# 사이트 설명으로 떨어지고 og:type·JSON-LD 가 함께 사라지는데 위 검사는 그래도 통과한다.
+if [[ -n "$POST_HTML" ]]; then
+  PD=$(grep -o 'name="description" content="[^"]*"' "$POST_HTML" | head -1 | sed 's/.*content="//;s/"$//')
+  [[ -n "$PD" && "$PD" != "$SITE_DESC" ]] && ok "포스트 description 이 사이트 설명과 다름" || bad "포스트 description 이 사이트 설명으로 떨어졌다" "'$PD' (${POST_HTML#$SITE})"
+  grep -q '<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting"' "$POST_HTML" \
+    && ok "포스트 JSON-LD BlogPosting 있음" || bad "포스트에 JSON-LD BlogPosting 이 없다" "${POST_HTML#$SITE}"
+  NA=$(grep -rL 'property="og:type" content="article"' $(grep -rl 'id="disqus_thread"' "$SITE" --include=index.html | grep -v '/feed-research/') 2>/dev/null)
+  [[ -z "$NA" ]] && ok "댓글이 있는 모든 글이 og:type article" || bad "og:type 이 article 이 아닌 글" "$NA"
+fi
 
 head_ "6. RSS / 사이트맵"
 FEED="$SITE/feed.xml"
@@ -153,38 +164,63 @@ elif [[ -z "$MANGLED" ]]; then ok "목록 제목에 공백→밑줄 치환 없�
 else bad "목록 제목의 공백이 밑줄로 바뀌었다" "$MANGLED(_includes/tree-posts.html)"; fi
 
 head_ "12. 페이지 배경색"
-# main.css 는 html/body 에 배경을 주지 않는다. 캔버스가 어두운 환경에서는 #333 본문이
-# 투명 배경 위에 놓여 거의 안 보였다. main.css 는 다시 빌드하면 안 되므로 배경은
-# custom.css 에서 준다. 규칙이 여러 줄에 걸쳐도 잡히게 개행을 펴서 본다.
-CSS="$SITE/assets/css/custom.css"
-if tr '\n' ' ' < "$CSS" 2>/dev/null | grep -Eq '(^|[},[:space:]])(html|body)[[:space:]]*(,[^{]*)?\{[^}]*background'; then ok "custom.css 에 html/body 배경 지정"
+# 예전 main.css 는 html/body 에 배경을 주지 않아, 캔버스가 어두운 환경에서는 #333 본문이
+# 투명 배경 위에 놓여 거의 안 보였다. site.css 는 body 에 background: var(--bg) 를 준다.
+# 규칙이 여러 줄에 걸쳐도 잡히게 개행을 펴서 본다.
+CSS="$SITE/assets/css/site.css"
+if tr '\n' ' ' < "$CSS" 2>/dev/null | grep -Eq '(^|[},[:space:]])(html|body)[[:space:]]*(,[^{]*)?\{[^}]*background'; then ok "site.css 에 html/body 배경 지정"
 else bad "html/body 배경이 없다" "$CSS 에 html 또는 body 의 background 규칙이 없다"; fi
 
-head_ "13. 인라인 스크립트"
-# 두 번 깨진 적이 있다. (1) _layouts/compress.html 은 <pre> 밖의 개행을 전부 지워서
-# 인라인 <script> 가 한 줄이 되고, 첫 // 주석이 그 뒤 코드를 모두 삼킨다(네이버
-# 분석 설정이 이렇게 사라졌다). (2) Liquid 값을 이스케이프 없이 JS 문자열에 넣어
-# 따옴표 하나로 SyntaxError 가 나고 댓글이 뜨지 않았다. 둘 다 빌드와 html-proofer 를
-# 통과하고 브라우저 콘솔에서만 보인다. node 로 파싱만 하고 실행하지는 않는다.
-# // 판별은 휴리스틱이다: 개행이 없는 스크립트 본문에서 앞이 줄머리·공백·; { } 이고
-# 뒤가 공백인 // 를 주석으로 본다('//' + x 나 https:// 는 걸리지 않는다).
+head_ "13. 인라인 스크립트·이벤트 속성 (CSP 에 'unsafe-inline' 이 없다)"
+# head.html 의 CSP 는 'unsafe-inline' 없이 script-src 'self' + 정해진 서드파티 파일만 허용한다.
+# 동작은 전부 /assets/js/site.js 에 있다. 템플릿에 인라인 <script>·onclick 같은 속성·javascript:
+# 링크가 다시 들어오면 브라우저가 막아 기능이 조용히 죽는다(빌드와 html-proofer 는 통과한다).
+# 예전에는 실제로 인라인 스크립트가 두 번 깨졌다(compress 레이아웃의 // 주석, 따옴표 미이스케이프).
+# - src 없는 <script> 는 type 이 application/ld+json·application/json 인 데이터 블록만 허용
+# - 데이터 블록은 JSON.parse 가 돼야 하고 '</' 가 없어야 한다(jsonify 는 </script> 를 이스케이프하지 않는다)
+# - 실제 태그(<로 시작, 본문 코드 예제의 &lt; 는 해당 없음)에 on*= 속성, href/src 의 javascript: 금지
+# feed-research/ 는 다른 저장소가 생성하고 자체 검사(build-html.mjs)를 가진다. 여기서는 뺀다.
 if JS_BAD=$(node - "$SITE" <<'JS'
-const fs = require('fs'), path = require('path'), vm = require('vm');
+const fs = require('fs'), path = require('path');
 const site = process.argv[2], out = [];
+let pages = 0, blocks = 0;
 for (const rel of fs.readdirSync(site, { recursive: true }).sort()) {
   if (!rel.endsWith('.html') || rel.split(path.sep).includes('feed-research')) continue;
+  pages++;
   const html = fs.readFileSync(path.join(site, rel), 'utf8');
-  for (const [, attrs, body] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
-    if (/\bsrc=/i.test(attrs) || (/\btype=/i.test(attrs) && !/javascript/i.test(attrs))) continue;
-    try { new vm.Script(body); } catch (e) { out.push(`${rel}: ${e.message}`); continue; }
-    if (!body.includes('\n') && /(^|[;{}\s])\/\/\s/.test(body)) out.push(`${rel}: 한 줄로 뭉개진 스크립트에 // 주석`);
+  for (const [, attrs, body] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
+    if (/\bsrc\s*=/i.test(attrs)) {
+      if (body.trim()) out.push(`${rel}: src 가 있는 <script> 에 본문이 있다`);
+      continue;
+    }
+    const type = (attrs.match(/\btype\s*=\s*[\x22\x27]?([^\x22\x27\s>]+)/i) || [])[1] || '';
+    if (!/^application\/(ld\+)?json$/i.test(type)) { out.push(`${rel}: 인라인 <script${attrs}>`); continue; }
+    blocks++;
+    if (body.includes('</')) out.push(`${rel}: JSON 데이터 블록 안에 '</'`);
+    try { JSON.parse(body); } catch (e) { out.push(`${rel}: JSON 데이터 블록 파싱 실패 (${e.message})`); }
+  }
+  const tags = html.replace(/<!--[\s\S]*?-->/g, '').match(/<[a-zA-Z][^>]*>/g) || [];
+  for (const t of tags) {
+    const ev = t.match(/\son[a-z]+\s*=/i);
+    if (ev) out.push(`${rel}: 이벤트 속성 ${ev[0].trim()} in ${t.slice(0, 80)}`);
+    if (/\s(href|src|action|formaction)\s*=\s*[\x22\x27]?\s*javascript:/i.test(t)) out.push(`${rel}: javascript: URL in ${t.slice(0, 80)}`);
   }
 }
+if (!pages) out.push('검사한 HTML 이 없다');
 console.log(out.join('\n'));
+console.error(`  (${pages}개 페이지, JSON 데이터 블록 ${blocks}개)`);
 JS
 ); then
-  [[ -z "$JS_BAD" ]] && ok "인라인 스크립트 파싱 통과, 뭉개진 // 주석 없음" || bad "인라인 스크립트가 깨졌다" "${JS_BAD//$'\n'/ / }"
+  [[ -z "$JS_BAD" ]] && ok "인라인 스크립트·이벤트 속성·javascript: URL 없음, JSON 데이터 블록 정상" || bad "CSP 가 막을 인라인 코드가 있다" "${JS_BAD//$'\n'/ / }"
 else bad "node 로 인라인 스크립트를 검사하지 못함" "node 가 설치돼 있는지 확인"; fi
+
+# jsonify 는 </script> 를 이스케이프하지 않는다. 지금 글 제목에는 < 가 없어 위 산출물 검사로는
+# 이스케이프가 빠져도 통과하므로 템플릿을 직접 본다: JSON-LD 의 jsonify 마다 replace: '<', '\u003c' 가 붙어야 한다.
+HEAD_T="$(dirname "$0")/../_includes/head.html"
+LD=$(grep 'application/ld+json' "$HEAD_T" 2>/dev/null)
+NJ=$(grep -o 'jsonify' <<<"$LD" | wc -l | tr -d ' ')
+NE=$(grep -oF "jsonify | replace: '<', '\u003c'" <<<"$LD" | wc -l | tr -d ' ')
+(( NJ > 0 && NJ == NE )) && ok "JSON-LD 의 jsonify ${NJ}곳 모두 '<' 이스케이프" || bad "JSON-LD 값에 '<' 이스케이프가 빠졌다" "jsonify ${NJ}곳 중 ${NE}곳만 replace: '<', '\u003c' ($HEAD_T)"
 
 head_ "14. 포스트 코드 예제"
 # 두 번 깨진 적이 있다. (1) 이미지 지연 로딩을 일괄 치환하다 코드 예제 안의 문자열
@@ -211,6 +247,38 @@ JS
 ); then
   [[ -z "$CODE_BAD" ]] && ok "코드 예제 원문 보존" || bad "포스트 코드 예제가 깨졌다" "${CODE_BAD//$'\n'/ / }"
 else bad "node 로 코드 예제를 검사하지 못함" "node 가 설치돼 있는지 확인"; fi
+
+head_ "15. 공통 머리·꼬리 바이트 일치"
+# 헤더(건너뛰기 링크~</header>)와 푸터(<footer class="site-foot">~</footer>)는 블로그와
+# feed-research 생성기가 같은 바이트를 낸다(spec: DESIGN.md §2.2·§2.3). 현재 메뉴 표시는
+# body[data-nav] 를 CSS 가 읽으므로 페이지마다 달라질 것이 없다.
+# feed-research 는 생성기가 새 템플릿으로 바뀌기 전까지 옛 머리를 쓴다. 옛 생성기만 site.css 를 안 걸므로
+# 그때만 건너뛴다(검사 대상인 헤더 글자로 고르면 헤더가 틀어진 페이지도 건너뛰어 통과한다).
+# fr#6 이 배포된 뒤 첫 블로그 커밋에서 이 건너뛰기를 지운다.
+if HF_BAD=$(node - "$SITE" "$POST_HTML" <<'JS'
+const fs = require('fs'), path = require('path');
+const [site, post] = process.argv.slice(2), out = [];
+const files = ['index.html', 'posts/index.html', post ? path.relative(site, post) : '', 'about/index.html', '404.html'];
+const fr = path.join(site, 'feed-research', 'index.html');
+if (fs.existsSync(fr) && fs.readFileSync(fr, 'utf8').includes('/assets/css/site.css')) files.push('feed-research/index.html');
+else console.error('  \x1b[33mWARN\x1b[0m feed-research/index.html 은 아직 옛 템플릿(site.css 없음)이라 건너뜀');
+const grab = (h, re) => (h.match(re) || [])[0];
+const seen = { head: new Map(), foot: new Map() };
+for (const rel of files) {
+  const p = path.join(site, rel);
+  if (!rel || !fs.existsSync(p)) { out.push(`${rel || '(포스트)'}: 파일 없음`); continue; }
+  const h = fs.readFileSync(p, 'utf8');
+  const head = grab(h, /<a class="skip" href="#content">[\s\S]*?<\/header>/), foot = grab(h, /<footer class="site-foot">[\s\S]*?<\/footer>/);
+  if (!head) out.push(`${rel}: 공통 헤더 없음`); else seen.head.set(head, [...(seen.head.get(head) || []), rel]);
+  if (!foot) out.push(`${rel}: 공통 푸터 없음`); else seen.foot.set(foot, [...(seen.foot.get(foot) || []), rel]);
+}
+for (const k of ['head', 'foot']) if (seen[k].size > 1) out.push(`${k} 가 ${seen[k].size}가지: ` + [...seen[k].values()].map((v) => v.join(',')).join(' | '));
+console.log(out.join('\n'));
+console.error(`  (${files.length}개 페이지 비교)`);
+JS
+); then
+  [[ -z "$HF_BAD" ]] && ok "헤더·푸터가 모든 비교 페이지에서 같은 바이트" || bad "헤더·푸터가 페이지마다 다르다" "${HF_BAD//$'\n'/ / }"
+else bad "node 로 헤더·푸터를 비교하지 못함" "node 가 설치돼 있는지 확인"; fi
 
 echo
 if (( FAIL )); then printf '\033[31m실패 — 위 FAIL 항목을 고칠 것\033[0m\n'; exit 1; fi
