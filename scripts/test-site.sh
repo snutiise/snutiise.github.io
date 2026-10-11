@@ -179,13 +179,13 @@ head_ "13. 인라인 스크립트·이벤트 속성 (CSP 에 'unsafe-inline' 이
 # - src 없는 <script> 는 type 이 application/ld+json·application/json 인 데이터 블록만 허용
 # - 데이터 블록은 JSON.parse 가 돼야 하고 '</' 가 없어야 한다(jsonify 는 </script> 를 이스케이프하지 않는다)
 # - 실제 태그(<로 시작, 본문 코드 예제의 &lt; 는 해당 없음)에 on*= 속성, href/src 의 javascript: 금지
-# feed-research/ 는 다른 저장소가 생성하고 자체 검사(build-html.mjs)를 가진다. 여기서는 뺀다.
+# feed-research/ 도 같은 규칙으로 본다. 생성기(build-html.mjs)의 자체 검사가 1차이고, 여기가 게시본에 대한 2차다.
 if JS_BAD=$(node - "$SITE" <<'JS'
 const fs = require('fs'), path = require('path');
 const site = process.argv[2], out = [];
 let pages = 0, blocks = 0;
 for (const rel of fs.readdirSync(site, { recursive: true }).sort()) {
-  if (!rel.endsWith('.html') || rel.split(path.sep).includes('feed-research')) continue;
+  if (!rel.endsWith('.html')) continue;
   pages++;
   const html = fs.readFileSync(path.join(site, rel), 'utf8');
   for (const [, attrs, body] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
@@ -252,16 +252,13 @@ head_ "15. 공통 머리·꼬리 바이트 일치"
 # 헤더(건너뛰기 링크~</header>)와 푸터(<footer class="site-foot">~</footer>)는 블로그와
 # feed-research 생성기가 같은 바이트를 낸다(spec: DESIGN.md §2.2·§2.3). 현재 메뉴 표시는
 # body[data-nav] 를 CSS 가 읽으므로 페이지마다 달라질 것이 없다.
-# feed-research 는 생성기가 새 템플릿으로 바뀌기 전까지 옛 머리를 쓴다. 옛 생성기만 site.css 를 안 걸므로
-# 그때만 건너뛴다(검사 대상인 헤더 글자로 고르면 헤더가 틀어진 페이지도 건너뛰어 통과한다).
-# fr#6 이 배포된 뒤 첫 블로그 커밋에서 이 건너뛰기를 지운다.
+# 리서치 쪽은 정본·일일 리포트·목록이 서로 다른 생성 경로라 세 종류를 하나씩 넣는다.
 if HF_BAD=$(node - "$SITE" "$POST_HTML" <<'JS'
 const fs = require('fs'), path = require('path');
 const [site, post] = process.argv.slice(2), out = [];
 const files = ['index.html', 'posts/index.html', post ? path.relative(site, post) : '', 'about/index.html', '404.html'];
-const fr = path.join(site, 'feed-research', 'index.html');
-if (fs.existsSync(fr) && fs.readFileSync(fr, 'utf8').includes('/assets/css/site.css')) files.push('feed-research/index.html');
-else console.error('  \x1b[33mWARN\x1b[0m feed-research/index.html 은 아직 옛 템플릿(site.css 없음)이라 건너뜀');
+const fr = fs.readdirSync(path.join(site, 'feed-research')).filter((f) => /^daily-\d{4}-\d{2}-\d{2}\.html$/.test(f)).sort();
+files.push('feed-research/index.html', 'feed-research/x.html', 'feed-research/daily.html', fr.length ? `feed-research/${fr.at(-1)}` : '');
 const grab = (h, re) => (h.match(re) || [])[0];
 const seen = { head: new Map(), foot: new Map() };
 for (const rel of files) {
