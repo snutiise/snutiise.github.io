@@ -1,0 +1,33 @@
+{%- comment -%}
+  TOC from the rendered post body (kramdown auto_ids). Same markup as the feed-research
+  generator (spec/DESIGN.md 3.3): h2 entries, h3 nested under the preceding h2, raw ids.
+  Usage: {% include toc.html html=content %}. Emits nothing for fewer than 3 headings.
+{%- endcomment -%}
+{%- assign n = 0 -%}{%- assign top = 0 -%}{%- assign sub = false -%}{%- assign prev = '' -%}
+{%- capture items -%}
+{%- assign chunks = include.html | split: '<h' -%}
+{%- for c in chunks offset: 1 -%}
+{%- assign lv = c | slice: 0 -%}
+{%- assign idattr = c | slice: 1, 5 -%}
+{%- if lv != '2' and lv != '3' -%}{%- continue -%}{%- endif -%}
+{%- if idattr != ' id="' -%}{%- continue -%}{%- endif -%}
+{%- assign parts = c | split: '"' -%}{%- assign id = parts[1] -%}
+{%- capture pre -%}{{ lv }} id="{{ id }}">{%- endcapture -%}
+{%- assign t = c | split: '</h' | first | remove_first: pre | strip_html | strip -%}
+{%- assign nested = false -%}
+{%- if lv == '3' and n > 0 -%}{%- if sub or prev == '2' -%}{%- assign nested = true -%}{%- endif -%}{%- endif -%}
+{%- if nested -%}
+{%- unless sub -%}<ol>{%- assign sub = true -%}{%- endunless -%}<li><a href="#{{ id }}">{{ t }}</a></li>
+{%- else -%}
+{%- if sub -%}</ol>{%- assign sub = false -%}{%- endif -%}
+{%- if n > 0 -%}</li>{%- endif -%}<li><a href="#{{ id }}">{{ t }}</a>
+{%- assign top = top | plus: 1 -%}
+{%- endif -%}
+{%- assign n = n | plus: 1 -%}{%- assign prev = lv -%}
+{%- endfor -%}
+{%- if sub -%}</ol></li>{%- elsif n > 0 -%}</li>{%- endif -%}
+{%- endcapture -%}
+{%- if n >= 3 -%}
+{%- if n > 24 -%}{%- assign cls = 'toc toc-long' -%}{%- assign cnt = top -%}{%- else -%}{%- assign cls = 'toc' -%}{%- assign cnt = n -%}{%- endif -%}
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="{{ cls }}"><summary>목차<span class="toc-n">{{ cnt }}</span></summary><ol>{{ items }}</ol></details></nav>
+{%- endif -%}

@@ -1,20 +1,27 @@
 ---
-layout: compress
-# head.html 의 <title>·og:title 이 page.title 을 쓴다. 없으면 홈과 같은 '0x00 - NULL' 이 나가
-# 탭·검색 결과에서 홈과 구분되지 않았다.
-title: "전체 글"
+layout: base
+title: 글
+nav: /posts/
+permalink: /posts/index.html
+description: 전체 글 목록
 ---
-
-<!DOCTYPE html>
-<html lang="ko">
-    {% include head.html %}
-    <body>
-<h1 class="sr-only">전체 글</h1>
-        <div class="page_posts" role="main">
-        {% include svg-icons.html %}
-        {% include header-post.html %}
-        {% include tree-posts.html %}
-        </div>
-        {% include scripts.html %}
-    </body>
-</html>
+{%- comment -%}
+  전체 목록을 HTML 에 다 싣는다(JS 가 꺼져도 완전하다). .filter 는 hidden 으로 나가고
+  site.js 가 켠다. 거르기는 행의 textContent(날짜·제목·시리즈)와 data-tags 로 한다.
+{%- endcomment %}
+<header class="page-head">
+<h1>글</h1>
+<p class="page-desc">{{ site.posts.size }}편 · {{ site.posts.last.date | date: '%Y' }}–{{ site.posts.first.date | date: '%Y' }}</p>
+</header>
+<div class="sec filter" hidden>
+<label class="sec-h" for="post-filter">거르기</label>
+<div class="filter-in"><input id="post-filter" type="search" placeholder="제목, 시리즈, 태그" autocomplete="off" aria-describedby="filter-count"><p class="filter-count" id="filter-count" role="status"></p></div>
+</div>
+{%- assign years = site.posts | group_by_exp: 'p', "p.date | date: '%Y'" -%}
+{% for y in years %}<section class="sec" aria-labelledby="y{{ y.name }}">
+<h2 class="sec-h year" id="y{{ y.name }}">{{ y.name }}<span class="sec-n">{{ y.size }}</span></h2>
+<ul class="ls" data-filter>
+{% for p in y.items %}{% include post-row.html post=p short=true filter=true %}
+{% endfor %}</ul>
+</section>
+{% endfor %}

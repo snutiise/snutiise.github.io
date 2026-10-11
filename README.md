@@ -33,29 +33,27 @@ python3 -m http.server 4000 --bind 127.0.0.1 -d /tmp/site
 
 ## 하지 말 것
 
-- **`assets/css/main.css`·`assets/js/main.js` 를 다시 빌드하지 않는다.** 2018년
-  gulp 산출물이다. 지금 `src/styl` 로 다시 빌드하면 normalize.css 버전이 바뀌어
-  사이트 전체 기본 스타일이 달라진다. 스타일은 main.css 뒤에 로드되는
-  `assets/css/custom.css` 에서 덮어쓰고, 동작은 `assets/js/a11y.js` 처럼 별도
-  파일로 더한다. 원래 툴체인(package.json, gulpfile.js)은 커밋 219162f 에 남아 있다.
+- **인라인 `<script>`·`onclick=` 같은 이벤트 속성·`javascript:` 링크를 넣지 않는다.**
+  `_includes/head.html` 의 CSP 에 `'unsafe-inline'` 이 없어서 브라우저가 막는다.
+  동작은 `assets/js/site.js` 에 더한다(`innerHTML` 대신 `textContent`).
+  `scripts/test-site.sh` 13번 검사가 막는다.
+- **`assets/css/site.css`·`assets/js/site.js` 는 feed-research 페이지도 쓴다.**
+  리서치 생성기가 `/assets/css/site.css` 를 링크하고, 공통 헤더·푸터
+  (`_includes/site-header.html`, `_includes/site-footer.html`)와 같은 바이트를 낸다.
+  리서치 컴포넌트 규칙을 지우거나 헤더·푸터를 바꿀 때는 그쪽 템플릿도 같이 바꾼다.
 - **`feed-research/` 와 `_data/feed_research.yml` 을 손으로 고치지 않는다.**
   feed-research 저장소의 `scripts/publish-html.sh` 가 매일 생성해 이 저장소에
   커밋·푸시한다. 여기서 고치면 다음 게시 때 덮인다. 고칠 것은 그 저장소에서 고친다.
-- **`_layouts/compress.html` 을 거치는 페이지의 인라인 `<script>` 에 `//` 줄 주석을
-  쓰지 않는다.** 이 레이아웃은 `<pre>` 밖의 공백(개행 포함)을 전부 뭉개서, `//`
-  뒤의 코드가 모두 주석이 된다. `/* */` 를 쓰거나 외부 `.js` 파일로 뺀다.
 
 ## 디렉터리
 
 | 경로 | 내용 |
 | --- | --- |
 | `_posts/` | 글 (Markdown) |
-| `_layouts/`, `_includes/` | 템플릿. 테마 gem 없이 전부 여기 있는 것만 쓴다 |
-| `assets/css/` | `main.css`(동결), `custom.css`(실제로 고치는 곳) |
-| `assets/js/` | `main.js`(동결, Zepto + 검색), `a11y.js`(키보드·포커스 보완) |
+| `_layouts/`, `_includes/` | 템플릿. 테마 gem 없이 전부 여기 있는 것만 쓴다(`base`, `post` 두 레이아웃) |
+| `assets/css/site.css` | 사이트 전체 스타일(블로그 + feed-research). 웹폰트·외부 CSS 없음 |
+| `assets/js/site.js` | 메뉴 표시, 목차 따라가기, /posts/ 거르기, Disqus 클릭 로드, 방문자 카운터·Naver 분석(운영 주소에서만) |
 | `assets/img/` | 글 이미지, 파비콘 |
 | `feed-research/`, `_data/feed_research.yml` | 생성물. 위 "하지 말 것" 참고 |
-| `src/` | main.css·main.js 의 2018년 원본(stylus, js). 참고용이고 빌드·배포하지 않는다 |
-| `sample/` | 테마가 딸려 보낸 데모 글. 빌드에서 제외된다 |
 | `scripts/test-site.sh` | 빌드 산출물 검사 |
 | `google*.html`, `naver*.html` | 검색엔진 소유 확인 파일. 지우지 않는다 |
