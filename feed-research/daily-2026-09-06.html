@@ -2,226 +2,68 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-06 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X 4세대+16(902a06f)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-06.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-06 — feed-research">
 <meta property="og:description" content="한 줄: X 4세대+16(902a06f)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-06.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-06</h1>
-  <div class="wd">일요일 · 읽는 데 약 32분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+16(<a href="https://github.com/xai-org/x-algorithm/commit/902a06f">902a06f</a>)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에 국한했으며, Phoenix serving 요청에 <code>experiment_overrides map</code>과 <code>SlateContext.exact_k/exact_gap</code> 필드를 신설했고, VF dark-traffic 미러링 대상에 <code>devel</code> app_env(PR별 프리뷰 배포)를 추가했다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-x-4세대16--cold-start-codivert-impression-배선--treatment-스코프를-phoenix-moe로-국한--phoenix-serving-계약-확장-experiment_overrides-exact_k--dark-traffic-devel-확장--예정된-muted-keyword-rule-신호--x">1. X 4세대+16 — cold-start codivert impression 배선 + treatment 스코프를 Phoenix MoE로 국한 + Phoenix serving 계약 확장 (<code>experiment_overrides</code>, <code>exact_k</code>) + dark-traffic devel 확장 + 예정된 muted-keyword rule 신호 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/902a06f">xai-org/x-algorithm@902a06f</a> — GitHub, 2026-09-04 21:03 UTC, 코드. <code>Open-source X Recommendation Algorithm</code> 정기 크론 미러. 파일 25개, +472/−179.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X의 오픈소스 미러는 프로덕션 캐넌을 크론으로 흘려보내는 정기 커밋이다. 어제(2026-09-05) 판이 4세대+15(<a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31">9b0dc31</a>)까지 반영됐고, 이 커밋(902a06f)이 그 다음 판이다. Phoenix MoE(Mixture of Experts — 검색·랭킹 백본을 서로 다른 전문가 서브네트워크에 배분해 서빙하는 아키텍처)의 A/B 인프라를 다시 손봤고, 부수적으로 Phoenix serving 요청 계약, VF dark-traffic(프로덕션 트래픽을 별도 배포로 복제 전송해 응답 없이 관측만 하는 미러링) 배선, 예정된 muted-keyword VF rule의 실마리가 붙었다.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-06">2026-09-06</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>일요일</li>
+<li><span class="meta-k">읽는 시간</span>32분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+16(<a href="https://github.com/xai-org/x-algorithm/commit/902a06f">902a06f</a>)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에 국한했으며, Phoenix serving 요청에 <code>experiment_overrides map</code>과 <code>SlateContext.exact_k/exact_gap</code> 필드를 신설했고, VF dark-traffic 미러링 대상에 <code>devel</code> app_env(PR별 프리뷰 배포)를 추가했다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">11</span></summary><ol><li><a href="#1-x-4세대16--cold-start-codivert-impression-배선--treatment-스코프를-phoenix-moe로-국한--phoenix-serving-계약-확장-experiment_overrides-exact_k--dark-traffic-devel-확장--예정된-muted-keyword-rule-신호--x"><span class="num">1</span>X 4세대+16 — cold-start codivert impression 배선 + treatment 스코프를 Phoenix MoE로 국한 + Phoenix serving 계약 확장 (experiment_overrides, exact_k) + dark-traffic devel 확장 + 예정된 muted-keyword rule 신호 — X</a><ol><li><a href="#a-cold-start-experiment에-codivert-impression-패턴이-배선됐다--두-arm이-동일한-experiment-bucket-impression을-남기게-강제">A. Cold-start experiment에 codivert impression 패턴이 배선됐다 — 두 arm이 동일한 experiment bucket impression을 남기게 강제</a></li><li><a href="#b-cold-start-treatment-후보-필터가-phoenix-moe-후보만-남기도록-좁혀졌다">B. Cold-start Treatment 후보 필터가 Phoenix MoE 후보만 남기도록 좁혀졌다</a></li><li><a href="#c-engagement-counts-hydration이-cold-start-게이팅과-분리됐다">C. Engagement counts hydration이 cold-start 게이팅과 분리됐다</a></li><li><a href="#d-phoenix-serving-요청-계약에-experiment_overrides-map과-slatecontextexact_kexact_gap-추가">D. Phoenix serving 요청 계약에 experiment_overrides map과 SlateContext.exact_k/exact_gap 추가</a></li><li><a href="#e-vf-dark-traffic-미러링에-devel-app_env가-추가돼-pr별-프리뷰-배포도-프로덕션-트래픽을-받는다">E. VF dark-traffic 미러링에 devel app_env가 추가돼 PR별 프리뷰 배포도 프로덕션 트래픽을 받는다</a></li><li><a href="#f-corefeaturetext가-예정된-muted-keyword-rule을-위해-dead-code로-보존됐다">F. CoreFeature.text가 예정된 muted-keyword rule을 위해 dead-code로 보존됐다</a></li><li><a href="#g-부수-변화-요약">G. 부수 변화 요약</a></li></ol></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-x-4세대16--cold-start-codivert-impression-배선--treatment-스코프를-phoenix-moe로-국한--phoenix-serving-계약-확장-experiment_overrides-exact_k--dark-traffic-devel-확장--예정된-muted-keyword-rule-신호--x"><span class="num">1</span>X 4세대+16 — cold-start codivert impression 배선 + treatment 스코프를 Phoenix MoE로 국한 + Phoenix serving 계약 확장 (<code>experiment_overrides</code>, <code>exact_k</code>) + dark-traffic devel 확장 + 예정된 muted-keyword rule 신호 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/902a06f" target="_blank" rel="noopener">xai-org/x-algorithm@902a06f</a> — GitHub, 2026-09-04 21:03 UTC, 코드. <code>Open-source X Recommendation Algorithm</code> 정기 크론 미러. 파일 25개, +472/−179.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X의 오픈소스 미러는 프로덕션 캐넌을 크론으로 흘려보내는 정기 커밋이다. 어제(2026-09-05) 판이 4세대+15(<a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">9b0dc31</a>)까지 반영됐고, 이 커밋(902a06f)이 그 다음 판이다. Phoenix MoE(Mixture of Experts — 검색·랭킹 백본을 서로 다른 전문가 서브네트워크에 배분해 서빙하는 아키텍처)의 A/B 인프라를 다시 손봤고, 부수적으로 Phoenix serving 요청 계약, VF dark-traffic(프로덕션 트래픽을 별도 배포로 복제 전송해 응답 없이 관측만 하는 미러링) 배선, 예정된 muted-keyword VF rule의 실마리가 붙었다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <h3 id="a-cold-start-experiment에-codivert-impression-패턴이-배선됐다--두-arm이-동일한-experiment-bucket-impression을-남기게-강제">A. Cold-start experiment에 codivert impression 패턴이 배선됐다 — 두 arm이 동일한 experiment bucket impression을 남기게 강제</h3>
-<p><em>Codivert</em>는 X 내부 용어로 보인다 <code>[추정]</code>(bucket 관측 시점을 두 arm에서 동일하게 맞춰서 A/B 분석에 편향이 들지 않게 하는 패턴, &quot;co-divert&quot;는 두 arm이 같은 시점에서 각자 분기한다는 의미). 이번 커밋은 이 패턴을 코드로 구체화했다.</p>
-<p><strong>신규 param 두 개</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>:</p>
+<p><em>Codivert</em>는 X 내부 용어로 보인다 <span class="badge est">추정</span>(bucket 관측 시점을 두 arm에서 동일하게 맞춰서 A/B 분석에 편향이 들지 않게 하는 패턴, &quot;co-divert&quot;는 두 arm이 같은 시점에서 각자 분기한다는 의미). 이번 커밋은 이 패턴을 코드로 구체화했다.</p>
+<p><strong>신규 param 두 개</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>:</p>
 <ul>
 <li><code>rust_home_mixer_phoenix_moe_codivert_viewer_is_control</code> (bool, default false)</li>
 <li><code>rust_home_mixer_phoenix_moe_codivert_viewer_is_treatment</code> (bool, default false)</li>
 </ul>
 <p>두 param은 <code>moe_codivert_viewer</code> experiment의 bucket membership으로 흘러 들어온다. YAML rule의 짝은 다음과 같이 대칭적이다:</p>
 <blockquote>
-<pre><code class="language-yaml">- description: &quot;co-divert viewer treatment&quot;
+<figure class="highlight"><pre tabindex="0"><code class="language-yaml" data-lang="yaml">- description: &quot;co-divert viewer treatment&quot;
   query: &gt;
     [moe_codivert_viewer bucket_membership treatment]
   values:
@@ -235,10 +77,10 @@ ul.rl .chip b { font-size: 13px; }
     rust_home_mixer_phoenix_moe_codivert_viewer_is_treatment: false
     rust_home_mixer_phoenix_moe_codivert_viewer_is_control: true
     rust_home_mixer_enable_viewer_cold_start_boost: false
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs</code></a> 테스트 fixture, 2026-09-04</p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a> 테스트 fixture, 2026-09-04</p>
 </blockquote>
-<p><strong>핵심 배선: <code>AuthorColdStart::apply</code>가 실행 순서를 재정렬</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs</code></a>. 이전 판(4세대+3까지)에서는 이렇게 흘렀다:</p>
+<p><strong>핵심 배선: <code>AuthorColdStart::apply</code>가 실행 순서를 재정렬</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>. 이전 판(4세대+3까지)에서는 이렇게 흘렀다:</p>
 <ol>
 <li><code>ColdStartTrackedIds</code> 조회 + <code>record_tracked_ids</code> 호출</li>
 <li><code>EnableViewerColdStart</code>가 false면 여기서 조기 반환</li>
@@ -255,9 +97,9 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>그 다음에</strong> <code>!params.enabled</code>이면 scores 원본을 그대로 반환하는 조기 반환. Impression이 이미 남은 뒤이므로 관측 로그는 두 arm에서 대칭.</li>
 <li>cold-start 로직 실행.</li>
 </ol>
-<p><strong>회귀 테스트가 이 대칭을 잠근다</strong> <code>[확인]</code>. 새로 추가된 두 테스트:</p>
+<p><strong>회귀 테스트가 이 대칭을 잠근다</strong> <span class="badge ok">확인</span>. 새로 추가된 두 테스트:</p>
 <blockquote>
-<pre><code class="language-rust">#[test]
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[test]
 fn both_arms_log_the_same_codivert_impressions() {
     ...
     assert_eq!(control_impressor.impression_count(CODIVERT_EXPERIMENT), 3);
@@ -275,31 +117,31 @@ fn both_viewer_arms_log_the_same_author_impressions() {
         assert_eq!(impressor.impression_count(&quot;moe_exp&quot;), 2);
     }
 }
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs</code></a>, 2026-09-04</p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>, 2026-09-04</p>
 </blockquote>
 <p>즉 control이든 treatment든 (a) <code>moe_codivert_viewer</code> bucket 관측을 정확히 3회, (b) <code>moe_exp</code>(author 대상) bucket 관측을 정확히 2회 남긴다. 관측 count가 arm과 무관하게 같아야 한다는 대칭성이 assertion으로 잠긴 것.</p>
 <div class="blk why"><p><span class="lbl">의미</span> — canon 이전 판은 4세대+1(2026-08-14) Thompson sampling 배선과 4세대+3(2026-08-18) <code>count_tracked_ids</code> 단순화까지 알았고, 이 두 흐름은 콜드스타트 <strong>로직</strong>의 진화였다. 이번 커밋은 처음으로 콜드스타트의 <strong>A/B 관측 방법론</strong> 자체를 코드로 잠근다. <code>SpyingBucketImpressor</code>라는 테스트 유틸(experiment SDK가 노출한 impression 계측 스파이)의 존재까지 드러난다. X가 A/B 실험에서 <strong>bucket 관측 대칭성</strong>을 회귀 테스트로 강제한다는 문화 관찰이 canon에 붙는다.</p></div>
 <h3 id="b-cold-start-treatment-후보-필터가-phoenix-moe-후보만-남기도록-좁혀졌다">B. Cold-start Treatment 후보 필터가 Phoenix MoE 후보만 남기도록 좁혀졌다</h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs</code></a>:</p>
-<pre><code class="language-rust">fn cold_start_corpus_eligible(arm: ViewerArm, c: &amp;PostCandidate, corpus: AuthorCorpus) -&gt; bool {
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn cold_start_corpus_eligible(arm: ViewerArm, c: &amp;PostCandidate, corpus: AuthorCorpus) -&gt; bool {
     match arm {
         ViewerArm::Holdout =&gt; !is_phoenix_moe(c),
         ViewerArm::Control =&gt; corpus == AuthorCorpus::Control &amp;&amp; !is_phoenix_moe(c),
         ViewerArm::Treatment =&gt; corpus == AuthorCorpus::Treatment &amp;&amp; is_phoenix_moe(c),
     }
 }
-</code></pre>
+</code></pre></figure>
 <p>이전 판은 <code>ViewerArm::Treatment</code> 분기가 <code>corpus == AuthorCorpus::Treatment</code> 조건만 확인했다. 이번 커밋에서 <strong><code>&amp;&amp; is_phoenix_moe(c)</code>가 추가</strong>됐다. Treatment 뷰어의 cold-start 후보는 이제 (a) treatment corpus author의 포스트이면서 (b) <code>served_type == ForYouPhoenixRetrievalMoe</code>인 후보만이다.</p>
 <p>테스트도 이름부터 바뀌었다:</p>
 <ul>
 <li>이전: <code>treatment_viewer_keeps_treatment_moe_and_cold_starts_treatment_corpus</code></li>
-<li>이번: <code>treatment_viewer_cold_starts_treatment_moe_only</code> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs</code></a></li>
+<li>이번: <code>treatment_viewer_cold_starts_treatment_moe_only</code> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a></li>
 </ul>
 <p>즉 treatment corpus author의 포스트라도 Phoenix MoE 소스에서 온 것이 아니면 cold-start boost 대상에서 제외된다. <code>cold_start_candidate(...)</code>가 아니라 <code>moe_candidate(...)</code>로 fixture가 대체된 것도 같은 의미다.</p>
 <div class="blk why"><p><span class="lbl">의미</span> — Phoenix MoE와 cold-start를 <strong>하나의 codivert 실험 안에 묶어</strong> 서로 confounded되지 않게 하려는 배선이다. Treatment 뷰어는 (a) MoE 배선을 활성화하고 (b) cold-start도 MoE 후보에만 적용해서, &quot;MoE의 효과&quot;와 &quot;cold-start 부스트의 효과&quot;가 겹치지 않게 격리한다. <code>enable_viewer_cold_start_boost</code>가 treatment에서 <code>true</code>·control에서 <code>false</code>로 YAML에 못 박힌 것도 같은 방향이다. Cold-start는 이제 <strong>Phoenix MoE의 실 트래픽 실험 옆칸에 재배치</strong>됐다.</p></div>
 <h3 id="c-engagement-counts-hydration이-cold-start-게이팅과-분리됐다">C. Engagement counts hydration이 cold-start 게이팅과 분리됐다</h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a>:</p>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a>:</p>
 <ul>
 <li>이전: <code>fn enable(&amp;self, query) -&gt; bool { query.params.get(EnableViewerColdStart) || (!query.has_cached_posts &amp;&amp; (query.params.get(EnableEngagementCountsHydration) || query.is_shadow_traffic)) }</code></li>
 <li>이후: <code>fn enable(&amp;self, query) -&gt; bool { query.params.get(EnableEngagementCountsHydration) || query.is_shadow_traffic }</code></li>
@@ -307,47 +149,47 @@ fn both_viewer_arms_log_the_same_author_impressions() {
 <p>세 가지 변화가 있다: (a) <code>EnableViewerColdStart</code> 종속 제거, (b) <code>!query.has_cached_posts</code> 게이팅 제거(캐시가 있어도 항상 갱신), (c) 정책 축이 순수 hydration flag + shadow traffic으로 좁혀졌다. Cold-start와 engagement counts hydration은 이제 서로 독립적 정책 축이다.</p>
 <div class="blk why"><p><span class="lbl">의미</span> — 이전 배선은 &quot;cold-start가 켜지면 반드시 engagement counts를 hydrate한다&quot;는 강결합이었다. Cold-start Thompson sampling이 <code>view_count_on_home</code>·<code>fav_count</code>에 의존하는 4세대+1의 초기 배선 유물로 보인다. 이번 분리로 두 파이프라인의 rollout이 서로 걸림 없이 진행된다. 특히 codivert 대칭성(A절)과 결합하면 &quot;Treatment는 cold-start 켜짐 + engagement counts 켜짐, Control은 cold-start 꺼짐 + engagement counts는 자기 flag대로&quot;라는 명확한 실험 축 분리가 가능해진다.</p></div>
 <h3 id="d-phoenix-serving-요청-계약에-experiment_overrides-map과-slatecontextexact_kexact_gap-추가">D. Phoenix serving 요청 계약에 <code>experiment_overrides map</code>과 <code>SlateContext.exact_k/exact_gap</code> 추가</h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/python/common/xai-proto/proto/recsys.proto"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>:</p>
-<p>**<code>PredictNextActionsRequest.experiment_overrides = 21</code>**은 <code>map&lt;string, string&gt;</code> 타입의 새 필드다. 이전엔 Phoenix 서빙이 서비스 배포 시점의 config·feature switch로 experiment 파라미터를 정해 뒀는데, 이 필드가 붙으면 <strong>요청마다 experiment 파라미터를 오버라이드</strong>할 수 있다. Home-mixer(요청자)가 자기가 이미 A/B 배정된 결정을 Phoenix에 그대로 전달해 downstream(Phoenix)의 experiment 배정이 upstream(home-mixer)과 일관되게 흐르도록 하는 배선으로 읽힌다 <code>[추정]</code>. Codivert 패턴(A절)이 upstream에서 자리를 잡으면서 downstream까지 동일한 experiment 스코프를 지도록 전달 채널이 필요해진 것.</p>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>:</p>
+<p>**<code>PredictNextActionsRequest.experiment_overrides = 21</code>**은 <code>map&lt;string, string&gt;</code> 타입의 새 필드다. 이전엔 Phoenix 서빙이 서비스 배포 시점의 config·feature switch로 experiment 파라미터를 정해 뒀는데, 이 필드가 붙으면 <strong>요청마다 experiment 파라미터를 오버라이드</strong>할 수 있다. Home-mixer(요청자)가 자기가 이미 A/B 배정된 결정을 Phoenix에 그대로 전달해 downstream(Phoenix)의 experiment 배정이 upstream(home-mixer)과 일관되게 흐르도록 하는 배선으로 읽힌다 <span class="badge est">추정</span>. Codivert 패턴(A절)이 upstream에서 자리를 잡으면서 downstream까지 동일한 experiment 스코프를 지도록 전달 채널이 필요해진 것.</p>
 <p>**<code>SlateContext.exact_k = 16</code>과 <code>SlateContext.exact_gap = 17</code>**은 새 <code>Option&lt;uint32&gt;</code> 필드다. 이전 SlateContext 필드는:</p>
 <ul>
 <li><code>sid_known</code> (필드 6), <code>sid_k_l1/2/3</code> (7–9), <code>sid_gap_l1/2/3</code> (10–12) — 4세대+3(2026-08-18) VMRanker에서 SID 배선</li>
 <li><code>recon_cos_milli</code> (13) — 4세대+9(2026-08-26)</li>
 <li><code>recon_count_above</code> (14), <code>recon_gap_above</code> (15) — 4세대+11 무렵</li>
 </ul>
-<p><code>exact_k/exact_gap</code>는 이 시리즈의 연장이다. <code>sid_k/sid_gap</code>이 semantic ID 코드북 매치 기반 metric이라면, <code>exact_k/exact_gap</code>는 이름 그대로 <strong>정확 일치</strong> 기반 metric일 가능성이 높다 <code>[추정]</code>. Slate 안의 후보 사이에서 특정 신호(post_id? 저자? 미디어 hash?)가 정확 일치하는 이웃 후보 수(<code>exact_k</code>)와 정확 일치가 나타나기 시작하는 slot 갭(<code>exact_gap</code>)으로 해석하는 것이 SID 계열 필드와 자연스러운 대응이다. 실제 정의는 미공개(Phoenix 서빙 코드가 이 필드를 채우는 곳은 오픈소스에 없음).</p>
-<p>Home-mixer 쪽에서도 대응 필드가 배선됐다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/models/candidate.rs"><code>home-mixer/models/candidate.rs</code></a>. <code>SlateContext</code> struct와 <code>From&lt;xai_recsys_proto::SlateContext&gt;</code> 변환 impl 양쪽에 <code>exact_k: Option&lt;u32&gt;</code>, <code>exact_gap: Option&lt;u32&gt;</code> 두 필드가 추가됐다.</p>
+<p><code>exact_k/exact_gap</code>는 이 시리즈의 연장이다. <code>sid_k/sid_gap</code>이 semantic ID 코드북 매치 기반 metric이라면, <code>exact_k/exact_gap</code>는 이름 그대로 <strong>정확 일치</strong> 기반 metric일 가능성이 높다 <span class="badge est">추정</span>. Slate 안의 후보 사이에서 특정 신호(post_id? 저자? 미디어 hash?)가 정확 일치하는 이웃 후보 수(<code>exact_k</code>)와 정확 일치가 나타나기 시작하는 slot 갭(<code>exact_gap</code>)으로 해석하는 것이 SID 계열 필드와 자연스러운 대응이다. 실제 정의는 미공개(Phoenix 서빙 코드가 이 필드를 채우는 곳은 오픈소스에 없음).</p>
+<p>Home-mixer 쪽에서도 대응 필드가 배선됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>. <code>SlateContext</code> struct와 <code>From&lt;xai_recsys_proto::SlateContext&gt;</code> 변환 impl 양쪽에 <code>exact_k: Option&lt;u32&gt;</code>, <code>exact_gap: Option&lt;u32&gt;</code> 두 필드가 추가됐다.</p>
 <div class="blk why"><p><span class="lbl">의미</span> — Phoenix serving이 slate context에 관측 metric을 계속 추가하는 흐름이 이어진다. SID 계열(4세대+3)에서 시작해 recon 계열(4세대+9~+11)로 확장됐고, 이번엔 exact 계열이 붙었다. 소비 경로(RankingScorer 폴백)는 이미 4세대+5 <code>UseServedSlateContext</code> 게이트에 배선돼 있으니, 새 metric이 붙어도 자동으로 흡수된다. <code>experiment_overrides</code>는 upstream/downstream experiment 스코프 일관성 이슈에 대한 계약적 대응으로, codivert 배선(A절)과 시점이 겹치는 게 우연이 아니다.</p></div>
 <h3 id="e-vf-dark-traffic-미러링에-devel-app_env가-추가돼-pr별-프리뷰-배포도-프로덕션-트래픽을-받는다">E. VF dark-traffic 미러링에 <code>devel</code> app_env가 추가돼 PR별 프리뷰 배포도 프로덕션 트래픽을 받는다</h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/dark_traffic_setup.rs"><code>visibility-filtering/dark_traffic_setup.rs</code></a>:</p>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/dark_traffic_setup.rs" target="_blank" rel="noopener"><code>visibility-filtering/dark_traffic_setup.rs</code></a>:</p>
 <p>이전 판(4세대+6에서 shadow→staging 리네임 완료)은 <code>parse_staging_listener</code>가 <code>.staging.visibility:grpc</code> 접미사만 인식했다. 이번 커밋은 함수를 <code>parse_mirror_listener</code>로 리네임하고 <strong>staging + devel 두 app_env를 모두 인식</strong>하도록 확장했다. 통과하는 리스너 이름 예시가 회귀 테스트에 잠긴다:</p>
 <blockquote>
-<pre><code class="language-rust">(&quot;xai-vf-service.devel.visibility:grpc&quot;, &quot;xai-vf-service.devel&quot;),
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">(&quot;xai-vf-service.devel.visibility:grpc&quot;, &quot;xai-vf-service.devel&quot;),
 (&quot;xai-vf-service-pr-123.devel.visibility:grpc&quot;, &quot;xai-vf-service-pr-123.devel&quot;),
 (
     &quot;xdstp://kube-discovery/envoy.config.listener.v3.Listener/xai-vf-service-pr-123.devel.visibility:grpc?key=val&quot;,
     &quot;xai-vf-service-pr-123.devel&quot;,
 ),
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/dark_traffic_setup.rs"><code>visibility-filtering/dark_traffic_setup.rs</code></a> 테스트, 2026-09-04</p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/dark_traffic_setup.rs" target="_blank" rel="noopener"><code>visibility-filtering/dark_traffic_setup.rs</code></a> 테스트, 2026-09-04</p>
 </blockquote>
-<p><code>MirrorChannelFactory</code>는 대상 리스너의 <code>xds_dest</code>에 <code>.devel.</code>이 있으면 devel용 TLS 도메인(<code>visibility.xai-vf-service.devel.{dc}.s2s.twttr.net</code>)의 채널 팩토리를, 그렇지 않으면 staging용(<code>visibility.visibility-filtering-service.staging.{dc}.s2s.twttr.net</code>)의 채널 팩토리를 골라 사용한다. <code>xai-vf-service-pr-123.devel.visibility:grpc</code> 형태의 리스너 이름은 GitHub PR 번호 기반으로 자동 생성되는 프리뷰 배포(Kubernetes preview environments)의 관행을 시사한다 <code>[추정]</code>.</p>
+<p><code>MirrorChannelFactory</code>는 대상 리스너의 <code>xds_dest</code>에 <code>.devel.</code>이 있으면 devel용 TLS 도메인(<code>visibility.xai-vf-service.devel.{dc}.s2s.twttr.net</code>)의 채널 팩토리를, 그렇지 않으면 staging용(<code>visibility.visibility-filtering-service.staging.{dc}.s2s.twttr.net</code>)의 채널 팩토리를 골라 사용한다. <code>xai-vf-service-pr-123.devel.visibility:grpc</code> 형태의 리스너 이름은 GitHub PR 번호 기반으로 자동 생성되는 프리뷰 배포(Kubernetes preview environments)의 관행을 시사한다 <span class="badge est">추정</span>.</p>
 <p>Reject 케이스 회귀 테스트도 좁혀졌다:</p>
 <blockquote>
-<pre><code class="language-rust">&quot;xai-vf-service.development.visibility:grpc&quot;,
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">&quot;xai-vf-service.development.visibility:grpc&quot;,
 &quot;xai-vf-service.staging-devel.visibility:grpc&quot;,
 &quot;xai-vf-service.devel-staging.visibility:grpc&quot;,
 &quot;xai-vf-service.devel.visibility:grpc-extra&quot;,
 &quot;xai-vf-service.devel.visibility:grpc.other&quot;,
-</code></pre>
+</code></pre></figure>
 <p>— 위 파일의 <code>parse_rejects_out_of_scope_listeners</code> 테스트</p>
 </blockquote>
 <p><code>development</code>나 <code>staging-devel</code> 같은 유사 이름은 거부한다. 정확히 <code>staging</code> 또는 <code>devel</code> 두 app_env만 허용한다.</p>
 <div class="blk why"><p><span class="lbl">의미</span> — VF 재작성의 검증 인프라(4세대+4 dark_traffic → 4세대+6 shadow→staging 리네임 → 4세대+7 reference_compare까지 이어진 감사 스택)에 PR-level 검증까지 붙었다. 개발자가 VF 규칙 변경 PR을 올리면 그 PR용 devel 배포에 프로덕션 트래픽 미러가 흘러 들어와 실제 프로덕션 규모에서의 verdict 차이를 사전 검증할 수 있다. VF는 fail-closed(canon 주의 목록 #1)라 규칙 변경 리스크가 크므로, 미러링 스택이 staging 배포 → PR 배포까지 확장되는 것이 자연스러운 진화 경로다.</p></div>
 <h3 id="f-corefeaturetext가-예정된-muted-keyword-rule을-위해-dead-code로-보존됐다">F. <code>CoreFeature.text</code>가 예정된 muted-keyword rule을 위해 dead-code로 보존됐다</h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs"><code>visibility-filtering/models/tweet.rs</code></a>:</p>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/tweet.rs</code></a>:</p>
 <blockquote>
-<pre><code class="language-rust">#[derive(Clone, Debug, Default)]
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[derive(Clone, Debug, Default)]
 pub struct CoreFeature {
     #[cfg_attr(
         not(test),
@@ -356,33 +198,33 @@ pub struct CoreFeature {
     pub text: String,
     pub source_tweet_id: Option&lt;u64&gt;,
 }
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs"><code>visibility-filtering/models/tweet.rs</code></a>, 2026-09-04</p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/tweet.rs</code></a>, 2026-09-04</p>
 </blockquote>
 <p>즉 VF 서비스가 hydration 단계에서 각 tweet의 <code>text</code>를 이미 채우고 있지만 현재 어떤 rule도 그것을 소비하지 않는다. Dead-code 억제 어트리뷰트가 명시적으로 &quot;upcoming muted-keyword rule에 쓰기 위해 남겨 둔다&quot;고 밝힌다. 새 테스트 <code>assemble_hydrates_text_from_core_data</code>가 hydration 경로에서 text가 실제로 채워지는지 회귀로 잠근다.</p>
 <p>4세대+4(2026-08-19, aad7179)에서 신설된 <code>FollowingViewerMutedKeywordFilter</code>는 Following 파이프라인 전용(65줄)이었다. 이번 signal은 <strong>VF 서비스 자체에도 muted-keyword rule이 곧 붙는다</strong>는 예고다. VF는 For You 파이프라인 전역을 커버하므로, 뷰어의 muted-keyword 리스트가 Following뿐 아니라 추천 전체에서 필터되는 정책 확장 방향이다.</p>
 <div class="blk why"><p><span class="lbl">의미</span> — Muted keyword 필터가 두 파이프라인에서 별개로 구현되던 것이 통합되거나(Following 필터가 VF 서비스로 이관), 아니면 병렬 두 층 배선으로 남을지가 다음 커밋의 관측 포인트다.</p></div>
 <h3 id="g-부수-변화-요약">G. 부수 변화 요약</h3>
 <ul>
-<li><strong>checkpoint DEK KMS 재시도</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py</code></a>. <code>_unwrap_with_backoff</code>가 신설돼 KMS unwrap이 transient 오류(<code>429</code>·<code>502</code>·<code>503</code>·<code>504</code>·<code>&quot;KMS transport&quot;</code> 마커)일 때 4회, 총 2초 상한, jittered exponential backoff로 재시도한다. <code>publish_tree_dek</code>·<code>adopt_tree_dek</code>·<code>_unwrap_header_master</code>가 모두 이 wrapper를 통해 호출된다. <code>assert_all_enveloped</code>는 finalize 전에 <code>_DEK</code> 마스터 파일 존재를 필수로 확인한다(<code>encrypted save left no master _DEK at {path}; not committing</code>). 4세대+13 신설된 envelope-encrypted Orbax writer의 안정화 후속.</li>
-<li><strong><code>retrieval_dataset.py</code> 리팩터</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/data/retrieval_dataset.py"><code>phoenix/xrex/data/retrieval_dataset.py</code></a>. SID snapshot window 경로 생성을 <code>_sid_window(filename) -&gt; (primary, backup)</code> 헬퍼로 DRY. 실 경로 규칙은 그대로(<code>post_sid_v8_256x6_snapshots</code>·<code>_backup</code>).</li>
-<li><strong>StableHLO bundle 매니페스트 타임스탬프 갱신</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/recsys_bundle_export.py"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/trainer_recsys.py"><code>trainer_recsys.py</code></a>. <code>restamp_manifest(data)</code>가 매 export 시점에 <code>MANIFEST.json</code>의 <code>created_timestamp</code>를 <code>time.time()</code>으로 재기록. 4세대+13에서 도입한 <code>.mlirbc</code> 번들 시스템의 fresh-detection용 배선.</li>
-<li><strong>Backbone score bfloat16 다운캐스트</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/trainer_recsys.py"><code>phoenix/xrex/train/trainer_recsys.py</code></a>:</li>
+<li><strong>checkpoint DEK KMS 재시도</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py</code></a>. <code>_unwrap_with_backoff</code>가 신설돼 KMS unwrap이 transient 오류(<code>429</code>·<code>502</code>·<code>503</code>·<code>504</code>·<code>&quot;KMS transport&quot;</code> 마커)일 때 4회, 총 2초 상한, jittered exponential backoff로 재시도한다. <code>publish_tree_dek</code>·<code>adopt_tree_dek</code>·<code>_unwrap_header_master</code>가 모두 이 wrapper를 통해 호출된다. <code>assert_all_enveloped</code>는 finalize 전에 <code>_DEK</code> 마스터 파일 존재를 필수로 확인한다(<code>encrypted save left no master _DEK at {path}; not committing</code>). 4세대+13 신설된 envelope-encrypted Orbax writer의 안정화 후속.</li>
+<li><strong><code>retrieval_dataset.py</code> 리팩터</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/data/retrieval_dataset.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/retrieval_dataset.py</code></a>. SID snapshot window 경로 생성을 <code>_sid_window(filename) -&gt; (primary, backup)</code> 헬퍼로 DRY. 실 경로 규칙은 그대로(<code>post_sid_v8_256x6_snapshots</code>·<code>_backup</code>).</li>
+<li><strong>StableHLO bundle 매니페스트 타임스탬프 갱신</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>trainer_recsys.py</code></a>. <code>restamp_manifest(data)</code>가 매 export 시점에 <code>MANIFEST.json</code>의 <code>created_timestamp</code>를 <code>time.time()</code>으로 재기록. 4세대+13에서 도입한 <code>.mlirbc</code> 번들 시스템의 fresh-detection용 배선.</li>
+<li><strong>Backbone score bfloat16 다운캐스트</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_recsys.py</code></a>:</li>
 </ul>
 <blockquote>
-<pre><code class="language-python">log_probs = jax.nn.log_sigmoid(logits).astype(jnp.bfloat16).astype(jnp.float32)
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">log_probs = jax.nn.log_sigmoid(logits).astype(jnp.bfloat16).astype(jnp.float32)
 cont_preds = candidate_continuous_predictions.astype(jnp.bfloat16).astype(jnp.float32)
-</code></pre>
+</code></pre></figure>
 </blockquote>
-<p>명시적 bfloat16 다운캐스트 후 float32 재승격. 서빙 정밀도(bfloat16으로 뿌리는 것으로 추정 <code>[추정]</code>)와 학습 시 관측 numerics를 맞추려는 계산 층이다. 4세대+14에서 신설된 backbone scores 요청 시맨틱과 짝이 되는 numerics 정합 배선.</p>
+<p>명시적 bfloat16 다운캐스트 후 float32 재승격. 서빙 정밀도(bfloat16으로 뿌리는 것으로 추정 <span class="badge est">추정</span>)와 학습 시 관측 numerics를 맞추려는 계산 층이다. 4세대+14에서 신설된 backbone scores 요청 시맨틱과 짝이 되는 numerics 정합 배선.</p>
 <ul>
-<li><strong><code>log_util</code> 구조화 로깅</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/utils/log_util.py"><code>phoenix/xrex/utils/log_util.py</code></a>. <code>LogRecord.__dict__</code>에서 표준 어트리뷰트를 뺀 나머지 extras를 자동으로 <code>key=value</code> 시리즈로 이어 붙여 로그 라인 뒤에 추가한다. <code>event=X</code> extra는 앞에 배치. bool은 <code>true</code>/<code>false</code>, 나머지는 <code>json.dumps(default=str)</code>. 학습 로그의 grep 가능성과 downstream 파서 지원.</li>
-<li><strong>VF <code>pub</code> → <code>pub(crate)</code> 정리</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/lib.rs"><code>visibility-filtering/lib.rs</code></a>. <code>clients</code>·<code>hydration</code>·<code>models</code>·<code>rules</code>·<code>safety_label_source</code>·<code>twemcache</code> 모듈이 crate-internal로 좁혀졌다. <code>config.rs</code>·<code>params.rs</code>·<code>server.rs</code>·<code>twemcache/{client,mod}.rs</code>에서 여러 pub 함수와 상수가 <code>pub(crate)</code>나 dead-code 제거로 정리됐다. 4세대+15(9b0dc31)의 800줄 순감소 흐름과 방향이 같다: 재작성 안정화 이후 외부에 노출할 필요가 없어진 API를 좁힌다.</li>
-<li><strong>hydrator 소소한 변경</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/side_effects/mutual_follow_stats_side_effect.rs"><code>home-mixer/side_effects/mutual_follow_stats_side_effect.rs</code></a> <code>PhoenixRetrievalMOEInferenceClusterId</code> 조회가 <code>moe_enabled</code> 조건 안팎으로 이동해 borrow 수명 정리. <code>assemble_tweet_features</code> 테스트가 <code>text</code> 하드코딩에서 <code>source_tweet_id</code>로 옮겨졌다(위 F의 muted-keyword 예고와 짝).</li>
+<li><strong><code>log_util</code> 구조화 로깅</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/utils/log_util.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/log_util.py</code></a>. <code>LogRecord.__dict__</code>에서 표준 어트리뷰트를 뺀 나머지 extras를 자동으로 <code>key=value</code> 시리즈로 이어 붙여 로그 라인 뒤에 추가한다. <code>event=X</code> extra는 앞에 배치. bool은 <code>true</code>/<code>false</code>, 나머지는 <code>json.dumps(default=str)</code>. 학습 로그의 grep 가능성과 downstream 파서 지원.</li>
+<li><strong>VF <code>pub</code> → <code>pub(crate)</code> 정리</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/lib.rs" target="_blank" rel="noopener"><code>visibility-filtering/lib.rs</code></a>. <code>clients</code>·<code>hydration</code>·<code>models</code>·<code>rules</code>·<code>safety_label_source</code>·<code>twemcache</code> 모듈이 crate-internal로 좁혀졌다. <code>config.rs</code>·<code>params.rs</code>·<code>server.rs</code>·<code>twemcache/{client,mod}.rs</code>에서 여러 pub 함수와 상수가 <code>pub(crate)</code>나 dead-code 제거로 정리됐다. 4세대+15(9b0dc31)의 800줄 순감소 흐름과 방향이 같다: 재작성 안정화 이후 외부에 노출할 필요가 없어진 API를 좁힌다.</li>
+<li><strong>hydrator 소소한 변경</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/side_effects/mutual_follow_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/mutual_follow_stats_side_effect.rs</code></a> <code>PhoenixRetrievalMOEInferenceClusterId</code> 조회가 <code>moe_enabled</code> 조건 안팎으로 이동해 borrow 수명 정리. <code>assemble_tweet_features</code> 테스트가 <code>text</code> 하드코딩에서 <code>source_tweet_id</code>로 옮겨졌다(위 F의 muted-keyword 예고와 짝).</li>
 </ul>
 <blockquote>
 <p>&quot;retained for the upcoming muted-keyword rule&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs"><code>visibility-filtering/models/tweet.rs</code></a>, 2026-09-04</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/tweet.rs</code></a>, 2026-09-04</p>
 </blockquote>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>:</p></div>
 <ul>
@@ -402,82 +244,25 @@ cont_preds = candidate_continuous_predictions.astype(jnp.bfloat16).astype(jnp.fl
 <li>나머지 21건은 (a) benchmark·평가 방법론(SHELF, MultiGhostBench, Incremental Pooled Eval), (b) 도메인 제한(POI·법률·의료·과학·야구·music·finance QA), (c) RAG·private retrieval·essay grading 등 LLM 응용 방법론. 탈락.</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong><code>moe_codivert_viewer</code> experiment의 초기 트래픽 비율과 활성 시점</strong> — 이번 diff에서 YAML rule과 param default(false)만 잠겼다. 실 트래픽이 언제 붙는지가 다음 관측 포인트다. <code>moe_exp</code>와 <code>moe_codivert_viewer</code> 두 experiment의 관계(전자가 author-side 배정, 후자가 viewer-side 배정)와 두 배정의 orthogonality(독립 랜덤화인지 layered인지).</li>
 <li><strong><code>experiment_overrides</code> 소비 경로</strong> — Phoenix 서빙 쪽에서 이 map을 어떻게 파싱해서 어느 layer의 experiment param을 override하는지. Home-mixer에서 이 필드를 채우는 build 지점(하이드레이터 이름 관측).</li>
 <li><strong><code>exact_k</code>·<code>exact_gap</code>의 실 정의</strong> — Phoenix 서빙이 이 두 필드를 어떤 metric으로 채우는지. SID 계열과 대응되는 exact 계열이라는 해석의 검증. Home-mixer의 RankingScorer 폴백에서 이 필드를 어떻게 소비하는지.</li>
 <li><strong>VF muted-keyword rule의 실물 등장 시점</strong> — 4세대+16의 dead-code 어트리뷰트가 몇 커밋 뒤에 실제 rule로 물질화되는지. Following 파이프라인의 <code>FollowingViewerMutedKeywordFilter</code>(4세대+4)와의 통합 방식(중복 층인지, Following 필터 이관인지).</li>
 <li><strong>VF <code>devel</code> 배포 미러링의 실 사용 이력</strong> — PR별 프리뷰 배포에 프로덕션 트래픽 미러가 붙는 흐름이 어떤 규모의 트래픽을 다루는지, 프리뷰 배포의 리소스 예산이 미러 부하를 감당할 수 있게 설계됐는지(관측할 방법은 오픈소스에 없음, dark_traffic 대상 규모의 코드 상 상수만 관측 가능).</li>
-</ul>
+</ul></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-05.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-05</div></a><a class="r" href="daily-2026-09-07.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-07</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-05.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-05</span></a><a class="pg-next" href="daily-2026-09-07.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-07</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

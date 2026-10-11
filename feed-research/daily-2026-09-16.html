@@ -2,217 +2,59 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-16 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X 4세대+21 공개 — home-mixer가 응답 다양성 관측을 3단(pre-heuristic·top10·final)으로 계량하고, Phoenix ranker가 광고 웹 클릭 이후 실제 구매 금액을 continuous head로 회귀 예측하는 배선이 열렸다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-16.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-16 — feed-research">
 <meta property="og:description" content="한 줄: X 4세대+21 공개 — home-mixer가 응답 다양성 관측을 3단(pre-heuristic·top10·final)으로 계량하고, Phoenix ranker가 광고 웹 클릭 이후 실제 구매 금액을 continuous head로 회귀 예측하는 배선이 열렸다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-16.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-16</h1>
-  <div class="wd">수요일 · 읽는 데 약 24분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+21 공개 — home-mixer가 응답 다양성 관측을 3단(pre-heuristic·top10·final)으로 계량하고, Phoenix ranker가 광고 웹 클릭 이후 실제 구매 금액을 continuous head로 회귀 예측하는 배선이 열렸다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-x-4세대21-2d4a03c-2026-09-15--응답-다양성-3단-계량--광고-구매액-continuous-head--h100-attn-커널-통일--kafka-otel-export-30s120s--coordinated_spam-follower-임계-10k30k--x">1. X 4세대+21 (2d4a03c, 2026-09-15) — 응답 다양성 3단 계량 + 광고 구매액 continuous head + H100 attn 커널 통일 + Kafka OTel export 30s→120s + coordinated_spam follower 임계 10k→30k — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/2d4a03c">xai-org/x-algorithm@2d4a03c</a> — 파일 17개, +592/−9, 5개 축이 함께 움직였다. GitHub API로 diff 확인, 2026-09-16.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-16">2026-09-16</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>수요일</li>
+<li><span class="meta-k">읽는 시간</span>24분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+21 공개 — home-mixer가 응답 다양성 관측을 3단(pre-heuristic·top10·final)으로 계량하고, Phoenix ranker가 광고 웹 클릭 이후 실제 구매 금액을 continuous head로 회귀 예측하는 배선이 열렸다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">5</span></summary><ol><li><a href="#1-x-4세대21-2d4a03c-2026-09-15--응답-다양성-3단-계량--광고-구매액-continuous-head--h100-attn-커널-통일--kafka-otel-export-30s120s--coordinated_spam-follower-임계-10k30k--x"><span class="num">1</span>X 4세대+21 (2d4a03c, 2026-09-15) — 응답 다양성 3단 계량 + 광고 구매액 continuous head + H100 attn 커널 통일 + Kafka OTel export 30s→120s + coordinated_spam follower 임계 10k→30k — X</a></li><li><a href="#정본-반영-요약">정본 반영 요약</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-x-4세대21-2d4a03c-2026-09-15--응답-다양성-3단-계량--광고-구매액-continuous-head--h100-attn-커널-통일--kafka-otel-export-30s120s--coordinated_spam-follower-임계-10k30k--x"><span class="num">1</span>X 4세대+21 (2d4a03c, 2026-09-15) — 응답 다양성 3단 계량 + 광고 구매액 continuous head + H100 attn 커널 통일 + Kafka OTel export 30s→120s + coordinated_spam follower 임계 10k→30k — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/2d4a03c" target="_blank" rel="noopener">xai-org/x-algorithm@2d4a03c</a> — 파일 17개, +592/−9, 5개 축이 함께 움직였다. GitHub API로 diff 확인, 2026-09-16.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> X For You 랭킹의 최종 슬레이트는 Phoenix 랭커가 매긴 점수를 그대로 쓰는 것이 아니라, VMRanker DPP(θ=0.65, K=150)로 코사인 유사도 기반 다양성을 강제하고, 작성자 반복 감쇠·OON(out-of-network) 배수·새 작성자 부스트 같은 heuristic을 얹은 뒤 남는다. 이 heuristic 층이 랭커 원점수 대비 슬레이트 구성을 얼마나 바꾸는지, 즉 &quot;다양성 개선 vs 랭킹 손실&quot;의 실제 폭이 얼마나 되는지는 지금까지 X 공개 코드에 계량 지표가 없었다. 이번 커밋이 그 관측성 층을 붙였다. 함께 광고 Phoenix ranker에 <strong>구매액 자체를 continuous head로 회귀 예측하는 배선</strong>이 새로 열렸고(기존은 클릭·컨버전 확률 헤드만), H100 학습·서빙 커널이 GB300과 동일한 CUTe DSL 계열로 옮겨졌으며, Kafka OTel export가 30→120초로 완화됐고, coordinated spam 필터의 팔로워 임계가 10k→30k로 처음 완화됐다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
-<p><strong>A. Response diversity 3단 관측 side effect 신설 — sampled 5%(또는 experiment bucket 100%), stage마다 12~15개 지표를 histogram으로 방출</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/side_effects/response_diversity_stats_side_effect.rs"><code>home-mixer/side_effects/response_diversity_stats_side_effect.rs</code></a> (186줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs"><code>home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs</code></a> (+2), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a> (+7).</p>
+<p><strong>A. Response diversity 3단 관측 side effect 신설 — sampled 5%(또는 experiment bucket 100%), stage마다 12~15개 지표를 histogram으로 방출</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/side_effects/response_diversity_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/response_diversity_stats_side_effect.rs</code></a> (186줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs</code></a> (+2), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (+7).</p>
 <p>새 side effect <code>ResponseDiversityStatsSideEffect</code>가 Phoenix candidate pipeline에 6번째 관측 side effect로 배선됐다(<code>ScoredStatsSideEffect</code> 다음, <code>AuthorServedMetricsSideEffect</code> 앞). 활성 조건은 두 갈래:</p>
 <ul>
 <li><strong>기본</strong>: feature-switch param <code>EnableResponseDiversityStatsExperimentBucket</code>이 어떤 실험 버킷도 안 잡히면 <code>DEFAULT_SAMPLING_RATE = 0.05</code>(요청의 5%)에서만 실행.</li>
@@ -225,7 +67,7 @@ ul.rl .chip b { font-size: 13px; }
 <li><code>pre_heuristic</code> — <code>selected_candidates</code> + <code>non_selected_candidates</code>를 합쳐 <strong><code>weighted_score</code></strong>(head-weight sum 원점수, DPP·author-decay·OON 배수 적용 전) 내림차순으로 상위 K개(K = 최종 슬레이트 크기). 즉 &quot;만약 heuristic 층 없이 원점수 top-K만 그대로 냈다면 어떤 다양성을 갖는 슬레이트였을까&quot;의 counterfactual.</li>
 </ul>
 <p>stage마다 발행되는 지표(모두 <code>ResponseDiversity.*</code> 접두):</p>
-<table>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table>
 <thead>
 <tr>
 <th>지표</th>
@@ -264,20 +106,20 @@ ul.rl .chip b { font-size: 13px; }
 <td><code>UniqueSidL2</code>·<code>SidL2EntropyNorm</code></td>
 <td>Semantic ID L2 다양성</td>
 </tr>
-</tbody></table>
+</tbody></table></div>
 <p>새 primitive <code>Composition</code>(구조체: <code>size</code>, <code>unique</code>, <code>max_count</code>, <code>hhi</code>, <code>entropy_norm</code>)이 <code>home-mixer/util/composition.rs</code>(63줄 신규)에 신설됐다. <code>from_keys&lt;K: Hash + Eq&gt;(iter)</code> 하나로 어떤 축이든 다중집합 통계를 뽑는다. 이 구조체는 이번 side effect 외에 아래 C의 hydrator 신규 슬레이트 bit 산출에도 재사용된다.</p>
 <p>Sampling 확률 5%와 stage 3개의 조합은 <strong>랭킹 지연에는 거의 영향이 없되(sort 두 번, entropy·HHI 계산은 벡터 순회 O(n)), 관측 정확도는 유지</strong>한다는 튜닝. 실험 버킷일 때만 100% 관측으로 tail 분포까지 검증할 수 있게 열어 뒀다.</p>
 <blockquote>
-<pre><code class="language-rust">if experiment_buckets.is_empty() &amp;&amp; random::&lt;f64&gt;() &gt;= DEFAULT_SAMPLING_RATE {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if experiment_buckets.is_empty() &amp;&amp; random::&lt;f64&gt;() &gt;= DEFAULT_SAMPLING_RATE {
     return Ok(());
 }
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/side_effects/response_diversity_stats_side_effect.rs"><code>response_diversity_stats_side_effect.rs</code></a></p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/side_effects/response_diversity_stats_side_effect.rs" target="_blank" rel="noopener"><code>response_diversity_stats_side_effect.rs</code></a></p>
 </blockquote>
-<p><strong>B. Viewer positive-engagement history 파서 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/util/viewer_history.rs"><code>home-mixer/util/viewer_history.rs</code></a> (61줄 신규).</p>
+<p><strong>B. Viewer positive-engagement history 파서 신설</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/util/viewer_history.rs" target="_blank" rel="noopener"><code>home-mixer/util/viewer_history.rs</code></a> (61줄 신규).</p>
 <p>새 함수 <code>positively_engaged_author_ids(columnar_sequence: &amp;bytes::Bytes) -&gt; Option&lt;HashSet&lt;u64&gt;&gt;</code>가 요청에 실려 온 Arrow IPC 스트림(<code>ScoredPostsQuery.columnar_scoring_sequence</code>, 즉 유저의 최근 상호작용 이력을 columnar batch로 넣어 놓은 것)을 열어서 <code>authorId</code>가 0 초과이고 <code>actionNameMultiHot</code> fixed-size list 안에 <strong>18개 positive action 중 하나 이상이 켜져 있는</strong> 행의 authorId를 모아 반환한다.</p>
 <p>18개 positive action은 명시적으로 다음 하나뿐이다:</p>
-<pre><code>ServerTweetFav, ServerTweetReply, ServerTweetQuote, ServerTweetRetweet,
+<pre tabindex="0"><code>ServerTweetFav, ServerTweetReply, ServerTweetQuote, ServerTweetRetweet,
 ClientTweetClick, ClientQuotedTweetClick, ClientTweetOpenLink,
 ClientTweetClickProfile, ClientTweetPhotoExpand, ClientQuotedTweetPhotoExpand,
 ClientTweetVideoOpen, ClientTweetVideoQualityView, ClientQuotedTweetVideoQualityView,
@@ -286,7 +128,7 @@ ClientTweetBookmark, ClientTweetFollowAuthor
 </code></pre>
 <p>즉 리포트·뮤트·블록·<code>not_dwelled</code> 같은 부정 신호와 dwell·quality view 같은 노출성 신호는 <strong>의도적으로 제외</strong>됐다. 이 세트는 X 공개 코드의 다른 어느 곳에서도 나온 적이 없는 새 상수 집합으로, &quot;적극적 참여로 관계가 형성된 작성자&quot;의 정의를 처음 코드로 잠근다. 이 세트가 어떤 랭킹 head에 대응하는지, 즉 <code>phoenix/runners.py:233-253</code>의 positive engagement head 정의와 정확히 일치하는지는 이번 커밋 밖.</p>
 <p>이 함수는 아래 C의 슬레이트 bit 하나(<code>AUTHOR_NOT_ENGAGED_BY_VIEWER</code>)를 위해 소비된다.</p>
-<p><strong>C. <code>TweetTypeMetrics</code> bitset에 슬레이트 축 12개 bit 신설 (predicate slot 239-244 + 315-320)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/candidate_hydrators/tweet_type_metrics_hydrator.rs"><code>home-mixer/candidate_hydrators/tweet_type_metrics_hydrator.rs</code></a> (+100/−4), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/util/tweet_type_metrics.rs"><code>home-mixer/util/tweet_type_metrics.rs</code></a> (+27), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/models/candidate.rs"><code>home-mixer/models/candidate.rs</code></a> (+8).</p>
+<p><strong>C. <code>TweetTypeMetrics</code> bitset에 슬레이트 축 12개 bit 신설 (predicate slot 239-244 + 315-320)</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/candidate_hydrators/tweet_type_metrics_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/tweet_type_metrics_hydrator.rs</code></a> (+100/−4), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/util/tweet_type_metrics.rs" target="_blank" rel="noopener"><code>home-mixer/util/tweet_type_metrics.rs</code></a> (+27), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a> (+8).</p>
 <p><code>TweetTypeMetricsHydrator</code>가 지금까지는 후보 하나 하나에 대해 tweet 자체 속성(리트윗 여부, media 종류, tweet age 버킷, 작성자 팔로워 규모 6단 등)을 bitset으로 세팅했다. 이번 커밋이 여기에 <strong>슬레이트 전역 통계</strong>를 슬레이트 안 모든 후보에게 반영하는 6개 bit(239-244)와 <strong>각 후보가 슬레이트 안에서 갖는 문맥</strong>을 반영하는 6개 bit(315-320)를 추가했다.</p>
 <p>슬레이트 전역(모든 후보에 동일하게 세팅):</p>
 <ul>
@@ -303,22 +145,22 @@ ClientTweetBookmark, ClientTweetFollowAuthor
 </ul>
 <p>새 helper <code>PostCandidate::semantic_id_prefix(levels: usize) -&gt; Option&lt;&amp;[i32]&gt;</code>가 SID 배열에서 상위 <code>levels</code> 코드 슬라이스를 안전하게 잘라 낸다(<code>levels</code>가 배열 길이보다 크면 <code>None</code>).</p>
 <p>이 bit들은 <code>hydrate</code>에서 후보별 base bitset에 slate-level bit set과 per-position bit set이 union으로 합쳐진 뒤 압축돼 <code>tweet_type_metrics</code> payload로 저장된다. TweetTypeMetrics는 지금까지 랭킹 학습·서빙 로그와 오프라인 분석에 쓰이는 축이므로, <strong>이제 슬레이트 다양성이 후보별 feature로 로깅되고 학습·모델링에 접근 가능</strong>해진다. 다만 이번 커밋에는 이 bit들을 실제로 소비하는 학습 config 변경이 없어 배선만 열렸고, 실측 소비는 후속 커밋에서 관측 대상.</p>
-<p><strong>D. Phoenix proto — 광고 웹 클릭 후 실제 구매 금액 continuous head <code>ADS_WEB_CT_PURCHASE_VALUE = 5</code> 신설 + <code>PurchaseValueBaseline</code> 메시지 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a> (+9), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs"><code>phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs</code></a> (114줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/python/common/xai-proto/proto/recsys.proto"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a> (+9).</p>
+<p><strong>D. Phoenix proto — 광고 웹 클릭 후 실제 구매 금액 continuous head <code>ADS_WEB_CT_PURCHASE_VALUE = 5</code> 신설 + <code>PurchaseValueBaseline</code> 메시지 신설</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a> (+9), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs</code></a> (114줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a> (+9).</p>
 <p><code>ContinuousActionName</code> enum에 다섯 번째 continuous head가 붙었다. 기존 4개는 <code>DWELL_TIME = 1</code>, <code>CLICK_DWELL_TIME = 2</code>, <code>ACTIVE_SECS_5M_RESIDUAL_NORM = 3</code>(active seconds의 5분 이동평균 residual normalization — 이 세션의 다음 5분 활성 초를 이전 이동평균으로 정규화해 예측), <code>BRIDGE_PROBABILITY = 4</code>(부문 간 다리 확률)까지였다. 새 <code>ADS_WEB_CT_PURCHASE_VALUE = 5</code>는 <strong>웹 클릭-스루 컨버전 후 발생한 구매 금액의 회귀 target</strong>이다. CT는 Click-Through의 약어로, 광고 클릭 이후 랜딩 페이지에서 발생한 실제 구매다.</p>
 <p>같은 커밋에서 <code>PredictNextActionsRequest</code> 요청 페이로드에 새 필드 23이 붙었다:</p>
-<pre><code class="language-proto">repeated PurchaseValueBaseline purchase_value_baselines = 23;
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">repeated PurchaseValueBaseline purchase_value_baselines = 23;
 
 message PurchaseValueBaseline {
   int64 impression_id = 1;
   int64 advertiser_account_id = 2;
   double mean_value_usd_28d = 3;
 }
-</code></pre>
+</code></pre></figure>
 <p>각 baseline은 <code>(impression_id, advertiser_account_id, 광고주의 최근 28일 평균 구매 금액 USD)</code> 튜플이다. Rust 헬퍼 <code>purchase_value.rs</code>가 <code>is_valid_baseline</code>(positive id + positive finite USD)와 <code>find_baseline(request, impression_id, advertiser_account_id)</code>를 제공하고, wire tag 안정성(field 23 = <code>0xBA 0x01</code>, <code>returnLogitsList</code> field 22 = <code>0xB0 0x01 0x01</code>와 독립)과 하위 호환성(구 요청은 baseline 리스트가 비어 있는 상태로 정상 디코딩)을 unit test 5개로 잠근다.</p>
-<div class="blk why"><p><span class="lbl">의미</span>: 광고 랭킹이 지금까지 광고 클릭 확률(4세대+6에서 신설된 20개 conversion 액션 확률 헤드 포함)만 예측하고 그 확률에 광고주가 지불한 가격을 곱해 광고 랭킹 스코어로 썼다면, 이 continuous head는 <strong>광고 노출·클릭이 실제 발생시킬 구매 금액 자체를 예측</strong>한다. 광고주별 최근 28일 평균 구매액 baseline이 요청 페이로드로 함께 실려 오면 그 baseline 대비 이 impression이 얼마나 상회·하회할지의 residual을 학습·서빙할 수 있다(직접 학습 target인지 baseline offset인지는 이번 커밋에 명시 없음). 광고주별 평균 구매액에 비해 이 유저·이 광고 조합이 유독 큰(작은) 구매를 유도할 확률이 광고 랭킹 스코어에 들어가면서, <strong>X 광고 랭킹이 진일보한 value-optimizing 옥션 구조</strong>로 옮겨 갈 준비가 됐다 <code>[추정]</code> — Meta·Google이 각각 VBB(Value-Based Bidding)·tCPA/tROAS로 부르는 것과 방향이 같다.</p></div>
-<p>Baseline이 request마다 실려 온다는 것은 광고주 계정의 28일 평균값을 별도 오프라인 파이프라인이 매일 갱신해서 광고 서빙 요청에 병렬로 주입해야 한다는 뜻이다. 서빙 트래픽 오버헤드가 걱정되므로 광고주 계정 수를 절대치로 다 실지는 않을 가능성이 높고, 요청 시점에 어느 광고가 이 뷰어에게 진지하게 스코어링될지 사전 pruning 후 그 광고주들의 baseline만 붙여 넣는 형태로 읽힌다 <code>[추정]</code>.</p>
-<p><strong>E. H100 학습 attn 커널이 GB300과 동일한 CUTe DSL 계열로 통일 (<code>pallas_ranker_varlen_attn</code> → <code>cutedsl_ranker_varlen_attn</code>)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/xrex/configs/xrecsys_two_tower.py"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a> (+1/−1).</p>
-<pre><code class="language-python">_H100_OVERRIDES = {
+<div class="blk why"><p><span class="lbl">의미</span>: 광고 랭킹이 지금까지 광고 클릭 확률(4세대+6에서 신설된 20개 conversion 액션 확률 헤드 포함)만 예측하고 그 확률에 광고주가 지불한 가격을 곱해 광고 랭킹 스코어로 썼다면, 이 continuous head는 <strong>광고 노출·클릭이 실제 발생시킬 구매 금액 자체를 예측</strong>한다. 광고주별 최근 28일 평균 구매액 baseline이 요청 페이로드로 함께 실려 오면 그 baseline 대비 이 impression이 얼마나 상회·하회할지의 residual을 학습·서빙할 수 있다(직접 학습 target인지 baseline offset인지는 이번 커밋에 명시 없음). 광고주별 평균 구매액에 비해 이 유저·이 광고 조합이 유독 큰(작은) 구매를 유도할 확률이 광고 랭킹 스코어에 들어가면서, <strong>X 광고 랭킹이 진일보한 value-optimizing 옥션 구조</strong>로 옮겨 갈 준비가 됐다 <span class="badge est">추정</span> — Meta·Google이 각각 VBB(Value-Based Bidding)·tCPA/tROAS로 부르는 것과 방향이 같다.</p></div>
+<p>Baseline이 request마다 실려 온다는 것은 광고주 계정의 28일 평균값을 별도 오프라인 파이프라인이 매일 갱신해서 광고 서빙 요청에 병렬로 주입해야 한다는 뜻이다. 서빙 트래픽 오버헤드가 걱정되므로 광고주 계정 수를 절대치로 다 실지는 않을 가능성이 높고, 요청 시점에 어느 광고가 이 뷰어에게 진지하게 스코어링될지 사전 pruning 후 그 광고주들의 baseline만 붙여 넣는 형태로 읽힌다 <span class="badge est">추정</span>.</p>
+<p><strong>E. H100 학습 attn 커널이 GB300과 동일한 CUTe DSL 계열로 통일 (<code>pallas_ranker_varlen_attn</code> → <code>cutedsl_ranker_varlen_attn</code>)</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a> (+1/−1).</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">_H100_OVERRIDES = {
     &quot;bs_per_device&quot;: 480,
     &quot;ep&quot;: 128,
 -    &quot;attn_impl&quot;: &quot;pallas_ranker_varlen_attn&quot;,
@@ -326,22 +168,22 @@ message PurchaseValueBaseline {
 }
 
 _GB300_OVERRIDES = {&quot;bs_per_device&quot;: 960, &quot;ep&quot;: 64, &quot;attn_impl&quot;: &quot;cutedsl_ranker_varlen_attn&quot;}
-</code></pre>
+</code></pre></figure>
 <p><code>cutedsl_ranker_varlen_attn</code>은 4세대+6(28e414f, 2026-08-21)에서 <code>_GB300_OVERRIDES</code>에 처음 등장한 NVIDIA CUTLASS/CUTe DSL 기반 variable-length attention 커널이었고, 4세대+15(9b0dc31, 2026-09-04)에서 SM80·SM90 forward·backward가 모두 오픈소스로 공개됐다(<code>phoenix/xrex/cutedsl/ranker_fa4/</code>). SM80은 H100(및 A100), SM90은 GB300에 각각 대응하므로, 이번 flip은 H100 배포도 같은 커널을 쓰도록 통일한 후속이다. GB300과 H100 두 GPU generation의 학습 code path가 이제 attn 층 시맨틱까지 동일해졌다.</p>
 <p>부수적으로 4세대+11(bc8e5f0)에서 관측된 <strong>seqpack 학습 config가 H100에서만 <code>pallas_ranker_varlen_attn</code>을 강제하는 제약이 이번 커밋으로 해소</strong>되는지는 미확인 — seqpack 코드 경로에 명시된 <code>NotImplementedError</code> 검사가 여전히 남아 있으면 seqpack + FA4 조합은 여전히 막힌 상태다. 후속 커밋에서 관측 대상.</p>
-<p><strong>F. Phoenix 학습 Kafka OTel export 간격 30s → 120s (지표 export 부하 4배 완화)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/xrex/data/streaming/kafkaloader.py"><code>phoenix/xrex/data/streaming/kafkaloader.py</code></a> (+2/−2).</p>
-<p><code>_init_otel_metrics</code>의 default <code>export_interval_ms</code>와 <code>PhoenixKafkaDataset.metrics_export_interval_ms</code> 둘 다 30_000 → 120_000. 4세대+20(6bb4594, 2026-09-12)의 H. Kafka mTLS 배선과 짝으로 읽히지만 방향은 반대(mTLS는 인증 오버헤드 증가, export 완화는 지표 부하 감소). OTel(OpenTelemetry) 지표를 4배 덜 자주 배출한다는 것은 학습 잡의 관측 tail 분해능이 낮아지는 대신 collector 부담이 낮아진다는 트레이드오프다. 지표 host cost가 실측적으로 부담됐다는 방증 <code>[추정]</code>.</p>
-<p><strong>G. Grox coordinated_spam 필터 팔로워 임계 10k → 30k (첫 완화)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/grox/flows/reply_spam/task_filter.py"><code>grox/flows/reply_spam/task_filter.py</code></a> (+1/−1).</p>
-<pre><code class="language-python">class TaskCoordinatedSpamFilter(TaskFilterWithPost):
+<p><strong>F. Phoenix 학습 Kafka OTel export 간격 30s → 120s (지표 export 부하 4배 완화)</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/xrex/data/streaming/kafkaloader.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/streaming/kafkaloader.py</code></a> (+2/−2).</p>
+<p><code>_init_otel_metrics</code>의 default <code>export_interval_ms</code>와 <code>PhoenixKafkaDataset.metrics_export_interval_ms</code> 둘 다 30_000 → 120_000. 4세대+20(6bb4594, 2026-09-12)의 H. Kafka mTLS 배선과 짝으로 읽히지만 방향은 반대(mTLS는 인증 오버헤드 증가, export 완화는 지표 부하 감소). OTel(OpenTelemetry) 지표를 4배 덜 자주 배출한다는 것은 학습 잡의 관측 tail 분해능이 낮아지는 대신 collector 부담이 낮아진다는 트레이드오프다. 지표 host cost가 실측적으로 부담됐다는 방증 <span class="badge est">추정</span>.</p>
+<p><strong>G. Grox coordinated_spam 필터 팔로워 임계 10k → 30k (첫 완화)</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py</code></a> (+1/−1).</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">class TaskCoordinatedSpamFilter(TaskFilterWithPost):
 -    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 10000
 +    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 30000
-</code></pre>
+</code></pre></figure>
 <p>Grox reply-spam 파이프라인에는 두 개의 팔로워 임계가 별개로 존재한다:</p>
 <ul>
 <li><code>TaskSpamFilter</code>·<code>TaskReplyRankingFilter</code>: 4세대 공개 이후 15k → 30k(4세대+1) → 60k(4세대+3) → 80k(4세대+6) → <strong>100k</strong>(4세대+7)로 다섯 단계 상향됐다. 이 임계는 팔로워 수가 임계 이하인 계정의 답글만 스팸 분류에 넣는다는 뜻이므로, 상향은 <strong>분류 범위 확대</strong>(더 큰 계정까지 검사)를 의미한다.</li>
 <li><code>TaskCoordinatedSpamFilter</code>: 지금까지 15k(원래) → 10k(어느 시점의 하향)에서 이번에 10k → <strong>30k</strong>로 첫 완화. coordinated spam은 여러 계정이 짝지어 같은 스팸 패턴을 반복 게시하는 유형이다.</li>
 </ul>
-<p>두 필터의 임계 곡선이 정반대 방향으로 움직이는 것이 특이하다: 일반 spam 분류는 큰 계정까지 확대(오탐 감수), coordinated spam 분류는 큰 계정을 제외(작은 계정에 집중, 오탐 감소). Coordinated spam은 조직화된 소규모 계정 클러스터가 전형이라 30k 이상 팔로워 계정은 이 파이프라인에서 판정 가치가 낮다는 판단으로 읽힌다 <code>[추정]</code>.</p>
+<p>두 필터의 임계 곡선이 정반대 방향으로 움직이는 것이 특이하다: 일반 spam 분류는 큰 계정까지 확대(오탐 감수), coordinated spam 분류는 큰 계정을 제외(작은 계정에 집중, 오탐 감소). Coordinated spam은 조직화된 소규모 계정 클러스터가 전형이라 30k 이상 팔로워 계정은 이 파이프라인에서 판정 가치가 낮다는 판단으로 읽힌다 <span class="badge est">추정</span>.</p>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">../services/x.md</a> 4세대 공개 표에 <code>4세대+21</code> 행 추가, 상세 절 <code>### 4세대+21 (2026-09-15, 2d4a03c) — …</code> 신설. 광고 절과 피드백 신호 절, Phoenix 랭킹 절에도 새 continuous head와 슬레이트 관측 지표를 배선 있는 대로만 짧게 반영.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span>: 두 가지 축이 나란히 열렸다.</p></div>
 <ol>
@@ -349,93 +191,41 @@ _GB300_OVERRIDES = {&quot;bs_per_device&quot;: 960, &quot;ep&quot;: 64, &quot;at
 <li><strong>광고 랭킹이 확률 예측에서 금액 예측으로 확장됐다.</strong> 4세대+6의 conversion 액션 20개는 여전히 확률(클릭·컨버전 발생 여부)의 헤드였다. 새 continuous head는 <strong>금액 자체</strong>를 회귀 target으로 받고, 광고주별 28일 baseline까지 요청에 함께 실어 residual 학습을 가능하게 하는 배선을 준비했다. Value-optimizing 옥션은 광고주 ROI 최적화를 서빙 계층에서 직접 처리한다는 뜻이므로, 광고 랭킹 스코어 계산과 그 뒤의 옥션 로직 양쪽에 파급이 있을 것이다.</li>
 </ol>
 <p>두 축 모두 이번 커밋에는 <strong>feature-switch 게이트 뒤에서 배선만</strong> 열렸고, 실측 소비(학습 config에 새 bit·head 승격, 프로덕션 experiment ramp)는 후속 커밋의 관측 대상이다.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="정본-반영-요약">정본 반영 요약</h2>
 <ul>
 <li><a href="x.html">services/x.md</a> 4세대 공개 표 + <code>### 4세대+21</code> 상세 절 신설</li>
 <li>다이어그램 재생성은 미실행: 파이프라인 구조(단계·소스·수치·세대)가 바뀐 게 없고 관측 side effect·proto 필드·attn 커널 flip이라 <code>assets/x-pipeline.svg</code>는 그대로 유지</li>
 </ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
 <p>없음.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="레이더">레이더</h2>
 <p>이번 배치에서 arXiv cs.IR API가 계속 429(rate limit)로 응답해 triage에 실패했다. 재시도 6회 후 포기. 통과 항목 반영도 0.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong><code>ADS_WEB_CT_PURCHASE_VALUE</code>가 학습 config에 등장하는 시점</strong> — <code>phoenix/xrex/models/recsys_model.py</code>나 <code>xrecsys_two_tower.py</code>가 이 head를 continuous loss에 등록하고, <code>PurchaseValueBaseline</code>이 실제로 어떤 shape로 서빙 배치에 접합되는지. baseline offset regression인지 raw dollar regression인지가 여기서 갈린다.</li>
 <li><strong><code>ResponseDiversityStatsSideEffect</code>가 실측 활성화된 뒤 나오는 실험 결과</strong> — sampled 5% 데이터가 축적되면 heuristic 층의 실제 다양성 개선/랭킹 손실 폭이 어느 실험군에서 어떻게 갈리는지가 관측 대상. 특히 <code>pre_heuristic</code> vs <code>final</code>의 <code>AuthorHhi</code>·<code>InNetworkShare</code>·<code>SidL1EntropyNorm</code> 갭.</li>
 <li><strong><code>TweetTypeMetrics</code>의 신규 12개 bit(239-244, 315-320)가 학습 config에 활성화되는 시점</strong> — 슬레이트 문맥이 후보 feature로 랭커에 들어가면 랭커가 슬레이트 인지형 스코어링으로 이동한다(pointwise → slate-aware). Phoenix <code>recsys_model.py</code>의 feature list 갱신 감시.</li>
 <li><strong><code>positively_engaged_author_ids</code>의 18개 action 세트</strong>가 랭킹 head 정의와 정확히 매칭되는지 — <code>phoenix/runners.py</code> positive engagement head 인덱스와 대조. 만약 매칭되면 이 세트가 유저 관계 정의의 canonical 상수.</li>
 <li><strong>coordinated_spam 임계 30k의 다음 단계</strong>가 일반 spam 임계 곡선과 계속 반대 방향으로 가는지, 아니면 이번이 튜닝 노이즈였는지.</li>
 </ul>
-<p>조회 실패: arXiv cs.IR API — HTTP 429 (rate limit exceeded), 재시도 6회 후 포기.</p>
+<p>조회 실패: arXiv cs.IR API — HTTP 429 (rate limit exceeded), 재시도 6회 후 포기.</p></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-15.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-15</div></a><a class="r" href="daily-2026-09-17.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-17</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-15.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-15</span></a><a class="pg-next" href="daily-2026-09-17.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-17</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

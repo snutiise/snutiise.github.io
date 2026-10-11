@@ -2,231 +2,73 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-10-04 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: 어제 공개된 generative SID retrieval의 &quot;실제 요청을 받아 응답을 돌려줄 서버 크레이트&quot;(parquet 30초 폴링 + 48-bit u64 트라이 + 깊이 역순/round-robin 알고리즘)와 홈믹서의 PopularPostsSource(top-K…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-10-04.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-10-04 — feed-research">
 <meta property="og:description" content="한 줄: 어제 공개된 generative SID retrieval의 &quot;실제 요청을 받아 응답을 돌려줄 서버 크레이트&quot;(parquet 30초 폴링 + 48-bit u64 트라이 + 깊이 역순/round-robin 알고리즘)와 홈믹서의 PopularPostsSource(top-K…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-10-04.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-10-04</h1>
-  <div class="wd">일요일 · 읽는 데 약 28분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>어제 공개된 <strong>generative SID retrieval</strong>의 <strong>&quot;실제 요청을 받아 응답을 돌려줄 서버 크레이트&quot;</strong>(parquet 30초 폴링 + 48-bit u64 트라이 + 깊이 역순/round-robin 알고리즘)와 홈믹서의 <strong><code>PopularPostsSource</code></strong>(top-K 인기 저자를 Thunder in-network에 &quot;가짜 following&quot;으로 꽂는 OON 보강)가 함께 공개됐고, 광고 <strong><code>EnableAdsBrandSafetyVerdictV2</code></strong> 가 처음으로 기본 ON으로 플립됐다 (오늘 커밋 하나, +9,128/−2,356, 파일 148개).</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-4세대35--x가-sid-retrieval-서버를-완성하고-popularpostssource를-추가--x">1. 4세대+35 — X가 SID retrieval 서버를 완성하고 PopularPostsSource를 추가 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/b412112">xai-org/x-algorithm@b412112</a> — xai-org, 2026-10-03T03:26:56Z, 코드.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-04">2026-10-04</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>일요일</li>
+<li><span class="meta-k">읽는 시간</span>28분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>어제 공개된 <strong>generative SID retrieval</strong>의 <strong>&quot;실제 요청을 받아 응답을 돌려줄 서버 크레이트&quot;</strong>(parquet 30초 폴링 + 48-bit u64 트라이 + 깊이 역순/round-robin 알고리즘)와 홈믹서의 <strong><code>PopularPostsSource</code></strong>(top-K 인기 저자를 Thunder in-network에 &quot;가짜 following&quot;으로 꽂는 OON 보강)가 함께 공개됐고, 광고 <strong><code>EnableAdsBrandSafetyVerdictV2</code></strong> 가 처음으로 기본 ON으로 플립됐다 (오늘 커밋 하나, +9,128/−2,356, 파일 148개).</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">3</span></summary><ol><li><a href="#1-4세대35--x가-sid-retrieval-서버를-완성하고-popularpostssource를-추가--x"><span class="num">1</span>4세대+35 — X가 SID retrieval 서버를 완성하고 PopularPostsSource를 추가 — X</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-4세대35--x가-sid-retrieval-서버를-완성하고-popularpostssource를-추가--x"><span class="num">1</span>4세대+35 — X가 SID retrieval 서버를 완성하고 PopularPostsSource를 추가 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/b412112" target="_blank" rel="noopener">xai-org/x-algorithm@b412112</a> — xai-org, 2026-10-03T03:26:56Z, 코드.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>지난 사흘(2026-10-01 ~ 2026-10-03) 사이 X의 generative SID retrieval 라인이 세 단계로 쌓여 왔다. SID(semantic ID)는 RQ-VAE 계열 양자화로 포스트를 다단계 토큰 시퀀스로 압축한 코드를 말한다. Pinterest TIGER(2024) · Alibaba PailitaoGR(2025) · Kuaishou OneRec(2025) · Tencent BARGE(2026) · ByteDance GEAR(2026-09-30 arXiv) 라인이 유저 히스토리를 입력으로 받아 Transformer가 다음 포스트의 SID 토큰을 autoregressive로 <strong>생성</strong>해서 그 코드가 가리키는 포스트들을 candidate로 반환하는 접근을 쓴다.</p>
 <p>X 쪽은 **2026-10-01(4세대+33, b79b947)**에서 Phoenix retrieval wire에 SID를 뽑는 자리의 밑그림이 보였고, **2026-10-02(4세대+34, 76843a5)**에서 Phoenix에 전용 Transformer 학습 config/모델/트레이너/러너 4-파일과 홈믹서의 <code>SidSource</code> 후보 소스 뼈대 + <code>SidRetrievalClient</code> gRPC 클라이언트가 공개됐다. 다만 그 커밋에는 <strong>실제 요청을 받아 응답을 돌려줄 서버 크레이트가 없었다</strong>. 홈믹서는 <code>xai-recsys-sid-retrieval.prod.fou.twitter.biz:443</code>로 호출을 쏘지만 그 endpoint 뒤에 있는 Rust 서버가 어떻게 생겼는지는 외부에서 알 수 없었다.</p>
 <p>오늘 공개는 그 자리를 채운다. (a) <code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code> 7-파일 1,062줄 신설로 <strong>서버 크레이트가 통째 공개</strong>됐다. (b) 그와 별개로 <strong>홈믹서에 <code>PopularPostsSource</code>라는 새 OON 후보 소스</strong>가 추가됐다 — top-K 인기 저자를 Thunder in-network 인덱스에 &quot;가상 following&quot;으로 꽂아 OON 추천 공백을 보강하는 각도. (c) 광고 측에서는 <strong><code>EnableAdsBrandSafetyVerdictV2</code> 기본값이 false → true로 플립</strong>됐고, 작성자 수준 Grok 라벨을 포스트 라벨로 폴백하는 <code>EnableAdsAuthorBrandSafetyFallback</code> 파라미터가 신설(기본 off)됐다. (d) VF 쪽에 <code>visibility-filtering/staging/</code> 1,850줄짜리 리플레이·캡처 서브시스템이 신설됐다. 커밋 전체는 +9,128/−2,356, 파일 148개.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — A. SID retrieval 서버 크레이트</span></p></div>
-<p><a href="https://github.com/xai-org/x-algorithm/tree/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval"><code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code></a> 7-파일 신설 <code>[확인]</code>:</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. SID retrieval 서버 크레이트</span></p></div>
+<p><a href="https://github.com/xai-org/x-algorithm/tree/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code></a> 7-파일 신설 <span class="badge ok">확인</span>:</p>
 <ul>
 <li><code>src/service.rs:208</code>, <code>src/index.rs:223</code>, <code>src/loader.rs:170</code>, <code>src/http_api.rs:109</code>, <code>src/main.rs:115</code>, <code>src/seed_sids.rs:114</code>, <code>src/metrics.rs:79</code>.</li>
-<li>별도 proto 크레이트 <code>xai-recsys-sid-retrieval-proto</code>의 <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval-proto/proto/sid_retrieval.proto"><code>sid_retrieval.proto:46</code></a>이 서비스 shape 정의. <code>rpc Retrieve(RetrieveRequest) returns (RetrieveResponse)</code> 하나. 요청 필드 <code>seed_post_ids/max_results/max_per_seed/min_prefix_depth/max_prefix_depth/caller</code>. 응답에는 <code>candidates</code>·<code>seeds</code>(각 seed가 어디서 왔는지: Index/SidService/Missing 라벨)·<code>snapshot_timestamp_secs</code>·<code>index_posts</code>가 담긴다.</li>
+<li>별도 proto 크레이트 <code>xai-recsys-sid-retrieval-proto</code>의 <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval-proto/proto/sid_retrieval.proto" target="_blank" rel="noopener"><code>sid_retrieval.proto:46</code></a>이 서비스 shape 정의. <code>rpc Retrieve(RetrieveRequest) returns (RetrieveResponse)</code> 하나. 요청 필드 <code>seed_post_ids/max_results/max_per_seed/min_prefix_depth/max_prefix_depth/caller</code>. 응답에는 <code>candidates</code>·<code>seeds</code>(각 seed가 어디서 왔는지: Index/SidService/Missing 라벨)·<code>snapshot_timestamp_secs</code>·<code>index_posts</code>가 담긴다.</li>
 </ul>
-<p><strong>인덱스 자료구조</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs"><code>src/index.rs:5-110</code></a>:</p>
+<p><strong>인덱스 자료구조</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs" target="_blank" rel="noopener"><code>src/index.rs:5-110</code></a>:</p>
 <ul>
 <li><code>SID_LEVELS = 6</code>, <code>BITS_PER_LEVEL = 8</code>, <code>MAX_CODE = 255</code>. 즉 <strong>각 레벨이 2^8=256 코드</strong>를 가지며 전체 SID는 상위 레벨부터 왼쪽으로 8비트씩 shift해 <strong>48-bit u64 key에 패킹</strong>된다. 이론 공간은 256^6 ≈ 2.8 × 10^14.</li>
 <li><code>IndexedPost { key, post_id, author_id }</code> 벡터 2개 유지: <code>by_key</code>는 <code>(key ASC, post_id DESC)</code> 정렬 — <strong>접두사 범위 검색용</strong>, <code>by_post</code>는 <code>(post_id ASC)</code> 정렬 — <strong>seed post_id → SID key 이진탐색용</strong>.</li>
 <li><code>prefix_range(key, depth)</code>가 상위 <code>depth</code> 레벨만 보존하고 하위 <code>(6-depth)*8</code> 비트를 0으로 clear한 <code>[lo, hi)</code>를 리턴 → <code>by_key.partition_point</code>로 범위 안의 포스트를 뽑는다. 각 깊이 수준이 O(log N) + O(결과 크기)로 돈다.</li>
 </ul>
-<p><strong>검색 알고리즘</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs"><code>src/index.rs:138-193</code></a>:</p>
+<p><strong>검색 알고리즘</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs" target="_blank" rel="noopener"><code>src/index.rs:138-193</code></a>:</p>
 <p>의미는 세 가지로 요약된다.</p>
 <ul>
 <li><strong>각 포스트는 &quot;그 포스트가 공유한 가장 깊은 접두사 수준에서 한 번만&quot; emit된다.</strong> 깊이 6에서 뽑힌 포스트는 깊이 5~3 레벨에서 다시 안 뽑힘. 깊이 역순 iteration + <code>consumed</code> 영역 제외로 구현됐다.</li>
@@ -234,7 +76,7 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>seed post 자신은 전역 excluded set로 걸러짐.</strong> 다중 seed 요청일 때 seed₁의 결과에 seed₂가 안 섞인다.</li>
 </ul>
 <blockquote>
-<pre><code class="language-rust">for depth in (params.min_prefix_depth..=max_depth).rev() {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">for depth in (params.min_prefix_depth..=max_depth).rev() {
     let (lo, hi) = prefix_range(seed.key, depth);
     let (start, end) = self.key_range(lo, hi);
     let mut level: Vec&lt;&amp;IndexedPost&gt; = match consumed {
@@ -252,31 +94,31 @@ ul.rl .chip b { font-size: 13px; }
     }));
     consumed = Some((start, end));
 }
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs"><code>src/index.rs:138-179</code></a></p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs" target="_blank" rel="noopener"><code>src/index.rs:138-179</code></a></p>
 </blockquote>
-<p><strong>복수 seed interleave</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs"><code>src/index.rs:196-222</code></a>: 각 seed의 후보 리스트를 <strong>round-robin</strong>(seed 1 → seed 2 → ... → seed N → seed 1 → ...)으로 뽑으면서 전역 <code>HashSet&lt;post_id&gt; emitted</code>로 중복 제거. <code>max_results</code>까지 또는 더 뽑을 게 없을 때까지. 결과: <strong>포지션 바이어스가 특정 seed로 쏠리지 않도록 균등화된다</strong>.</p>
-<p><strong>스냅샷 로더</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/loader.rs"><code>src/loader.rs:1-170</code></a>:</p>
+<p><strong>복수 seed interleave</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs" target="_blank" rel="noopener"><code>src/index.rs:196-222</code></a>: 각 seed의 후보 리스트를 <strong>round-robin</strong>(seed 1 → seed 2 → ... → seed N → seed 1 → ...)으로 뽑으면서 전역 <code>HashSet&lt;post_id&gt; emitted</code>로 중복 제거. <code>max_results</code>까지 또는 더 뽑을 게 없을 때까지. 결과: <strong>포지션 바이어스가 특정 seed로 쏠리지 않도록 균등화된다</strong>.</p>
+<p><strong>스냅샷 로더</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/loader.rs" target="_blank" rel="noopener"><code>src/loader.rs:1-170</code></a>:</p>
 <ul>
 <li>입력 포맷: Arrow Parquet(<code>post_sid_snapshot.parquet</code>), 세 컬럼 <code>post_id: int64</code>, <code>author_id: int64</code>, <code>post_sid: list&lt;int64&gt;</code>. 배치 크기 65,536.</li>
 <li>파일명 suffix(<code>*_&lt;unix_ts&gt;.parquet</code>)에서 timestamp 추출(파싱 실패 시 파일 mtime 폴백).</li>
 <li><code>watch_snapshots(path, poll_interval=30s, index, ready_tx)</code>가 <strong>30초마다 <code>canonicalize(path)</code> 하고 경로가 바뀌었으면 통째 재적재</strong> → <code>tokio::spawn_blocking</code>에서 build → 성공 시 <code>ArcSwapOption&lt;SidIndex&gt;</code>로 <strong>atomic swap</strong> → <code>ready_tx.send(true)</code>로 <code>/readyz</code> 초기 ready 플래그를 올린다. 즉 <strong>실시간 업서트는 없고</strong>, 모델 쪽에서 생성한 코드 테이블을 배치로 밀어넣는 패턴.</li>
 <li>코드 검증: <code>pack_full_key(row_codes)</code>가 <code>len != 6</code> 또는 코드 하나라도 0..=255 범위 밖이면 <code>None</code> → <code>skipped</code> 카운터 증가로 <strong>잘못된 SID는 조용히 drop</strong>.</li>
 </ul>
-<p><strong>seed → SID 변환 경로</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/seed_sids.rs"><code>src/seed_sids.rs:1-114</code></a>:</p>
+<p><strong>seed → SID 변환 경로</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/seed_sids.rs" target="_blank" rel="noopener"><code>src/seed_sids.rs:1-114</code></a>:</p>
 <p>seed post_id가 로컬 트라이에 있으면 그 코드를 그대로 쓰고, 없으면 <strong>별도 gRPC 서비스 <code>SidLookupService</code></strong>(<code>xai-recsys-sid-proto</code>, endpoint는 <code>--sid-endpoint</code> 플래그)에 batch 조회해 결과를 moka 캐시(<strong>2백만 엔트리, TTL 6시간</strong>)에 넣는다. 즉 서비스가 두 소스에서 seed SID를 받아들인다 — (i) 자신의 parquet 스냅샷(= 코퍼스 측 모든 코드), (ii) 외부 서비스(= 아마도 Phoenix 측 실시간 코드 발행 라인).</p>
 <blockquote>
 <p><strong>역사적 맥락</strong>: <code>SidLookupService</code>는 **4세대+15(2026-09-04, 9b0dc31)**에서 &quot;Phoenix 서빙 엔진에서 SID retrieval 사이드카가 통째 제거&quot;됐을 때 사라진 그 lookup 서비스가 이번 자리에서 <strong>별도 외부 서비스</strong>로 환생한 셈이다. 당시 사이드카는 Phoenix 요청 상에서 &quot;유저 히스토리의 각 포스트 ID를 SID로 변환&quot;해 주는 lookup 역할이었고, 사라진 뒤 히스토리 SID는 요청에 미리 실려 들어오는 형태로 흡수됐다. 지금은 <strong>retrieval 서버가 seed → SID 변환이 필요할 때</strong> 그 서비스를 호출하는 축으로 모양이 바뀌었다.</p>
 </blockquote>
-<p><strong>메트릭 3종</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/metrics.rs"><code>src/metrics.rs</code></a>:</p>
+<p><strong>메트릭 3종</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/metrics.rs" target="_blank" rel="noopener"><code>src/metrics.rs</code></a>:</p>
 <ul>
 <li><code>sid_retrieve_requests{caller, result=ok|empty|unavailable}</code> 카운터</li>
 <li><code>sid_retrieve_seeds{source=index|sid_service|missing}</code> 카운터</li>
 <li><code>sid_retrieve_candidates{caller}</code> + <code>sid_retrieve_latency_seconds{caller}</code> 히스토그램</li>
 </ul>
-<p><strong>main.rs 플래그</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/main.rs"><code>src/main.rs:26-52</code></a>: <code>--grpc-port=9090 · --http-port=8080 · --snapshot-poll-secs=30 · --sid-timeout-ms=200 · --sid-cache-size=2_000_000 · --max-seeds=200 · --default-max-results=800 · --default-max-per-seed=100 · --default-min-prefix-depth=3 · --default-max-prefix-depth=6</code>.</p>
+<p><strong>main.rs 플래그</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/main.rs" target="_blank" rel="noopener"><code>src/main.rs:26-52</code></a>: <code>--grpc-port=9090 · --http-port=8080 · --snapshot-poll-secs=30 · --sid-timeout-ms=200 · --sid-cache-size=2_000_000 · --max-seeds=200 · --default-max-results=800 · --default-max-per-seed=100 · --default-min-prefix-depth=3 · --default-max-prefix-depth=6</code>.</p>
 <p><strong>새로 알게 된 것 — B. <code>PopularPostsSource</code> 신규 후보 소스</strong></p>
-<p><code>PopularPostsSource</code> 흐름 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/sources/popular_posts_source.rs"><code>home-mixer/sources/popular_posts_source.rs:68-115</code></a>:</p>
+<p><code>PopularPostsSource</code> 흐름 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/sources/popular_posts_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/popular_posts_source.rs:68-115</code></a>:</p>
 <ol>
 <li><strong>비게이트</strong>: <code>!has_cached_posts &amp;&amp; !in_network_only &amp;&amp; EnablePopularPostsSource==true</code>.</li>
 <li><code>PopularAuthorsCache.maybe_spawn_refresh(now_ms)</code>를 호출 — AtomicBool 하나로 중복을 방지하면서 백그라운드 리프레시 트리거.</li>
@@ -285,7 +127,7 @@ ul.rl .chip b { font-size: 13px; }
 <li>응답 포스트를 <code>served_type=ForYouPhoenixRetrieval</code> 라벨(<strong>PhoenixSource와 같은 라벨</strong>)로 PostCandidate에 담아 리턴.</li>
 </ol>
 <blockquote>
-<pre><code class="language-rust">let authors = self.popular_authors.top_author_ids(top_k);
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let authors = self.popular_authors.top_author_ids(top_k);
 ...
 let request = GetInNetworkPostsRequest {
     user_id: query.user_id,
@@ -300,17 +142,17 @@ let request = GetInNetworkPostsRequest {
     }),
     ...
 };
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/sources/popular_posts_source.rs"><code>popular_posts_source.rs:87-101</code></a></p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/sources/popular_posts_source.rs" target="_blank" rel="noopener"><code>popular_posts_source.rs:87-101</code></a></p>
 </blockquote>
-<p><code>PopularAuthorsCache</code>의 저장 포맷은 자체 바이너리 v1 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/util/popular_authors.rs"><code>util/popular_authors.rs:64-104</code></a>:</p>
+<p><code>PopularAuthorsCache</code>의 저장 포맷은 자체 바이너리 v1 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/util/popular_authors.rs" target="_blank" rel="noopener"><code>util/popular_authors.rs:64-104</code></a>:</p>
 <ul>
 <li><code>version=1(1B) + updated_at_ms(8B BE) + count(4B BE) + [author_id(8B BE), follower_count(8B BE)] * count</code>.</li>
 <li>1,000명이면 13 + 16,000 = 16,013바이트 → Manhattan 한 키에 통째로 저장되는 설계.</li>
 <li>리프레시 주기: 캐시 비어 있으면 60초, 비어 있지 않으면 60분. <strong>빈 상태일 때만 공격적으로 재시도</strong>하는 흔한 패턴.</li>
 </ul>
-<p>파라미터 5개 신설 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>:</p>
-<table>
+<p>파라미터 5개 신설 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>:</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col class="w6"><col></colgroup>
 <thead>
 <tr>
 <th>파라미터</th>
@@ -343,32 +185,32 @@ let request = GetInNetworkPostsRequest {
 <td align="right">0</td>
 <td><strong>답글/리트윗은 소스에서 완전히 배제</strong></td>
 </tr>
-</tbody></table>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — C. 광고 브랜드 안전 V2 verdict 기본 ON + 작성자 라벨 fallback</span></p></div>
-<p>광고 측 변경 두 가지 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>:</p>
+</tbody></table></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. 광고 브랜드 안전 V2 verdict 기본 ON + 작성자 라벨 fallback</span></p></div>
+<p>광고 측 변경 두 가지 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>:</p>
 <ul>
-<li><code>EnableAdsBrandSafetyVerdictV2</code>: <strong>false → true</strong>. 4세대+2(2026-08-17, b089ce6)에서 <code>BrandSafetyVerdictV2</code> 로직이 공개된 뒤 쭉 off였던 기본값이 <strong>오늘 처음으로 ON으로 플립</strong>. 미러 sync 시점 <code>last sync 2026-10-01T16:00:46Z → 2026-10-02T16:00:41Z</code>에서 올라온 것으로, <strong>2026-10-02 중 어느 시점의 프로덕션 cron에서 올라간 상태를 미러한 것으로 보인다</strong> <code>[추정]</code>.</li>
+<li><code>EnableAdsBrandSafetyVerdictV2</code>: <strong>false → true</strong>. 4세대+2(2026-08-17, b089ce6)에서 <code>BrandSafetyVerdictV2</code> 로직이 공개된 뒤 쭉 off였던 기본값이 <strong>오늘 처음으로 ON으로 플립</strong>. 미러 sync 시점 <code>last sync 2026-10-01T16:00:46Z → 2026-10-02T16:00:41Z</code>에서 올라온 것으로, <strong>2026-10-02 중 어느 시점의 프로덕션 cron에서 올라간 상태를 미러한 것으로 보인다</strong> <span class="badge est">추정</span>.</li>
 <li><code>EnableAdsAuthorBrandSafetyFallback</code> 신설(기본 off): 작성자 수준의 Grok 라벨(<code>GrokSfa</code>/<code>GrokNsfaLimited</code>/<code>GrokNsfa</code>)이 있는데 포스트 수준 라벨은 없을 때, <strong>작성자 라벨을 포스트 라벨로 fallback 삽입</strong>하는 경로.</li>
 </ul>
-<p>핵심 자료구조 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/models/brand_safety.rs"><code>home-mixer/models/brand_safety.rs:6-80</code></a>:</p>
+<p>핵심 자료구조 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/models/brand_safety.rs" target="_blank" rel="noopener"><code>home-mixer/models/brand_safety.rs:6-80</code></a>:</p>
 <blockquote>
-<pre><code class="language-rust">#[repr(i32)]
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[repr(i32)]
 pub enum BrandSafetyVerdict {
     Unspecified = 0, Safe = 1, LowRisk = 2, MediumRisk = 3, HighRisk = 4,
 }
 pub enum AuthorBrandSafetyFallback { Sfa, NsfaLimited, Nsfa }
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/models/brand_safety.rs"><code>brand_safety.rs:6-21</code></a></p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/models/brand_safety.rs" target="_blank" rel="noopener"><code>brand_safety.rs:6-21</code></a></p>
 </blockquote>
 <p>Verdict 4-tier(Safe / LowRisk / MediumRisk / HighRisk)는 광고 블렌더 측 <code>AdAdjacencyControl.brand_safety_risk</code>와 짝을 이루는 인접성 매트릭스(4세대+10의 <code>MultiRiskAdsBlender</code>)에 소비된다. 즉 <strong>광고 지면의 &quot;포스트 안전도 → 광고 삽입 가능 여부&quot; 결정 축이 오늘부로 기본 소스로 켜졌다</strong>.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — D. VF staging 리플레이 서브시스템 신설</span></p></div>
-<p><code>visibility-filtering/staging/</code> 폴더가 <strong>어제까지 없던 자리에 1,850+줄로 신설</strong> <code>[확인]</code>:</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">D. VF staging 리플레이 서브시스템 신설</span></p></div>
+<p><code>visibility-filtering/staging/</code> 폴더가 <strong>어제까지 없던 자리에 1,850+줄로 신설</strong> <span class="badge ok">확인</span>:</p>
 <ul>
 <li><code>recording.rs</code>(+744 신규), <code>replay_corpus.rs</code>(+299 신규), <code>capture.rs</code>(+221 신규), <code>reference/tweetypie.rs</code>(+204/-81 renamed), <code>reference_compare.rs</code>(+63/-39 renamed), <code>reference/mod.rs</code>(+35/-72 renamed), <code>main.rs</code>(+39 신규), <code>serve.rs</code>(+29 신규), <code>mod.rs</code>(+6 신규).</li>
 <li><code>staging/main.rs</code>가 <strong>별도 crate 엔트리 포인트</strong>를 가진다 — VF를 실 트래픽과 완전히 분리된 <strong>리플레이·캡처 모드</strong>로 돌리기 위한 서브시스템. 어제까지 VF 트리의 다른 곳에 흩어져 있던 <strong>referential 비교(Tweetypie reference) 코드</strong>가 이쪽으로 이사했다.</li>
 </ul>
 <p>심층 분석 필요: recording.rs 744줄이 <strong>무엇을 어떤 포맷으로 기록해 두는지</strong>(parquet/jsonl 추정), capture.rs가 <strong>라이브 트래픽을 어떻게 샘플링하는지</strong>, replay_corpus.rs의 <strong>재생 contract</strong>가 어떻게 생겼는지는 다음 창에서 봐야 한다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — E. 소소한 변경들</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">E. 소소한 변경들</span></p></div>
 <ul>
 <li><code>phoenix/xrex/train/row_embedding_restore.py</code>(+488 신규): 어제 4세대+34에서 공개된 row-sharded 임베딩 CUDA 커널 묶음(<code>cuda/row_emb/</code>)의 <strong>체크포인트 복원 쪽이 Python으로 완성</strong>됐다. 어제의 공유 adapter(<code>recsys_async_emb.py</code>) + 오늘의 복원 유틸이 함께 들어온 셈. 심층 분석 필요.</li>
 <li><code>phoenix/crates/serving/xai-recsys-engine/src/grpc_server_latency.rs</code>(+361 신규): Phoenix 랭킹 서버에 <strong>서버 측 레이턴시 전용 메트릭 모듈</strong>이 inflight 메트릭과 분리됐다. 운영적 관측 축 확장, 모델 축은 아님.</li>
@@ -384,97 +226,40 @@ pub enum AuthorBrandSafetyFallback { Sfa, NsfaLimited, Nsfa }
 <ol>
 <li><p><strong>어제 공개된 generative SID retrieval 세 축(home-mixer source + Phoenix 모델/트레이너 + proto)에 &quot;실제 서버 크레이트&quot;가 오늘 붙었다 — 사흘짜리 공개 arc의 세 번째이자 마지막 조각.</strong> 어제까지는 학습 레시피와 홈믹서 소스 뼈대만 있었고 서버는 공란 상태였다. 오늘 공개된 <code>xai-recsys-sid-retrieval</code> 크레이트는 (a) <strong>parquet 스냅샷을 30초마다 통째 재적재하는 완전 정적 인덱스</strong>(즉 실시간 업서트 없음), (b) <strong>48-bit u64 key에 패킹된 6-level 트라이</strong>와 <code>partition_point</code> 기반 범위 검색, (c) <strong>깊이 역순 + round-robin 인터리브</strong>로 recall을 자르는 알고리즘을 명시해, 이 서버의 실제 쿼리 복잡도를 <strong>공개된 코드만으로 측정 가능하게</strong> 만들었다. 어제까지는 &quot;generative decoding을 서버가 할 거다&quot;로 읽혔던 자리였는데, 오늘 공개는 <strong>generation을 코퍼스 측에서 미리 해 두고(배치 코드 테이블) 서버는 접두사 범위 검색만 한다</strong>는 설계 선택을 드러낸다. 즉 추론 시점의 <strong>beam search는 서버에 없다</strong> — 모델이 뽑은 코드가 코퍼스에 담겨 들어오고, 서버는 seed 코드와 공유 접두사 길이로 검색하는 KNN-like 서버다. <strong><code>EnableSidSource=false</code>가 여전히 기본값</strong>이므로 실 트래픽 적용은 FeatureSwitches cron에서 ON 되는 날이 관측 지점이다.</p>
 </li>
-<li><p><strong>PopularPostsSource는 Thunder in-network 인덱스를 &quot;global popularity&quot; 축에서 재활용하는 각도이고, 결과를 <code>ForYouPhoenixRetrieval</code> 라벨로 담아 Phoenix two-tower retrieval 응답과 섞는다.</strong> 라벨 축에서 PhoenixSource와 <strong>구분되지 않도록 설계</strong>된 자리가 흥미롭다 — scorer/filter 입장에서는 &quot;Phoenix retrieval이 K명 더 돌려줬다&quot;처럼 보여서, 상위 랭킹 단계에서 PhoenixScore와 같은 분포로 섞인다. 메커니즘은 <strong>임베딩 기반 retrieval이 아니라 &quot;follow graph의 global popularity centroid&quot;를 &quot;가상 following&quot;으로 Thunder에 꽂는</strong> 복고적 접근이다. &quot;유저가 아무도 안 팔로우해도 Thunder가 뭔가 응답하도록&quot; 또는 &quot;유저 engagement 신호가 너무 적어서 다른 OON 소스가 결과를 못 돌려줄 때 공백을 메우도록&quot; 쓰이는 전형적 global popularity backfill 패턴 <code>[추정]</code>. <strong><code>EnablePopularPostsSource=false</code>가 여전히 기본값</strong>이므로 실제 활성 시점이 다음 창의 관측 지점.</p>
+<li><p><strong>PopularPostsSource는 Thunder in-network 인덱스를 &quot;global popularity&quot; 축에서 재활용하는 각도이고, 결과를 <code>ForYouPhoenixRetrieval</code> 라벨로 담아 Phoenix two-tower retrieval 응답과 섞는다.</strong> 라벨 축에서 PhoenixSource와 <strong>구분되지 않도록 설계</strong>된 자리가 흥미롭다 — scorer/filter 입장에서는 &quot;Phoenix retrieval이 K명 더 돌려줬다&quot;처럼 보여서, 상위 랭킹 단계에서 PhoenixScore와 같은 분포로 섞인다. 메커니즘은 <strong>임베딩 기반 retrieval이 아니라 &quot;follow graph의 global popularity centroid&quot;를 &quot;가상 following&quot;으로 Thunder에 꽂는</strong> 복고적 접근이다. &quot;유저가 아무도 안 팔로우해도 Thunder가 뭔가 응답하도록&quot; 또는 &quot;유저 engagement 신호가 너무 적어서 다른 OON 소스가 결과를 못 돌려줄 때 공백을 메우도록&quot; 쓰이는 전형적 global popularity backfill 패턴 <span class="badge est">추정</span>. <strong><code>EnablePopularPostsSource=false</code>가 여전히 기본값</strong>이므로 실제 활성 시점이 다음 창의 관측 지점.</p>
 </li>
-<li><p><strong>광고 측 변경 두 가지는 모두 &quot;SFA(Suitable For Advertising) 라벨링을 포스트 수준 → 작성자 수준으로 확장&quot;하는 축이다.</strong> <code>EnableAdsBrandSafetyVerdictV2=true</code> 플립과 <code>EnableAdsAuthorBrandSafetyFallback</code> 신설이 <strong>같은 날 올라온 것은 우연이 아니다</strong> — 포스트 수준 Grok 라벨이 아직 없는 포스트에 <strong>작성자의 과거 라벨 패턴을 fallback</strong>으로 쓰는 방향이다. 이는 Grok 분류기가 포스트 단위로는 커버가 성긴 상황(특히 신규 포스트)을 <strong>작성자 수준 집계로 보완</strong>하려는 신호다 <code>[추정]</code>.</p>
+<li><p><strong>광고 측 변경 두 가지는 모두 &quot;SFA(Suitable For Advertising) 라벨링을 포스트 수준 → 작성자 수준으로 확장&quot;하는 축이다.</strong> <code>EnableAdsBrandSafetyVerdictV2=true</code> 플립과 <code>EnableAdsAuthorBrandSafetyFallback</code> 신설이 <strong>같은 날 올라온 것은 우연이 아니다</strong> — 포스트 수준 Grok 라벨이 아직 없는 포스트에 <strong>작성자의 과거 라벨 패턴을 fallback</strong>으로 쓰는 방향이다. 이는 Grok 분류기가 포스트 단위로는 커버가 성긴 상황(특히 신규 포스트)을 <strong>작성자 수준 집계로 보완</strong>하려는 신호다 <span class="badge est">추정</span>.</p>
 </li>
 </ol>
 <h2 id="레이더">레이더</h2>
 <p>arXiv <code>cs.IR</code> 2026-10-01 ~ 2026-10-02 창에서 요청 30건 중 <code>&lt;entry&gt;</code> <strong>30건 전부 파싱 성공</strong>. 수용 기준(① 플랫폼 저자 또는 프로덕션 A/B ② 메커니즘 신규성 ③ 대규모 결과)을 모두 넘는 항목 <strong>0건</strong>. 아래 세 항목이 경계였지만 전부 탈락.</p>
 <ul>
-<li><a href="https://arxiv.org/abs/2609.39312">arXiv 2609.39312</a> <em>Learning Multiresolution Relevance for Hierarchical Generative Retrieval</em> — Weihao Shen 외 7인, hierarchical generative retrieval의 멀티해상도 관련성 학습. 저자 소속이 arXiv 1차 메타데이터로 즉시 확인 안 됨, abstract에 프로덕션/배포 주장 없음. <strong>탈락 사유</strong>: ①의 플랫폼·배포 축 비어 있음.</li>
-<li><a href="https://arxiv.org/abs/2609.39319">arXiv 2609.39319</a> <em>Residual Trajectory Distillation for Generative Retrieval</em> — 같은 7인 저자. SID RQ(residual quantization)의 중간 trajectory를 distillation하는 각도. <strong>탈락 사유</strong>: 같은 이유. 2609.39312와 짝을 이루는 아카데믹 라인이고 어느 쪽도 industry 배포 주장이 없다.</li>
-<li><a href="https://arxiv.org/abs/2609.39828">arXiv 2609.39828</a> <em>KUAISHOU Explorer LLM-Rec Challenge 2026: Reasoning Generative Recommendation</em> — Kuaishou 저자. <strong>본문이 챌린지 개요이고 메커니즘 신규성이 없다</strong> — OneRec/OneRec-V2가 Kuaishou에 배포됐다는 사실(이미 레이더에 있는 라인)을 재확인하는 자료일 뿐. <strong>탈락 사유</strong>: ②의 메커니즘 신규성.</li>
+<li><a href="https://arxiv.org/abs/2609.39312" target="_blank" rel="noopener">arXiv 2609.39312</a> <em>Learning Multiresolution Relevance for Hierarchical Generative Retrieval</em> — Weihao Shen 외 7인, hierarchical generative retrieval의 멀티해상도 관련성 학습. 저자 소속이 arXiv 1차 메타데이터로 즉시 확인 안 됨, abstract에 프로덕션/배포 주장 없음. <strong>탈락 사유</strong>: ①의 플랫폼·배포 축 비어 있음.</li>
+<li><a href="https://arxiv.org/abs/2609.39319" target="_blank" rel="noopener">arXiv 2609.39319</a> <em>Residual Trajectory Distillation for Generative Retrieval</em> — 같은 7인 저자. SID RQ(residual quantization)의 중간 trajectory를 distillation하는 각도. <strong>탈락 사유</strong>: 같은 이유. 2609.39312와 짝을 이루는 아카데믹 라인이고 어느 쪽도 industry 배포 주장이 없다.</li>
+<li><a href="https://arxiv.org/abs/2609.39828" target="_blank" rel="noopener">arXiv 2609.39828</a> <em>KUAISHOU Explorer LLM-Rec Challenge 2026: Reasoning Generative Recommendation</em> — Kuaishou 저자. <strong>본문이 챌린지 개요이고 메커니즘 신규성이 없다</strong> — OneRec/OneRec-V2가 Kuaishou에 배포됐다는 사실(이미 레이더에 있는 라인)을 재확인하는 자료일 뿐. <strong>탈락 사유</strong>: ②의 메커니즘 신규성.</li>
 </ul>
 <p>Meta ETT% 추천 학습 인프라 논문(arXiv 2610.02057, 어제 레이더에서 탈락)의 그 뒤 창에 올라온 2609.39xxx 번호대 중 추적 가치가 있는 플랫폼 소속 신규 메커니즘은 발견되지 않았다.</p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong><code>EnableSidSource</code> + <code>EnablePopularPostsSource</code> cron flip 시점</strong>: 둘 다 기본 off로 공개됐으므로, FeatureSwitches cron이 둘 중 하나를 true로 돌리는 시점이 <strong>실 트래픽 적용 시점</strong>이다. 홈믹서 측 <code>SidSource.retrieved{type=seeds|retrieved|hydrated}</code>와 Thunder 측 <code>GetInNetworkPostsRequest</code> 호출 패턴이 관측 지점.</li>
 <li><strong><code>xai-recsys-sid-retrieval.prod.fou.twitter.biz</code> endpoint의 호출 메트릭</strong>: 서버 측 <code>sid_retrieve_requests{caller, result=ok|empty|unavailable}</code> · <code>sid_retrieve_seeds{source=index|sid_service|missing}</code>가 <strong>실 트래픽 분포</strong>를 드러낸다. 특히 <code>source=sid_service</code> 비중이 높으면 &quot;코퍼스 측 스냅샷에 아직 안 담긴 포스트들&quot;에 대한 실시간 변환 비용이 큰 상태이고, <code>source=index</code> 비중이 높으면 포스트 코퍼스가 안정화된 상태.</li>
 <li><strong><code>VF staging/</code> 리플레이·캡처 서브시스템 심층 분석</strong>: recording.rs 744줄이 어떤 포맷으로 어떤 트래픽을 기록하는지, capture.rs의 라이브 샘플링 전략, replay_corpus.rs의 재생 contract. 심층 분석 필요.</li>
 <li><strong><code>row_embedding_restore.py</code> 488줄 심층 분석</strong>: 어제 공개된 row-sharded 임베딩 CUDA 커널의 체크포인트 복원 쪽. 어제의 공유 adapter와 짝.</li>
 <li><strong><code>SidLookupService</code>의 서버 측 공개 여부</strong>: 오늘 공개된 SID retrieval 서버가 호출하는 외부 서비스 <code>xai-recsys-sid-proto::SidLookupService</code>가 다음 커밋에서 <strong>별도 크레이트로 공개</strong>되는지가 다음 창의 관측 지점. 지금은 <code>--sid-endpoint=http://localhost:50051</code>로 default가 localhost인 상태로, 외부 노출 endpoint 이름이 아직 리포에 안 보인다.</li>
 <li><strong>generative SID retrieval 심층 분석</strong>: 어제(4세대+34)에서 심층 분석 필요로 넘긴 축 — beam decoder 수학(prefix retrieval 멈춤 조건, score aggregation), SID → post 역해상 corpus view 구조, 학습 loss(positive=FAV 하나, hard negative action 7개의 가중치), training throughput — 이 모든 축이 <strong>오늘 공개된 서버 크레이트가 &quot;beam search를 서버가 안 한다, 코퍼스 측에서 코드를 미리 뽑아 batch로 밀어넣고 서버는 접두사 범위 검색만 한다&quot;로 드러난 뒤</strong>에도 여전히 열려 있다. 모델이 코드를 뽑는 쪽이 지금 어떤 batch 파이프라인에 담겨 돌아가는지가 다음 창의 각도 — 학습 config의 <code>max_steps ≈ 3.1B</code>가 모델 측 체크포인트이고, 서빙 측은 그 체크포인트가 코퍼스 전체를 돌려 만드는 <code>post_sid_snapshot.parquet</code>를 받는다.</li>
-</ul>
+</ul></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-10-03.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-10-03</div></a><a class="r" href="daily-2026-10-07.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-10-07</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-10-03.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-10-03</span></a><a class="pg-next" href="daily-2026-10-07.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-10-07</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

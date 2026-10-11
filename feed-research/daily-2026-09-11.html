@@ -2,219 +2,61 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-11 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X 4세대+18(75d93d9)이 visibility-filtering의 판정 축을 FilteredReason에서 명시적 Action enum으로 옮기고, 홈 타임라인에 여섯 번째 광고 포맷 header-image-prompt-ad를 새로 배선했으며, grox LLM…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-11.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-11 — feed-research">
 <meta property="og:description" content="한 줄: X 4세대+18(75d93d9)이 visibility-filtering의 판정 축을 FilteredReason에서 명시적 Action enum으로 옮기고, 홈 타임라인에 여섯 번째 광고 포맷 header-image-prompt-ad를 새로 배선했으며, grox LLM…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-11.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-11</h1>
-  <div class="wd">금요일 · 읽는 데 약 37분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+18(75d93d9)이 visibility-filtering의 판정 축을 <code>FilteredReason</code>에서 명시적 <code>Action</code> enum으로 옮기고, 홈 타임라인에 여섯 번째 광고 포맷 <code>header-image-prompt-ad</code>를 새로 배선했으며, grox LLM 입력에 30초+ 영상 preview thumbnail과 라이브 broadcast 프레임을 붙였고, ranking 학습 config에서 멀티모달 post 임베딩을 전부 껐다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-x--4세대18-2026-09-09-75d93d9-vf-action-축-리팩터--신규-광고-포맷-header-image-prompt-ad--grox-video-preview-thumbnail--broadcast-ptos-통합--multimodal-임베딩-학습-비활성화">1. X — 4세대+18 (2026-09-09, 75d93d9): VF Action-축 리팩터 + 신규 광고 포맷 header-image-prompt-ad + grox video preview thumbnail + broadcast PTOS 통합 + multimodal 임베딩 학습 비활성화</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/75d93d9">xai-org/x-algorithm@75d93d9</a> — 공개 소스코드, 2026-09-09, 파일 28개, +801/−252.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X는 for-you 파이프라인 소스코드를 <a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a>에 매일 두 번 정도 미러링한다(2026-08-13 4세대 공개 이래). 이번 커밋은 파일 28개짜리 중형이지만 서로 다른 5개 축을 동시에 건드렸다. (a) visibility-filtering 클라이언트가 <code>TweetVisibility</code>에 명시적 <code>Action</code> 필드를 추가하고, home-mixer의 <code>VFFilter</code>가 이제 <code>FilteredReason</code>이 아니라 <code>Action</code> enum으로 drop/keep을 결정한다 — 즉 판정 축이 &quot;reason에서 파생된 action&quot;에서 &quot;action이 결정, reason은 로깅용 annotation&quot;으로 옮겨졌다. (b) <code>home-mixer/util/urt/ad_marshaller.rs</code>에 <code>header_image_prompt_ad_info</code>가 있는 광고를 별도 marshaller로 처리하는 분기가 신설돼, 트윗을 감싸는 프로모트 트윗 포맷이 아닌 <strong>머리 이미지 + 본문 + 1~2개 CTA 버튼으로 구성되는 새 광고 포맷 6번째 변종</strong>이 홈 타임라인에 first-class로 등장했다. (c) <code>grox</code> 미디어 로더가 30초+ 영상에 대해 첫 프레임 preview 이미지를 다운로드·리사이즈해 LLM 프롬프트에 <code>[Video Preview Thumbnail]</code> 라벨과 함께 storyboard 앞에 붙인다. (d) <code>BroadcastLoader</code>가 grox에 새로 들어와 라이브 broadcast(X의 라이브 비디오, Periscope 후신)의 프레임을 추출하고, PTOS adult-content leading-frames와 sex/nudity safemodel 두 안전 파이프라인이 broadcast 프레임을 정식 payload로 인정한다. (e) <code>phoenix/README.md</code>의 nano 훈련 config 표에서 multimodal post 임베딩이 <code>xrecsys_seqpack</code>에서 v5로 켜져 있다는 줄이 &quot;off (<code>home_direct_packed</code> and <code>xrecsys_seqpack</code>)&quot;로 바뀌었다 — 즉 등록된 랭킹 훈련 config 두 개 모두에서 멀티모달 post 임베딩이 학습 입력에서 빠졌다. 부수적으로 phoenix NUMA pinning이 isolated CPU를 sched_setaffinity 대상에서 빼도록 고쳐졌고, <code>candidate-pipeline</code>의 <code>quiet-spans</code> feature-gated 로그 6곳이 삭제됐다.</p></div>
-<p><strong>A. VF 판정 축을 <code>FilteredReason</code>에서 <code>Action</code>으로 리팩터</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/visibility-filtering-client/vf_client.rs"><code>visibility-filtering-client/vf_client.rs</code></a> (+130/−62), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/visibility-filtering-client/models.rs"><code>visibility-filtering-client/models.rs</code></a> (+7), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/filters/vf_filter.rs"><code>home-mixer/filters/vf_filter.rs</code></a> (+27/−69), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/candidate_hydrators/vf_candidate_hydrator.rs"><code>home-mixer/candidate_hydrators/vf_candidate_hydrator.rs</code></a> (+159/−23), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/candidate_hydrators/vf_following_candidate_hydrator.rs"><code>home-mixer/candidate_hydrators/vf_following_candidate_hydrator.rs</code></a> (+6/−11), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/models/candidate.rs"><code>home-mixer/models/candidate.rs</code></a> (+1).</p>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-11">2026-09-11</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>금요일</li>
+<li><span class="meta-k">읽는 시간</span>37분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+18(75d93d9)이 visibility-filtering의 판정 축을 <code>FilteredReason</code>에서 명시적 <code>Action</code> enum으로 옮기고, 홈 타임라인에 여섯 번째 광고 포맷 <code>header-image-prompt-ad</code>를 새로 배선했으며, grox LLM 입력에 30초+ 영상 preview thumbnail과 라이브 broadcast 프레임을 붙였고, ranking 학습 config에서 멀티모달 post 임베딩을 전부 껐다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-x--4세대18-2026-09-09-75d93d9-vf-action-축-리팩터--신규-광고-포맷-header-image-prompt-ad--grox-video-preview-thumbnail--broadcast-ptos-통합--multimodal-임베딩-학습-비활성화"><span class="num">1</span>X — 4세대+18 (2026-09-09, 75d93d9): VF Action-축 리팩터 + 신규 광고 포맷 header-image-prompt-ad + grox video preview thumbnail + broadcast PTOS 통합 + multimodal 임베딩 학습 비활성화</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-x--4세대18-2026-09-09-75d93d9-vf-action-축-리팩터--신규-광고-포맷-header-image-prompt-ad--grox-video-preview-thumbnail--broadcast-ptos-통합--multimodal-임베딩-학습-비활성화"><span class="num">1</span>X — 4세대+18 (2026-09-09, 75d93d9): VF Action-축 리팩터 + 신규 광고 포맷 header-image-prompt-ad + grox video preview thumbnail + broadcast PTOS 통합 + multimodal 임베딩 학습 비활성화</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/75d93d9" target="_blank" rel="noopener">xai-org/x-algorithm@75d93d9</a> — 공개 소스코드, 2026-09-09, 파일 28개, +801/−252.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X는 for-you 파이프라인 소스코드를 <a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a>에 매일 두 번 정도 미러링한다(2026-08-13 4세대 공개 이래). 이번 커밋은 파일 28개짜리 중형이지만 서로 다른 5개 축을 동시에 건드렸다. (a) visibility-filtering 클라이언트가 <code>TweetVisibility</code>에 명시적 <code>Action</code> 필드를 추가하고, home-mixer의 <code>VFFilter</code>가 이제 <code>FilteredReason</code>이 아니라 <code>Action</code> enum으로 drop/keep을 결정한다 — 즉 판정 축이 &quot;reason에서 파생된 action&quot;에서 &quot;action이 결정, reason은 로깅용 annotation&quot;으로 옮겨졌다. (b) <code>home-mixer/util/urt/ad_marshaller.rs</code>에 <code>header_image_prompt_ad_info</code>가 있는 광고를 별도 marshaller로 처리하는 분기가 신설돼, 트윗을 감싸는 프로모트 트윗 포맷이 아닌 <strong>머리 이미지 + 본문 + 1~2개 CTA 버튼으로 구성되는 새 광고 포맷 6번째 변종</strong>이 홈 타임라인에 first-class로 등장했다. (c) <code>grox</code> 미디어 로더가 30초+ 영상에 대해 첫 프레임 preview 이미지를 다운로드·리사이즈해 LLM 프롬프트에 <code>[Video Preview Thumbnail]</code> 라벨과 함께 storyboard 앞에 붙인다. (d) <code>BroadcastLoader</code>가 grox에 새로 들어와 라이브 broadcast(X의 라이브 비디오, Periscope 후신)의 프레임을 추출하고, PTOS adult-content leading-frames와 sex/nudity safemodel 두 안전 파이프라인이 broadcast 프레임을 정식 payload로 인정한다. (e) <code>phoenix/README.md</code>의 nano 훈련 config 표에서 multimodal post 임베딩이 <code>xrecsys_seqpack</code>에서 v5로 켜져 있다는 줄이 &quot;off (<code>home_direct_packed</code> and <code>xrecsys_seqpack</code>)&quot;로 바뀌었다 — 즉 등록된 랭킹 훈련 config 두 개 모두에서 멀티모달 post 임베딩이 학습 입력에서 빠졌다. 부수적으로 phoenix NUMA pinning이 isolated CPU를 sched_setaffinity 대상에서 빼도록 고쳐졌고, <code>candidate-pipeline</code>의 <code>quiet-spans</code> feature-gated 로그 6곳이 삭제됐다.</p></div>
+<p><strong>A. VF 판정 축을 <code>FilteredReason</code>에서 <code>Action</code>으로 리팩터</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/visibility-filtering-client/vf_client.rs" target="_blank" rel="noopener"><code>visibility-filtering-client/vf_client.rs</code></a> (+130/−62), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/visibility-filtering-client/models.rs" target="_blank" rel="noopener"><code>visibility-filtering-client/models.rs</code></a> (+7), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/filters/vf_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/vf_filter.rs</code></a> (+27/−69), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/candidate_hydrators/vf_candidate_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/vf_candidate_hydrator.rs</code></a> (+159/−23), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/candidate_hydrators/vf_following_candidate_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/vf_following_candidate_hydrator.rs</code></a> (+6/−11), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a> (+1).</p>
 <p><strong>Client 측 자료구조.</strong> <code>TweetVisibility</code>가 기존 <code>reason: Option&lt;FilteredReason&gt;</code> + <code>safety_labels</code>에 이어 <strong><code>action: Action</code> 필드를 정식 멤버로</strong> 갖게 됐다. 즉 판정의 결과가 이제 세 개 튜플이다: (1) 결정론적 판정 <code>Action</code>(Allow / Interstitial / Avoid / Downrank / Drop / Tombstone / NotEvaluated), (2) 로깅·다운스트림 annotation <code>FilteredReason</code>, (3) 라벨 lookup 결과 <code>SafetyLabelMap</code>. 새 helper <code>TweetVisibility::to_visibility_reason()</code>이 action과 reason을 조합해 <code>visibility_reason</code> 필드 값을 유도한다.</p>
 <p><strong>Strato 경로의 action 유도.</strong> <code>StratoVfClient::get_result</code>가 Strato에서 받은 <code>FilteredReason</code>으로부터 <code>action_from_strato_reason</code>을 태워 action을 계산한다. 규칙은 세 갈래다:</p>
-<pre><code class="language-rust">fn action_from_strato_reason(reason: &amp;Option&lt;FilteredReason&gt;) -&gt; Action {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn action_from_strato_reason(reason: &amp;Option&lt;FilteredReason&gt;) -&gt; Action {
     match reason {
         None =&gt; Action::Allow,
         Some(FilteredReason::SafetyResult(safety_result)) =&gt; match safety_result.action {
@@ -224,34 +66,34 @@ ul.rl .chip b { font-size: 13px; }
         Some(_) =&gt; Action::Drop(DropReason {}),
     }
 }
-</code></pre>
-<p>즉 Strato(레거시 VF 스택 <code>[추정]</code>, 2026-08-30 4세대+8 canon 주의 목록에서 언급됨)는 <code>SafetyResult</code>가 있으면 그 안의 action을 그대로 쓰고, 그 밖의 non-SafetyResult reason(뮤트·차단·null-cast·exclusive 등)은 무조건 <code>Drop</code>으로 만다. Strato가 <code>NotEvaluated</code>로 리턴하면 client 층에서 <code>Allow</code>로 승격되는데, 이는 Strato가 판정 미실행을 fail-open으로 취급하겠다는 뜻이다.</p>
+</code></pre></figure>
+<p>즉 Strato(레거시 VF 스택 <span class="badge est">추정</span>, 2026-08-30 4세대+8 canon 주의 목록에서 언급됨)는 <code>SafetyResult</code>가 있으면 그 안의 action을 그대로 쓰고, 그 밖의 non-SafetyResult reason(뮤트·차단·null-cast·exclusive 등)은 무조건 <code>Drop</code>으로 만다. Strato가 <code>NotEvaluated</code>로 리턴하면 client 층에서 <code>Allow</code>로 승격되는데, 이는 Strato가 판정 미실행을 fail-open으로 취급하겠다는 뜻이다.</p>
 <p><strong>gRPC 경로의 action 유도.</strong> <code>result_to_visibility</code>가 gRPC 응답의 <code>result.action</code>을 그대로 <code>Action</code>으로 매핑한다. <code>action</code> 필드가 없으면 <code>Action::NotEvaluated</code>. 즉 새 gRPC 경로는 action을 서버가 결정해서 내려주는 것이 표준이다.</p>
 <p><strong>Filter 층의 결정 함수 교체.</strong> <code>VFFilter::filter</code>가 이제 candidate.visibility_action의 함수다:</p>
-<pre><code class="language-rust">pub(crate) fn should_drop_action(action: &amp;Action) -&gt; bool {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn should_drop_action(action: &amp;Action) -&gt; bool {
     match action {
         Action::Allow | Action::Interstitial | Action::Avoid | Action::Downrank =&gt; false,
         Action::Drop(_) | Action::Tombstone | Action::NotEvaluated =&gt; true,
     }
 }
-</code></pre>
+</code></pre></figure>
 <p>이전 버전은 <code>FilteredReason</code> variants를 매칭해 <code>SafetyResult</code>면 <code>action == Drop</code>만 통과, 나머지 non-SafetyResult reason(뮤트·차단·null-cast·exclusive 등)은 무조건 drop이었다. 새 버전은 판정 축이 명시적이라 훨씬 읽기 좋다.</p>
-<p>⚠ <strong>주장 변경 (services/x.md line 392 &quot;fail-closed&quot; 진술)</strong>. 이전 정본은 &quot;<code>VFFilter</code>는 fail-closed다. <code>SafetyResult</code> 이외의 모든 <code>FilteredReason</code> 변종이 무조건 drop이다&quot;였다. 새 판정 함수는 문법이 완전히 달라졌지만 <strong>결과는 대부분 동일</strong>하다: Strato 경로에서 non-SafetyResult reason은 client 층에서 이미 <code>Drop</code>으로 변환되고, <code>NotEvaluated</code>도 drop이다. <strong>바뀐 것 하나:</strong> 이제 <code>Interstitial</code>이 명시적으로 통과된다(이전 코드도 통과시켰다). <code>Downrank</code>와 <code>Avoid</code>가 명시적으로 통과되는데, 이 두 action은 이전엔 <code>SafetyResult.action</code>으로 오면 drop되고 다른 경로로 오면 통과되는 애매한 상태였다. 즉 <strong>fail-closed 성격은 유지되지만 판정 세분화는 훨씬 명확해졌다</strong>.</p>
+<p class="warn">⚠ <strong>주장 변경 (services/x.md line 392 &quot;fail-closed&quot; 진술)</strong>. 이전 정본은 &quot;<code>VFFilter</code>는 fail-closed다. <code>SafetyResult</code> 이외의 모든 <code>FilteredReason</code> 변종이 무조건 drop이다&quot;였다. 새 판정 함수는 문법이 완전히 달라졌지만 <strong>결과는 대부분 동일</strong>하다: Strato 경로에서 non-SafetyResult reason은 client 층에서 이미 <code>Drop</code>으로 변환되고, <code>NotEvaluated</code>도 drop이다. <strong>바뀐 것 하나:</strong> 이제 <code>Interstitial</code>이 명시적으로 통과된다(이전 코드도 통과시켰다). <code>Downrank</code>와 <code>Avoid</code>가 명시적으로 통과되는데, 이 두 action은 이전엔 <code>SafetyResult.action</code>으로 오면 drop되고 다른 경로로 오면 통과되는 애매한 상태였다. 즉 <strong>fail-closed 성격은 유지되지만 판정 세분화는 훨씬 명확해졌다</strong>.</p>
 <p><strong>Ancillary drop 함수도 action 축으로.</strong> <code>vf_candidate_hydrator.rs</code>의 <code>should_drop_ancillary</code>도 조상·quoted·retweeted 포스트의 <code>visibility.action</code>을 봐서 drop 여부 결정. 이전 <code>should_drop_reason(reason: &amp;FilteredReason)</code>은 제거되고 filter 층의 <code>should_drop_action</code>을 공유한다.</p>
 <p><strong>PostCandidate에 필드 추가.</strong> <code>candidate.rs</code>의 <code>PostCandidate</code>가 <code>visibility_action: Option&lt;Action&gt;</code>을 갖게 됐다(기존 <code>visibility_reason: Option&lt;FilteredReason&gt;</code>은 유지). Hydrator update 함수 두 개(<code>VFCandidateHydrator::update</code>·<code>VFFollowingCandidateHydrator::update</code>)가 이 필드도 함께 채운다.</p>
 <p><strong>신규 <code>FilteredReason</code> 변종.</strong> <code>FilteredReason::ViewerBlocksAuthor</code>가 추가됐다. 기존에는 <code>AuthorBlockViewer</code>(작성자가 뷰어를 차단)만 있었는데 이제 대칭 방향(뷰어가 작성자를 차단)도 정식 reason 이름을 갖는다. <code>vf_pb::FilteredReason::ViewerBlocksAuthor</code>와 proto to/from 매핑도 추가.</p>
 <blockquote>
 <p>&quot;match action { Action::Allow | Action::Interstitial | Action::Avoid | Action::Downrank =&gt; false, Action::Drop(_) | Action::Tombstone | Action::NotEvaluated =&gt; true, }&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/filters/vf_filter.rs">home-mixer/filters/vf_filter.rs:16-21</a>, 2026-09-09</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/filters/vf_filter.rs" target="_blank" rel="noopener">home-mixer/filters/vf_filter.rs:16-21</a>, 2026-09-09</p>
 </blockquote>
-<div class="blk why"><p><span class="lbl">의미 (A)</span> — 4세대 공개(2026-08-13) 이래 VF의 판정 함수는 <code>SafetyResult.action</code>을 봐야 하는 경로, <code>FilteredReason</code> variant를 봐야 하는 경로, gRPC action을 매핑해야 하는 경로가 얽혀 있었다. 이번 리팩터는 <strong>client 층에서 판정을 통일된 <code>Action</code> enum으로 좁힌 뒤 downstream에는 action만 흐르게</strong> 만든 것이다. 4세대+8(2026-08-26, <code>reference_compare.rs</code>)이 도입한 shadow 비교에서 diff의 원인이 대부분 &quot;reason variant matching이 파이프라인마다 조금씩 달라서&quot;였을 가능성이 크고 <code>[추정]</code>, 그 diff를 줄이는 후속 조치로 읽힌다. 아직 <code>Downrank</code>가 실제로 사용되는 코드는 이 커밋에 등장하지 않는다 — Strato가 리턴하는 <code>SafetyResult.action</code>에 <code>Downrank</code>가 들어올 여지가 열렸지만, 실제 배선은 다음 커밋 관측 대상.</p></div>
-<p><strong>B. 홈 타임라인에 신규 광고 포맷 <code>header-image-prompt-ad</code> 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/util/urt/ad_marshaller.rs"><code>home-mixer/util/urt/ad_marshaller.rs</code></a> (+258/−3).</p>
-<p>기존 홈 타임라인 광고는 다섯 포맷이었다: (1) 프로모트 트윗(<code>promoted-tweet-&lt;post_id&gt;-&lt;impression&gt;</code>), (2) preroll 비디오 광고, (3) <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/util/urt/ad_marshaller.rs">SSP 트윗</a>/RTB Trend Takeover, (4) <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/util/urt/ad_marshaller.rs">RTB image ad</a> (<code>rtb-image-ad-&lt;impression&gt;</code>), (5) Google SDK Native ad(<code>GoogleSDKNativeAd</code>). 이번 커밋이 여섯 번째를 추가했다: <strong><code>header-image-prompt-ad-&lt;impression&gt;</code></strong>.</p>
+<div class="blk why"><p><span class="lbl">의미 (A)</span> — 4세대 공개(2026-08-13) 이래 VF의 판정 함수는 <code>SafetyResult.action</code>을 봐야 하는 경로, <code>FilteredReason</code> variant를 봐야 하는 경로, gRPC action을 매핑해야 하는 경로가 얽혀 있었다. 이번 리팩터는 <strong>client 층에서 판정을 통일된 <code>Action</code> enum으로 좁힌 뒤 downstream에는 action만 흐르게</strong> 만든 것이다. 4세대+8(2026-08-26, <code>reference_compare.rs</code>)이 도입한 shadow 비교에서 diff의 원인이 대부분 &quot;reason variant matching이 파이프라인마다 조금씩 달라서&quot;였을 가능성이 크고 <span class="badge est">추정</span>, 그 diff를 줄이는 후속 조치로 읽힌다. 아직 <code>Downrank</code>가 실제로 사용되는 코드는 이 커밋에 등장하지 않는다 — Strato가 리턴하는 <code>SafetyResult.action</code>에 <code>Downrank</code>가 들어올 여지가 열렸지만, 실제 배선은 다음 커밋 관측 대상.</p></div>
+<p><strong>B. 홈 타임라인에 신규 광고 포맷 <code>header-image-prompt-ad</code> 신설</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/util/urt/ad_marshaller.rs" target="_blank" rel="noopener"><code>home-mixer/util/urt/ad_marshaller.rs</code></a> (+258/−3).</p>
+<p>기존 홈 타임라인 광고는 다섯 포맷이었다: (1) 프로모트 트윗(<code>promoted-tweet-&lt;post_id&gt;-&lt;impression&gt;</code>), (2) preroll 비디오 광고, (3) <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/util/urt/ad_marshaller.rs" target="_blank" rel="noopener">SSP 트윗</a>/RTB Trend Takeover, (4) <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/util/urt/ad_marshaller.rs" target="_blank" rel="noopener">RTB image ad</a> (<code>rtb-image-ad-&lt;impression&gt;</code>), (5) Google SDK Native ad(<code>GoogleSDKNativeAd</code>). 이번 커밋이 여섯 번째를 추가했다: <strong><code>header-image-prompt-ad-&lt;impression&gt;</code></strong>.</p>
 <p><strong>Marshaller 진입 조건.</strong> <code>marshal_ad()</code> 함수 최상단이 다음 분기를 갖는다:</p>
-<pre><code class="language-rust">if let Some(info) = &amp;ad.header_image_prompt_ad_info {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if let Some(info) = &amp;ad.header_image_prompt_ad_info {
     return marshal_header_image_prompt_ad(ad, info, sort_index, request_type, &amp;impression_string);
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 <code>AdIndexInfo.header_image_prompt_ad_info: Option&lt;HeaderImagePromptAdInfo&gt;</code> 필드가 있으면 이 marshaller가 우선 처리한다. 프로모트 트윗과 상호 배타적으로 분기된다.</p>
 <p><strong>HeaderImagePromptAdInfo 구조.</strong> 광고 인덱스 서비스가 채워 넣는 proto message로, 필드 구성은 marshaller가 소비하는 형태에서 역산 가능하다:</p>
 <ul>
@@ -279,8 +121,8 @@ ul.rl .chip b { font-size: 13px; }
 <li><code>header_image_prompt_ad_emits_secondary_button_when_set</code> — <code>secondary_button_text = &quot;Learn more&quot;</code> 세팅 시 secondary_button_action 존재 + secondary_cta action.</li>
 <li><code>header_image_prompt_ad_info_absent_stays_a_tweet_item</code> — <code>header_image_prompt_ad_info: None</code>이면 기존 프로모트 트윗 marshaller로 fall-through.</li>
 </ol>
-<div class="blk why"><p><span class="lbl">의미 (B)</span> — X 홈 타임라인이 <strong>트윗을 감싸지 않는 광고 포맷</strong>을 새로 정식 배선했다. RTB image ad가 이미 트윗과 분리된 이미지 광고였지만, header-image-prompt-ad는 <strong>헤더 이미지 + 본문 텍스트 + 최대 2개 CTA 버튼</strong>이라는 훨씬 풍부한 컴포넌트 구성을 갖는다. URT <code>MessageContent</code>라는 별도 컨텐츠 타입을 사용하는 광고는 이 포맷이 첫 사례다 — 클라이언트 렌더링 관점에서는 트윗이 아니라 in-feed announcement/dialog UI로 렌더링될 가능성이 높다 <code>[추정]</code>. Secondary CTA를 지원하는 광고 포맷도 홈 타임라인에서는 이번이 첫 진입이다. 광고 인덱스 시스템(공개 안 됨)이 이 광고 포맷을 언제 어떤 조건에서 채우는지, 광고 블렌더 5종(<code>safe_gap</code>·<code>partition_organic</code>·<code>partition_organic_low_risk</code>·<code>time_gap</code>·<code>multi_risk</code>) 중 어느 것에 진입하는지는 이 커밋에 없다.</p></div>
-<p><strong>C. grox 미디어 로더 — 30초+ 영상에 preview thumbnail 첨부</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/data_loaders/media_loader.py"><code>grox/core/data_loaders/media_loader.py</code></a> (+100/−19), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/lm/convo.py"><code>grox/core/lm/convo.py</code></a> (+18).</p>
+<div class="blk why"><p><span class="lbl">의미 (B)</span> — X 홈 타임라인이 <strong>트윗을 감싸지 않는 광고 포맷</strong>을 새로 정식 배선했다. RTB image ad가 이미 트윗과 분리된 이미지 광고였지만, header-image-prompt-ad는 <strong>헤더 이미지 + 본문 텍스트 + 최대 2개 CTA 버튼</strong>이라는 훨씬 풍부한 컴포넌트 구성을 갖는다. URT <code>MessageContent</code>라는 별도 컨텐츠 타입을 사용하는 광고는 이 포맷이 첫 사례다 — 클라이언트 렌더링 관점에서는 트윗이 아니라 in-feed announcement/dialog UI로 렌더링될 가능성이 높다 <span class="badge est">추정</span>. Secondary CTA를 지원하는 광고 포맷도 홈 타임라인에서는 이번이 첫 진입이다. 광고 인덱스 시스템(공개 안 됨)이 이 광고 포맷을 언제 어떤 조건에서 채우는지, 광고 블렌더 5종(<code>safe_gap</code>·<code>partition_organic</code>·<code>partition_organic_low_risk</code>·<code>time_gap</code>·<code>multi_risk</code>) 중 어느 것에 진입하는지는 이 커밋에 없다.</p></div>
+<p><strong>C. grox 미디어 로더 — 30초+ 영상에 preview thumbnail 첨부</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/data_loaders/media_loader.py" target="_blank" rel="noopener"><code>grox/core/data_loaders/media_loader.py</code></a> (+100/−19), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/lm/convo.py" target="_blank" rel="noopener"><code>grox/core/lm/convo.py</code></a> (+18).</p>
 <p><strong>신규 상수와 필드.</strong> <code>_VIDEO_PREVIEW_MIN_DURATION_MS = 30_000</code>(30초). <code>Video</code> pydantic 모델에 <code>preview_image: bytes | None = None</code> 필드 추가. <code>PREVIEW_IMAGE_LABEL = &quot;[Video Preview Thumbnail]&quot;</code>.</p>
 <p><strong>Hydration 진입 조건 (4-way gate).</strong> <code>hydrate_video</code>가 기존 프레임 hydration 뒤에 <code>if grox_config.media_hydration.enable_video_preview_image: await cls.hydrate_video_preview(video, is_main_post and is_high_fav)</code>. <code>hydrate_video_preview</code>가:</p>
 <ol>
@@ -292,7 +134,7 @@ ul.rl .chip b { font-size: 13px; }
 <p><code>is_deluxe = is_main_post and is_high_fav</code>이면 <code>deluxe_image_tile_size</code>로, 아니면 <code>image_tile_size</code>로 <code>resize_tile(bs, tile_size)</code>. 다운로드 실패 시 <code>media_loader.hydrate_video_preview_failed.count</code> 증가. 성공 시 <code>media_loader.hydrate_video_preview.count</code> 증가 + <code>video.convo_video.preview_image = preview</code>.</p>
 <p><strong>LLM 입력에서의 위치.</strong> <code>Video.interleave_storyboard</code>가 preview_image가 있으면 storyboard 리스트 앞에 <code>[f&quot;{PREVIEW_IMAGE_LABEL} &quot;, self.preview_image, &quot;\n&quot;]</code> 세 원소를 추가. 즉 storyboard composite 앞에 라벨 + 원본 이미지 바이트 + newline. <code>_image_part</code> 기반 chat marshaling 경로에서도 <code>if c.preview_image: parts.append({&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: PREVIEW_IMAGE_LABEL}); parts.append(_image_part(c.preview_image))</code>로 그림 전에 텍스트 라벨을 붙인다.</p>
 <div class="blk why"><p><span class="lbl">의미 (C)</span> — 4세대+15(2026-09-06, &quot;grox multimodal 스택 재구조&quot;) 이래 grox가 LLM에 넘기는 미디어 표현은 storyboard(균일 샘플링된 프레임을 격자로 붙인 이미지)와 motion-reveal frames(정적/동적 분리) 두 형태였다. 이번 커밋은 <strong>긴 영상의 대표 프레임 한 장을 storyboard 앞에 먼저 붙이는 세 번째 형태</strong>를 추가했다. 짧은 영상은 이미 storyboard의 프레임 수가 적어서 대표성이 충분한 데 반해, 30초+ 긴 영상은 프레임 격자로는 첫 인상이 흐려질 수 있으므로 preview thumbnail로 &quot;이게 무엇인가&quot;를 먼저 잡아준다. Deluxe 티어(main post + high fav)면 tile 크기가 큰 preview를 쓴다는 것도 LLM 판정 비용을 대표성에 걸어놓는 기존 설계와 일관된다.</p></div>
-<p><strong>D. Broadcast(라이브 비디오) frame 추출과 PTOS 안전 파이프라인 통합</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/data_loaders/media_loader.py"><code>grox/core/data_loaders/media_loader.py</code></a> (broadcast 부분), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py"><code>grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py</code></a> (+18/−8), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py"><code>grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py</code></a> (+21/−2).</p>
+<p><strong>D. Broadcast(라이브 비디오) frame 추출과 PTOS 안전 파이프라인 통합</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/data_loaders/media_loader.py" target="_blank" rel="noopener"><code>grox/core/data_loaders/media_loader.py</code></a> (broadcast 부분), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py</code></a> (+18/−8), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py</code></a> (+21/−2).</p>
 <p><strong>신규 loader.</strong> <code>media_loader.py</code>에 <code>from broadcast_tools.broadcast import BroadcastLoader</code>가 들어오고, <code>MediaLoader._broadcast_loader: BroadcastLoader | None = None</code> 클래스 캐시. <code>_get_broadcast_loader()</code>가 lazy init(<code>bearer_token=X_API_BEARER</code>·<code>guest_token=BROADCAST_GUEST_TOKEN</code> 환경변수 사용).</p>
 <p><strong>Frame 추출.</strong> <code>_extract_broadcast_video(broadcast_metadata: BroadcastMetadata) -&gt; Video</code>가 <code>BroadcastLoader.load_broadcast(broadcast_id, media_key=..., max_frames=config.video_max_frames, tile_size=config.video_tile_size, max_duration=broadcast_metadata.crop_seconds)</code>로 프레임을 뽑아 <code>Video(convo_video=ConvoVideo(frames=..., duration=interval, total_duration=result.video.sampled_duration))</code>로 정규화한다. duration은 <code>(frames[-1].time_sec - frames[0].time_sec) / (len(frames) - 1)</code>로 계산.</p>
 <p><strong>PTOS leading-frames filter 진입 조건 재구성.</strong> <code>TaskSafetyPtosAdultContentLeadingFramesFilter._eligible_with_post</code>의 필터 조건 6-gate(4세대+17에서 정본화)가 이번에 두 곳에서 바뀌었다:</p>
@@ -301,10 +143,10 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>Broadcast payload 정식 추가.</strong> 기존은 <code>long_videos = [m for m in media if m.type == &quot;video&quot; and durationMillis &gt;= 30s]</code>만 봤고, 없으면 <code>no_long_video</code> skip. 새 코드는 <code>broadcasts = [p.broadcast_metadata for p in (post, post.quoted_post) if p is not None and p.broadcast_metadata is not None and p.broadcast_metadata.broadcast_id]</code>를 함께 계산하고, <code>long_videos</code>나 <code>broadcasts</code> 둘 중 하나라도 있으면 진입한다. <code>crop_seconds = 10.0</code>이 broadcasts에도 세팅되고, <code>Metrics.counter(&quot;...eligible.count&quot;)</code>에 <code>media = &quot;both&quot; | &quot;broadcast&quot; | &quot;video&quot;</code> 태그가 붙는다.</li>
 </ul>
 <p><strong>PTOS safemodel sex/nudity payload 확장.</strong> <code>TaskSafetyPtosSafemodelSexNudity._collect_payloads</code>에 <code>if grox_config.media_hydration.enable_local_broadcast_frame_extraction:</code> 분기가 추가돼, <code>_iter_broadcast_videos(post)</code>로 broadcast video의 <code>convo_video.frames</code>에서 <code>_MAX_FRAMES_PER_VIDEO = 8</code>을 uniform 샘플링해 <code>(&quot;broadcast_frame&quot;, frame)</code> payload로 append. <code>_FRAME_KINDS = {&quot;video_frame&quot;, &quot;broadcast_frame&quot;}</code> 상수로 <code>has_video</code>·<code>n_video_frames</code> 계산에서 두 종류를 동등하게 취급. <code>_iter_broadcast_videos</code>는 <code>post</code>와 <code>post.quoted_post</code> 각각에서 <code>broadcast_metadata.video.convo_video.frames</code>가 있는 것만 yield.</p>
-<div class="blk why"><p><span class="lbl">의미 (D)</span> — X의 라이브 비디오(broadcast, <a href="https://en.wikipedia.org/wiki/Periscope_(app)">Periscope의 계승</a>)가 이번 커밋 전까지 grox 안전 파이프라인의 사각지대였다. PTOS(post text-only sensitive classification, X 내부 안전 라벨링 프레임워크 <code>[추정]</code>)가 트윗의 정적 미디어(사진·업로드 영상)만 판정하고 라이브 방송은 다른 시스템으로 넘어갔거나 미판정 상태였을 가능성이 크다. 이번 커밋으로 <strong>라이브 broadcast가 정식 미디어 payload로 승격</strong>돼, 이미 정적 영상에 적용되던 두 안전 파이프라인(adult-content leading-frames + safemodel sex/nudity)의 판정 대상이 됐다. Deluxe fav 임계 제거는 4세대+17에서 도입된 6-gate 중 하나였는데 하루 만에 삭제 — leading-frames 파이프라인이 (a) prior PTOS 결과 존재 + (b) prior NSFW 아님 + (c) 30초+ 영상 or broadcast + (d) prior AdultContent policy 또는 fav ≥ 512라는 5-gate로 줄었다. 즉 <strong>재판정 대상 후보군이 급격히 늘어난다</strong>. 이 결정은 fav 임계로 재판정 부하를 관리하는 대신 (d)의 <code>ADULT_CONTENT_LEADING_FRAMES_UNCONDITIONAL_FAV = 512</code>와 (a)/(b)의 prior 조건으로 부하 제어를 옮긴다는 뜻으로 읽힌다 <code>[추정]</code>.</p></div>
-<p><strong>E. 랭킹 훈련 config에서 multimodal post 임베딩이 전부 꺼졌다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/phoenix/README.md"><code>phoenix/README.md</code></a> (+3/−3).</p>
+<div class="blk why"><p><span class="lbl">의미 (D)</span> — X의 라이브 비디오(broadcast, <a href="https://en.wikipedia.org/wiki/Periscope_(app)" target="_blank" rel="noopener">Periscope의 계승</a>)가 이번 커밋 전까지 grox 안전 파이프라인의 사각지대였다. PTOS(post text-only sensitive classification, X 내부 안전 라벨링 프레임워크 <span class="badge est">추정</span>)가 트윗의 정적 미디어(사진·업로드 영상)만 판정하고 라이브 방송은 다른 시스템으로 넘어갔거나 미판정 상태였을 가능성이 크다. 이번 커밋으로 <strong>라이브 broadcast가 정식 미디어 payload로 승격</strong>돼, 이미 정적 영상에 적용되던 두 안전 파이프라인(adult-content leading-frames + safemodel sex/nudity)의 판정 대상이 됐다. Deluxe fav 임계 제거는 4세대+17에서 도입된 6-gate 중 하나였는데 하루 만에 삭제 — leading-frames 파이프라인이 (a) prior PTOS 결과 존재 + (b) prior NSFW 아님 + (c) 30초+ 영상 or broadcast + (d) prior AdultContent policy 또는 fav ≥ 512라는 5-gate로 줄었다. 즉 <strong>재판정 대상 후보군이 급격히 늘어난다</strong>. 이 결정은 fav 임계로 재판정 부하를 관리하는 대신 (d)의 <code>ADULT_CONTENT_LEADING_FRAMES_UNCONDITIONAL_FAV = 512</code>와 (a)/(b)의 prior 조건으로 부하 제어를 옮긴다는 뜻으로 읽힌다 <span class="badge est">추정</span>.</p></div>
+<p><strong>E. 랭킹 훈련 config에서 multimodal post 임베딩이 전부 꺼졌다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/phoenix/README.md" target="_blank" rel="noopener"><code>phoenix/README.md</code></a> (+3/−3).</p>
 <p>nano 훈련 config 표의 &quot;Multimodal post embedding&quot; 행이 바뀌었다:</p>
-<table>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col class="w10"><col><col></colgroup>
 <thead>
 <tr>
 <th></th>
@@ -317,18 +159,18 @@ ul.rl .chip b { font-size: 13px; }
 <td>v5 on <code>xrecsys_seqpack</code>; off on <code>home_direct_packed</code></td>
 <td>off (<code>home_direct_packed</code> and <code>xrecsys_seqpack</code>)</td>
 </tr>
-</tbody></table>
+</tbody></table></div>
 <p>부수 설명 문구도 함께 바뀌었다:</p>
 <blockquote>
 <p>&quot;the multimodal-embedding input is off in both, and on every registered ranking config, as the table shows&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/phoenix/README.md">phoenix/README.md</a>, 2026-09-09</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/phoenix/README.md" target="_blank" rel="noopener">phoenix/README.md</a>, 2026-09-09</p>
 </blockquote>
 <p><code>on</code>은 &quot;off&quot;의 문법적 elision으로 읽어야 한다(&quot;off in both, and [off] on every registered ranking config&quot;) — 그렇지 않으면 표와 모순된다. 즉 <strong>등록된 랭킹 훈련 config 두 개(<code>home_direct_packed</code> 플래그십 + <code>xrecsys_seqpack</code> seqpack) 모두에서 multimodal post 임베딩이 학습 입력에서 빠졌다.</strong></p>
-<div class="blk why"><p><span class="lbl">의미 (E)</span> — 4세대+17(2026-09-08, 49815da)이 grox 검색 지면 전용 v8-search 멀티모달 임베딩 스택을 신설해 랭킹 옆에 v5·v8.2와 별개 벡터 공간을 열었다. 그 하루 뒤인 이번 커밋에서 <strong>flagship 랭킹 config(<code>xrecsys_seqpack</code>)의 v5 입력이 꺼졌다</strong>. 두 사건을 조합하면 시나리오가 좁혀진다: v5는 랭킹 입력으로 유의미한 개선을 내지 못했거나 latency/quality tradeoff에서 밀렸고, v8-search로 넘어가는 중간에 학습 config에서 임시로 뗐다 <code>[추정]</code>. v8-search가 랭킹 config로 붙는 배선은 이 커밋에 없다 — 검색 지면 임베딩과 랭킹 임베딩이 별도 벡터 공간으로 유지될지, v8-search가 v5를 대체할지는 다음 커밋 관측 대상이다.</p></div>
-<p><strong>F. 부수 변화</strong> <code>[확인]</code>:</p>
+<div class="blk why"><p><span class="lbl">의미 (E)</span> — 4세대+17(2026-09-08, 49815da)이 grox 검색 지면 전용 v8-search 멀티모달 임베딩 스택을 신설해 랭킹 옆에 v5·v8.2와 별개 벡터 공간을 열었다. 그 하루 뒤인 이번 커밋에서 <strong>flagship 랭킹 config(<code>xrecsys_seqpack</code>)의 v5 입력이 꺼졌다</strong>. 두 사건을 조합하면 시나리오가 좁혀진다: v5는 랭킹 입력으로 유의미한 개선을 내지 못했거나 latency/quality tradeoff에서 밀렸고, v8-search로 넘어가는 중간에 학습 config에서 임시로 뗐다 <span class="badge est">추정</span>. v8-search가 랭킹 config로 붙는 배선은 이 커밋에 없다 — 검색 지면 임베딩과 랭킹 임베딩이 별도 벡터 공간으로 유지될지, v8-search가 v5를 대체할지는 다음 커밋 관측 대상이다.</p></div>
+<p><strong>F. 부수 변화</strong> <span class="badge ok">확인</span>:</p>
 <ul>
-<li><strong><code>phoenix/xrex/utils/gpu.py</code>의 NUMA CPU affinity 버그 수정</strong> — <code>_parse_cpulist(text: str) -&gt; set[int]</code> + <code>schedulable_cpus(*nodes: int) -&gt; set[int]</code> 두 헬퍼가 신설. <code>schedulable_cpus</code>가 <code>/sys/devices/system/node/nodeN/cpulist</code>에서 노드 N의 CPU 집합을 읽고 <code>/sys/devices/system/cpu/isolated</code>를 빼서 반환. <code>pin_process_to_local_numa</code>가 기존 <code>numa.schedule.run_on_nodes(node) → numa.memory.set_membind_nodes(node)</code>를 <code>numa.memory.set_membind_nodes(node)</code>(먼저) + <code>os.sched_setaffinity(0, schedulable_cpus(node))</code>(둘째)로 분리해 예외 처리 계층화. 노드에 isolated 아닌 CPU가 없으면 warn 후 membind만 유지. 즉 <strong>NUMA 노드 안에 isolcpus로 격리된 코어가 있으면 그 코어에 스레드를 스케줄하려던 이전 버그를 고쳤다</strong>. Phoenix 학습이 실 프로덕션 host에서 격리된 코어 configuration을 만난 결과로 보인다 <code>[추정]</code>.</li>
-<li><strong><code>candidate-pipeline</code>의 <code>quiet-spans</code> feature-gated 로그 6곳 삭제</strong> — <code>filter.rs</code>·<code>hydrator.rs</code>·<code>query_hydrator.rs</code>·<code>scorer.rs</code>·<code>selector.rs</code>·<code>source.rs</code>에서 <code>#[cfg(feature = &quot;quiet-spans&quot;)] tracing::info!(...)</code> 블록이 각 1개씩 제거됐다(총 −40줄). 파이프라인 각 컴포넌트 실행마다 남기는 조용한 info-level 로그였는데, quiet-spans feature 조건이 상시 활성화된 상태에서 span record와 중복되므로 제거된 것으로 보인다 <code>[추정]</code>. Error 로그의 문자열 포맷도 <code>error!(component = self.name(), error = %err, &quot;source_failed&quot;)</code>에서 <code>error!(&quot;{} Failed: {}&quot;, self.name(), err)</code>로 되돌아갔다(구조화 필드가 제거되고 문자열 로그로 회귀).</li>
+<li><strong><code>phoenix/xrex/utils/gpu.py</code>의 NUMA CPU affinity 버그 수정</strong> — <code>_parse_cpulist(text: str) -&gt; set[int]</code> + <code>schedulable_cpus(*nodes: int) -&gt; set[int]</code> 두 헬퍼가 신설. <code>schedulable_cpus</code>가 <code>/sys/devices/system/node/nodeN/cpulist</code>에서 노드 N의 CPU 집합을 읽고 <code>/sys/devices/system/cpu/isolated</code>를 빼서 반환. <code>pin_process_to_local_numa</code>가 기존 <code>numa.schedule.run_on_nodes(node) → numa.memory.set_membind_nodes(node)</code>를 <code>numa.memory.set_membind_nodes(node)</code>(먼저) + <code>os.sched_setaffinity(0, schedulable_cpus(node))</code>(둘째)로 분리해 예외 처리 계층화. 노드에 isolated 아닌 CPU가 없으면 warn 후 membind만 유지. 즉 <strong>NUMA 노드 안에 isolcpus로 격리된 코어가 있으면 그 코어에 스레드를 스케줄하려던 이전 버그를 고쳤다</strong>. Phoenix 학습이 실 프로덕션 host에서 격리된 코어 configuration을 만난 결과로 보인다 <span class="badge est">추정</span>.</li>
+<li><strong><code>candidate-pipeline</code>의 <code>quiet-spans</code> feature-gated 로그 6곳 삭제</strong> — <code>filter.rs</code>·<code>hydrator.rs</code>·<code>query_hydrator.rs</code>·<code>scorer.rs</code>·<code>selector.rs</code>·<code>source.rs</code>에서 <code>#[cfg(feature = &quot;quiet-spans&quot;)] tracing::info!(...)</code> 블록이 각 1개씩 제거됐다(총 −40줄). 파이프라인 각 컴포넌트 실행마다 남기는 조용한 info-level 로그였는데, quiet-spans feature 조건이 상시 활성화된 상태에서 span record와 중복되므로 제거된 것으로 보인다 <span class="badge est">추정</span>. Error 로그의 문자열 포맷도 <code>error!(component = self.name(), error = %err, &quot;source_failed&quot;)</code>에서 <code>error!(&quot;{} Failed: {}&quot;, self.name(), err)</code>로 되돌아갔다(구조화 필드가 제거되고 문자열 로그로 회귀).</li>
 <li><strong>Phoenix inference 소수 변경</strong> — <code>phoenix/xrex/configs/xrecsys.py</code> (−1), <code>phoenix/xrex/inference/model_runner.py</code> (+2/−1), <code>phoenix/xrex/models/recsys_model.py</code> (+5) — 이번 커밋에서는 API surface 소소한 정리로 보이지만, 4세대+17의 <code>ContentFeatures</code> 소비 배선일 가능성 있으니 다음 커밋에서 재관측 대상이다.</li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> 랭킹·필터 절 line 392 (VF fail-closed 진술 갱신) + <a href="x.html#"><code>## 파이프라인</code> 아래 &quot;4세대+18&quot; subsection 신설</a> + <code>## 출처</code>에 75d93d9 sources 추가.</p></div>
@@ -346,7 +188,7 @@ ul.rl .chip b { font-size: 13px; }
 <li><code>Q2D-Web: A Large-Scale Benchmark for Retrieval in Agentic RAG Systems</code> — Agentic RAG 벤치마크. 도메인 외.</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong><code>Action::Downrank</code>의 실 사용처</strong> — 이번 커밋에서 정식 variant로 승격됐지만 실제로 이 action을 리턴하는 코드는 아직 없다. VF <code>visibility-filtering/rules/</code> 아래 rule 중 하나가 Downrank를 리턴하게 바뀌는지, 아니면 gRPC 서버가 특정 조건에서 이 action을 내려주게 되는지 감시.</li>
 <li><strong>header-image-prompt-ad의 광고 블렌더 진입</strong> — 이 광고 포맷이 5종 광고 블렌더(<code>safe_gap</code>·<code>partition_organic</code>·<code>partition_organic_low_risk</code>·<code>time_gap</code>·<code>multi_risk</code>) 중 어느 것에 진입하는지, 슬롯 예산 계산에 프로모트 트윗과 어떻게 함께 산정되는지 다음 커밋에서 관측.</li>
 <li><strong>v8-search가 랭킹 config로 붙는 시점</strong> — flagship <code>xrecsys_seqpack</code>에서 v5가 꺼졌으므로 v8-search가 후속 배선의 유력한 후보다. <code>phoenix/xrex/data/retrieval_dataset.py</code>에 <code>grox-multimodal-embedding-v8-search</code> topic 소비자가 붙는지, <code>phoenix/README.md</code> 표에 v8-search가 추가되는지 감시.</li>
@@ -354,76 +196,19 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong><code>FilteredReason::ViewerBlocksAuthor</code>의 rule 배선</strong> — 신규 variant지만 이 커밋에서 어느 rule이 이걸 리턴하게 되는지 코드가 붙지 않았다. <code>visibility-filtering/rules/author_rules.rs</code>의 다음 diff에서 관측.</li>
 <li><strong>NUMA isolated CPU 문제의 실 host configuration</strong> — Phoenix 학습 host가 왜 isolated CPU를 노드 안에 두었는지(RT 워크로드? DPDK? SR-IOV VF driver?), 실 프로덕션 configuration이 어딘가에서 공개될지 감시.</li>
 </ul>
-<p>조회 실패: 없음.</p>
+<p>조회 실패: 없음.</p></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-10.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-10</div></a><a class="r" href="daily-2026-09-12.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-12</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-10.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-10</span></a><a class="pg-next" href="daily-2026-09-12.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-12</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

@@ -2,245 +2,87 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-08-13 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: ⚠ 주장 변경 — Meta가 유기 피드의 온라인 서빙 경로에 LLM을 넣었다는 최초의 진술이 ConnectionMind arXiv 논문으로 공개됐고(Llama 3.1-8B가 헤비 유저 5–10%의 hot path를 맡고 Student GNN이 나머지 90–95%를 맡는…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-08-13.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-08-13 — feed-research">
 <meta property="og:description" content="한 줄: ⚠ 주장 변경 — Meta가 유기 피드의 온라인 서빙 경로에 LLM을 넣었다는 최초의 진술이 ConnectionMind arXiv 논문으로 공개됐고(Llama 3.1-8B가 헤비 유저 5–10%의 hot path를 맡고 Student GNN이 나머지 90–95%를 맡는…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-08-13.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-08-13</h1>
-  <div class="wd">목요일 · 읽는 데 약 31분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>3</b>건 (정본 반영 2건, 레이더 1건)</li><li class="chip">정본 반영 <b>3</b>개 파일 (netflix.md</li><li class="chip">facebook.md</li><li class="chip">llm-in-recsys.md)</li><li class="chip">레이더 갱신 <b>2</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>⚠ <strong>주장 변경</strong> — Meta가 유기 피드의 온라인 서빙 경로에 LLM을 넣었다는 최초의 진술이 ConnectionMind arXiv 논문으로 공개됐고(Llama 3.1-8B가 헤비 유저 5–10%의 hot path를 맡고 Student GNN이 나머지 90–95%를 맡는 하이브리드 구조), 같은 날 Netflix GenRec의 학술판이 블로그에서 밝히지 않았던 정량 수치(+0.006% 코어 지표, Phase 1/2 기여 분해, catalog softmax 손실 수식, GRPO preliminary 결과)를 공개했다. 자리 3, 즉 LLM을 랭커로 쓰는 자리의 지형이 하루 사이에 두 방향으로 뒤집혔다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-meta가-유기-피드-hot-path에-8b-llm을-넣었다--facebook--주장-변경">1. Meta가 유기 피드 hot path에 8B LLM을 넣었다 — Facebook (⚠ 주장 변경)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.10187">ConnectionMind: Leveraging Social Networks and Large Language Models for Personalized Recommendation at Meta (arXiv 2608.10187)</a> — arXiv 2608.10187, 2026-08-10, 논문 (Meta Platforms + Michigan State University; 저자 6명, 1저자 Haoyu Han은 MSU 인턴, 나머지 5명 Meta Menlo Park)</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-08-13">2026-08-13</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>목요일</li>
+<li><span class="meta-k">읽는 시간</span>31분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>3</b>건 (정본 반영 2건, 레이더 1건)</li><li class="chip">정본 반영 <b>3</b>개 파일 (netflix.md</li><li class="chip">facebook.md</li><li class="chip">llm-in-recsys.md)</li><li class="chip">레이더 갱신 <b>2</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>⚠ <strong>주장 변경</strong> — Meta가 유기 피드의 온라인 서빙 경로에 LLM을 넣었다는 최초의 진술이 ConnectionMind arXiv 논문으로 공개됐고(Llama 3.1-8B가 헤비 유저 5–10%의 hot path를 맡고 Student GNN이 나머지 90–95%를 맡는 하이브리드 구조), 같은 날 Netflix GenRec의 학술판이 블로그에서 밝히지 않았던 정량 수치(+0.006% 코어 지표, Phase 1/2 기여 분해, catalog softmax 손실 수식, GRPO preliminary 결과)를 공개했다. 자리 3, 즉 LLM을 랭커로 쓰는 자리의 지형이 하루 사이에 두 방향으로 뒤집혔다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">6</span></summary><ol><li><a href="#1-meta가-유기-피드-hot-path에-8b-llm을-넣었다--facebook--주장-변경"><span class="num">1</span>Meta가 유기 피드 hot path에 8B LLM을 넣었다 — Facebook (⚠ 주장 변경)</a></li><li><a href="#2-netflix-genrec의-학술판--블로그가-밝히지-않았던-정량-수치가-나왔다"><span class="num">2</span>Netflix GenRec의 학술판 — 블로그가 밝히지 않았던 정량 수치가 나왔다</a></li><li><a href="#3-yandex-music-sona--스마트-스피커-지면의-통합-랭커--레이더"><span class="num">3</span>Yandex Music Sona — 스마트 스피커 지면의 통합 랭커 — 레이더</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-meta가-유기-피드-hot-path에-8b-llm을-넣었다--facebook--주장-변경"><span class="num">1</span>Meta가 유기 피드 hot path에 8B LLM을 넣었다 — Facebook (⚠ 주장 변경)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.10187" target="_blank" rel="noopener">ConnectionMind: Leveraging Social Networks and Large Language Models for Personalized Recommendation at Meta (arXiv 2608.10187)</a> — arXiv 2608.10187, 2026-08-10, 논문 (Meta Platforms + Michigan State University; 저자 6명, 1저자 Haoyu Han은 MSU 인턴, 나머지 5명 Meta Menlo Park)</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>이 저장소에는 오래 유지해 온 주장이 하나 있었다. <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>는 LLM이 들어갈 수 있는 자리 여섯 개(콘텐츠 주석 / 안전성 판정 / 랭커 자체 / 유저 관심사 요약 / LLM-as-judge / 자연어 지시 파싱) 가운데 <strong>자리 3, 즉 LLM을 랭커로 쓰는 자리</strong>는 X도 Meta도 채우지 않았다고 단정해 왔다. 근거는 두 가지였다. 첫째, Meta의 GEM·LLaTTE·MARM 블로그가 쓰는 <em>&quot;LLM-scale&quot;</em>, *&quot;LLM-inspired&quot;*라는 표현은 스케일링 곡선과 파라미터 수를 빗댄 비유일 뿐이고 실제 랭커는 LLM이 아니었다. 둘째, Meta 블로그에서 Llama라는 이름이 나오는 곳은 Groups Search의 오프라인 automated judge 하나뿐이었고, 그마저도 랭킹 적용은 &quot;we plan to&quot;라는 미래형에 머물렀다. 이 공백을 2026-07 Netflix GenRec이 처음 채웠고, 오늘까지 두 번째 사례는 나오지 않았다.</p>
 <p>ConnectionMind가 바로 그 두 번째 사례이며, Netflix GenRec과는 근본적으로 다른 형태를 취한다. 채점 함수 자체가 LLM인 GenRec과 달리, ConnectionMind는 <strong>LLM이 그래프 위의 경로를 JSON으로 출력하는 경로 추론기</strong>다. 서빙 계층에서도 <strong>하이브리드 구조</strong>를 택했다. 상위 5–10%에 해당하는 헤비 유저의 요청은 Llama 3.1-8B가 온라인 hot path에서 직접 추론하고, 나머지 90–95%는 그 LLM이 오프라인에서 찾아낸 meta-path로 학습시킨 Student GNN이 서빙한다. 이 배치 덕분에 &quot;8B LLM이 실제로 온라인 hot path에 들어간다&quot;는 진술과 &quot;대다수 트래픽은 여전히 GNN이 서빙한다&quot;는 진술이 동시에 성립한다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>모델 백본은 Llama 3.1-8B-Instruct이고 배포까지 확인된다</strong> <code>[확인]</code> §6.1 — 실험에서는 3.2-3B와 3.1-8B를 모두 다뤘지만 프로덕션에 넣은 것은 8B다. Meta 자체 시스템을 인용한 것은 Fan et al. 2019(GraphRec) 하나뿐이고, HSTU·GEM·LLaTTE·MARM은 참고문헌에 등장하지 않는다.</p>
+<li><p><strong>모델 백본은 Llama 3.1-8B-Instruct이고 배포까지 확인된다</strong> <span class="badge ok">확인</span> §6.1 — 실험에서는 3.2-3B와 3.1-8B를 모두 다뤘지만 프로덕션에 넣은 것은 8B다. Meta 자체 시스템을 인용한 것은 Fan et al. 2019(GraphRec) 하나뿐이고, HSTU·GEM·LLaTTE·MARM은 참고문헌에 등장하지 않는다.</p>
 </li>
-<li><p><strong>하이브리드 서빙에서 LLM은 5–10% 코호트를 맡고 Student GNN이 나머지 90–95%를 맡는다</strong> <code>[확인]</code> §6.1</p>
+<li><p><strong>하이브리드 서빙에서 LLM은 5–10% 코호트를 맡고 Student GNN이 나머지 90–95%를 맡는다</strong> <span class="badge ok">확인</span> §6.1</p>
 <blockquote>
 <p>&quot;The top 5-10% of most active users exhibit complex social graphs and high engagement velocity. For this cohort, requests are routed to the full ConnectionMind LLM. For the remaining majority of traffic, we employ an offline distillation pipeline. The LLM processes historical contexts to discover effective meta-paths. These paths are extracted to train a lightweight Graph Neural Network (Student GNN).&quot;
-— <a href="https://arxiv.org/abs/2608.10187">ConnectionMind, §6.1 Hybrid Inference</a></p>
+— <a href="https://arxiv.org/abs/2608.10187" target="_blank" rel="noopener">ConnectionMind, §6.1 Hybrid Inference</a></p>
 </blockquote>
 </li>
-<li><p><strong>LLM이 그래프 위의 경로를 JSON으로 출력한다</strong> <code>[확인]</code> §4.1 — 상태 s_d는 *&quot;current paths, candidate next-hop edges, and compact textual node profiles&quot;*를 직렬화한 프롬프트 형태로 LLM에 입력되고, LLM은 *&quot;a structured action with two components: path expansions and surfaced item–path pairs&quot;*를 내놓는다. beam search나 constrained decoding은 쓰지 않고 format reward로 사후에 검증한다(§4.3). 종료 조건은 *&quot;when 𝒫_{d+1} = ∅ or when the maximum depth D_max is reached&quot;*이다.</p>
+<li><p><strong>LLM이 그래프 위의 경로를 JSON으로 출력한다</strong> <span class="badge ok">확인</span> §4.1 — 상태 s_d는 *&quot;current paths, candidate next-hop edges, and compact textual node profiles&quot;*를 직렬화한 프롬프트 형태로 LLM에 입력되고, LLM은 *&quot;a structured action with two components: path expansions and surfaced item–path pairs&quot;*를 내놓는다. beam search나 constrained decoding은 쓰지 않고 format reward로 사후에 검증한다(§4.3). 종료 조건은 *&quot;when 𝒫_{d+1} = ∅ or when the maximum depth D_max is reached&quot;*이다.</p>
 </li>
-<li><p><strong>그래프 스키마는 User–User(Friend, Similar) / User–Page(Follow) / User–Group / Group–Item(Share) / Page–Item(Post) / Item–Item(Co-watch, Semantic Similarity)으로 구성된다</strong> <code>[확인]</code> §3.1 — Groups와 Pages가 1급 엣지 타입으로 들어가 있다. Instagram과 Threads에는 Groups·Pages에 해당하는 스키마가 없다.</p>
+<li><p><strong>그래프 스키마는 User–User(Friend, Similar) / User–Page(Follow) / User–Group / Group–Item(Share) / Page–Item(Post) / Item–Item(Co-watch, Semantic Similarity)으로 구성된다</strong> <span class="badge ok">확인</span> §3.1 — Groups와 Pages가 1급 엣지 타입으로 들어가 있다. Instagram과 Threads에는 Groups·Pages에 해당하는 스키마가 없다.</p>
 </li>
-<li><p><strong>학습은 SFT 다음에 GRPO를 적용하는 2단계 구성이다</strong> <code>[확인]</code> §4.2-§4.3 — SFT는 *&quot;For each positive engagement (u,i⁺), we enumerate valid shortest paths from u to i⁺ in the sampled subgraph&quot;*에 해당하는 BFS 최단경로를 teacher-forcing으로 학습시킨다. RL 단계에서는 GRPO(DeepSeek-R1 계열)를 쓰고, reward는 format(−1/+1)과 F1 기반 recommendation, step-wise shaping을 합한 것이며, 가중치는 α_rec=0.5·α_step=0.3·α_fmt=0.2이다.</p>
+<li><p><strong>학습은 SFT 다음에 GRPO를 적용하는 2단계 구성이다</strong> <span class="badge ok">확인</span> §4.2-§4.3 — SFT는 *&quot;For each positive engagement (u,i⁺), we enumerate valid shortest paths from u to i⁺ in the sampled subgraph&quot;*에 해당하는 BFS 최단경로를 teacher-forcing으로 학습시킨다. RL 단계에서는 GRPO(DeepSeek-R1 계열)를 쓰고, reward는 format(−1/+1)과 F1 기반 recommendation, step-wise shaping을 합한 것이며, 가중치는 α_rec=0.5·α_step=0.3·α_fmt=0.2이다.</p>
 </li>
-<li><p><strong>A/B 결과는 수천만 유저를 대상으로 여러 주에 걸쳐 측정됐다</strong> <code>[확인]</code> §6.2 Table 2 (프로덕션 대비 상대 리프트): watch time +0.43% ± 0.14%, exposure +0.33% ± 0.08%, video sessions +0.22% ± 0.13%.</p>
+<li><p><strong>A/B 결과는 수천만 유저를 대상으로 여러 주에 걸쳐 측정됐다</strong> <span class="badge ok">확인</span> §6.2 Table 2 (프로덕션 대비 상대 리프트): watch time +0.43% ± 0.14%, exposure +0.33% ± 0.08%, video sessions +0.22% ± 0.13%.</p>
 <blockquote>
 <p>&quot;extensive A/B test on a massive user population (tens of millions of users) over a continuous multi-week period&quot;
-— <a href="https://arxiv.org/abs/2608.10187">ConnectionMind, §6.2</a></p>
+— <a href="https://arxiv.org/abs/2608.10187" target="_blank" rel="noopener">ConnectionMind, §6.2</a></p>
 </blockquote>
 </li>
-<li><p><strong>오프라인 벤치마크는 Delicious·Foursquare 공개 데이터셋을 쓴다</strong> <code>[확인]</code> §5.1 — Meta 데이터가 아니며, 베이스라인은 TrustMF/GraphRec/MHCN/SEPT/DiffNet/DiffNet++/RecDIFF/SGIL/BIGRec으로 한정된다. LightGCN·PinSage·SASRec·HSTU처럼 강한 sequential/generative-rec 베이스라인은 빠져 있다. Recall@10 기준 &quot;+88%&quot; 리프트가 Table 2에 실려 있는데, 이 숫자는 온라인 A/B가 아니라 학술 벤치마크의 오프라인 결과다. 표 캡션이 온라인 결과와 오프라인 결과를 섞어 놓았으므로 인용할 때 주의해야 한다.</p>
+<li><p><strong>오프라인 벤치마크는 Delicious·Foursquare 공개 데이터셋을 쓴다</strong> <span class="badge ok">확인</span> §5.1 — Meta 데이터가 아니며, 베이스라인은 TrustMF/GraphRec/MHCN/SEPT/DiffNet/DiffNet++/RecDIFF/SGIL/BIGRec으로 한정된다. LightGCN·PinSage·SASRec·HSTU처럼 강한 sequential/generative-rec 베이스라인은 빠져 있다. Recall@10 기준 &quot;+88%&quot; 리프트가 Table 2에 실려 있는데, 이 숫자는 온라인 A/B가 아니라 학술 벤치마크의 오프라인 결과다. 표 캡션이 온라인 결과와 오프라인 결과를 섞어 놓았으므로 인용할 때 주의해야 한다.</p>
 </li>
 </ul>
-<p><strong>⚠ 이 진술을 다룰 때 반드시 붙일 caveat 네 가지</strong></p>
+<p class="warn"><strong>⚠ 이 진술을 다룰 때 반드시 붙일 caveat 네 가지</strong></p>
 <ol>
-<li><strong>지면을 공개하지 않았다.</strong> 논문은 <em>&quot;large-scale personalized video recommendation in a social platform setting&quot;</em>(§3)과 <em>&quot;short-form video platform&quot;</em>(§6)까지만 밝힌다. <code>[추정]</code> <strong>Facebook Reels 또는 통합 Facebook Video 지면일 가능성이 가장 높다.</strong> 그래프 스키마에서 Groups·Pages가 1급 관계로 들어간 점, 주요 지표가 watch time과 video sessions인 점, 2024 Q2 이후 Meta가 Reels와 롱폼과 Live를 단일 video recommendation service로 묶은 사실이 모두 같은 방향을 가리키기 때문이다. 다만 논문이 이를 확정하지 않았으므로 <strong>서비스명을 인용해서는 안 되고</strong>, &quot;Meta short-form video platform&quot;으로 인용해야 한다.</li>
+<li><strong>지면을 공개하지 않았다.</strong> 논문은 <em>&quot;large-scale personalized video recommendation in a social platform setting&quot;</em>(§3)과 <em>&quot;short-form video platform&quot;</em>(§6)까지만 밝힌다. <span class="badge est">추정</span> <strong>Facebook Reels 또는 통합 Facebook Video 지면일 가능성이 가장 높다.</strong> 그래프 스키마에서 Groups·Pages가 1급 관계로 들어간 점, 주요 지표가 watch time과 video sessions인 점, 2024 Q2 이후 Meta가 Reels와 롱폼과 Live를 단일 video recommendation service로 묶은 사실이 모두 같은 방향을 가리키기 때문이다. 다만 논문이 이를 확정하지 않았으므로 <strong>서비스명을 인용해서는 안 되고</strong>, &quot;Meta short-form video platform&quot;으로 인용해야 한다.</li>
 <li><strong>Meta 자체 시스템 인용이 0건이다.</strong> HSTU·GEM·LLaTTE·MARM이 참고문헌에 없고, 같은 회사의 다른 랭킹 라인과 어떤 관계인지도 논문 안에서 설정하지 않는다. 별개 팀이 병렬로 진행한 실험일 수도 있는데, 저자 5명이 Meta Menlo Park 소속으로만 표기되어 있어서 어느 팀(Core Ranking / GenAI / Reality Labs)인지는 각주에서도 특정되지 않는다.</li>
 <li><strong>서빙 비용은 전혀 공개되지 않았다.</strong> 8B LLM이 헤비 유저 hot path에서 실제로 어떤 SLO를 견디는지, 즉 QPS와 p99 지연, GPU 세대, 코호트 라우팅의 fallback 정책이 논문 어디에도 나오지 않는다. &quot;millisecond-level latency&quot;라는 표현이 등장하기는 하지만 이것은 Student GNN에 해당하는 서술이다. Netflix GenRec의 서빙 계층 블로그가 vLLM·MSS·FSx pre-materialization·constrained decoding batch scaling까지 서술한 것과 크게 대비된다.</li>
 <li><strong>오프라인 실험은 학술 벤치마크로만 이뤄졌고 Meta 데이터를 쓴 ablation은 없다.</strong> Delicious·Foursquare를 60/20/20으로 나눈 스플릿에 강한 sequential/generative-rec 베이스라인이 빠져 있어서 학술 비교의 신뢰도가 떨어진다. Meta 데이터에 근거한 진술은 프로덕션 A/B의 세 숫자뿐이다.</li>
@@ -251,78 +93,79 @@ ul.rl .chip b { font-size: 13px; }
 <li><a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>에서는 자리 3 표의 Meta 칸을 갱신했고, 개요에 있던 &quot;자리 3 공백은 Netflix가 깼다&quot;라는 문장을 &quot;Netflix가 처음 깼고 Meta가 두 번째&quot;로 고쳐 썼다. Meta ConnectionMind 케이스 절을 새로 만들어 Netflix 케이스 앞에 배치했다. 프레이밍 검증 절의 결론 문장은 &quot;1차 진술은 X·Meta 어느 쪽에도 없다&quot;에서 &quot;Netflix GenRec이 처음이었고 Meta ConnectionMind가 두 번째&quot;로 다시 썼다. &quot;누가 이걸 쓰는가&quot; 절의 Facebook Feed 행도 갱신했다.</li>
 </ul>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
-<p>⚠ <strong>주장 변경.</strong> 이 저장소는 지금까지 *&quot;Meta는 LLM을 (광고) 피처 인코더와 오프라인 심판으로 쓴다. 유기 피드 랭킹 경로에 LLM이 들어간다는 1차 진술은 X·Meta 어느 쪽에도 없다&quot;*로 요약해 왔다. ConnectionMind가 이 가운데 두 번째 문장을 뒤집었다. 다만 뒤집힌 방식은 미묘하다. 랭커 그 자체는 아직 LLM이 아니고(GenRec처럼 백본을 LLM으로 교체한 형태가 아니다), <strong>그래프 위에서 수행하는 다중 hop 추론</strong>이 LLM에 맡겨진 자리다. 게다가 대다수 트래픽(90–95%)은 여전히 GNN이 서빙한다. 오늘 새로 확립된 지형은 <strong>&quot;LLM이 랭킹한다&quot;라는 말이 두 회사에서 완전히 다른 실체를 가리킨다는 사실</strong>이다.</p>
+<p class="warn">⚠ <strong>주장 변경.</strong> 이 저장소는 지금까지 *&quot;Meta는 LLM을 (광고) 피처 인코더와 오프라인 심판으로 쓴다. 유기 피드 랭킹 경로에 LLM이 들어간다는 1차 진술은 X·Meta 어느 쪽에도 없다&quot;*로 요약해 왔다. ConnectionMind가 이 가운데 두 번째 문장을 뒤집었다. 다만 뒤집힌 방식은 미묘하다. 랭커 그 자체는 아직 LLM이 아니고(GenRec처럼 백본을 LLM으로 교체한 형태가 아니다), <strong>그래프 위에서 수행하는 다중 hop 추론</strong>이 LLM에 맡겨진 자리다. 게다가 대다수 트래픽(90–95%)은 여전히 GNN이 서빙한다. 오늘 새로 확립된 지형은 <strong>&quot;LLM이 랭킹한다&quot;라는 말이 두 회사에서 완전히 다른 실체를 가리킨다는 사실</strong>이다.</p>
 <p>두 번째 의미는 자료가 없다는 사실을 어떻게 읽어야 하는가에 관한 것이다. 이 저장소는 오래 *&quot;Meta는 유기 피드 스택을 거의 안 공개한다 — 부재가 곧 미사용은 아니다&quot;*라는 caveat를 붙여 왔는데, ConnectionMind가 그 caveat이 옳았음을 확인해 줬다. 공개되지 않았을 뿐 Meta에 유기 피드 시스템이 실제로 존재하고 있었다는 뜻이다.</p>
-<p>세 번째로, ConnectionMind가 Meta 자체 시스템(HSTU·GEM·LLaTTE·MARM)을 하나도 인용하지 않았다는 사실은 <strong>같은 회사 안에서 랭킹 라인이 여전히 여러 갈래로 병렬 진행되고 있다</strong>는 신호일 수 있다. 이것이 조직 구조에서 비롯한 파편화인지, 서로 다른 지면과 서비스에 맞춰 최적화한 병렬 실험인지는 아직 확정할 수 없다. <code>[추정]</code></p>
-<h2 id="2-netflix-genrec의-학술판--블로그가-밝히지-않았던-정량-수치가-나왔다">2. Netflix GenRec의 학술판 — 블로그가 밝히지 않았던 정량 수치가 나왔다</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.10257">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a> — arXiv 2608.10257, 2026-08-10, 논문 (Netflix; 저자 6명 + §8에 팀별 전체 기여자 명단)</p></div>
+<p>세 번째로, ConnectionMind가 Meta 자체 시스템(HSTU·GEM·LLaTTE·MARM)을 하나도 인용하지 않았다는 사실은 <strong>같은 회사 안에서 랭킹 라인이 여전히 여러 갈래로 병렬 진행되고 있다</strong>는 신호일 수 있다. 이것이 조직 구조에서 비롯한 파편화인지, 서로 다른 지면과 서비스에 맞춰 최적화한 병렬 실험인지는 아직 확정할 수 없다. <span class="badge est">추정</span></p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="2-netflix-genrec의-학술판--블로그가-밝히지-않았던-정량-수치가-나왔다"><span class="num">2</span>Netflix GenRec의 학술판 — 블로그가 밝히지 않았던 정량 수치가 나왔다</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a> — arXiv 2608.10257, 2026-08-10, 논문 (Netflix; 저자 6명 + §8에 팀별 전체 기여자 명단)</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>이 저장소는 GenRec을 이미 두 번 정본에 반영했다. 2026-08-09 daily는 Netflix TechBlog 원문(<em>&quot;GenRec: Towards LLM-Native Recommendation at Netflix&quot;</em>, 2026-07-30)을 정독한 결과를 담았고, 2026-08-10 daily는 그 뒤에 나온 &quot;In-House LLM Serving at Netflix&quot; 블로그(2026-07-17)로 서빙 계층 서술을 보강했다. 그래서 오늘 나온 arXiv 논문에서 확인할 것은 하나로 좁혀진다. <strong>블로그가 밝히지 않았던 내용이 논문에 있는가</strong>이다.</p>
 <p>있다. 블로그와 명시적으로 모순되는 대목은 없고, 논문은 블로그의 정성적 서술을 뒤집는 대신 정량 세부 수치와 손실 함수 수식, 팀 구조를 덧붙인다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>온라인 코어 지표의 실측값이 처음 공개됐다</strong> <code>[확인]</code> §5.1 — 블로그는 *&quot;statistically significant win&quot;*이라고만 썼는데, 논문은 절대값을 제시한다.</p>
+<li><p><strong>온라인 코어 지표의 실측값이 처음 공개됐다</strong> <span class="badge ok">확인</span> §5.1 — 블로그는 *&quot;statistically significant win&quot;*이라고만 썼는데, 논문은 절대값을 제시한다.</p>
 <blockquote>
 <p>&quot;For example, we observe a +0.006% relative improvement on our core online metric, which is statistically meaningful at Netflix scale.&quot;
-— <a href="https://arxiv.org/abs/2608.10257">GenRec arXiv, §5.1</a></p>
+— <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec arXiv, §5.1</a></p>
 </blockquote>
 <p>이 값이 유의미하다고 논문이 스스로 규정한 점은 인용할 때 중요하다. 절대값만 놓고 보면 작아 보이지만, 논문은 &quot;at Netflix scale&quot;이라는 단서를 함께 붙였다.</p>
 </li>
-<li><p><strong>Phase 1과 Phase 2의 기여를 각각 분해했고, 그 비중은 시간 축이 결정한다</strong> <code>[확인]</code> §5.3</p>
+<li><p><strong>Phase 1과 Phase 2의 기여를 각각 분해했고, 그 비중은 시간 축이 결정한다</strong> <span class="badge ok">확인</span> §5.3</p>
 <blockquote>
 <p>&quot;Using the Phase-1 foundational LLM as the base model improves offline ranking metrics by the order of 10-20% compared with using an off-the-shelf LLM as the backbone.&quot;
 &quot;Phase-2 post-training provides a further roughly 35-50% gain in offline ranking metrics when evaluated on the Phase-1 training cutoff date (i.e. when Phase-1 model is the freshest).&quot;
 &quot;the improvement rises to roughly 80% after two weeks&quot;
-— <a href="https://arxiv.org/abs/2608.10257">GenRec arXiv, §5.3</a></p>
+— <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec arXiv, §5.3</a></p>
 </blockquote>
 <p>Phase 2의 상대 이득이 시간이 갈수록 커지는 이유를 논문이 *&quot;increasing staleness of the less frequently updated Phase-1 backbone&quot;*이라고 명시한다. 즉 Phase 1 백본이 상대적으로 낡을수록 Phase 2 post-training의 상대 가치가 올라간다. 두 단계가 모두 필요하다는 블로그의 진술에 <strong>시간 축이라는 관계</strong>가 새로 더해졌다.</p>
 </li>
-<li><p><strong>컨텍스트 압축의 구체적 예시가 나왔고, 서빙 비용도 1/3로 줄어든다</strong> <code>[확인]</code> §5.4 — 블로그는 *&quot;roughly one-third of the original budget&quot;*까지만 밝혔다.</p>
+<li><p><strong>컨텍스트 압축의 구체적 예시가 나왔고, 서빙 비용도 1/3로 줄어든다</strong> <span class="badge ok">확인</span> §5.4 — 블로그는 *&quot;roughly one-third of the original budget&quot;*까지만 밝혔다.</p>
 <blockquote>
 <p>&quot;the context length can be reduced to roughly a third of the original token budget (for example, from about 5,000 tokens down to about 1,700 tokens) with only negligible degradation in offline ranking metrics.&quot;
 &quot;Since GenRec is largely compute-bound with serving cost approximately proportional to the context length, we observed the serving cost is reduced to roughly a third of original cost as well.&quot;
-— <a href="https://arxiv.org/abs/2608.10257">GenRec arXiv, §5.4</a></p>
+— <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec arXiv, §5.4</a></p>
 </blockquote>
 <p>즉 5,000 토큰을 1,700 토큰으로 줄인 예시가 붙었고, 컨텍스트 압축이 품질 저하를 거의 일으키지 않으면서 <strong>서빙 비용까지 1/3</strong>로 낮춘다는 정량 주장이 새로 나왔다. 이 조합은 블로그의 정성적 서술만으로는 확보할 수 없었다.</p>
 </li>
-<li><p><strong>손실 함수 수식이 처음 공개됐다</strong> <code>[확인]</code> §4.4-§4.5</p>
+<li><p><strong>손실 함수 수식이 처음 공개됐다</strong> <span class="badge ok">확인</span> §4.4-§4.5</p>
 <blockquote>
 <p>&quot;ℒ = α·ℒ_ranking + β·ℒ_language + γ·ℒ_miscellaneous, s.t. α+β+γ = 1, α,β,γ ≥ 0&quot;
 &quot;These labels are used in a cross entropy loss over the item catalog (or candidate set), teaching the model to produce a high-quality ordering of items given the verbalized context.&quot;
 &quot;When the catalog is too large to score exhaustively, we can combine the scoring with sampled-softmax instead.&quot;
-— <a href="https://arxiv.org/abs/2608.10257">GenRec arXiv, §4.4-§4.5</a></p>
+— <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec arXiv, §4.4-§4.5</a></p>
 </blockquote>
 <p>세 항의 볼록결합이고, 랭킹 손실은 catalog(또는 candidate set) 전체에 대한 softmax cross-entropy이며, 카탈로그가 너무 클 때는 sampled softmax로 대체한다. α/β/γ의 구체적 수치는 공개하지 않았다. <strong>추론할 때는 랭킹 헤드만 쓰고 LM 헤드는 학습을 정규화하는 용도</strong>라는 명시도 새로 나왔으며, *&quot;future text generation use cases (e.g., natural-language explanations)&quot;*를 미래의 확장 방향으로 열어 두었다.</p>
 </li>
-<li><p><strong>학습 데이터 스키마는 user/assistant 대화 형식이고, assistant 쪽에 engagement 원신호가 들어간다</strong> <code>[확인]</code> §4.2</p>
+<li><p><strong>학습 데이터 스키마는 user/assistant 대화 형식이고, assistant 쪽에 engagement 원신호가 들어간다</strong> <span class="badge ok">확인</span> §4.2</p>
 <blockquote>
 <p>&quot;we transform a member&#39;s historical interaction data into a single-turn or multi-turn &#39;conversation&#39; between a user and a recommender. Each turn pairs a user message (combining context, history, and a task) with an assistant message representing the member&#39;s actual engagement for that turn.&quot;
-— <a href="https://arxiv.org/abs/2608.10257">GenRec arXiv, §4.2</a></p>
+— <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec arXiv, §4.2</a></p>
 </blockquote>
 <p>블로그는 user message 쪽(<em>&quot;verbalized context, profile, history, item metadata, and task&quot;</em>)만 나열했다. 논문은 <strong>assistant message에 실제 engagement(play, play duration, abandon, thumb, etc.)가 들어간다</strong>고 스키마를 공개했다. positive label의 정의도 *&quot;high-quality engaged events (e.g., high-duration plays, strong explicit feedback), with denoising logic and thresholds that vary by content types&quot;*라고 명시했다. 콘텐츠 타입별 임계값과 디노이징 로직이 존재한다(구체적인 임계값은 공개하지 않았다).</p>
 </li>
-<li><p><strong>GRPO는 preliminary 실험에서 실제로 SFT를 앞섰다</strong> <code>[확인]</code> §4.6 — 블로그는 *&quot;higher cost 때문에 future work&quot;*라고까지만 썼다.</p>
+<li><p><strong>GRPO는 preliminary 실험에서 실제로 SFT를 앞섰다</strong> <span class="badge ok">확인</span> §4.6 — 블로그는 *&quot;higher cost 때문에 future work&quot;*라고까지만 썼다.</p>
 <blockquote>
 <p>&quot;In preliminary experiments, RL-style methods (e.g. GRPO) showed additional gains over supervised finetuning, but their high training overhead makes them better suited for future work. Therefore, currently we adopt the reward-weighted loss approach as the main alignment mechanism for GenRec, due to its simplicity, stability, and cost considerations.&quot;
-— <a href="https://arxiv.org/abs/2608.10257">GenRec arXiv, §4.6</a></p>
+— <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec arXiv, §4.6</a></p>
 </blockquote>
 <p>시도해서 더 나은 결과를 얻고도 배포하지는 않았다. Meta ConnectionMind가 GRPO를 실제로 배포한 것과 대비되는데, 같은 알고리즘을 두고 두 회사가 정반대의 결정을 내린 셈이다.</p>
 </li>
-<li><p><strong>데이터 스케일링 스윕을 수행했다</strong> <code>[확인]</code> §5.2 — Phase-2 데이터를 1x부터 20x까지 늘리는 실험을 ~1B와 ~10B 두 백본에서 각각 실행했고, 양쪽 모두 monotonic 개선과 유사한 scaling pattern을 보였다. 절대 곡선과 기울기는 공개하지 않았다.</p>
+<li><p><strong>데이터 스케일링 스윕을 수행했다</strong> <span class="badge ok">확인</span> §5.2 — Phase-2 데이터를 1x부터 20x까지 늘리는 실험을 ~1B와 ~10B 두 백본에서 각각 실행했고, 양쪽 모두 monotonic 개선과 유사한 scaling pattern을 보였다. 절대 곡선과 기울기는 공개하지 않았다.</p>
 </li>
-<li><p><strong>Semantic-ID 계열이 아니라는 점을 논문이 명시적으로 밝힌다</strong> <code>[확인]</code> §2.2</p>
+<li><p><strong>Semantic-ID 계열이 아니라는 점을 논문이 명시적으로 밝힌다</strong> <span class="badge ok">확인</span> §2.2</p>
 <blockquote>
 <p>&quot;Most LLM-based generative retrieval systems rely on autoregressive decoding with beam search at inference time, which introduces latency overhead that can be prohibitive at scale, especially for large candidate sets. Our work avoids these limitations by augmenting the base LLM architecture with a catalog-aware ranking head, so that it can rank a large candidate set in a single forward pass&quot;
-— <a href="https://arxiv.org/abs/2608.10257">GenRec arXiv, §2.2</a></p>
+— <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec arXiv, §2.2</a></p>
 </blockquote>
 <p>Google PLUM, Kuaishou OneRec-Think, Spotify GLIDE, Yandex Gryphon 등 SID·생성 계열과 무엇이 다른지를 논문이 스스로 정리한다. <strong>GenRec은 semantic ID 계열이 아니다.</strong> 채점 헤드가 catalog-aware라서 single forward pass만으로 대규모 후보 집합을 채점하기 때문이다.</p>
 </li>
-<li><p><strong>팀 구조가 처음 드러났다</strong> <code>[확인]</code> §8 — 블로그에는 팀 구분이 없었다. 세 팀이 협업했다고 밝히는데, <strong>AI for members</strong>(22명, 주 저자단과 Justin Basilico 포함), <strong>AI platform and serving</strong>(13명, 서빙 인프라), <strong>Product</strong>(4명)로 나뉜다. Justin Basilico는 Netflix 개인화 총괄로 알려진 인물이고, 그의 이름이 GenRec 인접 문서에서 명시적으로 확인된 것은 이번이 처음이다.</p>
+<li><p><strong>팀 구조가 처음 드러났다</strong> <span class="badge ok">확인</span> §8 — 블로그에는 팀 구분이 없었다. 세 팀이 협업했다고 밝히는데, <strong>AI for members</strong>(22명, 주 저자단과 Justin Basilico 포함), <strong>AI platform and serving</strong>(13명, 서빙 인프라), <strong>Product</strong>(4명)로 나뉜다. Justin Basilico는 Netflix 개인화 총괄로 알려진 인물이고, 그의 이름이 GenRec 인접 문서에서 명시적으로 확인된 것은 이번이 처음이다.</p>
 </li>
-<li><p><strong>논문도 전면 롤아웃을 확언하지는 않는다</strong> <code>[확인]</code> §7</p>
+<li><p><strong>논문도 전면 롤아웃을 확언하지는 않는다</strong> <span class="badge ok">확인</span> §7</p>
 <blockquote>
 <p>&quot;GenRec represents an initial step toward a more LLM-centric recommendation stack at Netflix. Our results suggest that this is a viable and promising path for large-scale personalization in at least some scenarios&quot;
-— <a href="https://arxiv.org/abs/2608.10257">GenRec arXiv, §7 Conclusions</a></p>
+— <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec arXiv, §7 Conclusions</a></p>
 </blockquote>
 <p>*&quot;initial step&quot;*과 *&quot;at least some scenarios&quot;*라는 표현이 그 태도를 보여 준다. 정본이 열어 둔 질문, 즉 전면 롤아웃 여부와 실시간 지면 여부, 후보 집합을 누가 생성하는지는 논문에서도 답을 찾을 수 없어서 그대로 남는다.</p>
 </li>
@@ -337,105 +180,53 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>GRPO가 더 나은 결과를 냈는데도 배포되지 않았다</strong>는 진술은 Meta ConnectionMind가 같은 GRPO를 실제로 배포한 것과 대비된다. &quot;훈련 비용을 얼마나 감당할 수 있느냐가 배포 형태를 가른다&quot;라는 산업 차원의 절충이 두 사례에서 대칭적으로 드러난 첫 순간이다.</li>
 </ol>
 <p>블로그와 논문의 관계 자체도 시사하는 바가 있다. Netflix는 <strong>블로그를 먼저 내고 논문으로 정량 수치를 보강하는 순서</strong>를 열흘 남짓 만에 완성했다(블로그 2026-07-30 → 논문 2026-08-10). 이 순서가 앞으로도 반복된다면, 블로그가 나오면 즉시 정본에 반영하고 논문이 나오면 정량 수치를 보강한다는 이 저장소의 스캔 전략을 확립할 수 있다.</p>
-<h2 id="3-yandex-music-sona--스마트-스피커-지면의-통합-랭커--레이더">3. Yandex Music Sona — 스마트 스피커 지면의 통합 랭커 — 레이더</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.11015">Sona Technical Report</a> — arXiv 2608.11015, 2026-08-11, 논문 (Yandex Music, &quot;Sona Team&quot; + Alexandr Udeneev·Aleksei Krasilnikov 외)</p></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="3-yandex-music-sona--스마트-스피커-지면의-통합-랭커--레이더"><span class="num">3</span>Yandex Music Sona — 스마트 스피커 지면의 통합 랭커 — 레이더</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.11015" target="_blank" rel="noopener">Sona Technical Report</a> — arXiv 2608.11015, 2026-08-11, 논문 (Yandex Music, &quot;Sona Team&quot; + Alexandr Udeneev·Aleksei Krasilnikov 외)</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>이 저장소는 2026-08-10 daily에서 Yandex Music <strong>Gryphon-v2</strong>(arXiv 2608.06213, 2026-08-06)를 radar.md의 &quot;생성형 retrieval / semantic ID&quot; 스레드에 넣었다. Gryphon-v2는 프로덕션 캐스케이드의 15개 이상 후보 생성기와 pre-ranking, final ranking을 단일 모델로 대체했다고 진술했고, active users가 +1.41% 올랐다고 밝혔다. 같은 회사가 5일 만에 두 번째 논문을 냈다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li>Sona는 <strong>음악 스트리밍을 위한 통합 생성형 추천 모델</strong>이며, 유저 engagement 시퀀스를 공유 인코더로 처리한 다음 autoregressive 디코더와 랭킹 모듈로 추천을 만든다. hand-engineered feature는 쓰지 않는다 <code>[확인]</code> abstract.</li>
+<li>Sona는 <strong>음악 스트리밍을 위한 통합 생성형 추천 모델</strong>이며, 유저 engagement 시퀀스를 공유 인코더로 처리한 다음 autoregressive 디코더와 랭킹 모듈로 추천을 만든다. hand-engineered feature는 쓰지 않는다 <span class="badge ok">확인</span> abstract.</li>
 <li><strong>배포 지면은 &quot;My Vibe on smart speakers&quot;다</strong> — 스마트 스피커 전용 지면이다. 넓은 범위의 음악 추천 캐스케이드를 다루는 Gryphon-v2와는 배포 지면이 다르다.</li>
-<li><strong>프로덕션 A/B에서는 &quot;replaced the entire production cascade&quot;라고 밝혔고</strong>, active users가 +4.53%, total listening time이 +6.30% 올랐다 <code>[확인]</code> abstract.</li>
+<li><strong>프로덕션 A/B에서는 &quot;replaced the entire production cascade&quot;라고 밝혔고</strong>, active users가 +4.53%, total listening time이 +6.30% 올랐다 <span class="badge ok">확인</span> abstract.</li>
 </ul>
 <p><strong>정본 반영 없음</strong> — 추적 대상 서비스(X·Meta·Netflix)가 아니므로, radar.md의 Gryphon-v2 스레드에 2026-08-13 추가 근거로 3–4줄짜리 포인터만 붙였다.</p>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <p>Yandex Music이 5일 사이에 프로덕션 통합 랭커 논문을 두 편 낸 것 자체가 <strong>회사 차원에서 SID와 LLM을 결합한 통합 랭커 계열에 자원을 투입하고 있다는 신호</strong>다. Gryphon-v2와 Sona가 같은 모델 계보인지 별개 라인인지, 지면마다 다른 모델을 배포하는 이유가 무엇인지는 아직 확인되지 않았다. 음악이 아닌 도메인에서 세 번째 회사가 비슷한 진술을 내놓으면, <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>의 케이스 절로 승격할 후보로 계속 둔다.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
-<p><strong>⚠ 자리 3의 주장이 절반쯤 뒤집혔다.</strong> <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>의 오래된 결론 문장인 *&quot;유기 피드 랭킹 경로에 LLM이 들어간다는 1차 진술은 X·Meta 어느 쪽에도 없다 — 업계 전체에서 그 진술을 처음 낸 것은 Netflix GenRec&quot;*을 다시 썼다. 새 결론은 *&quot;Netflix GenRec(2026-07, LLM = 채점 함수)이 처음이었고, Meta ConnectionMind(2026-08, LLM = 그래프 경로 추론기)가 두 번째&quot;*다. LLM이 맡는 형태가 두 회사에서 다르다는 사실이 새로 확립된 지형이다. 검증에 사용한 코퍼스는 이번 사이클에서 읽은 arXiv 논문 2건의 원문이고, § 1과 § 2에 인용했다.</p>
+<p class="warn"><strong>⚠ 자리 3의 주장이 절반쯤 뒤집혔다.</strong> <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>의 오래된 결론 문장인 *&quot;유기 피드 랭킹 경로에 LLM이 들어간다는 1차 진술은 X·Meta 어느 쪽에도 없다 — 업계 전체에서 그 진술을 처음 낸 것은 Netflix GenRec&quot;*을 다시 썼다. 새 결론은 *&quot;Netflix GenRec(2026-07, LLM = 채점 함수)이 처음이었고, Meta ConnectionMind(2026-08, LLM = 그래프 경로 추론기)가 두 번째&quot;*다. LLM이 맡는 형태가 두 회사에서 다르다는 사실이 새로 확립된 지형이다. 검증에 사용한 코퍼스는 이번 사이클에서 읽은 arXiv 논문 2건의 원문이고, § 1과 § 2에 인용했다.</p>
 <p><strong>반대로 뒤집히지 않은 것도 하나 있다.</strong> *&quot;Netflix GenRec의 채점 구조는 텍스트 생성이 아니다 — LLM은 pooled hidden state h를 만드는 인코더이고 최종 채점은 임베딩 내적/작은 MLP&quot;*라는 서술은 그대로 유지된다. arXiv 논문 §4.5의 catalog softmax와 scoring head φ 서술이 이 요약과 들어맞는다. 새로 나온 손실 수식은 이 서술을 강화할 뿐 약화하지 않는다.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="레이더">레이더</h2>
 <ul>
-<li><strong>Sona (Yandex Music)</strong> <a href="https://arxiv.org/abs/2608.11015">arXiv 2608.11015</a>, 2026-08-11 — Gryphon-v2 스레드에 3–4줄짜리 포인터를 추가했다. 스마트 스피커 지면의 통합 랭커이고, active users +4.53%, total listening time +6.30%를 기록했다.</li>
+<li><strong>Sona (Yandex Music)</strong> <a href="https://arxiv.org/abs/2608.11015" target="_blank" rel="noopener">arXiv 2608.11015</a>, 2026-08-11 — Gryphon-v2 스레드에 3–4줄짜리 포인터를 추가했다. 스마트 스피커 지면의 통합 랭커이고, active users +4.53%, total listening time +6.30%를 기록했다.</li>
 <li><strong>LLM-native 랭킹 확산 스레드를 갱신했다</strong> — Meta ConnectionMind가 자리 3의 두 번째 프로덕션 진술로 들어왔다는 사실을 <a href="radar.html">radar.md</a>의 해당 오픈 스레드에 반영했다. 지켜볼 목록에는 &quot;ConnectionMind 지면 확정·서빙 코스트 후속 글&quot;을 추가했다.</li>
 </ul>
 <p><strong>radar triage 결과:</strong> 오늘 스캔한 arXiv cs.IR 신규 30건 가운데, 위 3건(2608.10257 Netflix GenRec / 2608.10187 Meta ConnectionMind / 2608.11015 Yandex Sona) 외에는 수용 기준(플랫폼 기업 저자 · 프로덕션·A/B 진술 · 메커니즘 신규성 · 스케일 결과)을 통과한 항목이 없었다. 통과하지 못한 대표적인 예로는 LLM 리랭커 계열(2608.10528·2608.10406), 멀티모달 sequential rec(2608.10700·2608.10240·2608.10983), 학술 벤치마크 CF(2608.10297·2608.10247)가 있는데, 모두 프로덕션 배포에 관한 진술이 없다.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong>ConnectionMind의 지면 확정</strong> — 후속 Meta 블로그와 Q3 IR 자료, 시스템 카드 갱신을 지켜본다. 카드에 &quot;그래프 경로 추론 LLM&quot; 예측 헤드가 나타나면 그때 지면이 확정된다.</li>
 <li><strong>ConnectionMind의 서빙 비용 후속 자료</strong> — Meta가 유기 피드 hot path에서 8B LLM을 실제로 어떻게 서빙하는지, 즉 vLLM을 쓰는지 자체 스택을 쓰는지, Ads의 MARM 인프라를 공유하는지에 관한 1차 진술이 나올 때까지 열린 질문으로 유지한다.</li>
 <li><strong>GenRec과 ConnectionMind 두 사례에서 나타난 GRPO의 대칭</strong> — 같은 알고리즘을 두고 두 회사가 반대되는 결정을 내린 이유가 훈련 비용의 절대치인지, 지면의 특성인지, 데이터의 양인지를 정리할 topic 절 후보다. <code>[topics/llm-in-recsys.md](../topics/llm-in-recsys.md)</code>에 GRPO 관련 소절을 추가할지 검토한다.</li>
 <li><strong>Meta 시스템 카드(fb-feed·fb-video·fb-reels) 재렌더링</strong> — ConnectionMind의 진술과 카드가 서로 맞는지, 카드가 갱신됐는지 확인한다. 카드가 client-rendered 방식이라서 브라우저 렌더링이 필요하며, 다음 스캔 사이클에 시도한다.</li>
 <li><strong>Yandex Music Gryphon-v2와 Sona의 관계</strong> — 두 논문의 아키텍처 차이를 정리한다. 당분간 radar에만 두고, 심층 분석은 사람이 요청할 때까지 기다린다.</li>
-</ul>
+</ul></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-08-12.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-12</div></a><a class="r" href="daily-2026-08-15.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-15</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-08-12.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-08-12</span></a><a class="pg-next" href="daily-2026-08-15.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-08-15</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

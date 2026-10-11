@@ -2,344 +2,124 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="feed-research 의 일일 리포트 모음. 매일 새로 공개된 코드와 논문을 검토해 정본에 반영한 내역이다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 — feed-research">
 <meta property="og:description" content="feed-research 의 일일 리포트 모음. 매일 새로 공개된 코드와 논문을 검토해 정본에 반영한 내역이다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="index.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>일일 리포트</h1>
-  <div class="wd">2026-08-08 ~ 2026-10-10</div>
-  <ul class="chips"><li class="chip">전체 <b>55</b>편</li><li class="chip">누적 <b>1606</b>분 분량</li></ul>
-  <div class="lead"><span class="lb">읽는 법</span>각 리포트는 <strong>한 줄 요약 → 자료 → 배경 → 정본 반영 → 의미</strong> 순서로 같은 구조를 따른다. 바쁘면 표지의 한 줄 요약과 각 절의 <strong>의미</strong> 카드만 읽어도 그날의 변화가 잡힌다. <a href="index.html">◂ 정본으로 돌아가기</a></div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2>2026년 10월</h2>
-<ul class="rl">
-<li><a href="daily-2026-10-10.html"><div class="hd"><span class="dt">2026-10-10</span><span class="wd">토</span><span class="rt">9분</span></div><div class="ds">X의 랭킹 모델(Phoenix) 추론 요청에 &quot;이 피드 요청이 앱 실행인지, 새로고침인지, 아래로 스크롤한 것인지&quot;를 담는 필드 2개가 추가됐다. 나머지는 H100 학습 효율 개선이다.</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-10-09.html"><div class="hd"><span class="dt">2026-10-09</span><span class="wd">금</span><span class="rt">14분</span></div><div class="ds">X가 For You 피드 안에 세로 영상 3~5개를 묶어 보여 주는 캐러셀 모듈을 만들었다(기본 off). 랭킹 모델의 체류 시간 헤드 학습 방식은 기본값에서 Tweedie/MAE 회귀가 CREAD(임계값별 분류 후 복원)로 바뀌었다.</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-10-08.html"><div class="hd"><span class="dt">2026-10-08</span><span class="wd">목</span><span class="rt">10분</span></div><div class="ds">X가 나흘 전 공개한 전역 인기 포스트 후보 소스(PopularPostsSource)를 기본 on으로 켰고, 같은 날 새-작성자 부스트 가중치를 0.02에서 0.015로 낮췄다. 검색 랭킹 학습 데이터에서 negative 샘플이 엉뚱한 쿼리의 렉시컬 매치 피처를 달고 있던 문제도 고쳤다.</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-10-07.html"><div class="hd"><span class="dt">2026-10-07</span><span class="wd">수</span><span class="rt">18분</span></div><div class="ds">X의 value model에 &quot;열 확률 × 열었을 때 머무는 초&quot;라는 기대 체류 시간 항 3개가 처음 코드로 들어왔고(가중치는 아직 0), 사흘 전 생긴 PopularPostsSource는 조회수 기반 오프라인 잡으로 다시 만들어졌다. Meta는 Facebook Feed 시스템 카드를 2026-10-06자로 갱신했고, 카드의 유일…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-10-04.html"><div class="hd"><span class="dt">2026-10-04</span><span class="wd">일</span><span class="rt">28분</span></div><div class="ds">어제 공개된 generative SID retrieval의 &quot;실제 요청을 받아 응답을 돌려줄 서버 크레이트&quot;(parquet 30초 폴링 + 48-bit u64 트라이 + 깊이 역순/round-robin 알고리즘)와 홈믹서의 PopularPostsSource(top-K 인기 저자를 Thunder in-network에 &quot;가짜 foll…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-10-03.html"><div class="hd"><span class="dt">2026-10-03</span><span class="wd">토</span><span class="rt">46분</span></div><div class="ds">X가 Phoenix 쪽에 generative SID retrieval 전용 microservice와 전용 Transformer 모델(6-level × 256-codebook)을 신설하고, home-mixer에 SidSource 후보 소스로 배선한 4세대+34 공개가 올라왔다 (오늘 커밋 하나, +5227/−756, 파일 105개)…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-10-02.html"><div class="hd"><span class="dt">2026-10-02</span><span class="wd">금</span><span class="rt">31분</span></div><div class="ds">X 4세대+33 커밋 b79b947(2026-10-01, +2,490/−506, 47파일)이 VF에 limited-actions policy 시스템(두 파일 신설 703줄)과 gRPC caller-identity 로깅(126줄)을 신설하고, abuse-enforcement-service는 설정 변경 자가재시작 게이트(173줄)와 …</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-10-01.html"><div class="hd"><span class="dt">2026-10-01</span><span class="wd">목</span><span class="rt">38분</span></div><div class="ds">X 4세대+32가 어제 신설한 VF hydration 상태 저장소를 Fetcher&lt;V> trait으로 재작성해 리트윗 소스 확장을 두 번 hydrate에서 한 번 hydrate + in-flight 확장으로 줄이고, Phoenix xrecsys_two_tower.py를 registry에 카탈로그 6-preset(SID 6-leve…</div><ul class="chips"><li class="chip">읽은 자료 <b>3</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></a></li>
-</ul>
-<h2>2026년 09월</h2>
-<ul class="rl">
-<li><a href="daily-2026-09-30.html"><div class="hd"><span class="dt">2026-09-30</span><span class="wd">수</span><span class="rt">26분</span></div><div class="ds">X 4세대+31이 어제 신설한 overturn-hold 게이트의 서버 쪽(abuse-ledger-service 12파일 2,254줄)을 그대로 공개했고, 함께 VF reference/tweetypie.rs(714줄)로 Scala Tweetypie 직접 호출을 스테이징 dual-call 대상에 편입했으며, home-mixer 프로덕…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-29.html"><div class="hd"><span class="dt">2026-09-29</span><span class="wd">화</span><span class="rt">17분</span></div><div class="ds">Tencent 광고·추천 플랫폼의 KuaFu가 유저 프로파일링을 위해 raw 행동 시퀀스를 behavior item 단위 two-axis 압축으로 재구성해 주간 10억 유저 · 100K QPM 규모의 프로파일 파이프라인에 배포됐고, 10개월 A/B에서 5% 홀드아웃 대비 GMV +1.37% (95% CI [0.71%, 2.03%]…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-28.html"><div class="hd"><span class="dt">2026-09-28</span><span class="wd">월</span><span class="rt">16분</span></div><div class="ds">Pinterest가 표준 광고 lightweight ranking 모델을 two-tower + cross tower 하이브리드로 확장하고, 같은 모델이 후보 전량엔 fast two-tower 점수를, 상위 서브셋엔 slow three-tower 점수를 내는 co-train + two-stage 서빙으로 프로덕션에 배포했다는 진술을…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-27.html"><div class="hd"><span class="dt">2026-09-27</span><span class="wd">일</span><span class="rt">28분</span></div><div class="ds">X 4세대+30이 abuse-enforcement에 overturn_hold_gate 5,270줄을 신설해 사람 검토자가 뒤집은 조치를 재적용하지 못하게 막는 마지막 프리체크를 배선했다.</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-26.html"><div class="hd"><span class="dt">2026-09-26</span><span class="wd">토</span><span class="rt">27분</span></div><div class="ds">X VF 하이드레이션 스택이 하루 만에 다시 뒤집혔다 — 어제(4세대+28)까지 유지되던 predicate 별 hydrator 함수 계층이 통째로 삭제되고, Hydrator enum(7→17 variant)·NodeSpec 데이터 테이블·HydrationPlan·execute.rs(FuturesUnordered 스케줄러) 3계층의…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-25.html"><div class="hd"><span class="dt">2026-09-25</span><span class="wd">금</span><span class="rt">22분</span></div><div class="ds">X 4세대+28 커밋이 홈믹서의 1,255줄짜리 랭킹 스코어러를 통째 지우고, 어제 신설된 공유 crate xai-value-model이 홈믹서와 vm-ranker 두 프로세스의 value model 계산을 동일 코드로 담당하게 됐다.</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-24.html"><div class="hd"><span class="dt">2026-09-24</span><span class="wd">목</span><span class="rt">25분</span></div><div class="ds">어제 예고한 세 슬롯이 하루 만에 실제 코드로 채워졌다 — VM-Ranker가 서비스로서 value model을 직접 계산하기 시작했고(신규 파일 4개·파라미터 56개), LimitedEngagementReason::ConversationControl 슬롯은 신규 hydrator·rule 4종·socialgraph reverse-…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-23.html"><div class="hd"><span class="dt">2026-09-23</span><span class="wd">수</span><span class="rt">36분</span></div><div class="ds">X 4세대+26 커밋(3aa0fa33)에서 VMRanker가 DPP wrapper에서 value-model input carrier로 확장되고 retrieval candidate attribution Kafka 스트림이 신설되고 VF rule engine이 이원 Verdict 트리로 재작성됐다 · Netflix가 recommend…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-22.html"><div class="hd"><span class="dt">2026-09-22</span><span class="wd">화</span><span class="rt">21분</span></div><div class="ds">Meta search·discovery 팀에서 KDD 2027로 향하는 프로덕션 논문 두 편이 arXiv에 함께 올라왔다. 한 편은 trillion-doc source corpus에서 GPU와 CPU 두 개의 retrieval 경로를 동시에 서빙하는 depth–breadth 아키텍처 논문이고(2609.21281), 다른 한 편은 …</div><ul class="chips"><li class="chip">읽은 자료 <b>3</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-20.html"><div class="hd"><span class="dt">2026-09-20</span><span class="wd">일</span><span class="rt">48분</span></div><div class="ds">X 오픈소스 4세대+25(8b25829)에서 홈믹서의 gated_dwell_regret 스코어링 모드와 그 진입을 결정하던 19-피처 GateModel이 통째로 롤백됐고, Phoenix retrieval에는 HOME_COLD_DATASET_TYPE=13 태그를 단 cold-start 슬라이스와 별도 상한 파라미터 PhoenixCo…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-19.html"><div class="hd"><span class="dt">2026-09-19</span><span class="wd">토</span><span class="rt">30분</span></div><div class="ds">X 4세대+24가 광고 랭킹 학습에서 세 개의 delayed feedback 관련 플래그(condition_conversion_on_click·train_view_through_heads·split_head_training_by_source)를 단일 ads_head_masking으로 통합하면서 sample source를 fresh…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-18.html"><div class="hd"><span class="dt">2026-09-18</span><span class="wd">금</span><span class="rt">37분</span></div><div class="ds">X 4세대+23(2026-09-17 42266f3)에서 fav count 계층 홀드아웃 필터가 신설됐고, click-dwell 랭킹 항이 저조 fav 페널티에서 dwell × click 곱으로 재정의됐으며, 4일 전에 도입된 LLM-judge search relevance action 두 개가 vacate되고 delayed con…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-17.html"><div class="hd"><span class="dt">2026-09-17</span><span class="wd">목</span><span class="rt">28분</span></div><div class="ds">X 4세대+22(2026-09-16 fad2f71)에서 광고 구매액 head가 학습 loss까지 정식 배선됐고 새 binary continuous loss type이 도입되면서 click_dwell_time이 default로 sigmoid BCE 이진 분류 학습으로 flip됐다.</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-16.html"><div class="hd"><span class="dt">2026-09-16</span><span class="wd">수</span><span class="rt">24분</span></div><div class="ds">X 4세대+21 공개 — home-mixer가 응답 다양성 관측을 3단(pre-heuristic·top10·final)으로 계량하고, Phoenix ranker가 광고 웹 클릭 이후 실제 구매 금액을 continuous head로 회귀 예측하는 배선이 열렸다.</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-15.html"><div class="hd"><span class="dt">2026-09-15</span><span class="wd">화</span><span class="rt">27분</span></div><div class="ds">arXiv cs.IR 신규 23건 triage에서 두 건이 통과했다. Pinterest PinDCO(arXiv 2609.11943, RecSys 2026 accepted)는 광고 크리에이티브를 대상으로 하는 프로덕션 dynamic creative optimization 시스템으로, 컴포넌트별 tower를 융합하는 CCFN과 wat…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-13.html"><div class="hd"><span class="dt">2026-09-13</span><span class="wd">일</span><span class="rt">43분</span></div><div class="ds">X 4세대+20(6bb4594)이 VMRanker DPP에 seed_tweet_id pinned anchor 축을 신설(집합 내부 다양성에서 참조 tweet 대비 다양성으로 확장 가능, top_k 예산 미소진)했고, 홈믹서가 Phoenix 후보 점수 로그를 기존 Thrift 스트림과 별개로 새 proto 토픽 LOGGED_SCOR…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-12.html"><div class="hd"><span class="dt">2026-09-12</span><span class="wd">토</span><span class="rt">47분</span></div><div class="ds">X 4세대+19(fee1d0f)가 visibility-filtering의 TES·Gizmoduck Strato timeout을 각각 100/80 ms에서 통합 상수 390 ms로 3~4배 상향하면서 TES 실패 시 tweet→author_id fallback 캐시(기본 1 M entries)로 author-side rules를 살…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-11.html"><div class="hd"><span class="dt">2026-09-11</span><span class="wd">금</span><span class="rt">37분</span></div><div class="ds">X 4세대+18(75d93d9)이 visibility-filtering의 판정 축을 FilteredReason에서 명시적 Action enum으로 옮기고, 홈 타임라인에 여섯 번째 광고 포맷 header-image-prompt-ad를 새로 배선했으며, grox LLM 입력에 30초+ 영상 preview thumbnail과 라이브 …</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-10.html"><div class="hd"><span class="dt">2026-09-10</span><span class="wd">목</span><span class="rt">45분</span></div><div class="ds">X 4세대+17(49815da, 2026-09-08 19:23 UTC, +10,938/−982, 파일 78)에서 (1) home-mixer 랭킹 스코어러에 per-head weight perturbation이 새로 배선됐다 — MD5(salt, user_id, head)로 결정론적으로 뽑은 부호로 26개 참여 헤드 가중치를 σ·e…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-09.html"><div class="hd"><span class="dt">2026-09-09</span><span class="wd">수</span><span class="rt">9분</span></div><div class="ds">Shopify가 Shop app·머천트 스토어프론트에 HSTU 기반 생성형 recommender를 프로덕션 배포하고 Shop orders +0.94%, high-quality CTR +5%, conversion +0.71%, recall@4 +4.8%를 A/B로 보고했다는 2026-02 산업 블로그를 뒤늦게 확인해 radar에 편…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-08.html"><div class="hd"><span class="dt">2026-09-08</span><span class="wd">화</span><span class="rt">12분</span></div><div class="ds">Huawei AppGallery(100M+ DAU 추정)의 랭킹 모델을 MMoE에서 personalized task dependency graph로 교체한 CIKM 2026 논문 1건이 레이더 통과.</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-07.html"><div class="hd"><span class="dt">2026-09-07</span><span class="wd">월</span><span class="rt">29분</span></div><div class="ds">월요일 산업 블로그 훑기에서 지난 배치들이 놓친 세 플랫폼의 프로덕션 배포 진술을 확인했다. Pinterest Home Feed의 Conditional Learned Retrieval(CLR) 재설계는 조건부 임베딩 retrieval을 통합 아키텍처로 확장하면서 p90 지연을 80ms에서 12ms로 85% 줄이고 7-figure …</div><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>4</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-06.html"><div class="hd"><span class="dt">2026-09-06</span><span class="wd">일</span><span class="rt">32분</span></div><div class="ds">X 4세대+16(902a06f)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에 국한했으며, Phoenix serving 요청에 experiment_o…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-05.html"><div class="hd"><span class="dt">2026-09-05</span><span class="wd">토</span><span class="rt">43분</span></div><div class="ds">X 4세대+15(2026-09-04, 9b0dc31)에서 (1) grox에 스레드 chain 단위 답글 스팸 판정 파이프라인 PlanMultiStepReplySpam이 신설됐다 — Gemma 2 한 번에 답글 스레드 전체를 넣고 &quot;스팸 인덱스 집합&quot;을 뽑아내되 진입 조건이 &quot;한 저자가 자기 답글에 자기가 답한 chain으로 roo…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-04.html"><div class="hd"><span class="dt">2026-09-04</span><span class="wd">금</span><span class="rt">53분</span></div><div class="ds">X 4세대+14(2026-09-02, 85ac72a)에서 (1) home-mixer가 5개 피드 엔드포인트 전체에서 Phoenix에 &quot;backbone scores&quot;를 강제로 요청하기 시작했고 이에 맞춰 Phoenix proto가 backboneTopLogProbs·backboneContinuousValues 두 필드를 응답에 새로…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-03.html"><div class="hd"><span class="dt">2026-09-03</span><span class="wd">목</span><span class="rt">52분</span></div><div class="ds">X 4세대+13(2026-09-01, 7ba7768)에서 visibility-filtering의 rule 파일 9개(2,670줄)가 3개(1,568줄)로 재구조화되고 — 정책 변화 없이 규칙 표현이 struct-per-rule에서 data-driven RuleSpec enum으로 옮겨졌으며 — 같은 커밋에서 Phoenix 랭킹 모…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-02.html"><div class="hd"><span class="dt">2026-09-02</span><span class="wd">수</span><span class="rt">21분</span></div><div class="ds">X 4세대+12(2026-09-01, 6384ca7)에서 NSFW 게이팅 대상 16개국이 처음으로 코드에 명시됐고 Rust VF와 Scala VF의 목록 drift를 30초마다 감시하는 배선이 붙었다. 같은 커밋에 고인기 비디오 전용 안전 파이프라인 PlanSafetyPtosSpecialVideo가 신설됐다. 새 파이프라인의 진입…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-09-01.html"><div class="hd"><span class="dt">2026-09-01</span><span class="wd">화</span><span class="rt">9분</span></div><div class="ds">Alibaba가 Taobao의 이미지 검색 지면 Pailitao에 SID(Semantic ID) 생성형 retrieval을 확장한 PailitaoGR 논문을 냈다. 오프라인 지표 +13.8%만 공개했고 프로덕션 A/B 수치는 밝히지 않았다.</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-</ul>
-<h2>2026년 08월</h2>
-<ul class="rl">
-<li><a href="daily-2026-08-30.html"><div class="hd"><span class="dt">2026-08-30</span><span class="wd">일</span><span class="rt">27분</span></div><div class="ds">X 4세대+11 커밋(bc8e5f0, 2026-08-28T22:37:32Z, +1950/−1175, 파일 24)이 어제 daily 마감 이후에 올라왔다. visibility-filtering 24개 rule 파일이 정책 변경 없이 리팩터링되어 90건 골든 코퍼스와 배선된 rule마다 최소 한 건의 결정자 케이스가 있어야 한다는 어…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-29.html"><div class="hd"><span class="dt">2026-08-29</span><span class="wd">토</span><span class="rt">36분</span></div><div class="ds">X 4세대+10 커밋(24c6094, 2026-08-28, +2071/−265, 파일 41)이 올라왔다. MultiRiskAdsBlender 신설(4세대+7의 BrandSafetyVerdict::HighRisk tier와 광고 BsrHigh 옵트인을 결합한 인접성 매트릭스로, HighRisk 포스트는 어떤 광고와도 인접할 수 없고…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-28.html"><div class="hd"><span class="dt">2026-08-28</span><span class="wd">금</span><span class="rt">39분</span></div><div class="ds">X 4세대+9번째 공개(45b48ba, 2026-08-26, +873/−525, 파일 36)에는 Phoenix 체크포인트 스택의 저장·복원 양방향 RSS 상한 재정리 (신규 ThrottledD2HArrayHandler가 D2H와 write를 배치로 끊어 pinned-host 메모리를 save_concurrent_gb로 제한하고, …</div><ul class="chips"><li class="chip">읽은 자료 <b>5</b>건</li><li class="chip">정본 반영 <b>6</b>개 파일</li><li class="chip">레이더 <b>3</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-27.html"><div class="hd"><span class="dt">2026-08-27</span><span class="wd">목</span><span class="rt">46분</span></div><div class="ds">X 4세대+8 커밋이 공개됐다(0d3cdd8, 2026-08-25, +5,850/−586, 파일 47). abuse-enforcement-service에 generic_actions 패스스루가 신설됐고(663줄 신규, growthbook 동적 allowlist +126), panda_reports_embedding_v10_roug…</div><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일(services/x.md, radar.md)</li><li class="chip">레이더 <b>2</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-26.html"><div class="hd"><span class="dt">2026-08-26</span><span class="wd">수</span><span class="rt">43분</span></div><div class="ds">X 4세대에 여덟 번째 후속 커밋(4세대+7, d011592, 2026-08-24)이 올라왔다. VF 재작성 검증 하니스(reference_compare.rs, 812줄) 배선, BrandSafetyVerdict HighRisk tier 신설, PTOS 심판의 3개 카테고리 확장(4.5가 X_ALGO 엔드포인트로 판정 전용 재도입…</div><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일(services/x.md, radar.md)</li><li class="chip">레이더 <b>3</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-24.html"><div class="hd"><span class="dt">2026-08-24</span><span class="wd">월</span><span class="rt">10분</span></div><div class="ds">추적하는 서비스(X·Meta·Netflix)에서는 새로 나온 자료가 없다. 대신 arXiv triage에서 어제 놓쳤던 GateDiffInt(arXiv 2608.18764, 2026-08-19 v1 / 2026-08-20 v2)를 확인했다. Xiaohongshu가 프로덕션 primary traffic(hundreds of mill…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일(radar)</li><li class="chip">레이더 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-23.html"><div class="hd"><span class="dt">2026-08-23</span><span class="wd">일</span><span class="rt">48분</span></div><div class="ds">X가 4세대 이후 일곱 번째 후속 커밋(28e414f, 2026-08-21)을 공개했다. (1) 광고 conversion 액션 20개를 신설했다(ADS ActionName 171–190으로, Mobile App Conversion Tracking(MACT)의 purchase·add_to_cart·level_achieved·tuto…</div></a></li>
-<li><a href="daily-2026-08-22.html"><div class="hd"><span class="dt">2026-08-22</span><span class="wd">토</span><span class="rt">38분</span></div><div class="ds">X가 4세대 이후 여섯 번째 후속 커밋(d0cef2f, 2026-08-20)을 공개했고, 여기에는 여섯 가지 변경이 담겼다. (1) AI trend feedback context hydrator(157줄 신규)를 추가해 For You에 &quot;AI trend&quot; 라벨을 붙이고, topic feedback과 나란한 두 번째 컨텍스트 채널을…</div></a></li>
-<li><a href="daily-2026-08-21.html"><div class="hd"><span class="dt">2026-08-21</span><span class="wd">금</span><span class="rt">30분</span></div><div class="ds">X가 4세대 이후 다섯 번째 후속 커밋(aad7179, 2026-08-19)에서 일곱 가지를 바꿨다. (1) Phoenix 학습이 Adam에서 Muon optimizer로 전환됐다: dense-parameter는 Newton-Schulz orthogonalization을 쓰는 Muon으로 옮기고 embedding·logits·no…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일 (services/x.md, services/netflix.md)</li><li class="chip">레이더 <b>0</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-20.html"><div class="hd"><span class="dt">2026-08-20</span><span class="wd">목</span><span class="rt">33분</span></div><div class="ds">X가 4세대 이후 네 번째 후속 공개(11a71f8, 2026-08-18)에서 어제 반영한 광고 브랜드 안전 V2의 strip_v1_grok_written 헬퍼와 PROMPT_OWNED_RULES = [1400, 1410, 1420, 1500, 1510, 1610, 1700] 로직을 하루 만에 완전히 삭제하고, 그 대신 새 상수 …</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건 (X 4세대+3 공개)</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 8개 절 갱신)</li><li class="chip">레이더 갱신 <b>0</b>건</li><li class="chip">Meta 엔지니어링 블로그 <b>0</b>건(마지막 관련 글 2026-08-05, canon에 이미 반영했다)</li><li class="chip">Netflix 테크 블로그 <b>0</b>건(마지막 2026-08-07, 알고리즘과 무관하다)</li><li class="chip">arXiv cs.IR 신규 제출 <b>30</b>건을 triage했고 통과 0건(UniDot 2608.16797은 KDD Cup 2026 runner-up 결과라서 프로덕션 배포와 A/B 진술이 없고 저자 소속도 공개되지 않아 레이더 수용 기준에 미달한다)</li></ul></a></li>
-<li><a href="daily-2026-08-19.html"><div class="hd"><span class="dt">2026-08-19</span><span class="wd">수</span><span class="rt">38분</span></div><div class="ds">X가 4세대 이후 세 번째로 내놓은 후속 공개(b089ce6, 2026-08-17)에서 다음 세 가지를 확인했다. (1) 광고 브랜드 안전 판정에 V2 경로를 나란히 추가해서 Grok 라벨 6종을 _V2 버전으로 옮기고, V1 라벨 가운데 PROMPT_OWNED_RULES(botmaker rule id 7개)에 속하는 것을 강제로…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건 (X 4세대+2 공개 1건 + arXiv triage 30건 중 통과 1건 [SDF/Google Discover])</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 4개 절 갱신)</li><li class="chip">레이더 갱신 <b>1</b>건 (Google Discover SDF 신규 등록)</li><li class="chip">Meta 엔지니어링 블로그 <b>0</b>건(마지막 관련 글 2026-08-05, canon에 이미 반영)</li><li class="chip">Netflix 테크 블로그 <b>0</b>건(마지막 2026-08-07</li><li class="chip">알고리즘 무관)</li></ul></a></li>
-<li><a href="daily-2026-08-16.html"><div class="hd"><span class="dt">2026-08-16</span><span class="wd">일</span><span class="rt">38분</span></div><div class="ds">X는 4세대 초대형 공개(2026-08-13, 47c1bcd) 다음 날에 후속 커밋 c65aa17을 추가했고, 이 커밋에는 다섯 가지 변경이 담겼다. (1) 가중치 비율을 raw-count 등가로 읽으면 안 된다는 해석 규칙을 param.rs와 ranking_scorer.rs 주석 및 README에 명시했다. (2) 브라질 202…</div><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건 (X 4세대+1 공개의 후속 커밋 1개</li><li class="chip">Meta/Netflix 블로그 신규 <b>0</b>건</li><li class="chip">arXiv triage <b>30</b>건 중 통과 1건 [DrEM])</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 9개 절 갱신 + sources 6건 추가)</li><li class="chip">다이어그램 갱신 <b>1</b>건 (x-pipeline.svg 필터 17→18)</li><li class="chip">레이더 갱신 <b>1</b>건 (DrEM 소속 확정 및 A/B 수치 반영)</li></ul></a></li>
-<li><a href="daily-2026-08-15.html"><div class="hd"><span class="dt">2026-08-15</span><span class="wd">토</span><span class="rt">43분</span></div><div class="ds">⚠ 주장 대량 변경: X가 2026-08-13에 4세대 코드를 공개했다. 가중치가 처음으로 실제 값과 함께 공개됐고(reply 5.0, favorite 0.5, report −234, ...), OON 배수(0.75)와 저자 다양성(decay 0.5, floor 0.25), VMRanker DPP(θ=0.65, K=150) 상수가…</div><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건 (X 4세대 공개 1건</li><li class="chip">arXiv triage <b>30</b>건 중 관찰 1건)</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 대폭 개정)</li><li class="chip">다이어그램 갱신 <b>1</b>건 (x-pipeline.svg)</li><li class="chip">레이더 갱신 <b>1</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-13.html"><div class="hd"><span class="dt">2026-08-13</span><span class="wd">목</span><span class="rt">31분</span></div><div class="ds">⚠ 주장 변경 — Meta가 유기 피드의 온라인 서빙 경로에 LLM을 넣었다는 최초의 진술이 ConnectionMind arXiv 논문으로 공개됐고(Llama 3.1-8B가 헤비 유저 5–10%의 hot path를 맡고 Student GNN이 나머지 90–95%를 맡는 하이브리드 구조), 같은 날 Netflix GenRec의 학술…</div><ul class="chips"><li class="chip">읽은 자료 <b>3</b>건 (정본 반영 2건, 레이더 1건)</li><li class="chip">정본 반영 <b>3</b>개 파일 (netflix.md</li><li class="chip">facebook.md</li><li class="chip">llm-in-recsys.md)</li><li class="chip">레이더 갱신 <b>2</b>건</li></ul></a></li>
-<li><a href="daily-2026-08-12.html"><div class="hd"><span class="dt">2026-08-12</span><span class="wd">수</span><span class="rt">16분</span></div><div class="ds">추적 서비스(X·Meta·Netflix)의 신규 발표는 없었으나, arXiv triage에서 Alibaba/Taobao 세 편(MetaStrategy·DREAM·IntHQ)과 Kuaishou 한 편(PushDualGen)이 같은 사흘 안에 프로덕션 진술을 담은 채로 수용 기준을 통과했다. 중국 대형 플랫폼이 서로 다른 각도에서 L…</div><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건 (모두 레이더 후보)</li><li class="chip">정본 반영 <b>0</b></li><li class="chip">레이더 신규 <b>2</b>건 + 오픈 스레드 갱신 2건</li></ul></a></li>
-<li><a href="daily-2026-08-11.html"><div class="hd"><span class="dt">2026-08-11</span><span class="wd">화</span><span class="rt">9분</span></div><div class="ds">추적 서비스(X·Meta·Netflix)의 정본을 흔들 신규 발표는 없었고, 대신 arXiv triage에서 프로덕션 진술 두 건(ByteDance 광고 20K 시퀀스 랭킹, Webtoon 파운데이션 모델 RL post-training)이 수용 기준을 통과해서 레이더에 올렸다.</div><ul class="chips"><li class="chip">읽은 자료 <b>3</b>건 (모두 레이더 후보)</li><li class="chip">정본 반영 <b>0</b></li><li class="chip">레이더 신규 <b>2</b>건 + 오픈 스레드 갱신 1건</li></ul></a></li>
-<li><a href="daily-2026-08-10.html"><div class="hd"><span class="dt">2026-08-10</span><span class="wd">월</span><span class="rt">14분</span></div><div class="ds">Netflix가 GenRec을 구동하는 서빙 인프라를 별도 블로그로 공개했고, Meta는 GEM의 훈련 인프라를 공개했다. 양쪽 다 &quot;모델이 무엇인가&quot;가 아니라 &quot;그 모델을 어떻게 돌리는가&quot;를 설명하는 문서다.</div><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>4</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li><li class="chip">어제 인용 결함 <b>3</b>건 발견</li></ul></a></li>
-<li><a href="daily-2026-08-09.html"><div class="hd"><span class="dt">2026-08-09</span><span class="wd">일</span><span class="rt">22분</span></div><div class="ds">Meta 조사를 시작했다. Facebook, Instagram, Threads 세 지면을 다루었고 서비스를 가로지르는 topics 노트 8개를 정비했다.</div></a></li>
-<li><a href="daily-2026-08-08.html"><div class="hd"><span class="dt">2026-08-08</span><span class="wd">토</span><span class="rt">7분</span></div><div class="ds">X 조사를 시작했다. 저장소를 새로 만들었고, X 3세대 공개 소스를 전부 해부했다.</div></a></li>
-</ul>
+<main id="content" class="wrap">
+<header class="page-head">
+<p class="kicker"><a href="index.html">리서치</a></p>
+<h1>일일 리포트</h1>
+<p class="page-desc mono">2026-08-08 ~ 2026-10-10</p>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">전체 <b>55</b>편</li><li class="chip">누적 <b>1606</b>분 분량</li></ul>
+<div class="lead"><span class="lb">읽는 법</span>각 리포트는 <strong>한 줄 요약 → 자료 → 배경 → 정본 반영 → 의미</strong> 순서로 같은 구조를 따른다. 바쁘면 표지의 한 줄 요약과 각 절의 <strong>의미</strong> 카드만 읽어도 그날의 변화가 잡힌다.</div>
 </div>
-<div class="wrap"></div>
+</header>
+<section class="sec" aria-labelledby="m2026-10">
+<h2 class="sec-h year" id="m2026-10">2026-10<span class="sec-n">8</span></h2>
+<ul class="ls clamp3">
+<li><time class="ls-date" datetime="2026-10-10">10-10</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-10-10.html">X의 랭킹 모델(Phoenix) 추론 요청에 &quot;이 피드 요청이 앱 실행인지, 새로고침인지, 아래로 스크롤한 것인지&quot;를 담는 필드 2개가 추가됐다. 나머지는 H100 학습 효율 개선이다.</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">토 · 9분</span></li>
+<li><time class="ls-date" datetime="2026-10-09">10-09</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-10-09.html">X가 For You 피드 안에 세로 영상 3~5개를 묶어 보여 주는 캐러셀 모듈을 만들었다(기본 off). 랭킹 모델의 체류 시간 헤드 학습 방식은 기본값에서 Tweedie/MAE 회귀가 CREAD(임계값별 분류 후 복원)로 바뀌었다.</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">금 · 14분</span></li>
+<li><time class="ls-date" datetime="2026-10-08">10-08</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-10-08.html">X가 나흘 전 공개한 전역 인기 포스트 후보 소스(PopularPostsSource)를 기본 on으로 켰고, 같은 날 새-작성자 부스트 가중치를 0.02에서 0.015로 낮췄다. 검색 랭킹 학습 데이터에서 negative 샘플이 엉뚱한 쿼리의 렉시컬 매치 피처를 달고 있던 문제도 고쳤다.</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">목 · 10분</span></li>
+<li><time class="ls-date" datetime="2026-10-07">10-07</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-10-07.html">X의 value model에 &quot;열 확률 × 열었을 때 머무는 초&quot;라는 기대 체류 시간 항 3개가 처음 코드로 들어왔고(가중치는 아직 0), 사흘 전 생긴 PopularPostsSource는 조회수 기반 오프라인 잡으로 다시 만들어졌다. Meta는 Facebook Feed 시스템 카드를 2026-10-06자로 갱신했고, 카드의 유일…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">수 · 18분</span></li>
+<li><time class="ls-date" datetime="2026-10-04">10-04</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-10-04.html">어제 공개된 generative SID retrieval의 &quot;실제 요청을 받아 응답을 돌려줄 서버 크레이트&quot;(parquet 30초 폴링 + 48-bit u64 트라이 + 깊이 역순/round-robin 알고리즘)와 홈믹서의 PopularPostsSource(top-K 인기 저자를 Thunder in-network에 &quot;가짜 foll…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">일 · 28분</span></li>
+<li><time class="ls-date" datetime="2026-10-03">10-03</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-10-03.html">X가 Phoenix 쪽에 generative SID retrieval 전용 microservice와 전용 Transformer 모델(6-level × 256-codebook)을 신설하고, home-mixer에 SidSource 후보 소스로 배선한 4세대+34 공개가 올라왔다 (오늘 커밋 하나, +5227/−756, 파일 105개)…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">토 · 46분</span></li>
+<li><time class="ls-date" datetime="2026-10-02">10-02</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-10-02.html">X 4세대+33 커밋 b79b947(2026-10-01, +2,490/−506, 47파일)이 VF에 limited-actions policy 시스템(두 파일 신설 703줄)과 gRPC caller-identity 로깅(126줄)을 신설하고, abuse-enforcement-service는 설정 변경 자가재시작 게이트(173줄)와 …</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">금 · 31분</span></li>
+<li><time class="ls-date" datetime="2026-10-01">10-01</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-10-01.html">X 4세대+32가 어제 신설한 VF hydration 상태 저장소를 Fetcher&lt;V> trait으로 재작성해 리트윗 소스 확장을 두 번 hydrate에서 한 번 hydrate + in-flight 확장으로 줄이고, Phoenix xrecsys_two_tower.py를 registry에 카탈로그 6-preset(SID 6-leve…</a><ul class="chips"><li class="chip">읽은 자료 <b>3</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></div><span class="ls-meta">목 · 38분</span></li>
+</ul>
+</section>
+<section class="sec" aria-labelledby="m2026-09">
+<h2 class="sec-h year" id="m2026-09">2026-09<span class="sec-n">28</span></h2>
+<ul class="ls clamp3">
+<li><time class="ls-date" datetime="2026-09-30">09-30</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-30.html">X 4세대+31이 어제 신설한 overturn-hold 게이트의 서버 쪽(abuse-ledger-service 12파일 2,254줄)을 그대로 공개했고, 함께 VF reference/tweetypie.rs(714줄)로 Scala Tweetypie 직접 호출을 스테이징 dual-call 대상에 편입했으며, home-mixer 프로덕…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">수 · 26분</span></li>
+<li><time class="ls-date" datetime="2026-09-29">09-29</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-29.html">Tencent 광고·추천 플랫폼의 KuaFu가 유저 프로파일링을 위해 raw 행동 시퀀스를 behavior item 단위 two-axis 압축으로 재구성해 주간 10억 유저 · 100K QPM 규모의 프로파일 파이프라인에 배포됐고, 10개월 A/B에서 5% 홀드아웃 대비 GMV +1.37% (95% CI [0.71%, 2.03%]…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">화 · 17분</span></li>
+<li><time class="ls-date" datetime="2026-09-28">09-28</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-28.html">Pinterest가 표준 광고 lightweight ranking 모델을 two-tower + cross tower 하이브리드로 확장하고, 같은 모델이 후보 전량엔 fast two-tower 점수를, 상위 서브셋엔 slow three-tower 점수를 내는 co-train + two-stage 서빙으로 프로덕션에 배포했다는 진술을…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">월 · 16분</span></li>
+<li><time class="ls-date" datetime="2026-09-27">09-27</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-27.html">X 4세대+30이 abuse-enforcement에 overturn_hold_gate 5,270줄을 신설해 사람 검토자가 뒤집은 조치를 재적용하지 못하게 막는 마지막 프리체크를 배선했다.</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">일 · 28분</span></li>
+<li><time class="ls-date" datetime="2026-09-26">09-26</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-26.html">X VF 하이드레이션 스택이 하루 만에 다시 뒤집혔다 — 어제(4세대+28)까지 유지되던 predicate 별 hydrator 함수 계층이 통째로 삭제되고, Hydrator enum(7→17 variant)·NodeSpec 데이터 테이블·HydrationPlan·execute.rs(FuturesUnordered 스케줄러) 3계층의…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">토 · 27분</span></li>
+<li><time class="ls-date" datetime="2026-09-25">09-25</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-25.html">X 4세대+28 커밋이 홈믹서의 1,255줄짜리 랭킹 스코어러를 통째 지우고, 어제 신설된 공유 crate xai-value-model이 홈믹서와 vm-ranker 두 프로세스의 value model 계산을 동일 코드로 담당하게 됐다.</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">금 · 22분</span></li>
+<li><time class="ls-date" datetime="2026-09-24">09-24</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-24.html">어제 예고한 세 슬롯이 하루 만에 실제 코드로 채워졌다 — VM-Ranker가 서비스로서 value model을 직접 계산하기 시작했고(신규 파일 4개·파라미터 56개), LimitedEngagementReason::ConversationControl 슬롯은 신규 hydrator·rule 4종·socialgraph reverse-…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">목 · 25분</span></li>
+<li><time class="ls-date" datetime="2026-09-23">09-23</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-23.html">X 4세대+26 커밋(3aa0fa33)에서 VMRanker가 DPP wrapper에서 value-model input carrier로 확장되고 retrieval candidate attribution Kafka 스트림이 신설되고 VF rule engine이 이원 Verdict 트리로 재작성됐다 · Netflix가 recommend…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></div><span class="ls-meta">수 · 36분</span></li>
+<li><time class="ls-date" datetime="2026-09-22">09-22</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-22.html">Meta search·discovery 팀에서 KDD 2027로 향하는 프로덕션 논문 두 편이 arXiv에 함께 올라왔다. 한 편은 trillion-doc source corpus에서 GPU와 CPU 두 개의 retrieval 경로를 동시에 서빙하는 depth–breadth 아키텍처 논문이고(2609.21281), 다른 한 편은 …</a><ul class="chips"><li class="chip">읽은 자료 <b>3</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></div><span class="ls-meta">화 · 21분</span></li>
+<li><time class="ls-date" datetime="2026-09-20">09-20</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-20.html">X 오픈소스 4세대+25(8b25829)에서 홈믹서의 gated_dwell_regret 스코어링 모드와 그 진입을 결정하던 19-피처 GateModel이 통째로 롤백됐고, Phoenix retrieval에는 HOME_COLD_DATASET_TYPE=13 태그를 단 cold-start 슬라이스와 별도 상한 파라미터 PhoenixCo…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">일 · 48분</span></li>
+<li><time class="ls-date" datetime="2026-09-19">09-19</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-19.html">X 4세대+24가 광고 랭킹 학습에서 세 개의 delayed feedback 관련 플래그(condition_conversion_on_click·train_view_through_heads·split_head_training_by_source)를 단일 ads_head_masking으로 통합하면서 sample source를 fresh…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">토 · 30분</span></li>
+<li><time class="ls-date" datetime="2026-09-18">09-18</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-18.html">X 4세대+23(2026-09-17 42266f3)에서 fav count 계층 홀드아웃 필터가 신설됐고, click-dwell 랭킹 항이 저조 fav 페널티에서 dwell × click 곱으로 재정의됐으며, 4일 전에 도입된 LLM-judge search relevance action 두 개가 vacate되고 delayed con…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">금 · 37분</span></li>
+<li><time class="ls-date" datetime="2026-09-17">09-17</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-17.html">X 4세대+22(2026-09-16 fad2f71)에서 광고 구매액 head가 학습 loss까지 정식 배선됐고 새 binary continuous loss type이 도입되면서 click_dwell_time이 default로 sigmoid BCE 이진 분류 학습으로 flip됐다.</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">목 · 28분</span></li>
+<li><time class="ls-date" datetime="2026-09-16">09-16</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-16.html">X 4세대+21 공개 — home-mixer가 응답 다양성 관측을 3단(pre-heuristic·top10·final)으로 계량하고, Phoenix ranker가 광고 웹 클릭 이후 실제 구매 금액을 continuous head로 회귀 예측하는 배선이 열렸다.</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">수 · 24분</span></li>
+<li><time class="ls-date" datetime="2026-09-15">09-15</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-15.html">arXiv cs.IR 신규 23건 triage에서 두 건이 통과했다. Pinterest PinDCO(arXiv 2609.11943, RecSys 2026 accepted)는 광고 크리에이티브를 대상으로 하는 프로덕션 dynamic creative optimization 시스템으로, 컴포넌트별 tower를 융합하는 CCFN과 wat…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></div><span class="ls-meta">화 · 27분</span></li>
+<li><time class="ls-date" datetime="2026-09-13">09-13</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-13.html">X 4세대+20(6bb4594)이 VMRanker DPP에 seed_tweet_id pinned anchor 축을 신설(집합 내부 다양성에서 참조 tweet 대비 다양성으로 확장 가능, top_k 예산 미소진)했고, 홈믹서가 Phoenix 후보 점수 로그를 기존 Thrift 스트림과 별개로 새 proto 토픽 LOGGED_SCOR…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">일 · 43분</span></li>
+<li><time class="ls-date" datetime="2026-09-12">09-12</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-12.html">X 4세대+19(fee1d0f)가 visibility-filtering의 TES·Gizmoduck Strato timeout을 각각 100/80 ms에서 통합 상수 390 ms로 3~4배 상향하면서 TES 실패 시 tweet→author_id fallback 캐시(기본 1 M entries)로 author-side rules를 살…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">토 · 47분</span></li>
+<li><time class="ls-date" datetime="2026-09-11">09-11</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-11.html">X 4세대+18(75d93d9)이 visibility-filtering의 판정 축을 FilteredReason에서 명시적 Action enum으로 옮기고, 홈 타임라인에 여섯 번째 광고 포맷 header-image-prompt-ad를 새로 배선했으며, grox LLM 입력에 30초+ 영상 preview thumbnail과 라이브 …</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">금 · 37분</span></li>
+<li><time class="ls-date" datetime="2026-09-10">09-10</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-10.html">X 4세대+17(49815da, 2026-09-08 19:23 UTC, +10,938/−982, 파일 78)에서 (1) home-mixer 랭킹 스코어러에 per-head weight perturbation이 새로 배선됐다 — MD5(salt, user_id, head)로 결정론적으로 뽑은 부호로 26개 참여 헤드 가중치를 σ·e…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">목 · 45분</span></li>
+<li><time class="ls-date" datetime="2026-09-09">09-09</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-09.html">Shopify가 Shop app·머천트 스토어프론트에 HSTU 기반 생성형 recommender를 프로덕션 배포하고 Shop orders +0.94%, high-quality CTR +5%, conversion +0.71%, recall@4 +4.8%를 A/B로 보고했다는 2026-02 산업 블로그를 뒤늦게 확인해 radar에 편…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">수 · 9분</span></li>
+<li><time class="ls-date" datetime="2026-09-08">09-08</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-08.html">Huawei AppGallery(100M+ DAU 추정)의 랭킹 모델을 MMoE에서 personalized task dependency graph로 교체한 CIKM 2026 논문 1건이 레이더 통과.</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">화 · 12분</span></li>
+<li><time class="ls-date" datetime="2026-09-07">09-07</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-07.html">월요일 산업 블로그 훑기에서 지난 배치들이 놓친 세 플랫폼의 프로덕션 배포 진술을 확인했다. Pinterest Home Feed의 Conditional Learned Retrieval(CLR) 재설계는 조건부 임베딩 retrieval을 통합 아키텍처로 확장하면서 p90 지연을 80ms에서 12ms로 85% 줄이고 7-figure …</a><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>4</b>건</li></ul></div><span class="ls-meta">월 · 29분</span></li>
+<li><time class="ls-date" datetime="2026-09-06">09-06</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-06.html">X 4세대+16(902a06f)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에 국한했으며, Phoenix serving 요청에 experiment_o…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">일 · 32분</span></li>
+<li><time class="ls-date" datetime="2026-09-05">09-05</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-05.html">X 4세대+15(2026-09-04, 9b0dc31)에서 (1) grox에 스레드 chain 단위 답글 스팸 판정 파이프라인 PlanMultiStepReplySpam이 신설됐다 — Gemma 2 한 번에 답글 스레드 전체를 넣고 &quot;스팸 인덱스 집합&quot;을 뽑아내되 진입 조건이 &quot;한 저자가 자기 답글에 자기가 답한 chain으로 roo…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">토 · 43분</span></li>
+<li><time class="ls-date" datetime="2026-09-04">09-04</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-04.html">X 4세대+14(2026-09-02, 85ac72a)에서 (1) home-mixer가 5개 피드 엔드포인트 전체에서 Phoenix에 &quot;backbone scores&quot;를 강제로 요청하기 시작했고 이에 맞춰 Phoenix proto가 backboneTopLogProbs·backboneContinuousValues 두 필드를 응답에 새로…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">금 · 53분</span></li>
+<li><time class="ls-date" datetime="2026-09-03">09-03</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-03.html">X 4세대+13(2026-09-01, 7ba7768)에서 visibility-filtering의 rule 파일 9개(2,670줄)가 3개(1,568줄)로 재구조화되고 — 정책 변화 없이 규칙 표현이 struct-per-rule에서 data-driven RuleSpec enum으로 옮겨졌으며 — 같은 커밋에서 Phoenix 랭킹 모…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul></div><span class="ls-meta">목 · 52분</span></li>
+<li><time class="ls-date" datetime="2026-09-02">09-02</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-02.html">X 4세대+12(2026-09-01, 6384ca7)에서 NSFW 게이팅 대상 16개국이 처음으로 코드에 명시됐고 Rust VF와 Scala VF의 목록 drift를 30초마다 감시하는 배선이 붙었다. 같은 커밋에 고인기 비디오 전용 안전 파이프라인 PlanSafetyPtosSpecialVideo가 신설됐다. 새 파이프라인의 진입…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">수 · 21분</span></li>
+<li><time class="ls-date" datetime="2026-09-01">09-01</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-09-01.html">Alibaba가 Taobao의 이미지 검색 지면 Pailitao에 SID(Semantic ID) 생성형 retrieval을 확장한 PailitaoGR 논문을 냈다. 오프라인 지표 +13.8%만 공개했고 프로덕션 A/B 수치는 밝히지 않았다.</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">화 · 9분</span></li>
+</ul>
+</section>
+<section class="sec" aria-labelledby="m2026-08">
+<h2 class="sec-h year" id="m2026-08">2026-08<span class="sec-n">19</span></h2>
+<ul class="ls clamp3">
+<li><time class="ls-date" datetime="2026-08-30">08-30</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-30.html">X 4세대+11 커밋(bc8e5f0, 2026-08-28T22:37:32Z, +1950/−1175, 파일 24)이 어제 daily 마감 이후에 올라왔다. visibility-filtering 24개 rule 파일이 정책 변경 없이 리팩터링되어 90건 골든 코퍼스와 배선된 rule마다 최소 한 건의 결정자 케이스가 있어야 한다는 어…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">일 · 27분</span></li>
+<li><time class="ls-date" datetime="2026-08-29">08-29</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-29.html">X 4세대+10 커밋(24c6094, 2026-08-28, +2071/−265, 파일 41)이 올라왔다. MultiRiskAdsBlender 신설(4세대+7의 BrandSafetyVerdict::HighRisk tier와 광고 BsrHigh 옵트인을 결합한 인접성 매트릭스로, HighRisk 포스트는 어떤 광고와도 인접할 수 없고…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">토 · 36분</span></li>
+<li><time class="ls-date" datetime="2026-08-28">08-28</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-28.html">X 4세대+9번째 공개(45b48ba, 2026-08-26, +873/−525, 파일 36)에는 Phoenix 체크포인트 스택의 저장·복원 양방향 RSS 상한 재정리 (신규 ThrottledD2HArrayHandler가 D2H와 write를 배치로 끊어 pinned-host 메모리를 save_concurrent_gb로 제한하고, …</a><ul class="chips"><li class="chip">읽은 자료 <b>5</b>건</li><li class="chip">정본 반영 <b>6</b>개 파일</li><li class="chip">레이더 <b>3</b>건</li></ul></div><span class="ls-meta">금 · 39분</span></li>
+<li><time class="ls-date" datetime="2026-08-27">08-27</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-27.html">X 4세대+8 커밋이 공개됐다(0d3cdd8, 2026-08-25, +5,850/−586, 파일 47). abuse-enforcement-service에 generic_actions 패스스루가 신설됐고(663줄 신규, growthbook 동적 allowlist +126), panda_reports_embedding_v10_roug…</a><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일(services/x.md, radar.md)</li><li class="chip">레이더 <b>2</b>건</li></ul></div><span class="ls-meta">목 · 46분</span></li>
+<li><time class="ls-date" datetime="2026-08-26">08-26</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-26.html">X 4세대에 여덟 번째 후속 커밋(4세대+7, d011592, 2026-08-24)이 올라왔다. VF 재작성 검증 하니스(reference_compare.rs, 812줄) 배선, BrandSafetyVerdict HighRisk tier 신설, PTOS 심판의 3개 카테고리 확장(4.5가 X_ALGO 엔드포인트로 판정 전용 재도입…</a><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일(services/x.md, radar.md)</li><li class="chip">레이더 <b>3</b>건</li></ul></div><span class="ls-meta">수 · 43분</span></li>
+<li><time class="ls-date" datetime="2026-08-24">08-24</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-24.html">추적하는 서비스(X·Meta·Netflix)에서는 새로 나온 자료가 없다. 대신 arXiv triage에서 어제 놓쳤던 GateDiffInt(arXiv 2608.18764, 2026-08-19 v1 / 2026-08-20 v2)를 확인했다. Xiaohongshu가 프로덕션 primary traffic(hundreds of mill…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일(radar)</li><li class="chip">레이더 <b>1</b>건</li></ul></div><span class="ls-meta">월 · 10분</span></li>
+<li><time class="ls-date" datetime="2026-08-23">08-23</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-23.html">X가 4세대 이후 일곱 번째 후속 커밋(28e414f, 2026-08-21)을 공개했다. (1) 광고 conversion 액션 20개를 신설했다(ADS ActionName 171–190으로, Mobile App Conversion Tracking(MACT)의 purchase·add_to_cart·level_achieved·tuto…</a></div><span class="ls-meta">일 · 48분</span></li>
+<li><time class="ls-date" datetime="2026-08-22">08-22</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-22.html">X가 4세대 이후 여섯 번째 후속 커밋(d0cef2f, 2026-08-20)을 공개했고, 여기에는 여섯 가지 변경이 담겼다. (1) AI trend feedback context hydrator(157줄 신규)를 추가해 For You에 &quot;AI trend&quot; 라벨을 붙이고, topic feedback과 나란한 두 번째 컨텍스트 채널을…</a></div><span class="ls-meta">토 · 38분</span></li>
+<li><time class="ls-date" datetime="2026-08-21">08-21</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-21.html">X가 4세대 이후 다섯 번째 후속 커밋(aad7179, 2026-08-19)에서 일곱 가지를 바꿨다. (1) Phoenix 학습이 Adam에서 Muon optimizer로 전환됐다: dense-parameter는 Newton-Schulz orthogonalization을 쓰는 Muon으로 옮기고 embedding·logits·no…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일 (services/x.md, services/netflix.md)</li><li class="chip">레이더 <b>0</b>건</li></ul></div><span class="ls-meta">금 · 30분</span></li>
+<li><time class="ls-date" datetime="2026-08-20">08-20</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-20.html">X가 4세대 이후 네 번째 후속 공개(11a71f8, 2026-08-18)에서 어제 반영한 광고 브랜드 안전 V2의 strip_v1_grok_written 헬퍼와 PROMPT_OWNED_RULES = [1400, 1410, 1420, 1500, 1510, 1610, 1700] 로직을 하루 만에 완전히 삭제하고, 그 대신 새 상수 …</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건 (X 4세대+3 공개)</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 8개 절 갱신)</li><li class="chip">레이더 갱신 <b>0</b>건</li><li class="chip">Meta 엔지니어링 블로그 <b>0</b>건(마지막 관련 글 2026-08-05, canon에 이미 반영했다)</li><li class="chip">Netflix 테크 블로그 <b>0</b>건(마지막 2026-08-07, 알고리즘과 무관하다)</li><li class="chip">arXiv cs.IR 신규 제출 <b>30</b>건을 triage했고 통과 0건(UniDot 2608.16797은 KDD Cup 2026 runner-up 결과라서 프로덕션 배포와 A/B 진술이 없고 저자 소속도 공개되지 않아 레이더 수용 기준에 미달한다)</li></ul></div><span class="ls-meta">목 · 33분</span></li>
+<li><time class="ls-date" datetime="2026-08-19">08-19</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-19.html">X가 4세대 이후 세 번째로 내놓은 후속 공개(b089ce6, 2026-08-17)에서 다음 세 가지를 확인했다. (1) 광고 브랜드 안전 판정에 V2 경로를 나란히 추가해서 Grok 라벨 6종을 _V2 버전으로 옮기고, V1 라벨 가운데 PROMPT_OWNED_RULES(botmaker rule id 7개)에 속하는 것을 강제로…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건 (X 4세대+2 공개 1건 + arXiv triage 30건 중 통과 1건 [SDF/Google Discover])</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 4개 절 갱신)</li><li class="chip">레이더 갱신 <b>1</b>건 (Google Discover SDF 신규 등록)</li><li class="chip">Meta 엔지니어링 블로그 <b>0</b>건(마지막 관련 글 2026-08-05, canon에 이미 반영)</li><li class="chip">Netflix 테크 블로그 <b>0</b>건(마지막 2026-08-07</li><li class="chip">알고리즘 무관)</li></ul></div><span class="ls-meta">수 · 38분</span></li>
+<li><time class="ls-date" datetime="2026-08-16">08-16</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-16.html">X는 4세대 초대형 공개(2026-08-13, 47c1bcd) 다음 날에 후속 커밋 c65aa17을 추가했고, 이 커밋에는 다섯 가지 변경이 담겼다. (1) 가중치 비율을 raw-count 등가로 읽으면 안 된다는 해석 규칙을 param.rs와 ranking_scorer.rs 주석 및 README에 명시했다. (2) 브라질 202…</a><ul class="chips"><li class="chip">읽은 자료 <b>1</b>건 (X 4세대+1 공개의 후속 커밋 1개</li><li class="chip">Meta/Netflix 블로그 신규 <b>0</b>건</li><li class="chip">arXiv triage <b>30</b>건 중 통과 1건 [DrEM])</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 9개 절 갱신 + sources 6건 추가)</li><li class="chip">다이어그램 갱신 <b>1</b>건 (x-pipeline.svg 필터 17→18)</li><li class="chip">레이더 갱신 <b>1</b>건 (DrEM 소속 확정 및 A/B 수치 반영)</li></ul></div><span class="ls-meta">일 · 38분</span></li>
+<li><time class="ls-date" datetime="2026-08-15">08-15</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-15.html">⚠ 주장 대량 변경: X가 2026-08-13에 4세대 코드를 공개했다. 가중치가 처음으로 실제 값과 함께 공개됐고(reply 5.0, favorite 0.5, report −234, ...), OON 배수(0.75)와 저자 다양성(decay 0.5, floor 0.25), VMRanker DPP(θ=0.65, K=150) 상수가…</a><ul class="chips"><li class="chip">읽은 자료 <b>2</b>건 (X 4세대 공개 1건</li><li class="chip">arXiv triage <b>30</b>건 중 관찰 1건)</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 대폭 개정)</li><li class="chip">다이어그램 갱신 <b>1</b>건 (x-pipeline.svg)</li><li class="chip">레이더 갱신 <b>1</b>건</li></ul></div><span class="ls-meta">토 · 43분</span></li>
+<li><time class="ls-date" datetime="2026-08-13">08-13</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-13.html">⚠ 주장 변경 — Meta가 유기 피드의 온라인 서빙 경로에 LLM을 넣었다는 최초의 진술이 ConnectionMind arXiv 논문으로 공개됐고(Llama 3.1-8B가 헤비 유저 5–10%의 hot path를 맡고 Student GNN이 나머지 90–95%를 맡는 하이브리드 구조), 같은 날 Netflix GenRec의 학술…</a><ul class="chips"><li class="chip">읽은 자료 <b>3</b>건 (정본 반영 2건, 레이더 1건)</li><li class="chip">정본 반영 <b>3</b>개 파일 (netflix.md</li><li class="chip">facebook.md</li><li class="chip">llm-in-recsys.md)</li><li class="chip">레이더 갱신 <b>2</b>건</li></ul></div><span class="ls-meta">목 · 31분</span></li>
+<li><time class="ls-date" datetime="2026-08-12">08-12</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-12.html">추적 서비스(X·Meta·Netflix)의 신규 발표는 없었으나, arXiv triage에서 Alibaba/Taobao 세 편(MetaStrategy·DREAM·IntHQ)과 Kuaishou 한 편(PushDualGen)이 같은 사흘 안에 프로덕션 진술을 담은 채로 수용 기준을 통과했다. 중국 대형 플랫폼이 서로 다른 각도에서 L…</a><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건 (모두 레이더 후보)</li><li class="chip">정본 반영 <b>0</b></li><li class="chip">레이더 신규 <b>2</b>건 + 오픈 스레드 갱신 2건</li></ul></div><span class="ls-meta">수 · 16분</span></li>
+<li><time class="ls-date" datetime="2026-08-11">08-11</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-11.html">추적 서비스(X·Meta·Netflix)의 정본을 흔들 신규 발표는 없었고, 대신 arXiv triage에서 프로덕션 진술 두 건(ByteDance 광고 20K 시퀀스 랭킹, Webtoon 파운데이션 모델 RL post-training)이 수용 기준을 통과해서 레이더에 올렸다.</a><ul class="chips"><li class="chip">읽은 자료 <b>3</b>건 (모두 레이더 후보)</li><li class="chip">정본 반영 <b>0</b></li><li class="chip">레이더 신규 <b>2</b>건 + 오픈 스레드 갱신 1건</li></ul></div><span class="ls-meta">화 · 9분</span></li>
+<li><time class="ls-date" datetime="2026-08-10">08-10</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-10.html">Netflix가 GenRec을 구동하는 서빙 인프라를 별도 블로그로 공개했고, Meta는 GEM의 훈련 인프라를 공개했다. 양쪽 다 &quot;모델이 무엇인가&quot;가 아니라 &quot;그 모델을 어떻게 돌리는가&quot;를 설명하는 문서다.</a><ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>4</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li><li class="chip">어제 인용 결함 <b>3</b>건 발견</li></ul></div><span class="ls-meta">월 · 14분</span></li>
+<li><time class="ls-date" datetime="2026-08-09">08-09</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-09.html">Meta 조사를 시작했다. Facebook, Instagram, Threads 세 지면을 다루었고 서비스를 가로지르는 topics 노트 8개를 정비했다.</a></div><span class="ls-meta">일 · 22분</span></li>
+<li><time class="ls-date" datetime="2026-08-08">08-08</time><div class="ls-body"><a class="ls-title ls-sum" href="daily-2026-08-08.html">X 조사를 시작했다. 저장소를 새로 만들었고, X 3세대 공개 소스를 전부 해부했다.</a></div><span class="ls-meta">토 · 7분</span></li>
+</ul>
+</section>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

@@ -2,237 +2,79 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-08-10 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: Netflix가 GenRec을 구동하는 서빙 인프라를 별도 블로그로 공개했고, Meta는 GEM의 훈련 인프라를 공개했다. 양쪽 다 &quot;모델이 무엇인가&quot;가 아니라 &quot;그 모델을 어떻게 돌리는가&quot;를 설명하는 문서다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-08-10.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-08-10 — feed-research">
 <meta property="og:description" content="한 줄: Netflix가 GenRec을 구동하는 서빙 인프라를 별도 블로그로 공개했고, Meta는 GEM의 훈련 인프라를 공개했다. 양쪽 다 &quot;모델이 무엇인가&quot;가 아니라 &quot;그 모델을 어떻게 돌리는가&quot;를 설명하는 문서다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-08-10.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-08-10</h1>
-  <div class="wd">월요일 · 읽는 데 약 14분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>4</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li><li class="chip">어제 인용 결함 <b>3</b>건 발견</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>Netflix가 GenRec을 구동하는 <strong>서빙 인프라</strong>를 별도 블로그로 공개했고, Meta는 GEM의 <strong>훈련 인프라</strong>를 공개했다. 양쪽 다 &quot;모델이 무엇인가&quot;가 아니라 &quot;그 모델을 어떻게 돌리는가&quot;를 설명하는 문서다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-genrec의-서빙-층이-별도-블로그로-공개됐다--netflix">1. GenRec의 서빙 층이 별도 블로그로 공개됐다 — Netflix</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c">In-House LLM Serving at Netflix</a> — netflixtechblog, 2026-07-17, 블로그
-<code>[관찰]</code> 2026-08-10 원문 URL이 Medium 리다이렉트로 열리지 않아서 archive.org의 2026-07-28 스냅샷으로 본문을 확보했다.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-08-10">2026-08-10</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>월요일</li>
+<li><span class="meta-k">읽는 시간</span>14분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>4</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li><li class="chip">어제 인용 결함 <b>3</b>건 발견</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>Netflix가 GenRec을 구동하는 <strong>서빙 인프라</strong>를 별도 블로그로 공개했고, Meta는 GEM의 <strong>훈련 인프라</strong>를 공개했다. 양쪽 다 &quot;모델이 무엇인가&quot;가 아니라 &quot;그 모델을 어떻게 돌리는가&quot;를 설명하는 문서다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">5</span></summary><ol><li><a href="#1-genrec의-서빙-층이-별도-블로그로-공개됐다--netflix"><span class="num">1</span>GenRec의 서빙 층이 별도 블로그로 공개됐다 — Netflix</a></li><li><a href="#2-gem의-훈련-인프라--llm-스택이-추천으로-그대로-넘어오지-않는다--meta-광고"><span class="num">2</span>GEM의 훈련 인프라 — LLM 스택이 추천으로 그대로 넘어오지 않는다 — Meta (광고)</a></li><li><a href="#검증에서-뒤집힌-것--어제-반영한-llatte-인용-3건이-블로그-원문에-없다">검증에서 뒤집힌 것 — 어제 반영한 LLaTTE 인용 3건이 블로그 원문에 없다</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-genrec의-서빙-층이-별도-블로그로-공개됐다--netflix"><span class="num">1</span>GenRec의 서빙 층이 별도 블로그로 공개됐다 — Netflix</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a> — netflixtechblog, 2026-07-17, 블로그
+<span class="badge obs">관찰</span> 2026-08-10 원문 URL이 Medium 리다이렉트로 열리지 않아서 archive.org의 2026-07-28 스냅샷으로 본문을 확보했다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span>
-GenRec은 Netflix가 쓰는 LLM 기반 랭커다 (<a href="netflix.html">services/netflix.md</a> GenRec 절). 여기서 오해하기 쉬운 지점이 하나 있는데, GenRec은 추천 결과를 <strong>문장으로 생성</strong>하지 않는다. LLM 백본이 유저 이력을 읽어 pooled hidden state를 하나 만들고, 그 상태를 학습된 아이템 임베딩과 결합해 점수를 낸다. 결합 방식은 원문이 <em>&quot;(e.g., via dot product or small MLP)&quot;</em> 라고만 적어 열어 두었다 <code>[확인]</code>. 즉 LLM은 유저 표현을 만드는 인코더이고, 점수를 매기는 쪽은 여전히 임베딩 기반이다.</p></div>
+GenRec은 Netflix가 쓰는 LLM 기반 랭커다 (<a href="netflix.html">services/netflix.md</a> GenRec 절). 여기서 오해하기 쉬운 지점이 하나 있는데, GenRec은 추천 결과를 <strong>문장으로 생성</strong>하지 않는다. LLM 백본이 유저 이력을 읽어 pooled hidden state를 하나 만들고, 그 상태를 학습된 아이템 임베딩과 결합해 점수를 낸다. 결합 방식은 원문이 <em>&quot;(e.g., via dot product or small MLP)&quot;</em> 라고만 적어 열어 두었다 <span class="badge ok">확인</span>. 즉 LLM은 유저 표현을 만드는 인코더이고, 점수를 매기는 쪽은 여전히 임베딩 기반이다.</p></div>
 <p>이 구조가 중요한 이유는 서빙 비용에 있다. 후보 하나마다 LLM을 한 번씩 돌리는 방식이 아니라 <strong>후보 집합 전체를 1패스</strong>로 처리하므로 생성 단계(decode)가 사실상 필요 없고, 프롬프트를 읽어 내부 상태만 만드는 prefill 단계만 쓴다. 오늘 자료는 그 prefill 전용 워크로드를 위해 Netflix가 어떤 엔진을 골랐고, 그 엔진에서 무엇이 병목이었는지를 설명하는 글이다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>GenRec이 서빙 스택 선정 기준의 4대 워크로드 가운데 하나로 명시되어 있다</strong> <code>[확인]</code> — <em>&quot;prefill-only inference for ranking and retrieval&quot;</em> 가 Netflix를 TensorRT-LLM에서 vLLM으로 옮기게 만든 워크로드 확장의 한 축이라고 블로그가 직접 밝힌다. 엔진 전환은 2025년 여름에 이뤄졌고, V1 마이그레이션은 Q4 2025에 진행했다. <strong>GenRec이 실험적 부산물이 아니라 인프라를 채택한 이유 자체에 들어가 있다.</strong></p>
+<li><p><strong>GenRec이 서빙 스택 선정 기준의 4대 워크로드 가운데 하나로 명시되어 있다</strong> <span class="badge ok">확인</span> — <em>&quot;prefill-only inference for ranking and retrieval&quot;</em> 가 Netflix를 TensorRT-LLM에서 vLLM으로 옮기게 만든 워크로드 확장의 한 축이라고 블로그가 직접 밝힌다. 엔진 전환은 2025년 여름에 이뤄졌고, V1 마이그레이션은 Q4 2025에 진행했다. <strong>GenRec이 실험적 부산물이 아니라 인프라를 채택한 이유 자체에 들어가 있다.</strong></p>
 </li>
-<li><p><strong>constrained decoding의 배치 스케일링이 GenRec 배치 서빙의 상한을 결정했다</strong> <code>[확인]</code> — constrained decoding은 모델이 정해진 후보 목록 밖의 토큰을 고르지 못하게 막는 처리를 말한다. vLLM V0에서는 이 처리를 커스텀 logits processor로 구현했는데, Python GIL 때문에 요청마다 순차적으로 실행됐다.</p>
+<li><p><strong>constrained decoding의 배치 스케일링이 GenRec 배치 서빙의 상한을 결정했다</strong> <span class="badge ok">확인</span> — constrained decoding은 모델이 정해진 후보 목록 밖의 토큰을 고르지 못하게 막는 처리를 말한다. vLLM V0에서는 이 처리를 커스텀 logits processor로 구현했는데, Python GIL 때문에 요청마다 순차적으로 실행됐다.</p>
 <blockquote>
 <p>&quot;CPU time in logit processing therefore grows linearly with batch size&quot;
-— <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c">In-House LLM Serving at Netflix</a> (블로그), 2026-07-17</p>
+— <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a> (블로그), 2026-07-17</p>
 </blockquote>
 <p>V1에서는 batch-level 처리와 hot path의 C++ 구현, multi-threading을 적용해 다시 만들었고, 그 결과 <em>&quot;logits processing time staying flat as batch size grows&quot;</em> 를 얻었다. GenRec의 &quot;후보 집합 전체 1패스&quot; 채점이 배치 규모를 키워도 성립하는 이유를 하드웨어와 엔진 쪽에서 설명해 주는 내용이다.</p>
 </li>
-<li><p><strong>&quot;special snowflake 없음&quot; 원칙으로 LLM 서빙을 기존 스택에 통합한다</strong> <code>[확인]</code></p>
+<li><p><strong>&quot;special snowflake 없음&quot; 원칙으로 LLM 서빙을 기존 스택에 통합한다</strong> <span class="badge ok">확인</span></p>
 <blockquote>
 <p>&quot;Every model — XGBoost ensemble or large-scale LLMs — is scored via the same gRPC call&quot;
-— <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c">같은 블로그</a>, 2026-07-17</p>
+— <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">같은 블로그</a>, 2026-07-17</p>
 </blockquote>
 <p>OpenAI-compatible API는 별도의 프론트엔드로만 추가했다. 소형 모델은 CPU에서 in-process로 처리하고, 대형 모델은 원격 MSS(Model Scoring Service)로 보낸다.</p>
 </li>
-<li><p><strong>아키텍처 구성요소를 확인했다</strong> <code>[확인]</code> — MSS · Triton · Java control plane을 쓰고, 모델 가중치를 미리 파일시스템에 풀어 두는 FSx pre-materialization을 적용하며, 배포는 Red-Black과 Versioned 두 가지 방식으로 한다.</p>
+<li><p><strong>아키텍처 구성요소를 확인했다</strong> <span class="badge ok">확인</span> — MSS · Triton · Java control plane을 쓰고, 모델 가중치를 미리 파일시스템에 풀어 두는 FSx pre-materialization을 적용하며, 배포는 Red-Black과 Versioned 두 가지 방식으로 한다.</p>
 </li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span></p></div>
@@ -241,25 +83,26 @@ GenRec은 Netflix가 쓰는 LLM 기반 랭커다 (<a href="netflix.html">service
 <li><a href="llm-in-recsys.html">topics/llm-in-recsys.md</a> — Netflix 사례에 각주를 한 문단 붙였다. GenRec이 vLLM 채택의 4대 워크로드에 명시적으로 열거된다는 사실이다</li>
 </ul>
 <div class="blk why"><p><span class="lbl">의미</span>
-Meta와 Netflix가 <strong>서로 다른 축으로 통합</strong>하고 있다. Meta는 인덱스와 모델을 합쳤고(SilverTorch가 말하는 &quot;index as model&quot;이며, <a href="embedding-retrieval.html">topics/embedding-retrieval.md</a>에 정리해 두었다), Netflix는 XGBoost와 PyTorch와 LLM을 <strong>하나의 호출 인터페이스</strong>로 합쳤다 <code>[추정]</code> (두 회사가 서로를 언급하지 않으므로 이 대비는 우리 쪽 해석이다).</p></div>
-<p>그리고 &quot;LLM 랭커를 넣었다&quot;는 진술 뒤에는 <strong>엔진 층의 재구현</strong>이 놓여 있다 <code>[추정]</code>. 배치 규모를 키워도 성능이 유지되려면 logits 처리를 batch-level로 다시 작성하는 작업이 먼저 필요했다는 점이 근거다. 다만 블로그는 그 재구현을 누가 했는지(vLLM 업스트림인지 Netflix인지) 밝히지 않으므로, &quot;Netflix가 엔진을 고쳤다&quot;고까지는 쓰지 않는다.</p>
-<h2 id="2-gem의-훈련-인프라--llm-스택이-추천으로-그대로-넘어오지-않는다--meta-광고">2. GEM의 훈련 인프라 — LLM 스택이 추천으로 그대로 넘어오지 않는다 — Meta (광고)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/">Training GEM at LLM Scale</a> — engineering.fb.com, 2026-08-03, 블로그</p></div>
+Meta와 Netflix가 <strong>서로 다른 축으로 통합</strong>하고 있다. Meta는 인덱스와 모델을 합쳤고(SilverTorch가 말하는 &quot;index as model&quot;이며, <a href="embedding-retrieval.html">topics/embedding-retrieval.md</a>에 정리해 두었다), Netflix는 XGBoost와 PyTorch와 LLM을 <strong>하나의 호출 인터페이스</strong>로 합쳤다 <span class="badge est">추정</span> (두 회사가 서로를 언급하지 않으므로 이 대비는 우리 쪽 해석이다).</p></div>
+<p>그리고 &quot;LLM 랭커를 넣었다&quot;는 진술 뒤에는 <strong>엔진 층의 재구현</strong>이 놓여 있다 <span class="badge est">추정</span>. 배치 규모를 키워도 성능이 유지되려면 logits 처리를 batch-level로 다시 작성하는 작업이 먼저 필요했다는 점이 근거다. 다만 블로그는 그 재구현을 누가 했는지(vLLM 업스트림인지 Netflix인지) 밝히지 않으므로, &quot;Netflix가 엔진을 고쳤다&quot;고까지는 쓰지 않는다.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="2-gem의-훈련-인프라--llm-스택이-추천으로-그대로-넘어오지-않는다--meta-광고"><span class="num">2</span>GEM의 훈련 인프라 — LLM 스택이 추천으로 그대로 넘어오지 않는다 — Meta (광고)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">Training GEM at LLM Scale</a> — engineering.fb.com, 2026-08-03, 블로그</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span>
 GEM은 Meta 광고 랭킹의 파운데이션 모델이고, 계보상 DHEN → Wukong → InterFormer의 후속에 해당한다 (<a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a> 계보 B). 지금까지 우리 정본은 GEM을 <strong>모델 구조</strong>로만 다루고 있었다. 오늘 자료는 그 모델을 어떻게 학습시키는지, 그리고 왜 LLM 훈련 스택을 재사용할 수 없었는지를 설명하는 글이다.</p></div>
 <p>MFU(Model FLOPs Utilization)는 GPU가 이론 성능 대비 실제로 몇 %를 쓰고 있는지 나타내는 지표다. 대규모 훈련에서 이 값이 낮으면 사 둔 GPU를 놀리는 셈이므로, MFU를 올리는 일이 인프라 팀의 1차 목표가 된다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>12개월간 MFU 2배 · 총 FLOPs 4배, 현재 E2E MFU 20~25%</strong> <code>[확인]</code></p>
+<li><p><strong>12개월간 MFU 2배 · 총 FLOPs 4배, 현재 E2E MFU 20~25%</strong> <span class="badge ok">확인</span></p>
 </li>
-<li><p><strong>LLM용 인프라가 추천으로 직접 이전되지 않는다고 스스로 밝힌다</strong> <code>[확인]</code></p>
+<li><p><strong>LLM용 인프라가 추천으로 직접 이전되지 않는다고 스스로 밝힌다</strong> <span class="badge ok">확인</span></p>
 <blockquote>
 <p>&quot;AI infrastructure optimized for LLM training ... does not directly transfer, requiring significant innovation and hardware/software co-design&quot;
-— <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/">Training GEM at LLM Scale</a> (블로그), 2026-08-03</p>
+— <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">Training GEM at LLM Scale</a> (블로그), 2026-08-03</p>
 </blockquote>
 <p>실제로 새로 만든 것은 커스텀 커널(JFA · GDPA · BlockAttention), MXFP8 저정밀 학습, 5D 병렬화, SM-free collectives다. 추천 워크로드가 다루는 sparse embedding과 jagged tensor(길이가 제각각인 시퀀스 텐서), 이질적 attention이 LLM 훈련 스택과 근본적으로 다르다는 뜻이다.</p>
 </li>
-<li><p><strong>DHEN이 GEM 안에서 expert 모듈로 남아 있다는 사실이 처음 명시됐다</strong> <code>[확인]</code> — 본문에 <em>&quot;Deep Hierarchical Ensemble Network experts&quot;</em> 라는 표현이 나온다. 지금까지는 계보 표의 GEM 항목을 &quot;Wukong + InterFormer 통합&quot;으로만 이해하고 있었는데, 실제로는 <strong>DHEN도 그 안에 흡수</strong>되어 있다.</p>
+<li><p><strong>DHEN이 GEM 안에서 expert 모듈로 남아 있다는 사실이 처음 명시됐다</strong> <span class="badge ok">확인</span> — 본문에 <em>&quot;Deep Hierarchical Ensemble Network experts&quot;</em> 라는 표현이 나온다. 지금까지는 계보 표의 GEM 항목을 &quot;Wukong + InterFormer 통합&quot;으로만 이해하고 있었는데, 실제로는 <strong>DHEN도 그 안에 흡수</strong>되어 있다.</p>
 </li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span></p></div>
@@ -267,11 +110,12 @@ GEM은 Meta 광고 랭킹의 파운데이션 모델이고, 계보상 DHEN → Wu
 <li><a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a> — 계보 B 표에 &quot;2026-08 GEM training&quot; 행을 추가하고, <strong>GEM training 인프라 절을 새로 만들었다</strong>(커스텀 커널, MXFP8, 5D 병렬화, DHEN이 GEM 내부의 expert로 남아 있다는 점). 출처에도 이 블로그를 추가했다</li>
 </ul>
 <div class="blk why"><p><span class="lbl">의미</span>
-&quot;추천 모델도 LLM처럼 스케일한다&quot;는 주장(<a href="radar.html">radar.md</a> 스케일링 법칙 스레드)은 그대로 유지되지만, <strong>스케일의 비용 구조가 다르다</strong>는 반례가 붙었다. 스케일링 법칙이 성립하더라도 LLM 훈련 스택을 그대로 재사용할 수 없다면, 진입 장벽은 모델 설계가 아니라 커널과 병렬화 쪽에 남는다 <code>[추정]</code>.
+&quot;추천 모델도 LLM처럼 스케일한다&quot;는 주장(<a href="radar.html">radar.md</a> 스케일링 법칙 스레드)은 그대로 유지되지만, <strong>스케일의 비용 구조가 다르다</strong>는 반례가 붙었다. 스케일링 법칙이 성립하더라도 LLM 훈련 스택을 그대로 재사용할 수 없다면, 진입 장벽은 모델 설계가 아니라 커널과 병렬화 쪽에 남는다 <span class="badge est">추정</span>.
 그리고 계보 표의 정확도가 한 단계 올라갔다. &quot;Wukong·InterFormer 통합&quot;이라는 이해는 그대로 유효하고, 거기에 <strong>DHEN도 그 안에 들어 있다</strong>는 사실이 더해졌다.</p></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="검증에서-뒤집힌-것--어제-반영한-llatte-인용-3건이-블로그-원문에-없다">검증에서 뒤집힌 것 — 어제 반영한 LLaTTE 인용 3건이 블로그 원문에 없다</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/">From User Sequences to Scaling Laws</a> — engineering.fb.com, 2026-08-05, 블로그 (어제 이미 반영한 자료를 <strong>인용 재검증 목적으로 다시 읽었다</strong>)</p></div>
-<p><code>[관찰]</code> 2026-08-10 원문을 다시 받아 <code>/tmp/llatte-blog.html</code>에 저장하고 grep으로 대조했다. 어제 정본에 넣은 인용 4건 가운데 <strong>3건이 블로그 본문에 없다.</strong></p>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">From User Sequences to Scaling Laws</a> — engineering.fb.com, 2026-08-05, 블로그 (어제 이미 반영한 자료를 <strong>인용 재검증 목적으로 다시 읽었다</strong>)</p></div>
+<p><span class="badge obs">관찰</span> 2026-08-10 원문을 다시 받아 <code>/tmp/llatte-blog.html</code>에 저장하고 grep으로 대조했다. 어제 정본에 넣은 인용 4건 가운데 <strong>3건이 블로그 본문에 없다.</strong></p>
 <ul>
 <li><p>❌ <em>&quot;Deployed as the largest user model at Meta&quot;</em> — 원문에 없다</p>
 </li>
@@ -280,7 +124,7 @@ GEM은 Meta 광고 랭킹의 파운데이션 모델이고, 계보상 DHEN → Wu
 <li><p>❌ <em>&quot;semantic features bend the scaling curve: they are a prerequisite for scaling&quot;</em> — 원문에 &quot;prerequisite&quot; 이라는 단어가 없다. 대응하는 문장은 훨씬 완화된 표현이다:</p>
 <blockquote>
 <p>&quot;Semantic content features from foundation models complement traditional collaborative filtering... especially helpful in cold-start scenarios&quot;
-— <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/">From User Sequences to Scaling Laws</a> (블로그), 2026-08-05</p>
+— <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">From User Sequences to Scaling Laws</a> (블로그), 2026-08-05</p>
 </blockquote>
 </li>
 <li><p>✓ <em>&quot;a two-stage architecture that offloads the heavy computation...&quot;</em> — 이 한 건은 원문에 있다고 확인했다</p>
@@ -288,95 +132,41 @@ GEM은 Meta 광고 랭킹의 파운데이션 모델이고, 계보상 DHEN → Wu
 </ul>
 <p><strong>어떻게 처리했나</strong>
 <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a> LLaTTE 절에 재검증 실패 표시를 붙이고, 블로그가 실제로 밝힌 A/B 수치(6% / 3% / 3.5%, cumulative)로 교체했다. dense tokenization과 target-aware attention의 정식화는 원문 인용으로 다시 실었다.</p>
-<p><code>[추정]</code> 위 3건은 <strong>LLaTTE 논문</strong>(<a href="https://arxiv.org/abs/2601.20083">arXiv 2601.20083</a>)에서 나왔을 가능성이 높다. 어제 정본이 논문 문장을 블로그 인용으로 표기했을 것으로 본다. 이를 확정하려면 논문 원문과 대조해야 하므로 <strong>심층 분석 필요</strong>로 남긴다.</p>
+<p><span class="badge est">추정</span> 위 3건은 <strong>LLaTTE 논문</strong>(<a href="https://arxiv.org/abs/2601.20083" target="_blank" rel="noopener">arXiv 2601.20083</a>)에서 나왔을 가능성이 높다. 어제 정본이 논문 문장을 블로그 인용으로 표기했을 것으로 본다. 이를 확정하려면 논문 원문과 대조해야 하므로 <strong>심층 분석 필요</strong>로 남긴다.</p>
 <p><strong>교훈 두 개</strong></p>
 <ol>
 <li>어제 적대적 검증 2판을 통과했던 인용이 오늘 <strong>원문 재수집</strong>에서 결함을 드러냈다. 적대적 검증은 &quot;쓰여 있는 내용끼리 서로 맞는가&quot;를 보고, 원문 재수집은 &quot;원문에 실제로 있는가&quot;를 보므로 둘은 서로 다른 검사다.</li>
-<li>Meta 블로그는 <strong>URL이 같아도 편집될 수 있다</strong> <code>[추정]</code>(발표한 뒤에 문구를 조정하는 관행이 있어 보인다). 그리고 논문과 블로그를 함께 적는 계보 절에서는 인용 출처가 섞이기 쉽다. 그래서 <strong>앞으로 모든 인용 옆에 (블로그) / (논문)을 명시한다.</strong> 이 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md">CLAUDE.md</a> 링크 규칙에 넣어 두었다.</li>
+<li>Meta 블로그는 <strong>URL이 같아도 편집될 수 있다</strong> <span class="badge est">추정</span>(발표한 뒤에 문구를 조정하는 관행이 있어 보인다). 그리고 논문과 블로그를 함께 적는 계보 절에서는 인용 출처가 섞이기 쉽다. 그래서 <strong>앞으로 모든 인용 옆에 (블로그) / (논문)을 명시한다.</strong> 이 규칙은 <a href="https://github.com/snutiise/feed-research/blob/main/CLAUDE.md" target="_blank" rel="noopener">CLAUDE.md</a> 링크 규칙에 넣어 두었다.</li>
 </ol>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="레이더">레이더</h2>
 <p>arXiv cs.IR 신규 제출 30건을 triage한 결과 2건이 수용 기준을 통과했다. 둘 다 <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 추가하고 최종 갱신을 2026-08-10으로 올렸다.</p>
 <ul>
-<li><strong>Gryphon-v2 (Yandex Music)</strong> — <a href="https://arxiv.org/abs/2608.06213">arXiv 2608.06213</a>, 2026-08-06. 유저 이력을 1회 인코딩하고 Semantic-ID로 후보를 생성한 다음, 공유 인코더 상태를 재사용하는 item-level 랭커로 이어지는 구조이며, <strong>retrieval과 rerank와 rank를 단일 모델로</strong> 대체한다. 프로덕션 A/B에서 <em>&quot;replaces the production cascade of 15+ candidate generators, pre-ranking and final ranking&quot;</em> 라고 밝혔고, active users는 +1.41% 늘었다 <code>[확인]</code>. GenRec과 정면으로 대응하는 두 번째 프로덕션 진술이다. GenRec은 <strong>랭킹 경로만</strong> LLM으로 처리하는 반면, 이쪽은 <strong>retrieval까지 통합</strong>했다.</li>
-<li><strong>Multi-Objective Ranking for Live-Streaming (Twitch, Amazon)</strong> — <a href="https://arxiv.org/abs/2608.04455">arXiv 2608.04455</a>, 2026-08-05. 라이브 스트리밍에서 즉시 신호(click, initial watch)와 지연 신호(session length, retention)의 시간 스케일이 서로 다른 문제를 다룬다. <strong>delayed window collection + multi-model architecture</strong>로 나눠서 학습한 뒤에 결합한다. mobile live feed 온라인 A/B에서 DAV와 ARPU가 유의미하게 개선됐다고 밝힌다 <code>[확인]</code>. Netflix의 라이브 콜드스타트(RecSys 2025)와 인접하지만, 이쪽은 일반 라이브 피드의 다목적 랭킹을 다룬다.</li>
+<li><strong>Gryphon-v2 (Yandex Music)</strong> — <a href="https://arxiv.org/abs/2608.06213" target="_blank" rel="noopener">arXiv 2608.06213</a>, 2026-08-06. 유저 이력을 1회 인코딩하고 Semantic-ID로 후보를 생성한 다음, 공유 인코더 상태를 재사용하는 item-level 랭커로 이어지는 구조이며, <strong>retrieval과 rerank와 rank를 단일 모델로</strong> 대체한다. 프로덕션 A/B에서 <em>&quot;replaces the production cascade of 15+ candidate generators, pre-ranking and final ranking&quot;</em> 라고 밝혔고, active users는 +1.41% 늘었다 <span class="badge ok">확인</span>. GenRec과 정면으로 대응하는 두 번째 프로덕션 진술이다. GenRec은 <strong>랭킹 경로만</strong> LLM으로 처리하는 반면, 이쪽은 <strong>retrieval까지 통합</strong>했다.</li>
+<li><strong>Multi-Objective Ranking for Live-Streaming (Twitch, Amazon)</strong> — <a href="https://arxiv.org/abs/2608.04455" target="_blank" rel="noopener">arXiv 2608.04455</a>, 2026-08-05. 라이브 스트리밍에서 즉시 신호(click, initial watch)와 지연 신호(session length, retention)의 시간 스케일이 서로 다른 문제를 다룬다. <strong>delayed window collection + multi-model architecture</strong>로 나눠서 학습한 뒤에 결합한다. mobile live feed 온라인 A/B에서 DAV와 ARPU가 유의미하게 개선됐다고 밝힌다 <span class="badge ok">확인</span>. Netflix의 라이브 콜드스타트(RecSys 2025)와 인접하지만, 이쪽은 일반 라이브 피드의 다목적 랭킹을 다룬다.</li>
 </ul>
 <p>나머지 28건은 순수 학술 증분이거나 도메인이 한정되어 탈락했다.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
-<li><strong>LLaTTE 논문 원문 대조</strong> — 위 3건이 <a href="https://arxiv.org/abs/2601.20083">arXiv 2601.20083</a> 본문에 있는지 확인해서 등급을 정정한다. <code>[관찰]</code> 2026-08-10 시점에 아직 해소하지 못했다 (<strong>심층 분석 필요</strong>)</li>
+<div class="next"><ul>
+<li><strong>LLaTTE 논문 원문 대조</strong> — 위 3건이 <a href="https://arxiv.org/abs/2601.20083" target="_blank" rel="noopener">arXiv 2601.20083</a> 본문에 있는지 확인해서 등급을 정정한다. <span class="badge obs">관찰</span> 2026-08-10 시점에 아직 해소하지 못했다 (<strong>심층 분석 필요</strong>)</li>
 <li><strong>Meta GEM training 후속</strong> — 광고 파운데이션 모델의 훈련 스택이 사실상 별도의 문서 계열이 됐다. <code>topics/training-infra.md</code>를 새로 만들어야 할 수도 있지만, X와 Netflix에 대응하는 자료가 없으므로 지금은 만들지 않고 기다린다</li>
 <li><strong>Gryphon-v2 vs Netflix GenRec</strong> — 두 프로덕션 진술이 generate-and-rank의 두 극단(retrieval 통합과 랭킹 전용)을 보여준다. 세 번째 회사의 진술이 나오면 <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>에 새 절을 만든다</li>
 <li><strong>GenRec 실시간 지면 적용 여부</strong> — 어제 열어 둔 질문이다. 오늘도 후속 글이 없어서 그대로 유지한다</li>
-</ul>
+</ul></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-08-09.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-09</div></a><a class="r" href="daily-2026-08-11.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-11</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-08-09.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-08-09</span></a><a class="pg-next" href="daily-2026-08-11.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-08-11</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

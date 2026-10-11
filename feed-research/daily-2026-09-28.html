@@ -2,239 +2,81 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-28 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: Pinterest가 표준 광고 lightweight ranking 모델을 two-tower + cross tower 하이브리드로 확장하고, 같은 모델이 후보 전량엔 fast two-tower 점수를, 상위 서브셋엔 slow three-tower 점수를 내는…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-28.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-28 — feed-research">
 <meta property="og:description" content="한 줄: Pinterest가 표준 광고 lightweight ranking 모델을 two-tower + cross tower 하이브리드로 확장하고, 같은 모델이 후보 전량엔 fast two-tower 점수를, 상위 서브셋엔 slow three-tower 점수를 내는…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-28.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-28</h1>
-  <div class="wd">월요일 · 읽는 데 약 16분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>Pinterest가 표준 광고 lightweight ranking 모델을 <strong>two-tower + cross tower</strong> 하이브리드로 확장하고, 같은 모델이 후보 전량엔 fast two-tower 점수를, 상위 서브셋엔 slow three-tower 점수를 내는 <strong>co-train + two-stage 서빙</strong>으로 프로덕션에 배포했다는 진술을 냈다(CTR·gCTR30·oCTR 각 ~1% 상승, CPC ~1% 감소).</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-pinterest-3-tower-engagement-co-train--광고-lightweight-ranking을-two-tower-밖으로-프로덕션-ab에서-ctrgctr30octr-각-1-상승cpc-1-감소로-launched--레이더">1. Pinterest 3-Tower Engagement Co-Train — 광고 lightweight ranking을 two-tower 밖으로, 프로덕션 A/B에서 CTR·gCTR30·oCTR 각 ~1% 상승·CPC ~1% 감소로 launched — 레이더</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14">Beyond Two Towers: Launching the 3-Tower Engagement Co-Train Model (Part 2)</a> — 2026-09-17, Pinterest Engineering Blog, 저자 8인. 마지막 저자 Zhaohong Han의 직책은 &quot;Manager II, Ads Lightweight Ranking&quot;으로 명시돼 있다. 참조된 Part 1은 Xiao Yang 등의 &quot;Beyond Two Towers: Re-architecting the Serving Stack for Next-Gen Ads Lightweight Ranking Models (Part 1)&quot; — 저장소에서는 아직 정본에 반영하지 않은 선행 자료다.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-28">2026-09-28</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>월요일</li>
+<li><span class="meta-k">읽는 시간</span>16분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>Pinterest가 표준 광고 lightweight ranking 모델을 <strong>two-tower + cross tower</strong> 하이브리드로 확장하고, 같은 모델이 후보 전량엔 fast two-tower 점수를, 상위 서브셋엔 slow three-tower 점수를 내는 <strong>co-train + two-stage 서빙</strong>으로 프로덕션에 배포했다는 진술을 냈다(CTR·gCTR30·oCTR 각 ~1% 상승, CPC ~1% 감소).</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-pinterest-3-tower-engagement-co-train--광고-lightweight-ranking을-two-tower-밖으로-프로덕션-ab에서-ctrgctr30octr-각-1-상승cpc-1-감소로-launched--레이더"><span class="num">1</span>Pinterest 3-Tower Engagement Co-Train — 광고 lightweight ranking을 two-tower 밖으로, 프로덕션 A/B에서 CTR·gCTR30·oCTR 각 ~1% 상승·CPC ~1% 감소로 launched — 레이더</a></li><li><a href="#조회-요약">조회 요약</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-pinterest-3-tower-engagement-co-train--광고-lightweight-ranking을-two-tower-밖으로-프로덕션-ab에서-ctrgctr30octr-각-1-상승cpc-1-감소로-launched--레이더"><span class="num">1</span>Pinterest 3-Tower Engagement Co-Train — 광고 lightweight ranking을 two-tower 밖으로, 프로덕션 A/B에서 CTR·gCTR30·oCTR 각 ~1% 상승·CPC ~1% 감소로 launched — 레이더</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14" target="_blank" rel="noopener">Beyond Two Towers: Launching the 3-Tower Engagement Co-Train Model (Part 2)</a> — 2026-09-17, Pinterest Engineering Blog, 저자 8인. 마지막 저자 Zhaohong Han의 직책은 &quot;Manager II, Ads Lightweight Ranking&quot;으로 명시돼 있다. 참조된 Part 1은 Xiao Yang 등의 &quot;Beyond Two Towers: Re-architecting the Serving Stack for Next-Gen Ads Lightweight Ranking Models (Part 1)&quot; — 저장소에서는 아직 정본에 반영하지 않은 선행 자료다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> Pinterest의 표준 광고 스택은 유저 요청 하나당 후보 광고를 수십만 건 채점한다. 블로그 본문 진술로 <strong>post-targeting 후보 수의 P99이 200K를 넘는 지면도 있다</strong>. 이 규모를 소화하기 위해 오래 써 온 아키텍처가 <strong>two-tower</strong>다 — 유저 쪽(query)과 아이템 쪽(Pin)을 각각 임베딩으로 만들어 두고 dot product로 채점한다. Pin 쪽 임베딩은 요청 밖에서 미리 계산해 캐시할 수 있으므로 후보가 아무리 많아도 채점 자체는 저렴하다. 대신 표현력이 얕다. query와 Pin의 상호작용을 dot product 한 번으로만 처리하기 때문에 유저 시퀀스와 후보 피처 간 고차 상호작용을 잡아내지 못한다.</p></div>
 <p>Pinterest는 앞선 글(Part 1)에서 <strong>Nexus</strong>라는 서빙 스택을 배포해 candidate generation과 scoring을 분리했다. 이번 Part 2는 그 위에 얹는 첫 번째 모델링 진술이다. 즉 Nexus가 &quot;cross-attention이든 시퀀스 모델링이든 원리적으로 서빙 가능한 판&quot;을 마련했고, 이번 글은 그 판에서 <strong>표현력을 늘리되 서빙 예산 안에 들어오는</strong> 첫 아키텍처를 정한 이야기다.</p>
 <p>Lightweight ranking은 랭킹 파이프라인의 초기 단계다. Pinterest 광고 파이프라인에서는 후보 광고를 수십만 건 받아 상위 N건으로 자르는 자리로, 뒤에 나오는 fine ranking(더 무거운 모델)이 남은 후보만 세밀하게 채점하도록 한다. 이 자리에서 two-tower 이상을 굳이 쓰지 않는 것이 업계 관행이었다 — 후보 수가 너무 많아 무거운 모델을 붙일 여지가 없기 때문이다. 이번 글은 그 관행을 뒤집는 첫 프로덕션 진술이다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>아키텍처: two-tower + cross tower + inter module의 3-tower 구조</strong> <code>[확인]</code>. 기존 two-tower(query·Pin)를 그대로 두고, <strong>cross tower</strong>를 세 번째 tower로 얹는다. Cross tower는 세 종류의 유저 시퀀스(<strong>organic engagement, ads engagement, search history</strong>)와 네 종류의 후보 피처(<strong>advertiser ID, campaign ID, GraphSAGE 임베딩, Pin PinnerSAGE 임베딩</strong>)를 입력으로 받는다. 핵심 설계는 &quot;<strong>후보 피처를 query token으로 만들어서</strong> 유저 시퀀스와 cross-attention을 계산한다&quot;는 것이다. 이렇게 하면 attention의 query 축을 후보 피처 개수로 통제할 수 있어 서빙 비용이 후보 수에 따라 폭발하지 않는다. Inter module은 query·Pin·cross 세 임베딩을 shared-bottom MLP로 합쳐 세 태스크의 logit을 만든다. 저자들은 DCN(Deep &amp; Cross Network) 층을 쌓거나 MMoE를 넣는 대안도 시도했지만, shared-bottom MLP가 성능 손실 대비 지연 이득이 가장 컸다고 진술한다.</p>
+<li><p><strong>아키텍처: two-tower + cross tower + inter module의 3-tower 구조</strong> <span class="badge ok">확인</span>. 기존 two-tower(query·Pin)를 그대로 두고, <strong>cross tower</strong>를 세 번째 tower로 얹는다. Cross tower는 세 종류의 유저 시퀀스(<strong>organic engagement, ads engagement, search history</strong>)와 네 종류의 후보 피처(<strong>advertiser ID, campaign ID, GraphSAGE 임베딩, Pin PinnerSAGE 임베딩</strong>)를 입력으로 받는다. 핵심 설계는 &quot;<strong>후보 피처를 query token으로 만들어서</strong> 유저 시퀀스와 cross-attention을 계산한다&quot;는 것이다. 이렇게 하면 attention의 query 축을 후보 피처 개수로 통제할 수 있어 서빙 비용이 후보 수에 따라 폭발하지 않는다. Inter module은 query·Pin·cross 세 임베딩을 shared-bottom MLP로 합쳐 세 태스크의 logit을 만든다. 저자들은 DCN(Deep &amp; Cross Network) 층을 쌓거나 MMoE를 넣는 대안도 시도했지만, shared-bottom MLP가 성능 손실 대비 지연 이득이 가장 컸다고 진술한다.</p>
 </li>
-<li><p><strong>세 태스크: pCTR / pGCTR30 / pOCTR</strong> <code>[확인]</code>. <strong>pCTR</strong>은 광고 클릭 확률, <strong>pGCTR30</strong>은 클릭이 30초 이상 지속되는 good click 확률(광고 랜딩 페이지에서 유저가 실제로 머무르는지), <strong>pOCTR</strong>은 outbound click 확률(광고주 사이트로 이탈하는 클릭)이다. Pinterest 광고 랭킹이 세 지표를 동시에 최적화하고 있다는 정황은 이전에도 있었지만, 이번 글이 lightweight ranking 자리에서 세 지표를 한 모델의 세 head로 잡는다는 프로덕션 진술을 처음 공개했다.</p>
+<li><p><strong>세 태스크: pCTR / pGCTR30 / pOCTR</strong> <span class="badge ok">확인</span>. <strong>pCTR</strong>은 광고 클릭 확률, <strong>pGCTR30</strong>은 클릭이 30초 이상 지속되는 good click 확률(광고 랜딩 페이지에서 유저가 실제로 머무르는지), <strong>pOCTR</strong>은 outbound click 확률(광고주 사이트로 이탈하는 클릭)이다. Pinterest 광고 랭킹이 세 지표를 동시에 최적화하고 있다는 정황은 이전에도 있었지만, 이번 글이 lightweight ranking 자리에서 세 지표를 한 모델의 세 head로 잡는다는 프로덕션 진술을 처음 공개했다.</p>
 </li>
-<li><p><strong>co-train으로 fast + slow 헤드를 한 모델에 담는다</strong> <code>[확인]</code>. 같은 모델이 <strong>모든 후보에 대해 두 tower dot product로 빠른 점수</strong>를, <strong>선택된 서브셋에 대해 3-tower 경로로 정확한 점수</strong>를 낸다. 두 예측은 loss가 다르지만 파라미터를 공유해 함께 학습된다. 손실 함수는 정확히 이렇게 명시돼 있다.</p>
+<li><p><strong>co-train으로 fast + slow 헤드를 한 모델에 담는다</strong> <span class="badge ok">확인</span>. 같은 모델이 <strong>모든 후보에 대해 두 tower dot product로 빠른 점수</strong>를, <strong>선택된 서브셋에 대해 3-tower 경로로 정확한 점수</strong>를 낸다. 두 예측은 loss가 다르지만 파라미터를 공유해 함께 학습된다. 손실 함수는 정확히 이렇게 명시돼 있다.</p>
 <blockquote>
 <p>&quot;L = (100 * L_main_ctr + 5 * L_main_gctr30 + 1 * L_main_octr) + (10 * L_cotrain_ctr + 5 * L_cotrain_gctr30 + 1 * L_cotrain_octr)&quot;
-— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14">Beyond Two Towers Part 2</a></p>
+— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14" target="_blank" rel="noopener">Beyond Two Towers Part 2</a></p>
 </blockquote>
 <p>즉 main(three-tower) CTR에 100의 가중치, co-train(two-tower) CTR에 10을 준다. gCTR30·oCTR도 각각 main 5·1, co-train 5·1이다. Main과 co-train을 분리한 이유는 오프라인 손실 감소를 three-tower 예측에 집중시키면서, 대체될 프로덕션 two-tower 모델 대비 co-train two-tower 헤드가 열등하지 않게 유지하기 위해서다.</p>
 </li>
-<li><p><strong>임베딩 차원 배치가 태스크에 맞춰 나뉘어 있다</strong> <code>[확인]</code>. Query tower는 <strong>192차원</strong>을 생성해 CTR 144 / gCTR30 32 / oCTR 16으로 나눈다. Pin tower는 그에 대응하는 차원에 더해 <strong>cross tower용 256차원 candidate-feature projection</strong>을 붙여 총 448차원을 내며, 이 projection은 오프라인에서 캐시된다. 서빙에서 fast CTR 점수는 <strong>144차원 CTR 세그먼트의 처음 64차원만</strong> 사용하고, three-tower CTR 점수는 CTR 세그먼트 전체와 cross 임베딩을 함께 쓴다. gCTR30·oCTR은 fast와 slow 두 경로가 임베딩 전체를 공유한다.</p>
+<li><p><strong>임베딩 차원 배치가 태스크에 맞춰 나뉘어 있다</strong> <span class="badge ok">확인</span>. Query tower는 <strong>192차원</strong>을 생성해 CTR 144 / gCTR30 32 / oCTR 16으로 나눈다. Pin tower는 그에 대응하는 차원에 더해 <strong>cross tower용 256차원 candidate-feature projection</strong>을 붙여 총 448차원을 내며, 이 projection은 오프라인에서 캐시된다. 서빙에서 fast CTR 점수는 <strong>144차원 CTR 세그먼트의 처음 64차원만</strong> 사용하고, three-tower CTR 점수는 CTR 세그먼트 전체와 cross 임베딩을 함께 쓴다. gCTR30·oCTR은 fast와 slow 두 경로가 임베딩 전체를 공유한다.</p>
 </li>
-<li><p><strong>서빙: 2단계 flow with utility topK = 40K</strong> <code>[확인]</code>. Stage 1에서 co-train된 two-tower head로 후보 전량을 채점하고 utility를 계산한다. Stage 2에서 utility 상위 40K만 three-tower로 재채점한다. 이 40K는 Home Feed·Related Pins에서 후보의 70퍼센타일, Search에서 90퍼센타일 수준이다 — 즉 대부분의 요청에서 후보의 다수가 three-tower까지 도달하지만, 극단적으로 후보가 많은 P99 요청에서는 처음 40K만 통과한다. Two-tower 점수와 three-tower 점수는 마지막 top-K 선정 전 blending된다. 40K를 벗어난 후보는 two-tower 점수를 유지해 이후 stage로 넘어간다.</p>
+<li><p><strong>서빙: 2단계 flow with utility topK = 40K</strong> <span class="badge ok">확인</span>. Stage 1에서 co-train된 two-tower head로 후보 전량을 채점하고 utility를 계산한다. Stage 2에서 utility 상위 40K만 three-tower로 재채점한다. 이 40K는 Home Feed·Related Pins에서 후보의 70퍼센타일, Search에서 90퍼센타일 수준이다 — 즉 대부분의 요청에서 후보의 다수가 three-tower까지 도달하지만, 극단적으로 후보가 많은 P99 요청에서는 처음 40K만 통과한다. Two-tower 점수와 three-tower 점수는 마지막 top-K 선정 전 blending된다. 40K를 벗어난 후보는 two-tower 점수를 유지해 이후 stage로 넘어간다.</p>
 <p>후보 서브셋을 heuristic으로 자르는 것은 캘리브레이션 왜곡을 유발할 수 있다. 저자들은 이 걱정을 명시적으로 다루고, <strong>경매 후보에 대해 three-tower 모델이 오히려 over-calibration을 줄여</strong> 예측 CTR을 실측 CTR에 가깝게 만들었다고 진술한다.</p>
 </li>
-<li><p><strong>서빙 최적화 4종의 정량 효과</strong> <code>[확인]</code>.</p>
+<li><p><strong>서빙 최적화 4종의 정량 효과</strong> <span class="badge ok">확인</span>.</p>
 <blockquote>
 <p>&quot;Together, these changes reduced P99 model inference from over 200 ms to about 30 ms, leaving the final model only 1–2 ms slower than production.&quot;
-— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14">Beyond Two Towers Part 2</a></p>
+— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14" target="_blank" rel="noopener">Beyond Two Towers Part 2</a></p>
 </blockquote>
 <p>구성 요소를 별도로 계량한다.</p>
 <ul>
@@ -245,12 +87,12 @@ ul.rl .chip b { font-size: 13px; }
 </ul>
 <p>네 최적화 중 late expansion과 BF16이 가장 큰 이득을 냈다.</p>
 </li>
-<li><p><strong>오프라인 성능</strong> <code>[확인]</code>. Held-out standard ads 데이터에서 three-tower main 예측이 기존 프로덕션 two-tower 대비 <strong>~30% 상대 손실 감소</strong>. Co-train two-tower 예측은 프로덕션 two-tower와 대체로 comparable, gCTR30 co-train 손실만 소폭 열화가 있었지만 main task 이득으로 받아들일 만하다는 판정. 저자들은 이 결과로 &quot;<strong>standalone 프로덕션 two-tower engagement 모델을 deprecate하고 co-train head에 의존해도 품질 손실이 없다</strong>&quot;고 명시한다.</p>
+<li><p><strong>오프라인 성능</strong> <span class="badge ok">확인</span>. Held-out standard ads 데이터에서 three-tower main 예측이 기존 프로덕션 two-tower 대비 <strong>~30% 상대 손실 감소</strong>. Co-train two-tower 예측은 프로덕션 two-tower와 대체로 comparable, gCTR30 co-train 손실만 소폭 열화가 있었지만 main task 이득으로 받아들일 만하다는 판정. 저자들은 이 결과로 &quot;<strong>standalone 프로덕션 two-tower engagement 모델을 deprecate하고 co-train head에 의존해도 품질 손실이 없다</strong>&quot;고 명시한다.</p>
 </li>
-<li><p><strong>온라인 A/B</strong> <code>[확인]</code>. 표준 광고 지면(<strong>Home Feed·Related Pins·Search</strong>)에서:</p>
+<li><p><strong>온라인 A/B</strong> <span class="badge ok">확인</span>. 표준 광고 지면(<strong>Home Feed·Related Pins·Search</strong>)에서:</p>
 <blockquote>
 <p>&quot;In online A/B experiments on standard ads, the three-tower co-train model delivered around 1% gains in CTR, gCTR30, and oCTR, along with nearly 1% reductions in CPC, with only a modest increase in GPU spend.&quot;
-— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14">Beyond Two Towers Part 2</a></p>
+— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14" target="_blank" rel="noopener">Beyond Two Towers Part 2</a></p>
 </blockquote>
 <p>세 engagement 지표에 각각 약 1% 상승, cost-per-click은 약 1% 감소, GPU 지출은 &quot;modest&quot; 증가. 제목이 &quot;Launching&quot;이고 본문이 프로덕션 대체 두 tower 모델의 deprecate를 진술하므로 실제 배포로 판단.</p>
 </li>
@@ -269,7 +111,7 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>Google Research blog</strong> (월요일 스캔): 신규 관련 글 0건. 최신 글(2026-09-24)은 video generation 주제.</li>
 <li><strong>Pinterest Engineering</strong> (월요일 스캔): <strong>본문에서 다룬 3-Tower 글 1건 통과</strong>. 별도로 2026-09-11 &quot;Evolving Pinterest&#39;s Embedding Retrieval Platform&quot;도 목록에서 확인했지만, 저장소의 Pinterest CLR 스레드가 이미 유기 Home Feed retrieval 축을 다루고 있어 본문 반영은 다음에 볼 것 항목으로 미룬다.</li>
 <li><strong>arXiv cs.IR triage</strong>: 30건 파싱, 통과 0건.<ul>
-<li><strong>Beyond a Scalar: Distributional Serving Interfaces for Watch-Time Prediction</strong> (<a href="https://arxiv.org/abs/2609.28383">2609.28383</a>) — 저자 4인의 소속이 <a href="https://arxiv.org/html/2609.28383v1">HTML 판</a> 확인 결과 전원 Shanghai Jiao Tong University·Rice University(즉 학계)이고, 프로덕션 배포나 A/B 진술이 없다. 데이터셋도 공개 KuaiRec·KuaiRand-1K·WeChat21로 회사 프로덕션 로그가 아니다. VK HEGM 이후 watch-time 분포 예측이 두 번째 프로덕션 회사에서 진술되는 흐름과 별개의 학술 방법론이다. 탈락.</li>
+<li><strong>Beyond a Scalar: Distributional Serving Interfaces for Watch-Time Prediction</strong> (<a href="https://arxiv.org/abs/2609.28383" target="_blank" rel="noopener">2609.28383</a>) — 저자 4인의 소속이 <a href="https://arxiv.org/html/2609.28383v1" target="_blank" rel="noopener">HTML 판</a> 확인 결과 전원 Shanghai Jiao Tong University·Rice University(즉 학계)이고, 프로덕션 배포나 A/B 진술이 없다. 데이터셋도 공개 KuaiRec·KuaiRand-1K·WeChat21로 회사 프로덕션 로그가 아니다. VK HEGM 이후 watch-time 분포 예측이 두 번째 프로덕션 회사에서 진술되는 흐름과 별개의 학술 방법론이다. 탈락.</li>
 <li>나머지 29건은 어제 09-27 daily에서 이미 triage한 batch(2026-09-23~24 제출)의 잔류이거나 학계 RAG·QA·retrieval 방법론이다. 새로 파싱한 batch 자체가 어제와 겹치는 이유는 arXiv cs.IR에 2026-09-25 이후 신규 제출이 없기 때문이다(2026-09-25는 금요일이지만 이 카테고리 신규 제출이 없었고 2026-09-26·27은 주말, 2026-09-28 batch는 아직 공개 전).</li>
 </ul>
 </li>
@@ -279,80 +121,23 @@ ul.rl .chip b { font-size: 13px; }
 <li><a href="radar.html#pinterest-3-tower-engagement-co-train--%EA%B4%91%EA%B3%A0-lightweight-ranking%EC%9D%84-two-tower-%EB%B0%96%EC%9C%BC%EB%A1%9C-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-ab%EC%97%90%EC%84%9C-ctrgctr30octr-%EA%B0%81-1-%EC%83%81%EC%8A%B9cpc-1-%EA%B0%90%EC%86%8C%EB%A1%9C-launched">Pinterest 3-Tower Engagement Co-Train</a> — 이번 달 신규 편입.</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong>Pinterest Nexus (Part 1)</strong> — 3-Tower가 앉는 서빙 스택 자체가 아직 코퍼스에 들어와 있지 않다. Part 1 &quot;Beyond Two Towers: Re-architecting the Serving Stack for Next-Gen Ads Lightweight Ranking Models&quot;를 다음 월요일 산업 블로그 스캔에서 정독 후보로 올린다.</li>
 <li><strong>Pinterest Evolving Embedding Retrieval Platform</strong> (2026-09-11 게시) — 오늘 목록에서 확인했지만 CLR 스레드와 겹치므로 다음 배치에서 후속 근거로 반영할지 판단한다.</li>
 <li><strong>VK HEGM 이후 두 번째 회사의 watch-time 분포 예측 프로덕션 진술</strong> — 오늘 arXiv에서 학계 방법론 하나(2609.28383)가 나왔지만 프로덕션 진술은 아니다. 다음 배치에서 계속 추적.</li>
-</ul>
+</ul></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-27.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-27</div></a><a class="r" href="daily-2026-09-29.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-29</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-27.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-27</span></a><a class="pg-next" href="daily-2026-09-29.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-29</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

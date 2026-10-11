@@ -2,227 +2,69 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-29 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: Tencent 광고·추천 플랫폼의 KuaFu가 유저 프로파일링을 위해 raw 행동 시퀀스를 behavior item 단위 two-axis 압축으로 재구성해 주간 10억 유저 · 100K QPM 규모의 프로파일 파이프라인에 배포됐고, 10개월 A/B에서 5% 홀드아웃 대비…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-29.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-29 — feed-research">
 <meta property="og:description" content="한 줄: Tencent 광고·추천 플랫폼의 KuaFu가 유저 프로파일링을 위해 raw 행동 시퀀스를 behavior item 단위 two-axis 압축으로 재구성해 주간 10억 유저 · 100K QPM 규모의 프로파일 파이프라인에 배포됐고, 10개월 A/B에서 5% 홀드아웃 대비…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-29.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-29</h1>
-  <div class="wd">화요일 · 읽는 데 약 17분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>Tencent 광고·추천 플랫폼의 <strong>KuaFu</strong>가 유저 프로파일링을 위해 raw 행동 시퀀스를 <strong>behavior item 단위 two-axis 압축</strong>으로 재구성해 <strong>주간 10억 유저 · 100K QPM</strong> 규모의 프로파일 파이프라인에 배포됐고, 10개월 A/B에서 5% 홀드아웃 대비 GMV +1.37% (95% CI [0.71%, 2.03%])와 per-GPU throughput +37–350% · GPU 190대 절약을 진술했다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-kuafu-tencent-추정--behavior-item-단위-two-axis-압축으로-유저-프로파일링-파이프라인을-대체-10개월-프로덕션-배포에서-gmv-137--190-gpu-절약--레이더">1. KuaFu (Tencent 추정) — behavior item 단위 two-axis 압축으로 유저 프로파일링 파이프라인을 대체, 10개월 프로덕션 배포에서 GMV +1.37% · 190 GPU 절약 — 레이더</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.31045">KuaFu: Compressing Long User Behavior into Understanding at Billion Scale</a> — 2026-09-25 v1, 저자 11인(Jiahao Hui·Lin Zhu·Yishen Hu·Jingdong Shu·Zetai Jiang·Xining Ran·Ben Tan·Yeshou Cai·Gong Chen·Haijie Gu·Jie Jiang). <a href="https://arxiv.org/html/2609.31045v1">HTML 판</a>에는 저자 소속이 렌더링되지 않지만, 본문이 &quot;deployed on the Tencent advertising and recommendation platform for ten months, with a 1.37% lift in overall GMV&quot;라고 진술하고 저자 중 Jie Jiang이 <a href="radar.html#chroniclerec-tencent-pcg--weixin-moments-ads-pcvr%EC%97%90-ultra-long-%EC%9C%A0%EC%A0%80-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4%EB%A5%BC-target-independent-chronicle-token%EC%9C%BC%EB%A1%9C-%EC%82%AC%EC%A0%84-%EC%95%95%EC%B6%95-gmv-161-95-ci-0678-2547">ChronicleRec (Tencent PCG Weixin Moments Ads)</a> 저자 명단과 겹쳐 Tencent 광고·추천 라인으로 판단 <code>[추정]</code>.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-29">2026-09-29</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>화요일</li>
+<li><span class="meta-k">읽는 시간</span>17분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>Tencent 광고·추천 플랫폼의 <strong>KuaFu</strong>가 유저 프로파일링을 위해 raw 행동 시퀀스를 <strong>behavior item 단위 two-axis 압축</strong>으로 재구성해 <strong>주간 10억 유저 · 100K QPM</strong> 규모의 프로파일 파이프라인에 배포됐고, 10개월 A/B에서 5% 홀드아웃 대비 GMV +1.37% (95% CI [0.71%, 2.03%])와 per-GPU throughput +37–350% · GPU 190대 절약을 진술했다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-kuafu-tencent-추정--behavior-item-단위-two-axis-압축으로-유저-프로파일링-파이프라인을-대체-10개월-프로덕션-배포에서-gmv-137--190-gpu-절약--레이더"><span class="num">1</span>KuaFu (Tencent 추정) — behavior item 단위 two-axis 압축으로 유저 프로파일링 파이프라인을 대체, 10개월 프로덕션 배포에서 GMV +1.37% · 190 GPU 절약 — 레이더</a></li><li><a href="#2-meta-component-benchmark--프로덕션-추천-모델이-tb-scale--수천-gpu--100b-examplesday-규모임을-명시-프로파일링-도구"><span class="num">2</span>Meta Component Benchmark — 프로덕션 추천 모델이 TB-scale · 수천 GPU · 100B examples/day 규모임을 명시 (프로파일링 도구)</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-kuafu-tencent-추정--behavior-item-단위-two-axis-압축으로-유저-프로파일링-파이프라인을-대체-10개월-프로덕션-배포에서-gmv-137--190-gpu-절약--레이더"><span class="num">1</span>KuaFu (Tencent 추정) — behavior item 단위 two-axis 압축으로 유저 프로파일링 파이프라인을 대체, 10개월 프로덕션 배포에서 GMV +1.37% · 190 GPU 절약 — 레이더</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.31045" target="_blank" rel="noopener">KuaFu: Compressing Long User Behavior into Understanding at Billion Scale</a> — 2026-09-25 v1, 저자 11인(Jiahao Hui·Lin Zhu·Yishen Hu·Jingdong Shu·Zetai Jiang·Xining Ran·Ben Tan·Yeshou Cai·Gong Chen·Haijie Gu·Jie Jiang). <a href="https://arxiv.org/html/2609.31045v1" target="_blank" rel="noopener">HTML 판</a>에는 저자 소속이 렌더링되지 않지만, 본문이 &quot;deployed on the Tencent advertising and recommendation platform for ten months, with a 1.37% lift in overall GMV&quot;라고 진술하고 저자 중 Jie Jiang이 <a href="radar.html#chroniclerec-tencent-pcg--weixin-moments-ads-pcvr%EC%97%90-ultra-long-%EC%9C%A0%EC%A0%80-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4%EB%A5%BC-target-independent-chronicle-token%EC%9C%BC%EB%A1%9C-%EC%82%AC%EC%A0%84-%EC%95%95%EC%B6%95-gmv-161-95-ci-0678-2547">ChronicleRec (Tencent PCG Weixin Moments Ads)</a> 저자 명단과 겹쳐 Tencent 광고·추천 라인으로 판단 <span class="badge est">추정</span>.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> 산업 규모의 추천 시스템은 유저 개개인의 취향을 파악할 때 <strong>raw 행동 로그</strong>(클릭·조회·구매 등)를 그대로 다루기 어렵기 때문에, 로그를 요약한 <strong>유저 프로파일</strong>을 랭킹 모델의 입력 피처로 쓴다. 프로파일은 &quot;content-interest summarization&quot;(유저가 어떤 콘텐츠를 좋아하는지), life stage 추정, 구매 인텐트 예측 같은 여러 태스크로 나뉘고, 태스크마다 별도의 소규모 모델이 로그의 일부를 잘라 처리하는 것이 통상적인 관행이다.</p></div>
 <p>이 관행에는 두 가지 병목이 있다. 첫째, 태스크별로 잘라도 시퀀스가 여전히 길다. Content-interest summarization 하나만 봐도 유저당 평균 수백 건, tail에서는 수천 건의 행동 아이템을 읽어야 하고, 프롬프트 텍스트로 직렬화하면 수만 토큰이 된다 — LLM으로 프로파일링한다면 context window에 넣기 벅찬 규모다. 둘째, 프로파일은 자주 갱신해야 한다. Tencent 규모(주간 10억 유저, 시간당 aggregate 100K QPM — Query Per Minute)에서는 GPU 예산이 고정된 이상 태스크별 모델의 처리량이 하한선을 만든다.</p>
 <p>여기서 자연스러운 대안이 <strong>압축</strong>이다. 시퀀스를 짧은 토큰으로 압축해서 LLM에 넣거나, 태스크별로 잘라 넣는 대신 하나의 압축 표현을 여러 태스크가 공유하도록 만들면 예산 문제를 완화할 수 있다. 그런데 압축 자체가 새로운 문제를 만든다. 저자들은 <strong>네 가지 hallucination 유형</strong>을 진술한다: <strong>fabrication</strong>(존재하지 않은 관심을 지어내기), <strong>omission</strong>(신호 누락), <strong>date misattribution</strong>(사건을 잘못된 시점에 귀속), <strong>broken logic</strong>(잔여 근거로부터의 잘못된 추론). 이들 hallucination은 downstream 비즈니스 지표(CTR·GMV)로만 관측되는데, 그 지표는 diffuse하고 한 달치 데이터를 봐야 root cause를 짚을 수 있어 학습 루프를 심각하게 느리게 만든다.</p>
 <p>KuaFu는 이 두 문제를 함께 다루는 압축 표현 레이어다. <strong>압축의 최소 단위를 시퀀스가 아니라 behavior item 하나</strong>로 잡고, item마다 독립적으로 압축한 뒤 downstream 태스크가 공유하는 캐시로 쌓아 두는 구조를 제안한다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>아키텍처: item 단위 two-axis 압축 + 캐시</strong> <code>[확인]</code>. 각 behavior item(하나의 클릭, 하나의 조회, 하나의 광고 컨텍스트 등)을 <strong>item compressor</strong>가 독립적으로 인코딩해 shape <code>m × d</code> 임베딩을 얻고, 그 위에 <strong>two-axis projector</strong>가 붙어 두 축을 함께 줄인다. 토큰 축을 <code>m → k</code>(약 10배), width 축을 <code>d → d′</code>(약 20배)로 낮춰 최종 압축 표현 <code>z_i</code>의 shape은 <strong>2–4 tokens × width 128–256</strong>이 된다. 정량으로는 <strong>per-item 캐시가 10 KB에서 0.5 KB로 감소</strong>. Item 단위 압축이라 캐시가 시퀀스 길이에 대해 선형이고, 유저의 새로운 이벤트는 기존 캐시를 재계산할 필요 없이 추가만 하면 된다. Instruction-token 임베딩은 압축하지 않는다.</p>
+<li><p><strong>아키텍처: item 단위 two-axis 압축 + 캐시</strong> <span class="badge ok">확인</span>. 각 behavior item(하나의 클릭, 하나의 조회, 하나의 광고 컨텍스트 등)을 <strong>item compressor</strong>가 독립적으로 인코딩해 shape <code>m × d</code> 임베딩을 얻고, 그 위에 <strong>two-axis projector</strong>가 붙어 두 축을 함께 줄인다. 토큰 축을 <code>m → k</code>(약 10배), width 축을 <code>d → d′</code>(약 20배)로 낮춰 최종 압축 표현 <code>z_i</code>의 shape은 <strong>2–4 tokens × width 128–256</strong>이 된다. 정량으로는 <strong>per-item 캐시가 10 KB에서 0.5 KB로 감소</strong>. Item 단위 압축이라 캐시가 시퀀스 길이에 대해 선형이고, 유저의 새로운 이벤트는 기존 캐시를 재계산할 필요 없이 추가만 하면 된다. Instruction-token 임베딩은 압축하지 않는다.</p>
 <blockquote>
 <p>&quot;A two-axis projector compresses each item into 2–4 tokens of width 128–256—about 10× compression along the token axis and 20× along the width axis, cutting the per-item cache from 10 KB to 0.5 KB.&quot;
-— <a href="https://arxiv.org/abs/2609.31045">KuaFu abstract</a>, 2026-09-25</p>
+— <a href="https://arxiv.org/abs/2609.31045" target="_blank" rel="noopener">KuaFu abstract</a>, 2026-09-25</p>
 </blockquote>
 </li>
-<li><p><strong>훈련: fidelity-oriented four-stage recipe</strong> <code>[확인]</code>. 저자들은 압축을 학습시키는 데 다음 4단계를 순차적으로 쌓는다.</p>
+<li><p><strong>훈련: fidelity-oriented four-stage recipe</strong> <span class="badge ok">확인</span>. 저자들은 압축을 학습시키는 데 다음 4단계를 순차적으로 쌓는다.</p>
 <ol>
 <li><strong>Understanding</strong>: 압축된 표현을 입력으로 받는 decoder가 원본 시퀀스를 재구성하도록 학습. 압축·decoder 모두 업데이트.</li>
 <li><strong>Post-training</strong>: 42 태스크 유형의 layered-difficulty 데이터로 복합 이해를 학습. 4개 profiling task를 포함.</li>
@@ -230,26 +72,26 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>Hallucination-aware RL</strong>: 압축·projector를 freeze한 상태에서 decoder만 DAPO(direct advantage policy optimization)로 업데이트. Reward는 네 hallucination 유형별 판정을 harm 가중치로 합산.</li>
 </ol>
 </li>
-<li><p><strong>Hallucination-aware RL의 가중치와 효과</strong> <code>[확인]</code>. Reward 모델이 응답에서 네 유형을 각각 present/absent로 판정하고 다음 harm 가중치로 벌점을 준다: <strong>fabrication 0.45</strong>(가장 무거움), <strong>date misattribution 0.24</strong>, <strong>broken logic 0.24</strong>, <strong>missed detection 0.07</strong>(가장 가벼움). Completeness는 별도 보너스로 계산한다. 저자들은 fabrication을 가장 무겁게 벌하면 모델이 답변 자체를 거부하는 방향으로 도피할 수 있다는 부작용을 명시하고, refusal은 별도로 counteract한다고 밝힌다.</p>
+<li><p><strong>Hallucination-aware RL의 가중치와 효과</strong> <span class="badge ok">확인</span>. Reward 모델이 응답에서 네 유형을 각각 present/absent로 판정하고 다음 harm 가중치로 벌점을 준다: <strong>fabrication 0.45</strong>(가장 무거움), <strong>date misattribution 0.24</strong>, <strong>broken logic 0.24</strong>, <strong>missed detection 0.07</strong>(가장 가벼움). Completeness는 별도 보너스로 계산한다. 저자들은 fabrication을 가장 무겁게 벌하면 모델이 답변 자체를 거부하는 방향으로 도피할 수 있다는 부작용을 명시하고, refusal은 별도로 counteract한다고 밝힌다.</p>
 <blockquote>
 <p>&quot;Fabrication carries the heaviest weight (0.45) and missed detection the lightest (0.07), with completeness as a separate bonus. After DAPO fabrication falls from 33.5 to 4.5 and the fully-correct rate rises by 34.0 pp.&quot;
-— <a href="https://arxiv.org/html/2609.31045v1">KuaFu §3.4 / §4.6</a>, 2026-09-25</p>
+— <a href="https://arxiv.org/html/2609.31045v1" target="_blank" rel="noopener">KuaFu §3.4 / §4.6</a>, 2026-09-25</p>
 </blockquote>
 <p>Hallucination-aware RL 이후 fabrication hit rate가 <strong>33.5 → 4.5</strong> (약 29 pp 감소), fully-correct answer rate가 <strong>+34.0 pp</strong> 상승. Date와 logic 에러는 함께 감소, missed detection과 missing answer는 소폭 상승했다 — 즉 &quot;fabrication에 heavy penalty를 주면 refusal 방향으로의 drift가 나타난다&quot;는 예상된 부작용이 실제로 관측된다.</p>
 </li>
-<li><p><strong>오프라인: 4 태스크 · 5 headline metric에서 uncompressed baseline과 동등 이상</strong> <code>[확인]</code>.</p>
+<li><p><strong>오프라인: 4 태스크 · 5 headline metric에서 uncompressed baseline과 동등 이상</strong> <span class="badge ok">확인</span>.</p>
 <blockquote>
 <p>&quot;Across four production profiling tasks, the compressed model matches or exceeds the uncompressed single-task production models on all five headline metrics, increases per-GPU throughput by 37%–350%, and saves 190 GPUs.&quot;
-— <a href="https://arxiv.org/abs/2609.31045">KuaFu abstract</a></p>
+— <a href="https://arxiv.org/abs/2609.31045" target="_blank" rel="noopener">KuaFu abstract</a></p>
 </blockquote>
 <p>4개 프로덕션 profiling task는 content-interest summarization 등을 포함하고, 각각에 대해 압축된 KuaFu 모델이 uncompressed single-task 프로덕션 모델과 매치되거나 상회한다. 저자들은 이것이 &quot;shared serving budget에서도 태스크별 모델을 대체할 수 있음&quot;의 정량 근거라고 진술한다.</p>
 </li>
-<li><p><strong>공개 벤치마크: MRQA out-of-domain +17.7 EM, RecBench 4B &gt; 8B by 1.90</strong> <code>[확인]</code>. 공개 MRQA(6 in-domain: SQuAD·NewsQA·TriviaQA·SearchQA·HotpotQA·NaturalQuestions; 6 out-of-domain: BioASQ·DROP·DuoRC·RACE·RelationExtraction·TextbookQA)에서 기존 prompt compressor 대비 최대 +17.7 EM 향상. RecBench에서는 KuaFu의 4B 모델이 KuaFu 8B 모델보다 1.90점 앞선다는 결과가 나온다 — 저자들은 이를 &quot;압축 구조 자체가 태스크에 잘 맞았기 때문에 파라미터 예산을 줄여도 성능이 유지된다&quot;의 근거로 든다.</p>
+<li><p><strong>공개 벤치마크: MRQA out-of-domain +17.7 EM, RecBench 4B &gt; 8B by 1.90</strong> <span class="badge ok">확인</span>. 공개 MRQA(6 in-domain: SQuAD·NewsQA·TriviaQA·SearchQA·HotpotQA·NaturalQuestions; 6 out-of-domain: BioASQ·DROP·DuoRC·RACE·RelationExtraction·TextbookQA)에서 기존 prompt compressor 대비 최대 +17.7 EM 향상. RecBench에서는 KuaFu의 4B 모델이 KuaFu 8B 모델보다 1.90점 앞선다는 결과가 나온다 — 저자들은 이를 &quot;압축 구조 자체가 태스크에 잘 맞았기 때문에 파라미터 예산을 줄여도 성능이 유지된다&quot;의 근거로 든다.</p>
 </li>
-<li><p><strong>온라인 A/B: unique visitor 기반 traffic split, 5% 홀드아웃 유지 후 10개월 관측</strong> <code>[확인]</code>. 온라인 검증은 unique visitor 단위로 트래픽을 랜덤 분할한 A/B 실험이다. 두 arm이 profile mining에 쓰는 리소스는 동일하게 유지하고, control은 &quot;1년치 행동, 월간 갱신&quot; 방식의 기존 프로파일 피처를 유지한다. Rollout은 4주 관측 창 내에 0% → 100%로 진행됐고, full rollout 이후 <strong>5% 홀드아웃</strong>을 남겨 추가로 10개월을 관측했다.</p>
+<li><p><strong>온라인 A/B: unique visitor 기반 traffic split, 5% 홀드아웃 유지 후 10개월 관측</strong> <span class="badge ok">확인</span>. 온라인 검증은 unique visitor 단위로 트래픽을 랜덤 분할한 A/B 실험이다. 두 arm이 profile mining에 쓰는 리소스는 동일하게 유지하고, control은 &quot;1년치 행동, 월간 갱신&quot; 방식의 기존 프로파일 피처를 유지한다. Rollout은 4주 관측 창 내에 0% → 100%로 진행됐고, full rollout 이후 <strong>5% 홀드아웃</strong>을 남겨 추가로 10개월을 관측했다.</p>
 <blockquote>
 <p>&quot;After full rollout a 5% holdout was retained and observed for a further ten months, over which overall GMV rose by 1.37% against that holdout (95% CI [0.71%, 2.03%]).&quot;
-— <a href="https://arxiv.org/html/2609.31045v1">KuaFu §4.8</a>, 2026-09-25</p>
+— <a href="https://arxiv.org/html/2609.31045v1" target="_blank" rel="noopener">KuaFu §4.8</a>, 2026-09-25</p>
 </blockquote>
 <p>즉 배포 이후 10개월 지속 관측에서 홀드아웃 대비 GMV <strong>+1.37%</strong> (95% CI [0.71%, 2.03%])로 신뢰구간이 0을 배제. 저자들은 &quot;두 arm이 GPU와 스토리지를 동일하게 소비하므로 이득의 원인은 압축이 확보한 두 종류의 headroom(태스크 간 공유 가능한 표현, 그리고 더 긴 시간 창)&quot;이라고 진술한다.</p>
 </li>
@@ -259,15 +101,15 @@ ul.rl .chip b { font-size: 13px; }
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot; 최상단에 <strong>KuaFu (Tencent 추정)</strong> 편입. Tencent는 canon 추적 서비스가 아니므로 services 정본은 만들지 않는다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> LLM 기반 유저 프로파일링이 아이디어에서 <strong>주간 10억 유저 규모 프로덕션 배포</strong>로 이동했다는 정량 근거가 저장소에 처음 들어온다. 저장소가 추적하던 LLM/추천 결합의 자리 목록(Netflix GenRec=채점 함수, Yandex Gryphon=생성 retrieval+rank, Alibaba MetaStrategy=오프라인 정책 컴파일러, Meta ConnectionMind=그래프 경로 추론기, Meta AMBER=입력 tokenization, Spotify GLIDE=SID candidate generator, LinkedIn Follows=LLM 임베딩 retrieval, Comcast LLM profiling=오프라인 실험)에 <strong>프로파일링 파이프라인 자체를 압축·통합하는 자리</strong>가 하나 더 추가된다. 자리 목록의 세는 순서에는 넣지 않고 스레드에 진술만 더한다.</p></div>
-<h2 id="2-meta-component-benchmark--프로덕션-추천-모델이-tb-scale--수천-gpu--100b-examplesday-규모임을-명시-프로파일링-도구">2. Meta Component Benchmark — 프로덕션 추천 모델이 TB-scale · 수천 GPU · 100B examples/day 규모임을 명시 (프로파일링 도구)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.30656">Component Benchmark: Hierarchical Model Profiling for Large-scale Recommendation Systems</a> — 2026-09-25 v1, 저자 14인 전원이 Meta Platforms Inc. Sunnyvale 소속(도메인 <code>@meta.com</code>이 <a href="https://arxiv.org/html/2609.30656v1">HTML 판</a> affiliation 블록에서 확인).</p></div>
+<h2 id="2-meta-component-benchmark--프로덕션-추천-모델이-tb-scale--수천-gpu--100b-examplesday-규모임을-명시-프로파일링-도구"><span class="num">2</span>Meta Component Benchmark — 프로덕션 추천 모델이 TB-scale · 수천 GPU · 100B examples/day 규모임을 명시 (프로파일링 도구)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.30656" target="_blank" rel="noopener">Component Benchmark: Hierarchical Model Profiling for Large-scale Recommendation Systems</a> — 2026-09-25 v1, 저자 14인 전원이 Meta Platforms Inc. Sunnyvale 소속(도메인 <code>@meta.com</code>이 <a href="https://arxiv.org/html/2609.30656v1" target="_blank" rel="noopener">HTML 판</a> affiliation 블록에서 확인).</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> 산업 규모의 추천 모델은 memory-bandwidth-bound 연산(임베딩 lookup), 작은 compute-bound dense 레이어, jagged categorical feature에서 오는 동적 shape이 혼재해 있어 프로파일링이 까다롭다. 기존 도구는 end-to-end throughput만 보거나 operator-level trace를 뽑는데, 모델 구성 실무자가 사고하는 단위인 &quot;submodule별 성능&quot;을 바로 보여 주지 못한다. Component Benchmark(CB)는 submodule 단위로 계층적 tree 시각화를 제공하는 프로파일링 프레임워크다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>Meta 추천 모델 규모 진술</strong> <code>[확인]</code>.</p>
+<li><p><strong>Meta 추천 모델 규모 진술</strong> <span class="badge ok">확인</span>.</p>
 <blockquote>
 <p>&quot;These large-scale recommendation models are TB-scale, run on thousands of GPUs and ingest 100B examples per day.&quot;
-— <a href="https://arxiv.org/abs/2609.30656">Component Benchmark abstract</a>, 2026-09-25</p>
+— <a href="https://arxiv.org/abs/2609.30656" target="_blank" rel="noopener">Component Benchmark abstract</a>, 2026-09-25</p>
 </blockquote>
 <p>즉 Meta 추천 스택이 <strong>TB-scale 모델 · 수천 GPU · 하루 100B 예제</strong>를 소비한다. 저장소가 추적하던 <a href="sequence-transformer-ranking.html">Meta HSTU/Wukong</a>, <a href="facebook.html">ConnectionMind</a>, <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">AMBER</a> 관련 진술이 파라미터 축(HSTU 실험), 지면 축(hot path 5-10%), 이벤트 축(하루 수십억 이벤트)을 다뤘다면 이번 진술은 <strong>하드웨어와 학습 데이터 규모</strong>를 aggregate로 명시한다.</p>
 </li>
@@ -278,83 +120,26 @@ ul.rl .chip b { font-size: 13px; }
 <div class="blk why"><p><span class="lbl">의미</span> Meta 랭킹 스택이 <strong>TB-scale 모델을 수천 GPU에서 하루 100B 예제로 학습</strong>한다는 정량 진술 자체가 새롭다(기존 정본은 파라미터 규모나 지면별 진술이 중심이었다). 다만 이번 자료는 프로파일링 프레임워크의 정당화 문맥에서 나온 aggregate 수치라 프로덕션 파이프라인 어느 층에 해당하는지가 특정되지 않는다. 단일 추천 모델의 규모인지, 여러 지면 모델의 합인지 후속 자료에서 확인이 필요하다.</p></div>
 <h2 id="레이더">레이더</h2>
 <ul>
-<li><strong>KuaFu (Tencent)</strong> (<a href="https://arxiv.org/abs/2609.31045">arXiv 2609.31045</a>): behavior item 단위 two-axis 압축으로 profiling 파이프라인을 대체, 주간 10억 유저·100K QPM 규모에 10개월 배포, GMV +1.37% (95% CI [0.71%, 2.03%]) · 190 GPU 절약 · 4B &gt; 8B 1.90pt(RecBench) · MRQA OOD +17.7 EM. <code>[확인]</code>, 저자 소속 [추정](Jie Jiang이 ChronicleRec 저자와 일치). <a href="radar.html">radar.md 편입.</a></li>
+<li><strong>KuaFu (Tencent)</strong> (<a href="https://arxiv.org/abs/2609.31045" target="_blank" rel="noopener">arXiv 2609.31045</a>): behavior item 단위 two-axis 압축으로 profiling 파이프라인을 대체, 주간 10억 유저·100K QPM 규모에 10개월 배포, GMV +1.37% (95% CI [0.71%, 2.03%]) · 190 GPU 절약 · 4B &gt; 8B 1.90pt(RecBench) · MRQA OOD +17.7 EM. <span class="badge ok">확인</span>, 저자 소속 [추정](Jie Jiang이 ChronicleRec 저자와 일치). <a href="radar.html">radar.md 편입.</a></li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong>KuaFu 저자 소속의 [확인] 승격</strong>: v2·회사 블로그·Tencent Tech Blog 게시가 나오면 [추정]에서 [확인]으로 승격.</li>
 <li><strong>Meta Component Benchmark가 참조하는 실제 모델</strong>: CB 논문이 언급하는 &quot;TB-scale 모델&quot;이 Facebook Feed 랭커인지 Ads 랭커인지 Reels 랭커인지 불명. Meta 후속 자료에서 구체 지면 매핑이 나오는지 확인.</li>
 <li><strong>arXiv cs.IR triage</strong>: 30건 파싱, 통과 1건(KuaFu). 나머지 29건은 어제 09-28 triage의 잔류이거나 학계 RAG/QA/retrieval 방법론이다. Component Benchmark는 프로덕션 진술이 있어 daily에 반영은 했지만 radar 승격은 하지 않는다(프로파일링 도구라 랭킹·retrieval 메커니즘 축이 아님).</li>
-</ul>
+</ul></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-28.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-28</div></a><a class="r" href="daily-2026-09-30.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-30</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-28.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-28</span></a><a class="pg-next" href="daily-2026-09-30.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-30</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

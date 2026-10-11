@@ -2,230 +2,72 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-10-03 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X가 Phoenix 쪽에 generative SID retrieval 전용 microservice와 전용 Transformer 모델(6-level × 256-codebook)을 신설하고, home-mixer에 SidSource 후보 소스로 배선한 4세대+34 공개가…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-10-03.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-10-03 — feed-research">
 <meta property="og:description" content="한 줄: X가 Phoenix 쪽에 generative SID retrieval 전용 microservice와 전용 Transformer 모델(6-level × 256-codebook)을 신설하고, home-mixer에 SidSource 후보 소스로 배선한 4세대+34 공개가…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-10-03.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-10-03</h1>
-  <div class="wd">토요일 · 읽는 데 약 46분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X가 Phoenix 쪽에 <strong>generative SID retrieval</strong> 전용 microservice와 전용 Transformer 모델(6-level × 256-codebook)을 신설하고, home-mixer에 <code>SidSource</code> 후보 소스로 배선한 4세대+34 공개가 올라왔다 (오늘 커밋 하나, +5227/−756, 파일 105개).</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-4세대34--x가-generative-sid-retrieval을-home-mixer-후보-소스로-배선--x">1. 4세대+34 — X가 generative SID retrieval을 home-mixer 후보 소스로 배선 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/76843a5">xai-org/x-algorithm@76843a5</a> — xai-org, 2026-10-02T02:06:55Z, 코드.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-03">2026-10-03</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>토요일</li>
+<li><span class="meta-k">읽는 시간</span>46분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 Phoenix 쪽에 <strong>generative SID retrieval</strong> 전용 microservice와 전용 Transformer 모델(6-level × 256-codebook)을 신설하고, home-mixer에 <code>SidSource</code> 후보 소스로 배선한 4세대+34 공개가 올라왔다 (오늘 커밋 하나, +5227/−756, 파일 105개).</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-4세대34--x가-generative-sid-retrieval을-home-mixer-후보-소스로-배선--x"><span class="num">1</span>4세대+34 — X가 generative SID retrieval을 home-mixer 후보 소스로 배선 — X</a></li><li><a href="#2-산업-블로그와-netflix--신규-없음"><span class="num">2</span>산업 블로그와 Netflix — 신규 없음</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-4세대34--x가-generative-sid-retrieval을-home-mixer-후보-소스로-배선--x"><span class="num">1</span>4세대+34 — X가 generative SID retrieval을 home-mixer 후보 소스로 배선 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/76843a5" target="_blank" rel="noopener">xai-org/x-algorithm@76843a5</a> — xai-org, 2026-10-02T02:06:55Z, 코드.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>X의 추천 스택은 지난 넉 달 동안 Phoenix(2026년 재구축한 GPU 랭킹 스택)를 중심으로 재편돼 왔다. 그 안에서 &quot;retrieval&quot;은 두 가지 축으로 쪼개져 있었다. 하나는 <strong>two-tower retrieval</strong> — 유저 타워와 아이템 타워의 임베딩 내적으로 ANN 검색을 돌리는 전통적 OON 소스로, 2026-09-30 커밋에서 <code>xrecsys_two_tower.py</code>가 6-preset 카탈로그로 승격되고 <strong>SID 6-level + seqpack + Home/Immersive 두 head 공유</strong>가 명시된 자리다. 다른 하나는 <strong>generative retrieval</strong>(SID generation) — RQ-VAE나 비슷한 양자화로 아이템을 다단계 토큰 시퀀스(semantic ID, 줄여서 SID)로 압축한 다음, Transformer가 유저 히스토리를 조건부로 SID 토큰을 <strong>생성</strong>하는 방식이다. Pinterest TIGER(2024)·Alibaba PailitaoGR(2025)·Kuaishou OneRec(2025)·Tencent BARGE(2026)·ByteDance GEAR(어제 2026-09-30 arXiv) 같은 라인이 이 쪽이다.</p>
 <p>X 쪽은 그동안 SID 토큰을 <strong>학습 config의 <code>sid_num_levels</code>로</strong>(two-tower 모델이 아이템 타워의 입력 피처로 소비하는 축으로) 노출해 왔지만, SID를 생성해서 그 자체로 candidate을 뽑는 generative retrieval 경로는 공개된 적이 없었다. 2026-09-04(4세대+15)에서 &quot;Phoenix 서빙 엔진에서 SID retrieval 사이드카가 통째 제거&quot;됐다는 기록이 있었는데, 당시 사이드카는 Phoenix 요청 상에서 <strong>유저 히스토리의 각 포스트 ID를 SID로 변환</strong>해 주는 lookup 역할이었고 그 역할은 요청에 SID를 미리 실어 넣는 형태로 흡수됐다. 즉 그때까지 X의 &quot;SID retrieval&quot;은 <strong>아이템 ID → SID 토큰 lookup</strong>이라는 좁은 의미였다.</p>
 <p>오늘 공개는 그 자리를 완전히 바꾼다. (a) <strong>Phoenix 측에 SID generative retrieval 전용 Transformer 학습 config와 모델·트레이너·인퍼런스 러너가 신설</strong>되고, (b) <strong>home-mixer가 이 서비스를 호출하는 <code>SidSource</code> 후보 소스를 추가</strong>해, (c) 응답 후보에 <code>shared_prefix_depth</code>를 점수로 붙여 <strong><code>ForYouPhoenixRetrievalMoe</code>로 라벨</strong>해 흘려 보낸다. 숫자 하나로 요약하면 이 커밋은 +5227/−756, 파일 105개다. 신규 파일 중 SID 관련 코드가 다섯 개 묶음이다.</p>
 <p><strong>새로 알게 된 것 — A. home-mixer에 <code>SidSource</code> 후보 소스 신설</strong></p>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/sources/sid_source.rs"><code>home-mixer/sources/sid_source.rs</code></a>(신규 +112) + <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/clients/sid_retrieval_client.rs"><code>home-mixer/clients/sid_retrieval_client.rs</code></a>(신규 +246).</p>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/sources/sid_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/sid_source.rs</code></a>(신규 +112) + <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/clients/sid_retrieval_client.rs" target="_blank" rel="noopener"><code>home-mixer/clients/sid_retrieval_client.rs</code></a>(신규 +246).</p>
 <ul>
 <li><p>호출 대상 endpoint: <code>https://xai-recsys-sid-retrieval.prod.fou.twitter.biz:443</code> — <strong>별도 서비스로 분리된 generative SID retrieval microservice</strong>.</p>
 </li>
-<li><p>gRPC 서비스는 <code>SidRetrievalServiceClient</code>, 요청 타입은 <code>RetrieveRequest { seed_post_ids, max_results, max_per_seed, min_prefix_depth, max_prefix_depth, caller }</code>, 응답 타입은 <code>RetrieveResponse { candidates: Vec&lt;Candidate&gt; }</code>. 각 Candidate에 <code>post_id</code>·<code>shared_prefix_depth</code>가 담긴다. 이 proto 심볼은 <code>xai_recsys_sid_retrieval_proto</code> crate가 외부(비공개 혹은 생성물)에서 들어오고, 레포에는 <strong>별도 crate <code>xai-recsys-sid-proto</code>가 <code>sid_lookup.proto</code>만 담은 상태로</strong> 함께 공개됐다 — <code>sid_lookup.proto</code>는 <code>SidLookupService { LookupSids(repeated int64 post_ids) → repeated PostSids { repeated int32 codes } }</code>로 <strong>post_id → SID 코드 배열</strong> 매핑만 다루고(2026-09-04에서 사라졌던 lookup 사이드카의 복귀), generative retrieval 쪽 proto는 레포에 포함되지 않았다. 레포 안에서 보이는 생산 코드와 그 &quot;generative retrieval&quot; 전용 proto 정의가 분리된 상태라는 뜻이다 <code>[추정]</code>.</p>
+<li><p>gRPC 서비스는 <code>SidRetrievalServiceClient</code>, 요청 타입은 <code>RetrieveRequest { seed_post_ids, max_results, max_per_seed, min_prefix_depth, max_prefix_depth, caller }</code>, 응답 타입은 <code>RetrieveResponse { candidates: Vec&lt;Candidate&gt; }</code>. 각 Candidate에 <code>post_id</code>·<code>shared_prefix_depth</code>가 담긴다. 이 proto 심볼은 <code>xai_recsys_sid_retrieval_proto</code> crate가 외부(비공개 혹은 생성물)에서 들어오고, 레포에는 <strong>별도 crate <code>xai-recsys-sid-proto</code>가 <code>sid_lookup.proto</code>만 담은 상태로</strong> 함께 공개됐다 — <code>sid_lookup.proto</code>는 <code>SidLookupService { LookupSids(repeated int64 post_ids) → repeated PostSids { repeated int32 codes } }</code>로 <strong>post_id → SID 코드 배열</strong> 매핑만 다루고(2026-09-04에서 사라졌던 lookup 사이드카의 복귀), generative retrieval 쪽 proto는 레포에 포함되지 않았다. 레포 안에서 보이는 생산 코드와 그 &quot;generative retrieval&quot; 전용 proto 정의가 분리된 상태라는 뜻이다 <span class="badge est">추정</span>.</p>
 </li>
-<li><p><code>SidSource</code>가 enable되는 조건은 네 축의 AND다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/sources/sid_source.rs"><code>sid_source.rs:50-60</code></a>: <code>EnableSidSource</code> param이 켜져 있고(기본 <code>false</code>), 토픽 요청이 아니고, in-network only 요청이 아니고, cached posts가 없고(cold path), <code>has_post_signals(query)</code>가 true다. 마지막 조건은 <strong>SimclustersSource와 완전히 같은 함수를 재사용</strong>해 유저의 포지티브 engagement 신호가 있어야 소스가 돌게 한다는 뜻이다. 두 소스가 같은 seed 집합(유저가 fav/retweet/reply 등으로 상호작용한 포스트 ID)에서 분기한다는 설계가 선언돼 있다.</p>
+<li><p><code>SidSource</code>가 enable되는 조건은 네 축의 AND다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/sources/sid_source.rs" target="_blank" rel="noopener"><code>sid_source.rs:50-60</code></a>: <code>EnableSidSource</code> param이 켜져 있고(기본 <code>false</code>), 토픽 요청이 아니고, in-network only 요청이 아니고, cached posts가 없고(cold path), <code>has_post_signals(query)</code>가 true다. 마지막 조건은 <strong>SimclustersSource와 완전히 같은 함수를 재사용</strong>해 유저의 포지티브 engagement 신호가 있어야 소스가 돌게 한다는 뜻이다. 두 소스가 같은 seed 집합(유저가 fav/retweet/reply 등으로 상호작용한 포스트 ID)에서 분기한다는 설계가 선언돼 있다.</p>
 </li>
-<li><p>흐름: <code>post_signal_ids(query)</code>에서 유저의 positive engagement 포스트 ID들을 꺼내고, <code>SidSourceMaxSeeds</code> 상한(기본 <strong>50</strong>)으로 truncate → <code>RetrieveRequest</code>를 조립해 gRPC 호출(300ms 데드라인, <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/clients/sid_retrieval_client.rs"><code>sid_retrieval_client.rs:21</code></a>에 하드코딩) → 응답 Candidate 각각을 <code>PostCandidate</code>로 변환하되 <strong><code>served_type = ForYouPhoenixRetrievalMoe</code></strong>(기존 <code>PhoenixMOESource</code>와 <strong>같은 라벨</strong>)로 마킹하고 <code>shared_prefix_depth</code>를 <code>score</code> 필드에 <strong>f32로</strong> 넣는다 → <code>CoreDataCandidateHydrator</code>로 작성자·생성 시각 등을 채운 뒤 <code>author_id == 0</code>인 후보는 제거한다.</p>
+<li><p>흐름: <code>post_signal_ids(query)</code>에서 유저의 positive engagement 포스트 ID들을 꺼내고, <code>SidSourceMaxSeeds</code> 상한(기본 <strong>50</strong>)으로 truncate → <code>RetrieveRequest</code>를 조립해 gRPC 호출(300ms 데드라인, <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/clients/sid_retrieval_client.rs" target="_blank" rel="noopener"><code>sid_retrieval_client.rs:21</code></a>에 하드코딩) → 응답 Candidate 각각을 <code>PostCandidate</code>로 변환하되 <strong><code>served_type = ForYouPhoenixRetrievalMoe</code></strong>(기존 <code>PhoenixMOESource</code>와 <strong>같은 라벨</strong>)로 마킹하고 <code>shared_prefix_depth</code>를 <code>score</code> 필드에 <strong>f32로</strong> 넣는다 → <code>CoreDataCandidateHydrator</code>로 작성자·생성 시각 등을 채운 뒤 <code>author_id == 0</code>인 후보는 제거한다.</p>
 </li>
-<li><p>파라미터 다섯 개가 <code>rust_home_mixer_sid_source_*</code> 네이밍으로 신설됐고 기본값이 공개됐다 <code>[확인]</code> — <code>home-mixer/params/param.rs</code>:</p>
+<li><p>파라미터 다섯 개가 <code>rust_home_mixer_sid_source_*</code> 네이밍으로 신설됐고 기본값이 공개됐다 <span class="badge ok">확인</span> — <code>home-mixer/params/param.rs</code>:</p>
 <ul>
 <li><code>EnableSidSource=false</code></li>
 <li><code>SidSourceMaxResults=800</code></li>
@@ -235,14 +77,14 @@ ul.rl .chip b { font-size: 13px; }
 </ul>
 <p><code>max_prefix_depth: 0</code>은 <code>RetrieveRequest</code>에 하드코딩이고(상한 없음), <code>min_prefix_depth=3</code>은 <strong>공유 접두사가 6-level SID 중 3개 이상 일치하는 후보만</strong> 반환하라는 요청 축 상의 필터다. 매 seed마다 최대 100개 포스트, 전체 상한 800개 — 50 × 100 = 5000이 이론적 상한이지만 800으로 재조여진다.</p>
 </li>
-<li><p>gRPC 클라이언트가 두 경로를 병행한다 <code>[확인]</code>: xDS P2C(discovery authority 기반 <code>xdstp://discovery-*/envoy.config.endpoint.v3.ClusterLoadAssignment/fou-xai-recsys-sid-retrieval.prod.prod:grpc-tls</code>)로 로드밸런서를 1차로 세우고, xDS 빌드가 10초 안에 끝나지 못하거나 bootstrap이 없으면 DNS 경로(<code>RotatingChannel</code>, 60초 간격 refresh)로 폴백한다. <code>MAX_DECODING_MESSAGE_BYTES = 16 MiB</code>로 응답 크기 상한을 그 수치에 둔다. 메트릭은 <code>SidRetrievalClient.retrieve{result=success|timeout|failure, path=xds|dns}</code>로 호출 결과·경로 라벨을 두고, 호출 지연은 <code>SidRetrievalClient.retrieve{path}</code> 히스토그램에 담긴다. 서비스 자체의 readiness probe는 <code>GET /readyz</code> on port 29180이고, keep-alive는 30초 간격·10초 데드라인·idle=true로 설정된다.</p>
+<li><p>gRPC 클라이언트가 두 경로를 병행한다 <span class="badge ok">확인</span>: xDS P2C(discovery authority 기반 <code>xdstp://discovery-*/envoy.config.endpoint.v3.ClusterLoadAssignment/fou-xai-recsys-sid-retrieval.prod.prod:grpc-tls</code>)로 로드밸런서를 1차로 세우고, xDS 빌드가 10초 안에 끝나지 못하거나 bootstrap이 없으면 DNS 경로(<code>RotatingChannel</code>, 60초 간격 refresh)로 폴백한다. <code>MAX_DECODING_MESSAGE_BYTES = 16 MiB</code>로 응답 크기 상한을 그 수치에 둔다. 메트릭은 <code>SidRetrievalClient.retrieve{result=success|timeout|failure, path=xds|dns}</code>로 호출 결과·경로 라벨을 두고, 호출 지연은 <code>SidRetrievalClient.retrieve{path}</code> 히스토그램에 담긴다. 서비스 자체의 readiness probe는 <code>GET /readyz</code> on port 29180이고, keep-alive는 30초 간격·10초 데드라인·idle=true로 설정된다.</p>
 </li>
-<li><p>메트릭 <code>SidSource.retrieved{type=seeds|retrieved|hydrated}</code>로 <strong>seed 수(RPC에 보낸 양)·retrieved 수(RPC 응답)·hydrated 수(author_id!=0 생존자)</strong> 세 단계가 각각 측정된다 <code>[확인]</code>.</p>
+<li><p>메트릭 <code>SidSource.retrieved{type=seeds|retrieved|hydrated}</code>로 <strong>seed 수(RPC에 보낸 양)·retrieved 수(RPC 응답)·hydrated 수(author_id!=0 생존자)</strong> 세 단계가 각각 측정된다 <span class="badge ok">확인</span>.</p>
 </li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — B. Phoenix에 SID generative retrieval 전용 Transformer 모델</span></p></div>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py"><code>phoenix/xrex/configs/xrecsys_sid_retrieval.py</code></a>(신규), <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py"><code>phoenix/xrex/models/recsys_sid_retrieval_model.py</code></a>(신규), <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/train/trainer_sid_retrieval.py"><code>phoenix/xrex/train/trainer_sid_retrieval.py</code></a>(신규), <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/inference/sid_retrieval_runner.py"><code>phoenix/xrex/inference/sid_retrieval_runner.py</code></a>(신규).</p>
-<p>학습 config <code>xrecsys_sid_retrieval.py</code>가 모델의 하이퍼파라미터를 전부 공개한다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py"><code>xrecsys_sid_retrieval.py:11-45</code></a>:</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. Phoenix에 SID generative retrieval 전용 Transformer 모델</span></p></div>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_sid_retrieval.py</code></a>(신규), <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_sid_retrieval_model.py</code></a>(신규), <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/train/trainer_sid_retrieval.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_sid_retrieval.py</code></a>(신규), <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/inference/sid_retrieval_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/sid_retrieval_runner.py</code></a>(신규).</p>
+<p>학습 config <code>xrecsys_sid_retrieval.py</code>가 모델의 하이퍼파라미터를 전부 공개한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py" target="_blank" rel="noopener"><code>xrecsys_sid_retrieval.py:11-45</code></a>:</p>
 <ul>
 <li><strong>입력 시퀀스 구성</strong>: 유저 prefix 1토큰 + 유저 액션 히스토리 1023토큰 + SID 타겟 6토큰 = <strong>1030 길이</strong>. 캔디데이트 시퀀스는 64.</li>
 <li><strong>SID 설계</strong>: <code>sid_num_levels=6</code> (6-level 계층 SID), <code>sid_codebook_size=256</code> (각 레벨 256개 코드) → 이론상 $256^6 ≈ 2.8 \times 10^{14}$ 개 SID 공간. <code>sid_embed_dim=1024</code>(= <code>EMB_TABLE_WIDTH</code>), <code>sid_prediction_hidden_dim=512</code>, <code>sid_level_loss_decay=1.0</code>(레벨별 loss 가중치 감쇠 없음, 즉 6개 레벨 전부 동일 가중치). <code>sid_hash_level=True</code>, <code>sid_cross_attn=True</code>.</li>
@@ -252,61 +94,61 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>데이터셋</strong>: <code>aggregated_kafka</code> 모드, <code>PhoenixDataset</code>에 <code>path=&quot;/path/to/offline_kafka_dump&quot;</code>(필러), <code>num_kafka_partitions=1024</code>, <code>include_candidate_post_ids=True</code>, <code>use_post_sid=True</code>, <code>multimodal_embedding_type=None</code>.</li>
 <li><strong>체크포인트</strong>: <code>checkpoint_every_n=100</code>·<code>checkpoint_keep_every_nth=1000</code>·<code>checkpoint_keep_last_n=10</code>·<code>verify_checksums=True</code>·<code>replica_axis=&quot;replica&quot;</code>·<code>checkpoint_chunked=False</code>·<code>checkpoint_compressed=False</code>.</li>
 </ul>
-<p>모델 코드는 Haiku transformed 함수로 <code>_embed_sid_token(code, level)</code>을 레벨별 별도 테이블(<code>sid_emb_level_{level}</code> 크기 <code>[256, 128]</code>)로 관리하고, 각 레벨 뒤에 <code>sid_emb_proj_{level}</code> 프로젝션을 거쳐 1024-dim으로 올리는 축에 두는 구조로 보인다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py"><code>recsys_sid_retrieval_model.py:72-100</code></a>. positive action은 <code>SERVER_TWEET_FAV</code> 단 하나 <code>[확인]</code>(<a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py">line 40</a>) — fav 하나로 좁혀진 포지티브다. hard-negative action 7개(<code>CLIENT_TWEET_REPORT</code>, <code>_NOT_INTERESTED_IN</code>, <code>_SEE_FEWER</code>, <code>_UNFOLLOW_AUTHOR</code>, <code>_BLOCK_AUTHOR</code>, <code>_MUTE_AUTHOR</code>, <code>_NOT_RELEVANT</code>)는 <strong>negative supervision</strong>에 쓰이는 축이다. 서빙 측 beam decoder의 평가 조건은 <code>eval_num_batches=20</code>·<code>eval_beam_width=128</code>·<code>eval_bs_per_device=8</code>.</p>
-<p>인퍼런스 러너 <code>sid_retrieval_runner.py</code>가 <strong>beam search 기반 SID 생성</strong>과 <code>SidPostIndex</code>/<code>SidBeamResolver</code>로 <strong>생성된 SID 접두사를 실제 post_id 집합으로 역해상</strong>하는 두 단계를 분리해 담는다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/inference/sid_retrieval_runner.py"><code>sid_retrieval_runner.py:21-80</code></a>. 러너의 하이퍼파라미터 중 <code>beam_width</code>·<code>decode_levels</code>가 플래그이고, <code>decode_levels &lt; 6</code>이면 <strong>접두사 수준에서 생성을 멈춰 접두사 공유 집합을 반환</strong>한다(prefix retrieval). 이것이 home-mixer <code>SidSourceMinPrefixDepth=3</code>과 짝을 이룬다 — 서버는 3~6단계까지 생성하되, 3단계에서 매칭된 모든 post는 접두사 깊이 3을 score로 받아 반환될 수 있다. <code>_CorpusView.sentinel_idx</code>·<code>post_ids_with_sentinel</code>·<code>author_ids_with_sentinel</code> 같은 축에서 코퍼스가 <strong>사전 빌드된 인덱스</strong>(SID → posts) 형태로 로드돼 있다는 걸 보여준다. 즉 서빙 시점의 코퍼스는 &quot;SID 트라이 + leaf에 담긴 post_id 집합&quot;이고, beam search가 트라이 위에서 top-K 경로를 뽑으면 그 경로 아래 posts가 후보가 된다 <code>[추정]</code> — 코드에서 <code>SidBeamResolver</code>의 세부 구조는 다른 파일(<code>xrex/inference/sid_post_index.py</code>)에 있고 이번 커밋 diff에는 안 나왔다.</p>
+<p>모델 코드는 Haiku transformed 함수로 <code>_embed_sid_token(code, level)</code>을 레벨별 별도 테이블(<code>sid_emb_level_{level}</code> 크기 <code>[256, 128]</code>)로 관리하고, 각 레벨 뒤에 <code>sid_emb_proj_{level}</code> 프로젝션을 거쳐 1024-dim으로 올리는 축에 두는 구조로 보인다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py" target="_blank" rel="noopener"><code>recsys_sid_retrieval_model.py:72-100</code></a>. positive action은 <code>SERVER_TWEET_FAV</code> 단 하나 <span class="badge ok">확인</span>(<a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py" target="_blank" rel="noopener">line 40</a>) — fav 하나로 좁혀진 포지티브다. hard-negative action 7개(<code>CLIENT_TWEET_REPORT</code>, <code>_NOT_INTERESTED_IN</code>, <code>_SEE_FEWER</code>, <code>_UNFOLLOW_AUTHOR</code>, <code>_BLOCK_AUTHOR</code>, <code>_MUTE_AUTHOR</code>, <code>_NOT_RELEVANT</code>)는 <strong>negative supervision</strong>에 쓰이는 축이다. 서빙 측 beam decoder의 평가 조건은 <code>eval_num_batches=20</code>·<code>eval_beam_width=128</code>·<code>eval_bs_per_device=8</code>.</p>
+<p>인퍼런스 러너 <code>sid_retrieval_runner.py</code>가 <strong>beam search 기반 SID 생성</strong>과 <code>SidPostIndex</code>/<code>SidBeamResolver</code>로 <strong>생성된 SID 접두사를 실제 post_id 집합으로 역해상</strong>하는 두 단계를 분리해 담는다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/inference/sid_retrieval_runner.py" target="_blank" rel="noopener"><code>sid_retrieval_runner.py:21-80</code></a>. 러너의 하이퍼파라미터 중 <code>beam_width</code>·<code>decode_levels</code>가 플래그이고, <code>decode_levels &lt; 6</code>이면 <strong>접두사 수준에서 생성을 멈춰 접두사 공유 집합을 반환</strong>한다(prefix retrieval). 이것이 home-mixer <code>SidSourceMinPrefixDepth=3</code>과 짝을 이룬다 — 서버는 3~6단계까지 생성하되, 3단계에서 매칭된 모든 post는 접두사 깊이 3을 score로 받아 반환될 수 있다. <code>_CorpusView.sentinel_idx</code>·<code>post_ids_with_sentinel</code>·<code>author_ids_with_sentinel</code> 같은 축에서 코퍼스가 <strong>사전 빌드된 인덱스</strong>(SID → posts) 형태로 로드돼 있다는 걸 보여준다. 즉 서빙 시점의 코퍼스는 &quot;SID 트라이 + leaf에 담긴 post_id 집합&quot;이고, beam search가 트라이 위에서 top-K 경로를 뽑으면 그 경로 아래 posts가 후보가 된다 <span class="badge est">추정</span> — 코드에서 <code>SidBeamResolver</code>의 세부 구조는 다른 파일(<code>xrex/inference/sid_post_index.py</code>)에 있고 이번 커밋 diff에는 안 나왔다.</p>
 <p>이 설계는 공개된 generative retrieval 가족과 자리가 겹친다: Pinterest TIGER(2024)·Alibaba PailitaoGR(2025)·Kuaishou OneRec(2025)·Tencent BARGE(2026)·ByteDance GEAR(2026-09-30)가 그 라인이다. X판의 특수성은 (a) <strong>6-level × 256-codebook</strong>이라는 비교적 좁은 공간(TIGER는 4-level × <del>2k, OneRec는 3-level × 1024)에 (b) <strong>1023토큰 유저 액션 히스토리</strong>를 그대로 조건으로 넣고(TIGER는 유저 히스토리 20</del>50), (c) <code>shared_prefix_depth</code>를 상위 랭킹의 스코어로 넘긴다(TIGER는 생성 확률을 쓰는 쪽), (d) <strong>이미 vocab 설계를 two-tower 모델과 공유</strong>해 두 retrieval 축이 같은 유저·아이템·작성자 임베딩 공간을 사용한다는 점에 있다. two-tower가 <strong>벡터 공간 ANN</strong>을 돌리고, SID retrieval이 <strong>코드 공간 beam search</strong>를 돌리는 <strong>duplication</strong>이 아니라 <strong>상보</strong> 구조를 선언한 셈이다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — C. row-sharded embedding CUDA 커널 묶음 신설</span></p></div>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/tree/76843a5/phoenix/xrex/cuda/row_emb"><code>phoenix/xrex/cuda/row_emb/</code></a> 12-파일 묶음(총 3,180줄 신규): <code>row_emb_api.cc</code>(+766) · <code>row_emb_comm.cc</code>(+1,104) · <code>row_emb_kernel.cu</code>(+629) · <code>row_emb.py</code>(+290) · <code>row_emb_comm.hpp</code>(+256) · <code>comm_utils.cc</code>(+146) · <code>row_emb_kernel.hpp</code>(+135) · <code>row_emb_common.cuh</code>(+82) · <code>cuda_error_utils.hpp</code>(+68) · <code>comm_utils.h</code>(+57) · <code>comm_utils.py</code>(+47) · <code>__init__.py</code>(+2).</p>
-<p>Phoenix의 기존 <code>async_emb</code> 커널이 <strong>열(column) 축으로 샤드된 임베딩 테이블</strong>을 다룬다면, 새 <code>row_emb</code>는 <strong>행(row) 축으로 샤드된 테이블</strong>을 다룬다 <code>[확인]</code>. 즉 vocab이 N개면 N / group_size개 row가 각 rank에 올라가는 구조다. 이 설계는 vocab이 수억 규모(아이템 100M · 작성자 30M)로 커지면 임베딩 테이블이 <strong>GPU 수십~수백 장에 걸쳐야</strong> 하는 자리에서 중요해진다 — 각 토큰 lookup이 자기 소속 rank에만 질의하면 되고, all-to-all은 토큰을 lookup rank로 보내는 축으로 발생한다 <code>[추정]</code>.</p>
-<p>Python 바인딩 <code>row_emb.py</code>는 JAX FFI target 6개(<code>xrex_row_emb_lookup_start</code>, <code>_lookup_done</code>, <code>_stage_update</code>, <code>_rowwise_adagrad_update_start</code>, <code>_rowwise_adagrad_lazy_update_start</code>, <code>_rowwise_adagrad_update_done</code>)를 CUDA 플랫폼에 등록하고, <code>RowEmbContextHandle</code> NamedTuple로 (context_id · group_size · flatten_replicas · tokens_per_rank · emb_width · rows_per_rank · recv_capacity · num_devices_per_node · mesh · table_axis · data_axis)를 묶어 shard spec을 캐리한다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/cuda/row_emb/row_emb.py"><code>row_emb.py:30-80, 100-290</code></a>.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. row-sharded embedding CUDA 커널 묶음 신설</span></p></div>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/76843a5/phoenix/xrex/cuda/row_emb" target="_blank" rel="noopener"><code>phoenix/xrex/cuda/row_emb/</code></a> 12-파일 묶음(총 3,180줄 신규): <code>row_emb_api.cc</code>(+766) · <code>row_emb_comm.cc</code>(+1,104) · <code>row_emb_kernel.cu</code>(+629) · <code>row_emb.py</code>(+290) · <code>row_emb_comm.hpp</code>(+256) · <code>comm_utils.cc</code>(+146) · <code>row_emb_kernel.hpp</code>(+135) · <code>row_emb_common.cuh</code>(+82) · <code>cuda_error_utils.hpp</code>(+68) · <code>comm_utils.h</code>(+57) · <code>comm_utils.py</code>(+47) · <code>__init__.py</code>(+2).</p>
+<p>Phoenix의 기존 <code>async_emb</code> 커널이 <strong>열(column) 축으로 샤드된 임베딩 테이블</strong>을 다룬다면, 새 <code>row_emb</code>는 <strong>행(row) 축으로 샤드된 테이블</strong>을 다룬다 <span class="badge ok">확인</span>. 즉 vocab이 N개면 N / group_size개 row가 각 rank에 올라가는 구조다. 이 설계는 vocab이 수억 규모(아이템 100M · 작성자 30M)로 커지면 임베딩 테이블이 <strong>GPU 수십~수백 장에 걸쳐야</strong> 하는 자리에서 중요해진다 — 각 토큰 lookup이 자기 소속 rank에만 질의하면 되고, all-to-all은 토큰을 lookup rank로 보내는 축으로 발생한다 <span class="badge est">추정</span>.</p>
+<p>Python 바인딩 <code>row_emb.py</code>는 JAX FFI target 6개(<code>xrex_row_emb_lookup_start</code>, <code>_lookup_done</code>, <code>_stage_update</code>, <code>_rowwise_adagrad_update_start</code>, <code>_rowwise_adagrad_lazy_update_start</code>, <code>_rowwise_adagrad_update_done</code>)를 CUDA 플랫폼에 등록하고, <code>RowEmbContextHandle</code> NamedTuple로 (context_id · group_size · flatten_replicas · tokens_per_rank · emb_width · rows_per_rank · recv_capacity · num_devices_per_node · mesh · table_axis · data_axis)를 묶어 shard spec을 캐리한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/cuda/row_emb/row_emb.py" target="_blank" rel="noopener"><code>row_emb.py:30-80, 100-290</code></a>.</p>
 <p>핵심 설계 결정 3개:</p>
 <ol>
 <li><strong>lookup이 두 단계로 쪼개진다</strong> — <code>lookup_start</code>는 token_ids와 로컬 샤드 테이블을 받아 <code>table_out</code>과 <code>lookup_pin</code>(float32 scalar)을 리턴한다. <code>lookup_done</code>은 <code>pin</code>을 받아 <code>embeddings</code>를 리턴한다. 두 FFI 사이에 <strong>다른 compute가 돌 수 있는 창</strong>이 열리고, all-to-all 통신이 그 창 안에서 compute와 overlap된다 — Pathways/MegaScale 같은 패턴. <code>tokens_per_rank</code>가 <code>tokens_per_batch / group_size</code>로 결정되고, <code>recv_capacity = min(ceil(tokens_per_rank × recv_factor), tokens_per_rank × group_size)</code>로 <strong>수신 버퍼 상한</strong>이 미리 잡힌다. <code>recv_factor</code>가 작으면 collision 많을 때 drop, 크면 버퍼 낭비.</li>
 <li><strong>rowwise Adagrad가 lookup과 같은 2-phase 구조로 fused</strong> — <code>rowwise_adagrad_update_start</code>는 테이블 · row_state(각 row의 accumulator) · gate를 받아 <strong>업데이트 중인 테이블 자체</strong>를 돌려주고(input_output_aliases={0:0, 1:1}로 in-place), <code>rowwise_adagrad_update_done</code>은 완료 신호를 돌려준다. 추가로 <code>rowwise_adagrad_lazy_update_start</code>는 <code>last_step</code>과 <code>step</code>을 받아 <strong>접근된 row만 lazy update</strong>하는 변종을 제공한다 — sparse embedding 테이블에 흔한 패턴.</li>
 <li><strong>gate 축으로 XLA 순서 보장</strong> — 모든 FFI 함수가 <code>gate: jax.Array</code>를 입력으로 받고 float32 scalar를 출력에 섞어 넣는다. XLA가 자유롭게 재배열할 수 없는 <strong>side-effect 체인</strong>을 명시적으로 만든다. <code>attrs()</code>로 context_id · flatten_replicas 같은 커뮤니케이터 식별자를 FFI attribute로 넘기고, 같은 context_id면 동일한 통신 그룹을 재사용한다.</li>
 </ol>
-<p>유효성 체크 축: <code>vocab_rows % group_size == 0</code>(row shard 균등 분배), <code>tokens_per_batch % group_size == 0</code>(token shard 균등 분배), <code>emb_width % 8 == 0</code>(8의 배수, bf16 tiling 요건으로 보임 <code>[추정]</code>), <code>recv_factor &gt; 0</code>, 그리고 <strong><code>table_axis</code> 축이 반드시 <code>data_axis</code> 축에 포함</strong>돼야 한다. 포함되지 않으면 &quot;token shard가 커뮤니케이터 랭크마다 1개가 아니다&quot;는 ValueError를 던진다.</p>
-<p><code>phoenix/xrex/utils/recsys_async_emb.py</code>(+112/−36)가 <code>async_emb</code>와 <code>row_emb</code> 두 kernel 모두를 받아들이는 <strong>adapter 레이어</strong>로 재작성됐다 <code>[확인]</code>. <code>is_row_sharded(context_handle)</code> 분기로 row냐 column이냐 결정하고, <code>table_spec</code>을 <code>P(table_axis, None)</code>(row-sharded) 또는 <code>P(None, table_axis)</code>(column-sharded)로 돌려준다. 즉 Phoenix의 async embedding 유틸이 이제 <strong>column + row 두 샤딩 전략을 동시에 지원</strong>하는 추상화 축으로 바뀌었다.</p>
-<p>이 커널 묶음은 SID retrieval 모델 전용이 아니라 <strong>Phoenix 임베딩 테이블 일반 설계의 확장</strong>이지만, 이번 커밋에서 함께 공개된 자리에서 보면 <strong>row-sharded 임베딩이 필요한 모델</strong>(즉 vocab이 매우 큰 모델)의 등장이 트리거로 보인다 <code>[추정]</code>. two-tower는 column-sharded로도 돌 수 있지만, generative 모델은 lookup 패턴상 row-sharded가 더 자연스럽다 — 각 토큰은 자기 vocab 레벨의 특정 range만 참조하기 때문이다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — D. Phoenix proto 재편(LLM_JUDGE 재귀환 + 광고 축 확장 + Retrieval 요청에 exclusion 축)</span></p></div>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a> + 동일 변경이 <code>phoenix/python/common/xai-proto/proto/recsys.proto</code>에 미러됨, +68/−44 각각.</p>
+<p>유효성 체크 축: <code>vocab_rows % group_size == 0</code>(row shard 균등 분배), <code>tokens_per_batch % group_size == 0</code>(token shard 균등 분배), <code>emb_width % 8 == 0</code>(8의 배수, bf16 tiling 요건으로 보임 <span class="badge est">추정</span>), <code>recv_factor &gt; 0</code>, 그리고 <strong><code>table_axis</code> 축이 반드시 <code>data_axis</code> 축에 포함</strong>돼야 한다. 포함되지 않으면 &quot;token shard가 커뮤니케이터 랭크마다 1개가 아니다&quot;는 ValueError를 던진다.</p>
+<p><code>phoenix/xrex/utils/recsys_async_emb.py</code>(+112/−36)가 <code>async_emb</code>와 <code>row_emb</code> 두 kernel 모두를 받아들이는 <strong>adapter 레이어</strong>로 재작성됐다 <span class="badge ok">확인</span>. <code>is_row_sharded(context_handle)</code> 분기로 row냐 column이냐 결정하고, <code>table_spec</code>을 <code>P(table_axis, None)</code>(row-sharded) 또는 <code>P(None, table_axis)</code>(column-sharded)로 돌려준다. 즉 Phoenix의 async embedding 유틸이 이제 <strong>column + row 두 샤딩 전략을 동시에 지원</strong>하는 추상화 축으로 바뀌었다.</p>
+<p>이 커널 묶음은 SID retrieval 모델 전용이 아니라 <strong>Phoenix 임베딩 테이블 일반 설계의 확장</strong>이지만, 이번 커밋에서 함께 공개된 자리에서 보면 <strong>row-sharded 임베딩이 필요한 모델</strong>(즉 vocab이 매우 큰 모델)의 등장이 트리거로 보인다 <span class="badge est">추정</span>. two-tower는 column-sharded로도 돌 수 있지만, generative 모델은 lookup 패턴상 row-sharded가 더 자연스럽다 — 각 토큰은 자기 vocab 레벨의 특정 range만 참조하기 때문이다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">D. Phoenix proto 재편(LLM_JUDGE 재귀환 + 광고 축 확장 + Retrieval 요청에 exclusion 축)</span></p></div>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a> + 동일 변경이 <code>phoenix/python/common/xai-proto/proto/recsys.proto</code>에 미러됨, +68/−44 각각.</p>
 <ul>
-<li><strong><code>LLM_JUDGE_RELEVANT_TO_SEARCH=108</code>·<code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH=109</code> 재등장.</strong> 두 action이 <strong>4세대+20(2026-09-12)에 107/108에 신설</strong> → <strong>4세대+23(2026-09-17)에 4일 만에 vacate</strong>(자리에 <code>CLIENT_TWEET_LIVE_STREAM_REPLY=107</code> 들어옴, 108은 <code>RESERVED_108</code> 플레이스홀더로 보존) → <strong>오늘(4세대+34, 15일 만에) 재등장</strong>. 다만 번호가 바뀌었다: 과거 107/108 → 이번 <strong>108/109</strong>. <code>RESERVED_108</code>이 LLM_JUDGE_RELEVANT_TO_SEARCH로 재사용되고, 새 번호 109가 LLM_JUDGE_NOT_RELEVANT_TO_SEARCH로 할당됐다. 즉 <strong>LLM judge 라벨을 action 축으로 다시 끌어들이려는 결정이 되돌아왔지만, 번호는 새 자리로</strong> 간 셈. 이것이 재조정 후 안정 상태가 될지, 다시 vacate될지는 다음 커밋 창에서 관측해야 한다 <code>[추정]</code>.</li>
-<li><strong><code>WEB_CONV_VALUE_USD=6</code>·<code>WEB_CONV_VALUE_RATIO=7</code> ContinuousActionName 신설.</strong> 기존 continuous action 6개(<code>ACTIVE_SECS</code> 등 + <code>BRIDGE_PROBABILITY=4</code>, <code>ADS_WEB_CT_PURCHASE_VALUE=5</code>)에 두 개가 추가됨. 광고 전환 가치를 <strong>USD 절대값</strong>과 **비율(아마 baseline 대비 ratio)**로 두 축으로 쪼개 continuous head가 소비한다 <code>[추정]</code> — 이번 커밋에 continuous loss 쪽 코드 변경은 없고 proto만 미리 자리를 잡은 상태.</li>
+<li><strong><code>LLM_JUDGE_RELEVANT_TO_SEARCH=108</code>·<code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH=109</code> 재등장.</strong> 두 action이 <strong>4세대+20(2026-09-12)에 107/108에 신설</strong> → <strong>4세대+23(2026-09-17)에 4일 만에 vacate</strong>(자리에 <code>CLIENT_TWEET_LIVE_STREAM_REPLY=107</code> 들어옴, 108은 <code>RESERVED_108</code> 플레이스홀더로 보존) → <strong>오늘(4세대+34, 15일 만에) 재등장</strong>. 다만 번호가 바뀌었다: 과거 107/108 → 이번 <strong>108/109</strong>. <code>RESERVED_108</code>이 LLM_JUDGE_RELEVANT_TO_SEARCH로 재사용되고, 새 번호 109가 LLM_JUDGE_NOT_RELEVANT_TO_SEARCH로 할당됐다. 즉 <strong>LLM judge 라벨을 action 축으로 다시 끌어들이려는 결정이 되돌아왔지만, 번호는 새 자리로</strong> 간 셈. 이것이 재조정 후 안정 상태가 될지, 다시 vacate될지는 다음 커밋 창에서 관측해야 한다 <span class="badge est">추정</span>.</li>
+<li><strong><code>WEB_CONV_VALUE_USD=6</code>·<code>WEB_CONV_VALUE_RATIO=7</code> ContinuousActionName 신설.</strong> 기존 continuous action 6개(<code>ACTIVE_SECS</code> 등 + <code>BRIDGE_PROBABILITY=4</code>, <code>ADS_WEB_CT_PURCHASE_VALUE=5</code>)에 두 개가 추가됨. 광고 전환 가치를 <strong>USD 절대값</strong>과 **비율(아마 baseline 대비 ratio)**로 두 축으로 쪼개 continuous head가 소비한다 <span class="badge est">추정</span> — 이번 커밋에 continuous loss 쪽 코드 변경은 없고 proto만 미리 자리를 잡은 상태.</li>
 <li><strong><code>AdInfo</code>에 <code>viewer_advertiser_engagement_counts</code>(필드 24)·<code>viewer_advertiser_conversion_counts</code>(필드 25) 추가.</strong> 둘 다 기존 <code>EngagementCounts</code> 메시지 타입이지만, 의미상 <strong>뷰어×광고주 축의 engagement/conversion 히스토리</strong>를 담는 새 슬롯이다. 광고 랭킹 모델이 &quot;이 뷰어가 <strong>이 광고주의</strong> 이전 광고에 어떻게 반응했나&quot;라는 축의 피처를 받을 수 있게 되는 자리.</li>
 <li><strong><code>EngagementCounts</code>에 <code>collected_actions</code>(필드 6, <code>repeated int32</code>) 추가.</strong> 어떤 action 종류들이 그 counts 집계에 포함됐는지 자체를 함께 실어 보낸다 — 다운스트림이 &quot;이 counts가 fav만 집계한 건지, fav+reply까지 포함한 건지&quot; 알 수 있게 됨.</li>
 <li><strong><code>RetrieveTopKCandidatesRequest</code>가 세 축 확장.</strong> 필드 14 <code>seed_post_ids</code>(기존 SidRetrieval의 RetrieveRequest와는 다른 메시지 — <strong>two-tower retrieval 쪽</strong>도 이제 seed post ID를 요청에 실을 수 있게 됨), 필드 15 <code>excluded_posts_bloom_filters</code>(repeated <code>ExcludedPostsBloomFilter { bit_array: repeated fixed64, size_cap, false_positive_rate }</code>), 필드 16 <code>excluded_post_ids</code>(repeated uint64). Phoenix two-tower retrieval도 이제 <strong>seed 조건부 검색</strong>과 <strong>이미 본 포스트 bloom-filter exclusion</strong>을 받는다는 뜻이다. SidSource와 two-tower retrieval이 같은 seed 축을 공유하게 되는 축에서 설계가 수렴하는 자리.</li>
-<li><strong><code>UnifiedCardType</code> enum 신설(29-variant).</strong> 광고 창의 unified card 포맷을 proto 수준에서 열거(IMAGE_WEBSITE · VIDEO_WEBSITE · IMAGE_APP · ... · VIDEO_PLAYABLE_WEBSITE · IMAGE_COLLECTION_WEBSITE). 코드 쪽 소비자는 이번 diff에 안 나오고 proto만 선언. 광고 ranking 모델이 <strong>unified card 포맷 자체를 범주형 피처</strong>로 받는 자리를 선점한 걸로 보인다 <code>[추정]</code>.</li>
+<li><strong><code>UnifiedCardType</code> enum 신설(29-variant).</strong> 광고 창의 unified card 포맷을 proto 수준에서 열거(IMAGE_WEBSITE · VIDEO_WEBSITE · IMAGE_APP · ... · VIDEO_PLAYABLE_WEBSITE · IMAGE_COLLECTION_WEBSITE). 코드 쪽 소비자는 이번 diff에 안 나오고 proto만 선언. 광고 ranking 모델이 <strong>unified card 포맷 자체를 범주형 피처</strong>로 받는 자리를 선점한 걸로 보인다 <span class="badge est">추정</span>.</li>
 <li><strong><code>FetchAggregatedUserActionRequest</code>의 proto 내 <strong>위치</strong>가 바뀜(파일 순서 재배치만).</strong> 의미 변화 없음.</li>
 </ul>
 <p><strong>새로 알게 된 것 — E. VF <code>caller_identity.rs</code>에 <code>outcome</code> 축 추가</strong></p>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/visibility-filtering/caller_identity.rs"><code>visibility-filtering/caller_identity.rs</code></a> +90/−15. 어제(4세대+33) 신설된 <code>vf_requests_by_caller{caller_identity, rpc, deadline}</code> 메트릭에 네 번째 라벨 <code>outcome</code> 추가. <code>Outcome { Success, Failure, Cancelled }</code> 3-variant enum이 신설되고, <code>record()</code> 함수가 이제 <strong><code>CallerRequest</code> 가드 구조체</strong>를 리턴한다(must_use로 annotation). 핸들러가 요청 처리 중 <code>request.mark_success()</code> 또는 <code>.mark_failure()</code>를 호출하지 않고 그대로 drop되면 <code>Cancelled</code>로 집계된다. Drop impl이 메트릭을 발행 — RAII 패턴.</p>
-<p>새 테스트 <code>dashboard_generator_pins_the_requests_by_caller_metric</code>가 <strong>대시보드 생성 Python 스크립트와 Rust 측 상수를 함께 pin</strong>한다 <code>[확인]</code>: 스크립트가 <code>REQUESTS_BY_CALLER_METRIC = &quot;vf_requests_by_caller&quot;</code>·<code>REQUESTS_BY_CALLER_NO_DEADLINE_FILTER = &#39;deadline=&quot;absent&quot;&#39;</code>·success/non-success filter 네 개 상수를 코드에 담고 있어야 Rust 테스트가 통과한다. 메트릭 정의가 <strong>Rust 코드와 대시보드 코드 두 축에서 동시에 drift 체크</strong>되는 설계다. 어제의 <code>_drift_checks</code> 메트릭이 UI 번들 drift를 보던 자리와 비슷한 패턴.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — F. home-mixer cold-start 분기와 engagement count 축 단순화</span></p></div>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs</code></a> +15/−38, <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a> +16/−48, <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/util/author_rules.rs"><code>home-mixer/util/author_rules.rs</code></a> 삭제(-156).</p>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/visibility-filtering/caller_identity.rs" target="_blank" rel="noopener"><code>visibility-filtering/caller_identity.rs</code></a> +90/−15. 어제(4세대+33) 신설된 <code>vf_requests_by_caller{caller_identity, rpc, deadline}</code> 메트릭에 네 번째 라벨 <code>outcome</code> 추가. <code>Outcome { Success, Failure, Cancelled }</code> 3-variant enum이 신설되고, <code>record()</code> 함수가 이제 <strong><code>CallerRequest</code> 가드 구조체</strong>를 리턴한다(must_use로 annotation). 핸들러가 요청 처리 중 <code>request.mark_success()</code> 또는 <code>.mark_failure()</code>를 호출하지 않고 그대로 drop되면 <code>Cancelled</code>로 집계된다. Drop impl이 메트릭을 발행 — RAII 패턴.</p>
+<p>새 테스트 <code>dashboard_generator_pins_the_requests_by_caller_metric</code>가 <strong>대시보드 생성 Python 스크립트와 Rust 측 상수를 함께 pin</strong>한다 <span class="badge ok">확인</span>: 스크립트가 <code>REQUESTS_BY_CALLER_METRIC = &quot;vf_requests_by_caller&quot;</code>·<code>REQUESTS_BY_CALLER_NO_DEADLINE_FILTER = &#39;deadline=&quot;absent&quot;&#39;</code>·success/non-success filter 네 개 상수를 코드에 담고 있어야 Rust 테스트가 통과한다. 메트릭 정의가 <strong>Rust 코드와 대시보드 코드 두 축에서 동시에 drift 체크</strong>되는 설계다. 어제의 <code>_drift_checks</code> 메트릭이 UI 번들 drift를 보던 자리와 비슷한 패턴.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">F. home-mixer cold-start 분기와 engagement count 축 단순화</span></p></div>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a> +15/−38, <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a> +16/−48, <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/util/author_rules.rs" target="_blank" rel="noopener"><code>home-mixer/util/author_rules.rs</code></a> 삭제(-156).</p>
 <ol>
 <li><strong><code>is_arm_gated_retrieval</code>(Phoenix MoE/Cold retrieval 소스 판정) 함수 삭제.</strong> 과거 Control arm에서 <strong>Control corpus인 포스트 중에서도 Phoenix MoE/Cold retrieval 출신은 cold-start 부스트 대상에서 제외</strong>했는데, 오늘부터 Control arm은 <strong>Control corpus의 모든 포스트</strong>(retrieval 소스 무관)를 부스트 대상으로 삼는다. 테스트도 <code>cold_retrieval_keeps_its_score_in_every_arm</code>가 삭제되고, 새 테스트 <code>control_viewer_lifts_cold_retrieval_from_control_corpus</code>가 그 자리를 대체 — &quot;Control 뷰어가 cold retrieval 후보도 Control corpus 소속이면 들어 올린다&quot;를 명시한다. 메트릭 <code>home_mixer.cold_started_posts_total</code>의 <code>is_moe</code> 라벨도 제거 — Phoenix MoE/Cold retrieval인지 여부는 더 이상 추적되지 않는다. 의미: 어제까지 cold-start 부스트가 Phoenix retrieval 축을 <strong>arm × corpus × 소스</strong>의 3축으로 보고 소스 축에서 걸러냈는데, 이제 <strong>arm × corpus</strong> 2축으로 좁혀진다.</li>
 <li><strong><code>EngagementCountsHydrator</code>가 cached_posts 상황에서 cold-start eligibility 분기 제거.</strong> 과거 <code>has_cached_posts</code>일 때는 <code>cold_start_base_eligible</code> 통과한 후보만 engagement count를 <strong>다시 fetch</strong>하고 나머지는 <code>preserve_counts</code>로 cached 값을 유지했는데, 오늘부터 <strong>모든 후보에 대해 unconditional 재fetch</strong>. <code>preserve_counts</code> helper 삭제. 새 테스트 <code>cached_posts_refetch_all_candidates</code>가 cold-start eligibility 무관하게 세 후보 전부가 새 counts로 교체됨을 pin한다. 호출 축에서 <code>ColdStartFollowerCap</code>·<code>cold_start_base_eligible</code> 의존성 둘 다 걷힘. 의미: engagement counts 축의 cold-start 상호의존이 끊어졌다 — 뒤에 cold-start 로직은 engagement count가 &quot;최신&quot;임을 전제할 수 있고, 하이드레이터 쪽은 더 단순해졌다.</li>
-<li><strong><code>home-mixer/util/author_rules.rs</code>(156줄) 삭제, <code>xai_feature_switches::AuthorRulesEvaluator</code>로 심볼 이동.</strong> 홈믹서 안에 있던 작성자 룰 평가 유틸이 공용 crate로 올라간 리팩터. moka cache 사이즈 500k · TTL 10분 · 64 shard 구성이 공용 crate 쪽에 복제됐을 것으로 보임 <code>[추정]</code> — 그 구현은 이번 diff에 노출되지 않음.</li>
+<li><strong><code>home-mixer/util/author_rules.rs</code>(156줄) 삭제, <code>xai_feature_switches::AuthorRulesEvaluator</code>로 심볼 이동.</strong> 홈믹서 안에 있던 작성자 룰 평가 유틸이 공용 crate로 올라간 리팩터. moka cache 사이즈 500k · TTL 10분 · 64 shard 구성이 공용 crate 쪽에 복제됐을 것으로 보임 <span class="badge est">추정</span> — 그 구현은 이번 diff에 노출되지 않음.</li>
 </ol>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — G. 소소한 변경 몇 가지</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">G. 소소한 변경 몇 가지</span></p></div>
 <ul>
 <li>VF <code>filter.rs</code>(+94/−2) — 테스트 두 개(<code>pure_core_alone_says_a_post_is_a_retweet</code>, <code>without_a_pure_core_answer_a_post_reads_as_an_original</code>)만 추가. 둘 다 PureCore(트윗 코어 메타) hydration이 실패하거나 성공할 때 <code>viewer_mutes_retweets</code> 규칙과 <code>nullcasted_tweet</code> 규칙이 각각 어떤 fallback으로 결론을 내는지를 pin한다. 정책 변화 없음, 기존 fault 처리 behavior에 lock을 추가한 테스트.</li>
-<li>VF <code>hydration/execute.rs</code>(+68/−2), <code>hydration/tweet_source.rs</code>(+8/−14), <code>safety_label_source/metrics.rs</code>(+29/−7) — 어제의 <code>Fetcher&lt;V&gt;</code> 재작성 후속으로 보이는 소폭 리팩터 <code>[추정]</code> — 테스트 추가 위주.</li>
+<li>VF <code>hydration/execute.rs</code>(+68/−2), <code>hydration/tweet_source.rs</code>(+8/−14), <code>safety_label_source/metrics.rs</code>(+29/−7) — 어제의 <code>Fetcher&lt;V&gt;</code> 재작성 후속으로 보이는 소폭 리팩터 <span class="badge est">추정</span> — 테스트 추가 위주.</li>
 <li>VF <code>visibility-filtering-client/vf_client.rs</code>(+1/−35), <code>test_support.rs</code>(+37/−0) — 테스트 fixture를 별도 파일로 분리. 로직 변화 없음.</li>
 <li>Phoenix <code>python/training/xai-checkpointing/xai_checkpointing/kms_client.py</code>(+74/−0, 신규) — KMS 접근 공용 wrapper. 피드 랭킹 직결 영향 없음.</li>
-<li>Phoenix <code>trainer_recsys.py</code>(+164/−39) — 공용 트레이너에서 SID retrieval 전용 Trainer가 상속할 축 분리로 보임 <code>[추정]</code>.</li>
+<li>Phoenix <code>trainer_recsys.py</code>(+164/−39) — 공용 트레이너에서 SID retrieval 전용 Trainer가 상속할 축 분리로 보임 <span class="badge est">추정</span>.</li>
 <li>Phoenix <code>rowwise_adagrad.py</code>(+14/−9) — row_emb 쪽 fused 커널과 python-level 참조 adapter 변경.</li>
-<li><code>abuse-enforcement-service/service-lib/src/overturn_hold.rs</code>(+22/−22) — 어제 공개된 overturn hold 모듈의 테스트 보강 <code>[추정]</code>.</li>
+<li><code>abuse-enforcement-service/service-lib/src/overturn_hold.rs</code>(+22/−22) — 어제 공개된 overturn hold 모듈의 테스트 보강 <span class="badge est">추정</span>.</li>
 <li><code>botmaker/src/java/com/twitter/botmaker/compiler/thrift/TType.java</code>(+14/−14) — thrift 컴파일러 유지보수.</li>
-<li><code>thunder/posts/post_store.rs</code>(+20/−20) — 테스트 리네이밍 수준 <code>[추정]</code>.</li>
-<li><code>phoenix-rankall/src/store/base.rs</code>(+12/−12) — SID 백필 저장소 어댑터 미세 조정 <code>[추정]</code>.</li>
-<li><code>visibility-filtering-client/tweet_safety_label.rs</code>(+39/−12) — thrift decoder 테스트 확장 <code>[추정]</code>.</li>
+<li><code>thunder/posts/post_store.rs</code>(+20/−20) — 테스트 리네이밍 수준 <span class="badge est">추정</span>.</li>
+<li><code>phoenix-rankall/src/store/base.rs</code>(+12/−12) — SID 백필 저장소 어댑터 미세 조정 <span class="badge est">추정</span>.</li>
+<li><code>visibility-filtering-client/tweet_safety_label.rs</code>(+39/−12) — thrift decoder 테스트 확장 <span class="badge est">추정</span>.</li>
 <li><code>home-mixer/params/param.rs</code>(+31/−1) — 위 5개 SID source param 추가로 인한 증분. cron sync 시각 미변경이면 유의미한 다른 변화는 없음.</li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> 공개 소스 4세대 섹션에 &quot;### 4세대+34 (2026-10-02, 76843a5)&quot; 신설. retrieval 소스 표(<code>## 후보 생성 (retrieval)</code> 절)에 <code>SidSource</code> 행을 추가해 &quot;SID generative retrieval microservice. seed post ID → 6-level × 256-codebook SID beam search → shared_prefix_depth score, served_type=ForYouPhoenixRetrievalMoe로 라벨, EnableSidSource=false 기본 off&quot;로 명기.</p></div>
 <blockquote>
-<pre><code class="language-python">HISTORY_SEQ_LEN = 1023
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">HISTORY_SEQ_LEN = 1023
 CANDIDATE_SEQ_LEN = 64
 NUM_SID_TOKENS = 6
 NUM_USER_PREFIX = 1
@@ -321,106 +163,49 @@ AUTHOR_VOCAB_SIZE = 30_000_000
 # ...
 sid_codebook_size=256,
 sid_num_levels=6,
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py"><code>phoenix/xrex/configs/xrecsys_sid_retrieval.py:11-40, 150</code></a>, 2026-10-02</p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_sid_retrieval.py:11-40, 150</code></a>, 2026-10-02</p>
 </blockquote>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <p>세 겹의 사실이 겹친다.</p>
 <ol>
 <li><p><strong>X가 generative SID retrieval을 &quot;별도 microservice + 전용 Transformer 학습·서빙 스택 + home-mixer 후보 소스 배선&quot;의 완결된 세 축으로 공개한 첫 커밋이다.</strong> 지금까지 X의 SID는 (a) two-tower 아이템 타워의 <strong>입력 피처</strong>(2026-09-30 공개된 <code>xrecsys_two_tower.py</code>에 <code>use_post_sid</code> 플래그)로, 또는 (b) phoenix-rankall의 <strong>백필 QPS 800k 상한</strong>으로(어제 공개된 <code>SID_BACKFILL_QPS_CAP = 800_000</code>) 간접적으로 모습을 비쳤지만, SID를 <strong>직접 생성</strong>해서 그 결과를 candidate로 리턴하는 라인은 공개되지 않았다. 오늘 공개는 (i) Phoenix 쪽에 전용 Transformer 모델(8-layer, GQA 20:4, 1030-length context, 6-level × 256-codebook)의 config/모델/트레이너/러너 네 파일을 신설하고, (ii) 별도 microservice(<code>xai-recsys-sid-retrieval.prod.fou.twitter.biz</code>)의 gRPC client와 request shape(<code>seed_post_ids</code>, <code>shared_prefix_depth</code> scoring, prefix retrieval 축 <code>min_prefix_depth=3</code>)을 공개하고, (iii) home-mixer <code>SidSource</code>로 <strong>PhoenixMOESource와 같은 ServedType으로 라벨된</strong> 후보를 흘려 보내는 전체 체인을 한 번에 공개한다. 이 세 축이 각기 별개 커밋으로 흩어졌다면 &quot;준비 중&quot; 신호였겠지만, 한 커밋에 묶여 공개된 사실이 <strong>배선 완성에 가깝다</strong>는 뜻이다. 다만 <code>EnableSidSource=false</code> 기본 off이므로 <strong>실 트래픽 적용은 FeatureSwitches cron에서 ON 되는 날이 관측 지점</strong>이다.</p>
 </li>
-<li><p><strong>two-tower retrieval과 SID generative retrieval이 &quot;서로 대체&quot;가 아니라 &quot;동일 vocab 공간 위의 두 레이어&quot;로 설계됐다.</strong> 두 모델이 같은 유저·아이템·작성자 hash vocab(100M · 30M · double hashing scales/biases 똑같음)을 공유한다는 사실이 <code>xrecsys_sid_retrieval.py:30-45</code>와 2026-09-30 공개된 <code>xrecsys_two_tower.py</code>의 수치를 대조하면 드러난다. 이것이 중요한 이유: generative retrieval이 두 가지 비용 축으로 비싼데(① SID 생성 시간 복잡도가 beam_width × decode_levels × 코드북 크기, ② 코퍼스 측 SID 인덱스 유지 비용), two-tower가 <strong>ANN이 돌릴 수 있는 broad recall을 먼저 커버</strong>한 뒤 SID retrieval이 <strong>접두사 공유도 축에서 보강 recall</strong>을 담당하는 상보 구조를 선택한 자리로 보인다 <code>[추정]</code>. 같은 vocab이면 양쪽 모델이 공유 임베딩 테이블로 돌 수도 있는데, 지금 공개된 config는 양쪽 모델이 각자 임베딩 테이블을 가진다. 공유 임베딩으로 통합되는지는 다음 커밋에서 관측해야 한다.</p>
+<li><p><strong>two-tower retrieval과 SID generative retrieval이 &quot;서로 대체&quot;가 아니라 &quot;동일 vocab 공간 위의 두 레이어&quot;로 설계됐다.</strong> 두 모델이 같은 유저·아이템·작성자 hash vocab(100M · 30M · double hashing scales/biases 똑같음)을 공유한다는 사실이 <code>xrecsys_sid_retrieval.py:30-45</code>와 2026-09-30 공개된 <code>xrecsys_two_tower.py</code>의 수치를 대조하면 드러난다. 이것이 중요한 이유: generative retrieval이 두 가지 비용 축으로 비싼데(① SID 생성 시간 복잡도가 beam_width × decode_levels × 코드북 크기, ② 코퍼스 측 SID 인덱스 유지 비용), two-tower가 <strong>ANN이 돌릴 수 있는 broad recall을 먼저 커버</strong>한 뒤 SID retrieval이 <strong>접두사 공유도 축에서 보강 recall</strong>을 담당하는 상보 구조를 선택한 자리로 보인다 <span class="badge est">추정</span>. 같은 vocab이면 양쪽 모델이 공유 임베딩 테이블로 돌 수도 있는데, 지금 공개된 config는 양쪽 모델이 각자 임베딩 테이블을 가진다. 공유 임베딩으로 통합되는지는 다음 커밋에서 관측해야 한다.</p>
 </li>
-<li><p><strong>row-sharded 임베딩 CUDA 커널 묶음은 Phoenix 임베딩 설계 자체의 2축 확장이다.</strong> 3,180줄 짜리 <code>row_emb</code>가 generative retrieval 모델만을 위해 추가된 건 아니지만, 이번 커밋 묶음의 맥락에서 보면 <strong>SID generative retrieval이 요구하는 거대 vocab 임베딩</strong>(100M · 30M · 6-level × 256 codebook)이 트리거라는 해석이 자연스럽다. <code>async_emb</code>(column-sharded, 기존)와 <code>row_emb</code>(row-sharded, 신규) 두 샤딩 전략을 공유 adapter(<code>recsys_async_emb.py</code>)로 선택하게 함으로써, <strong>모델별로 최적 샤딩을 고를 수 있는 자리</strong>를 마련한 셈이다. two-tower는 하나의 유저 타워 / 아이템 타워를 각각 column-shard로 유지해도 되지만, SID generative 모델은 <strong>generation 축에서 각 토큰이 자기 vocab 범위만 참조</strong>하므로 row-shard가 더 compact한 통신 패턴을 낳는다 <code>[추정]</code>.</p>
+<li><p><strong>row-sharded 임베딩 CUDA 커널 묶음은 Phoenix 임베딩 설계 자체의 2축 확장이다.</strong> 3,180줄 짜리 <code>row_emb</code>가 generative retrieval 모델만을 위해 추가된 건 아니지만, 이번 커밋 묶음의 맥락에서 보면 <strong>SID generative retrieval이 요구하는 거대 vocab 임베딩</strong>(100M · 30M · 6-level × 256 codebook)이 트리거라는 해석이 자연스럽다. <code>async_emb</code>(column-sharded, 기존)와 <code>row_emb</code>(row-sharded, 신규) 두 샤딩 전략을 공유 adapter(<code>recsys_async_emb.py</code>)로 선택하게 함으로써, <strong>모델별로 최적 샤딩을 고를 수 있는 자리</strong>를 마련한 셈이다. two-tower는 하나의 유저 타워 / 아이템 타워를 각각 column-shard로 유지해도 되지만, SID generative 모델은 <strong>generation 축에서 각 토큰이 자기 vocab 범위만 참조</strong>하므로 row-shard가 더 compact한 통신 패턴을 낳는다 <span class="badge est">추정</span>.</p>
 </li>
 </ol>
 <p>LLM_JUDGE_* action의 재귀환은 이와 별개의 흐름이다. 15일 전 vacate됐던 두 action이 <strong>번호를 바꿔</strong>(107/108 → 108/109) 재등장한 사실은 &quot;LLM judge를 action 축에 담아 학습 target 중 하나로 소비&quot;하려는 방향이 재조정 후 다시 올라왔음을 뜻한다. 번호가 바뀐 이유는 <strong>그 사이 107 자리가 <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code>로 영구 점유</strong>됐기 때문이고, 108도 함께 비워 재사용하는 쪽을 택했다. 이번 공개가 모델 학습 config나 wire에서의 소비처는 보여주지 않는다 — proto만 자리 선점. 어느 head 가중치에 들어가는지, 어느 config의 target action list에 포함되는지는 다음 창에서 봐야 한다.</p>
-<h2 id="2-산업-블로그와-netflix--신규-없음">2. 산업 블로그와 Netflix — 신규 없음</h2>
+<h2 id="2-산업-블로그와-netflix--신규-없음"><span class="num">2</span>산업 블로그와 Netflix — 신규 없음</h2>
 <p>Netflix tech blog 피드는 10건 중 최신 2건이 &quot;Trading a Cloud Identity for Your Own: Workload Attestation on Managed Compute&quot;(2026-09-25, 인프라)·&quot;Leave the Class Path in the Rearview Mirror&quot;(2026-09-18, Java packaging)로 추천 축과 무관. 그 전 &quot;MAPS&quot;·&quot;GenRec&quot;·&quot;GenPage&quot;는 이미 반영됨. Meta <code>engineering.fb.com</code> 최신은 &quot;From User Sequences to Scaling Laws&quot;(2026-09-02)로 이미 반영됐고, 그 이후 쌓인 네 건(Private Processing / Rebalancer / Petal / ZGateway)은 모두 인프라·네트워킹·개인정보로 추천 축과 무관.</p>
 <h2 id="레이더">레이더</h2>
 <p>arXiv <code>cs.IR</code> 2026-09-30 ~ 2026-10-01 창에서 요청 30건 중 <code>&lt;entry&gt;</code> <strong>30건 전부 파싱 성공</strong>. 수용 기준(① 플랫폼 저자 또는 프로덕션 A/B ② 메커니즘 신규성 ③ 대규모 결과)을 모두 넘는 항목 <strong>0건</strong>. 아래 세 항목이 경계였지만 전부 탈락.</p>
 <ul>
-<li><a href="https://arxiv.org/abs/2610.02057">arXiv 2610.02057</a> <em>Optimizing Effective Training Time for Large-Scale Recommendation Systems</em> — Meta 소속으로 확인(PDF strings에 &quot;Meta Platforms, Inc.&quot;, &quot;Meta Engineering Blog&quot;, &quot;Meta internal&quot; 다수 등장). 추천 학습 플릿의 ETT%(Effective Training Time)를 80% → 90%+로 올리는 축의 fleet-scale 운영 사례. 비동기 체크포인팅 · 통신 제거 · 파이프라인 overlap · 동적 shape · PyTorch 2 compile cache 재사용 등. <strong>탈락 사유</strong>: 추천 <strong>학습 인프라</strong>의 운영적 승리이고, 레이더 기준 ②의 <strong>retrieval·랭킹 메커니즘 신규성</strong>과는 축이 다름. 서비스 정본에도 &quot;학습 처리량&quot;은 들어가지 않는 축이므로 반영하지 않음.</li>
-<li><a href="https://arxiv.org/abs/2610.01533">arXiv 2610.01533</a> <em>Neither Black nor White: Balancing Semantic and Collaborative Signals with Graph-Informed Semantic IDs (GrIS)</em> — Huawei Ireland Research Centre 소속 전원 확인. SID와 collaborative 신호를 그래프로 섞는 메커니즘 축이지만 <strong>프로덕션 배포 주장 없음</strong>. <strong>탈락 사유</strong>: ①의 플랫폼·배포 축이 비어 있음.</li>
-<li><a href="https://arxiv.org/abs/2609.39043">arXiv 2609.39043</a> <em>Routing Between Generative and Collaborative User Profiles: A Serving-Time Gate for Controllable Novelty</em> — Comcast Technology AI + DePaul University 소속. &quot;serving-time routing gate가 LLM-profile 모델과 collaborative sequential 모델 사이에서 유저를 선택적으로 라우팅&quot;, NDCG 5% 손실 예산 안에서 <strong>Novelty@10 +6.5%, 유저의 12.5%만 라우팅</strong>. 메커니즘 축은 흥미로움(cost-aware 선택적 LLM 사용). <strong>탈락 사유</strong>: Comcast의 Xfinity Stream은 추적 대상 서비스가 아니며, 피드/랭킹 플랫폼으로서의 추적 가치가 낮음(스트리밍 TV의 영상 추천 축).</li>
+<li><a href="https://arxiv.org/abs/2610.02057" target="_blank" rel="noopener">arXiv 2610.02057</a> <em>Optimizing Effective Training Time for Large-Scale Recommendation Systems</em> — Meta 소속으로 확인(PDF strings에 &quot;Meta Platforms, Inc.&quot;, &quot;Meta Engineering Blog&quot;, &quot;Meta internal&quot; 다수 등장). 추천 학습 플릿의 ETT%(Effective Training Time)를 80% → 90%+로 올리는 축의 fleet-scale 운영 사례. 비동기 체크포인팅 · 통신 제거 · 파이프라인 overlap · 동적 shape · PyTorch 2 compile cache 재사용 등. <strong>탈락 사유</strong>: 추천 <strong>학습 인프라</strong>의 운영적 승리이고, 레이더 기준 ②의 <strong>retrieval·랭킹 메커니즘 신규성</strong>과는 축이 다름. 서비스 정본에도 &quot;학습 처리량&quot;은 들어가지 않는 축이므로 반영하지 않음.</li>
+<li><a href="https://arxiv.org/abs/2610.01533" target="_blank" rel="noopener">arXiv 2610.01533</a> <em>Neither Black nor White: Balancing Semantic and Collaborative Signals with Graph-Informed Semantic IDs (GrIS)</em> — Huawei Ireland Research Centre 소속 전원 확인. SID와 collaborative 신호를 그래프로 섞는 메커니즘 축이지만 <strong>프로덕션 배포 주장 없음</strong>. <strong>탈락 사유</strong>: ①의 플랫폼·배포 축이 비어 있음.</li>
+<li><a href="https://arxiv.org/abs/2609.39043" target="_blank" rel="noopener">arXiv 2609.39043</a> <em>Routing Between Generative and Collaborative User Profiles: A Serving-Time Gate for Controllable Novelty</em> — Comcast Technology AI + DePaul University 소속. &quot;serving-time routing gate가 LLM-profile 모델과 collaborative sequential 모델 사이에서 유저를 선택적으로 라우팅&quot;, NDCG 5% 손실 예산 안에서 <strong>Novelty@10 +6.5%, 유저의 12.5%만 라우팅</strong>. 메커니즘 축은 흥미로움(cost-aware 선택적 LLM 사용). <strong>탈락 사유</strong>: Comcast의 Xfinity Stream은 추적 대상 서비스가 아니며, 피드/랭킹 플랫폼으로서의 추적 가치가 낮음(스트리밍 TV의 영상 추천 축).</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong><code>EnableSidSource</code> cron flip 시점</strong>: FeatureSwitches cron이 언제 이 param을 true로 돌리는지, 그 시점의 <code>SidSourceMaxSeeds</code>·<code>SidSourceMaxResults</code>·<code>SidSourceMinPrefixDepth</code> 값이 config 기본값에서 바뀌는지가 <strong>실 트래픽 적용 시점</strong>이다. <code>SidSource.retrieved{type=seeds|retrieved|hydrated}</code> 메트릭이 홈믹서 측 관측 지점.</li>
 <li><strong>LLM_JUDGE_*(108/109) action의 학습 소비처</strong>: proto만 선언됐고 학습 config나 target head 쪽에서 소비하는 코드는 아직 안 보임. 다음 커밋에서 <code>xrecsys_search.py</code> 또는 <code>xrecsys_two_tower.py</code>의 target action list에 108/109가 추가되면 그때가 <strong>wire 선언에서 학습 소비로 승격</strong>되는 시점이다.</li>
 <li><strong>two-tower와 SID retrieval 임베딩 테이블 공유 여부</strong>: 두 모델이 같은 vocab 설계를 쓰지만 현재 임베딩 테이블은 각자 소유. 다음 커밋에서 체크포인트 공유 또는 임베딩 테이블 재사용 축이 생기면 두 retrieval이 <strong>공유 임베딩 위의 두 head</strong>로 통합되는 신호다.</li>
 <li><strong>generative retrieval 심층 분석</strong>: 모델의 beam decoder 수학(prefix retrieval 멈춤 조건, score aggregation, SID → post 역해상의 corpus view 구조), 학습 loss(positive=FAV 하나로 좁힌 자리의 negative sampling 축, hard negative action 7개의 가중치), training throughput(ep=128 · dp=1 · bs=128 · max_steps=3.1B 조합의 처리량 추정)이 모두 전면 분석 대상. 심층 분석 필요.</li>
 <li><strong>row_emb vs async_emb 선택 축</strong>: 어느 모델이 row-sharded를 쓰고 어느 모델이 column-sharded를 쓰는지, <code>is_row_sharded(context_handle)</code> 분기의 실제 호출처가 어디인지가 다음 창의 관측 지점. 현재 둘 다 adapter 레이어에서 지원되지만 어느 모델이 &quot;실제로&quot; row-sharded를 쓰는지는 model config의 <code>make_context_handle</code> 호출을 따라가야 보임.</li>
-</ul>
+</ul></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-10-02.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-10-02</div></a><a class="r" href="daily-2026-10-04.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-10-04</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-10-02.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-10-02</span></a><a class="pg-next" href="daily-2026-10-04.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-10-04</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

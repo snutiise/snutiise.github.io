@@ -2,230 +2,72 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-22 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: Meta search·discovery 팀에서 KDD 2027로 향하는 프로덕션 논문 두 편이 arXiv에 함께 올라왔다. 한 편은 trillion-doc source corpus에서 GPU와 CPU 두 개의 retrieval 경로를 동시에 서빙하는…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-22.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-22 — feed-research">
 <meta property="og:description" content="한 줄: Meta search·discovery 팀에서 KDD 2027로 향하는 프로덕션 논문 두 편이 arXiv에 함께 올라왔다. 한 편은 trillion-doc source corpus에서 GPU와 CPU 두 개의 retrieval 경로를 동시에 서빙하는…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-22.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-22</h1>
-  <div class="wd">화요일 · 읽는 데 약 21분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>3</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>Meta search·discovery 팀에서 KDD 2027로 향하는 프로덕션 논문 두 편이 arXiv에 함께 올라왔다. 한 편은 trillion-doc source corpus에서 GPU와 CPU 두 개의 retrieval 경로를 동시에 서빙하는 depth–breadth 아키텍처 논문이고(2609.21281), 다른 한 편은 hundreds of millions 규모 비디오 인덱스를 시간마다 새로 발행하는 <strong>Video Deep Dive (VDD)</strong> 지면의 model-based retrieval을 두고 37일 동안 진행된 human-gated LLM 자동 실험 프로토콜 <strong>EvoPilot</strong> 이야기다(2609.21257). 두 논문은 저자가 겹치고 같은 GSRR(Good Search Result Rate for Retention) 지표를 쓴다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-meta의-trillion-doc-personalized-search--gpu와-cpu-경로가-나눠-서빙한다--meta-facebook-search-인프라">1. Meta의 trillion-doc personalized search — GPU와 CPU 경로가 나눠 서빙한다 — Meta (Facebook Search 인프라)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.21281">Hybrid GPU–CPU Retrieval for Personalized Search at Ultra-Large Scale</a> — arXiv 2609.21281, 2026-09-18 v1 제출, KDD 2027 accepted. 저자 21인 전원 Meta Platforms(Menlo Park). <a href="https://arxiv.org/html/2609.21281">HTML 판</a>에서 소속 확인.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-22">2026-09-22</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>화요일</li>
+<li><span class="meta-k">읽는 시간</span>21분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>3</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>Meta search·discovery 팀에서 KDD 2027로 향하는 프로덕션 논문 두 편이 arXiv에 함께 올라왔다. 한 편은 trillion-doc source corpus에서 GPU와 CPU 두 개의 retrieval 경로를 동시에 서빙하는 depth–breadth 아키텍처 논문이고(2609.21281), 다른 한 편은 hundreds of millions 규모 비디오 인덱스를 시간마다 새로 발행하는 <strong>Video Deep Dive (VDD)</strong> 지면의 model-based retrieval을 두고 37일 동안 진행된 human-gated LLM 자동 실험 프로토콜 <strong>EvoPilot</strong> 이야기다(2609.21257). 두 논문은 저자가 겹치고 같은 GSRR(Good Search Result Rate for Retention) 지표를 쓴다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">5</span></summary><ol><li><a href="#1-meta의-trillion-doc-personalized-search--gpu와-cpu-경로가-나눠-서빙한다--meta-facebook-search-인프라"><span class="num">1</span>Meta의 trillion-doc personalized search — GPU와 CPU 경로가 나눠 서빙한다 — Meta (Facebook Search 인프라)</a></li><li><a href="#2-video-deep-dive의-model-based-retrieval--37일-캠페인이-밝혀-낸-mbr-파이프라인과-human-gated-자동-실험-프로토콜-evopilot--meta-vdd"><span class="num">2</span>Video Deep Dive의 model-based retrieval — 37일 캠페인이 밝혀 낸 MBR 파이프라인과 human-gated 자동 실험 프로토콜 EvoPilot — Meta (VDD)</a></li><li><a href="#3-angle-tencent--저자-소속-확인-완료-tencent-프로덕션-sponsored-search-ads"><span class="num">3</span>ANGLE (Tencent) — 저자 소속 확인 완료 (Tencent 프로덕션 sponsored search ads)</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-meta의-trillion-doc-personalized-search--gpu와-cpu-경로가-나눠-서빙한다--meta-facebook-search-인프라"><span class="num">1</span>Meta의 trillion-doc personalized search — GPU와 CPU 경로가 나눠 서빙한다 — Meta (Facebook Search 인프라)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.21281" target="_blank" rel="noopener">Hybrid GPU–CPU Retrieval for Personalized Search at Ultra-Large Scale</a> — arXiv 2609.21281, 2026-09-18 v1 제출, KDD 2027 accepted. 저자 21인 전원 Meta Platforms(Menlo Park). <a href="https://arxiv.org/html/2609.21281" target="_blank" rel="noopener">HTML 판</a>에서 소속 확인.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> Meta의 personalized search는 유저가 남긴 상호작용 이력에 크게 기대는 질의(사람 이름, 그룹, 관심사)와 아이템 커버리지가 넓어야 하는 질의(navigational, 이름이 정확한 것)를 동시에 처리해야 한다. 후자를 넓게 커버하려면 인벤토리 자체를 서빙 인덱스에 크게 담아야 하고, 전자를 잘 처리하려면 두 타워의 dot product를 넘어서 유저와 아이템 사이의 cross-feature interaction을 인퍼런스 경로에 넣어야 한다. 논문은 이 대립을 &quot;personalization–scale paradox&quot;라고 부른다: 전체 서빙 인벤토리를 GPU 메모리에 올리는 건 자원이 부족하고, CPU에서는 interaction-heavy 모델을 지연 예산 안에 넣기 어렵다. 이 조건을 새 모델 클래스가 아니라 <strong>동시 서빙(co-serving) 오케스트레이션</strong>으로 푸는 것이 이 논문의 주장이다.</p></div>
-<p>Meta search의 인프라 논문은 공개된 것이 많지 않다. 인용 문헌에도 2020년 <a href="https://research.facebook.com/publications/embedding-based-retrieval-in-facebook-search/">Embedding-based retrieval in Facebook search</a>(KDD 2020)와 2021년 <a href="https://research.facebook.com/publications/que2search-fast-and-accurate-query-and-document-understanding-for-search-at-facebook/">Que2Search</a>(KDD 2021) 이후 프로덕션 아키텍처 진술이 오래 없었다. 이번 자료가 프로덕션 A/B 수치와 함께 이 갭을 채운다.</p>
+<p>Meta search의 인프라 논문은 공개된 것이 많지 않다. 인용 문헌에도 2020년 <a href="https://research.facebook.com/publications/embedding-based-retrieval-in-facebook-search/" target="_blank" rel="noopener">Embedding-based retrieval in Facebook search</a>(KDD 2020)와 2021년 <a href="https://research.facebook.com/publications/que2search-fast-and-accurate-query-and-document-understanding-for-search-at-facebook/" target="_blank" rel="noopener">Que2Search</a>(KDD 2021) 이후 프로덕션 아키텍처 진술이 오래 없었다. 이번 자료가 프로덕션 A/B 수치와 함께 이 갭을 채운다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><strong>source corpus는 multi-trillion 규모</strong>이고, 서빙에 실리는 인벤토리는 여기에서 별도로 뽑는다 <code>[확인]</code>. 4-trillion figure는 &quot;before selection&quot;, ANN scan 대상이 아니다. 정책·품질·언어·프레시니스·중복 검사를 통과한 뒤 하드웨어별 selector가 GPU snapshot과 CPU snapshot을 독립으로 만든다.</li>
-<li><strong>GPU pathway는 billion-scale 인벤토리</strong>를 대상으로 two-tower retrieval과 interaction pre-ranking을 한 프로세스에 fuse해 실행한다. <code>[확인]</code></li>
-<li><strong>CPU pathway는 tens-of-billions 인벤토리</strong>(GPU의 대략 20배)를 다루고, dedicated dense embedding index + eager term-at-a-time scoring + bulk scanning + finer clustering을 조합한다. dot product만 쓰고 유저·문서 벡터 사이에 cross feature는 넣지 않는다. <code>[확인]</code></li>
-<li><strong>두 경로는 요청마다 하나만 켤 수도, 둘 다 켤 수도, 각각 독립으로 disable할 수도 있다.</strong> 후보는 downstream ranker로 넘어가기 전에 top-level aggregator에서 dedupe된다. <code>[확인]</code></li>
-<li>서빙 지연에서 GPU pathway가 P50과 P95에서 더 빠르고 P99만 16% 더 느리다 — 인터랙션 pre-ranking을 포함해 224개 후보를 shared ranker에 넣기 때문이지, 순수 kernel 비교가 아니다. dense CPU pathway는 dedupe 후 59개를 넘긴다. <code>[확인]</code></li>
-<li><strong>full-system A/B에서 legacy CPU-only 대비 model-scored relevance와 substantive engagement가 함께 오른다</strong> <code>[확인]</code>. 두 pathway를 따로 A/B로 붙였을 때도 각자의 배포 스코프에서 양(+) 값이었다.</li>
+<li><strong>source corpus는 multi-trillion 규모</strong>이고, 서빙에 실리는 인벤토리는 여기에서 별도로 뽑는다 <span class="badge ok">확인</span>. 4-trillion figure는 &quot;before selection&quot;, ANN scan 대상이 아니다. 정책·품질·언어·프레시니스·중복 검사를 통과한 뒤 하드웨어별 selector가 GPU snapshot과 CPU snapshot을 독립으로 만든다.</li>
+<li><strong>GPU pathway는 billion-scale 인벤토리</strong>를 대상으로 two-tower retrieval과 interaction pre-ranking을 한 프로세스에 fuse해 실행한다. <span class="badge ok">확인</span></li>
+<li><strong>CPU pathway는 tens-of-billions 인벤토리</strong>(GPU의 대략 20배)를 다루고, dedicated dense embedding index + eager term-at-a-time scoring + bulk scanning + finer clustering을 조합한다. dot product만 쓰고 유저·문서 벡터 사이에 cross feature는 넣지 않는다. <span class="badge ok">확인</span></li>
+<li><strong>두 경로는 요청마다 하나만 켤 수도, 둘 다 켤 수도, 각각 독립으로 disable할 수도 있다.</strong> 후보는 downstream ranker로 넘어가기 전에 top-level aggregator에서 dedupe된다. <span class="badge ok">확인</span></li>
+<li>서빙 지연에서 GPU pathway가 P50과 P95에서 더 빠르고 P99만 16% 더 느리다 — 인터랙션 pre-ranking을 포함해 224개 후보를 shared ranker에 넣기 때문이지, 순수 kernel 비교가 아니다. dense CPU pathway는 dedupe 후 59개를 넘긴다. <span class="badge ok">확인</span></li>
+<li><strong>full-system A/B에서 legacy CPU-only 대비 model-scored relevance와 substantive engagement가 함께 오른다</strong> <span class="badge ok">확인</span>. 두 pathway를 따로 A/B로 붙였을 때도 각자의 배포 스코프에서 양(+) 값이었다.</li>
 <li>지표는 <strong>GSRR(Good Search Result Rate)</strong> 로, retention-oriented substantive engagement 지표라고 자체 정의한다. 데일리 assigned population은 millions 단위, 계정 단위 랜덤 배정, 대략 반씩 분할.</li>
-<li>capacity plan 관점에서 CPU pathway가 어떤 참조 dense retrieval 구현 대비 4배 처리량 개선을 낸다 — 다만 이 비교는 shared ranking·네트워킹·GPU pathway를 제외한 vector op 한정. <code>[확인]</code></li>
+<li>capacity plan 관점에서 CPU pathway가 어떤 참조 dense retrieval 구현 대비 4배 처리량 개선을 낸다 — 다만 이 비교는 shared ranking·네트워킹·GPU pathway를 제외한 vector op 한정. <span class="badge ok">확인</span></li>
 </ul>
 <blockquote>
 <p>&quot;We present a hybrid GPU–CPU co-serving system that resolves the paradox through orchestration rather than a new model class. A high-depth GPU pathway fuses retrieval and interaction pre-ranking over a curated online pool on the order of a billion documents, while a high-breadth CPU pathway searches an independently selected online inventory roughly twenty times larger with lightweight personalized scoring.&quot;
-— <a href="https://arxiv.org/abs/2609.21281">arXiv 2609.21281</a>, 2026-09-18</p>
+— <a href="https://arxiv.org/abs/2609.21281" target="_blank" rel="noopener">arXiv 2609.21281</a>, 2026-09-18</p>
 </blockquote>
 <blockquote>
 <p>&quot;The system is deployed in production. A full-system A/B test against the legacy CPU-only configuration improves model-scored relevance and substantive engagement, while separate pathway experiments show positive value at their own deployment scopes.&quot;
@@ -233,32 +75,33 @@ ul.rl .chip b { font-size: 13px; }
 </blockquote>
 <div class="blk app"><p><span class="lbl">정본 반영</span> 없음. <strong>Facebook Search는 이 저장소의 canon 서비스가 아니다</strong>(services는 Facebook Feed 중심). 논문의 결과는 <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 편입한다. 두 번째 회사(구글, Bing, Yandex)가 depth-breadth heterogeneous co-serving을 프로덕션 A/B 수치와 함께 발표하면 <code>topics/retrieval-heterogeneous-compute.md</code> 승격 후보로 관찰한다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> Meta의 프로덕션 retrieval 인프라를 한 계층 더 아래로 열어 준 첫 진술이다. 지난 5년간 Facebook Search에서 공개된 아키텍처 문헌은 EBR(2020)과 Que2Search(2021) 두 편에 사실상 멈춰 있었다. 이번 자료가 heterogeneous compute 층에서 무엇을 하는지를 보여 준다. 다만 <strong>VDD 논문의 문맥과 종합하면 이 &quot;Search&quot;는 순수 웹 검색 관점보다는 Facebook 안에서 검색 → 비디오 소비로 이어지는 통합 검색 지면</strong>에 걸쳐 있다(둘 다 GSRR을 쓴다). 우리 저장소가 추적하는 Facebook Feed의 후보 생성과는 아키텍처가 다르지만, 두 지면이 인프라를 상당 부분 공유한다는 정황이다(Xue et al., 2026이 &quot;existing GPU platform&quot;으로 인용된다).</p></div>
-<h2 id="2-video-deep-dive의-model-based-retrieval--37일-캠페인이-밝혀-낸-mbr-파이프라인과-human-gated-자동-실험-프로토콜-evopilot--meta-vdd">2. Video Deep Dive의 model-based retrieval — 37일 캠페인이 밝혀 낸 MBR 파이프라인과 human-gated 자동 실험 프로토콜 EvoPilot — Meta (VDD)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.21257">Verify, Don&#39;t Trust: Agentic Model Development for Video Discovery Retrieval at Scale</a> — arXiv 2609.21257, 2026-09-18 v1 제출, KDD 2027 accepted. 저자 5인 전원 Meta Platforms(Menlo Park). Hao Fu·Baiting Zhu·Minglei Chen·Yinjie Huang·Shuai Ding — 이 5명 가운데 4명은 자료 1의 저자 21인 명단과 겹친다.</p></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="2-video-deep-dive의-model-based-retrieval--37일-캠페인이-밝혀-낸-mbr-파이프라인과-human-gated-자동-실험-프로토콜-evopilot--meta-vdd"><span class="num">2</span>Video Deep Dive의 model-based retrieval — 37일 캠페인이 밝혀 낸 MBR 파이프라인과 human-gated 자동 실험 프로토콜 EvoPilot — Meta (VDD)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.21257" target="_blank" rel="noopener">Verify, Don&#39;t Trust: Agentic Model Development for Video Discovery Retrieval at Scale</a> — arXiv 2609.21257, 2026-09-18 v1 제출, KDD 2027 accepted. 저자 5인 전원 Meta Platforms(Menlo Park). Hao Fu·Baiting Zhu·Minglei Chen·Yinjie Huang·Shuai Ding — 이 5명 가운데 4명은 자료 1의 저자 21인 명단과 겹친다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> LLM agent가 코드 변경, 실행, 평가까지 도는 autoresearch 루프는 이미 있다. 자기완결 스크립트 안에서 몇 분짜리 iteration을 돌리는 것은 잘 알려져 있고, 이번 자료가 다루는 건 그것이 아니다. 여기 대상은 여러 subsystem을 아우르고 학습·인덱싱·서빙이 시간 단위로 굴러가는 온라인 시스템 위에서, <strong>hours-long 실행과 weeks-long 캠페인</strong>을 자동화된 에이전트가 돌리려 할 때 발생하는 실패 모드다. 코드 변경이 실제로는 no-op이거나, 데이터 window가 새거나, evaluator 시맨틱이 조용히 바뀌었거나, control과 treatment가 서로 다른 서빙 funnel을 지나가는 상황이 있다. 이런 상황에서도 캠페인 자체는 성공적으로 &quot;끝날&quot; 수 있는데, 결론이 유효하지 않다. <strong>EvoPilot</strong> 은 이 취약성을 human-gated verification 프로토콜로 막는다는 주장이다. 그리고 그 검증을 실증한 사례가 VDD(Video Deep Dive) MBR 시스템의 37일 캠페인이다.</p></div>
 <p>지면 이름 자체는 이번 자료가 논문 코퍼스에 처음 등장시킨다(원문에서 Facebook·Instagram·Reels 지면 이름은 인용 문헌 안에만 나오고, 본문에서는 &quot;VDD&quot; 로만 부른다). VDD는 &quot;hundreds of millions of users를 서빙하는 온라인 follow-on discovery 지면&quot; 이라고만 설명된다. <strong>유저가 seed 비디오를 열면 그 뒤로 볼 만한 비디오를 검색-랭킹 방식으로 이어 준다</strong>.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — VDD 시스템 쪽</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">VDD 시스템 쪽</span></p></div>
 <ul>
-<li><strong>요청은 세쌍(triple) (s, q, u)</strong> 이다: seed video s, 기계가 생성한 pivot query q, user/context profile u <code>[확인]</code>.</li>
-<li><strong>MBR (model-based retrieval)</strong> 은 downstream ranker가 아니라 dense candidate generator다. 두 단계로 f(s,q,u,d)를 근사한다: ① 두 타워 dot product 기반 ANN, ② 조건부 non-linear scoring(옵션). <code>[확인]</code></li>
-<li><strong>request tower Q</strong> 는 pivot query + user context + seed video의 request-side feature를 받고, <strong>candidate tower D</strong> 는 candidate video feature만 받는다. 두 벡터 모두 정규화돼서 dot product와 cosine이 같은 순서를 유도한다. <code>[확인]</code></li>
-<li><strong>학습 목적</strong>: out-of-session in-batch InfoNCE가 primary 손실이다. batch 내에서 같은 세션 예시는 negative에서 제외된다(공동 참여가 negative로 오염되지 않도록). <code>[확인]</code></li>
-<li><strong>interaction head</strong> G(h_r, h_d, a(d))는 candidate-specific 함수로, click과 engagement-derived auxiliary label에 대한 weighted binary cross-entropy를 낸다. 이 head의 relevance output은 인터페이스 호환성용으로 남아 있지만 VDD 설정에서 학습 가중치가 0이다 <code>[확인]</code>. 총 손실은 InfoNCE + BCE 가중합.</li>
-<li><strong>서빙 인덱스</strong>: D 타워를 servable inventory에 적용해 &quot;hundreds of millions of videos&quot; 규모의 ANN 인덱스를 &quot;existing GPU platform (Xue et al., 2026)&quot; 위에서 만들고 매 시간 갱신한다. <strong>가중치 자체는 매 시간 재학습하지 않는다</strong> — 임베딩과 인덱스만 매시간 새로 발행한다. <code>[확인]</code></li>
-<li>요청 시 ANN이 affinity a(d) 상위 P개를 뽑는다. candidate-conditioned scoring이 켜져 있으면 P개 각각에 대해 interaction head가 점수를 낸다. 그 뒤 task score 결정론적 가중합으로 top-K를 남긴다. <strong>베이스라인은 P = K = 3000, interaction head disabled</strong> (즉 순수 two-tower ANN 결과). <code>[확인]</code></li>
+<li><strong>요청은 세쌍(triple) (s, q, u)</strong> 이다: seed video s, 기계가 생성한 pivot query q, user/context profile u <span class="badge ok">확인</span>.</li>
+<li><strong>MBR (model-based retrieval)</strong> 은 downstream ranker가 아니라 dense candidate generator다. 두 단계로 f(s,q,u,d)를 근사한다: ① 두 타워 dot product 기반 ANN, ② 조건부 non-linear scoring(옵션). <span class="badge ok">확인</span></li>
+<li><strong>request tower Q</strong> 는 pivot query + user context + seed video의 request-side feature를 받고, <strong>candidate tower D</strong> 는 candidate video feature만 받는다. 두 벡터 모두 정규화돼서 dot product와 cosine이 같은 순서를 유도한다. <span class="badge ok">확인</span></li>
+<li><strong>학습 목적</strong>: out-of-session in-batch InfoNCE가 primary 손실이다. batch 내에서 같은 세션 예시는 negative에서 제외된다(공동 참여가 negative로 오염되지 않도록). <span class="badge ok">확인</span></li>
+<li><strong>interaction head</strong> G(h_r, h_d, a(d))는 candidate-specific 함수로, click과 engagement-derived auxiliary label에 대한 weighted binary cross-entropy를 낸다. 이 head의 relevance output은 인터페이스 호환성용으로 남아 있지만 VDD 설정에서 학습 가중치가 0이다 <span class="badge ok">확인</span>. 총 손실은 InfoNCE + BCE 가중합.</li>
+<li><strong>서빙 인덱스</strong>: D 타워를 servable inventory에 적용해 &quot;hundreds of millions of videos&quot; 규모의 ANN 인덱스를 &quot;existing GPU platform (Xue et al., 2026)&quot; 위에서 만들고 매 시간 갱신한다. <strong>가중치 자체는 매 시간 재학습하지 않는다</strong> — 임베딩과 인덱스만 매시간 새로 발행한다. <span class="badge ok">확인</span></li>
+<li>요청 시 ANN이 affinity a(d) 상위 P개를 뽑는다. candidate-conditioned scoring이 켜져 있으면 P개 각각에 대해 interaction head가 점수를 낸다. 그 뒤 task score 결정론적 가중합으로 top-K를 남긴다. <strong>베이스라인은 P = K = 3000, interaction head disabled</strong> (즉 순수 two-tower ANN 결과). <span class="badge ok">확인</span></li>
 <li>MBR 위에는 downstream retrieval funnel과 그 위의 랭커가 있다 — 이번 자료는 그 위 계층을 다루지 않는다.</li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — 캠페인 결과와 EvoPilot 쪽</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">캠페인 결과와 EvoPilot 쪽</span></p></div>
 <ul>
-<li>캠페인 대상은 7 direction, 총 37일. VDD MBR 파이프라인 위에서 인터랙션 head, 데이터, 목적함수 등을 흔든다. <code>[확인]</code></li>
-<li><strong>인터랙션 head는 원래 수동 실험에서 개선을 확인하지 못해 disabled였다.</strong> primitive autoresearch attempt는 이 direction을 다시 시도했다가 인터랙션 head가 offline hit-rate를 22 percentage points 떨어뜨린다고 결론 냈다. 잘못된 결론이었다. <code>[확인]</code></li>
-<li>EvoPilot이 human-gated verification을 걸어서 이 drop을 추적한 결과, 원인은 인터랙션 head가 아니라 <strong>evaluation 코드가 output depth를 3,000이 아니라 600으로 계산하는 사전 결함</strong> 이었다 <code>[확인]</code>. 수정 후 matched comparison에서는 offline metric이 <strong>3.20 percentage points 개선</strong> 됐다.</li>
-<li><strong>7일 랜덤 온라인 실험에서 VDD slice의 GSRR이 relative +0.66%</strong> 로 유의미 lift, tens of millions 계정 규모, US·Canada slice에서 계측 <code>[확인]</code>. <strong>실험 리뷰 이후 인터랙션 head 처리가 VDD MBR의 기본 서빙 구성으로 채택됐고 manuscript cutoff 시점까지 켜져 있다.</strong> <code>[확인]</code></li>
+<li>캠페인 대상은 7 direction, 총 37일. VDD MBR 파이프라인 위에서 인터랙션 head, 데이터, 목적함수 등을 흔든다. <span class="badge ok">확인</span></li>
+<li><strong>인터랙션 head는 원래 수동 실험에서 개선을 확인하지 못해 disabled였다.</strong> primitive autoresearch attempt는 이 direction을 다시 시도했다가 인터랙션 head가 offline hit-rate를 22 percentage points 떨어뜨린다고 결론 냈다. 잘못된 결론이었다. <span class="badge ok">확인</span></li>
+<li>EvoPilot이 human-gated verification을 걸어서 이 drop을 추적한 결과, 원인은 인터랙션 head가 아니라 <strong>evaluation 코드가 output depth를 3,000이 아니라 600으로 계산하는 사전 결함</strong> 이었다 <span class="badge ok">확인</span>. 수정 후 matched comparison에서는 offline metric이 <strong>3.20 percentage points 개선</strong> 됐다.</li>
+<li><strong>7일 랜덤 온라인 실험에서 VDD slice의 GSRR이 relative +0.66%</strong> 로 유의미 lift, tens of millions 계정 규모, US·Canada slice에서 계측 <span class="badge ok">확인</span>. <strong>실험 리뷰 이후 인터랙션 head 처리가 VDD MBR의 기본 서빙 구성으로 채택됐고 manuscript cutoff 시점까지 켜져 있다.</strong> <span class="badge ok">확인</span></li>
 <li>Post-study replay와 mutation test로 invalid 비교는 걸러 내고 valid 비교는 통과시켰다 — 즉 이번에 붙인 control이 post-hoc 재현에도 견딘다는 검증. durable state로 중단된 round를 회복해서 대략 5 GPU-hour의 아티팩트 재생성 비용을 아낀 것도 별도 실증 결과.</li>
 </ul>
 <blockquote>
 <p>&quot;We formalize a VDD request as a triple (s, q, u): the opened seed video s, the machine-generated pivot query q, and a user/context profile u. From a servable inventory 𝒟, the system must retrieve a short ranked list of videos worth watching next. Retrieval is conditioned jointly on (s, q, u). This differs from intent-driven search, which uses a user query alone, and from next-item recommendation, which uses s and u without a query, search relevance, or a retrieval funnel.&quot;
-— <a href="https://arxiv.org/abs/2609.21257">arXiv 2609.21257</a>, 2026-09-18</p>
+— <a href="https://arxiv.org/abs/2609.21257" target="_blank" rel="noopener">arXiv 2609.21257</a>, 2026-09-18</p>
 </blockquote>
 <blockquote>
 <p>&quot;Publishing applies D to the servable inventory and builds an ANN index of hundreds of millions of videos on an existing GPU platform (Xue et al., 2026). Candidate embeddings and the index are refreshed hourly, but the neural weights are not retrained every hour.&quot;
@@ -270,103 +113,50 @@ ul.rl .chip b { font-size: 13px; }
 </blockquote>
 <div class="blk app"><p><span class="lbl">정본 반영</span> 없음. VDD 지면 자체가 저장소가 추적하는 canon 서비스 목록(Facebook Feed·Instagram·Threads·Reels·X·Netflix)에 없다. 이 자료는 두 각도에서 라디에 편입한다: ① Meta 프로덕션 retrieval 스택 계층 정보의 한 축(자료 1과 함께), ② 산업계 LLM autoresearch 프로토콜의 첫 프로덕션-깊이 진술.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> 두 가지 관점이 새롭게 잡힌다. 첫째, <strong>Meta 안에서 &quot;search + recommendation&quot; 이 섞인 지면(seed video + pivot query)이 자체 retrieval 스택을 가지고 있다는 것</strong>이 프로덕션 세부와 함께 처음 진술됐다. Facebook Feed(친구 그래프 축)나 Instagram Reels(재생 시퀀스 축)와 다른 축의 discovery 지면이다. 둘째, 산업계 LLM 자동 실험이 실제로 프로덕션 파이프라인 위에서 굴러가면 <strong>명세만으로는 안 되고 evaluator 코드 결함까지 잡히는 human-gated verification 층이 필요하다는 첫 케이스 스터디</strong>다. 이는 <a href="radar.html">radar.md</a>에 관찰 중인 <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 랭킹의 확산</a> 스레드와는 각도가 다르다(모델 아키텍처 안에 LLM을 넣는 것 vs 실험 자동화 위에 LLM을 넣는 것). 후자 각도의 첫 대규모 프로덕션 진술.</p></div>
-<h2 id="3-angle-tencent--저자-소속-확인-완료-tencent-프로덕션-sponsored-search-ads">3. ANGLE (Tencent) — 저자 소속 확인 완료 (Tencent 프로덕션 sponsored search ads)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.18296">One-Step Retrieval Framework for Real-Time Sponsored Search Ads Using Hierarchical Text Representations</a> — arXiv 2609.18296. <a href="https://arxiv.org/html/2609.18296">HTML 판</a>에서 저자 8인 전원 Tencent Inc. 이메일 도메인 <code>@tencent.com</code> 확인.</p></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="3-angle-tencent--저자-소속-확인-완료-tencent-프로덕션-sponsored-search-ads"><span class="num">3</span>ANGLE (Tencent) — 저자 소속 확인 완료 (Tencent 프로덕션 sponsored search ads)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.18296" target="_blank" rel="noopener">One-Step Retrieval Framework for Real-Time Sponsored Search Ads Using Hierarchical Text Representations</a> — arXiv 2609.18296. <a href="https://arxiv.org/html/2609.18296" target="_blank" rel="noopener">HTML 판</a>에서 저자 8인 전원 Tencent Inc. 이메일 도메인 <code>@tencent.com</code> 확인.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> 이 자료는 <a href="daily-2026-09-20.html">daily/2026-09-20.md</a> 레이더에서 &quot;저자 소속 확인 유보&quot;로 남긴 것이다. 오늘 HTML 판을 열어 소속을 확인했다. 프로덕션 소속이 확인된 만큼 <a href="radar.html">radar.md</a>의 <a href="radar.html#angle-tencent--%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%8A%A4%ED%8F%B0%EC%84%9C-%EC%84%9C%EC%B9%98-%EA%B4%91%EA%B3%A0-one-step-retrieval-framework-gmv-216">ANGLE 항목</a>에 소속 확인을 반영하고, 상태를 &quot;관찰 (소속 확인 대기)&quot; → &quot;관찰 (Tencent 확인)&quot; 으로 갱신한다.</p></div>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> — ANGLE 항목의 소속과 상태 라인만 갱신. Tencent WeChat/Weixin 광고와의 관계를 자료에서 명시하지는 않으므로 서비스 정본으로는 승격하지 않는다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> 저장소의 관찰 중 스레드 중 하나인 LLM-native 랭킹 흐름에서 Tencent가 sponsored search ads 각도로 붙는다는 근거가 추가된다. Tencent PCG의 <a href="radar.html#tgr-tencent-pcg--%EC%83%9D%EC%84%B1-%ED%8C%A8%EB%9F%AC%EB%8B%A4%EC%9E%84-%EB%9E%AD%ED%82%B9retrievalslate-%EC%83%9D%EC%84%B1reason-token%EC%9D%84-%ED%95%9C-%ED%94%84%EB%A0%88%EC%9E%84%EC%97%90-%EB%AC%B6%EA%B3%A0-5%EA%B0%9C-%EC%A7%80%EB%A9%B4%EC%97%90-%EB%B0%B0%ED%8F%AC">TGR</a>(생성 랭킹 5 지면 배포)과는 자리가 다르다 — TGR은 유기 콘텐츠 랭킹, ANGLE은 스폰서 검색 광고 retrieval 통합.</p></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="레이더">레이더</h2>
 <p>오늘 arXiv cs.IR 신규 30건 triage(파싱된 <code>&lt;entry&gt;</code> 개수 30, 2026-09-16~09-18). 통과 2건 — <strong>Meta의 프로덕션 논문 2편이 같은 날 함께 올라왔다</strong>. 아래는 이번 batch에서 검토한 삼각(플랫폼 기업 저자 + 프로덕션 A/B 진술 + 메커니즘·스케일 신규성)의 결과다.</p>
 <ul>
 <li><strong>통과 (radar 편입 결정)</strong><ul>
-<li><strong>Hybrid GPU-CPU Retrieval for Personalized Search at Ultra-Large Scale</strong> (Meta) — <a href="https://arxiv.org/abs/2609.21281">arXiv 2609.21281</a>. 이번 자료 1로 상세 다뤘고 <a href="radar.html">radar.md</a> 이번 달 신규에 편입한다.</li>
-<li><strong>Verify, Don&#39;t Trust / EvoPilot + VDD</strong> (Meta) — <a href="https://arxiv.org/abs/2609.21257">arXiv 2609.21257</a>. 이번 자료 2로 상세 다뤘고 <a href="radar.html">radar.md</a> 이번 달 신규에 편입한다.</li>
+<li><strong>Hybrid GPU-CPU Retrieval for Personalized Search at Ultra-Large Scale</strong> (Meta) — <a href="https://arxiv.org/abs/2609.21281" target="_blank" rel="noopener">arXiv 2609.21281</a>. 이번 자료 1로 상세 다뤘고 <a href="radar.html">radar.md</a> 이번 달 신규에 편입한다.</li>
+<li><strong>Verify, Don&#39;t Trust / EvoPilot + VDD</strong> (Meta) — <a href="https://arxiv.org/abs/2609.21257" target="_blank" rel="noopener">arXiv 2609.21257</a>. 이번 자료 2로 상세 다뤘고 <a href="radar.html">radar.md</a> 이번 달 신규에 편입한다.</li>
 </ul>
 </li>
 <li><strong>탈락 / 관찰 대상 아님</strong><ul>
-<li><strong>Auto-Bidding with Disentangled Advertiser Profiles and Train-Free Adaptation (ADAPT)</strong> (Alibaba Taobao) — <a href="https://arxiv.org/abs/2609.21308">arXiv 2609.21308</a>. Taobao 소속 확인되지만 자료가 auto-bidding(광고주가 입찰가를 결정하는 시스템)에 국한되고 랭킹·retrieval 메커니즘 신규성은 아니다. abstract 수준에서 프로덕션 A/B 수치가 명시되지 않는다. 관찰 대상 아님.</li>
+<li><strong>Auto-Bidding with Disentangled Advertiser Profiles and Train-Free Adaptation (ADAPT)</strong> (Alibaba Taobao) — <a href="https://arxiv.org/abs/2609.21308" target="_blank" rel="noopener">arXiv 2609.21308</a>. Taobao 소속 확인되지만 자료가 auto-bidding(광고주가 입찰가를 결정하는 시스템)에 국한되고 랭킹·retrieval 메커니즘 신규성은 아니다. abstract 수준에서 프로덕션 A/B 수치가 명시되지 않는다. 관찰 대상 아님.</li>
 <li><strong>Hybrid GPU-CPU Retrieval 저자군의 이전 논문</strong> — 관련 인용만 확인.</li>
 <li>학술 증분이거나 도메인이 좁은 다른 27건은 요건 삼각을 만족하지 않는다: multi-hop retrieval score confidence, autolab, news personalization interview, fashion matching, subtractive unlearning(SURF), KDD Cup 2026 UniRec 챌린지 솔루션(academic), 텍스트 리랭킹, retrieval-QA 신뢰도, RTL verification, 자체 진화 search index, RAG evidence, agent web search, encrypted keyword search, 자재 예측 RAG, local service AI provider recommendation, sim-to-real person retrieval, algebraic composable search, AI privacy landscape, visual document retrieval MAGIC, EHR 종단 정신건강, 재사용 가능한 RAG 시각화, semantic layer telemetry, LLM embedding reasoning quality, financial SEC filing QA, zero-token graph RAG.</li>
 </ul>
 </li>
 </ul>
 <p>산업 블로그 훑기는 오늘(화요일) 대상 아님(월요일에만).</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong>Xue et al., 2026 확인</strong> — 두 논문 모두 Meta의 &quot;existing GPU serving platform&quot;을 이 참조로 가리킨다. 원본 문서가 어느 지면·인프라 논문인지 확인해서 저장소의 Meta 인프라 계층 이해를 이어 붙이는 것이 관측 순서 1번.</li>
 <li><strong>VDD 지면 정체</strong> — Facebook Watch 위인지, Reels 위 seed video 흐름인지, Instagram Explore 파생인지가 원문에서 명시적으로 갈리지 않는다. 후속 자료(공식 블로그, IR 콜, Transparency Center 카드)에서 VDD가 어떤 지면과 매핑되는지가 관측 대상.</li>
 <li><strong>GSRR 지표의 지면 범위</strong> — 두 논문 모두 GSRR을 쓴다. VDD는 GSRR의 &quot;VDD slice&quot;, Hybrid GPU-CPU는 &quot;GSRR&quot; 자체 값을 A/B 결과 metric으로 사용한다. 이 지표가 Meta의 통합 검색 지면 전체를 커버하는 metric인지, 각 지면마다 slice로 갈리는지가 확인 대상.</li>
 <li><strong>Meta의 personalized search에 대한 후속 진술</strong> — Que2Search(2021) 이후 오랜 갭이 열린 뒤 이번에 두 편이 붙어 나왔다. 이어지는 KDD 2027 accepted 논문 목록에 Meta search 인프라 진술이 더 있는지 확인 대상.</li>
-</ul>
+</ul></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-20.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-20</div></a><a class="r" href="daily-2026-09-23.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-23</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-20.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-20</span></a><a class="pg-next" href="daily-2026-09-23.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-23</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

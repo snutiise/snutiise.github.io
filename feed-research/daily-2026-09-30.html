@@ -2,242 +2,84 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-30 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X 4세대+31이 어제 신설한 overturn-hold 게이트의 서버 쪽(abuse-ledger-service 12파일 2,254줄)을 그대로 공개했고, 함께 VF reference/tweetypie.rs(714줄)로 Scala Tweetypie 직접 호출을 스테이징…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-30.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-30 — feed-research">
 <meta property="og:description" content="한 줄: X 4세대+31이 어제 신설한 overturn-hold 게이트의 서버 쪽(abuse-ledger-service 12파일 2,254줄)을 그대로 공개했고, 함께 VF reference/tweetypie.rs(714줄)로 Scala Tweetypie 직접 호출을 스테이징…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-30.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-30</h1>
-  <div class="wd">수요일 · 읽는 데 약 26분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+31이 어제 신설한 overturn-hold 게이트의 <strong>서버 쪽</strong>(abuse-ledger-service 12파일 2,254줄)을 그대로 공개했고, 함께 VF <code>reference/tweetypie.rs</code>(714줄)로 Scala Tweetypie 직접 호출을 스테이징 dual-call 대상에 편입했으며, home-mixer 프로덕션 크론이 <code>ClickWeight</code> 0.4→0.3, <code>ContClickDwellTimeWeight</code> 0.0→0.4로 동시 스위칭됐다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-x-4세대31--overturn-hold-서버abuse-ledger-service-신규-공개--vf-레퍼런스-비교의-tweetypie-경로-신설--홈믹서-클릭드웰-가중치-재조정">1. X 4세대+31 — overturn-hold 서버(<code>abuse-ledger-service</code>) 신규 공개 + VF 레퍼런스 비교의 Tweetypie 경로 신설 + 홈믹서 클릭·드웰 가중치 재조정</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/a707cc2">xai-org/x-algorithm@a707cc2</a> — GitHub 커밋, 2026-09-29T03:06:30Z, 89 파일, +9,552/−2,325.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 어제(4세대+30, <a href="https://github.com/xai-org/x-algorithm/commit/4c5cfe8">4c5cfe8</a>, 2026-09-27 daily 참조) abuse-enforcement 서비스에 <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/abuse-enforcement-service/service-lib/src/overturn_hold.rs"><code>overturn_hold.rs</code></a> 5,270줄이 신설되면서, 사람 검토자가 이의제기 처리로 뒤집은(overturned) 정지·라벨을 hold 유효 기간 동안 자동화 판정이 다시 걸지 못하게 막는 마지막 프리체크가 코드로 잠겼다. 그 클라이언트가 원격 ledger의 <code>POST /v1/holds/lookup</code>을 호출한다는 것까지가 어제 나온 사실이었고, 서버 구현은 공개되지 않은 상태였다. 오늘 그 서버가 통째로 공개됐다.</p></div>
-<p>visibility-filtering 쪽에서도 오래 걸어 두었던 &quot;레퍼런스 비교&quot; 배선(4세대+7, 2026-08-24) 위에 두 번째 대상이 붙었다. 기존에는 Scala VF 서비스만 대상이었는데, 이제 Scala Tweetypie를 직접 호출해 자체 VF 판정과 비교하는 <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/reference/tweetypie.rs"><code>reference/tweetypie.rs</code></a>(714줄 신설)가 붙었다. Tweetypie는 X의 tweet 본문 저장·조회 서비스이고, 그 응답에는 이미 tweet 단위 visibility 결정이 들어 있다. 이걸 자체 VF의 판정과 diff한다.</p>
-<p>home-mixer의 <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/home-mixer/params/param.rs"><code>params/param.rs</code></a>는 저장소의 오래된 규약대로 프로덕션 feature-switch 기본값의 크론 미러라, 상단 주석 <code>// mirrored from config feature-switch defaults; last sync 2026-09-28T16:00:35Z</code>가 갱신됐고 세 가중치가 함께 움직였다.</p>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-30">2026-09-30</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>수요일</li>
+<li><span class="meta-k">읽는 시간</span>26분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+31이 어제 신설한 overturn-hold 게이트의 <strong>서버 쪽</strong>(abuse-ledger-service 12파일 2,254줄)을 그대로 공개했고, 함께 VF <code>reference/tweetypie.rs</code>(714줄)로 Scala Tweetypie 직접 호출을 스테이징 dual-call 대상에 편입했으며, home-mixer 프로덕션 크론이 <code>ClickWeight</code> 0.4→0.3, <code>ContClickDwellTimeWeight</code> 0.0→0.4로 동시 스위칭됐다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-x-4세대31--overturn-hold-서버abuse-ledger-service-신규-공개--vf-레퍼런스-비교의-tweetypie-경로-신설--홈믹서-클릭드웰-가중치-재조정"><span class="num">1</span>X 4세대+31 — overturn-hold 서버(abuse-ledger-service) 신규 공개 + VF 레퍼런스 비교의 Tweetypie 경로 신설 + 홈믹서 클릭·드웰 가중치 재조정</a></li><li><a href="#2-arxiv-pear--익명-e-commerce-검색-팀의-progressive-verifier-autoresearch-프레임워크-radar-편입"><span class="num">2</span>arXiv PEAR — 익명 e-commerce 검색 팀의 progressive-verifier autoresearch 프레임워크 (radar 편입)</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-x-4세대31--overturn-hold-서버abuse-ledger-service-신규-공개--vf-레퍼런스-비교의-tweetypie-경로-신설--홈믹서-클릭드웰-가중치-재조정"><span class="num">1</span>X 4세대+31 — overturn-hold 서버(<code>abuse-ledger-service</code>) 신규 공개 + VF 레퍼런스 비교의 Tweetypie 경로 신설 + 홈믹서 클릭·드웰 가중치 재조정</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/a707cc2" target="_blank" rel="noopener">xai-org/x-algorithm@a707cc2</a> — GitHub 커밋, 2026-09-29T03:06:30Z, 89 파일, +9,552/−2,325.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 어제(4세대+30, <a href="https://github.com/xai-org/x-algorithm/commit/4c5cfe8" target="_blank" rel="noopener">4c5cfe8</a>, 2026-09-27 daily 참조) abuse-enforcement 서비스에 <a href="https://github.com/xai-org/x-algorithm/blob/4c5cfe8/abuse-enforcement-service/service-lib/src/overturn_hold.rs" target="_blank" rel="noopener"><code>overturn_hold.rs</code></a> 5,270줄이 신설되면서, 사람 검토자가 이의제기 처리로 뒤집은(overturned) 정지·라벨을 hold 유효 기간 동안 자동화 판정이 다시 걸지 못하게 막는 마지막 프리체크가 코드로 잠겼다. 그 클라이언트가 원격 ledger의 <code>POST /v1/holds/lookup</code>을 호출한다는 것까지가 어제 나온 사실이었고, 서버 구현은 공개되지 않은 상태였다. 오늘 그 서버가 통째로 공개됐다.</p></div>
+<p>visibility-filtering 쪽에서도 오래 걸어 두었던 &quot;레퍼런스 비교&quot; 배선(4세대+7, 2026-08-24) 위에 두 번째 대상이 붙었다. 기존에는 Scala VF 서비스만 대상이었는데, 이제 Scala Tweetypie를 직접 호출해 자체 VF 판정과 비교하는 <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/reference/tweetypie.rs" target="_blank" rel="noopener"><code>reference/tweetypie.rs</code></a>(714줄 신설)가 붙었다. Tweetypie는 X의 tweet 본문 저장·조회 서비스이고, 그 응답에는 이미 tweet 단위 visibility 결정이 들어 있다. 이걸 자체 VF의 판정과 diff한다.</p>
+<p>home-mixer의 <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs</code></a>는 저장소의 오래된 규약대로 프로덕션 feature-switch 기본값의 크론 미러라, 상단 주석 <code>// mirrored from config feature-switch defaults; last sync 2026-09-28T16:00:35Z</code>가 갱신됐고 세 가중치가 함께 움직였다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong><code>abuse-ledger-service</code>는 axum + PostgreSQL로 구현된 read-only 조회 서비스다</strong> <code>[확인]</code>. 파일 12개(<code>api.rs</code>·<code>boot.rs</code>·<code>codes.rs</code>·<code>config.rs</code>·<code>lib.rs</code>·<code>main.rs</code>·<code>metrics.rs</code>·<code>pg.rs</code>·<code>repo.rs</code>·<code>sql.rs</code>·<code>tls.rs</code>)에 총 약 2,254줄. Cargo 이름은 <code>xai-abuse-ledger-service</code>. 어제 클라이언트가 호출하던 <code>/v1/holds/lookup</code> 엔드포인트가 서버 API의 유일한 조회 경로다.</p>
+<li><p><strong><code>abuse-ledger-service</code>는 axum + PostgreSQL로 구현된 read-only 조회 서비스다</strong> <span class="badge ok">확인</span>. 파일 12개(<code>api.rs</code>·<code>boot.rs</code>·<code>codes.rs</code>·<code>config.rs</code>·<code>lib.rs</code>·<code>main.rs</code>·<code>metrics.rs</code>·<code>pg.rs</code>·<code>repo.rs</code>·<code>sql.rs</code>·<code>tls.rs</code>)에 총 약 2,254줄. Cargo 이름은 <code>xai-abuse-ledger-service</code>. 어제 클라이언트가 호출하던 <code>/v1/holds/lookup</code> 엔드포인트가 서버 API의 유일한 조회 경로다.</p>
 <blockquote>
 <p>&quot;pub const LOOKUP_PATH: &amp;str = &quot;/v1/holds/lookup&quot;;
 pub const DEADLINE_HEADER: &amp;str = &quot;x-request-deadline-ms&quot;;
 pub const MAX_USER_IDS: usize = 100;
 pub const MAX_LABELS: usize = 32;&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/api.rs"><code>abuse-ledger-service/src/api.rs</code></a>, 2026-09-29</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/api.rs" target="_blank" rel="noopener"><code>abuse-ledger-service/src/api.rs</code></a>, 2026-09-29</p>
 </blockquote>
 <p>요청 스키마는 <code>{user_ids: Vec&lt;i64&gt;, labels: Vec&lt;String&gt;}</code>이고, 응답은 <code>{holds: Vec&lt;Hold&gt;, db_ms: u64}</code>이다. <code>user_ids</code>는 최대 100개, <code>labels</code>는 최대 32개까지 한 번에 조회 가능하고, 호출자가 <code>x-request-deadline-ms</code> 헤더로 남은 예산을 지정한다. 서버는 이 값이 statement timeout보다 작으면 그 값을, 크면 statement timeout에 <code>QUERY_DEADLINE_SLACK = 100ms</code>를 더한 값을 실제 DB 예산으로 쓴다(<code>api::budget</code>).</p>
 </li>
-<li><p><strong>테이블 스키마는 <code>ledger.enforcement_holds</code>이고 SQL 세 개가 전체다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/sql.rs"><code>abuse-ledger-service/src/sql.rs</code></a>. 조회 SQL은 다음과 같다.</p>
+<li><p><strong>테이블 스키마는 <code>ledger.enforcement_holds</code>이고 SQL 세 개가 전체다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/sql.rs" target="_blank" rel="noopener"><code>abuse-ledger-service/src/sql.rs</code></a>. 조회 SQL은 다음과 같다.</p>
 <blockquote>
 <p>&quot;SELECT user_id, hold_id, head, expires_at, case_group_id, reason, action_kind, label
  FROM ledger.enforcement_holds
  WHERE user_id = ANY($1::bigint[]) AND cleared_at IS NULL AND expires_at &gt; now()
  AND (action_kind = &#39;suspend&#39; OR (action_kind = &#39;label&#39; AND label = ANY($2::text[])))&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/sql.rs"><code>abuse-ledger-service/src/sql.rs</code></a>, 2026-09-29</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/sql.rs" target="_blank" rel="noopener"><code>abuse-ledger-service/src/sql.rs</code></a>, 2026-09-29</p>
 </blockquote>
 <p>즉 (a) <code>cleared_at IS NULL</code>인 살아 있는 hold이면서 (b) <code>expires_at &gt; now()</code>로 만료되지 않았고 (c) <code>action_kind=&#39;suspend&#39;</code>이거나 (d) <code>action_kind=&#39;label&#39; AND label ∈ 요청 라벨 집합</code>인 행만 반환한다. <code>action_kind</code>는 두 값 (<code>suspend</code>, <code>label</code>)만 정의됐고, <code>cleared_at</code>는 사람 검토자가 hold를 회수했을 때 채워지는 tombstone이다. 기동 시 <code>SELECT ... LIMIT 0</code>으로 컬럼 프로젝션이 스키마와 일치하는지 확인하는 <code>CONTRACT_SQL</code>이 있고, 헬스체크는 <code>SELECT 1</code>(<code>PING_SQL</code>)뿐이다. <code>sql.rs</code>의 테스트가 세 SQL 문자열에 <code>INSERT/UPDATE/DELETE/ALTER/DROP/CREATE</code>가 하나도 들어가지 않음을 assert한다. 서버는 원리적으로 write를 못 한다.</p>
 </li>
-<li><p><strong>PostgreSQL 클라이언트는 deadpool-postgres, TLS는 rustls 기반이다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/pg.rs"><code>abuse-ledger-service/src/pg.rs</code></a>. 상수는 <code>POOL_WAIT_TIMEOUT = 1s</code>, <code>POOL_CREATE_TIMEOUT = 1.5s</code>, <code>POOL_RECYCLE_TIMEOUT = 500ms</code>, <code>QUERY_DEADLINE_SLACK = 100ms</code>. <code>PgError</code> variant는 <code>BadDsn / Connect{Refused|Auth|Tls|Timeout|Other} / Saturated / Transport / Query{sqlstate, message} / Decode / Timeout</code> 7종이고, SQLSTATE <code>57014</code>(query_canceled) 만 <code>ErrorCode::StatementTimeout</code>으로, <code>28P01/28000</code>(auth) 는 <code>ErrorCode::AuthFailed</code>로 별도 분류된다. 부팅 시 <code>boot::contract_check_until_ok</code>가 <code>AtomicBool&lt;ready&gt;</code>를 <code>false</code>에서 시작해 스키마 검사 성공까지 <code>/readyz</code>를 200이 아닌 상태로 유지한다.</p>
+<li><p><strong>PostgreSQL 클라이언트는 deadpool-postgres, TLS는 rustls 기반이다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/pg.rs" target="_blank" rel="noopener"><code>abuse-ledger-service/src/pg.rs</code></a>. 상수는 <code>POOL_WAIT_TIMEOUT = 1s</code>, <code>POOL_CREATE_TIMEOUT = 1.5s</code>, <code>POOL_RECYCLE_TIMEOUT = 500ms</code>, <code>QUERY_DEADLINE_SLACK = 100ms</code>. <code>PgError</code> variant는 <code>BadDsn / Connect{Refused|Auth|Tls|Timeout|Other} / Saturated / Transport / Query{sqlstate, message} / Decode / Timeout</code> 7종이고, SQLSTATE <code>57014</code>(query_canceled) 만 <code>ErrorCode::StatementTimeout</code>으로, <code>28P01/28000</code>(auth) 는 <code>ErrorCode::AuthFailed</code>로 별도 분류된다. 부팅 시 <code>boot::contract_check_until_ok</code>가 <code>AtomicBool&lt;ready&gt;</code>를 <code>false</code>에서 시작해 스키마 검사 성공까지 <code>/readyz</code>를 200이 아닌 상태로 유지한다.</p>
 </li>
-<li><p><strong><code>Hold</code> 레코드의 실제 모양</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/repo.rs"><code>abuse-ledger-service/src/repo.rs</code></a>.</p>
+<li><p><strong><code>Hold</code> 레코드의 실제 모양</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/repo.rs" target="_blank" rel="noopener"><code>abuse-ledger-service/src/repo.rs</code></a>.</p>
 <blockquote>
 <p>&quot;pub struct Hold {
     pub user_id: i64,
@@ -249,11 +91,11 @@ pub const MAX_LABELS: usize = 32;&quot;
     pub case_group_id: Option&lt;i32>,
     pub reason: String,
 }&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/repo.rs"><code>abuse-ledger-service/src/repo.rs</code></a>, 2026-09-29</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/repo.rs" target="_blank" rel="noopener"><code>abuse-ledger-service/src/repo.rs</code></a>, 2026-09-29</p>
 </blockquote>
 <p><code>head</code>는 어제 이미 클라이언트 쪽 진단 키(<code>overturn_hold_head</code>)로 등장한 필드였고, 이제 서버 스키마에서 <code>Option&lt;String&gt;</code>으로 확정됐다(내용은 여전히 공개되지 않았다 — hold를 발행한 검토 도구의 식별자 정도로 보이지만 [추정]). <code>case_group_id: Option&lt;i32&gt;</code>는 이의제기 case를 여러 hold로 묶는 그룹 키다. <code>reason: String</code>은 사람 검토자가 남긴 사유 문자열(필드 존재는 확인, 내용 포맷은 공개되지 않음).</p>
 </li>
-<li><p><strong>VF 레퍼런스 비교 대상이 <code>vf_service</code>에서 <code>vf_service | tweetypie</code> 두 값으로 확장</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/reference/mod.rs"><code>visibility-filtering/reference/mod.rs</code></a>.</p>
+<li><p><strong>VF 레퍼런스 비교 대상이 <code>vf_service</code>에서 <code>vf_service | tweetypie</code> 두 값으로 확장</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/reference/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/reference/mod.rs</code></a>.</p>
 <blockquote>
 <p>&quot;pub enum Reference {
     None,
@@ -264,11 +106,11 @@ pub const MAX_LABELS: usize = 32;&quot;
 (_, Some(&quot;prod&quot;)) =&gt; Err(format!(
     &quot;{ENV_REFERENCE} selects {reference:?} but {ENV_APP_ENV}=prod; reference comparisons are staging-only&quot;
 )),&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/reference/mod.rs"><code>visibility-filtering/reference/mod.rs</code></a>, 2026-09-29</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/reference/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/reference/mod.rs</code></a>, 2026-09-29</p>
 </blockquote>
 <p>기존 4세대+7(2026-08-24)에서 <code>dual_call_harness</code> 환경 변수로 켜던 Rust VF ↔ Scala VF 비교가 이번 개편에서 <code>VF_REFERENCE</code> 환경 변수로 옮겨졌고, 값 세 개(<code>none / vf_service / tweetypie</code>)를 소지한다. 기존 <code>ENV_DUAL_CALL_HARNESS_ENABLED</code> 플래그가 남아 있으면 기동이 실패하며 새 이름을 쓰라는 에러가 나온다(migration). 어느 값이든 <code>APP_ENV=prod</code>에서는 기동이 거부된다.</p>
 </li>
-<li><p><strong>Tweetypie 경로는 Strato 컬럼 <code>tweetypie/getTweetFields.Tweet</code>를 호출한다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/reference/tweetypie.rs"><code>visibility-filtering/reference/tweetypie.rs</code></a>. 이 컬럼에 <code>GetTweetFieldsOptions { visibility_policy: VISIBILITY_POLICY_USER_VISIBLE, ... }</code>를 실어 호출하면 Tweetypie가 이미 VF 결정(<code>Action::Allow | Drop(reason)</code>)까지 붙여 반환한다. 상수:</p>
+<li><p><strong>Tweetypie 경로는 Strato 컬럼 <code>tweetypie/getTweetFields.Tweet</code>를 호출한다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/reference/tweetypie.rs" target="_blank" rel="noopener"><code>visibility-filtering/reference/tweetypie.rs</code></a>. 이 컬럼에 <code>GetTweetFieldsOptions { visibility_policy: VISIBILITY_POLICY_USER_VISIBLE, ... }</code>를 실어 호출하면 Tweetypie가 이미 VF 결정(<code>Action::Allow | Drop(reason)</code>)까지 붙여 반환한다. 상수:</p>
 <ul>
 <li><code>TWEETYPIE_MAX_BATCH_SIZE = 250</code> (한 번에 250개 tweet까지 배칭)</li>
 <li><code>MAX_IN_FLIGHT = 32</code> (semaphore로 fan-out 상한)</li>
@@ -279,9 +121,9 @@ pub const MAX_LABELS: usize = 32;&quot;
 </ul>
 <p>결과 클래스는 <code>Allow / BareDrop / Drop / Suppressed / NotFound / Failed / Missing</code> 7가지이고, 실패 사유는 <code>NoValue / StratoError / RateLimited / DecodeError / RpcError / OverCapacity / TweetypieFailed</code> 7가지다. 각각 <code>vf_tweetypie_reference_compare</code> 메트릭 라벨로 카운트된다.</p>
 </li>
-<li><p><strong>VF 리트윗 소스 병합 로직이 별도 모듈 <code>visibility-filtering/retweet.rs</code>로 추출됐다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/retweet.rs"><code>visibility-filtering/retweet.rs</code></a> 318줄 신규, <code>evaluate_tweets.rs</code>가 +101/−102로 축소. 4세대+28(2026-09-24)에서 인라인으로 도입된 in-batch vs fetched 두 세트 소스 verdict 병합이 오늘 <code>evaluate_merging_sources</code> 함수로 분리됐다. 구조는 동일하고 (요청 후보 안에 원본이 이미 있으면 in-batch로, 없으면 별도 hydration으로 fetched로 판정한 뒤 병합), 대신 <code>evaluate_tweets_retweet_sources { outcome=in_batch | fetched }</code> 메트릭이 신설됐다. 리트윗 원본 판정을 위해 얼마나 자주 별도 fetch가 필요한지가 metric으로 보이게 됐다.</p>
+<li><p><strong>VF 리트윗 소스 병합 로직이 별도 모듈 <code>visibility-filtering/retweet.rs</code>로 추출됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/retweet.rs" target="_blank" rel="noopener"><code>visibility-filtering/retweet.rs</code></a> 318줄 신규, <code>evaluate_tweets.rs</code>가 +101/−102로 축소. 4세대+28(2026-09-24)에서 인라인으로 도입된 in-batch vs fetched 두 세트 소스 verdict 병합이 오늘 <code>evaluate_merging_sources</code> 함수로 분리됐다. 구조는 동일하고 (요청 후보 안에 원본이 이미 있으면 in-batch로, 없으면 별도 hydration으로 fetched로 판정한 뒤 병합), 대신 <code>evaluate_tweets_retweet_sources { outcome=in_batch | fetched }</code> 메트릭이 신설됐다. 리트윗 원본 판정을 위해 얼마나 자주 별도 fetch가 필요한지가 metric으로 보이게 됐다.</p>
 </li>
-<li><p><strong>VF <code>params/client_switches.rs</code>(+225 신설)로 클라이언트 별 rule 활성 여부가 데이터 테이블로 잠겼다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/params/client_switches.rs"><code>visibility-filtering/params/client_switches.rs</code></a>. 6개 스위치가 열거된다.</p>
+<li><p><strong>VF <code>params/client_switches.rs</code>(+225 신설)로 클라이언트 별 rule 활성 여부가 데이터 테이블로 잠겼다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/params/client_switches.rs" target="_blank" rel="noopener"><code>visibility-filtering/params/client_switches.rs</code></a>. 6개 스위치가 열거된다.</p>
 <blockquote>
 <p>&quot;enum ClientSwitch {
     AgeVerification(VerifyBlurSupport),
@@ -291,13 +133,13 @@ pub const MAX_LABELS: usize = 32;&quot;
     FosnrRules,
     FosnrFallbackDrops,
 }&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/params/client_switches.rs"><code>visibility-filtering/params/client_switches.rs</code></a>, 2026-09-29</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/params/client_switches.rs" target="_blank" rel="noopener"><code>visibility-filtering/params/client_switches.rs</code></a>, 2026-09-29</p>
 </blockquote>
 <p>각 스위치가 <code>xai_feature_switches::FeatureSwitches</code>의 문자열 키에 매핑되고, <code>VerifyBlurSupport</code> 4-축(<code>Unsupported | IosNeedsUpdate | AndroidNeedsUpdate | Supported</code>)마다 서로 다른 <code>age_verification_*_tombstone_rule_enabled</code> 키를 쓴다. <code>default_on</code>으로 기본 켜지는 것은 세 개(<code>AgeVerification(Unsupported)</code>, <code>StaleTweetLimits</code>, <code>FosnrRules</code>). 요청 시 <code>TwitterContextViewer</code>(client_application_id, user_agent, country_code)와 viewer_id로 <code>RecipientBuilder</code>를 구성해 매치한다.</p>
 </li>
-<li><p><strong>age verification golden corpus 705줄 신설, legacy interstitial 130줄 신설</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/rules/golden_corpus/age_verification.rs"><code>visibility-filtering/rules/golden_corpus/age_verification.rs</code></a>와 <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/rules/golden_corpus/legacy_interstitial.rs"><code>legacy_interstitial.rs</code></a>. 4세대+29(2026-09-25)에서 시작된 golden corpus 15-파일 분할의 후속이다. <code>age_verification.rs</code>는 위 <code>AgeVerification(*)</code> 스위치가 각 클라이언트 상태(Unsupported/iOS 갱신 필요/Android 갱신 필요/Supported)에서 만들어 내는 verdict를 role×tweet 매트릭스로 pin한다(<code>web_in_fr</code>·<code>web_in_us</code>·<code>sensitive_opt_in_web_in_fr</code> 등의 Role, <code>nsfw_admin_flag_media</code>·<code>limited</code>·<code>blurred</code> 등의 후보). <code>local_regulations.rs</code>와 <code>takedown.rs</code>도 같은 커밋에서 새로 파일로 갈라졌다.</p>
+<li><p><strong>age verification golden corpus 705줄 신설, legacy interstitial 130줄 신설</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/rules/golden_corpus/age_verification.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/golden_corpus/age_verification.rs</code></a>와 <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/visibility-filtering/rules/golden_corpus/legacy_interstitial.rs" target="_blank" rel="noopener"><code>legacy_interstitial.rs</code></a>. 4세대+29(2026-09-25)에서 시작된 golden corpus 15-파일 분할의 후속이다. <code>age_verification.rs</code>는 위 <code>AgeVerification(*)</code> 스위치가 각 클라이언트 상태(Unsupported/iOS 갱신 필요/Android 갱신 필요/Supported)에서 만들어 내는 verdict를 role×tweet 매트릭스로 pin한다(<code>web_in_fr</code>·<code>web_in_us</code>·<code>sensitive_opt_in_web_in_fr</code> 등의 Role, <code>nsfw_admin_flag_media</code>·<code>limited</code>·<code>blurred</code> 등의 후보). <code>local_regulations.rs</code>와 <code>takedown.rs</code>도 같은 커밋에서 새로 파일로 갈라졌다.</p>
 </li>
-<li><p><strong>home-mixer 프로덕션 크론 미러가 <code>ClickWeight</code> 0.4 → 0.3, <code>ContClickDwellTimeWeight</code> 0.0 → 0.4로 동시에 뒤집혔다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>. 파일 상단 주석의 <code>last sync</code>가 2026-09-25T16:24:28Z → 2026-09-28T16:00:35Z로 갱신됐고, 세 값이 함께 움직였다.</p>
+<li><p><strong>home-mixer 프로덕션 크론 미러가 <code>ClickWeight</code> 0.4 → 0.3, <code>ContClickDwellTimeWeight</code> 0.0 → 0.4로 동시에 뒤집혔다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>. 파일 상단 주석의 <code>last sync</code>가 2026-09-25T16:24:28Z → 2026-09-28T16:00:35Z로 갱신됐고, 세 값이 함께 움직였다.</p>
 <blockquote>
 <p>&quot;-param!(ClickWeight, f64, &quot;rust_home_mixer_click_weight&quot;, 0.4);
 +param!(ClickWeight, f64, &quot;rust_home_mixer_click_weight&quot;, 0.3);
@@ -319,19 +161,19 @@ pub const MAX_LABELS: usize = 32;&quot;
 <li>&quot;rust_home_mixer_not_interested_weight&quot;,</li>
 <li>-47.52&quot;</li>
 </ul>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code> 프로덕션 크론 미러</a>, 2026-09-29</p>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code> 프로덕션 크론 미러</a>, 2026-09-29</p>
 </blockquote>
 <p>즉 클릭 자체 가중치는 4분의 1 낮아지고(0.4 → 0.3), 그동안 0으로 꺼져 있던 continue-click-dwell(클릭 뒤에 실제로 오래 머무른 세션) 가중치가 0.4로 켜졌다. Not Interested 가중치는 −43.2에서 −47.52(정확히 1.1배)로 강화됐다. 4세대+22(2026-09-16)에서 <code>binary</code> continuous loss type이 <code>click-dwell</code> BCE로 프로덕션에 배선된 뒤로, 학습된 head 하나가 오프라인에서 효과를 보였고 그 head를 실제 서빙 가중합에 편입시킨 것으로 보인다 [추정].</p>
 </li>
-<li><p><strong><code>PhoenixRetrievalExcludeSeenPosts</code> 신규 파라미터, 기본 <code>false</code></strong> <code>[확인]</code> — 같은 파일. Phoenix retrieval이 이미 본 포스트를 후보에서 제외하는 게이팅 토글이 새로 열렸다. 기본이 false이므로 아직 활성 정책은 아니다.</p>
+<li><p><strong><code>PhoenixRetrievalExcludeSeenPosts</code> 신규 파라미터, 기본 <code>false</code></strong> <span class="badge ok">확인</span> — 같은 파일. Phoenix retrieval이 이미 본 포스트를 후보에서 제외하는 게이팅 토글이 새로 열렸다. 기본이 false이므로 아직 활성 정책은 아니다.</p>
 </li>
-<li><p><strong><code>UseEngagementCounterViewCountForImpressionBoost</code> 파라미터가 제거됐다</strong> <code>[확인]</code> — 같은 파일. impression 부스트를 위한 view count 소스가 engagement counter에서 다른 소스로 이관됐거나 부스트 자체가 폐기됐다.</p>
+<li><p><strong><code>UseEngagementCounterViewCountForImpressionBoost</code> 파라미터가 제거됐다</strong> <span class="badge ok">확인</span> — 같은 파일. impression 부스트를 위한 view count 소스가 engagement counter에서 다른 소스로 이관됐거나 부스트 자체가 폐기됐다.</p>
 </li>
-<li><p><strong><code>author_policy_zeroed</code> 필드가 홈믹서 시그널에서 완전히 제거됐다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/commit/a707cc2"><code>home-mixer/models/candidate.rs</code>, <code>scorers/value_model.rs</code>, <code>scorers/vm_ranker.rs</code>, <code>scorers/vm_ranker_request.rs</code></a>. VMRanker 요청 shape에도, 후보 dict에도 이 boolean이 사라졌다. 이 신호가 무엇을 억제하던 플래그였는지 이번 공개에서 직접 명시된 자리는 없지만, 이름과 사용 위치(scoring 시 후보에 실려 있던 boolean)를 볼 때 author policy에 의해 스코어가 0으로 억눌린 후보를 표시하던 마커였다 [추정]. 4세대에서 policy-driven 후보 억제는 이제 VF verdict에서 직접 판정된다.</p>
+<li><p><strong><code>author_policy_zeroed</code> 필드가 홈믹서 시그널에서 완전히 제거됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/commit/a707cc2" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code>, <code>scorers/value_model.rs</code>, <code>scorers/vm_ranker.rs</code>, <code>scorers/vm_ranker_request.rs</code></a>. VMRanker 요청 shape에도, 후보 dict에도 이 boolean이 사라졌다. 이 신호가 무엇을 억제하던 플래그였는지 이번 공개에서 직접 명시된 자리는 없지만, 이름과 사용 위치(scoring 시 후보에 실려 있던 boolean)를 볼 때 author policy에 의해 스코어가 0으로 억눌린 후보를 표시하던 마커였다 [추정]. 4세대에서 policy-driven 후보 억제는 이제 VF verdict에서 직접 판정된다.</p>
 </li>
-<li><p><strong>Phoenix <code>purchase_value.rs</code>의 <code>PUBLISHED</code> 배열이 4개에서 6개(= <code>ALL</code>)로 확장</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs"><code>phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs</code></a>. 4세대+30에서 잠겼던 <code>PUBLISHED = [PURCHASE_CT, PURCHASE_VT, CONTENT_VIEW_CT, ADD_TO_CART_CT]</code>가 오늘 <code>PUBLISHED = ALL</code>로 변경돼 <code>CONTENT_VIEW_VT</code>와 <code>ADD_TO_CART_VT</code>(view-through 두 종류)도 서빙 응답에 실린다. 프로토 <code>PurchaseValueBaseline</code> 인코딩 크기 상한 assert도 <code>≤64 바이트</code> → <code>= 73 바이트</code>로 갱신됐다.</p>
+<li><p><strong>Phoenix <code>purchase_value.rs</code>의 <code>PUBLISHED</code> 배열이 4개에서 6개(= <code>ALL</code>)로 확장</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs</code></a>. 4세대+30에서 잠겼던 <code>PUBLISHED = [PURCHASE_CT, PURCHASE_VT, CONTENT_VIEW_CT, ADD_TO_CART_CT]</code>가 오늘 <code>PUBLISHED = ALL</code>로 변경돼 <code>CONTENT_VIEW_VT</code>와 <code>ADD_TO_CART_VT</code>(view-through 두 종류)도 서빙 응답에 실린다. 프로토 <code>PurchaseValueBaseline</code> 인코딩 크기 상한 assert도 <code>≤64 바이트</code> → <code>= 73 바이트</code>로 갱신됐다.</p>
 </li>
-<li><p><strong>abuse-ledger-service의 TLS 모듈은 별도 파일 348줄</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/tls.rs"><code>abuse-ledger-service/src/tls.rs</code></a>. PostgreSQL 연결에 rustls를 태우는 코드로, DSN에 <code>sslmode=require|verify-ca|verify-full</code>을 파싱하고 CA/CRT/KEY 경로를 별도 환경 변수로 읽어 붙인다. 즉 ledger 저장소는 mTLS로 접근하며, 이 서비스는 그 저장소의 read-only 프록시로 위치한다.</p>
+<li><p><strong>abuse-ledger-service의 TLS 모듈은 별도 파일 348줄</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a707cc2/abuse-ledger-service/src/tls.rs" target="_blank" rel="noopener"><code>abuse-ledger-service/src/tls.rs</code></a>. PostgreSQL 연결에 rustls를 태우는 코드로, DSN에 <code>sslmode=require|verify-ca|verify-full</code>을 파싱하고 CA/CRT/KEY 경로를 별도 환경 변수로 읽어 붙인다. 즉 ledger 저장소는 mTLS로 접근하며, 이 서비스는 그 저장소의 read-only 프록시로 위치한다.</p>
 </li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> — &quot;4세대+31&quot; 절 신규 추가(overturn-hold 서버 공개, VF Tweetypie 레퍼런스 비교, 홈믹서 가중치 3개 이동, retweet.rs 추출, client_switches 6-축 데이터 잠금, Phoenix <code>PUBLISHED = ALL</code> 갱신). 4세대+7·+22·+30에 걸쳐 부분적으로 서술된 관련 메커니즘(dual-call harness, click-dwell BCE 학습, overturn-hold 클라이언트)이 오늘 서버·정책·가중치에서 각각 마무리되는 형국이라 이 절이 4세대 표면 개편의 잠정 종점처럼 읽힌다.</p></div>
@@ -344,17 +186,17 @@ pub const MAX_LABELS: usize = 32;&quot;
 <li><p><strong>랭킹이 &quot;클릭&quot;을 덜 믿기 시작했다.</strong> click_weight 0.4 → 0.3과 cont_click_dwell_time_weight 0.0 → 0.4가 같은 크론 sync에서 함께 뒤집혔다. 4세대+22에서 학습 loss에 편입된 click-dwell head가 학습 curve와 홀드아웃을 통과한 뒤 서빙 가중합의 계수로 승격된 시퀀스로 보인다. 정확한 합계는 두 head가 서로 다른 확률 스케일이라 비교 불가지만, &quot;클릭했다&quot;보다 &quot;클릭한 뒤에도 머물렀다&quot;가 프로덕션 목적에 더 부합하는 방향이 명시적으로 잠긴 것이다. Not Interested의 −43.2 → −47.52(정확히 ×1.1)도 사용자 명시 부정 신호를 함께 강화하는 방향이다.</p>
 </li>
 </ol>
-<h2 id="2-arxiv-pear--익명-e-commerce-검색-팀의-progressive-verifier-autoresearch-프레임워크-radar-편입">2. arXiv PEAR — 익명 e-commerce 검색 팀의 progressive-verifier autoresearch 프레임워크 (radar 편입)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.35031">Progressive Evidence-Based AutoResearch for Industrial Search Systems</a> — arXiv 2609.35031, 2026-09-28 v1, 저자 9인 소속이 &quot;Global E-Commerce Agentic Search Team&quot;으로만 표기됨(회사명 미기재).</p></div>
+<h2 id="2-arxiv-pear--익명-e-commerce-검색-팀의-progressive-verifier-autoresearch-프레임워크-radar-편입"><span class="num">2</span>arXiv PEAR — 익명 e-commerce 검색 팀의 progressive-verifier autoresearch 프레임워크 (radar 편입)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.35031" target="_blank" rel="noopener">Progressive Evidence-Based AutoResearch for Industrial Search Systems</a> — arXiv 2609.35031, 2026-09-28 v1, 저자 9인 소속이 &quot;Global E-Commerce Agentic Search Team&quot;으로만 표기됨(회사명 미기재).</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> 어제 daily에 편입한 <a href="radar.html">Kuaishou 추정 AgentX-Model</a>에 이어, 추천·검색 실험을 자동화하는 autoresearch 프레임워크 계열의 두 번째 자료다. AgentX-Model이 리서치 루프를 dual-agent(Research + Model)로 분리한 데 비해, PEAR는 (a) 태스크마다 지속되는 hypothesis state와 (b) 4-계층 verifier ladder라는 다른 각도로 접근한다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><p><strong>Verifier ladder 4-계층</strong> <code>[확인]</code> — Offline Replay → Shadow-Traffic Evaluation → Rapid Online Evaluation → Decision-Grade Online Evaluation. 저비용 지표부터 높은 신뢰 지표까지 순차로 통과해야 다음 단계로 넘어가고, confidence-gated로 통과 여부가 결정된다.</p>
+<li><p><strong>Verifier ladder 4-계층</strong> <span class="badge ok">확인</span> — Offline Replay → Shadow-Traffic Evaluation → Rapid Online Evaluation → Decision-Grade Online Evaluation. 저비용 지표부터 높은 신뢰 지표까지 순차로 통과해야 다음 단계로 넘어가고, confidence-gated로 통과 여부가 결정된다.</p>
 </li>
-<li><p><strong>온라인 A/B 결과 Main Order/DAU +2.7336%, +3.2957% (두 실험)</strong> <code>[확인]</code>.</p>
+<li><p><strong>온라인 A/B 결과 Main Order/DAU +2.7336%, +3.2957% (두 실험)</strong> <span class="badge ok">확인</span>.</p>
 <blockquote>
 <p>&quot;In a real-world industrial search system, strategies optimized with PEAR significantly increased Main Order/DAU by 2.7336% and 3.2957% relative to their respective baselines in two A/B experiments.&quot;
-— <a href="https://arxiv.org/abs/2609.35031">PEAR abstract</a>, 2026-09-28</p>
+— <a href="https://arxiv.org/abs/2609.35031" target="_blank" rel="noopener">PEAR abstract</a>, 2026-09-28</p>
 </blockquote>
 <p>자릿수를 4자리까지 준 것과 &quot;Main Order/DAU&quot;(주문 수 / DAU)라는 지표는 e-commerce 지면의 표준 KPI. 회사명이 미기재라서 소속은 Alibaba International Digital Commerce(AliExpress/Lazada) 라인의 &quot;Global E-Commerce&quot; 팀 브랜딩과 일치해 [추정] Alibaba 라인이지만 v1 HTML에서 도메인이 렌더링되지 않아 확정 불가.</p>
 </li>
@@ -363,84 +205,27 @@ pub const MAX_LABELS: usize = 32;&quot;
 <div class="blk why"><p><span class="lbl">의미</span> — 자동화 리서치 루프의 프로덕션 배포 진술이 하루 간격으로 두 번 나온 것은 이 각도가 실험 인프라의 다음 축으로 자리를 잡고 있다는 신호다. AgentX-Model이 리서치 오케스트레이션을 dual-agent로 분해한 축, PEAR가 verifier 신뢰도를 계층으로 분해한 축, 이 둘이 상호 배타적이지 않다. 관찰 중 스레드로 열지는 않는다(추적 서비스와 직결되지 않고, 두 자료만으로 방향을 쓰기에는 이르다). 세 번째 자료가 다른 회사에서 나오면 스레드를 연다.</p></div>
 <h2 id="레이더">레이더</h2>
 <ul>
-<li><strong>PEAR (익명 e-commerce, [추정] Alibaba 라인)</strong> (<a href="https://arxiv.org/abs/2609.35031">arXiv 2609.35031</a>): 산업 검색 시스템용 progressive autoresearch — 4-계층 verifier ladder + hypothesis-guided per-task state, A/B 두 건에서 Main Order/DAU +2.7336%·+3.2957%. <code>[확인]</code> 지표·<code>[추정]</code> 소속. radar.md 이번 달 신규 편입.</li>
+<li><strong>PEAR (익명 e-commerce, [추정] Alibaba 라인)</strong> (<a href="https://arxiv.org/abs/2609.35031" target="_blank" rel="noopener">arXiv 2609.35031</a>): 산업 검색 시스템용 progressive autoresearch — 4-계층 verifier ladder + hypothesis-guided per-task state, A/B 두 건에서 Main Order/DAU +2.7336%·+3.2957%. <span class="badge ok">확인</span> 지표·<span class="badge est">추정</span> 소속. radar.md 이번 달 신규 편입.</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong>abuse-ledger-service의 발행자(write path)</strong>: 오늘 공개된 것은 read-only 조회 서비스뿐이다. 사람 검토자의 이의제기 승인이 <code>ledger.enforcement_holds</code>에 hold를 삽입하는 경로는 여전히 공개되지 않았다. 후속 커밋에서 해당 서비스가 열리면 정본에 반영한다.</li>
 <li><strong>home-mixer click_weight 0.3의 현장 지속 여부</strong>: 크론 미러는 해당 시점 스냅샷이라 다음 sync에서 0.4로 되돌리면 실험이 실패한 것이다. 다음 crontab tick에 나오는 값을 daily에서 계속 추적한다.</li>
 <li><strong>VF Tweetypie 레퍼런스 비교의 metric 리포트</strong>: 스테이징에서 diff가 얼마나 나오는지가 관측되면 정본에 반영한다.</li>
 <li><strong>arXiv cs.IR triage</strong>: 30건 파싱, 통과 1건(PEAR). 나머지 29건은 학계 RAG/multimodal retrieval/session-based 등. EvoSkillRec(2609.34552, Kuaishou·Huawei 혼재)은 온라인 A/B가 없어 통과 미포함.</li>
-</ul>
+</ul></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-29.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-29</div></a><a class="r" href="daily-2026-10-01.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-10-01</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-29.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-29</span></a><a class="pg-next" href="daily-2026-10-01.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-10-01</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

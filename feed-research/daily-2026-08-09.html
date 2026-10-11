@@ -2,212 +2,50 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-08-09 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="Meta 조사를 시작했다. Facebook, Instagram, Threads 세 지면을 다루었고 서비스를 가로지르는 topics 노트 8개를 정비했다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-08-09.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-08-09 — feed-research">
 <meta property="og:description" content="Meta 조사를 시작했다. Facebook, Instagram, Threads 세 지면을 다루었고 서비스를 가로지르는 topics 노트 8개를 정비했다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-08-09.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-08-09</h1>
-  <div class="wd">일요일 · 읽는 데 약 22분</div>
-  <ul class="chips"></ul>
-  
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-08-09">2026-08-09</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>일요일</li>
+<li><span class="meta-k">읽는 시간</span>22분</li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">11</span></summary><ol><li><a href="#읽은-것">읽은 것</a></li><li><a href="#새로-알게-된-것-오늘의-큰-것-6개">새로 알게 된 것 (오늘의 큰 것 6개)</a></li><li><a href="#검증에서-뒤집힌-것-중요">검증에서 뒤집힌 것 (중요)</a></li><li><a href="#반영">반영</a></li><li><a href="#같은-날-2부-netflix-조사를-시작해-마무리하고-기존-작업을-재검증하고-일일-배치를-구축했다">같은 날 2부: Netflix 조사를 시작해 마무리하고, 기존 작업을 재검증하고, 일일 배치를 구축했다</a></li><li><a href="#읽은-것-2부">읽은 것 (2부)</a></li><li><a href="#새로-알게-된-것-netflix의-큰-것-5개">새로 알게 된 것 (Netflix의 큰 것 5개)</a></li><li><a href="#검증에서-뒤집힌-것-2부--기존-xmeta-파일-재검증">검증에서 뒤집힌 것 (2부 — 기존 X·Meta 파일 재검증)</a></li><li><a href="#반영-2부">반영 (2부)</a></li><li><a href="#반영-3부--genrec-원문-재독과-적대-검증">반영 (3부) — GenRec 원문 재독과 적대 검증</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
 <p>Meta 조사를 시작했다. Facebook, Instagram, Threads 세 지면을 다루었고 서비스를 가로지르는 topics 노트 8개를 정비했다.</p>
 <p>작업 기록이다. 근거 등급과 인용문은 전부 <code>services/</code>와 <code>topics/</code>에 두었고 여기서는 반복하지 않는다.</p>
 <h2 id="읽은-것">읽은 것</h2>
@@ -220,6 +58,7 @@ ul.rl .chip b { font-size: 13px; }
 <li>Adam Mosseri의 게시물(Threads 랭킹 변경 내역을 날짜별로 정리한 것), Meta 뉴스룸(Dear Algo, Your Algorithm)</li>
 <li>EU DSA VLOP 지정 목록, Meta DSA 제출 문서(3자 호스팅 PDF, 검증 실패. 아래 참조)</li>
 </ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="새로-알게-된-것-오늘의-큰-것-6개">새로 알게 된 것 (오늘의 큰 것 6개)</h2>
 <ol>
 <li><strong>X와 Meta가 말하는 &quot;공개&quot;는 종류가 다르다.</strong> Meta는 <em>설계</em>를 공개했고 X는 <em>설정</em>을 공개했다. X의 후보 수는 소스 코드에서 확인한 정확한 값이지만 Meta의 후보 수는 시스템 카드에 실린 반올림 값이다. 무엇을 위해 공시했는지가 숫자의 형태에 드러난다.</li>
@@ -230,6 +69,7 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>다양성은 자료가 없다는 사실 자체가 발견이다.</strong> 메인 피드의 diversity와 dedup에 대해 Meta는 알고리즘 수준에서 거의 아무것도 공개하지 않았다(Threads는 0건이다). 유일한 예외가 2025년 Instagram의 <strong>알림</strong> 다양성 프레임워크인데, 이것은 피드가 아니다.</li>
 </ol>
 <p>부수적으로 확인한 내용이다. Threads 시스템 카드는 슬러그가 <code>ig-threads-feed</code>인데도 본문에 실린 시그널 50개가 전부 <code>Text Post App</code> 네임스페이스에 속하고 <code>Instagram</code>은 0회 나온다. 인프라는 100% 재사용하면서 랭킹 시그널은 100% 분리한 셈이다. Threads는 EU VLOP로 지정되지 <strong>않았고</strong>, Threads API의 엔드포인트 9개에 피드 읽기가 없어서 랭커를 외부에서 감사할 수 없다. Facebook의 강등 유형은 2021년 약 24종에서 2025년 4종(한 페이지 기준)과 7종(다른 페이지 기준)으로 줄었는데, Meta 자신의 두 페이지가 지금 서로 어긋나 있다. Widely Viewed Content Report를 보면 미연결 콘텐츠 비중이 11.7%에서 15.2%로, 다시 41.0%로 뛰었다. Meta는 AI 추천 비율(Facebook 30%, Instagram 50% 이상)을 Q1 2024 이후로 보고하지 않는다.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="검증에서-뒤집힌-것-중요">검증에서 뒤집힌 것 (중요)</h2>
 <p>적대적 검증을 2판까지 돌렸더니 실제 결함이 나왔다.</p>
 <ul>
@@ -241,11 +81,12 @@ ul.rl .chip b { font-size: 13px; }
 </li>
 <li><p><strong>접속된다고 적어 둔 페이지가 404였고</strong>, Mosseri 인용 링크 하나는 홈으로 리다이렉트되며, Clegg 2023 기사에 없는 문구가 그 기사의 인용문으로 실려 있었다. 인용문 3건은 생략 부호가 결론을 바꾸는 자리에 놓여 있었다(Q4 2025의 12% 개선에는 *&quot;along with a series of back-end improvements&quot;*라는 단서가 붙어 있어서 모델 통합만의 효과가 아니다).</p>
 </li>
-<li><p><strong>새 규칙: 부재를 어떤 등급으로 적을 것인가.</strong> 오늘 정한 정책이다. &quot;페이지 X를 D일에 받아봤더니 Y가 없다&quot;는 재현할 수 있는 1차 관찰이므로 <code>[관찰]</code>에 날짜와 대상을 함께 적는다. &quot;Meta가 Z를 공개한 적 없다&quot; 같은 무한 부정은 <code>[추정]</code>으로 적고 <strong>검색한 코퍼스가 무엇인지를 문장에 밝힌다.</strong> 특정 커밋에 고정한 소스 코드를 grep한 결과만 <code>[확인]</code>으로 남기는데, 그 경우에만 코퍼스가 유한해서 전수 검색이 가능하기 때문이다.</p>
+<li><p><strong>새 규칙: 부재를 어떤 등급으로 적을 것인가.</strong> 오늘 정한 정책이다. &quot;페이지 X를 D일에 받아봤더니 Y가 없다&quot;는 재현할 수 있는 1차 관찰이므로 <span class="badge obs">관찰</span>에 날짜와 대상을 함께 적는다. &quot;Meta가 Z를 공개한 적 없다&quot; 같은 무한 부정은 <span class="badge est">추정</span>으로 적고 <strong>검색한 코퍼스가 무엇인지를 문장에 밝힌다.</strong> 특정 커밋에 고정한 소스 코드를 grep한 결과만 <span class="badge ok">확인</span>으로 남기는데, 그 경우에만 코퍼스가 유한해서 전수 검색이 가능하기 때문이다.</p>
 </li>
 <li><p><strong>새 규칙: arXiv PDF를 쓰지 않는다.</strong> WebFetch로 PDF를 받아 읽으면 <strong>없는 숫자를 지어낸다.</strong> SilverTorch를 다룰 때 AWS 인스턴스 타입과 &quot;Recall@100 &gt;95%&quot;, &quot;~40% infra savings&quot;를 만들어냈는데, HTML판의 실제 값은 A100 40G와 Recall@20 +28.2%였다. 앞으로는 <code>arxiv.org/html/</code>이나 ar5iv만 쓴다. PDF로만 존재하는 주장은 확인도 부정도 하지 않고 미검증으로 남긴다.</p>
 </li>
 </ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="반영">반영</h2>
 <ul>
 <li><code>services/facebook.md</code>를 새로 만들었다: Vijt 공식, 지면별 후보 수, 강등 유형이 줄어든 경위, 광고 특허, Epinet 콜드스타트, dwell-time 정규화, DSA</li>
@@ -261,7 +102,9 @@ ul.rl .chip b { font-size: 13px; }
 <li><code>topics/llm-in-recsys.md</code>: 표현으로 쓰는 경우와 비유로 쓰는 경우의 구분, LLaTTE</li>
 </ul>
 <hr>
-<h1 id="같은-날-2부-netflix-조사를-시작해-마무리하고-기존-작업을-재검증하고-일일-배치를-구축했다">같은 날 2부: Netflix 조사를 시작해 마무리하고, 기존 작업을 재검증하고, 일일 배치를 구축했다</h1>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="같은-날-2부-netflix-조사를-시작해-마무리하고-기존-작업을-재검증하고-일일-배치를-구축했다" class="part">같은 날 2부: Netflix 조사를 시작해 마무리하고, 기존 작업을 재검증하고, 일일 배치를 구축했다</h2>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="읽은-것-2부">읽은 것 (2부)</h2>
 <ul>
 <li>TMIS 2015(Gomez-Uribe &amp; Hunt): 고전 세대 시스템을 서술한 정본</li>
@@ -270,6 +113,7 @@ ul.rl .chip b { font-size: 13px; }
 <li>논문: Calibrated Recommendations(Steck, RecSys 2018), UniCoRn(RecSys 2024), GenPage(RecSys 2026), 1B 스케일링(2026, shadow), 라이브 콜드스타트(RecSys 2025), 임베딩 안정화(RecSys 2025), Artwork LLM post-training(2026, 연구)</li>
 <li>help.netflix.com 추천 문서, SIGIR 2019 검색 논문, AI Magazine 2021 초록</li>
 </ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="새로-알게-된-것-netflix의-큰-것-5개">새로 알게 된 것 (Netflix의 큰 것 5개)</h2>
 <ol>
 <li><strong>retrieval 레이어가 없다.</strong> PVR이 카탈로그 전체를 회원별로 정렬한다. 코퍼스가 수천에서 수만 규모라 브루트포스로 전부 채점하는 방식이 성립하기 때문이다. &quot;어떤 ANN을 쓰는가&quot;라는 질문 자체가 성립하지 않는 첫 표본이다. 배분 문제는 아이템이 아니라 <strong>행 선택</strong>으로 옮겨 가고(수만 개의 후보 행에서 약 40행을 고른다), 2015년에 이미 비율로 배분하는 템플릿 방식을 버렸다.</li>
@@ -279,18 +123,20 @@ ul.rl .chip b { font-size: 13px; }
 <li><strong>다양성을 다루는 다섯 번째 방식은 calibration이다.</strong> 시청 이력의 장르 분포를 추천 리스트에도 보존한다(Steck RecSys 2018, 수식까지 공개되어 있다). 다만 <strong>배포했다는 진술이 없으므로</strong> &quot;Netflix가 이 방식을 쓴다&quot;고 적으면 안 된다. 다양성 자체는 행 선택 단계에서 다루고(&quot;관련성+다양성 최적화&quot;), 아트워크 개인화는 지각적 다양성을 조절하는 별도의 수단이다.</li>
 </ol>
 <p>부수적으로 확인한 내용이다. 명시적 평점의 1차 출처를 확보했다(2017년 thumbs 전환, 활동 200% 증가, % Match는 표시용, 2022년 two thumbs). 이에 따라 survey-signals의 Netflix 절을 2차 보도 기반에서 1차 출처 기반으로 올렸다. 광고는 파이프라인과 타겟팅 상품만 공개되어 있고 <strong>랭킹 모델 공개물은 0건</strong>이어서, Meta에서 했던 것처럼 오가닉 계보와 광고 계보를 나누어 서술할 수 없는 상태다. 인구통계는 쓰지 않는다고 명시되어 있다. &quot;Hydra&quot;라는 통합 시스템 이름과 semantic ID를 쓴다는 설명은 1차 출처가 없다(후자는 Spotify 발표와 혼동하는 경우가 흔하다).</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="검증에서-뒤집힌-것-2부--기존-xmeta-파일-재검증">검증에서 뒤집힌 것 (2부 — 기존 X·Meta 파일 재검증)</h2>
 <p>X 노트에 2차 적대 검증을 걸었고(44 OK / 3 DEFECT / 3 MINOR), Meta 노트도 2차 검증을 거쳤다(58 OK / 4 DEFECT). 아래 내용을 전부 수정해 반영했다.</p>
 <ul>
 <li><strong>x.md에 조작된 인용이 1건 있었다</strong>: &quot;our decision not to release training data or model weights&quot;는 2023년 블로그 아카이브 전문에 없는 문장이었다. 실제로 존재하는 문장(recap README에 적힌 학습 데이터 비공개 사유)으로 교체했다.</li>
 <li><strong>x.md의 2023년 가중치 범위 서술이 틀렸다</strong>: &quot;0.0~100.0, 음수 표현 불가&quot;라고 적었지만 사실이 아니다. Report의 −20000..0처럼 음수 전용 범위 4종이 2023년부터 있었고, 2025년 경계값은 2023년과 같다(새로 생긴 신호가 아니다). multi-task-ranking의 표까지 함께 고쳤다.</li>
 <li><strong>x.md의 개수 집계가 틀렸다</strong>: &quot;나머지 default 203개 전부 실제값&quot;이라고 적었지만, 실제로는 173개 가운데 25개가 0.0이다. 결론의 방향은 유지하고 수치만 정정했다.</li>
-<li><strong>facebook.md</strong>: 강등 유형이 &quot;약 24종&quot;이라는 서술의 출처로 단 2021년 발표문에는 개수가 나오지 않는다. 등급을 <code>[추정]</code>으로 낮췄다.</li>
+<li><strong>facebook.md</strong>: 강등 유형이 &quot;약 24종&quot;이라는 서술의 출처로 단 2021년 발표문에는 개수가 나오지 않는다. 등급을 <span class="badge est">추정</span>으로 낮췄다.</li>
 <li><strong>instagram.md에서 2건을 고쳤다</strong>: 팔로워 수 인용의 3번째 문장이 현행 페이지와 달라서 다시 복사했고, 원본성 복구 조건은 &quot;최근 30일 콘텐츠 구성&quot;이지 &quot;위반 후 30일 경과&quot;가 아니다.</li>
 <li><strong>model-freshness.md</strong>: RankGraph-2 인용에서 &quot;constraining&quot;이라고 적었지만 원문은 &quot;filtering&quot;이다(한 단어 차이다).</li>
 <li>사소한 수정: bulk topic은 7개 &quot;이상&quot;이고(<code>&gt;6</code>), 50/50 인용의 출처를 더 정밀하게 밝혔으며, e414c17은 &quot;187파일 변경&quot;이다(저장소 전체는 216파일이다).</li>
 </ul>
 <p>netflix.md 자체에도 같은 방식으로 적대 검증을 걸었고, 결과는 <strong>54 OK / 결함 0 / 사소 3</strong>이었다. 핵심 수치는 전부 살아남았다(40행×75, 80%/20%, $1B, GenRec의 트래픽 10%·+1.6% MRR·40×, 월 단위와 일 단위를 겹친 주기, 200%, 2-6개월·200만/셀, 라이브 1억 디바이스/1분). 사소한 3건도 반영했다. FM 소비 3모드의 출처를 두 편의 글로 나누어 표기했고, UniCoRn의 7%/10%에는 &quot;오프라인 지표&quot;라는 한정을 붙였으며, TMIS의 &quot;이틀 전 데이터&quot;는 실험 프로토콜의 예시이지 프로덕션 학습 주기를 말한 것이 아님을 명시했다.</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="반영-2부">반영 (2부)</h2>
 <ul>
 <li><code>services/netflix.md</code>를 새로 만들었다: 세대 구분(고전 2015-22 / 통합 2023-24 / FM 2025 / LLM-네이티브 2026), 모든 절에 근거 등급을 붙였다</li>
@@ -304,91 +150,37 @@ ul.rl .chip b { font-size: 13px; }
 <li><code>topics/survey-signals.md</code>: Netflix 절을 1차 출처 기반으로 올렸다(thumbs, two thumbs, 온보딩 픽커)</li>
 <li><code>scripts/daily-research.sh</code>와 <code>scripts/daily-research-prompt.md</code>를 새로 만들었다. <strong>일일 배치</strong> 작업이다. 매일 09:30에 각 서비스의 신규 공개물을 확인해서, 있으면 분석하고 정본을 갱신하고 daily에 기록한 뒤 푸시하며, 없으면 Slack으로 보고만 한다. pm2 cron에 등록했다.</li>
 </ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="반영-3부--genrec-원문-재독과-적대-검증">반영 (3부) — GenRec 원문 재독과 적대 검증</h2>
 <p>&quot;GenRec을 설명해 달라&quot;는 요청을 계기로 블로그를 다시 받아 읽고 적대 검증을 걸었다. 기존 수치는 전부 살아남았지만 <strong>정본에서 빠져 있던 사실 두 개가 나왔고, 둘 다 이해를 바꿔 놓는다.</strong></p>
 <ol>
 <li><strong>채점 구조가 생성 방식이 아니다.</strong> 원문은 *&quot;we extract a pooled hidden state h&quot;*라고 쓴다. 여기에 아이템 임베딩 eᵢ와 scoring head ϕ(dot product 또는 small MLP)를 적용해 sᵢ를 얻고 softmax를 취한다. 백본과 헤드, 아이템 임베딩을 함께 학습한다. 즉 LLM은 유저 표현을 만드는 인코더이고, 채점기는 여전히 임베딩 내적이다. <strong>&quot;LLM 랭커&quot;를 semantic ID 기반 생성형 retrieval과 혼동하기 딱 좋은 지점</strong>이라서 <code>llm-in-recsys.md</code>에 경고 블록을 넣었다. prefill을 1패스만 수행하는 대상이 후보 하나가 아니라 <strong>후보 집합 전체</strong>인 것도 이 구조 때문이다.</li>
-<li>**A/B 실험은 <em>&quot;batch-compute recommendation surfaces&quot;<em>로 한정된다.</em></em> 원문에 그렇게 명시되어 있다. 다만 글이 &quot;실시간 지면에는 적용하지 않았다&quot;고 쓴 것은 아니다. 그것은 우리 쪽 추론이므로 <code>[추정]</code>으로 분리했고, X·Meta와 나란히 놓고 비교할 때 지면 성격의 차이를 지우지 말라는 ⚠ 표시를 해당 주장 옆에 달았다.</li>
+<li>**A/B 실험은 <em>&quot;batch-compute recommendation surfaces&quot;<em>로 한정된다.</em></em> 원문에 그렇게 명시되어 있다. 다만 글이 &quot;실시간 지면에는 적용하지 않았다&quot;고 쓴 것은 아니다. 그것은 우리 쪽 추론이므로 <span class="badge est">추정</span>으로 분리했고, X·Meta와 나란히 놓고 비교할 때 지면 성격의 차이를 지우지 말라는 ⚠ 표시를 해당 주장 옆에 달았다.</li>
 </ol>
 <p>검증 과정에서 함께 잡아낸 정밀화 3건이다. ① 컨텍스트를 1/3로 압축했을 때의 &quot;negligible degradation&quot;은 <strong>오프라인 랭킹 지표에 한정된 이야기다.</strong> ② 40×와 +1.6%는 오프라인 MRR 진술에 묶어서 써야 하고, 프로덕션에서 대등하거나 앞선다는 쪽은 별도로 *&quot;10–40× ... depending on configuration&quot;*이라고 적혀 있다. ③ Limitations 절은 따로 없지만 전망을 담은 문장이 여기저기 흩어져 있어서(natural-language steering, 추천 이유 설명 등) &quot;GRPO가 유일한 미래 과제&quot;라고 요약하면 틀린다.</p>
-<p><code>[관찰]</code> 2026-08-09 기준으로 GenRec 후속 글이 없어서 롤아웃 여부는 열린 질문으로 남겨 둔다. 다만 netflixtechblog 인덱스가 JS로 렌더링되기 때문에 이 확인은 검색 결과를 기준으로 한 것이다. 열린 질문 2개를 추가했다. 실시간 지면에 적용했는지 여부, 그리고 <strong>후보 집합을 누가 생성하는가</strong>이다(글에 밝혀져 있지 않다).</p>
+<p><span class="badge obs">관찰</span> 2026-08-09 기준으로 GenRec 후속 글이 없어서 롤아웃 여부는 열린 질문으로 남겨 둔다. 다만 netflixtechblog 인덱스가 JS로 렌더링되기 때문에 이 확인은 검색 결과를 기준으로 한 것이다. 열린 질문 2개를 추가했다. 실시간 지면에 적용했는지 여부, 그리고 <strong>후보 집합을 누가 생성하는가</strong>이다(글에 밝혀져 있지 않다).</p>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong>Transparency Center 재검증</strong>: 시스템 카드 페이지는 자동 fetch가 차단된다(400/429). 카드에 근거한 주장은 전부 2026-08-09 시점의 스냅샷이므로 브라우저로 다시 확인해야 한다.</li>
 <li><strong>Meta DSA 제출 문서 원문</strong>과 <strong>Que2Search ACM판</strong>: 상황은 이전과 동일하다.</li>
 <li><strong>Netflix의 열린 질문들</strong>: GenRec과 GenPage의 전면 롤아웃 여부를 이후 블로그 후속 글로 추적하고, calibration 배포 여부, FM 파라미터 수, 광고 랭킹 모델의 공개 시작 여부도 함께 본다.</li>
 <li><strong>sequence-transformer-ranking에 Netflix FM 절을 추가할지 검토한다</strong>: 토큰화(BPE에 빗댄 설명), 이질적인 피처를 토큰으로 다루는 방식, multi-token 목적이 X(ID-only)와 Meta(HSTU)에 이은 세 번째 좌표가 된다. 이번에는 netflix.md에만 실었다.</li>
 <li>다음에 다룰 서비스 후보는 YouTube(공개 문헌의 밀도가 높다) 또는 TikTok(USM 계보)이다.</li>
-</ul>
+</ul></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-08-08.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-08-08</div></a><a class="r" href="daily-2026-08-10.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-08-10</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-08-08.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-08-08</span></a><a class="pg-next" href="daily-2026-08-10.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-08-10</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

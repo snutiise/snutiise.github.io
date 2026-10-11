@@ -2,233 +2,75 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-25 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X 4세대+28 커밋이 홈믹서의 1,255줄짜리 랭킹 스코어러를 통째 지우고, 어제 신설된 공유 crate xai-value-model이 홈믹서와 vm-ranker 두 프로세스의 value model 계산을 동일 코드로 담당하게 됐다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-25.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-25 — feed-research">
 <meta property="og:description" content="한 줄: X 4세대+28 커밋이 홈믹서의 1,255줄짜리 랭킹 스코어러를 통째 지우고, 어제 신설된 공유 crate xai-value-model이 홈믹서와 vm-ranker 두 프로세스의 value model 계산을 동일 코드로 담당하게 됐다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-25.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-25</h1>
-  <div class="wd">금요일 · 읽는 데 약 22분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+28 커밋이 홈믹서의 1,255줄짜리 랭킹 스코어러를 통째 지우고, 어제 신설된 공유 crate <code>xai-value-model</code>이 홈믹서와 vm-ranker 두 프로세스의 value model 계산을 <strong>동일 코드로</strong> 담당하게 됐다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-4세대28--홈믹서-랭킹-스코어러-삭제-value-model이-공유-crate-하나로-수렴--x">1. 4세대+28 — 홈믹서 랭킹 스코어러 삭제, value model이 공유 crate 하나로 수렴 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/44d37ebf87f2185b949cd37b710d410c2a77d21f">xai-org/x-algorithm@<code>44d37eb</code></a> — GitHub 공개 소스코드, 2026-09-24, +2,569/−2,257 (파일 62). 어제 <a href="https://github.com/xai-org/x-algorithm/commit/1b3fec20">1b3fec20</a> 커밋이 vm-ranker 프로세스에 <code>xai_value_model::compute_value_scores()</code>를 인라인으로 붙였고, 오늘은 그 shared crate가 실제 파일로 공개됐다.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-25">2026-09-25</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>금요일</li>
+<li><span class="meta-k">읽는 시간</span>22분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+28 커밋이 홈믹서의 1,255줄짜리 랭킹 스코어러를 통째 지우고, 어제 신설된 공유 crate <code>xai-value-model</code>이 홈믹서와 vm-ranker 두 프로세스의 value model 계산을 <strong>동일 코드로</strong> 담당하게 됐다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-4세대28--홈믹서-랭킹-스코어러-삭제-value-model이-공유-crate-하나로-수렴--x"><span class="num">1</span>4세대+28 — 홈믹서 랭킹 스코어러 삭제, value model이 공유 crate 하나로 수렴 — X</a></li><li><a href="#arxiv-triage">arXiv triage</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-4세대28--홈믹서-랭킹-스코어러-삭제-value-model이-공유-crate-하나로-수렴--x"><span class="num">1</span>4세대+28 — 홈믹서 랭킹 스코어러 삭제, value model이 공유 crate 하나로 수렴 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/44d37ebf87f2185b949cd37b710d410c2a77d21f" target="_blank" rel="noopener">xai-org/x-algorithm@<code>44d37eb</code></a> — GitHub 공개 소스코드, 2026-09-24, +2,569/−2,257 (파일 62). 어제 <a href="https://github.com/xai-org/x-algorithm/commit/1b3fec20" target="_blank" rel="noopener">1b3fec20</a> 커밋이 vm-ranker 프로세스에 <code>xai_value_model::compute_value_scores()</code>를 인라인으로 붙였고, 오늘은 그 shared crate가 실제 파일로 공개됐다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> X의 For You 랭킹은 Phoenix가 예측한 24개 참여 확률(favorite·reply·retweet·dwell·report ...)을 가중합해서 하나의 스칼라 점수를 얻은 뒤 여기에 작성자 다양성·OON(out-of-network) 배수·새-작성자 부스트를 곱하는 구조다. 이 계산은 두 곳에서 일어난다 — 홈믹서(Rust, home-mixer)와 그 뒤에 붙는 vm-ranker(별도 gRPC 서비스, DPP 다양성과 rank server 역할). 두 프로세스가 같은 수식을 두 벌 구현하면 미러가 어긋나는 것을 매번 사람이 잡아야 한다. 어제 커밋에서 <code>xai_value_model</code> 이름의 shared crate가 등장하기 시작했고, 오늘 그 crate가 실제 파일 6개로 공개되면서 <strong>홈믹서의 팻 스코어러(<code>ranking_scorer.rs</code>, 1,255줄)가 통째로 삭제됐다.</strong> 어느 프로세스가 어떤 파라미터를 쓰는지, 파라미터 미러가 몇 개인지 세는 관행이 이 커밋으로 정리된다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li>신규 crate <code>xai-value-model</code>이 파일 6개, 총 807줄로 공개됐다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/lib.rs"><code>xai-value-model/lib.rs</code></a> (+14) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/inputs.rs"><code>inputs.rs</code></a> (+35) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/phoenix_scores.rs"><code>phoenix_scores.rs</code></a> (+28) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/proto.rs"><code>proto.rs</code></a> (+92) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/scoring.rs"><code>scoring.rs</code></a> (+444) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/weights.rs"><code>weights.rs</code></a> (+194).</li>
-<li>노출된 심볼(<code>lib.rs</code>가 <code>pub use</code>로 재수출한 것 그대로)은 다음과 같다 <code>[확인]</code> — <code>ValueModelWeights</code>(33 필드) · <code>CandidateScoringInputs</code> · <code>QueryScoringContext</code> · <code>PhoenixScores</code>(26 필드) · <code>compute_value_scores</code> · <code>compute_value_scores_with_adjustment</code> · <code>fuse_heads</code> · <code>compute_weighted_score</code> · <code>offset_score</code> · <code>post_fusion_multipliers</code> · <code>apply_cold_start_decisions</code> · <code>diversity_multiplier</code> · <code>author_pool_counts</code> · <code>PostFusionMultiplier</code> · <code>ValueScores</code> · <code>NEGATIVE_SCORES_OFFSET</code> 상수.</li>
-<li><strong>홈믹서의 <code>ranking_scorer.rs</code>(1,255줄)가 통째로 삭제됐다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/1b3fec20/home-mixer/scorers/ranking_scorer.rs"><code>home-mixer/scorers/ranking_scorer.rs</code></a> (직전 커밋 tree에서 확인). 대체는 신규 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/value_model.rs"><code>home-mixer/scorers/value_model.rs</code></a> 114줄뿐이다. 이 파일이 하는 일은 세 개다: (1) <code>weights_for(query)</code>가 홈믹서 FS 파라미터에서 33개 값을 뽑아 <code>ValueModelWeights</code>를 구성, (2) <code>scoring_inputs(query, weights, candidate)</code>가 후보의 Phoenix 참여 확률과 in-network·mutual-follow·vqv 조건을 <code>CandidateScoringInputs</code>로 변환, (3) <code>weighted_score(query, weights, candidate)</code>가 공유 crate의 <code>fuse_heads</code>를 그대로 호출.</li>
-<li><strong>홈믹서 파라미터 파일에서 136줄이 삭제됐다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a> (+2/−136). 삭제된 파라미터: <code>EnableAuthorDiversity</code>·<code>AuthorDiversityDecay</code>·<code>AuthorDiversityFloor</code>·<code>OonWeightFactor</code>·<code>MultiplierPreOffset</code>·<code>EnableOonRescoreForInNetworkRepliesRetweets</code>·<code>TopicOonWeightFactor</code>·<code>NewUserAgeThresholdSecs</code>·<code>NewUserOonWeightFactor</code>·<code>EnableMultiplicativePostUnexplored</code>·<code>MultiplicativePostUnexploredAlpha</code>·<code>PostUnexploredWeightInNetworkOnly</code>·<code>EnableCdwellOnImpr</code>·<code>ContActiveSecs5mResidualNormWeight</code>·<code>WeightPerturbationSigma</code>·<code>WeightPerturbationSalt</code>·<code>EnableVMRanker</code>·<code>VMRankerDppTheta</code>·<code>VMRankerDppMaxSelectedRank</code>·<code>VMRankerSendValueModelInputs</code>·<code>VMRankerComputeValueModel</code>·<code>CachedPostsReuseWeightedScore</code>. 이 값들은 두 갈래로 이관됐다: (a) value model 가중치·게이팅 파라미터는 <code>ValueModelWeights</code> 구조체 필드로 이동해 vm-ranker가 관리하는 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/vm-ranker/params.rs"><code>vm-ranker/params.rs</code></a>(어제 신설, 56 파라미터)가 유일한 소스가 됐고, (b) DPP 파라미터(<code>VMRankerDppTheta</code>·<code>VMRankerDppMaxSelectedRank</code>)는 vm-ranker 프로세스 내부 RankingConfig로 흡수됐다. 파일 헤더 sync 시각도 <code>2026-09-22T17:39:32Z</code> → <code>2026-09-23T16:28:43Z</code>로 갱신.</li>
-<li><strong>홈믹서의 <code>vm_ranker.rs</code>가 &quot;요청 조립&quot;에서 &quot;local-first, RPC-refine&quot;으로 재구성됐다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/vm_ranker.rs"><code>home-mixer/scorers/vm_ranker.rs</code></a> (+84/−76). 새 함수 <code>local_scores()</code>가 각 후보에 대해 <code>value_model::weighted_score()</code>로 로컬 가중합을 먼저 계산하고 <code>AuthorColdStart::apply_with_decisions()</code>로 콜드스타트 lift·author_policy_zeroed 결정을 붙인다. 그 다음 vm-ranker gRPC로 refinement 요청을 보내는데, <strong>RPC가 실패하면 로컬로 계산한 가중합을 그대로 서빙한다</strong> — 기존 코드는 실패를 후보별 Err로 전파했다.</li>
-<li><strong>Phoenix retrieval에 <code>HOME_HOT</code> 슬라이스가 신설됐다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/data/retrieval_dataset.py"><code>phoenix/xrex/data/retrieval_dataset.py</code></a> (+103/−8). <code>RetrievalDataset</code> enum이 <code>HOME_COLD = 13</code> 옆에 <code>HOME_HOT = 14</code>를 신설, 둘 다 같은 <code>1fav_1day.parquet</code> 소스에서 뽑되 신규 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/data/cold_pool_filter.py"><code>phoenix/xrex/data/cold_pool_filter.py</code></a> (+78)의 <code>cold_pool_mask(post_ids, meta_path, max_favs=8, max_views=500)</code>와 <code>fresh_post_mask(post_ids, max_age_seconds)</code>(Twitter Snowflake epoch를 이용해 게시 시각을 트윗 id에서 직접 계산)로 갈라진다. <code>HOME_COLD</code>는 <code>cold_keep = cold_pool_mask &amp; fresh_post_mask</code>, <code>HOME_HOT</code>은 그 여집합. 콜드 풀이 이제 학습·서빙 단계에서 데이터 로딩 시점에 잘리고, 나머지 인기 후보만 별도 index로 관리된다. <code>default_cold_pool_metadata_path()</code>는 <code>${PHOENIX_INDEX_BASE:-/data/phoenix_index/prod}/post_author_pairs_metadata/metadata_1day.parquet</code>.</li>
-<li><strong>Phoenix bundle export에 per-target 인덱스 메타데이터가 붙었다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/train/recsys_bundle_export.py"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a> (+170/−46). <code>RetrievalExport</code> dataclass에 <code>dataset_capacities</code>·<code>rows_from</code>(target별로 어느 소스 dataset의 rows를 참조할지)·<code>max_age_seconds</code>(target별 최대 나이)·<code>optional_targets</code> 4 필드 추가. 매니페스트가 <code>POST_SCALES_KEY</code>·<code>DATASET_RANGES_KEY</code> 두 상수를 노출, <code>enable_int8_post_table</code>·<code>enable_bloom_filter</code>·<code>enable_topic_filter</code> 세 새 게이팅으로 int8 post table(per-post absolute-max scale)을 export에 포함할지 결정. HOME_COLD와 HOME_HOT이 동일 소스(HOME)의 rows를 나눠 쓰는 구조는 정확히 이 <code>rows_from</code>으로 표현된다.</li>
-<li><strong>VF에 retweet source verdict 병합 로직이 배선됐다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/models/verdict.rs"><code>visibility-filtering/models/verdict.rs</code></a> (+60)에 <code>Verdict::merge_retweet_verdict(retweet, source)</code> 신규. 병합 규칙: (1) source가 <code>Withheld</code>면 무조건 source를 채택(원 트윗이 감춰졌으면 리트윗도 감춤), (2) retweet이 <code>Withheld</code>면 retweet 유지(리트윗 자체가 감춰지는 규칙이 이겼을 때), (3) retweet이 <code>Shown{media: None, engagement: None}</code>(제약 없음)이면 source 상속, (4) 그 외에는 retweet 유지. <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/evaluate_tweets.rs"><code>visibility-filtering/evaluate_tweets.rs</code></a> (+157/−18)가 이 병합을 실제 실행하는 flow를 구현했다: (a) 1차 평가 후 결과에서 <code>source_tweet_id.is_some()</code>인 evaluated 리트윗들을 모아, (b) 그 source id들 중 <code>in_batch</code>(같은 배치에 이미 있는 것) vs <code>fetched</code>(재조회 필요)를 <code>HashSet.contains()</code>로 분리, (c) <code>fetched</code> 목록에 대해 <code>filter_tweets.run(...)</code>을 두 번째로 호출해 source verdict를 얻고, (d) 리트윗별로 source verdict를 조회해 <code>merge_retweet_verdict</code>를 적용. 새 메트릭 <code>evaluate_tweets_retweet_sources{outcome=in_batch|fetched}</code>.</li>
-<li>뒷받침으로 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/hydration/mod.rs"><code>visibility-filtering/hydration/mod.rs</code></a> (+244/−18)에 <code>pure_cores: TweetHydrationBatch&lt;PureCore&gt;</code>가 hydration 결과 튜플에 추가됐다. <code>PureCore</code>는 리트윗 원본 id(<code>source_tweet_id</code>)를 담는 얇은 코어 정보이고, <code>PureCoreFallbackCache</code>가 처음 실패한 id를 다음 요청에서 재시도할 수 있게 캐시한다. <code>RawCandidate</code>에 <code>source_tweet_id: Option&lt;TweetId&gt;</code> 필드가 붙어(4세대+22 이후 도입) hydration에서 채워진다.</li>
-<li><strong>VF <code>clock_cache.rs</code>(412줄)가 제거됐다</strong> <code>[확인]</code> — 2026-09-10(4세대+19)에 &quot;미배선&quot; 상태로 도입됐던 프리미티브가 15일 만에 삭제. 배선되지 않은 프리미티브는 유지 부담을 지고 싶지 않다는 신호. 재도입이 필요하면 그때 다시 넣을 것이다 <code>[추정]</code>.</li>
-<li><strong>grox PTOS 신규 카테고리 <code>AgeGatingHarmfulText</code></strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/state.py"><code>grox/flows/ptos/state.py</code></a> (+6)에 <code>SafetyPolicyCategory.AgeGatingHarmfulText</code> enum이 붙고, 그 아래 5개 서브타입 <code>AgeGatingHarmfulTextAdultContent</code>·<code>EatingDisorder</code>·<code>HarmfulSubstance</code>·<code>DangerousStunt</code>·<code>GraphicDescription</code>이 <code>SafetyPolicyType</code>에 등록됐다. <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/classifier.py"><code>grox/flows/ptos/classifier.py</code></a> (+5)에서 이 카테고리는 <code>USE_GEMMA_CATEGORIES</code> 세트에 등록되어 first-pass 판정을 Gemma-4-26b에서 수행(오늘 시점 이 세트에 든 다른 카테고리는 <code>Spam</code>·<code>IllegalAndRegulatedBehaviors</code>뿐이다). 즉 성인 콘텐츠 성격의 텍스트가 있더라도 삭제가 아니라 <strong>연령 게이팅</strong>으로 넘기는 정책 축이 신설됐다. 프롬프트 템플릿은 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/prompts.py"><code>prompts.py</code></a> (+5)의 <code>age_gating_harmful_text_policy_prompt()</code>가 별도 <code>age_gating_harmful_text_policy.j2</code>를 렌더(템플릿 본문은 이 커밋 tree에는 포함되지 않았다).</li>
-<li><strong>grox reply spam Gemma-vs-Grok 팔로워 임계</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/reply_spam/constants.py"><code>grox/flows/reply_spam/constants.py</code></a> (<code>GROK_GEMMA_FOLLOWER_SPLIT</code>)이 225,000 → <strong>250,000</strong>으로 상향됐다. 팔로워 25만 이상 계정의 리플라이만 Grok으로, 그 아래는 Gemma로 처리하는 라우팅 경계다. 15일간의 상향 시리즈(15k → 30k → 60k → 80k → 100k → 150k → 225k → <strong>250k</strong>) 연장선. 스팸 분류 부담을 계속 Gemma 쪽으로 옮기고 있다.</li>
-<li><strong>홈믹서 스코어드 통계에 SimClusters retrieval 기여 attribution이 붙었다</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/side_effects/scored_stats_side_effect.rs"><code>home-mixer/side_effects/scored_stats_side_effect.rs</code></a> (+35/−4). <code>Phoenix.RetrievalContribution.SimclustersTopK</code> 계열이 신설되어 top-k 후보 중 SimClusters 소스가 몇 개인지 관찰하고, top-k 버킷은 <code>[50, 100, 200, 400, 600, 800]</code>으로 Phoenix의 <code>[10, 100, 200, 500, 1000]</code>과 별도 축을 쓴다. 또한 신규 <code>Phoenix.RetrievalContribution.ScoredTopK</code>가 selected + non-selected 후보 전체를 대상으로 top-k 소스 분포를 잰다(선택되기 전에 어느 소스가 스코어링 top-k에 들었는지 관찰). 4세대+26에서 도입된 <code>retrieval_candidates_kafka_side_effect.rs</code>(원자료 샘플링)와 짝을 이루는 aggregate metric 축이다.</li>
+<li>신규 crate <code>xai-value-model</code>이 파일 6개, 총 807줄로 공개됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/lib.rs" target="_blank" rel="noopener"><code>xai-value-model/lib.rs</code></a> (+14) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/inputs.rs" target="_blank" rel="noopener"><code>inputs.rs</code></a> (+35) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/phoenix_scores.rs" target="_blank" rel="noopener"><code>phoenix_scores.rs</code></a> (+28) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/proto.rs" target="_blank" rel="noopener"><code>proto.rs</code></a> (+92) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>scoring.rs</code></a> (+444) · <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/weights.rs" target="_blank" rel="noopener"><code>weights.rs</code></a> (+194).</li>
+<li>노출된 심볼(<code>lib.rs</code>가 <code>pub use</code>로 재수출한 것 그대로)은 다음과 같다 <span class="badge ok">확인</span> — <code>ValueModelWeights</code>(33 필드) · <code>CandidateScoringInputs</code> · <code>QueryScoringContext</code> · <code>PhoenixScores</code>(26 필드) · <code>compute_value_scores</code> · <code>compute_value_scores_with_adjustment</code> · <code>fuse_heads</code> · <code>compute_weighted_score</code> · <code>offset_score</code> · <code>post_fusion_multipliers</code> · <code>apply_cold_start_decisions</code> · <code>diversity_multiplier</code> · <code>author_pool_counts</code> · <code>PostFusionMultiplier</code> · <code>ValueScores</code> · <code>NEGATIVE_SCORES_OFFSET</code> 상수.</li>
+<li><strong>홈믹서의 <code>ranking_scorer.rs</code>(1,255줄)가 통째로 삭제됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/1b3fec20/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a> (직전 커밋 tree에서 확인). 대체는 신규 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/value_model.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/value_model.rs</code></a> 114줄뿐이다. 이 파일이 하는 일은 세 개다: (1) <code>weights_for(query)</code>가 홈믹서 FS 파라미터에서 33개 값을 뽑아 <code>ValueModelWeights</code>를 구성, (2) <code>scoring_inputs(query, weights, candidate)</code>가 후보의 Phoenix 참여 확률과 in-network·mutual-follow·vqv 조건을 <code>CandidateScoringInputs</code>로 변환, (3) <code>weighted_score(query, weights, candidate)</code>가 공유 crate의 <code>fuse_heads</code>를 그대로 호출.</li>
+<li><strong>홈믹서 파라미터 파일에서 136줄이 삭제됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (+2/−136). 삭제된 파라미터: <code>EnableAuthorDiversity</code>·<code>AuthorDiversityDecay</code>·<code>AuthorDiversityFloor</code>·<code>OonWeightFactor</code>·<code>MultiplierPreOffset</code>·<code>EnableOonRescoreForInNetworkRepliesRetweets</code>·<code>TopicOonWeightFactor</code>·<code>NewUserAgeThresholdSecs</code>·<code>NewUserOonWeightFactor</code>·<code>EnableMultiplicativePostUnexplored</code>·<code>MultiplicativePostUnexploredAlpha</code>·<code>PostUnexploredWeightInNetworkOnly</code>·<code>EnableCdwellOnImpr</code>·<code>ContActiveSecs5mResidualNormWeight</code>·<code>WeightPerturbationSigma</code>·<code>WeightPerturbationSalt</code>·<code>EnableVMRanker</code>·<code>VMRankerDppTheta</code>·<code>VMRankerDppMaxSelectedRank</code>·<code>VMRankerSendValueModelInputs</code>·<code>VMRankerComputeValueModel</code>·<code>CachedPostsReuseWeightedScore</code>. 이 값들은 두 갈래로 이관됐다: (a) value model 가중치·게이팅 파라미터는 <code>ValueModelWeights</code> 구조체 필드로 이동해 vm-ranker가 관리하는 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs</code></a>(어제 신설, 56 파라미터)가 유일한 소스가 됐고, (b) DPP 파라미터(<code>VMRankerDppTheta</code>·<code>VMRankerDppMaxSelectedRank</code>)는 vm-ranker 프로세스 내부 RankingConfig로 흡수됐다. 파일 헤더 sync 시각도 <code>2026-09-22T17:39:32Z</code> → <code>2026-09-23T16:28:43Z</code>로 갱신.</li>
+<li><strong>홈믹서의 <code>vm_ranker.rs</code>가 &quot;요청 조립&quot;에서 &quot;local-first, RPC-refine&quot;으로 재구성됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a> (+84/−76). 새 함수 <code>local_scores()</code>가 각 후보에 대해 <code>value_model::weighted_score()</code>로 로컬 가중합을 먼저 계산하고 <code>AuthorColdStart::apply_with_decisions()</code>로 콜드스타트 lift·author_policy_zeroed 결정을 붙인다. 그 다음 vm-ranker gRPC로 refinement 요청을 보내는데, <strong>RPC가 실패하면 로컬로 계산한 가중합을 그대로 서빙한다</strong> — 기존 코드는 실패를 후보별 Err로 전파했다.</li>
+<li><strong>Phoenix retrieval에 <code>HOME_HOT</code> 슬라이스가 신설됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/data/retrieval_dataset.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/retrieval_dataset.py</code></a> (+103/−8). <code>RetrievalDataset</code> enum이 <code>HOME_COLD = 13</code> 옆에 <code>HOME_HOT = 14</code>를 신설, 둘 다 같은 <code>1fav_1day.parquet</code> 소스에서 뽑되 신규 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/data/cold_pool_filter.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/cold_pool_filter.py</code></a> (+78)의 <code>cold_pool_mask(post_ids, meta_path, max_favs=8, max_views=500)</code>와 <code>fresh_post_mask(post_ids, max_age_seconds)</code>(Twitter Snowflake epoch를 이용해 게시 시각을 트윗 id에서 직접 계산)로 갈라진다. <code>HOME_COLD</code>는 <code>cold_keep = cold_pool_mask &amp; fresh_post_mask</code>, <code>HOME_HOT</code>은 그 여집합. 콜드 풀이 이제 학습·서빙 단계에서 데이터 로딩 시점에 잘리고, 나머지 인기 후보만 별도 index로 관리된다. <code>default_cold_pool_metadata_path()</code>는 <code>${PHOENIX_INDEX_BASE:-/data/phoenix_index/prod}/post_author_pairs_metadata/metadata_1day.parquet</code>.</li>
+<li><strong>Phoenix bundle export에 per-target 인덱스 메타데이터가 붙었다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a> (+170/−46). <code>RetrievalExport</code> dataclass에 <code>dataset_capacities</code>·<code>rows_from</code>(target별로 어느 소스 dataset의 rows를 참조할지)·<code>max_age_seconds</code>(target별 최대 나이)·<code>optional_targets</code> 4 필드 추가. 매니페스트가 <code>POST_SCALES_KEY</code>·<code>DATASET_RANGES_KEY</code> 두 상수를 노출, <code>enable_int8_post_table</code>·<code>enable_bloom_filter</code>·<code>enable_topic_filter</code> 세 새 게이팅으로 int8 post table(per-post absolute-max scale)을 export에 포함할지 결정. HOME_COLD와 HOME_HOT이 동일 소스(HOME)의 rows를 나눠 쓰는 구조는 정확히 이 <code>rows_from</code>으로 표현된다.</li>
+<li><strong>VF에 retweet source verdict 병합 로직이 배선됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/verdict.rs</code></a> (+60)에 <code>Verdict::merge_retweet_verdict(retweet, source)</code> 신규. 병합 규칙: (1) source가 <code>Withheld</code>면 무조건 source를 채택(원 트윗이 감춰졌으면 리트윗도 감춤), (2) retweet이 <code>Withheld</code>면 retweet 유지(리트윗 자체가 감춰지는 규칙이 이겼을 때), (3) retweet이 <code>Shown{media: None, engagement: None}</code>(제약 없음)이면 source 상속, (4) 그 외에는 retweet 유지. <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/evaluate_tweets.rs" target="_blank" rel="noopener"><code>visibility-filtering/evaluate_tweets.rs</code></a> (+157/−18)가 이 병합을 실제 실행하는 flow를 구현했다: (a) 1차 평가 후 결과에서 <code>source_tweet_id.is_some()</code>인 evaluated 리트윗들을 모아, (b) 그 source id들 중 <code>in_batch</code>(같은 배치에 이미 있는 것) vs <code>fetched</code>(재조회 필요)를 <code>HashSet.contains()</code>로 분리, (c) <code>fetched</code> 목록에 대해 <code>filter_tweets.run(...)</code>을 두 번째로 호출해 source verdict를 얻고, (d) 리트윗별로 source verdict를 조회해 <code>merge_retweet_verdict</code>를 적용. 새 메트릭 <code>evaluate_tweets_retweet_sources{outcome=in_batch|fetched}</code>.</li>
+<li>뒷받침으로 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs</code></a> (+244/−18)에 <code>pure_cores: TweetHydrationBatch&lt;PureCore&gt;</code>가 hydration 결과 튜플에 추가됐다. <code>PureCore</code>는 리트윗 원본 id(<code>source_tweet_id</code>)를 담는 얇은 코어 정보이고, <code>PureCoreFallbackCache</code>가 처음 실패한 id를 다음 요청에서 재시도할 수 있게 캐시한다. <code>RawCandidate</code>에 <code>source_tweet_id: Option&lt;TweetId&gt;</code> 필드가 붙어(4세대+22 이후 도입) hydration에서 채워진다.</li>
+<li><strong>VF <code>clock_cache.rs</code>(412줄)가 제거됐다</strong> <span class="badge ok">확인</span> — 2026-09-10(4세대+19)에 &quot;미배선&quot; 상태로 도입됐던 프리미티브가 15일 만에 삭제. 배선되지 않은 프리미티브는 유지 부담을 지고 싶지 않다는 신호. 재도입이 필요하면 그때 다시 넣을 것이다 <span class="badge est">추정</span>.</li>
+<li><strong>grox PTOS 신규 카테고리 <code>AgeGatingHarmfulText</code></strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/state.py" target="_blank" rel="noopener"><code>grox/flows/ptos/state.py</code></a> (+6)에 <code>SafetyPolicyCategory.AgeGatingHarmfulText</code> enum이 붙고, 그 아래 5개 서브타입 <code>AgeGatingHarmfulTextAdultContent</code>·<code>EatingDisorder</code>·<code>HarmfulSubstance</code>·<code>DangerousStunt</code>·<code>GraphicDescription</code>이 <code>SafetyPolicyType</code>에 등록됐다. <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py</code></a> (+5)에서 이 카테고리는 <code>USE_GEMMA_CATEGORIES</code> 세트에 등록되어 first-pass 판정을 Gemma-4-26b에서 수행(오늘 시점 이 세트에 든 다른 카테고리는 <code>Spam</code>·<code>IllegalAndRegulatedBehaviors</code>뿐이다). 즉 성인 콘텐츠 성격의 텍스트가 있더라도 삭제가 아니라 <strong>연령 게이팅</strong>으로 넘기는 정책 축이 신설됐다. 프롬프트 템플릿은 <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/prompts.py" target="_blank" rel="noopener"><code>prompts.py</code></a> (+5)의 <code>age_gating_harmful_text_policy_prompt()</code>가 별도 <code>age_gating_harmful_text_policy.j2</code>를 렌더(템플릿 본문은 이 커밋 tree에는 포함되지 않았다).</li>
+<li><strong>grox reply spam Gemma-vs-Grok 팔로워 임계</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/reply_spam/constants.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/constants.py</code></a> (<code>GROK_GEMMA_FOLLOWER_SPLIT</code>)이 225,000 → <strong>250,000</strong>으로 상향됐다. 팔로워 25만 이상 계정의 리플라이만 Grok으로, 그 아래는 Gemma로 처리하는 라우팅 경계다. 15일간의 상향 시리즈(15k → 30k → 60k → 80k → 100k → 150k → 225k → <strong>250k</strong>) 연장선. 스팸 분류 부담을 계속 Gemma 쪽으로 옮기고 있다.</li>
+<li><strong>홈믹서 스코어드 통계에 SimClusters retrieval 기여 attribution이 붙었다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/side_effects/scored_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/scored_stats_side_effect.rs</code></a> (+35/−4). <code>Phoenix.RetrievalContribution.SimclustersTopK</code> 계열이 신설되어 top-k 후보 중 SimClusters 소스가 몇 개인지 관찰하고, top-k 버킷은 <code>[50, 100, 200, 400, 600, 800]</code>으로 Phoenix의 <code>[10, 100, 200, 500, 1000]</code>과 별도 축을 쓴다. 또한 신규 <code>Phoenix.RetrievalContribution.ScoredTopK</code>가 selected + non-selected 후보 전체를 대상으로 top-k 소스 분포를 잰다(선택되기 전에 어느 소스가 스코어링 top-k에 들었는지 관찰). 4세대+26에서 도입된 <code>retrieval_candidates_kafka_side_effect.rs</code>(원자료 샘플링)와 짝을 이루는 aggregate metric 축이다.</li>
 </ul>
 <blockquote>
-<pre><code class="language-rust">pub fn merge_retweet_verdict(retweet: Verdict, source: &amp;Verdict) -&gt; Verdict {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub fn merge_retweet_verdict(retweet: Verdict, source: &amp;Verdict) -&gt; Verdict {
     match (&amp;retweet, source) {
         (_, Verdict::Withheld(_)) =&gt; source.clone(),
         (Verdict::Withheld(_), _) =&gt; retweet,
@@ -242,26 +84,26 @@ ul.rl .chip b { font-size: 13px; }
         _ =&gt; retweet,
     }
 }
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/models/verdict.rs"><code>visibility-filtering/models/verdict.rs</code></a>, 2026-09-24</p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/verdict.rs</code></a>, 2026-09-24</p>
 </blockquote>
 <blockquote>
-<pre><code class="language-rust">pub(crate) fn weighted_score(
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn weighted_score(
     query: &amp;ScoredPostsQuery,
     weights: &amp;ValueModelWeights,
     candidate: &amp;PostCandidate,
 ) -&gt; f64 {
     fuse_heads(weights, &amp;scoring_inputs(query, weights, candidate))
 }
-</code></pre>
-<p>— <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/value_model.rs"><code>home-mixer/scorers/value_model.rs</code></a>, 2026-09-24. 홈믹서 랭킹 스코어러가 하는 일이 이 세 줄로 압축됐다. 실제 수식은 공유 crate의 <code>fuse_heads</code> 안에 있다.</p>
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/value_model.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/value_model.rs</code></a>, 2026-09-24. 홈믹서 랭킹 스코어러가 하는 일이 이 세 줄로 압축됐다. 실제 수식은 공유 crate의 <code>fuse_heads</code> 안에 있다.</p>
 </blockquote>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> 세대 표에 4세대+28 행 추가, 최종 갱신 갱신, 랭킹 절의 &quot;가중치 미러의 caveat 다섯 가지&quot;와 &quot;미러링 범위&quot; 두 곳에 홈믹서 자체 미러가 제거되고 vm-ranker/params.rs가 유일한 채널이 됐음을 명시, 후보 생성 절에 Phoenix HOME_COLD/HOME_HOT 이원화 반영, 재순위·다양성·필터 절에 VF 리트윗 source 병합 배선 반영.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> 이 커밋의 아키텍처 신호는 두 가지다. 첫째, <strong>X의 랭킹 계산이 라이브러리 하나로 수렴했다</strong>. 이전에는 홈믹서와 vm-ranker가 같은 수식(Phoenix 확률 × 가중치의 합)을 두 벌 구현하고 있었고, 그래서 파라미터도 두 벌 미러링됐고, 어제까지도 두 프로세스 사이 정합성이 어떻게 유지되는지가 열린 질문이었다. 오늘 커밋으로 홈믹서의 사본은 사라졌고 계산은 crate 안에서만 산다. 파라미터도 홈믹서 param.rs 미러가 얇아지고(랭킹 계산 파라미터 22개 삭제) vm-ranker/params.rs가 canonical이 됐다. 둘째, <strong>홈믹서가 vm-ranker RPC 실패에 대해 저하 모드(degraded mode)를 갖는다</strong> — 이전에는 vm-ranker가 죽으면 후보별로 Err를 후속 코드에 던졌고, 이제는 로컬로 계산한 가중합을 그대로 서빙한다. shared crate가 홈믹서 안에 실물로 있기 때문에 가능해진 저하 모드다. 그 밖에 오늘 반영된 것들: Phoenix retrieval이 인기(hot) 슬라이스를 별도 index로 분리해 cold와 뒤섞이지 않게 됐고(HOME_HOT), VF는 지난 두 달간 진행해 온 rule engine 재작성의 마지막 미완 배선 — 리트윗의 visibility가 원본 트윗의 visibility를 실제로 따라가게 하는 병합 — 이 마무리됐다.</p></div>
 <h2 id="arxiv-triage">arXiv triage</h2>
 <p>오늘 arXiv cs.IR 신규 30건(파싱한 <code>&lt;entry&gt;</code> 개수 30, 2026-09-21~09-23 제출) 중 어제 이후 신규는 2026-09-23 제출 13건이다. 이 13건을 요건 삼각(플랫폼 기업 저자 + 프로덕션 A/B 진술 + 메커니즘·스케일 신규성)으로 훑었다. 통과 1건, 원문 확인 후 라디에이터 편입.</p>
 <ul>
-<li><strong>Comcast Technology AI — When LLM-Based User Profiling Adds Value in Production Streaming Recommendation</strong> <code>[확인]</code> <a href="https://arxiv.org/abs/2609.27183">arXiv 2609.27183</a>, 2026-09-23. <a href="https://arxiv.org/html/2609.27183v1">HTML 판</a>에서 저자 4명 중 3명(Neeraj Sharma·Sardar Hamidian·Shaghayegh Agah)의 소속이 Comcast Technology AI(Sunnyvale·Washington DC), 1저자 Milad Sabouri는 DePaul University + Comcast Technology AI 듀얼 소속임을 확인. Comcast는 Peacock 스트리밍과 Xfinity의 소유주다. 논문 내용은 <strong>컨텐츠 기반 사용자 프로파일 4종의 프로덕션 데이터셋 factorial 비교</strong>다 — (aggregate vs LLM-generated) × (temporal disentanglement on/off). 프로파일 종류는 (1) aggregate: 유저의 최근/과거 아이템 임베딩 평균, (2) LLM: 유저 이력을 LLM에 넣어 자연어 요약을 얻고 그것을 텍스트 인코더로 벡터화. LLM 방식은 aggregate 대비 훨씬 비싸므로, &quot;그 비용이 언제 정당화되는가&quot;를 묻는다. <strong>온라인 A/B 결과는 없다.</strong> 오프라인 accuracy + beyond-accuracy(다양성 등)만 보고. 프로덕션 데이터셋은 어느 Comcast 제품 것인지 명시하지 않았다. <a href="radar.html">radar.md</a>에 편입 — Comcast/Peacock가 이 저장소 관찰 리스트에 이전에 없었기 때문에 프로덕션 스택의 첫 신호로 기록해 둔다.</li>
+<li><strong>Comcast Technology AI — When LLM-Based User Profiling Adds Value in Production Streaming Recommendation</strong> <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2609.27183" target="_blank" rel="noopener">arXiv 2609.27183</a>, 2026-09-23. <a href="https://arxiv.org/html/2609.27183v1" target="_blank" rel="noopener">HTML 판</a>에서 저자 4명 중 3명(Neeraj Sharma·Sardar Hamidian·Shaghayegh Agah)의 소속이 Comcast Technology AI(Sunnyvale·Washington DC), 1저자 Milad Sabouri는 DePaul University + Comcast Technology AI 듀얼 소속임을 확인. Comcast는 Peacock 스트리밍과 Xfinity의 소유주다. 논문 내용은 <strong>컨텐츠 기반 사용자 프로파일 4종의 프로덕션 데이터셋 factorial 비교</strong>다 — (aggregate vs LLM-generated) × (temporal disentanglement on/off). 프로파일 종류는 (1) aggregate: 유저의 최근/과거 아이템 임베딩 평균, (2) LLM: 유저 이력을 LLM에 넣어 자연어 요약을 얻고 그것을 텍스트 인코더로 벡터화. LLM 방식은 aggregate 대비 훨씬 비싸므로, &quot;그 비용이 언제 정당화되는가&quot;를 묻는다. <strong>온라인 A/B 결과는 없다.</strong> 오프라인 accuracy + beyond-accuracy(다양성 등)만 보고. 프로덕션 데이터셋은 어느 Comcast 제품 것인지 명시하지 않았다. <a href="radar.html">radar.md</a>에 편입 — Comcast/Peacock가 이 저장소 관찰 리스트에 이전에 없었기 때문에 프로덕션 스택의 첫 신호로 기록해 둔다.</li>
 </ul>
 <p><strong>탈락(관찰 대상 아님).</strong> 나머지 12건: MultiVENT-Raw(비디오 검색 벤치마크·학술), Beyond a Scalar(watch-time DSI, Shanghai Jiao Tong University+Rice·학술, KuaiRec/WeChat21 벤치마크 사용이나 플랫폼 저자 없음), Entangle(퀀텀 GitHub 협업·주제 무관), Dual-Hypergraph Indexing(RAG·학술), Turkish LLM eval(도메인 한정), LLM workflow structural diff(SE 툴), Flexible Rec System(그룹 추천·학술), VDR TTA(문서 검색·학술), SLP verifiable LLM inference(LLM 인프라·주제 무관), RoPA Vietnam(데이터 보호 자동화·주제 무관), Large Knowledge Model(과학 지식 그래프·주제 무관), LatWeave(다단 QA·학술), BoundaryMORPH(RAG reranking·학술).</p>
 <p>산업 블로그 훑기는 오늘(금요일) 대상 아님(월요일에만).</p>
@@ -271,82 +113,25 @@ ul.rl .chip b { font-size: 13px; }
 <li><a href="radar.html#comcast-technology-ai--llm-based-user-profiling-for-streaming-recommendation-offline-production-comparison">Comcast Technology AI — LLM-based user profiling for streaming recommendation (offline production comparison)</a> — 저자 4명 중 3명이 @comcast.com, Peacock/Xfinity 소유주의 첫 공개 신호. 온라인 A/B는 아직 없음.</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong>vm-ranker/params.rs가 canonical이 된 관행이 어떻게 문서화되는가</strong> — 4세대+27 시점에서는 &quot;홈믹서 param.rs와 vm-ranker/params.rs 두 미러가 서로 어떻게 동기화되는지 미문서화&quot;였는데, 4세대+28에서 홈믹서 사본이 사라졌으므로 이제 미러는 하나다. README나 <code>docs/</code> 아래에 이 변화가 기록되는지 후속 커밋에서 관측.</li>
 <li><strong>홈믹서 로컬 저하 모드가 실제로 켜지는 빈도</strong> — <code>vm_ranker.rs</code>가 RPC 실패 시 로컬 가중합을 서빙하도록 바뀌었지만 실제로 이 경로가 트리거되는 비율은 관측되지 않았다. <code>VMRanker.local_fallback</code> 계열 메트릭이 생기는지, 아니면 기존 <code>vm_ranker_value_model_fallback_total{reason=...}</code>이 그대로 재사용되는지 후속 커밋에서 관측.</li>
 <li><strong>HOME_HOT 슬라이스가 서빙에서 어느 시점부터 실제 index로 로드되는가</strong> — 지금은 데이터 파이프라인에 정의만 됐다. <code>RetrievalDataset.HOME_HOT</code>을 소비하는 두 번째 index publication cron이 스케줄되는 시점을 관측.</li>
 <li><strong>VF <code>evaluate_tweets_retweet_sources{outcome=in_batch}</code> 비율</strong> — 리트윗 배치에서 source가 같은 배치에 있을 확률은 트래픽 패턴에 따른다(For You는 종종 원본+리트윗이 함께 뜬다). in_batch 비율이 낮으면 <code>fetched</code> 경로가 지연을 만든다.</li>
 <li><strong>grox <code>AgeGatingHarmfulText</code> 정책의 실제 페이로드</strong> — <code>age_gating_harmful_text_policy.j2</code> 템플릿 본문이 다음 커밋에서 함께 공개되는지 확인. 5개 서브타입 각각의 판정 기준이 무엇인지가 정책 축의 실체다.</li>
-</ul>
+</ul></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-24.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-24</div></a><a class="r" href="daily-2026-09-26.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-26</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-24.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-24</span></a><a class="pg-next" href="daily-2026-09-26.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-26</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

@@ -2,215 +2,57 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-13 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X 4세대+20(6bb4594)이 VMRanker DPP에 seed_tweet_id pinned anchor 축을 신설(집합 내부 다양성에서 참조 tweet 대비 다양성으로 확장 가능, top_k 예산 미소진)했고, 홈믹서가 Phoenix 후보 점수 로그를 기존…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-13.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-13 — feed-research">
 <meta property="og:description" content="한 줄: X 4세대+20(6bb4594)이 VMRanker DPP에 seed_tweet_id pinned anchor 축을 신설(집합 내부 다양성에서 참조 tweet 대비 다양성으로 확장 가능, top_k 예산 미소진)했고, 홈믹서가 Phoenix 후보 점수 로그를 기존…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-13.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-13</h1>
-  <div class="wd">일요일 · 읽는 데 약 43분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+20(6bb4594)이 VMRanker DPP에 <code>seed_tweet_id</code> pinned anchor 축을 신설(집합 내부 다양성에서 참조 tweet 대비 다양성으로 확장 가능, top_k 예산 미소진)했고, 홈믹서가 Phoenix 후보 점수 로그를 기존 Thrift 스트림과 별개로 새 proto 토픽 <code>LOGGED_SCORED_CANDIDATES_TOPIC</code>로 병렬 발행하기 시작했으며, visibility-filtering의 TES·Gizmoduck 클라이언트 조립을 datacenter 템플릿 hostname에서 xDS LDS listener 경유로 이관했다. Phoenix proto는 <code>LLM_JUDGE_RELEVANT_TO_SEARCH</code>/<code>_NOT_RELEVANT_TO_SEARCH</code> 두 액션과 <code>returnLogitsList</code> 응답 포맷을 신설했고, VF <code>AuthorFeatures</code>를 8 바이트 <code>CompactAuthorFeatures</code>로 packing할 준비를 마쳤다(미배선). 부수적으로 VF worldwide takedown 규칙이 세밀화됐고(bystander worldwide 신고와 legal-copyright 코드는 자동 drop 대상에서 제외), Under-The-Hood 리포트에 최대 월 상한 파라미터와 employee 역할이 신설됐으며, Phoenix 학습 Kafka에 mTLS 인증 모드가 자동 감지로 추가됐다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-x--4세대20-2026-09-12-6bb4594-vmranker-dpp-seed-anchor--phoenix-스코어-로그-proto-이중-발행--vf-클라이언트-xds-경유-이관--phoenix-proto-llm-judge-search-relevance-action--returnlogitslist-wire--compactauthorfeatures-8-byte-packed--vf-worldwide-takedown-규칙-세밀화--uth-리포트-월-상한--phoenix-학습-kafka-mtls">1. X — 4세대+20 (2026-09-12, 6bb4594): VMRanker DPP seed anchor + Phoenix 스코어 로그 proto 이중 발행 + VF 클라이언트 xDS 경유 이관 + Phoenix proto LLM-judge search relevance action + returnLogitsList wire + CompactAuthorFeatures 8-byte packed + VF worldwide takedown 규칙 세밀화 + UTH 리포트 월 상한 + Phoenix 학습 Kafka mTLS</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/6bb4594">xai-org/x-algorithm@6bb4594</a> — 공개 소스코드, 2026-09-12, 파일 24개, +1397/−338.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X는 for-you 파이프라인의 소스코드를 <a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a>에 매일 한두 번 미러링한다(2026-08-13 4세대 공개 이래). 이번 커밋은 앞선 4세대+19(fee1d0f, 2026-09-10)의 hydration timeout 통일과 결이 이어지는 중형 diff로, 지금까지 정본에 축적된 여러 축을 한꺼번에 건드린다.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-13">2026-09-13</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>일요일</li>
+<li><span class="meta-k">읽는 시간</span>43분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+20(6bb4594)이 VMRanker DPP에 <code>seed_tweet_id</code> pinned anchor 축을 신설(집합 내부 다양성에서 참조 tweet 대비 다양성으로 확장 가능, top_k 예산 미소진)했고, 홈믹서가 Phoenix 후보 점수 로그를 기존 Thrift 스트림과 별개로 새 proto 토픽 <code>LOGGED_SCORED_CANDIDATES_TOPIC</code>로 병렬 발행하기 시작했으며, visibility-filtering의 TES·Gizmoduck 클라이언트 조립을 datacenter 템플릿 hostname에서 xDS LDS listener 경유로 이관했다. Phoenix proto는 <code>LLM_JUDGE_RELEVANT_TO_SEARCH</code>/<code>_NOT_RELEVANT_TO_SEARCH</code> 두 액션과 <code>returnLogitsList</code> 응답 포맷을 신설했고, VF <code>AuthorFeatures</code>를 8 바이트 <code>CompactAuthorFeatures</code>로 packing할 준비를 마쳤다(미배선). 부수적으로 VF worldwide takedown 규칙이 세밀화됐고(bystander worldwide 신고와 legal-copyright 코드는 자동 drop 대상에서 제외), Under-The-Hood 리포트에 최대 월 상한 파라미터와 employee 역할이 신설됐으며, Phoenix 학습 Kafka에 mTLS 인증 모드가 자동 감지로 추가됐다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">13</span></summary><ol><li><a href="#1-x--4세대20-2026-09-12-6bb4594-vmranker-dpp-seed-anchor--phoenix-스코어-로그-proto-이중-발행--vf-클라이언트-xds-경유-이관--phoenix-proto-llm-judge-search-relevance-action--returnlogitslist-wire--compactauthorfeatures-8-byte-packed--vf-worldwide-takedown-규칙-세밀화--uth-리포트-월-상한--phoenix-학습-kafka-mtls"><span class="num">1</span>X — 4세대+20 (2026-09-12, 6bb4594): VMRanker DPP seed anchor + Phoenix 스코어 로그 proto 이중 발행 + VF 클라이언트 xDS 경유 이관 + Phoenix proto LLM-judge search relevance action + returnLogitsList wire + CompactAuthorFeatures 8-byte packed + VF worldwide takedown 규칙 세밀화 + UTH 리포트 월 상한 + Phoenix 학습 Kafka mTLS</a><ol><li><a href="#a-vmranker-dpp--seed_tweet_id-pinned-anchor">A. VMRanker DPP — seed_tweet_id pinned anchor</a></li><li><a href="#b-phoenix-후보-점수-로그--thrift와-proto의-병렬-발행">B. Phoenix 후보 점수 로그 — Thrift와 proto의 병렬 발행</a></li><li><a href="#c-vf-클라이언트-발견--xds-lds-listener-경유로-이관">C. VF 클라이언트 발견 — xDS LDS listener 경유로 이관</a></li><li><a href="#d-phoenix-proto--llm-judge-search-relevance--returnlogitslist">D. Phoenix proto — LLM-judge search relevance + returnLogitsList</a></li><li><a href="#e-vf-compactauthorfeatures--8-byte-nonzerou64-packing-미배선">E. VF CompactAuthorFeatures — 8-byte NonZeroU64 packing (미배선)</a></li><li><a href="#f-vf-worldwide-takedown-규칙-세밀화">F. VF worldwide takedown 규칙 세밀화</a></li><li><a href="#g-under-the-hood--리포트-월-상한-파라미터--employee-역할">G. Under-The-Hood — 리포트 월 상한 파라미터 + employee 역할</a></li><li><a href="#h-phoenix-학습-파이프라인--kafka-인증-mtls-모드-자동-감지">H. Phoenix 학습 파이프라인 — Kafka 인증 mTLS 모드 자동 감지</a></li><li><a href="#i-부수-변화">I. 부수 변화</a></li></ol></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-x--4세대20-2026-09-12-6bb4594-vmranker-dpp-seed-anchor--phoenix-스코어-로그-proto-이중-발행--vf-클라이언트-xds-경유-이관--phoenix-proto-llm-judge-search-relevance-action--returnlogitslist-wire--compactauthorfeatures-8-byte-packed--vf-worldwide-takedown-규칙-세밀화--uth-리포트-월-상한--phoenix-학습-kafka-mtls"><span class="num">1</span>X — 4세대+20 (2026-09-12, 6bb4594): VMRanker DPP seed anchor + Phoenix 스코어 로그 proto 이중 발행 + VF 클라이언트 xDS 경유 이관 + Phoenix proto LLM-judge search relevance action + returnLogitsList wire + CompactAuthorFeatures 8-byte packed + VF worldwide takedown 규칙 세밀화 + UTH 리포트 월 상한 + Phoenix 학습 Kafka mTLS</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/6bb4594" target="_blank" rel="noopener">xai-org/x-algorithm@6bb4594</a> — 공개 소스코드, 2026-09-12, 파일 24개, +1397/−338.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X는 for-you 파이프라인의 소스코드를 <a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a>에 매일 한두 번 미러링한다(2026-08-13 4세대 공개 이래). 이번 커밋은 앞선 4세대+19(fee1d0f, 2026-09-10)의 hydration timeout 통일과 결이 이어지는 중형 diff로, 지금까지 정본에 축적된 여러 축을 한꺼번에 건드린다.</p></div>
 <ul>
 <li><strong>랭킹 재정렬 축</strong>: For You 최종 배치 직전 slate에 적용되는 VMRanker DPP(θ=0.65, K=150)에 새 계약이 붙었다 — 이전엔 후보 집합 안에서의 코사인 반발만 계산했는데, 이제 요청이 <code>seed_tweet_id</code>를 실어 주면 그 tweet의 임베딩이 kernel에 pinned로 들어가 다른 후보와의 유사도를 함께 계산한다. seed 자체는 최종 결과에서 필터링되므로 top_k 예산은 그대로다. 다양성 축이 <strong>집합 내부</strong>에서 <strong>참조 tweet 대비</strong>로도 확장 가능해진 것이다.</li>
 <li><strong>로깅·학습 파이프라인 축</strong>: 홈믹서가 Phoenix 후보 점수를 Kafka로 흘리는 통로가 지금까지 Thrift <code>ScoredCandidate</code>(28개 참여 헤드 점수 + 후보 메타)를 <code>PHOENIX_SCORES_TOPIC</code>(cluster <code>Aiml</code>)로 보내는 하나였는데, 이번 커밋에서 <strong>proto <code>LoggedScoredCandidate</code>를 <code>LOGGED_SCORED_CANDIDATES_TOPIC</code>(cluster <code>Phoenix</code>)로 병렬 발행</strong>하는 두 번째 통로가 붙었다. 다운스트림이 언제 Proto로 스위치하는지는 이번 diff 밖.</li>
@@ -221,13 +63,13 @@ ul.rl .chip b { font-size: 13px; }
 <p>이 다섯 축은 서로 독립이지만, 하나의 커밋으로 묶여 올라온 점에서 대략 같은 시기의 프로젝트라는 신호다. 이 절에서는 축마다 무엇이 바뀌었는지와 지금까지의 이해가 어떻게 이동하는지를 순서대로 정리한다.</p>
 <h3 id="a-vmranker-dpp--seed_tweet_id-pinned-anchor">A. VMRanker DPP — <code>seed_tweet_id</code> pinned anchor</h3>
 <p><code>vm-ranker/dpp.rs</code>의 <code>rescore</code> 시그니처가 새 <code>seed</code> 인자를 받도록 확장됐다:</p>
-<pre><code class="language-rust">pub fn rescore(
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub fn rescore(
     inputs: &amp;[DppInput],
     seed: Option&lt;&amp;DppInput&gt;,
     config: &amp;DppConfig,
     _viewer_id: u64,
 ) -&gt; Vec&lt;DppResult&gt; { ... }
-</code></pre>
+</code></pre></figure>
 <p>동작은 다음 4단계다. <strong>(1) 확장된 kernel 구성</strong>: 기존 top-K 후보(<code>m = min(inputs.len(), max_selected_rank)</code>)에 seed 하나를 더한 <code>total = m + 1</code> 크기의 kernel을 만든다. seed의 <code>q</code> 값은 임의로 <code>1.0</code>으로 고정한다(score가 없으므로). <strong>(2) greedy DPP의 첫 슬롯 pinning</strong>: <code>greedy_dpp</code>가 이전엔 kernel diagonal이 가장 큰 인덱스를 시작점으로 선택했는데, 새 인자 <code>pinned_first: Option&lt;usize&gt;</code>가 주어지면 그 인덱스를 강제 첫 선택으로 쓴다. 이 인덱스가 seed의 위치다. <strong>(3) 예산 확장</strong>: pinned가 있으면 <code>max_items = (k + 1).min(n)</code>으로 늘려서 seed가 top_k를 잡아먹지 않게 한다. <strong>(4) 결과에서 seed 필터링</strong>: 최종 리턴 전에 <code>dpp_result.selected.iter().filter(|&amp;(ki, _)| ki &lt; m)</code>로 seed 인덱스를 배제한다.</p>
 <p>이 4단계로 나타나는 순 효과는 다음 두 가지 계약이다:</p>
 <ul>
@@ -235,7 +77,7 @@ ul.rl .chip b { font-size: 13px; }
 <li>seed 자체는 결과에 나타나지 않고 top_k도 소진하지 않는다.</li>
 </ul>
 <p>새 테스트 두 개가 이 계약을 잠근다:</p>
-<pre><code class="language-rust">#[test]
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[test]
 fn seed_suppresses_near_duplicate() {
     let seed = make_input(999, 0.0, &amp;[1.0, 0.0]);
     let inputs = vec![
@@ -257,9 +99,9 @@ fn seed_does_not_consume_top_k_budget() {
     let result = rescore(&amp;inputs, Some(&amp;seed), &amp;config, 0);
     assert_eq!(result.len(), 2, &quot;seed must not eat top_k budget&quot;);
 }
-</code></pre>
+</code></pre></figure>
 <p><code>vm-ranker/scoring/dpp_model.rs</code>의 <code>rank</code>가 이 새 파라미터를 어떻게 채우는지도 정의된다:</p>
-<pre><code class="language-rust">fn build_seed_input(req: &amp;RankRequest, ctx: &amp;DppContext) -&gt; Option&lt;DppInput&gt; {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn build_seed_input(req: &amp;RankRequest, ctx: &amp;DppContext) -&gt; Option&lt;DppInput&gt; {
     if req.seed_tweet_id == 0 { return None; }
     match ctx.store.client.get(req.seed_tweet_id) {
         Some(embedding) =&gt; {
@@ -279,19 +121,19 @@ fn seed_does_not_consume_top_k_budget() {
         }
     }
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 seed의 임베딩이 서빙 시점 스토어에 없으면 pinning 없이 기존 경로로 흐른다. <code>vm_ranker_dpp_seed_context_total{result=&quot;pinned&quot;|&quot;embedding_missing&quot;}</code> 카운터가 hit·miss를 분리 관측한다.</p>
 <blockquote>
 <p><code>pinned = pinned_first.filter(|&amp;p| kernel[p * n + p] &gt; EPSILON);</code>
-— <a href="https://github.com/xai-org/x-algorithm/blob/6bb4594/vm-ranker/dpp.rs"><code>vm-ranker/dpp.rs</code></a></p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/6bb4594/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>vm-ranker/dpp.rs</code></a></p>
 </blockquote>
 <p>임베딩 norm이 0에 가까워 kernel diagonal이 EPSILON 이하면 pin을 포기하고 기존 greedy 경로로 돌아간다.</p>
-<p><strong>어디에 쓰이는가</strong>는 이번 커밋만으로는 확정할 수 없다. <code>seed_tweet_id</code>를 실어 주는 홈믹서 파이프라인은 이번 diff에 없다. 자연스러운 소비처 후보는 (1) permalink 페이지의 related tweets — &quot;이 tweet과 이질적인&quot; 슬레이트, (2) 특정 tweet의 &quot;more like this&quot; 흐름의 대안 컬렉션, (3) 스레드 컨텐츠에서 부모 tweet을 seed로 두고 유사한 리플라이를 억제하는 시나리오 등이다 <code>[추정]</code>. <strong>홈 타임라인의 For You 자체가 이 필드를 채워 주는지</strong>는 관측 대상이다 — For You는 이론상 seed가 없는 slate 생성이지만, 최근에 본 tweet을 seed로 실어 반복 노출을 줄이는 확장이 논리적으로 가능하다.</p>
+<p><strong>어디에 쓰이는가</strong>는 이번 커밋만으로는 확정할 수 없다. <code>seed_tweet_id</code>를 실어 주는 홈믹서 파이프라인은 이번 diff에 없다. 자연스러운 소비처 후보는 (1) permalink 페이지의 related tweets — &quot;이 tweet과 이질적인&quot; 슬레이트, (2) 특정 tweet의 &quot;more like this&quot; 흐름의 대안 컬렉션, (3) 스레드 컨텐츠에서 부모 tweet을 seed로 두고 유사한 리플라이를 억제하는 시나리오 등이다 <span class="badge est">추정</span>. <strong>홈 타임라인의 For You 자체가 이 필드를 채워 주는지</strong>는 관측 대상이다 — For You는 이론상 seed가 없는 slate 생성이지만, 최근에 본 tweet을 seed로 실어 반복 노출을 줄이는 확장이 논리적으로 가능하다.</p>
 <h3 id="b-phoenix-후보-점수-로그--thrift와-proto의-병렬-발행">B. Phoenix 후보 점수 로그 — Thrift와 proto의 병렬 발행</h3>
 <p><code>home-mixer/side_effects/phoenix_experiments_side_effect.rs</code>가 이제 후보 하나마다 두 페이로드를 만들어 <code>tokio::join!</code>으로 두 Kafka publisher에 동시에 쓴다.</p>
 <p>첫 페이로드는 기존 Thrift <code>ScoredCandidate</code>다. 이 스트림은 4세대+3(11a71f8, 2026-08-18)의 v3 스키마 이래로 유지되고 있고, 필드는 <code>prediction_scores: Option&lt;BTreeSet&lt;Box&lt;PredictionScore&gt;&gt;&gt;</code>처럼 정렬된 컬렉션이다. Kafka 토픽 <code>PHOENIX_SCORES_TOPIC</code>, cluster <code>Aiml</code>.</p>
 <p>두 번째 페이로드가 이번 커밋의 신설이다. proto <code>LoggedScoredCandidate</code>:</p>
-<pre><code class="language-proto">// (proto 정의는 xai_proto::recsys_logging에 있음)
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">// (proto 정의는 xai_proto::recsys_logging에 있음)
 message LoggedScoredCandidate {
     int64 post_id = ...;
     int64 viewer_id = ...;
@@ -312,9 +154,9 @@ message LoggedScoredCandidate {
     int32 language_code = ...;
     int32 video_duration_ms = ...;
 }
-</code></pre>
+</code></pre></figure>
 <p>Kafka 토픽 이름은 새 상수 <code>LOGGED_SCORED_CANDIDATES_TOPIC</code>, cluster는 새로운 <code>KafkaCluster::Phoenix</code>(기존 <code>Aiml</code>과 별개)로 스위치한다. <code>PhoenixCandidatePipeline</code>의 프로덕션 조립 코드가 여섯 번째 Kafka publisher slot을 이 토픽에 배정한다:</p>
-<pre><code class="language-rust">async {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">async {
     Arc::new(
         ProdKafkaPublisherClient::new(
             LOGGED_SCORED_CANDIDATES_TOPIC,
@@ -322,9 +164,9 @@ message LoggedScoredCandidate {
         ).await,
     ) as Arc&lt;dyn KafkaPublisherClient&gt;
 },
-</code></pre>
+</code></pre></figure>
 <p>두 페이로드는 서로 다른 자료구조로 다시 정렬된다:</p>
-<pre><code class="language-rust">let mut prediction_scores = HashMap::new();
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let mut prediction_scores = HashMap::new();
 for (cluster_id, result) in &amp;experiment_results {
     ...
     insert_cluster_scores(&amp;mut prediction_scores, &amp;cluster_name, &amp;scores);
@@ -334,13 +176,13 @@ let thrift_scores: BTreeSet&lt;Box&lt;PredictionScore&gt;&gt; = prediction_score
     .iter()
     .map(|(name, value)| { Box::new(PredictionScore::new(...)) })
     .collect();
-</code></pre>
+</code></pre></figure>
 <p>즉 파이프라인이 내부적으로 <code>HashMap&lt;String, f64&gt;</code>를 만들어 놓고, Thrift 페이로드용으로만 <code>BTreeSet</code>으로 정렬해서 wrap하고, proto 페이로드는 HashMap을 그대로 map으로 실어 보낸다.</p>
-<div class="blk why"><p><span class="lbl">의미</span>: <code>prediction_scores</code>의 map 표현은 wire 크기(정렬 인덱스 제거)와 소비 측 조회 비용(BTreeSet 대신 map으로 O(1) 조회) 두 축에서 이득이다. Thrift 스트림을 유지하는 것은 다운스트림 소비자가 즉시 스위치할 수 없기 때문이고 <code>[추정]</code>, 두 스트림이 병렬로 유지될 이행기가 얼마나 지속되는지는 이번 커밋에 없다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span>: <code>prediction_scores</code>의 map 표현은 wire 크기(정렬 인덱스 제거)와 소비 측 조회 비용(BTreeSet 대신 map으로 O(1) 조회) 두 축에서 이득이다. Thrift 스트림을 유지하는 것은 다운스트림 소비자가 즉시 스위치할 수 없기 때문이고 <span class="badge est">추정</span>, 두 스트림이 병렬로 유지될 이행기가 얼마나 지속되는지는 이번 커밋에 없다.</p></div>
 <p>키 명명 규약(<code>phoenix.&lt;cluster_name&gt;.&lt;action_name&gt;</code>)과 스코어 필드 집합(28개 참여 헤드 + <code>pdwell</code> 별칭)은 그대로 유지된다. 테스트도 새 헬퍼 <code>insert_cluster_scores</code>와 <code>build_logged_scored_candidate</code>에 대해 각각 붙었다.</p>
 <h3 id="c-vf-클라이언트-발견--xds-lds-listener-경유로-이관">C. VF 클라이언트 발견 — xDS LDS listener 경유로 이관</h3>
 <p><code>visibility-filtering/server_deps.rs</code>가 이전 코드에서는 이런 모양이었다:</p>
-<pre><code class="language-rust">// 이전 (~fee1d0f)
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">// 이전 (~fee1d0f)
 let tes_client = Arc::new(
     init_client_with_retry(&quot;tes&quot;, init_deadline, || {
         ProdTESClient::new_with_config(
@@ -354,10 +196,10 @@ let tes_client = Arc::new(
 // tes_client_config는 TESClientConfig 구조체를 반환:
 // aperture_size, deterministic_aperture, lb_policy, readiness_probe_port,
 // request_timeout_ms, enable_serve_within 등 필드를 채운다.
-</code></pre>
+</code></pre></figure>
 <p>즉 클라이언트 조립에 필요한 파라미터 뭉치가 서비스 crate(<code>xai_core_entities::tweet_entity_service_client::TESClientConfig</code>) 안에 정의된 구조체로 격리되어 있었고, 서비스 이름은 <code>datacenter</code> 문자열로 hostname 템플릿을 채워 만들었다.</p>
 <p>이번 커밋에서는 다음처럼 바뀌었다:</p>
-<pre><code class="language-rust">// 신규 (6bb4594)
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">// 신규 (6bb4594)
 let tes_client = Arc::new(
     init_client_with_retry(&quot;tes&quot;, init_deadline, || async move {
         let strato = build_xds_strato(
@@ -378,9 +220,9 @@ let tes_client = Arc::new(
         anyhow::Ok(ProdTESClient { grpc_client: Arc::new(strato) })
     }).await
 );
-</code></pre>
+</code></pre></figure>
 <p><code>build_xds_strato</code>가 새 헬퍼로 등장하고, 이 헬퍼가 <code>xai_x_rpc::grpc_client::ChannelBuilder</code>로 gRPC 채널을 조립한다:</p>
-<pre><code class="language-rust">async fn build_xds_strato(
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">async fn build_xds_strato(
     params: XdsStratoParams,
     deterministic_aperture: bool,
 ) -&gt; anyhow::Result&lt;StratoGrpc&gt; {
@@ -412,16 +254,16 @@ let tes_client = Arc::new(
     }
     Ok(strato)
 }
-</code></pre>
+</code></pre></figure>
 <p>핵심은 <code>.xds(StartFrom::Lds(params.xds_listener))</code> 한 줄이다. xDS(x Discovery Service) 프로토콜의 **LDS(Listener Discovery Service)**를 리스너 이름 (<code>&quot;tweet-entity-service.prod.tweet-entity-service:fed-grpc&quot;</code> 등)으로 시작점 삼아 xDS control plane과 talking해 endpoint 리스트를 받는다. Envoy 계열 서비스 메시에서 클라이언트가 컨트롤 플레인에서 대상 endpoint 리스트를 동적으로 받는 표준 방식이다.</p>
 <p>TES 경로에만 붙는 옵션이 두 개 있다: (a) <code>enable_serve_within: true</code>로 서버측에 데드라인 힌트(요청이 서버 큐잉에서 얼마나 오래 대기해도 되는지)를 실어 준다. <code>duration_microseconds</code>는 클라이언트 timeout과 같은 값(<code>HYDRATION_TIMEOUT = 390 ms</code>), <code>round_trip_allowance_microseconds = 10_000</code>(왕복 여유분 10 ms). (b) <code>retry_config: Some(RetryConfig::for_idempotent())</code>로 idempotent 요청에 대해 자동 재시도.</p>
-<p>Gizmoduck 경로는 lb_policy가 <code>least_request()</code>고 위 두 옵션이 모두 꺼져 있다. <code>[확인]</code> — <code>server_deps.rs</code>.</p>
+<p>Gizmoduck 경로는 lb_policy가 <code>least_request()</code>고 위 두 옵션이 모두 꺼져 있다. <span class="badge ok">확인</span> — <code>server_deps.rs</code>.</p>
 <p><strong>결과의 의미</strong>: (1) 서비스 발견 계층이 hostname 템플릿에서 xDS control plane 경유로 옮겨졌다. (2) <code>TESClientConfig</code>·<code>GizmoduckClientConfig</code>처럼 서비스 crate가 export하던 별도 client-config 구조체가 사라지고, 클라이언트 조립 로직이 VF 서비스 자신의 <code>server_deps.rs</code>로 흡수됐다. (3) L2 cache warmer의 Strato 클라이언트도 이제 <code>deterministic_aperture</code> 플래그를 받는다. (4) <code>TES_READINESS_PROBE_PORT</code>와 <code>GIZMODUCK_READINESS_PROBE_PORT</code>가 둘 다 8081이었으므로 통합 상수 <code>READINESS_PROBE_PORT: u16 = 8081</code>로 합쳐졌다.</p>
 <p>4세대+19의 <code>HYDRATION_TIMEOUT</code> 통일이 여기까지 파급됐다는 관점으로도 읽힌다 — 이번엔 클라이언트 조립 코드에서 timeout 상수가 <code>STRATO_REQUEST_TIMEOUT: Duration = crate::hydration::HYDRATION_TIMEOUT</code>로 참조된다.</p>
 <h3 id="d-phoenix-proto--llm-judge-search-relevance--returnlogitslist">D. Phoenix proto — LLM-judge search relevance + returnLogitsList</h3>
 <p>recsys.proto 두 파일(Rust와 파이썬 미러) 양쪽에 세 개 필드가 붙었다.</p>
 <p><strong>신규 액션 두 개</strong>:</p>
-<pre><code class="language-proto">enum ActionName {
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">enum ActionName {
   ...
   CLIENT_TWEET_SEARCH_QUERY_REFORMULATED = 104;
   CLIENT_TWEET_RELEVANT_TO_SEARCH = 105;
@@ -431,10 +273,10 @@ let tes_client = Arc::new(
   ADS_WEB_CONVERSION = 128;
   ...
 }
-</code></pre>
-<p>즉 검색 관련성 축이 지금까지 client-side 시그널(사용자가 결과를 실제로 열었는지, 쿼리를 재작성했는지)만 갖고 있었는데, 이번 커밋에서 <strong>LLM judge의 판정</strong>이 별도 액션 축으로 편입됐다. 4세대+4(aad7179, 2026-08-19)에서 등장한 <code>xrecsys_search</code>가 별도 vocab과 <code>condition_search_relevance_on_prompt=True</code> 같은 검색 특유 설정을 갖고 있는 config인데, 그 config가 훈련 target으로 삼는 액션 axis에 LLM 판정을 supervise 신호로 편입할 준비로 읽힌다 <code>[추정]</code>. Grox나 dedicated LLM judge가 (query, tweet) 쌍에 relevant/not 라벨을 흘려 주는 파이프라인이 어딘가에 있어야 하지만, 이번 diff에는 그 파이프라인의 코드가 없다.</p>
+</code></pre></figure>
+<p>즉 검색 관련성 축이 지금까지 client-side 시그널(사용자가 결과를 실제로 열었는지, 쿼리를 재작성했는지)만 갖고 있었는데, 이번 커밋에서 <strong>LLM judge의 판정</strong>이 별도 액션 축으로 편입됐다. 4세대+4(aad7179, 2026-08-19)에서 등장한 <code>xrecsys_search</code>가 별도 vocab과 <code>condition_search_relevance_on_prompt=True</code> 같은 검색 특유 설정을 갖고 있는 config인데, 그 config가 훈련 target으로 삼는 액션 axis에 LLM 판정을 supervise 신호로 편입할 준비로 읽힌다 <span class="badge est">추정</span>. Grox나 dedicated LLM judge가 (query, tweet) 쌍에 relevant/not 라벨을 흘려 주는 파이프라인이 어딘가에 있어야 하지만, 이번 diff에는 그 파이프라인의 코드가 없다.</p>
 <p><strong>신규 응답 포맷 <code>returnLogitsList</code></strong>:</p>
-<pre><code class="language-proto">message PredictNextActionsRequest {
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">message PredictNextActionsRequest {
   ...
   bool returnBackboneScores = 20;
   map&lt;string, string&gt; experiment_overrides = 21;
@@ -447,9 +289,9 @@ message NextActionDistribution {
   repeated float backboneContinuousValues = 11;
   repeated float requestedActionLogits = 12;
 }
-</code></pre>
+</code></pre></figure>
 <p>파이썬 미러 파일도 동일하다. Rust 엔진 쪽에서는 <code>PredictRequestItem</code>에 <code>return_logits_list: bool</code> 필드가 추가되고, <code>PredictRequestBatch::forward</code> 안에서 이 플래그가 켜지면 다음 경로로 응답한다:</p>
-<pre><code class="language-rust">if item.return_logits_list {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if item.return_logits_list {
     dist_entry.requested_action_logits = item
         .requested_action_indices
         .iter()
@@ -464,12 +306,12 @@ message NextActionDistribution {
         }
     }
 }
-</code></pre>
+</code></pre></figure>
 <p>두 형식은 상호배타적으로 우선순위가 잡혀 있다(둘 다 켜면 <code>return_logits_list</code>가 이긴다). continuous action index 처리는 이제 두 포맷 모두에서 공유된다(이전엔 <code>return_log_map</code> 경로 안에만 있었다).</p>
-<div class="blk why"><p><span class="lbl">의미</span>: <code>return_log_map</code>은 <code>HashMap&lt;u32, f32&gt;</code>(action_index → logit)를 wire에 실어 보내는 sparse map이다. 이 표현은 sparse할 때 좋지만, 요청한 액션 index가 촘촘히 정해진 세트일 때에는 map key 오버헤드가 순수 손해다. <code>returnLogitsList</code>는 요청 index 순서대로 float array를 리턴하는 <strong>positional dense list</strong>로, 요청 index가 모델 vocab을 벗어나면 <code>-inf</code>로 채운다. 순서가 보장되고 index 저장이 없어지므로 wire 크기가 작다. 아마 캐스케이드나 실시간 랭커처럼 액션 인덱스가 이미 알려진 소비자에 최적화된 것이다 <code>[추정]</code>.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span>: <code>return_log_map</code>은 <code>HashMap&lt;u32, f32&gt;</code>(action_index → logit)를 wire에 실어 보내는 sparse map이다. 이 표현은 sparse할 때 좋지만, 요청한 액션 index가 촘촘히 정해진 세트일 때에는 map key 오버헤드가 순수 손해다. <code>returnLogitsList</code>는 요청 index 순서대로 float array를 리턴하는 <strong>positional dense list</strong>로, 요청 index가 모델 vocab을 벗어나면 <code>-inf</code>로 채운다. 순서가 보장되고 index 저장이 없어지므로 wire 크기가 작다. 아마 캐스케이드나 실시간 랭커처럼 액션 인덱스가 이미 알려진 소비자에 최적화된 것이다 <span class="badge est">추정</span>.</p></div>
 <h3 id="e-vf-compactauthorfeatures--8-byte-nonzerou64-packing-미배선">E. VF <code>CompactAuthorFeatures</code> — 8-byte NonZeroU64 packing (미배선)</h3>
 <p>4세대+19가 <code>AuthorLabelSet(HashSet&lt;LabelValue&gt;) → AuthorLabelSet(u64)</code>로 라벨 표현을 64-bit bitset으로 줄이면서 <code>AuthorFeatures</code> 전체를 16 바이트 Copy 구조체로 잠갔다. 이번 커밋은 그것을 다시 8 바이트로 줄이는 표현을 준비했다:</p>
-<pre><code class="language-rust">#[allow(dead_code)]
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[allow(dead_code)]
 pub(crate) struct CompactAuthorFeatures(NonZeroU64);
 
 const COMPACT_PRESENT_BIT: NonZeroU64 = match NonZeroU64::new(1 &lt;&lt; 63) {
@@ -478,9 +320,9 @@ const COMPACT_PRESENT_BIT: NonZeroU64 = match NonZeroU64::new(1 &lt;&lt; 63) {
 };
 const COMPACT_LABEL_SHIFT: u32 = 8;
 const COMPACT_LABEL_MASK: u64 = (1 &lt;&lt; (63 - COMPACT_LABEL_SHIFT)) - 1;
-</code></pre>
+</code></pre></figure>
 <p>레이아웃은 다음과 같다:</p>
-<table>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col class="w6"><col class="grow"></colgroup>
 <thead>
 <tr>
 <th>비트 위치</th>
@@ -503,14 +345,14 @@ const COMPACT_LABEL_MASK: u64 = (1 &lt;&lt; (63 - COMPACT_LABEL_SHIFT)) - 1;
 <td>8~62</td>
 <td>55-bit label bitset (실제 사용은 11 bit — 4세대+19의 <code>AuthorLabel</code> 11 variant와 1:1)</td>
 </tr>
-</tbody></table>
+</tbody></table></div>
 <p><code>to_compact</code>와 <code>from_compact</code> 라운드트립이 함께 정의되고, 테스트가 flag 조합 128개(<code>1 &lt;&lt; 7</code>)와 label 조합 2048개(<code>1 &lt;&lt; 11</code>)를 모두 exhaustively 검증한다 — 총 262,144 조합. <code>Option&lt;CompactAuthorFeatures&gt;</code>의 크기도 정확히 8 바이트임을 assert한다(NonZeroU64의 niche 최적화가 <code>None</code>을 all-zero로 표현해 별도 태그가 필요 없다).</p>
-<p><code>#[allow(dead_code)]</code>가 붙어 있으니 이번 커밋에서 소비자는 없다. <strong>어디에 배선될지의 후보</strong>는 (1) 4세대+19에 신설된 <code>clock_cache.rs</code>(32-way × 64-shard CLOCK 캐시)의 값 타입 — 이 캐시는 <code>V: Copy</code>를 요구하고 8-byte 값에 최적화되어 있다 <code>[추정]</code>, (2) <code>Gizmoduck</code> 하이드레이터의 hot-path 캐시, (3) <code>AuthorFeatures</code>의 wire 표현 자체 등이다. 다음 커밋에서 어느 소비자로 배선되는지가 관측 대상.</p>
+<p><code>#[allow(dead_code)]</code>가 붙어 있으니 이번 커밋에서 소비자는 없다. <strong>어디에 배선될지의 후보</strong>는 (1) 4세대+19에 신설된 <code>clock_cache.rs</code>(32-way × 64-shard CLOCK 캐시)의 값 타입 — 이 캐시는 <code>V: Copy</code>를 요구하고 8-byte 값에 최적화되어 있다 <span class="badge est">추정</span>, (2) <code>Gizmoduck</code> 하이드레이터의 hot-path 캐시, (3) <code>AuthorFeatures</code>의 wire 표현 자체 등이다. 다음 커밋에서 어느 소비자로 배선되는지가 관측 대상.</p>
 <div class="blk why"><p><span class="lbl">의미</span>: 4세대+19의 <code>HYDRATION_TIMEOUT</code> 상향(80/100 → 390 ms)이 지연 예산을 늘리는 방향이었다면, 이 축은 캐시 hit rate와 hot-path 자료구조 크기를 줄이는 방향이다. <strong>VF 서비스가 실 지연을 낮추기 위한 두 방향 프로젝트가 병행 중</strong>이라는 신호로 읽힌다 — timeout을 늘려 부분 판정 성공률을 높이고, 라벨/피처 표현을 좁혀 캐시 밀도를 높인다.</p></div>
 <h3 id="f-vf-worldwide-takedown-규칙-세밀화">F. VF worldwide takedown 규칙 세밀화</h3>
 <p><code>visibility-filtering/rules/context.rs</code>가 두 조각을 다듬었다.</p>
 <p><strong>첫 조각</strong>: <code>legal_takedown_country</code>가 이제 <code>LegalRequest { country_code: &quot;xy&quot; }</code>를 명시적으로 <code>None</code>으로 리턴한다. 즉 world-wide copyright 코드로 표시된 legal request는 이제 <code>DropLegalTakendownPostRule</code>을 트리거하지 않는다.</p>
-<pre><code class="language-rust">fn legal_takedown_country(reason: &amp;TakedownReason) -&gt; Option&lt;&amp;str&gt; {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn legal_takedown_country(reason: &amp;TakedownReason) -&gt; Option&lt;&amp;str&gt; {
     match reason {
         TakedownReason::LegalRequest { country_code }
             if country_code.eq_ignore_ascii_case(WORLDWIDE_COPYRIGHT_COUNTRY_CODE) =&gt;
@@ -523,10 +365,10 @@ const COMPACT_LABEL_MASK: u64 = (1 &lt;&lt; (63 - COMPACT_LABEL_SHIFT)) - 1;
         _ =&gt; None,
     }
 }
-</code></pre>
+</code></pre></figure>
 <p>DMCA는 여전히 <code>&quot;xy&quot;</code>를 리턴하므로 DMCA-기반 world-wide 저작권 takedown은 유지된다. 즉 <strong><code>&quot;xy&quot;</code> 코드는 이제 DMCA reason으로 도착한 경우에만 legal takedown을 트리거하고, <code>LegalRequest</code>로 도착한 경우에는 무시</strong>된다.</p>
 <p><strong>둘째 조각</strong>: <code>local_laws_takedown_country</code>가 이제 <code>BystanderReport { country_code: &quot;xx&quot; }</code> 또는 <code>&quot;xy&quot;</code>를 <code>None</code>으로 리턴한다:</p>
-<pre><code class="language-rust">fn local_laws_takedown_country(reason: &amp;TakedownReason) -&gt; Option&lt;&amp;str&gt; {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn local_laws_takedown_country(reason: &amp;TakedownReason) -&gt; Option&lt;&amp;str&gt; {
     match reason {
         TakedownReason::BystanderReport { country_code } if !is_worldwide_code(country_code) =&gt; {
             Some(country_code)
@@ -534,7 +376,7 @@ const COMPACT_LABEL_MASK: u64 = (1 &lt;&lt; (63 - COMPACT_LABEL_SHIFT)) - 1;
         _ =&gt; None,
     }
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 <strong>bystander 신고 중 world-wide 스코프만 붙은 것은 더 이상 <code>DropLocalLawsTakendownPostRule</code>을 트리거하지 않는다.</strong> 국가 코드가 실제로 지정된 bystander 신고만 local laws rule이 소비한다.</p>
 <p>새 테스트 3개(<code>legal_takedown_copyright_code_allows_without_viewer_country</code>, <code>unspecified_takedown_worldwide_drops_without_viewer_country</code>, <code>local_laws_takedown_worldwide_allows_any_viewer</code>)가 이 규칙을 골든 코퍼스에 잠근다.</p>
 <div class="blk why"><p><span class="lbl">의미</span>: 4세대+12(6384ca7, 2026-09-01)에서 국가 스코프 처리를 원본으로 도입한 이후 처음의 실질적 정책 완화다. <code>UnspecifiedReason</code>은 여전히 worldwide여도 drop이 유지되므로, 완화는 두 갈래에만 적용된다:</p></div>
@@ -545,17 +387,17 @@ const COMPACT_LABEL_MASK: u64 = (1 &lt;&lt; (63 - COMPACT_LABEL_SHIFT)) - 1;
 <p>이 두 완화는 이전 규칙이 world-wide 스코프에 대해 지나치게 광범위했다는 인식이 있었음을 시사한다. 실제로 이 조건들이 프로덕션에서 얼마나 자주 발생했는지, 그리고 어떤 크리에이터가 영향을 받았는지는 이 코드만으로는 알 수 없다.</p>
 <h3 id="g-under-the-hood--리포트-월-상한-파라미터--employee-역할">G. Under-The-Hood — 리포트 월 상한 파라미터 + employee 역할</h3>
 <p><code>under-the-hood/strato/lib/params.strato</code>가 새 int 파라미터를 export한다:</p>
-<pre><code class="language-scala">val underTheHoodReportMaxMonthBucket =
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">val underTheHoodReportMaxMonthBucket =
   fs.intParam(&quot;under_the_hood_report_max_month_bucket&quot;, 0)
-</code></pre>
+</code></pre></figure>
 <p><code>userRoles</code>에는 <code>&quot;employee&quot;</code>가 추가된다:</p>
-<pre><code class="language-scala">val userRoles = Set(
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">val userRoles = Set(
   &quot;birdwatch_team&quot;,
   &quot;employee&quot;,
 )
-</code></pre>
+</code></pre></figure>
 <p><code>underTheHoodReport.User.strato</code>의 <code>reportMonthBucket</code> 시그니처가 확장돼 이 상한을 적용한다:</p>
-<pre><code class="language-scala">def reportMonthBucket(now: Time.T, maxMonthBucket: Int): Int = {
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">def reportMonthBucket(now: Time.T, maxMonthBucket: Int): Int = {
   val candidate = calendarMonthBefore(now)
   val calendarMonth =
     if (monthPublishCalendarReady(candidate, now)) { candidate }
@@ -566,12 +408,12 @@ const COMPACT_LABEL_MASK: u64 = (1 &lt;&lt; (63 - COMPACT_LABEL_SHIFT)) - 1;
     calendarMonth
   }
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 (기본 = 0)이면 이전과 동일하게 최근 완성된 calendar 월을 리턴하고, 양수를 넣으면 그 값을 상한으로 클램프한다.</p>
 <div class="blk why"><p><span class="lbl">의미</span>: (1) 데이터 파이프라인이 특정 월의 백엔드 준비를 완료하지 못한 상황(예: 인시던트, 지연, 롤아웃 중단)에서 UTH 리포트를 안전한 마지막 월에 강제로 고정하는 안전판을 운영자가 손에 쥐게 됐다. (2) <code>&quot;employee&quot;</code> 역할이 리포트를 볼 수 있는 대상으로 편입된다 — 사내에서 리포트 UI를 검증·디버깅할 수 있게 됐다는 의미로 읽힌다. 4세대+19에서 신설된 UTH 국가별 계정 takedown 배치 잡과 짝을 이루는 안전판 신설.</p></div>
 <h3 id="h-phoenix-학습-파이프라인--kafka-인증-mtls-모드-자동-감지">H. Phoenix 학습 파이프라인 — Kafka 인증 mTLS 모드 자동 감지</h3>
 <p><code>phoenix/xrex/data/streaming/kafkaconsumer.py</code>에 새 dataclass가 붙었다:</p>
-<pre><code class="language-python">@dataclasses.dataclass(frozen=True)
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">@dataclasses.dataclass(frozen=True)
 class KafkaAuth:
     mode: str                       # &quot;mtls&quot; or &quot;sasl&quot;
     ca_path: str | None = None
@@ -589,7 +431,7 @@ class KafkaAuth:
 
     def ssl_context(self) -&gt; ssl.SSLContext: ...
     def consumer_kwargs(self) -&gt; dict[str, Any]: ...
-</code></pre>
+</code></pre></figure>
 <p><code>kafkaloader.py</code>의 <code>auto_detect_auth</code>가 다음 순서로 인증 방식을 정한다:</p>
 <ol>
 <li><code>KAFKA_AUTH</code> env var이 <code>&quot;sasl&quot;</code>이면 강제 SASL(mTLS 인증서 검사 skip).</li>
@@ -599,7 +441,7 @@ class KafkaAuth:
 <li>셋 다 실패면 에러.</li>
 </ol>
 <p>이전 코드는 3개 소비자 경로(<code>discover_partition_count</code>, <code>_consumer_poll_loop</code>, <code>_consume_multi_consumer</code>)에서 각각 <code>ssl.create_default_context()</code> + <code>SASL_SSL</code> protocol을 하드코딩했는데, 이번 커밋이 세 경로 모두 새 <code>auth.consumer_kwargs()</code>로 옮겼다.</p>
-<div class="blk why"><p><span class="lbl">의미</span>: Phoenix 학습 파이프라인이 소비하는 recsys 액션 스트림 Kafka(4세대+3의 v3 스키마 이래로 SASL/SCRAM으로 붙어 왔다)가 mTLS로도 붙을 수 있게 됐다. 클러스터 운영 정책의 이관(비밀번호 관리 인프라 → 인증서 관리 인프라)으로 읽힌다 <code>[추정]</code> — 실제 어느 쪽이 프로덕션에서 채택됐는지는 이 코드만으로는 알 수 없다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span>: Phoenix 학습 파이프라인이 소비하는 recsys 액션 스트림 Kafka(4세대+3의 v3 스키마 이래로 SASL/SCRAM으로 붙어 왔다)가 mTLS로도 붙을 수 있게 됐다. 클러스터 운영 정책의 이관(비밀번호 관리 인프라 → 인증서 관리 인프라)으로 읽힌다 <span class="badge est">추정</span> — 실제 어느 쪽이 프로덕션에서 채택됐는지는 이 코드만으로는 알 수 없다.</p></div>
 <h3 id="i-부수-변화">I. 부수 변화</h3>
 <ul>
 <li><strong><code>Brazil2026ElectionFilter</code> 계정 리스트 정비.</strong> <code>home-mixer/filters/brazil_2026_election_filter.rs</code>(+334/−42)에서 하드코딩 계정 목록에 신규 12개 삽입(<code>@VladimirAlves</code>, <code>@merisio</code>, <code>@LorenLuniere</code>, <code>@capitaoassumcao</code>, <code>@annavalente</code>, <code>@ademarmago</code>, <code>@henriquecatan</code>, <code>@jabscres</code>, <code>@yarahaquim</code>, <code>@ElySilveira</code>, <code>@MarceloFaro30</code>, <code>@freire_roberto</code>, <code>@felipececilio</code>, <code>@claudiojacoski</code>), <code>@rafaelcampelo → @RobertoOshiro</code> 스왑, &quot;no live account found&quot; 코멘트 다수 추가·삭제. 정기 유지 보수로 정책 변화 없음.</li>
@@ -609,13 +451,13 @@ class KafkaAuth:
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">../services/x.md</a> <code>### 4세대+20 (2026-09-12, 6bb4594)</code> 절 신설(A~I 아홉 축), <code>### 다양성</code> 절에 VMRanker DPP의 <code>seed_tweet_id</code> 확장 노트 추가, <code>## 출처</code> 절의 4세대 커밋 리스트에 <code>6bb4594</code>(21개째) 편입, 전체 커밋 카운트 <code>19개 → 21개</code>(4세대+19도 이번에 함께 추가), 최종 갱신 날짜 <code>2026-09-12 → 2026-09-13</code>.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> 이번 커밋은 4세대+19에서 시작된 VF 안정화·감축 프로젝트의 두 번째 이터레이션이자, 검색 관련성 supervise 라벨(<code>LLM_JUDGE_*</code>)이 proto에 등장한 첫 신호다. 다양성 축에서는 seed anchor 도입이 실질적 신기술이다 — 지금까지 노트에서 &quot;DPP는 집합 내부 다양성만 최적화&quot;라고 기술했던 것을 &quot;seed가 주어지면 참조 tweet 대비 다양성도 계산&quot;으로 확장해야 한다(위 <a href="x.html">../services/x.md</a> <code>### 다양성</code> 노트 반영). 로그 스트림 축에서는 Thrift→proto 이관이 시작됐고, 인프라 축에서는 xDS로의 서비스 발견 이관이 VF에서 시작됐다. 정책 축에서는 world-wide 스코프 takedown이 두 갈래에서 완화됐다.</p></div>
-<p>⚠ <strong>주장 갱신 없음</strong> — 이번 diff가 뒤집는 기존 정본 진술은 없다. 다양성 절의 진술은 확장되었지만 뒤집힌 것은 아니다(seed가 없는 경우의 동작은 그대로다).</p>
+<p class="warn">⚠ <strong>주장 갱신 없음</strong> — 이번 diff가 뒤집는 기존 정본 진술은 없다. 다양성 절의 진술은 확장되었지만 뒤집힌 것은 아니다(seed가 없는 경우의 동작은 그대로다).</p>
 <h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
 <p>없음.</p>
 <h2 id="레이더">레이더</h2>
 <p>이번 배치에서 arXiv cs.IR triage 30건 중 acceptance 기준(플랫폼 기업 저자, 프로덕션 A/B, 메커니즘 신기술, 대규모 스케일 결과)을 통과한 항목이 없다. Meta 엔지니어링 블로그(engineering.fb.com, ai.meta.com/blog)와 Netflix TechBlog(netflixtechblog.com)에도 2026-09-12 이후 신규 자료 없음.</p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong><code>seed_tweet_id</code>를 실어 주는 홈믹서 파이프라인</strong> — 홈믹서의 어느 candidate pipeline이 <code>RankRequest.seed_tweet_id</code>를 채우는지 다음 커밋에서 관측. For You 자체가 최근에 본 tweet을 seed로 실어 반복 노출을 줄이는 확장을 하는지, 아니면 permalink·related 경로에만 붙는지가 관건.</li>
 <li><strong><code>LOGGED_SCORED_CANDIDATES_TOPIC</code>의 다운스트림 소비자</strong> — Phoenix 학습 파이프라인이 이 새 proto 토픽을 소비하기 시작하는지, 아니면 별개 랭킹 로그 소비자(예: 실시간 오프라인 평가 파이프라인, feature store 스냅샷 생성)가 붙는지 관측.</li>
 <li><strong><code>LLM_JUDGE_RELEVANT_TO_SEARCH</code>/<code>_NOT</code> 라벨 발생 파이프라인</strong> — grox 서브레포에 (query, tweet) 쌍에 relevant/not 라벨을 흘려 주는 flow가 등장하는지. <code>xrecsys_search</code> config가 이 두 액션을 학습 타깃으로 편입하는지.</li>
@@ -624,76 +466,19 @@ class KafkaAuth:
 <li><strong>xDS LDS listener의 실제 등록 정의</strong> — <code>tweet-entity-service.prod.tweet-entity-service:fed-grpc</code> 등 리스너 이름이 어느 xDS control plane 저장소에 등록되어 있는지. 서비스 메시 소스가 이 레포에 함께 공개될 가능성.</li>
 <li><strong>UTH 리포트 월 상한의 실 사용 시점</strong> — feature-switch defaults 미러(<code>param.rs</code>)에 이 파라미터가 non-zero 값으로 뜨는 시점을 관측.</li>
 </ul>
-<p>조회 실패: 없음.</p>
+<p>조회 실패: 없음.</p></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-12.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-12</div></a><a class="r" href="daily-2026-09-15.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-15</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-12.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-12</span></a><a class="pg-next" href="daily-2026-09-15.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-15</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

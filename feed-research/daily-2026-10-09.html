@@ -2,267 +2,109 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-10-09 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X가 For You 피드 안에 세로 영상 3~5개를 묶어 보여 주는 캐러셀 모듈을 만들었다(기본 off). 랭킹 모델의 체류 시간 헤드 학습 방식은 기본값에서 Tweedie/MAE 회귀가 CREAD(임계값별 분류 후 복원)로 바뀌었다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-10-09.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-10-09 — feed-research">
 <meta property="og:description" content="한 줄: X가 For You 피드 안에 세로 영상 3~5개를 묶어 보여 주는 캐러셀 모듈을 만들었다(기본 off). 랭킹 모델의 체류 시간 헤드 학습 방식은 기본값에서 Tweedie/MAE 회귀가 CREAD(임계값별 분류 후 복원)로 바뀌었다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-10-09.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-10-09</h1>
-  <div class="wd">금요일 · 읽는 데 약 14분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X가 For You 피드 안에 세로 영상 3~5개를 묶어 보여 주는 캐러셀 모듈을 만들었다(기본 off). 랭킹 모델의 체류 시간 헤드 학습 방식은 기본값에서 Tweedie/MAE 회귀가 CREAD(임계값별 분류 후 복원)로 바뀌었다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-4세대38--영상-캐러셀-모듈-체류-시간-cread-손실-two-tower-mol-옵션--x">1. 4세대+38 — 영상 캐러셀 모듈, 체류 시간 CREAD 손실, two-tower MoL 옵션 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/35650fb89f3b14dc6234312535f642779d891d88">xai-org/x-algorithm@35650fb</a> — xai-org, 2026-10-08T05:09:20Z, 코드. 파일 173개, +15,160/−2,465. 직전 커밋은 2026-10-07의 <a href="https://github.com/xai-org/x-algorithm/commit/78460ca8b65c57ddd3a05f9217c8aaeba214b628">78460ca</a>(4세대+37)다.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-09">2026-10-09</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>금요일</li>
+<li><span class="meta-k">읽는 시간</span>14분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 For You 피드 안에 세로 영상 3~5개를 묶어 보여 주는 캐러셀 모듈을 만들었다(기본 off). 랭킹 모델의 체류 시간 헤드 학습 방식은 기본값에서 Tweedie/MAE 회귀가 CREAD(임계값별 분류 후 복원)로 바뀌었다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">3</span></summary><ol><li><a href="#1-4세대38--영상-캐러셀-모듈-체류-시간-cread-손실-two-tower-mol-옵션--x"><span class="num">1</span>4세대+38 — 영상 캐러셀 모듈, 체류 시간 CREAD 손실, two-tower MoL 옵션 — X</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li><li><a href="#소스-점검-메모">소스 점검 메모</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-4세대38--영상-캐러셀-모듈-체류-시간-cread-손실-two-tower-mol-옵션--x"><span class="num">1</span>4세대+38 — 영상 캐러셀 모듈, 체류 시간 CREAD 손실, two-tower MoL 옵션 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/35650fb89f3b14dc6234312535f642779d891d88" target="_blank" rel="noopener">xai-org/x-algorithm@35650fb</a> — xai-org, 2026-10-08T05:09:20Z, 코드. 파일 173개, +15,160/−2,465. 직전 커밋은 2026-10-07의 <a href="https://github.com/xai-org/x-algorithm/commit/78460ca8b65c57ddd3a05f9217c8aaeba214b628" target="_blank" rel="noopener">78460ca</a>(4세대+37)다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span></p></div>
 <p>X의 For You 피드는 여러 후보 소스가 포스트를 모으고, Phoenix(Grok 기반 Transformer 랭커)가 좋아요·답글·영상 열기 같은 행동마다 확률을 예측한다. 그다음 value model이 이 확률들을 가중합해서 순서를 정한다. 마지막 단계의 블렌더는 광고, 팔로우 추천(Who-to-Follow, WTF), 프롬프트 같은 비(非)포스트 모듈을 정해진 자리에 끼워 넣는다.</p>
 <p>이번 커밋은 변경량이 1만 5천 줄이지만, 상당 부분은 서드파티 GPU 커널 유틸(CuTe DSL <code>quack</code>, 약 3,000줄)과 안전 계층(visibility filtering, VF) 내부 코드다. 피드 동작과 관련된 변경은 세 가지다: 블렌더에 들어갈 새 모듈, 랭커 학습 손실의 기본값 변경, 후보 생성 모델(two-tower)의 새 옵션이다. 예산 가드에 따라 이 세 가지를 중심으로 분석하고, 나머지는 &quot;다음에 볼 것&quot;에 남긴다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — A. For You에 세로 영상 캐러셀 모듈이 생겼다 (기본 off)</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. For You에 세로 영상 캐러셀 모듈이 생겼다 (기본 off)</span></p></div>
 <ul>
-<li><p>새 파라미터 세 개가 프로덕션 기본값 미러(<code>param.rs</code>, 매일 X 내부 feature switch 기본값을 복사한 파일)에 들어왔다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>: <code>EnableVideoCarousel = false</code>, <code>VideoCarouselFatigueMinutes = 60</code>, <code>VideoCarouselPosition = 6</code>. 미러 sync 시각은 <code>2026-10-07T16:00:42Z</code>이고, 미러에서 바뀐 것은 이 세 개뿐이다.</p>
+<li><p>새 파라미터 세 개가 프로덕션 기본값 미러(<code>param.rs</code>, 매일 X 내부 feature switch 기본값을 복사한 파일)에 들어왔다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>: <code>EnableVideoCarousel = false</code>, <code>VideoCarouselFatigueMinutes = 60</code>, <code>VideoCarouselPosition = 6</code>. 미러 sync 시각은 <code>2026-10-07T16:00:42Z</code>이고, 미러에서 바뀐 것은 이 세 개뿐이다.</p>
 </li>
-<li><p>켜지는 조건은 세 가지다: For You 요청이고, 플래그가 켜져 있고, 직전 캐러셀 노출 후 60분이 지났어야 한다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/util/video_carousel.rs"><code>home-mixer/util/video_carousel.rs:7-11</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/query_hydrators/served_history_query_hydrator.rs"><code>query_hydrators/served_history_query_hydrator.rs:52-57, 110-126</code></a>. 피로도(fatigue)는 유저가 같은 모듈을 너무 자주 보지 않게 하는 쿨다운으로, WTF 모듈(시간 단위)과 피드 설문(분 단위)에 이미 쓰던 장치를 그대로 재사용했다.</p>
+<li><p>켜지는 조건은 세 가지다: For You 요청이고, 플래그가 켜져 있고, 직전 캐러셀 노출 후 60분이 지났어야 한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/util/video_carousel.rs" target="_blank" rel="noopener"><code>home-mixer/util/video_carousel.rs:7-11</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/query_hydrators/served_history_query_hydrator.rs" target="_blank" rel="noopener"><code>query_hydrators/served_history_query_hydrator.rs:52-57, 110-126</code></a>. 피로도(fatigue)는 유저가 같은 모듈을 너무 자주 보지 않게 하는 쿨다운으로, WTF 모듈(시간 단위)과 피드 설문(분 단위)에 이미 쓰던 장치를 그대로 재사용했다.</p>
 </li>
-<li><p>후보를 고르는 경로는 두 단계다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/selectors/top_k_score_selector.rs"><code>selectors/top_k_score_selector.rs:10-27</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/filters/video_carousel_filter.rs"><code>filters/video_carousel_filter.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/params/config.rs"><code>params/config.rs:17-19, 35-36</code></a>:</p>
+<li><p>후보를 고르는 경로는 두 단계다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/selectors/top_k_score_selector.rs" target="_blank" rel="noopener"><code>selectors/top_k_score_selector.rs:10-27</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/filters/video_carousel_filter.rs" target="_blank" rel="noopener"><code>filters/video_carousel_filter.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/params/config.rs" target="_blank" rel="noopener"><code>params/config.rs:17-19, 35-36</code></a>:</p>
 <ol>
 <li>랭킹 직후 선택 단계는 원래 점수 상위 50개만 남긴다. 캐러셀이 켜지면 탈락한 후보 중에서 영상이고, 답글이 아니고, <code>video_open</code> 예측값이 있는 포스트를 <strong><code>video_open</code> 확률 순으로 최대 30개</strong> 더 살려 둔다. 이 후보들에는 <code>video_carousel_extra</code> 표시가 붙는다.</li>
 <li>살린 후보도 VF 필터와 대화 중복 제거 필터를 똑같이 거친다. 마지막 필터 <code>VideoCarouselFilter</code>가 extra 후보를 본 피드에서 빼낸다. 그다음 &quot;상위 50개 중 36위 이하 + 빼낸 extra&quot; 풀에서 세로 영상(가로/세로 비 &lt; 1.0)만 골라 <code>video_open</code> 순으로 최대 5개를 캐러셀에 담는다. 3개가 안 되면 모듈을 만들지 않는다.</li>
 </ol>
 </li>
-<li><p>세로 영상 판정에 쓰는 가로/세로 비는 미디어 메타데이터에서 읽는 새 hydrator(<code>VideoAspectRatioHydrator</code>)가 채운다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/candidate_hydrators/video_aspect_ratio_hydrator.rs"><code>candidate_hydrators/video_aspect_ratio_hydrator.rs:95-101</code></a>. 9:16 세로 영상은 0.5625가 되어 통과하고, 16:9 가로 영상(1.78)과 정사각형(1.0)은 탈락한다(같은 파일의 테스트 기댓값).</p>
+<li><p>세로 영상 판정에 쓰는 가로/세로 비는 미디어 메타데이터에서 읽는 새 hydrator(<code>VideoAspectRatioHydrator</code>)가 채운다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/candidate_hydrators/video_aspect_ratio_hydrator.rs" target="_blank" rel="noopener"><code>candidate_hydrators/video_aspect_ratio_hydrator.rs:95-101</code></a>. 9:16 세로 영상은 0.5625가 되어 통과하고, 16:9 가로 영상(1.78)과 정사각형(1.0)은 탈락한다(같은 파일의 테스트 기댓값).</p>
 </li>
-<li><p>블렌더는 광고·프롬프트·WTF를 넣은 다음 캐러셀을 6번째 자리에 넣는다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/selectors/blender_selector.rs"><code>selectors/blender_selector.rs:72-85, 137-153</code></a>. 노출 기록에는 <code>VIDEO_CAROUSEL_MODULE</code> 엔트리로 남아 다음 요청의 피로도 판정에 쓰인다. 클라이언트에 보낼 헤더 문자열 키는 <code>VideoCarouselModule.header</code>이고, 테스트에 적힌 영문 값은 다음과 같다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/util/urt/video_carousel_marshaller.rs"><code>util/urt/video_carousel_marshaller.rs</code></a>:</p>
+<li><p>블렌더는 광고·프롬프트·WTF를 넣은 다음 캐러셀을 6번째 자리에 넣는다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/selectors/blender_selector.rs" target="_blank" rel="noopener"><code>selectors/blender_selector.rs:72-85, 137-153</code></a>. 노출 기록에는 <code>VIDEO_CAROUSEL_MODULE</code> 엔트리로 남아 다음 요청의 피로도 판정에 쓰인다. 클라이언트에 보낼 헤더 문자열 키는 <code>VideoCarouselModule.header</code>이고, 테스트에 적힌 영문 값은 다음과 같다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/util/urt/video_carousel_marshaller.rs" target="_blank" rel="noopener"><code>util/urt/video_carousel_marshaller.rs</code></a>:</p>
 <blockquote>
 <p><code>header(Some(&quot;Videos for you&quot;.to_string()))</code></p>
 </blockquote>
 </li>
-<li><p>캐러셀 영상은 본 피드에 보이는 포스트와 겹치지 않도록 설계된 것으로 보인다 <code>[추정]</code> — 후보 풀이 본 피드 크기(<code>RESULT_SIZE = 35</code>) 바깥의 순위와 extra로만 구성된다. 최종 응답이 정확히 35개에서 잘리는지는 이번에 대조하지 않았다.</p>
+<li><p>캐러셀 영상은 본 피드에 보이는 포스트와 겹치지 않도록 설계된 것으로 보인다 <span class="badge est">추정</span> — 후보 풀이 본 피드 크기(<code>RESULT_SIZE = 35</code>) 바깥의 순위와 extra로만 구성된다. 최종 응답이 정확히 35개에서 잘리는지는 이번에 대조하지 않았다.</p>
 </li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — B. 체류 시간 헤드의 학습 손실이 CREAD로 바뀌었다 (기본 on)</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 체류 시간 헤드의 학습 손실이 CREAD로 바뀌었다 (기본 on)</span></p></div>
 <p><code>dwell_time</code> 헤드는 유저가 포스트에 머문 초를 예측하는 회귀 헤드다. value model은 이 값에 <code>ContDwellTimeWeight</code>를 곱해 점수에 더한다. 체류 시간은 대부분 몇 초에 몰려 있고 긴 꼬리가 있어서 평균 제곱 오차 같은 단순 회귀로는 학습이 불안정하다. 그래서 X는 지금까지 Tweedie 손실(긴 꼬리가 있는 양수 값에 맞춘 분포 손실)과 MAE(절대 오차)를 함께 써 왔다.</p>
-<p>CREAD는 Kuaishou가 영상 시청 시간 예측을 위해 발표한 방법이다(<a href="https://arxiv.org/abs/2401.07521">CREAD: A Classification-Restoration Framework with Error Adaptive Discretization for Watch Time Prediction in Video Recommender Systems</a>, 2024-01, 논문). 시간을 직접 회귀하지 않고, 여러 임계값마다 &quot;이 시간을 넘었는가&quot;를 이진 분류로 학습한다. 그런 다음 확률들을 이어 붙여 기댓값을 복원한다.</p>
+<p>CREAD는 Kuaishou가 영상 시청 시간 예측을 위해 발표한 방법이다(<a href="https://arxiv.org/abs/2401.07521" target="_blank" rel="noopener">CREAD: A Classification-Restoration Framework with Error Adaptive Discretization for Watch Time Prediction in Video Recommender Systems</a>, 2024-01, 논문). 시간을 직접 회귀하지 않고, 여러 임계값마다 &quot;이 시간을 넘었는가&quot;를 이진 분류로 학습한다. 그런 다음 확률들을 이어 붙여 기댓값을 복원한다.</p>
 <ul>
-<li>홈 기본 학습 config <code>_home_direct_packed_base()</code>에서 Tweedie와 MAE 가중치가 <strong>0.0</strong>이 되고 CREAD 두 개가 <strong>0.1</strong>로 켜졌다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/configs/xrecsys.py"><code>phoenix/xrex/configs/xrecsys.py:272-275, 687-742</code></a>. 이전에는 Tweedie(power 1.5)와 MAE가 각각 0.1로 하드코딩돼 있었다.</li>
-<li>두 CREAD 손실은 지면별로 나뉜다 <code>[확인]</code>(같은 파일):<ul>
+<li>홈 기본 학습 config <code>_home_direct_packed_base()</code>에서 Tweedie와 MAE 가중치가 <strong>0.0</strong>이 되고 CREAD 두 개가 <strong>0.1</strong>로 켜졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py:272-275, 687-742</code></a>. 이전에는 Tweedie(power 1.5)와 MAE가 각각 0.1로 하드코딩돼 있었다.</li>
+<li>두 CREAD 손실은 지면별로 나뉜다 <span class="badge ok">확인</span>(같은 파일):<ul>
 <li>일반 지면용: 상한 120초이고 갤러리 지면(<code>PRODUCT_SURFACE_GALLERY_PAGE</code>)을 제외한다.</li>
-<li>몰입형용(<code>dwell-time-cread-immersive</code>): 상한 240초이고 갤러리 지면만 대상이다. 갤러리 지면은 사진·영상을 전체 화면으로 넘겨 보는 화면으로 보인다 <code>[추정]</code> — 메트릭 이름이 immersive이고, 체류 상한을 두 배로 잡았다.</li>
+<li>몰입형용(<code>dwell-time-cread-immersive</code>): 상한 240초이고 갤러리 지면만 대상이다. 갤러리 지면은 사진·영상을 전체 화면으로 넘겨 보는 화면으로 보인다 <span class="badge est">추정</span> — 메트릭 이름이 immersive이고, 체류 상한을 두 배로 잡았다.</li>
 </ul>
 </li>
-<li>임계값은 2초부터 상한까지 로그 간격으로 30개다. 상한이 120초이면 2.0, 2.3, 2.65 … 90.5, 104.2, 120초가 된다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/loss_recsys.py"><code>phoenix/xrex/models/loss_recsys.py</code></a> <code>cread_log_thresholds</code>. 각 임계마다 sigmoid 이진 교차 엔트로피를 계산한다. 복원값은 &quot;임계를 넘을 확률 × 구간 폭&quot;의 합이고, 이 값과 실제 초의 Huber 손실(δ=5초, 가중 0.5)을 더한다 <code>[확인]</code> — 같은 파일 <code>cread_loss_compute</code>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/recsys_model.py"><code>recsys_model.py</code></a> <code>_decode_cread</code>.</li>
-<li>논문은 구간 경계를 오차가 작아지도록 데이터에 맞춰 정하는 것(error adaptive discretization)이 핵심 기여인데, X 구현은 고정 로그 간격을 쓴다 <code>[확인]</code>. 이름과 분류-복원 구조만 가져온 셈이다.</li>
-<li>같은 임계 체계가 <strong>입력 피처</strong>에도 쓰인다. 유저 히스토리의 각 포스트에 대해 과거 체류 시간을 버킷 임베딩으로 넣는 <code>enable_dwell_bucket_table=True</code>가 기본 on이 됐다(상한 240초, 임계 30개, 인접한 두 버킷 사이를 선형 보간) <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/recsys_feature_prep.py"><code>models/recsys_feature_prep.py:180-184, 885-910</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/configs/xrecsys.py"><code>configs/xrecsys.py:301-304</code></a>. 지금까지는 히스토리의 체류 시간이 어떤 형태로 입력되는지 정본에 기록하지 않았다.</li>
+<li>임계값은 2초부터 상한까지 로그 간격으로 30개다. 상한이 120초이면 2.0, 2.3, 2.65 … 90.5, 104.2, 120초가 된다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/loss_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/loss_recsys.py</code></a> <code>cread_log_thresholds</code>. 각 임계마다 sigmoid 이진 교차 엔트로피를 계산한다. 복원값은 &quot;임계를 넘을 확률 × 구간 폭&quot;의 합이고, 이 값과 실제 초의 Huber 손실(δ=5초, 가중 0.5)을 더한다 <span class="badge ok">확인</span> — 같은 파일 <code>cread_loss_compute</code>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>recsys_model.py</code></a> <code>_decode_cread</code>.</li>
+<li>논문은 구간 경계를 오차가 작아지도록 데이터에 맞춰 정하는 것(error adaptive discretization)이 핵심 기여인데, X 구현은 고정 로그 간격을 쓴다 <span class="badge ok">확인</span>. 이름과 분류-복원 구조만 가져온 셈이다.</li>
+<li>같은 임계 체계가 <strong>입력 피처</strong>에도 쓰인다. 유저 히스토리의 각 포스트에 대해 과거 체류 시간을 버킷 임베딩으로 넣는 <code>enable_dwell_bucket_table=True</code>가 기본 on이 됐다(상한 240초, 임계 30개, 인접한 두 버킷 사이를 선형 보간) <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/recsys_feature_prep.py" target="_blank" rel="noopener"><code>models/recsys_feature_prep.py:180-184, 885-910</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>configs/xrecsys.py:301-304</code></a>. 지금까지는 히스토리의 체류 시간이 어떤 형태로 입력되는지 정본에 기록하지 않았다.</li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — C. two-tower retrieval에 Mixture-of-Logits 옵션 (기본 off)</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. two-tower retrieval에 Mixture-of-Logits 옵션 (기본 off)</span></p></div>
 <p>two-tower retrieval은 유저 벡터 하나와 포스트 벡터 하나의 내적으로 수억 개 중 후보를 빠르게 찾는 구조다. 유저 관심이 여러 갈래일 때 벡터 하나로는 다 담기 어렵다는 한계가 알려져 있다. Mixture-of-Logits(MoL)는 유저 쪽과 아이템 쪽 벡터를 여러 개 두고, 그 조합 점수들을 작은 gate 네트워크로 가중합해서 이 한계를 줄이는 방법이다.</p>
 <ul>
-<li><code>user_query_heads=K</code>이면 유저 시퀀스 출력을 학습된 query 벡터 K개로 attention pooling해서 유저 벡터를 K개 만든다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/recsys_two_tower_model.py"><code>phoenix/xrex/models/recsys_two_tower_model.py:1629-1665</code></a>. head마다 최근 행동에 더 무게를 두는 감쇠 계수가 따로 학습된다.</li>
-<li><code>mol_item_components=L</code>이면 포스트 임베딩에 저랭크 어댑터를 적용해 성분 벡터 L개를 만든다. K×L개 코사인을 MLP gate(softmax)로 섞어 최종 점수를 낸다 <code>[확인]</code> — 같은 파일 523-598행 <code>MolScorer</code>.</li>
-<li>서빙용 CUDA 커널도 함께 공개됐다. 지원 조합은 (K×L, gate hidden) ∈ {(4,32), (8,16), (8,32), (16,16)}이고 요청당 유저는 512명까지다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/cuda/mol_epilogue/__init__.py"><code>phoenix/xrex/cuda/mol_epilogue/__init__.py:11-12</code></a>.</li>
-<li>학습 손실 옵션도 네 개가 추가됐다 <code>[확인]</code> — 같은 파일 2194-2224행: 고정 temperature, 배치 안의 같은 포스트가 negative로 잡히는 false negative 마스킹, 유저가 부정 행동을 한 포스트에 대한 logit offset, positive 수 기반 유저 가중이다.</li>
-<li>기본값은 모두 0 또는 False이고, 공개된 프리셋 6개 어디에서도 켜지 않는다 <code>[확인]</code>(configs 디렉터리 grep). 프로덕션 retrieval이 이미 MoL인지는 이 코드로 판단할 수 없다 <code>[추정]</code> — 실험 config는 공개되지 않는다. 다만 서빙 커널까지 만들어 둔 것은 실험 단계를 넘어 배포를 준비하는 신호로 읽힌다 <code>[추정]</code>.</li>
+<li><code>user_query_heads=K</code>이면 유저 시퀀스 출력을 학습된 query 벡터 K개로 attention pooling해서 유저 벡터를 K개 만든다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/recsys_two_tower_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_two_tower_model.py:1629-1665</code></a>. head마다 최근 행동에 더 무게를 두는 감쇠 계수가 따로 학습된다.</li>
+<li><code>mol_item_components=L</code>이면 포스트 임베딩에 저랭크 어댑터를 적용해 성분 벡터 L개를 만든다. K×L개 코사인을 MLP gate(softmax)로 섞어 최종 점수를 낸다 <span class="badge ok">확인</span> — 같은 파일 523-598행 <code>MolScorer</code>.</li>
+<li>서빙용 CUDA 커널도 함께 공개됐다. 지원 조합은 (K×L, gate hidden) ∈ {(4,32), (8,16), (8,32), (16,16)}이고 요청당 유저는 512명까지다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/cuda/mol_epilogue/__init__.py" target="_blank" rel="noopener"><code>phoenix/xrex/cuda/mol_epilogue/__init__.py:11-12</code></a>.</li>
+<li>학습 손실 옵션도 네 개가 추가됐다 <span class="badge ok">확인</span> — 같은 파일 2194-2224행: 고정 temperature, 배치 안의 같은 포스트가 negative로 잡히는 false negative 마스킹, 유저가 부정 행동을 한 포스트에 대한 logit offset, positive 수 기반 유저 가중이다.</li>
+<li>기본값은 모두 0 또는 False이고, 공개된 프리셋 6개 어디에서도 켜지 않는다 <span class="badge ok">확인</span>(configs 디렉터리 grep). 프로덕션 retrieval이 이미 MoL인지는 이 코드로 판단할 수 없다 <span class="badge est">추정</span> — 실험 config는 공개되지 않는다. 다만 서빙 커널까지 만들어 둔 것은 실험 단계를 넘어 배포를 준비하는 신호로 읽힌다 <span class="badge est">추정</span>.</li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것 — D. 그 밖의 변경</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">D. 그 밖의 변경</span></p></div>
 <ul>
-<li>topic 피드 요청은 신규 작성자 cold-start 승격에서 빠진다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/scorers/author_cold_start.rs"><code>home-mixer/scorers/author_cold_start.rs:384-386</code></a>.</li>
-<li>Semantic ID(포스트를 짧은 코드 열로 표현하는 식별자)의 앞 2자리·3자리 prefix를 임베딩으로 조회하는 함수가 추가됐다 <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/recsys_sid.py"><code>phoenix/xrex/models/recsys_sid.py:32-79</code></a>. 모델에 배선됐는지는 확인하지 않았다.</li>
-<li>광고 블렌더가 탈락시킨 광고를 기록하는 경로(<code>home-mixer/ads/drops.rs</code>)가 생겼다. VF에는 유저 위치 조회 클라이언트(345줄)와 hydration <code>exchange.rs</code>(528줄)가 신설됐다 <code>[확인]</code>. 위치 기반 판정이 새로 생긴 것인지는 아래 &quot;다음에 볼 것&quot;으로 넘긴다.</li>
+<li>topic 피드 요청은 신규 작성자 cold-start 승격에서 빠진다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs:384-386</code></a>.</li>
+<li>Semantic ID(포스트를 짧은 코드 열로 표현하는 식별자)의 앞 2자리·3자리 prefix를 임베딩으로 조회하는 함수가 추가됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/35650fb/phoenix/xrex/models/recsys_sid.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_sid.py:32-79</code></a>. 모델에 배선됐는지는 확인하지 않았다.</li>
+<li>광고 블렌더가 탈락시킨 광고를 기록하는 경로(<code>home-mixer/ads/drops.rs</code>)가 생겼다. VF에는 유저 위치 조회 클라이언트(345줄)와 hydration <code>exchange.rs</code>(528줄)가 신설됐다 <span class="badge ok">확인</span>. 위치 기반 판정이 새로 생긴 것인지는 아래 &quot;다음에 볼 것&quot;으로 넘긴다.</li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a></p></div>
 <ul>
@@ -274,91 +116,33 @@ ul.rl .chip b { font-size: 13px; }
 </ul>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <ul>
-<li>지금까지 For You의 모든 포스트 슬롯은 value model 가중합으로 순서가 정해졌다. 캐러셀은 <strong><code>video_open</code> 단일 헤드 확률</strong>로 채우는 첫 포스트 모듈이다 <code>[확인]</code>. 본 랭킹에서 아깝게 탈락한 세로 영상을 별도 목적 함수로 다시 노출하는 구조다. Reels·Shorts식 세로 영상 소비를 피드 안으로 끌어오려는 시도로 보인다 <code>[추정]</code> — 정본이 기록한 비디오 전용 Thunder 경로(<code>is_video_request</code>)와 같은 방향이다.</li>
-<li>체류 시간 헤드의 학습 방식 변경은 기본 config에 들어갔으므로 다음 체크포인트부터 적용될 가능성이 높다 <code>[추정]</code> — 기본값 변경이 실제 프로덕션 학습 config에 반영되는지는 공개되지 않는다. 4세대+22에 <code>click_dwell_time</code>을 회귀에서 10초 임계 이진 분류로 바꾼 것과 같은 방향이다. 회귀를 분류 문제로 바꿔 꼬리 분포에 강하게 만드는 흐름이 <code>dwell_time</code>까지 확장됐다 <code>[추정]</code>.</li>
+<li>지금까지 For You의 모든 포스트 슬롯은 value model 가중합으로 순서가 정해졌다. 캐러셀은 <strong><code>video_open</code> 단일 헤드 확률</strong>로 채우는 첫 포스트 모듈이다 <span class="badge ok">확인</span>. 본 랭킹에서 아깝게 탈락한 세로 영상을 별도 목적 함수로 다시 노출하는 구조다. Reels·Shorts식 세로 영상 소비를 피드 안으로 끌어오려는 시도로 보인다 <span class="badge est">추정</span> — 정본이 기록한 비디오 전용 Thunder 경로(<code>is_video_request</code>)와 같은 방향이다.</li>
+<li>체류 시간 헤드의 학습 방식 변경은 기본 config에 들어갔으므로 다음 체크포인트부터 적용될 가능성이 높다 <span class="badge est">추정</span> — 기본값 변경이 실제 프로덕션 학습 config에 반영되는지는 공개되지 않는다. 4세대+22에 <code>click_dwell_time</code>을 회귀에서 10초 임계 이진 분류로 바꾼 것과 같은 방향이다. 회귀를 분류 문제로 바꿔 꼬리 분포에 강하게 만드는 흐름이 <code>dwell_time</code>까지 확장됐다 <span class="badge est">추정</span>.</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
-<li>영상 캐러셀의 최종 응답 크기 확인: 본 피드가 정확히 35개에서 잘리는지 보고 중복 여부를 <code>[확인]</code>으로 올린다.</li>
+<div class="next"><ul>
+<li>영상 캐러셀의 최종 응답 크기 확인: 본 피드가 정확히 35개에서 잘리는지 보고 중복 여부를 <span class="badge ok">확인</span>으로 올린다.</li>
 <li>VF <code>hydration/sources/exchange.rs</code>·<code>clients/user_location_client.rs</code>: 유저 위치를 판정 입력으로 쓰는 규칙이 새로 생겼는지 확인한다. 정책 변화라면 정본의 안전성 절에 반영해야 한다.</li>
 <li><code>phoenix-rankall/src/hydrate/*</code>(약 1,300줄): 오프라인 rank-all 잡의 hydration 스케줄러 신설이다. 심층 분석이 필요하다.</li>
 <li><code>EnableVideoCarousel</code>과 MoL 옵션이 켜지는지 매일 미러를 확인한다.</li>
-</ul>
+</ul></div>
 <h2 id="소스-점검-메모">소스 점검 메모</h2>
 <ul>
 <li>Meta: engineering.fb.com 최신 글은 여전히 2026-10-06 &quot;NTS: Authenticated Time at Meta&quot;(피드와 무관)다. ai.meta.com/blog 첫 페이지 최신 글은 2026-07로, 신규가 없다. WebSearch 교차 확인에서도 Instagram·Threads·Facebook 랭킹 관련 새 1차 자료는 없었다.</li>
 <li>Netflix: netflixtechblog.com RSS 최신 글은 2026-09-25로 신규가 없다. research.netflix.com 추천 영역 페이지도 열렸고 신규는 없다.</li>
-<li>arXiv cs.IR: 30건을 파싱했고 수용 기준을 통과한 것은 0건이다. 근접 탈락은 <a href="https://arxiv.org/abs/2610.10483">2610.10483</a>(two-level softmax 샘플링 편향 교정, NeurIPS 2026: 프로덕션 근거가 없다)과 <a href="https://arxiv.org/abs/2610.10124">2610.10124</a>(생성형 추천에서 놓친 target의 학습 방식, 공개된 OneRec 모델로 실험: 플랫폼 저자나 배포 주장이 없다)다.</li>
+<li>arXiv cs.IR: 30건을 파싱했고 수용 기준을 통과한 것은 0건이다. 근접 탈락은 <a href="https://arxiv.org/abs/2610.10483" target="_blank" rel="noopener">2610.10483</a>(two-level softmax 샘플링 편향 교정, NeurIPS 2026: 프로덕션 근거가 없다)과 <a href="https://arxiv.org/abs/2610.10124" target="_blank" rel="noopener">2610.10124</a>(생성형 추천에서 놓친 target의 학습 방식, 공개된 OneRec 모델로 실험: 플랫폼 저자나 배포 주장이 없다)다.</li>
 </ul>
-
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-10-08.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-10-08</div></a><a class="r" href="daily-2026-10-10.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-10-10</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-10-08.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-10-08</span></a><a class="pg-next" href="daily-2026-10-10.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-10-10</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

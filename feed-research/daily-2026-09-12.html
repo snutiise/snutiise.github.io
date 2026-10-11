@@ -2,250 +2,92 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-12 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X 4세대+19(fee1d0f)가 visibility-filtering의 TES·Gizmoduck Strato timeout을 각각 100/80 ms에서 통합 상수 390 ms로 3~4배 상향하면서 TES 실패 시 tweet→author_id fallback 캐시(기본…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-12.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-12 — feed-research">
 <meta property="og:description" content="한 줄: X 4세대+19(fee1d0f)가 visibility-filtering의 TES·Gizmoduck Strato timeout을 각각 100/80 ms에서 통합 상수 390 ms로 3~4배 상향하면서 TES 실패 시 tweet→author_id fallback 캐시(기본…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-12.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-12</h1>
-  <div class="wd">토요일 · 읽는 데 약 47분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+19(fee1d0f)가 visibility-filtering의 TES·Gizmoduck Strato timeout을 각각 100/80 ms에서 통합 상수 390 ms로 3~4배 상향하면서 TES 실패 시 tweet→author_id fallback 캐시(기본 1 M entries)로 author-side rules를 살리는 안전망을 넣었고, 규칙 판정 라벨을 <code>HashSet&lt;LabelValue&gt;</code>에서 11개 explicit variant + 64-bit bitset으로 축소했으며, gRPC deadline·hydration/post-hydration phase 관측을 붙였다. 함께 (a) 미배선 32-way × 64-shard CLOCK 캐시 primitive, (b) Phoenix proto <code>TREND_PAGE</code>/<code>EXPLORE_SPOTLIGHT</code> 지면 상수와 <code>IMMERSIVE_LONG_DWELL</code> action aggregation, (c) two-tower user tower가 padding 위치에 별도 segment ID를 쓰도록 하는 정확성 수정, (d) UTH 국가별 계정 takedown Scalding 배치 잡, (e) grox motion-reveal 이미지 빌더의 ECC + Farneback 정합 정제가 붙었다.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-x--4세대19-2026-09-10-fee1d0f-visibility-filtering-hydration-timeout-통일--authorid-fallback-캐시--authorlabel-bitset--grpc-deadline-관측--clock-cache-primitive--phoenix-proto-신규-상수--two-tower-padding-segment-id--uth-국가별-takedown-배치--grox-motion-reveal-정합-정제">1. X — 4세대+19 (2026-09-10, fee1d0f): visibility-filtering hydration timeout 통일 + AuthorId fallback 캐시 + AuthorLabel bitset + gRPC deadline 관측 + clock-cache primitive + Phoenix proto 신규 상수 + two-tower padding segment ID + UTH 국가별 takedown 배치 + grox motion-reveal 정합 정제</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/fee1d0f">xai-org/x-algorithm@fee1d0f</a> — 공개 소스코드, 2026-09-10, 파일 33개, +1587/−391.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X는 for-you 파이프라인 소스코드를 <a href="https://github.com/xai-org/x-algorithm">xai-org/x-algorithm</a>에 매일 두 번 정도 미러링한다(2026-08-13 4세대 공개 이래). 이번 커밋은 <code>visibility-filtering/</code>(=X의 홈 타임라인 안전 필터 gRPC 서비스, Rust로 재작성된 3세대 스택)에 집중한 중형 diff다. 두 축으로 정리된다.</p></div>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-12">2026-09-12</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>토요일</li>
+<li><span class="meta-k">읽는 시간</span>47분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+19(fee1d0f)가 visibility-filtering의 TES·Gizmoduck Strato timeout을 각각 100/80 ms에서 통합 상수 390 ms로 3~4배 상향하면서 TES 실패 시 tweet→author_id fallback 캐시(기본 1 M entries)로 author-side rules를 살리는 안전망을 넣었고, 규칙 판정 라벨을 <code>HashSet&lt;LabelValue&gt;</code>에서 11개 explicit variant + 64-bit bitset으로 축소했으며, gRPC deadline·hydration/post-hydration phase 관측을 붙였다. 함께 (a) 미배선 32-way × 64-shard CLOCK 캐시 primitive, (b) Phoenix proto <code>TREND_PAGE</code>/<code>EXPLORE_SPOTLIGHT</code> 지면 상수와 <code>IMMERSIVE_LONG_DWELL</code> action aggregation, (c) two-tower user tower가 padding 위치에 별도 segment ID를 쓰도록 하는 정확성 수정, (d) UTH 국가별 계정 takedown Scalding 배치 잡, (e) grox motion-reveal 이미지 빌더의 ECC + Farneback 정합 정제가 붙었다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">3</span></summary><ol><li><a href="#1-x--4세대19-2026-09-10-fee1d0f-visibility-filtering-hydration-timeout-통일--authorid-fallback-캐시--authorlabel-bitset--grpc-deadline-관측--clock-cache-primitive--phoenix-proto-신규-상수--two-tower-padding-segment-id--uth-국가별-takedown-배치--grox-motion-reveal-정합-정제"><span class="num">1</span>X — 4세대+19 (2026-09-10, fee1d0f): visibility-filtering hydration timeout 통일 + AuthorId fallback 캐시 + AuthorLabel bitset + gRPC deadline 관측 + clock-cache primitive + Phoenix proto 신규 상수 + two-tower padding segment ID + UTH 국가별 takedown 배치 + grox motion-reveal 정합 정제</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-x--4세대19-2026-09-10-fee1d0f-visibility-filtering-hydration-timeout-통일--authorid-fallback-캐시--authorlabel-bitset--grpc-deadline-관측--clock-cache-primitive--phoenix-proto-신규-상수--two-tower-padding-segment-id--uth-국가별-takedown-배치--grox-motion-reveal-정합-정제"><span class="num">1</span>X — 4세대+19 (2026-09-10, fee1d0f): visibility-filtering hydration timeout 통일 + AuthorId fallback 캐시 + AuthorLabel bitset + gRPC deadline 관측 + clock-cache primitive + Phoenix proto 신규 상수 + two-tower padding segment ID + UTH 국가별 takedown 배치 + grox motion-reveal 정합 정제</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/fee1d0f" target="_blank" rel="noopener">xai-org/x-algorithm@fee1d0f</a> — 공개 소스코드, 2026-09-10, 파일 33개, +1587/−391.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X는 for-you 파이프라인 소스코드를 <a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a>에 매일 두 번 정도 미러링한다(2026-08-13 4세대 공개 이래). 이번 커밋은 <code>visibility-filtering/</code>(=X의 홈 타임라인 안전 필터 gRPC 서비스, Rust로 재작성된 3세대 스택)에 집중한 중형 diff다. 두 축으로 정리된다.</p></div>
 <p>축 1은 <strong>hydration의 시간 예산과 실패 처리</strong>다. 홈믹서가 후보 리스트를 만들면 visibility-filtering(VF)이 후보마다 tweet 메타데이터를 TES(Tweet Entity Service, X의 tweet 코어 조회 서비스)와 저자 라벨을 Gizmoduck(user profile 서비스)에서 하이드레이트한 뒤 rule engine에 태운다. 이 하이드레이션에 (a) 두 백엔드에 얼마나 기다려 줄지, (b) 실패했을 때 판정을 어디까지 진행할지, (c) 지연이 어디서 소진되는지 세 결정이 얽혀 있다. 이번 커밋은 셋 다 건드렸다.</p>
 <p>축 2는 <strong>모델링 노브의 라벨 감축과 캐시 primitive 준비</strong>다. VF의 <code>AuthorFeatures</code>가 4세대 공개 이래 <code>HashSet&lt;LabelValue&gt;</code>(thrift 정의 라벨 20+ 종을 담는 heap 자료구조)로 저자 라벨을 담아 왔는데, 이번 커밋에서 이걸 <strong>11개 explicit variant를 갖는 <code>AuthorLabel</code> enum + 64-bit bitset</strong>으로 좁혔다. 규칙에서 실제로 참조하는 라벨은 이 11개뿐이라 정답이지만, thrift에서 오는 다른 라벨은 이제 인풋에서 명시적으로 버려지고 카운터에만 잡힌다. 함께 신규 파일 <code>clock_cache.rs</code>(446줄)로 <strong>32-way set-associative × 64-shard CLOCK 캐시 primitive</strong>가 들어왔지만, <code>dead_code</code> 애트리뷰트로 컴파일러 경고를 눌러 둔 것으로 보아 아직 소비자가 없다 — 다음 커밋에서 어느 hydrator가 이걸 소비하는지가 관측 대상이다.</p>
 <p>축 2를 벗어나는 부수 변경도 있다: (i) Phoenix proto가 <code>TREND_PAGE</code>·<code>EXPLORE_SPOTLIGHT</code> 두 지면 상수와 <code>IMMERSIVE_LONG_DWELL</code> action aggregation 상수를 신설했고, (ii) two-tower user tower가 padding 위치에 별도 segment ID를 쓰도록 수정됐으며, (iii) Under-The-Hood(X의 라벨 투명성 툴) 데이터 파이프라인에 국가별 계정 takedown 일일 배치 잡이 새로 붙었고, (iv) grox motion-reveal 이미지 빌더(video → 하이라이트 프레임 생성기)에 ECC affine 정합과 Farneback optical flow refinement 두 단계가 추가됐다.</p>
-<p><strong>A. VF hydration timeout 통일 — Strato per-call caller timeout이 TES 100 ms · Gizmoduck 80 ms → 통합 상수 390 ms로 상향</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/mod.rs"><code>visibility-filtering/hydration/mod.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/server_deps.rs"><code>visibility-filtering/server_deps.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/gizmoduck_hydrator.rs"><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/tes_hydrator.rs"><code>visibility-filtering/hydration/tes_hydrator.rs</code></a>.</p>
+<p><strong>A. VF hydration timeout 통일 — Strato per-call caller timeout이 TES 100 ms · Gizmoduck 80 ms → 통합 상수 390 ms로 상향</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/server_deps.rs" target="_blank" rel="noopener"><code>visibility-filtering/server_deps.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/gizmoduck_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/tes_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/tes_hydrator.rs</code></a>.</p>
 <p><code>visibility-filtering/hydration/mod.rs</code>에 새 crate-내 상수가 추가됐다:</p>
-<pre><code class="language-rust">pub(crate) const HYDRATION_TIMEOUT: Duration = Duration::from_millis(390);
-</code></pre>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) const HYDRATION_TIMEOUT: Duration = Duration::from_millis(390);
+</code></pre></figure>
 <p>이 상수가 두 층에서 소비된다. <strong>첫째, hydrator 층</strong>의 <code>CLIENT_TIMEOUT</code>이 이전엔 TES·Gizmoduck 각각 로컬 상수 150 ms였는데(4세대 공개 이래 계속), 이번 커밋에서 둘 다 <code>crate::hydration::HYDRATION_TIMEOUT</code>을 참조하도록 바뀌었다.</p>
-<p><strong>둘째, Strato(X 사내 gRPC 프록시) 클라이언트 층</strong>의 timeout 상수가 이전엔 TES 100 ms(<code>TES_STRATO_REQUEST_TIMEOUT_MS: u64 = 100</code>)와 Gizmoduck 80 ms(<code>GIZMODUCK_STRATO_REQUEST_TIMEOUT_MS: u64 = 80</code>)로 각각 하드코딩되어 있었는데, 이번 커밋에서 둘 다 <code>HYDRATION_TIMEOUT.as_millis() as u64</code>로 바뀌었다. 즉 Strato caller가 실제로 기다리는 timeout이 두 서비스에 대해 <strong>3.9배, 4.9배 늘어났다</strong> — VF 서비스가 하이드레이션에 훨씬 더 넉넉한 지연 예산을 쓰겠다는 결정이다. 4세대+7(<code>reference_compare.rs</code>, 2026-08-24)이 도입한 verdict 대조 canary에서 timeout으로 인한 disagreement가 관측됐을 가능성이 있고 <code>[추정]</code>, 이번 상향이 그 대응으로 읽힌다.</p>
-<p><strong>B. TES 실패 시 AuthorId fallback 캐시 — 기본 활성, 1 M entries</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/tes_hydrator.rs"><code>visibility-filtering/hydration/tes_hydrator.rs</code></a> (+234/−42), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/mod.rs"><code>visibility-filtering/models/mod.rs</code></a> (+49/−9), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/config.rs"><code>visibility-filtering/config.rs</code></a> (+14).</p>
+<p><strong>둘째, Strato(X 사내 gRPC 프록시) 클라이언트 층</strong>의 timeout 상수가 이전엔 TES 100 ms(<code>TES_STRATO_REQUEST_TIMEOUT_MS: u64 = 100</code>)와 Gizmoduck 80 ms(<code>GIZMODUCK_STRATO_REQUEST_TIMEOUT_MS: u64 = 80</code>)로 각각 하드코딩되어 있었는데, 이번 커밋에서 둘 다 <code>HYDRATION_TIMEOUT.as_millis() as u64</code>로 바뀌었다. 즉 Strato caller가 실제로 기다리는 timeout이 두 서비스에 대해 <strong>3.9배, 4.9배 늘어났다</strong> — VF 서비스가 하이드레이션에 훨씬 더 넉넉한 지연 예산을 쓰겠다는 결정이다. 4세대+7(<code>reference_compare.rs</code>, 2026-08-24)이 도입한 verdict 대조 canary에서 timeout으로 인한 disagreement가 관측됐을 가능성이 있고 <span class="badge est">추정</span>, 이번 상향이 그 대응으로 읽힌다.</p>
+<p><strong>B. TES 실패 시 AuthorId fallback 캐시 — 기본 활성, 1 M entries</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/tes_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/tes_hydrator.rs</code></a> (+234/−42), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/mod.rs</code></a> (+49/−9), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/config.rs" target="_blank" rel="noopener"><code>visibility-filtering/config.rs</code></a> (+14).</p>
 <p>TES가 tweet 하나를 조회할 때 결과는 세 갈래다: <code>Found(core_data)</code>, <code>NotFound</code>, <code>Failed(error)</code>. 이전 코드는 <code>Found</code>가 아니면 그 tweet의 <code>PureCoreData</code>가 없어서 <code>resolve_candidate</code>가 <code>raw.request_author_id</code>(홈믹서가 요청에 실어 준 저자 id, 없을 수도 있음)를 못 찾으면 아예 candidate 리스트에서 빠져 판정 자체를 skip했다. 이번 커밋은 이걸 캐시 폴백으로 보강한다.</p>
 <p><code>TesHydrator</code>에 새 필드가 붙는다:</p>
-<pre><code class="language-rust">pub(crate) type AuthorIdFallbackCache = FallbackCache&lt;TweetId, u64&gt;;
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) type AuthorIdFallbackCache = FallbackCache&lt;TweetId, u64&gt;;
 
 pub struct TesHydrator {
     pub tes_client: Arc&lt;dyn TESClient + Send + Sync&gt;,
     author_id_cache: Option&lt;AuthorIdFallbackCache&gt;,
 }
-</code></pre>
+</code></pre></figure>
 <p><code>fetch_pure_core</code>가 이제 <code>HashMap&lt;TweetId, PureCoreData&gt;</code> 대신 다음을 리턴한다:</p>
-<pre><code class="language-rust">pub(crate) struct PureCoreHydration {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) struct PureCoreHydration {
     pub(crate) core: HashMap&lt;TweetId, PureCoreData&gt;,
     pub(crate) recovered_authors: HashMap&lt;TweetId, u64&gt;,
 }
-</code></pre>
+</code></pre></figure>
 <p><code>Found</code>면 (tweet_id, author_id)를 캐시에 기록하고 core도 채운다. <code>NotFound</code>·<code>Failed</code>면 캐시에서 이 tweet의 이전 author_id를 조회한다. <code>resolve_candidate</code>가 이 결과를 소비할 때 우선순위는 다음이다:</p>
-<pre><code class="language-rust">let author = raw
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let author = raw
     .request_author_id
     .or_else(|| core.get(&amp;raw.tweet_id).map(|c| c.author_id))
     .or_else(|| recovered_authors.get(&amp;raw.tweet_id).copied())?;
-</code></pre>
+</code></pre></figure>
 <p>즉 요청이 저자 id를 직접 실어 주면 그것을 쓰고, 아니면 TES core가 있으면 거기서 뽑고, 그것도 없으면 캐시 폴백을 쓴다. 이 세 갈래를 다 뚫으면 그 후보는 판정 스킵.</p>
 <p><strong>결과의 의미: TES가 죽었거나 응답이 없어도 이 tweet의 이전 author_id가 캐시에 있으면 author-side rules는 여전히 판정된다.</strong> author-side rules는 유저의 계정 상태(suspended/deactivated/protected/erased/offboarded)와 저자 user_labels 11종(아래 C 참조)이다. tweet-side rules(nullcast, community-only, NSFW media, takedown reason, exclusive content, edit control)는 TES core 없이는 판정할 수 없으므로 여전히 skip된다.</p>
 <p>새 환경변수 두 개가 설정을 노출한다:</p>
-<pre><code class="language-rust">pub(crate) fn author_id_fallback_enabled() -&gt; bool {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn author_id_fallback_enabled() -&gt; bool {
     std::env::var(&quot;VF_AUTHOR_ID_FALLBACK_ENABLED&quot;)
         .ok()
         .is_none_or(|value| parse_env_flag(Some(&amp;value)))
@@ -258,10 +100,10 @@ pub(crate) fn author_id_fallback_capacity() -&gt; usize {
         .filter(|capacity| *capacity &gt; 0)
         .unwrap_or(1_000_000)
 }
-</code></pre>
+</code></pre></figure>
 <p><code>is_none_or</code> 사용에 주목 — <strong>환경변수가 세팅되지 않았을 때 활성이 기본</strong>이다(값이 있으면 그 값을 파싱). 즉 프로덕션 배포에서 opt-out으로만 끌 수 있고, 배포 순간부터 켜져 있다.</p>
 <p><code>server_deps.rs</code>가 이 두 노브를 초기화 시 <code>info!</code> 필드로 남긴다:</p>
-<pre><code class="language-rust">info!(
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">info!(
     hydrator_count = 5,
     fallback_cache_enabled,
     author_id_fallback_enabled,
@@ -270,12 +112,12 @@ pub(crate) fn author_id_fallback_capacity() -&gt; usize {
     recommendations_rule_count,
     &quot;VFServer initialized with prod clients&quot;
 );
-</code></pre>
+</code></pre></figure>
 <p>이 로그는 부팅 로그에 지표별로 잡혀 있어서, 실제 프로덕션 값이 다르면 즉시 감지된다.</p>
 <div class="blk why"><p><span class="lbl">의미 (A + B)</span> — A와 B는 사실상 한 프로젝트다. A가 timeout을 3~4배 늘려서 하이드레이션이 더 오래 걸리게 허용하는 대신, B가 여전히 실패할 경우의 자동 폴백 경로를 만든 것이다. 4세대+9(2026-08-26)의 &quot;TesHydrator media fallback cache 통째 제거&quot; 관측을 뒤집는 방향은 아니다 — media fallback은 TES가 반환한 media 정보를 캐싱해 재사용하는 것이었고, 이번 author-id fallback은 TES가 응답을 못 준 tweet에 대해서만 이전 값을 되살려 author-side rules만 부분 판정한다. 즉 <strong>결과의 재사용이 아니라 부분 판정의 부활</strong>이다. 4세대+15(2026-09-04)의 VF hydration 대규모 단순화(800+ 줄 순 감소)로 코드가 얇아진 뒤에 남은 강건성 gap을 좁힌 것으로 읽힌다.</p></div>
-<p><strong>C. AuthorLabel — 11개 explicit variant + 64-bit bitset (기존 <code>HashSet&lt;LabelValue&gt;</code> 축출)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/author.rs"><code>visibility-filtering/models/author.rs</code></a> (+49/−13), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/gizmoduck_hydrator.rs"><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/author_rules.rs"><code>visibility-filtering/rules/author_rules.rs</code></a> (+30/−27), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/context.rs"><code>visibility-filtering/rules/context.rs</code></a>.</p>
+<p><strong>C. AuthorLabel — 11개 explicit variant + 64-bit bitset (기존 <code>HashSet&lt;LabelValue&gt;</code> 축출)</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/author.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/author.rs</code></a> (+49/−13), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/gizmoduck_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/author_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/author_rules.rs</code></a> (+30/−27), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/context.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/context.rs</code></a>.</p>
 <p><code>models/author.rs</code> 전면 재작성. 이전은 이랬다:</p>
-<pre><code class="language-rust">use std::collections::HashSet;
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">use std::collections::HashSet;
 use xai_x_thrift::user_labels::LabelValue;
 
 #[derive(Clone, Debug, Default)]
@@ -289,9 +131,9 @@ pub struct AuthorFeatures {
 pub struct UserLabelSet {
     labels: HashSet&lt;LabelValue&gt;,
 }
-</code></pre>
+</code></pre></figure>
 <p>새 정의는 이렇다:</p>
-<pre><code class="language-rust">#[derive(Clone, Copy, Debug, Default)]
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[derive(Clone, Copy, Debug, Default)]
 pub struct AuthorFeatures {
     pub is_suspended: bool,
     // ...
@@ -316,15 +158,15 @@ pub enum AuthorLabel {
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct AuthorLabelSet(u64);
-</code></pre>
+</code></pre></figure>
 <p><code>AuthorLabelSet(u64)</code>는 11 variant를 각 비트에 매핑한 정수 하나다. Insert·has는 shift + AND. 새 assert 두 개가 크기를 잠근다:</p>
-<pre><code class="language-rust">assert_copy::&lt;AuthorFeatures&gt;();
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">assert_copy::&lt;AuthorFeatures&gt;();
 assert_eq!(std::mem::size_of::&lt;AuthorFeatures&gt;(), 16);
 assert_eq!(std::mem::size_of::&lt;Option&lt;AuthorFeatures&gt;&gt;(), 16);
-</code></pre>
+</code></pre></figure>
 <p>정확히 <strong>16 바이트</strong>, <code>Option&lt;AuthorFeatures&gt;</code>도 16 바이트(bool 필드 하나가 <code>Option</code> niche로 활용). 이전 <code>HashSet&lt;LabelValue&gt;</code> 시절은 heap 할당 + hash bucket을 매번 잡아야 했다.</p>
 <p>Gizmoduck 하이드레이터의 라벨 매핑이 명시적 함수 하나로 축약된다:</p>
-<pre><code class="language-rust">fn author_label(value: LabelValue) -&gt; Option&lt;AuthorLabel&gt; {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn author_label(value: LabelValue) -&gt; Option&lt;AuthorLabel&gt; {
     match value {
         LabelValue::NSFW_HIGH_RECALL =&gt; Some(AuthorLabel::NsfwHighRecall),
         LabelValue::NSFW_HIGH_PRECISION =&gt; Some(AuthorLabel::NsfwHighPrecision),
@@ -340,19 +182,19 @@ assert_eq!(std::mem::size_of::&lt;Option&lt;AuthorFeatures&gt;&gt;(), 16);
         _ =&gt; None,
     }
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 thrift에서 오는 <code>LabelValue</code>(20+ 종의 enum) 각각이 이 매핑을 태워 <code>Option&lt;AuthorLabel&gt;</code>로 좁혀지고, <code>None</code>이면 카운트만 올라간다.</p>
 <p>새 메트릭 <code>vf_author_labels{result=&quot;mapped&quot;|&quot;unmapped&quot;}</code>. 계약이 어긋나지 않게 컴파일 시 강제하는 테스트도 있다:</p>
-<pre><code class="language-rust">#[test]
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[test]
 fn dashboard_generator_pins_the_author_labels_metric_name() {
     // ... asserts dashboard.py contains AUTHOR_LABELS_METRIC = &quot;vf_author_labels&quot;
 }
-</code></pre>
+</code></pre></figure>
 <p>이 11개는 4세대+13(7ba7768, 2026-09-01)에서 정본화된 <code>OON_USER_LABEL_DROPS</code> 규칙 11개와 정확히 1:1이다. 즉 <strong>규칙에서 실제로 참조되는 라벨만 남기고 나머지는 인풋에서 제거</strong>한 것이다.</p>
-<p>⚠ <strong>정본에 대한 재확인</strong> — services/x.md의 안전 파이프라인 라벨 목록은 이전에도 이 11개를 정본화하고 있었다. 이번 커밋이 하는 일은 그 사실을 <strong>자료구조로 잠근 것</strong>이지 새 라벨을 추가한 것이 아니다. 다만 thrift에 정의된 다른 <code>LabelValue</code>(예: <code>NSFW_TEXT_HIGH_PRECISION</code>, <code>NSFW_TEXT_HIGH_RECALL</code>, <code>NSFW_NEW_USER</code> 등)가 hydrator 층에서 명시적으로 dropped된다는 사실은 이 커밋으로 처음 확인된다.</p>
-<p><strong>D. gRPC deadline 관측 (<code>filter_tweets_deadline{outcome=within|overrun|absent}</code>) + hydration/post_hydration 두 phase 분해</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/filter_tweets.rs"><code>visibility-filtering/filter_tweets.rs</code></a> (+42), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/filter.rs"><code>visibility-filtering/filter.rs</code></a> (+6/−1), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/metrics.rs"><code>visibility-filtering/rules/metrics.rs</code></a>.</p>
+<p class="warn">⚠ <strong>정본에 대한 재확인</strong> — services/x.md의 안전 파이프라인 라벨 목록은 이전에도 이 11개를 정본화하고 있었다. 이번 커밋이 하는 일은 그 사실을 <strong>자료구조로 잠근 것</strong>이지 새 라벨을 추가한 것이 아니다. 다만 thrift에 정의된 다른 <code>LabelValue</code>(예: <code>NSFW_TEXT_HIGH_PRECISION</code>, <code>NSFW_TEXT_HIGH_RECALL</code>, <code>NSFW_NEW_USER</code> 등)가 hydrator 층에서 명시적으로 dropped된다는 사실은 이 커밋으로 처음 확인된다.</p>
+<p><strong>D. gRPC deadline 관측 (<code>filter_tweets_deadline{outcome=within|overrun|absent}</code>) + hydration/post_hydration 두 phase 분해</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/filter_tweets.rs" target="_blank" rel="noopener"><code>visibility-filtering/filter_tweets.rs</code></a> (+42), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/filter.rs" target="_blank" rel="noopener"><code>visibility-filtering/filter.rs</code></a> (+6/−1), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/metrics.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/metrics.rs</code></a>.</p>
 <p><code>filter_tweets.rs::FilterTweetsEndpoint::filter_tweets</code>가 요청 metadata의 gRPC 표준 <code>grpc-timeout</code> 헤더를 파싱한다:</p>
-<pre><code class="language-rust">fn parse_grpc_timeout(metadata: &amp;MetadataMap) -&gt; Option&lt;Duration&gt; {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn parse_grpc_timeout(metadata: &amp;MetadataMap) -&gt; Option&lt;Duration&gt; {
     let raw = metadata.get(&quot;grpc-timeout&quot;)?.to_str().ok()?;
     let (digits, unit) = raw.split_at(raw.len().checked_sub(1)?);
     if digits.is_empty() || digits.len() &gt; 8 || !digits.bytes().all(|b| b.is_ascii_digit()) {
@@ -370,10 +212,10 @@ fn dashboard_generator_pins_the_author_labels_metric_name() {
     };
     Some(Duration::from_nanos(value.checked_mul(nanos_per_unit)?))
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 gRPC 스펙의 단위 접미사 <code>H/M/S/m/u/n</code>(시·분·초·밀리·마이크로·나노)을 지원하고 digits ≤ 8자리여야 하며 그 밖의 형식은 <code>None</code>.</p>
 <p>성공 응답 시점에 <code>RequestMetricsGuard::record_deadline(grpc_timeout)</code>이 호출된다:</p>
-<pre><code class="language-rust">pub(crate) fn record_deadline(&amp;self, grpc_timeout: Option&lt;Duration&gt;) {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn record_deadline(&amp;self, grpc_timeout: Option&lt;Duration&gt;) {
     let Some(deadline) = grpc_timeout else {
         incr(DEADLINE, &amp;[(&quot;outcome&quot;, &quot;absent&quot;)], 1);
         return;
@@ -387,25 +229,25 @@ fn dashboard_generator_pins_the_author_labels_metric_name() {
         observe_vm(DEADLINE_OVERRUN_MS, &amp;[], millis(elapsed - deadline));
     }
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 세 카운터 <code>filter_tweets_deadline{outcome=within|overrun|absent}</code>와 두 히스토그램 <code>filter_tweets_deadline_remaining_ms</code> / <code>filter_tweets_deadline_overrun_ms</code>. <strong>VF가 호출자(홈믹서)가 준 데드라인 대비 자기 지연이 얼마나 여유가 있었는지·초과했는지·측정 불가였는지를 처음으로 관측</strong>한다.</p>
 <p><code>filter.rs::FilterTweets::run</code>이 시간을 두 phase로 분해한다:</p>
-<pre><code class="language-rust">let started = Instant::now();
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let started = Instant::now();
 let hydration = self.hydration_pipeline.hydrate(...).await;
 let hydrated_at = Instant::now();
 ft_metrics::record_phase(&quot;hydration&quot;, hydrated_at - started);
 // ... rule engine
 ft_metrics::record_phase(&quot;post_hydration&quot;, hydrated_at.elapsed());
-</code></pre>
+</code></pre></figure>
 <p>새 히스토그램 <code>filter_tweets_phase_ms{stage=&quot;hydration&quot;|&quot;post_hydration&quot;}</code>. 즉 요청 총지연이 하이드레이션과 rule engine에 어떻게 배분되는지도 처음 관측 가능.</p>
 <div class="blk why"><p><span class="lbl">의미 (D)</span> — A에서 timeout이 늘어난 것과 이 관측 추가는 함께 배포되는 것이 자연스럽다: <strong>timeout을 늘렸으면 실제로 얼마나 늘어났는지 봐야 하고, 그 지연이 어느 phase에서 소진되는지 알아야 한다</strong>. 홈믹서 → VF 호출은 홈믹서가 요청에 gRPC 표준 <code>grpc-timeout</code> 헤더를 실어 주는 지금까지 관례가 이번에 처음 코드에서 확인된다(이전 커밋에서는 timeout이 caller-side에서만 시행되고 VF 서비스는 그 값을 읽지 않았다).</p></div>
-<p><strong>E. <code>clock_cache.rs</code> — 32-way set-associative × 64-shard CLOCK 캐시 primitive 신설, 아직 배선 없음</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/clock_cache.rs"><code>visibility-filtering/clock_cache.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/lib.rs"><code>visibility-filtering/lib.rs</code></a>.</p>
+<p><strong>E. <code>clock_cache.rs</code> — 32-way set-associative × 64-shard CLOCK 캐시 primitive 신설, 아직 배선 없음</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/clock_cache.rs" target="_blank" rel="noopener"><code>visibility-filtering/clock_cache.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/lib.rs" target="_blank" rel="noopener"><code>visibility-filtering/lib.rs</code></a>.</p>
 <p><code>visibility-filtering/clock_cache.rs</code> 신규 파일 446줄, <code>visibility-filtering/lib.rs</code>에 <code>pub(crate) mod clock_cache;</code> 한 줄 등록. 파일 상단이 이렇게 열린다:</p>
-<pre><code class="language-rust">#![cfg_attr(not(test), expect(dead_code, reason = &quot;TODO: no consumer wired yet&quot;))]
-</code></pre>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#![cfg_attr(not(test), expect(dead_code, reason = &quot;TODO: no consumer wired yet&quot;))]
+</code></pre></figure>
 <p>즉 컴파일러에게 &quot;테스트가 아닌 빌드에서는 이 모듈이 죽어 있는 것을 알고 있다, 경고 내지 마라, 사유는 아직 소비자가 붙지 않았기 때문이다&quot;라고 명시. 이번 커밋에서 이 파일을 참조하는 코드는 없다.</p>
 <p>내용은 다음과 같다.</p>
-<pre><code class="language-rust">const WAYS: usize = 32;
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const WAYS: usize = 32;
 const SHARDS: usize = 64;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -416,7 +258,7 @@ pub(crate) enum Lookup&lt;V&gt; {
 }
 
 pub(crate) struct ClockCache&lt;V&gt; { /* shards, set_count, next_generation */ }
-</code></pre>
+</code></pre></figure>
 <p>용량 <code>capacity</code>를 인자로 받아 <code>set_count = capacity / WAYS</code>개 set을 만들고 64개 shard로 분산. shard 하나가 여러 set을 가지고, set 하나가 32개 slot(way)을 가진다. Slot에 저장하는 값은 <code>(key: u64, generation: u64, value: Option&lt;V&gt;)</code> 튜플.</p>
 <p>CLOCK 알고리즘은 이렇게 돈다:</p>
 <ul>
@@ -425,7 +267,7 @@ pub(crate) struct ClockCache&lt;V&gt; { /* shards, set_count, next_generation */
 <li><strong>Generation</strong>: 요청마다 <code>begin_request() -&gt; u64</code>가 monotonic 값을 부여한다. 나중에 오는 요청이 오래된 캐시 값을 덮어쓸 수 있는지를 이 값으로 판정.</li>
 </ul>
 <p>기존 <code>FallbackCache</code>(4세대에서 정본화된 <code>hydration/fallback_cache.rs</code>, 뮤텍스 하나로 보호되는 <code>moka::sync::Cache</code> 기반 TinyLFU)와는 별개의 primitive다. 차이의 핵심:</p>
-<table>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table>
 <thead>
 <tr>
 <th>축</th>
@@ -458,11 +300,11 @@ pub(crate) struct ClockCache&lt;V&gt; { /* shards, set_count, next_generation */
 <td>한 mutex에 병목 가능</td>
 <td>64-way sharding으로 대부분 non-blocking</td>
 </tr>
-</tbody></table>
+</tbody></table></div>
 <p>즉 <strong>write throughput과 lock contention에 훨씬 강한 새 hot-path 캐시</strong>로 읽힌다. 다음 커밋에서 어느 hydrator(TES author_id? Gizmoduck AuthorFeatures? SafetyLabel expiring cache?)의 백엔드로 배선되는지가 주요 관측 대상.</p>
-<p><strong>F. Phoenix proto — <code>ProductSurface</code> 두 개 신규(<code>TREND_PAGE=16</code>, <code>EXPLORE_SPOTLIGHT=17</code>) + <code>UserActionAggregationType::IMMERSIVE_LONG_DWELL=29</code></strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/python/common/xai-proto/proto/recsys.proto"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>.</p>
+<p><strong>F. Phoenix proto — <code>ProductSurface</code> 두 개 신규(<code>TREND_PAGE=16</code>, <code>EXPLORE_SPOTLIGHT=17</code>) + <code>UserActionAggregationType::IMMERSIVE_LONG_DWELL=29</code></strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>.</p>
 <p>Phoenix ranking wire proto의 <code>ProductSurface</code> enum이 이렇게 바뀌었다:</p>
-<pre><code class="language-protobuf">enum ProductSurface {
+<figure class="highlight"><pre tabindex="0"><code class="language-protobuf" data-lang="protobuf">enum ProductSurface {
   // ... 1-15 as before
   PRODUCT_SURFACE_HOME_TIMELINE_RANKED_FOLLOWING = 15;
   PRODUCT_SURFACE_TREND_PAGE = 16;
@@ -471,10 +313,10 @@ pub(crate) struct ClockCache&lt;V&gt; { /* shards, set_count, next_generation */
   PRODUCT_SURFACE_PLACE_HOLDER_19 = 19;
   PRODUCT_SURFACE_PLACE_HOLDER_20 = 20;
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 16·17번이 각각 <strong>Trend 지면</strong>과 <strong>Explore Spotlight 지면</strong>의 이름을 얻었다(이전은 <code>PLACEHOLDER_16</code>·<code>PLACEHOLDER_17</code>). 4세대+3에서 정본화된 15개 상수 뒤에 두 지면이 추가된 것이다. 실제 홈믹서 배선은 아직 없어서, 이 두 상수를 Phoenix에 태워 랭킹시키는 코드는 이번 커밋에 등장하지 않는다 — proto 슬롯이 준비됐다는 신호에 그친다.</p>
 <p><code>UserActionAggregationType</code>은 이렇게 바뀌었다:</p>
-<pre><code class="language-protobuf">enum UserActionAggregationType {
+<figure class="highlight"><pre tabindex="0"><code class="language-protobuf" data-lang="protobuf">enum UserActionAggregationType {
   // ...
   IMMERSIVE = 26;
   ADS_CHAD_WITH_CONV_TYPES = 27;
@@ -483,18 +325,18 @@ pub(crate) struct ClockCache&lt;V&gt; { /* shards, set_count, next_generation */
   PLACEHOLDER_30 = 30;
   // ...
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 이전 <code>PLACEHOLDER_29</code>가 <code>IMMERSIVE_LONG_DWELL = 29</code>로 이름을 얻었다. 기존 <code>IMMERSIVE = 26</code>(immersive 지면에서의 상호작용 시퀀스 aggregation)과 별개로 <strong>긴 dwell 시간을 갖는 immersive 상호작용</strong>을 별도 aggregation 유형으로 분리할 수 있게 됐다. 어떤 학습 config가 이 새 aggregation을 소비하는지는 이번 커밋에 없음.</p>
-<p><strong>G. Two-tower user tower — padding 위치에 <code>PADDING_SEGMENT_ID</code>, 실제 history 위치에 <code>HISTORY_SEGMENT_ID</code> (기존 all-zero → mask 반영)</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/xrex/models/recsys_two_tower_model.py"><code>phoenix/xrex/models/recsys_two_tower_model.py</code></a> (+15/−4).</p>
+<p><strong>G. Two-tower user tower — padding 위치에 <code>PADDING_SEGMENT_ID</code>, 실제 history 위치에 <code>HISTORY_SEGMENT_ID</code> (기존 all-zero → mask 반영)</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/xrex/models/recsys_two_tower_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_two_tower_model.py</code></a> (+15/−4).</p>
 <p><code>user_tower_segment_ids</code> 함수가 이렇게 바뀌었다.</p>
 <p>이전:</p>
-<pre><code class="language-python">def user_tower_segment_ids(batch: int, seq_len: int, *, use_history_segment_ids: bool) -&gt; jax.Array:
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def user_tower_segment_ids(batch: int, seq_len: int, *, use_history_segment_ids: bool) -&gt; jax.Array:
     if use_history_segment_ids:
         return jnp.full((batch, seq_len), HISTORY_SEGMENT_ID, dtype=jnp.int32)
     return jnp.zeros((batch, seq_len), dtype=jnp.int32)
-</code></pre>
+</code></pre></figure>
 <p>이후:</p>
-<pre><code class="language-python">def user_tower_segment_ids(
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def user_tower_segment_ids(
     batch: int,
     seq_len: int,
     *,
@@ -506,43 +348,43 @@ pub(crate) struct ClockCache&lt;V&gt; { /* shards, set_count, next_generation */
     if padding_mask is None:
         return jnp.zeros((batch, seq_len), dtype=jnp.int32)
     return jnp.where(padding_mask, HISTORY_SEGMENT_ID, PADDING_SEGMENT_ID).astype(jnp.int32)
-</code></pre>
+</code></pre></figure>
 <p>호출부에서:</p>
-<pre><code class="language-python">user_segment_ids = user_tower_segment_ids(
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">user_segment_ids = user_tower_segment_ids(
     B, T,
     use_history_segment_ids=self.config.use_history_segment_ids,
     padding_mask=user_padding_mask,
 )
-</code></pre>
+</code></pre></figure>
 <p>이전 로직은 두 갈래였다 — (a) <code>use_history_segment_ids=True</code>면 배열 전체를 <code>HISTORY_SEGMENT_ID</code>로 채우고(padding까지 history와 같은 segment로 취급, 부정확), (b) <code>False</code>면 <code>jnp.zeros</code>(모든 위치를 0으로 취급, RoPE·attention bias가 padding 위치에서도 계산됨). 새 로직은 padding_mask가 넘어오면 mask 값에 따라 <code>HISTORY_SEGMENT_ID</code>와 <code>PADDING_SEGMENT_ID</code>를 섞는다.</p>
 <p>즉 <strong>user tower의 attention·RoPE·attention bias가 이제 padding 위치에서 실제 history와 구분되어 계산</strong>된다. 4세대+15(2026-09-04, 902a06f)에서 정본화된 &quot;FA4 attention 커널 가변길이 히스토리 원생 지원&quot;과 결이 같은 정확성 보완이다.</p>
-<p><strong>H. Home-mixer — 광고 injection 로그에 <code>ads_blender</code> 필드 명시화</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/home-mixer/side_effects/ads_injection_logging_side_effect.rs"><code>home-mixer/side_effects/ads_injection_logging_side_effect.rs</code></a> (+5/−1).</p>
+<p><strong>H. Home-mixer — 광고 injection 로그에 <code>ads_blender</code> 필드 명시화</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/home-mixer/side_effects/ads_injection_logging_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/ads_injection_logging_side_effect.rs</code></a> (+5/−1).</p>
 <p>diff는 짧다:</p>
-<pre><code class="language-rust">ads_blender: match query.request_type {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">ads_blender: match query.request_type {
     RequestType::Following =&gt; &quot;following&quot;.to_string(),
     _ =&gt; query.params.get(AdsBlenderType),
 },
-</code></pre>
+</code></pre></figure>
 <p>즉 광고 injection 로그 payload에 <code>ads_blender</code> 필드가 새로 붙는다. <code>RequestType::Following</code>이면 하드코딩된 <code>&quot;following&quot;</code>을 쓰고, 그 밖의 지면에서만 <code>AdsBlenderType</code> feature-switch param을 조회한다.</p>
-<p>4세대+10(2026-08-28, 24c6094)이 도입한 다섯 광고 블렌더(<code>safe_gap</code>·<code>partition_organic</code>·<code>partition_organic_low_risk</code>·<code>time_gap</code>·<code>multi_risk</code>)에 이어 팔로잉 지면의 별도 블렌더 라벨 <code>&quot;following&quot;</code>이 로깅 축에 정식 편입한다. 여섯 번째 블렌더인지, 아니면 팔로잉 지면은 다섯 블렌더 밖에서 별도 파이프라인을 타므로 로깅에만 라벨이 잡히는 것인지는 이번 diff만으로는 확정할 수 없다 <code>[추정]</code> — 후자가 코드 흐름과 더 어울린다(param 조회를 아예 건너뛴다는 것이 서로 다른 파이프라인이라는 신호로 읽힌다).</p>
-<p><strong>I. Under-The-Hood — 국가별 계정 takedown 일일 배치 잡 신설 (<code>UthPctdAccountTakedownEventsJob</code>) + UTH 라벨 aggregate에 <code>countryCodes</code> 필드</strong> <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/under-the-hood/scalding/UthPctdAccountTakedownEventsJob.scala"><code>under-the-hood/scalding/UthPctdAccountTakedownEventsJob.scala</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/under-the-hood/thrift/uth_serving.thrift"><code>under-the-hood/thrift/uth_serving.thrift</code></a>.</p>
-<p><code>under-the-hood/</code>는 X가 <a href="https://x.com/i/under_the_hood">x.com/i/under_the_hood</a>로 노출하는 유저 개인 계정·포스트 라벨 투명성 툴의 백엔드다. 신규 배치 잡 143줄이 붙는다. 흐름은 다음과 같다.</p>
+<p>4세대+10(2026-08-28, 24c6094)이 도입한 다섯 광고 블렌더(<code>safe_gap</code>·<code>partition_organic</code>·<code>partition_organic_low_risk</code>·<code>time_gap</code>·<code>multi_risk</code>)에 이어 팔로잉 지면의 별도 블렌더 라벨 <code>&quot;following&quot;</code>이 로깅 축에 정식 편입한다. 여섯 번째 블렌더인지, 아니면 팔로잉 지면은 다섯 블렌더 밖에서 별도 파이프라인을 타므로 로깅에만 라벨이 잡히는 것인지는 이번 diff만으로는 확정할 수 없다 <span class="badge est">추정</span> — 후자가 코드 흐름과 더 어울린다(param 조회를 아예 건너뛴다는 것이 서로 다른 파이프라인이라는 신호로 읽힌다).</p>
+<p><strong>I. Under-The-Hood — 국가별 계정 takedown 일일 배치 잡 신설 (<code>UthPctdAccountTakedownEventsJob</code>) + UTH 라벨 aggregate에 <code>countryCodes</code> 필드</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/under-the-hood/scalding/UthPctdAccountTakedownEventsJob.scala" target="_blank" rel="noopener"><code>under-the-hood/scalding/UthPctdAccountTakedownEventsJob.scala</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/under-the-hood/thrift/uth_serving.thrift" target="_blank" rel="noopener"><code>under-the-hood/thrift/uth_serving.thrift</code></a>.</p>
+<p><code>under-the-hood/</code>는 X가 <a href="https://x.com/i/under_the_hood" target="_blank" rel="noopener">x.com/i/under_the_hood</a>로 노출하는 유저 개인 계정·포스트 라벨 투명성 툴의 백엔드다. 신규 배치 잡 143줄이 붙는다. 흐름은 다음과 같다.</p>
 <p>두 소스를 조인한다:</p>
 <ul>
 <li><code>AuditServicePctdActionsScalaDataset</code> — PCTD(post·content takedown) action 로그. <code>.filter { a =&gt; a.type == PctdActionType.User &amp;&amp; a.takendown &amp;&amp; a.countryCode.nonEmpty }</code>로 계정 유형 · takendown 성공 · country 있는 것만 남긴다.</li>
 <li><code>UsersourceScalaDataset</code> — user 스냅샷의 <code>user.takedowns.takedownCountryReasons</code>. <code>TakedownReason::LegalRequest → &quot;LEGAL_REQUEST&quot;</code>, <code>BystanderReport → &quot;BYSTANDER_REPORT&quot;</code>, <code>Dmca → &quot;DMCA&quot;</code>(country는 <code>&quot;xy&quot;</code>로 하드코딩, 국가 정보 없음), <code>UnspecifiedReason → &quot;UNSPECIFIED&quot;</code>.</li>
 </ul>
 <p>같은 (userId, country)에 여러 reason이 잡히면 우선순위 값이 낮은 것을 남긴다:</p>
-<pre><code class="language-scala">private val ReasonPriority = Map(
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">private val ReasonPriority = Map(
   &quot;LEGAL_REQUEST&quot; -&gt; 0,
   &quot;BYSTANDER_REPORT&quot; -&gt; 1,
   &quot;DMCA&quot; -&gt; 2,
   &quot;UNSPECIFIED&quot; -&gt; 3
 )
-</code></pre>
+</code></pre></figure>
 <p>결과를 <code>daily_account_takedowns/YYYY/MM/DD</code> 파티션 파케이에 <code>UthAccountTakedownEvent(userId, day, reason, country)</code>로 쓴다. Cross-DC 스냅샷 접근(<code>AllowCrossDC</code>) 허용, 기본 reducers 50, 기본 usersourceSnapshotMaxAgeDays 10, 테스트 유저 필터(<code>TestUserFilter.isTestUserId</code>)로 test 계정 배제.</p>
 <p>동시에 <code>uth_serving.thrift</code>에서 두 스트럭트가 국가 필드를 얻는다:</p>
-<pre><code class="language-thrift">struct UthPostLabelAggregate {
+<figure class="highlight"><pre tabindex="0"><code class="language-thrift" data-lang="thrift">struct UthPostLabelAggregate {
   1: optional string label (personalDataType = &#39;TweetSafetyLabels&#39;)
   2: optional list&lt;UthDayCarriedRemoved&gt; days
   3: optional list&lt;string&gt; countryCodes  // NEW
@@ -553,108 +395,51 @@ struct UthAccountLabelAggregate {
   2: optional list&lt;i32&gt; activeDays
   3: optional list&lt;string&gt; countryCodes  // NEW
 }
-</code></pre>
+</code></pre></figure>
 <p>즉 <strong>UTH 투명성 툴이 이제 (a) 매일 계정별로 어느 나라에서 언제 어떤 reason으로 takedown되었는지의 이벤트 로그를 자체 데이터셋으로 갖게 되고, (b) label aggregate에 국가 코드 리스트를 노출할 준비가 됐다</strong>. 4세대+12(2026-09-01, 6384ca7)에서 NSFW 게이팅 대상 16개국이 코드에 처음 명시된 것과 짝을 이룬다: 어떤 라벨이 어떤 나라에서 활성이었는지를 유저가 UTH에서 볼 수 있는 계획으로 읽힌다. UTH 화면에 국가별 필터나 표시가 등장하는지 감시.</p>
 <p><strong>J. 부수 변화.</strong></p>
 <ul>
-<li><strong><code>ExpiringCache::with_clock</code> — 초기화 시 <code>cache.reserve(capacity)</code> 호출.</strong> Safety-label expiring cache가 이제 이용 예정 capacity를 미리 예약해 첫 삽입에서 재할당을 피한다. <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/safety_label_source/expiring_cache.rs"><code>visibility-filtering/safety_label_source/expiring_cache.rs</code></a>.</li>
-<li><strong><code>hydration/metrics.rs</code> +21/−154 — <code>timed_keyed_rpc</code>와 <code>KeyedResultCounts::from_results</code>·<code>outer_timeout</code> 제거.</strong> 4세대+15(902a06f, 2026-09-04)의 batch 통일 이후 이 keyed-result 경로는 죽은 코드였다. 새로 <code>record_author_labels(mapped, unmapped)</code> 헬퍼가 붙었다. <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/metrics.rs"><code>visibility-filtering/hydration/metrics.rs</code></a>.</li>
-<li><strong>Grox motion-reveal 이미지 빌더 — 32 → 48 프레임 상한 + ECC affine 정합 + Farneback optical flow refinement + weighted median + LAB 스킨 색상 plausibility 게이트.</strong> <code>_MOTION_REVEAL_MAX_INPUT_FRAMES</code> 32→48. 새 헬퍼 여섯 개: <code>_ecc_align</code>(<code>cv2.findTransformECC</code>로 affine 변환 정합), <code>_is_static</code>(<code>cv2.phaseCorrelate</code>로 정적 프레임 판정 — 이동량과 phase correlation response 둘 다 임계 이하면 정적), <code>_dense_align_residual</code>(Farneback dense optical flow로 residual을 미세 정합), <code>_weighted_median</code>(정합 후 shift한 오버레이의 pixel별 가중 중앙값), <code>_native_chroma</code>(LAB 색공간에서 밝은 픽셀 상위 30%의 중앙 chroma 좌표), <code>_skin_plausible</code>(오버레이의 chroma 중앙이 스킨색 축에서 거리 12 이하인지 게이트, false면 skin overlay라는 오탐 방지). 즉 grox의 motion-reveal 썸네일 생성(video → single frame 하이라이트)이 프레임을 더 많이 받고 정합·denoise·색채 검증을 단계별로 통과시키도록 정제됐다. 4세대+12(2026-09-01)에서 정본화된 <code>PlanSafetyPtosSpecialVideo</code> DAG가 이 motion-reveal 프레임을 소비하므로, 이번 정제는 그 DAG의 판정 품질에 직접 영향한다 <code>[추정]</code>. <code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/grox/libs/video_tools/image.py"><code>grox/libs/video_tools/image.py</code></a> (+288/−25).</li>
+<li><strong><code>ExpiringCache::with_clock</code> — 초기화 시 <code>cache.reserve(capacity)</code> 호출.</strong> Safety-label expiring cache가 이제 이용 예정 capacity를 미리 예약해 첫 삽입에서 재할당을 피한다. <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/safety_label_source/expiring_cache.rs" target="_blank" rel="noopener"><code>visibility-filtering/safety_label_source/expiring_cache.rs</code></a>.</li>
+<li><strong><code>hydration/metrics.rs</code> +21/−154 — <code>timed_keyed_rpc</code>와 <code>KeyedResultCounts::from_results</code>·<code>outer_timeout</code> 제거.</strong> 4세대+15(902a06f, 2026-09-04)의 batch 통일 이후 이 keyed-result 경로는 죽은 코드였다. 새로 <code>record_author_labels(mapped, unmapped)</code> 헬퍼가 붙었다. <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/metrics.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/metrics.rs</code></a>.</li>
+<li><strong>Grox motion-reveal 이미지 빌더 — 32 → 48 프레임 상한 + ECC affine 정합 + Farneback optical flow refinement + weighted median + LAB 스킨 색상 plausibility 게이트.</strong> <code>_MOTION_REVEAL_MAX_INPUT_FRAMES</code> 32→48. 새 헬퍼 여섯 개: <code>_ecc_align</code>(<code>cv2.findTransformECC</code>로 affine 변환 정합), <code>_is_static</code>(<code>cv2.phaseCorrelate</code>로 정적 프레임 판정 — 이동량과 phase correlation response 둘 다 임계 이하면 정적), <code>_dense_align_residual</code>(Farneback dense optical flow로 residual을 미세 정합), <code>_weighted_median</code>(정합 후 shift한 오버레이의 pixel별 가중 중앙값), <code>_native_chroma</code>(LAB 색공간에서 밝은 픽셀 상위 30%의 중앙 chroma 좌표), <code>_skin_plausible</code>(오버레이의 chroma 중앙이 스킨색 축에서 거리 12 이하인지 게이트, false면 skin overlay라는 오탐 방지). 즉 grox의 motion-reveal 썸네일 생성(video → single frame 하이라이트)이 프레임을 더 많이 받고 정합·denoise·색채 검증을 단계별로 통과시키도록 정제됐다. 4세대+12(2026-09-01)에서 정본화된 <code>PlanSafetyPtosSpecialVideo</code> DAG가 이 motion-reveal 프레임을 소비하므로, 이번 정제는 그 DAG의 판정 품질에 직접 영향한다 <span class="badge est">추정</span>. <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/grox/libs/video_tools/image.py" target="_blank" rel="noopener"><code>grox/libs/video_tools/image.py</code></a> (+288/−25).</li>
 <li><strong><code>home-mixer/params/param.rs</code> mirror sync tick.</strong> Feature-switch defaults 미러의 timestamp가 <code>2026-09-09T16:23:17Z</code> → <code>2026-09-10T16:21:03Z</code>로 갱신된 것 외에 실질 변경 없음.</li>
 </ul>
 <blockquote>
 <p>&quot;pub(crate) const HYDRATION_TIMEOUT: Duration = Duration::from_millis(390);&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/mod.rs">visibility-filtering/hydration/mod.rs:28</a>, 2026-09-10</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener">visibility-filtering/hydration/mod.rs:28</a>, 2026-09-10</p>
 </blockquote>
 <blockquote>
 <p>&quot;let author = raw.request_author_id.or_else(|| core.get(&amp;raw.tweet_id).map(|c| c.author_id)).or_else(|| recovered_authors.get(&amp;raw.tweet_id).copied())?;&quot;
-— <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/mod.rs">visibility-filtering/models/mod.rs:45-49</a>, 2026-09-10</p>
+— <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/mod.rs" target="_blank" rel="noopener">visibility-filtering/models/mod.rs:45-49</a>, 2026-09-10</p>
 </blockquote>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> <code>## 안전성</code> 절에 새 <code>### 4세대+19</code> 서브섹션 추가(A~J 열 개 축), 문서 헤더 최종 갱신 2026-09-11 → 2026-09-12로 이동. B(AuthorId fallback)와 D(gRPC deadline 관측)는 안전 파이프라인의 새 데이터 포인트라서 정본에 명시적으로 반영했고, F(TREND_PAGE·EXPLORE_SPOTLIGHT·IMMERSIVE_LONG_DWELL)와 G(padding segment ID)는 랭킹 wire·학습 노브의 변화라서 함께 반영했다. E(<code>clock_cache</code> primitive)는 미배선이지만 다음 커밋에서 소비자가 붙을 것으로 예상되어 명시적으로 문서화했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> 이번 커밋은 4세대 공개 이래 지속된 visibility-filtering 강건성 개선 라인의 연장선상에 있다. 지금까지 이 라인의 주요 이정표는 (a) 4세대+4(2026-08-19, <code>dark_traffic_setup.rs</code>)의 shadow deployment 미러링, (b) 4세대+7(2026-08-24, <code>reference_compare.rs</code>)의 verdict 대조 canary, (c) 4세대+13(2026-09-01, 7ba7768)의 rules 재구조화, (d) 4세대+15(2026-09-04, 902a06f)의 hydration 800줄 순 감소 단순화였다. 이번 4세대+19는 그 위에 <strong>timeout 예산 상향 + fallback 캐시 + 라벨 자료구조 축소 + phase 관측</strong>을 얹었다. <strong>timeout을 늘려서 판정 성공률을 높이는 동시에 부분 판정 경로를 뚫어 fail-open 대신 partial-open으로 강건성을 얻는 방향</strong>이다.</p></div>
-<p>⚠ <strong>주장 갱신 없음</strong> — 이번 diff가 뒤집는 이전 정본 진술은 없다. VF가 fail-closed라는 canon 주의 목록 #1은 여전히 유효하다(hydration 실패로 판정 못한 tweet은 여전히 skip이고, author fallback은 skip 대신 부분 판정으로 바꾸는 것뿐이다).</p>
+<p class="warn">⚠ <strong>주장 갱신 없음</strong> — 이번 diff가 뒤집는 이전 정본 진술은 없다. VF가 fail-closed라는 canon 주의 목록 #1은 여전히 유효하다(hydration 실패로 판정 못한 tweet은 여전히 skip이고, author fallback은 skip 대신 부분 판정으로 바꾸는 것뿐이다).</p>
 <h2 id="레이더">레이더</h2>
-<p><strong>UniRec (Kuaishou) — cascaded recommender의 pre-ranking + ranking fusion을 두 stage joint learning으로 정렬 · Kuaishou 프로덕션 A/B에서 app usage duration +0.616%</strong> <code>[확인]</code> — <a href="https://arxiv.org/abs/2609.11052">arXiv 2609.11052</a>, 2026-09-10 제출. Industrial recommender의 캐스케이드 stage(pre-ranking, ranking)가 각기 다른 objective·feature space·latency 제약 아래에서 독립 최적화되는 문제(upstream이 downstream이 선호하는 아이템을 filter out, downstream fusion이 upstream 개선을 상쇄)를 다룬다. 두 fusion agent가 input embedding을 부분 공유하고 single computation graph에서 함께 학습되어 gradient가 stage 사이를 흐른다. Dual-axis preference alignment로 (vertical) downstream pairwise preference를 upstream fusion score에 전이하고, (horizontal) 이질적 prior signal에 대한 수십 개 pairwise objective를 bidirectional preference evidence로 재편한다. 또 attribute group-relative regularization으로 unconstrained end-to-end fusion이 특정 attribute 그룹에 과집중하는 부작용을 억제한다. <strong>21일 프로덕션 A/B에서 앱 사용시간 +0.616% relative gain, Kuaishou 플랫폼에 fully deployed.</strong> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 추가.</p>
+<p><strong>UniRec (Kuaishou) — cascaded recommender의 pre-ranking + ranking fusion을 두 stage joint learning으로 정렬 · Kuaishou 프로덕션 A/B에서 app usage duration +0.616%</strong> <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2609.11052" target="_blank" rel="noopener">arXiv 2609.11052</a>, 2026-09-10 제출. Industrial recommender의 캐스케이드 stage(pre-ranking, ranking)가 각기 다른 objective·feature space·latency 제약 아래에서 독립 최적화되는 문제(upstream이 downstream이 선호하는 아이템을 filter out, downstream fusion이 upstream 개선을 상쇄)를 다룬다. 두 fusion agent가 input embedding을 부분 공유하고 single computation graph에서 함께 학습되어 gradient가 stage 사이를 흐른다. Dual-axis preference alignment로 (vertical) downstream pairwise preference를 upstream fusion score에 전이하고, (horizontal) 이질적 prior signal에 대한 수십 개 pairwise objective를 bidirectional preference evidence로 재편한다. 또 attribute group-relative regularization으로 unconstrained end-to-end fusion이 특정 attribute 그룹에 과집중하는 부작용을 억제한다. <strong>21일 프로덕션 A/B에서 앱 사용시간 +0.616% relative gain, Kuaishou 플랫폼에 fully deployed.</strong> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 추가.</p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong><code>clock_cache</code>의 실 소비자</strong> — TES author_id, Gizmoduck AuthorFeatures, SafetyLabel expiring cache 셋 중 어느 것이 이 새 primitive로 바뀌는지 다음 커밋에서 관측. <code>fallback_cache.rs</code>가 clock_cache로 대체되는지, 별개 hot-path에 붙는지도 관측 대상.</li>
 <li><strong><code>HYDRATION_TIMEOUT</code> 390 ms의 실 관측</strong> — 새 <code>filter_tweets_phase_ms{stage=&quot;hydration&quot;}</code> 히스토그램과 <code>filter_tweets_deadline_overrun_ms</code>가 프로덕션 대시보드에 나타나면 실제 P50·P99 지연 분포와 overrun 발생률을 알 수 있게 된다. 홈믹서가 VF에 실어 주는 gRPC deadline 값 자체가 코드로 확인되면 좋다(현재는 <code>grpc-timeout</code> 헤더 파싱 코드만 확인, 실 값은 미공개).</li>
 <li><strong><code>TREND_PAGE</code>·<code>EXPLORE_SPOTLIGHT</code> 지면 배선</strong> — proto 슬롯이 열렸으므로 홈믹서에 이 지면들의 gRPC 엔드포인트나 후보 파이프라인이 다음 커밋에서 등장할 가능성이 있다. <code>xrecsys_search</code>(4세대+4에서 신설된 검색 랭킹 config)와의 관계도 관측 대상.</li>
 <li><strong><code>IMMERSIVE_LONG_DWELL</code> 이벤트 정의</strong> — grox나 홈믹서에서 immersive 지면의 dwell 시간 임계로 이 aggregation을 만드는 코드가 어디에서 나타나는지. 학습 config에서 이 aggregation을 소비하는지도.</li>
-<li><strong>UTH 국가별 takedown UI 노출</strong> — <a href="https://x.com/i/under_the_hood">x.com/i/under_the_hood</a>에 국가별 필터나 라벨의 국가 표시가 등장하는지 감시. 4세대+12의 NSFW 16개국 코드 명시와 이번 UTH 국가 필드 확장이 유저 화면에서 어떻게 합쳐지는지가 다음 관전 포인트.</li>
+<li><strong>UTH 국가별 takedown UI 노출</strong> — <a href="https://x.com/i/under_the_hood" target="_blank" rel="noopener">x.com/i/under_the_hood</a>에 국가별 필터나 라벨의 국가 표시가 등장하는지 감시. 4세대+12의 NSFW 16개국 코드 명시와 이번 UTH 국가 필드 확장이 유저 화면에서 어떻게 합쳐지는지가 다음 관전 포인트.</li>
 <li><strong><code>Action::Downrank</code>의 실 사용처</strong> — 4세대+18의 열린 질문. 여전히 이 커밋에도 등장하지 않는다. 다음 커밋 감시 유지.</li>
-<li><strong>header-image-prompt-ad의 광고 블렌더 진입</strong> — 4세대+18의 열린 질문. 이번 커밋의 <code>ads_blender</code> 라벨링 확장(H)이 관련 조각. <code>following</code> 라벨이 명시적으로 특수 경로를 탄다는 사실은 새 광고 포맷도 지면별 블렌더 분기를 탈 가능성을 시사한다 <code>[추정]</code>.</li>
+<li><strong>header-image-prompt-ad의 광고 블렌더 진입</strong> — 4세대+18의 열린 질문. 이번 커밋의 <code>ads_blender</code> 라벨링 확장(H)이 관련 조각. <code>following</code> 라벨이 명시적으로 특수 경로를 탄다는 사실은 새 광고 포맷도 지면별 블렌더 분기를 탈 가능성을 시사한다 <span class="badge est">추정</span>.</li>
 </ul>
-<p>조회 실패: 없음.</p>
+<p>조회 실패: 없음.</p></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-11.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-11</div></a><a class="r" href="daily-2026-09-13.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-13</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-11.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-11</span></a><a class="pg-next" href="daily-2026-09-13.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-13</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>

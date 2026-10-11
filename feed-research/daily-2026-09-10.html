@@ -2,220 +2,62 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eK2iXmYABeQJTBur/suxSK+XnPUbw1Wr7qPGbORLiVg='; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-10 — feed-research</title>
-<!-- 이 페이지들은 front matter 가 없는 StaticFile 이라 Pages 저장소의 _includes/head.html
-     SEO 블록이 붙지 않는다. 사이트맵에는 34개가 등록돼 있으므로, 여기서 넣지 않으면
-     설명 없는 페이지를 색인해 달라고 크롤러에 제출하는 꼴이 된다. -->
 <meta name="description" content="한 줄: X 4세대+17(49815da, 2026-09-08 19:23 UTC, +10,938/−982, 파일 78)에서 (1) home-mixer 랭킹 스코어러에 per-head weight perturbation이 새로 배선됐다 — MD5(salt, user_id,…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-10.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-10 — feed-research">
 <meta property="og:description" content="한 줄: X 4세대+17(49815da, 2026-09-08 19:23 UTC, +10,938/−982, 파일 78)에서 (1) home-mixer 랭킹 스코어러에 per-head weight perturbation이 새로 배선됐다 — MD5(salt, user_id,…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-10.html">
 <meta name="twitter:card" content="summary">
-<style>
-:root {
-  --bg: #f7f7f9; --fg: #17171c; --muted: #6a6a76; --faint: #66666f; --line: #e3e3ea;
-  --card: #ffffff; --code-bg: #f0f0f4; --accent: #4f46e5; --accent-soft: #eeecfd;
-  --ok: #0a7a3d; --ok-bg: #e4f5ea; --obs: #0b57d0; --obs-bg: #e6efff;
-  --est: #8a5c00; --est-bg: #fdf3d7; --rose: #b52d5c; --rose-bg: #fdeaf1;
-  --serif: "Apple SD Gothic Neo", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --shadow: 0 1px 2px rgba(20,20,40,.05), 0 4px 16px rgba(20,20,40,.04);
-  /* --faint 는 날짜·목차 제목·'자료' 라벨·이전/다음 같은 11~12px 보조 글자에 쓴다. 예전 #93939f 는
-     배경 위 2.84:1 이었다. #66666f 는 --bg 위 5.31:1, --code-bg 위 5.00:1 이다. --est 는 배지 배경 위
-     4.4:1 이라 #8a5c00(5.25:1)으로 낮췄다. */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131318; --fg: #e9e9ee; --muted: #9b9ba7; --faint: #9090a0; --line: #2a2a33;
-    --card: #1b1b22; --code-bg: #23232c; --accent: #a5a0fb; --accent-soft: #221f3d;
-    --ok: #6fd39a; --ok-bg: #133021; --obs: #8ab4f8; --obs-bg: #16233a;
-    --est: #e2b34c; --est-bg: #33290f; --rose: #f2789f; --rose-bg: #3a1725;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-    /* --faint 는 #131318 위 5.89:1, #23232c 위 4.96:1(예전 #7a7a86 은 4.37·3.68:1). */
-  }
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-/* 목차 앵커의 부드러운 스크롤은 움직임을 줄여 달라는 설정을 따른다. */
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 16.5px; line-height: 1.8; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; text-underline-offset: 2px; }
-/* 본문 링크는 색만으로 주변 글자와 구분되지 않는다(#4f46e5 대 본문 #17171c 가 2.84:1, 3:1 미만이고
-   '자료' 카드의 링크는 아예 본문색이다). 본문 안 링크에는 밑줄을 긋는다. 덩어리 전체가 링크인
-   리포트 목록(ul.rl)과 이전/다음(.pager)은 아래 각 규칙에서 밑줄을 뺀다. */
-main a { text-decoration: underline; text-underline-offset: 2px; }
-
-/* 읽기 진행 바 */
-#prog { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); z-index: 50; transition: width .1s linear; }
-
-.layout { display: grid; grid-template-columns: 260px minmax(0,1fr); max-width: 1280px; margin: 0 auto; }
-nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 30px 18px 60px 22px; border-right: 1px solid var(--line); font-size: 13px; }
-nav.toc .home, nav.toc .blog { display: block; font-weight: 700; font-size: 13px; letter-spacing: .01em; margin-bottom: 3px; }
-nav.toc .gendate { color: var(--faint); font-size: 11.5px; margin-bottom: 18px; }
-nav.toc .tl { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 8px 8px; }
-nav.toc ul { list-style: none; margin: 0; padding: 0; }
-nav.toc a.s { display: flex; gap: 8px; padding: 5px 8px; border-radius: 7px; color: var(--muted); line-height: 1.45; }
-nav.toc a.s:hover { background: var(--code-bg); color: var(--fg); text-decoration: none; }
-nav.toc a.s.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-/* 목차 번호에 opacity .55 를 걸면 2.17:1 까지 떨어졌다. --muted 그대로(4.99:1) 둔다. */
-nav.toc a.s .n { flex: none; font-variant-numeric: tabular-nums; font-weight: 700; }
-nav.toc a.s .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-nav.toc a.sub { padding-left: 30px; font-size: 12px; }
-
-main { padding: 0 0 100px; min-width: 0; }
-/* `purchase·add_to_cart·checkout_initiated·…` 처럼 끊을 곳이 없는 긴 토큰이 320~390px 화면에서
-   가로 스크롤을 만들었다(x.html 4716px). 본문은 어디서든 줄을 바꾸게 하고, 표는 .tablewrap 이
-   가로로 스크롤하므로 원래대로 둔다(그러지 않으면 열이 한 글자 폭으로 찌그러진다). */
-main { overflow-wrap: anywhere; }
-main table { overflow-wrap: normal; }
-.wrap { padding: 0 56px; }
-
-/* 표지 */
-header.cover { padding: 44px 56px 30px; border-bottom: 1px solid var(--line); }
-.kicker { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.kicker::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-header.cover h1 { font-size: 42px; line-height: 1.15; margin: 12px 0 6px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.wd { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; padding: 0; list-style: none; }
-.chip { display: inline-flex; align-items: baseline; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 5px 13px 6px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow); }
-.chip b { color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
-.lead { margin: 22px 0 0; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; font-size: 16px; line-height: 1.85; box-shadow: var(--shadow); }
-.lead .lb { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 본문 */
-main h2 { font-size: 23px; line-height: 1.35; letter-spacing: -.015em; margin: 3em 0 .8em; padding-top: 1.4em; border-top: 1px solid var(--line); scroll-margin-top: 20px; display: flex; gap: 14px; align-items: baseline; }
-main h2 .num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
-/* 다크에서 밝은 보라 배지 위 흰 숫자는 2.33:1 이었다. 배경색으로 뒤집으면 7.96:1 이다.
-   위 규칙과 명시도가 같으므로 그 뒤에 둬야 이긴다. */
-@media (prefers-color-scheme: dark) { main h2 .num { color: #131318; } }
-main h2:first-of-type { border-top: none; padding-top: 0; margin-top: 1.6em; }
-main h3 { font-size: 17.5px; margin: 2.2em 0 .6em; scroll-margin-top: 20px; letter-spacing: -.01em; }
-main h3::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); margin-right: 9px; vertical-align: 2px; }
-p { margin: .95em 0; }
-ul, ol { padding-left: 1.35em; }
-li { margin: .4em 0; }
-li > ul, li > ol { margin-top: .3em; }
-strong { font-weight: 700; }
-code { font-family: var(--mono); font-size: .83em; background: var(--code-bg); padding: .15em .42em; border-radius: 5px; word-break: break-word; }
-pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 15px 17px; overflow-x: auto; line-height: 1.6; }
-pre code { background: none; padding: 0; font-size: 12.5px; }
-hr { border: none; border-top: 1px solid var(--line); margin: 2.6em 0; }
-
-/* 라벨 블록 — 이 문서의 핵심 구조 */
-.blk { margin: 1.15em 0; padding: 14px 18px 15px 17px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--bc, var(--line)); border-radius: 0 12px 12px 0; box-shadow: var(--shadow); }
-.blk > p { margin: 0; }
-.blk .lbl { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--bc, var(--muted)); background: var(--bbg, transparent); border-radius: 5px; padding: 2px 7px 3px; margin-right: 9px; vertical-align: 2px; white-space: normal; }
-/* 라벨은 '새로 알게 된 것 — A. 랭킹 요청에 …' 처럼 문장 길이일 때가 있어 nowrap 이면 화면 밖으로 나갔다. */
-.blk.src   { --bc: var(--faint); --bbg: var(--code-bg); font-size: 15px; color: var(--muted); }
-.blk.src strong, .blk.src a { color: var(--fg); }
-.blk.ctx   { --bc: var(--obs); --bbg: var(--obs-bg); }
-.blk.app   { --bc: var(--ok);  --bbg: var(--ok-bg); }
-.blk.why   { --bc: var(--accent); --bbg: var(--accent-soft); background: linear-gradient(180deg, var(--accent-soft), var(--card) 60%); }
-.blk.find  { --bc: var(--rose); --bbg: var(--rose-bg); }
-
-/* 인용 */
-blockquote { margin: 1.3em 0; padding: 16px 20px 14px 46px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; position: relative; color: var(--fg); box-shadow: var(--shadow); }
-blockquote::before { content: "\201C"; position: absolute; left: 14px; top: 6px; font-size: 40px; line-height: 1; color: var(--accent); opacity: .35; font-family: Georgia, serif; }
-blockquote p { margin: .3em 0; }
-blockquote p:last-child { color: var(--muted); font-size: 13.5px; }
-
-/* 표 */
-.tablewrap { overflow-x: auto; margin: 1.3em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); box-shadow: var(--shadow); }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-thead th { background: var(--code-bg); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: var(--code-bg); }
-
-/* 근거 등급 뱃지 */
-.badge { display: inline-block; font-size: 11px; font-weight: 800; line-height: 1; padding: 3.5px 8px 4.5px; border-radius: 99px; vertical-align: 1.5px; white-space: nowrap; }
-.badge.ok { color: var(--ok); background: var(--ok-bg); }
-.badge.obs { color: var(--obs); background: var(--obs-bg); }
-.badge.est { color: var(--est); background: var(--est-bg); }
-.warn { background: var(--est-bg); border-left: 3px solid var(--est); border-radius: 0 10px 10px 0; padding: .7em 1.1em; }
-li.warn { list-style: none; margin-left: -1.35em; }
-
-/* 마무리 체크리스트 */
-.next { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 24px 18px; box-shadow: var(--shadow); }
-.next ul { list-style: none; padding: 0; }
-.next li { padding-left: 26px; position: relative; margin: .7em 0; }
-.next li::before { content: ""; position: absolute; left: 0; top: .55em; width: 13px; height: 13px; border: 2px solid var(--accent); border-radius: 4px; opacity: .6; }
-
-/* 리포트 목록(daily.html) */
-ul.rl { list-style: none; padding: 0; margin: 1em 0 2.4em; display: grid; gap: 12px; }
-ul.rl li { margin: 0; }
-ul.rl a { display: block; text-decoration: none; padding: 16px 20px 15px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; color: var(--fg); box-shadow: var(--shadow); transition: transform .12s ease, border-color .12s ease; }
-ul.rl a:hover { text-decoration: none; transform: translateY(-2px); border-color: var(--accent); }
-ul.rl .hd { display: flex; align-items: baseline; gap: 10px; }
-ul.rl .dt { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--accent); }
-ul.rl .wd, ul.rl .rt { color: var(--faint); font-size: 12px; }
-ul.rl .rt { margin-left: auto; }
-ul.rl .ds { color: var(--muted); font-size: 14px; line-height: 1.65; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-ul.rl .chips { margin-top: 11px; }
-ul.rl .chip { font-size: 12px; padding: 3px 10px 4px; box-shadow: none; }
-ul.rl .chip b { font-size: 13px; }
-
-/* 하단 이동 */
-.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 46px 0 0; }
-.pager a { display: block; text-decoration: none; padding: 15px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; color: var(--fg); box-shadow: var(--shadow); }
-.pager a:hover { text-decoration: none; border-color: var(--accent); }
-.pager .d { color: var(--faint); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.pager .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 3px; }
-.pager .r { text-align: right; }
-
-.topbar { display: none; }
-@media (max-width: 940px) {
-  .layout { grid-template-columns: 1fr; }
-  nav.toc { display: none; }
-  .topbar { display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 11px 20px; font-size: 13px; z-index: 20; }
-  .wrap, header.cover { padding-left: 20px; padding-right: 20px; }
-  header.cover h1 { font-size: 32px; }
-  main h2 { font-size: 20px; }
-}
-@media print {
-  nav.toc, #prog, .topbar, .pager { display: none; }
-  .layout { display: block; }
-  body { background: #fff; font-size: 11pt; }
-  .blk, blockquote, .tablewrap, .next { box-shadow: none; break-inside: avoid; }
-  main h2, main h3 { break-after: avoid; }
-}
-</style>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
 </head>
-<body>
-<div id="prog"></div>
-<div class="topbar"><a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a><a class="home" href="daily.html">◂ 일일 리포트</a><span class="gendate">2026-10-10 기준</span></div>
-<div class="layout">
-<nav class="toc">
-  <!-- 메뉴로 들어온 독자가 뒤로가기 말고는 블로그로 돌아갈 길이 없었다. -->
-  <a class="blog" href="https://snutiise.github.io/">◂ 0x00 블로그</a>
-  <a class="home" href="daily.html">◂ 일일 리포트 전체</a>
-  <div class="gendate">index.html · 2026-10-10 기준</div>
-  <div class="tl">목차</div>
-  <ul id="toc"></ul>
-</nav>
-<main>
-<header class="cover">
-  <div class="kicker">FEED RESEARCH · 일일 리포트</div>
-  <h1>2026-09-10</h1>
-  <div class="wd">목요일 · 읽는 데 약 45분</div>
-  <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-  <div class="lead"><span class="lb">한 줄 요약</span>X 4세대+17(<a href="https://github.com/xai-org/x-algorithm/commit/49815da">49815da</a>, 2026-09-08 19:23 UTC, +10,938/−982, 파일 78)에서 (1) <strong>home-mixer 랭킹 스코어러에 per-head weight perturbation</strong>이 새로 배선됐다 — MD5(salt, user_id, head)로 결정론적으로 뽑은 부호로 26개 참여 헤드 가중치를 σ·exp 스케일로 흔들고, sum 재계산까지 매 요청 재계산한다. Bandit-style exploration 또는 gradient-free weight A/B의 첫 명시 코드다. (2) <strong>grox에 검색 지면 전용 멀티모달 포스트 임베딩 v8-search 스택 신설</strong> — <code>embedder_v8_search.py</code>(113줄) + <code>renderer_v8_search.py</code>(461줄) + backfill 5-DAG(fanout·gate·dedup·batched-fav-hydrator·adaptive-min-fav PI 컨트롤러) + <code>mm_emb_v8_search</code>·<code>mm_emb_v8_search_backfill</code>·<code>mm_emb_v8_search_backfill_batch</code>·<code>mm_emb_v8_search_for_reply</code> 네 플랜, TOPIC은 <code>grox-multimodal-embedding-v8-search</code>. v8.2와 별도의 벡터 공간이 검색용으로 배선됐다. (3) <strong>Phoenix serving proto와 home-mixer 랭커에 <code>ContentFeatures</code> 필드 신설</strong> — <code>TweetInfo</code>에 <code>contentFeatures</code>·<code>quotedContentFeatures</code> 두 필드가 붙었고, Twitter text weighting rule(URL=23, CJK 2배 등)로 계산된 <code>weighted_text_len</code>·<code>newline_count</code>·<code>has_url</code> 등 7개 구조화 컨텐츠 시그널이 서빙 wire format에 실린다. 인용 포스트도 대칭 배선. (4) <strong>PTOS에 성인 컨텐츠 leading-frames 심층 재스캔 경로</strong>가 새로 붙었다 — 이미 PTOS를 통과했지만 NSFW 태그가 없는 30초 이상 영상에 대해 앞 10초만 크롭해 재판정. <code>deluxe_fav_count_threshold</code> 이상만 진입, 512 fav 이상은 prior_adult 없어도 무조건 진입. 정적 층을 벗겨내는 4세대+12 special-video 스택과 짝을 이루는 두 번째 회피-대응 경로다. (5) <strong>Phoenix FA4 attention 커널의 forward·backward 양쪽이 SM80(Ampere)·SM90(Hopper) 두 아키텍처로 완전 오픈소스 공개</strong>됐다 — <code>flash_fwd.py</code>(1,333) + <code>flash_fwd_sm90.py</code>(1,465) + <code>flash_bwd.py</code>(1,954) + <code>flash_bwd_sm90.py</code>(1,864) + <code>flash_bwd_preprocess.py</code>(329) + <code>ampere_helpers.py</code>(135), 총 5,080줄 신규. 이제까지 forward만 varlen 지원 형태로 공개됐던 것이 <strong>backward pass 원본이 처음 공개된 사건</strong>이고, <code>SAVE_H100_RECSYS</code> remat 정책(4세대+15)이 실제로 무엇을 쓰는지가 코드로 확정됐다. (6) 부수 — <code>phoenix/xrex/utils/aot.py</code>가 CutlassCall custom_call의 device blob을 SHA256으로 요약해 캐시 키를 안정화, <code>copy_port_client.rs</code>가 <code>MANIFEST.json</code> 존재를 확인해 번들 완료 체크포인트만 고르는 로직 추가, <code>quote_hydrator.rs</code>가 인용 포스트의 media info를 <code>MediaInfoCacheClient</code>로 hydration(200ms timeout). Meta·Netflix 신규 없음, arXiv cs.IR 30건 파싱 성공 0건 통과.</div>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+</div>
 </header>
-<div class="wrap" id="content">
-<h2 id="1-x-4세대17-랭킹-가중치-per-request-퍼터베이션--v8-search-멀티모달-임베딩-신설--phoenix-contentfeatures-wire-진입--ptos-adult-leading-frames--fa4-sm80sm90-fwdbwd-오픈--x">1. X 4세대+17: 랭킹 가중치 per-request 퍼터베이션 + v8-search 멀티모달 임베딩 신설 + Phoenix ContentFeatures wire 진입 + PTOS adult leading-frames + FA4 SM80/SM90 fwd·bwd 오픈 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/49815da">xai-org/x-algorithm@49815da</a> — 공개 소스코드, 2026-09-08 19:23 UTC, X.AI Corp. 78개 파일, +10,938/−982. <code>Open-source X Recommendation Algorithm</code> 정기 크론 미러.</p></div>
-<p><strong>배경.</strong> X의 오픈소스 미러는 프로덕션 캐넌을 크론으로 흘려보내는 정기 커밋이다. 어제(2026-09-09) 판이 4세대+16(<a href="https://github.com/xai-org/x-algorithm/commit/902a06f">902a06f</a>)까지 반영됐고, 이 커밋이 그 다음 판이다. 이번 판은 지난 두 판(부수 변화 위주)과 달리 (a) 랭킹 스코어러의 참여 헤드 가중치를 서빙 요청마다 결정론적으로 흔드는 새 메커니즘, (b) grox 파이프라인에 검색 지면 전용 멀티모달 임베딩 스택 신설, (c) Phoenix 서빙 proto에 구조화된 컨텐츠 피처(<code>ContentFeatures</code>) 진입, (d) PTOS에 성인 컨텐츠 leading-frames 심층 재스캔 플랜 신설, (e) Phoenix FA4 attention 커널 forward·backward 양쪽을 두 아키텍처로 대규모 오픈소스화 — 다섯 개의 서로 다른 축이 한 커밋에 묶여 있어 축별로 나눠 정리한다.</p>
-<h3 id="a-랭킹-스코어러-per-head-weight-perturbation-확인">A. 랭킹 스코어러 per-head weight perturbation <code>[확인]</code></h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/scorers/ranking_scorer.rs"><code>home-mixer/scorers/ranking_scorer.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/params/param.rs"><code>home-mixer/params/param.rs</code></a>.</p>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-10">2026-09-10</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>목요일</li>
+<li><span class="meta-k">읽는 시간</span>45분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+17(<a href="https://github.com/xai-org/x-algorithm/commit/49815da">49815da</a>, 2026-09-08 19:23 UTC, +10,938/−982, 파일 78)에서 (1) <strong>home-mixer 랭킹 스코어러에 per-head weight perturbation</strong>이 새로 배선됐다 — MD5(salt, user_id, head)로 결정론적으로 뽑은 부호로 26개 참여 헤드 가중치를 σ·exp 스케일로 흔들고, sum 재계산까지 매 요청 재계산한다. Bandit-style exploration 또는 gradient-free weight A/B의 첫 명시 코드다. (2) <strong>grox에 검색 지면 전용 멀티모달 포스트 임베딩 v8-search 스택 신설</strong> — <code>embedder_v8_search.py</code>(113줄) + <code>renderer_v8_search.py</code>(461줄) + backfill 5-DAG(fanout·gate·dedup·batched-fav-hydrator·adaptive-min-fav PI 컨트롤러) + <code>mm_emb_v8_search</code>·<code>mm_emb_v8_search_backfill</code>·<code>mm_emb_v8_search_backfill_batch</code>·<code>mm_emb_v8_search_for_reply</code> 네 플랜, TOPIC은 <code>grox-multimodal-embedding-v8-search</code>. v8.2와 별도의 벡터 공간이 검색용으로 배선됐다. (3) <strong>Phoenix serving proto와 home-mixer 랭커에 <code>ContentFeatures</code> 필드 신설</strong> — <code>TweetInfo</code>에 <code>contentFeatures</code>·<code>quotedContentFeatures</code> 두 필드가 붙었고, Twitter text weighting rule(URL=23, CJK 2배 등)로 계산된 <code>weighted_text_len</code>·<code>newline_count</code>·<code>has_url</code> 등 7개 구조화 컨텐츠 시그널이 서빙 wire format에 실린다. 인용 포스트도 대칭 배선. (4) <strong>PTOS에 성인 컨텐츠 leading-frames 심층 재스캔 경로</strong>가 새로 붙었다 — 이미 PTOS를 통과했지만 NSFW 태그가 없는 30초 이상 영상에 대해 앞 10초만 크롭해 재판정. <code>deluxe_fav_count_threshold</code> 이상만 진입, 512 fav 이상은 prior_adult 없어도 무조건 진입. 정적 층을 벗겨내는 4세대+12 special-video 스택과 짝을 이루는 두 번째 회피-대응 경로다. (5) <strong>Phoenix FA4 attention 커널의 forward·backward 양쪽이 SM80(Ampere)·SM90(Hopper) 두 아키텍처로 완전 오픈소스 공개</strong>됐다 — <code>flash_fwd.py</code>(1,333) + <code>flash_fwd_sm90.py</code>(1,465) + <code>flash_bwd.py</code>(1,954) + <code>flash_bwd_sm90.py</code>(1,864) + <code>flash_bwd_preprocess.py</code>(329) + <code>ampere_helpers.py</code>(135), 총 5,080줄 신규. 이제까지 forward만 varlen 지원 형태로 공개됐던 것이 <strong>backward pass 원본이 처음 공개된 사건</strong>이고, <code>SAVE_H100_RECSYS</code> remat 정책(4세대+15)이 실제로 무엇을 쓰는지가 코드로 확정됐다. (6) 부수 — <code>phoenix/xrex/utils/aot.py</code>가 CutlassCall custom_call의 device blob을 SHA256으로 요약해 캐시 키를 안정화, <code>copy_port_client.rs</code>가 <code>MANIFEST.json</code> 존재를 확인해 번들 완료 체크포인트만 고르는 로직 추가, <code>quote_hydrator.rs</code>가 인용 포스트의 media info를 <code>MediaInfoCacheClient</code>로 hydration(200ms timeout). Meta·Netflix 신규 없음, arXiv cs.IR 30건 파싱 성공 0건 통과.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">10</span></summary><ol><li><a href="#1-x-4세대17-랭킹-가중치-per-request-퍼터베이션--v8-search-멀티모달-임베딩-신설--phoenix-contentfeatures-wire-진입--ptos-adult-leading-frames--fa4-sm80sm90-fwdbwd-오픈--x"><span class="num">1</span>X 4세대+17: 랭킹 가중치 per-request 퍼터베이션 + v8-search 멀티모달 임베딩 신설 + Phoenix ContentFeatures wire 진입 + PTOS adult leading-frames + FA4 SM80/SM90 fwd·bwd 오픈 — X</a><ol><li><a href="#a-랭킹-스코어러-per-head-weight-perturbation-확인">A. 랭킹 스코어러 per-head weight perturbation 확인</a></li><li><a href="#b-grox-v8-search-멀티모달-포스트-임베딩-스택-신설-확인">B. grox v8-search 멀티모달 포스트 임베딩 스택 신설 확인</a></li><li><a href="#c-phoenix-wire-format에-contentfeatures-진입-확인">C. Phoenix wire format에 ContentFeatures 진입 확인</a></li><li><a href="#d-ptos-adult-content-leading-frames-심층-재스캔-경로-확인">D. PTOS adult-content leading-frames 심층 재스캔 경로 확인</a></li><li><a href="#e-phoenix-fa4-attention-커널-forwardbackward-양쪽-sm80sm90-오픈소스-확인">E. Phoenix FA4 attention 커널: forward·backward 양쪽 SM80·SM90 오픈소스 확인</a></li><li><a href="#f-부수-변화-요약-확인">F. 부수 변화 요약 확인</a></li></ol></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-x-4세대17-랭킹-가중치-per-request-퍼터베이션--v8-search-멀티모달-임베딩-신설--phoenix-contentfeatures-wire-진입--ptos-adult-leading-frames--fa4-sm80sm90-fwdbwd-오픈--x"><span class="num">1</span>X 4세대+17: 랭킹 가중치 per-request 퍼터베이션 + v8-search 멀티모달 임베딩 신설 + Phoenix ContentFeatures wire 진입 + PTOS adult leading-frames + FA4 SM80/SM90 fwd·bwd 오픈 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/49815da" target="_blank" rel="noopener">xai-org/x-algorithm@49815da</a> — 공개 소스코드, 2026-09-08 19:23 UTC, X.AI Corp. 78개 파일, +10,938/−982. <code>Open-source X Recommendation Algorithm</code> 정기 크론 미러.</p></div>
+<p><strong>배경.</strong> X의 오픈소스 미러는 프로덕션 캐넌을 크론으로 흘려보내는 정기 커밋이다. 어제(2026-09-09) 판이 4세대+16(<a href="https://github.com/xai-org/x-algorithm/commit/902a06f" target="_blank" rel="noopener">902a06f</a>)까지 반영됐고, 이 커밋이 그 다음 판이다. 이번 판은 지난 두 판(부수 변화 위주)과 달리 (a) 랭킹 스코어러의 참여 헤드 가중치를 서빙 요청마다 결정론적으로 흔드는 새 메커니즘, (b) grox 파이프라인에 검색 지면 전용 멀티모달 임베딩 스택 신설, (c) Phoenix 서빙 proto에 구조화된 컨텐츠 피처(<code>ContentFeatures</code>) 진입, (d) PTOS에 성인 컨텐츠 leading-frames 심층 재스캔 플랜 신설, (e) Phoenix FA4 attention 커널 forward·backward 양쪽을 두 아키텍처로 대규모 오픈소스화 — 다섯 개의 서로 다른 축이 한 커밋에 묶여 있어 축별로 나눠 정리한다.</p>
+<h3 id="a-랭킹-스코어러-per-head-weight-perturbation-확인">A. 랭킹 스코어러 per-head weight perturbation <span class="badge ok">확인</span></h3>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
 <p><strong>신규 param 두 개</strong> — <code>WeightPerturbationSigma</code>(f64, default 0.0)와 <code>WeightPerturbationSalt</code>(String, default <code>&quot;&quot;</code>). 헤더 sync 시각도 <code>2026-09-04T16:22:24Z</code> → <code>2026-09-08T16:24:06Z</code>로 갱신됐다.</p>
 <p><strong>핵심 배선</strong> — <code>ScoringWeights::from_params(&amp;query.params)</code> 뒤에 <code>.perturbed(query)</code>가 붙었다. <code>perturbed()</code> 자체 로직은:</p>
-<pre><code class="language-rust">pub(crate) fn perturbed(mut self, query: &amp;ScoredPostsQuery) -&gt; Self {
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn perturbed(mut self, query: &amp;ScoredPostsQuery) -&gt; Self {
     let sigma = query.params.get(WeightPerturbationSigma);
     if sigma &lt;= 0.0 {
         return self;
@@ -232,7 +74,7 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
     let digest = md5::compute(format!(&quot;{salt}:{user_id}:{head}&quot;));
     if digest[0] &amp; 1 == 1 { 1.0 } else { -1.0 }
 }
-</code></pre>
+</code></pre></figure>
 <p><strong>흔들리는 헤드 26개</strong> — <code>favorite</code>·<code>reply</code>·<code>retweet</code>·<code>photo_expand</code>·<code>video_open</code>·<code>click</code>·<code>open_link</code>·<code>profile_click</code>·<code>vqv</code>·<code>share</code>·<code>share_via_dm</code>·<code>share_via_copy_link</code>·<code>dwell</code>·<code>quote</code>·<code>quoted_click</code>·<code>quoted_vqv</code>·<code>dwell_time</code>·<code>click_dwell_time</code>·<code>active_secs_5m_residual_norm</code>·<code>follow_author</code>·<code>post_unexplored</code>·<code>not_interested</code>·<code>block_author</code>·<code>mute_author</code>·<code>report</code>·<code>not_dwelled</code>. 즉 4세대 랭커의 core positive 17헤드(engagement)와 negative 5헤드(user feedback), 그리고 continuous 3헤드(dwell·click_dwell·active_secs)가 전부 대상이다. <strong>가중치가 흔들리면 <code>positive_sum</code>·<code>negative_sum</code>·<code>total_sum</code>도 함께 재계산</strong>(<code>recompute_sums()</code>)돼 downstream 게이팅 로직(예: <code>not_dwelled</code> 페널티의 total_sum 스케일링)이 흔들린 값을 그대로 반영한다.</p>
 <p><strong>동작의 성격.</strong> 부호가 <code>md5(salt:user_id:head)</code>에 의존하므로:</p>
 <ul>
@@ -243,14 +85,14 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
 </ul>
 <p><strong>해석 (부분 [확인] + [추정]).</strong> 이건 세 가지로 읽힐 수 있다:</p>
 <ol>
-<li><strong>가중치 A/B의 gradient-free 인프라</strong> — 프로덕션 유저 트래픽으로 가중치 조합의 sensitivity를 재는 wobble 실험. <code>WeightPerturbationSalt</code>를 실험 arm마다 다르게 세팅하면 arm별로 독립적인 노이즈 프로필. <code>[확인]</code>이 계약 자체이고 A/B용 사용은 <code>[추정]</code>.</li>
-<li><strong>On-policy exploration / bootstrap-style bandit</strong> — VMRanker 이전 단계에서 스코어 자체를 흔들어 impression 다양화를 강제. Bandit에서 UCB보다 Thompson sampling에 가까운 형태(posterior 대신 fixed noise, 그러나 유저-헤드 조합마다 결정론). <code>[추정]</code>.</li>
-<li><strong>모델 편향 감사 / robustness 측정</strong> — 가중치가 흔들려도 모델 점수가 안정적으로 어떤 헤드에 의존하는지 관측하는 도구. <code>[추정]</code>.</li>
+<li><strong>가중치 A/B의 gradient-free 인프라</strong> — 프로덕션 유저 트래픽으로 가중치 조합의 sensitivity를 재는 wobble 실험. <code>WeightPerturbationSalt</code>를 실험 arm마다 다르게 세팅하면 arm별로 독립적인 노이즈 프로필. <span class="badge ok">확인</span>이 계약 자체이고 A/B용 사용은 <span class="badge est">추정</span>.</li>
+<li><strong>On-policy exploration / bootstrap-style bandit</strong> — VMRanker 이전 단계에서 스코어 자체를 흔들어 impression 다양화를 강제. Bandit에서 UCB보다 Thompson sampling에 가까운 형태(posterior 대신 fixed noise, 그러나 유저-헤드 조합마다 결정론). <span class="badge est">추정</span>.</li>
+<li><strong>모델 편향 감사 / robustness 측정</strong> — 가중치가 흔들려도 모델 점수가 안정적으로 어떤 헤드에 의존하는지 관측하는 도구. <span class="badge est">추정</span>.</li>
 </ol>
 <p><strong>전제되는 사실.</strong> default가 <code>0.0</code>이므로 프로덕션 기본은 여전히 결정론이다. 이 계약이 옵션으로 존재한다는 것 자체가 신호다: 4세대는 지금까지 <code>EnableViewerColdStart</code>(Thompson)·<code>ValueModelMode</code>(dwell_regret_sigmoid) 같은 개별 게이트로 stochasticity를 도입했는데, 이제 <strong>참여 헤드 가중치 전체를 대상으로 하는 통합된 stochastic layer</strong>를 붙였다. 4세대+16의 codivert impression 대칭 배선과 결이 같다: A/B 인프라 자체가 4세대에서 계속 두꺼워지고 있다.</p>
 <p><strong>한계.</strong> salt 값이 실제로 어떤 experiment framework에서 세팅되는지, σ 실 프로덕션 값이 얼마인지, 어느 지면(For You / Following / RankedFollowing)에 적용되는지, 결과 로깅이 어떤 side_effect로 흘러가는지는 오픈소스에 공개되지 않았다.</p>
-<h3 id="b-grox-v8-search-멀티모달-포스트-임베딩-스택-신설-확인">B. grox v8-search 멀티모달 포스트 임베딩 스택 신설 <code>[확인]</code></h3>
-<p><code>[확인]</code> — 신규·수정 파일 17개, <a href="https://github.com/xai-org/x-algorithm/tree/49815da/grox/flows/mm_emb"><code>grox/flows/mm_emb/</code></a>.</p>
+<h3 id="b-grox-v8-search-멀티모달-포스트-임베딩-스택-신설-확인">B. grox v8-search 멀티모달 포스트 임베딩 스택 신설 <span class="badge ok">확인</span></h3>
+<p><span class="badge ok">확인</span> — 신규·수정 파일 17개, <a href="https://github.com/xai-org/x-algorithm/tree/49815da/grox/flows/mm_emb" target="_blank" rel="noopener"><code>grox/flows/mm_emb/</code></a>.</p>
 <p><strong>신규 파일 12개</strong> — <code>embedder_v8_search.py</code>(113) + <code>renderer_v8_search.py</code>(461) + <code>plan_post_embedding_v8_search.py</code>(34) + <code>plan_post_embedding_v8_search_for_reply.py</code>(37) + <code>plan_post_embedding_v8_search_backfill.py</code>(43) + <code>plan_post_embedding_v8_search_backfill_batch.py</code>(16) + <code>task_backfill_fanout.py</code>(85) + <code>task_backfill_gate.py</code>(60) + <code>backfill_consumer_dedup.py</code>(49) + <code>batched_fav_hydrator.py</code>(65) + <code>adaptive_min_fav.py</code>(63). 총 1,026줄 신규 + <code>generators.py</code>(+82) + <code>constants.py</code>(+9) + <code>task_multimodal_post_embedding.py</code>(+52) + <code>task_write_mm_embedding_sink.py</code>(+90) + <code>task_rate_limit.py</code>(+15) + <code>task_embedding_pub.py</code>(+5).</p>
 <p><strong>아키텍처.</strong> 기존에 존재하는 두 임베딩 파이프라인 — <code>v5_1</code>(레거시)·<code>v8_2</code>(현행) — 옆에 세 번째 파이프라인 <code>v8_search</code>를 나란히 배선한다.</p>
 <ul>
@@ -259,8 +101,8 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
 <li><strong>네 kafka 스트림 배선</strong> — <code>POST_EMBEDDING_V8_SEARCH_STREAM</code>(<code>grox-multimodal-embedding-requests-with-summary</code> 토픽), <code>POST_EMBEDDING_V8_SEARCH_FOR_REPLY_STREAM</code>(<code>content-understanding-...-min-traction-for-grox-multi-modal</code>), <code>POST_EMBEDDING_BACKFILL_STREAM</code>(<code>grox-multimodal-embedding-backfill</code>)이 각각 대응 Plan을 주입.</li>
 </ul>
 <p><strong>렌더러(<code>V8SearchEmbedPostRenderer.render_for_embedding</code>).</strong></p>
-<pre><code class="language-python">INSTRUCTION_PREFIX = &quot;Represent this X post (formerly Twitter) for recommendation: capture its topic, intent, key entities, and likely engagement.&quot;
-</code></pre>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">INSTRUCTION_PREFIX = &quot;Represent this X post (formerly Twitter) for recommendation: capture its topic, intent, key entities, and likely engagement.&quot;
+</code></pre></figure>
 <ul>
 <li><strong>instruction prefix</strong>를 문서 맨 앞에 붙인다. E5·GTE 계열 instruction-tuned embedding에서 흔한 패턴이다. 재현할 때 <code>Represent this X post ... recommendation:</code> 스타일의 프롬프트가 검색-랭킹 목적 벡터 공간에 맞춰진 임베딩을 유도한다.</li>
 <li><strong>저자 블록</strong>(author bio·verified·팔로워 수·팔로잉 수·계정 가입월)이 포스트 텍스트 전에 들어간다. 팔로워 수는 <code>_humanize_followers</code>(K/M/B 단위)로 사람이 읽는 표기로 축약된 값 + <code>_tier_label</code>(<code>&lt;10</code>·<code>10-100</code>·<code>100-1K</code>·…·<code>&gt;100M</code>) 두 표현을 함께 붙인다. 즉 인코더가 &quot;정확한 숫자&quot;와 &quot;규모 구간&quot; 두 신호를 동시에 보게 한다.</li>
@@ -276,7 +118,7 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
 <li>관측 히스토그램 3개(<code>render_duration_ms</code>·<code>encode_duration_ms</code>·<code>total_duration_ms</code>) + 카운터 2개(<code>image_count</code>·<code>core_user_hit</code>).</li>
 </ul>
 <p><strong>backfill 5-DAG 아키텍처.</strong> 새 포스트에 대해 실시간 파이프라인이 지나가는 것 외에, 과거 포스트를 뒤늦게 임베딩하는 backfill 경로가 신설됐다:</p>
-<pre><code>KafkaMmBackfillRequestLoader(TOPIC_BACKFILL=&quot;grox-multimodal-embedding-backfill&quot;)
+<pre tabindex="0"><code>KafkaMmBackfillRequestLoader(TOPIC_BACKFILL=&quot;grox-multimodal-embedding-backfill&quot;)
   ↓ (post_id의 byte-packed list&lt;i64&gt;를 배치 크기 BATCH_SIZE로 분할)
 TaskBackfillBatchFanout
   ↓ (BackfillConsumerDedup: 배치 안에서 이미 관측한 post_id 제거)
@@ -287,9 +129,9 @@ PlanPostEmbeddingV8SearchBackfill (인스턴스별 실행)
 TaskBackfillFavGate + TaskBackfillPreloadGate + TaskMultimodalPostEmbeddingV8SearchBackfill + TaskWriteV8SearchSink
 </code></pre>
 <p><strong>적응형 fav 임계 (<code>AdaptiveMinFav</code>).</strong> 이게 흥미로운 부분이다:</p>
-<pre><code class="language-python">_TARGET_QPS = float(os.environ.get(&quot;MM_EMB_BACKFILL_TARGET_QPS&quot;, &quot;5&quot;))
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">_TARGET_QPS = float(os.environ.get(&quot;MM_EMB_BACKFILL_TARGET_QPS&quot;, &quot;5&quot;))
 _min_fav = AdaptiveMinFav(start=MIN_FAV_COUNT, target_qps=_TARGET_QPS)
-</code></pre>
+</code></pre></figure>
 <ul>
 <li><strong>PI(비례-적분) 컨트롤러 스타일</strong>로 backfill의 실제 통과 QPS를 관측해 fav 임계를 동적으로 조절한다. 게이트 통과 QPS가 target(기본 5 QPS)보다 높으면 임계를 올리고(fav 20k에서 시작), 낮으면 임계를 내린다. <code>deadband=0.1</code>(±10%까지는 조정 없음), <code>warmup_s=60</code>(첫 60초는 관측만), <code>gain=0.3</code>(에러 대비 조정 강도), <code>floor=0</code>·<code>cap=20000</code>(경계값).</li>
 <li><strong>왜 필요한가.</strong> backfill 트래픽은 임베딩 서버의 GPU/CPU 예산과 하류 kafka sink의 처리 능력을 초과하지 않도록 정교하게 조절돼야 한다. 하드코딩된 threshold(예: <code>MIN_FAV_COUNT = 20_000</code>)로는 kafka 재생 속도·서버 큐 압력에 반응할 수 없다. <code>AdaptiveMinFav</code>가 이를 자동으로 스로틀링한다. <strong>인프라 코드에서 흔한 rate limiter 패턴을 임베딩 대상 선정에 얹은 것</strong>이 새로운 지점이다.</li>
@@ -302,10 +144,10 @@ _min_fav = AdaptiveMinFav(start=MIN_FAV_COUNT, target_qps=_TARGET_QPS)
 </ul>
 <p><strong>의미.</strong> 지금까지 X의 grox multimodal 임베딩은 하나의 v5·하나의 v8.2 벡터 공간을 랭킹·retrieval·search 전반에 재사용했다(2026-09-01 4세대+13에서 관측). 이번 배선은 <strong>검색 지면 전용 벡터 공간을 처음으로 분리</strong>한 사건이다. 4세대+4(2026-08-19)에서 Phoenix가 <code>xrecsys_search</code> config로 검색 랭킹 지면에 확장된 것과 대응한다: 검색 랭킹 모델과 짝을 이루는 검색 문서 임베딩 파이프라인이 이제 완비된 것이다.</p>
 <p><strong>한계.</strong> <code>RECSYS_V8_SEARCH_EMBED</code>·<code>RECSYS_V8_SEARCH_BACKFILL_EMBED</code> 두 endpoint의 실제 모델(dimension, base architecture, training data)은 오픈소스에 없다. 검색 지면에 어떻게 소비되는지(retrieval index 이름, ANN 파라미터)도 미공개. Kafka 토픽 <code>grox-multimodal-embedding-v8-search</code>는 등록됐지만 consumer 쪽 지면 코드는 함께 오지 않았다.</p>
-<h3 id="c-phoenix-wire-format에-contentfeatures-진입-확인">C. Phoenix wire format에 <code>ContentFeatures</code> 진입 <code>[확인]</code></h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/python/common/xai-proto/proto/recsys.proto"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/models/content_features.rs"><code>home-mixer/models/content_features.rs</code></a> (185줄 신규).</p>
+<h3 id="c-phoenix-wire-format에-contentfeatures-진입-확인">C. Phoenix wire format에 <code>ContentFeatures</code> 진입 <span class="badge ok">확인</span></h3>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/models/content_features.rs" target="_blank" rel="noopener"><code>home-mixer/models/content_features.rs</code></a> (185줄 신규).</p>
 <p><strong>신규 proto message</strong>:</p>
-<pre><code class="language-protobuf">message TweetInfo {
+<figure class="highlight"><pre tabindex="0"><code class="language-protobuf" data-lang="protobuf">message TweetInfo {
   // ...
   ScoreInfo scoreInfo = 35;
   ContentFeatures contentFeatures = 36;
@@ -321,10 +163,10 @@ message ContentFeatures {
   uint32 newlineCount = 6;
   bool hasUrl = 7;
 }
-</code></pre>
+</code></pre></figure>
 <p><strong>7개 시그널의 의미.</strong> <code>has_video</code>·<code>has_photo</code>·<code>media_count</code>·<code>max_video_duration_ms</code>는 기존에도 개별 필드로 존재하던 미디어 시그널을 하나의 struct로 묶은 것이지만, 나머지 3개는 새롭게 노출되는 텍스트 특성이다:</p>
 <ul>
-<li><strong><code>weighted_text_len</code></strong> — 그냥 문자 길이가 아니라 <a href="https://developer.twitter.com/en/docs/counting-characters">Twitter 자체 텍스트 길이 계산 규칙</a>을 그대로 따른다:<ul>
+<li><strong><code>weighted_text_len</code></strong> — 그냥 문자 길이가 아니라 <a href="https://developer.twitter.com/en/docs/counting-characters" target="_blank" rel="noopener">Twitter 자체 텍스트 길이 계산 규칙</a>을 그대로 따른다:<ul>
 <li><strong>URL은 무조건 23자로 카운트</strong>(<code>t.co</code> shortener 정책과 동일).</li>
 <li><strong>CJK 문자, punctuation, 이모지 modifier(스킨톤 등)는 2자</strong>.</li>
 <li><strong>ASCII·기본 라틴은 1자</strong>.</li>
@@ -336,17 +178,17 @@ message ContentFeatures {
 <li><strong><code>has_url</code></strong> — external URL이 하나 이상 있는지.</li>
 </ul>
 <p><strong>빌더 (<code>home-mixer/models/content_features.rs</code>).</strong> 4세대의 코드 스타일대로 순수 함수 2개(<code>build</code>·<code>build_quoted</code>)만 export한다. <code>TextMetrics::of(text, attachment_urls)</code>가 실제 계산을 담당하고, 회귀 테스트 5개로 Twitter의 text weighting rule을 코드화한다:</p>
-<pre><code class="language-rust">assert_eq!(weighted(&quot;&quot;), 0);
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">assert_eq!(weighted(&quot;&quot;), 0);
 assert_eq!(weighted(&quot;hello world&quot;), 11);
 assert_eq!(weighted(&quot;日本語&quot;), 6);  // CJK 3자 × 2
 assert_eq!(weighted(&quot;see https://t.co/abc123 now&quot;), 3 + 1 + 23 + 1 + 3);  // URL=23
 assert_eq!(weighted(&quot;ok 👍🏽&quot;), 2 + 1 + 2);  // 스킨톤 modifier는 0
 assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic space도 CJK 취급
-</code></pre>
+</code></pre></figure>
 <p><strong>의미.</strong> 이제까지 Phoenix 랭커가 소비하는 컨텐츠 시그널은 (a) 임베딩 테이블에 lookup되는 hashed feature (b) <code>has_media</code>·<code>has_video</code>·<code>view_count</code> 같은 산발적 boolean·정수였다. 4세대+17에서 <strong>텍스트 자체의 구조 시그널이 서빙 wire format의 first-class field로 승격</strong>됐다. 특히 <code>weighted_text_len</code>은 트윗 UI의 400자 상한과 직결되는 값이므로 <strong>&quot;이 포스트가 얼마나 꽉 차 있나 / URL만 걸고 지나가는 pass-through인가&quot;</strong> 를 랭커가 명시적으로 학습할 수 있게 된다.</p>
 <p><strong>한계.</strong> 이 시그널이 랭킹 헤드에서 어떻게 소비되는지는 이번 커밋에 없다. <code>phoenix/xrex/models/recsys_model.py</code>에 <code>content_features</code>를 읽는 코드가 아직 없기 때문이다. 즉 <strong>wire는 실렸으나 학습 소비는 다음 커밋 관측 대상</strong>이다.</p>
-<h3 id="d-ptos-adult-content-leading-frames-심층-재스캔-경로-확인">D. PTOS adult-content leading-frames 심층 재스캔 경로 <code>[확인]</code></h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/plan_safety_ptos_adult_content_leading_frames.py"><code>grox/flows/ptos/plan_safety_ptos_adult_content_leading_frames.py</code></a> (56줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py"><code>grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py</code></a> (81줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/constants.py"><code>grox/flows/ptos/constants.py</code></a> (+15).</p>
+<h3 id="d-ptos-adult-content-leading-frames-심층-재스캔-경로-확인">D. PTOS adult-content leading-frames 심층 재스캔 경로 <span class="badge ok">확인</span></h3>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/plan_safety_ptos_adult_content_leading_frames.py" target="_blank" rel="noopener"><code>grox/flows/ptos/plan_safety_ptos_adult_content_leading_frames.py</code></a> (56줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py</code></a> (81줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/constants.py" target="_blank" rel="noopener"><code>grox/flows/ptos/constants.py</code></a> (+15).</p>
 <p><strong>진입 필터 (<code>TaskSafetyPtosAdultContentLeadingFramesFilter._eligible_with_post</code>).</strong> 6단 게이트를 모두 통과해야 재스캔 대상이 된다:</p>
 <ol>
 <li><code>post.user</code>가 있어야 한다(anonymous·삭제된 유저 제외).</li>
@@ -360,15 +202,15 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <p><strong>의미.</strong> 이 경로가 왜 필요한가:</p>
 <ul>
 <li>30초 넘는 영상은 media hydration 비용(디코딩·프레임 추출·모델 호출)이 크므로 실시간 파이프라인은 미리 정해진 sample 프레임만 뽑아 판정한다. 그런데 <strong>회피 유저가 첫 15초 이상을 정상 콘텐츠로 채우고 후반에 성인 콘텐츠를 넣는 패턴</strong>을 취하면 실시간 판정이 놓칠 수 있다.</li>
-<li>4세대+12에서 도입된 <code>PlanSafetyPtosSpecialVideo</code>는 정적 오버레이(캡션·워터마크로 가려진 콘텐츠)를 다루고, 4세대+17의 이 경로는 **시간축 회피(첫 몇 초를 안전하게 위장)**를 다룬다. 이름은 leading-frames지만 실제로는 &quot;앞 10초를 crop해서 재판정&quot;이므로 <strong>성인 콘텐츠가 앞부분에 짧게 나타나는 케이스를 특히 겨냥</strong>한 것으로 보인다 <code>[추정]</code>.</li>
+<li>4세대+12에서 도입된 <code>PlanSafetyPtosSpecialVideo</code>는 정적 오버레이(캡션·워터마크로 가려진 콘텐츠)를 다루고, 4세대+17의 이 경로는 **시간축 회피(첫 몇 초를 안전하게 위장)**를 다룬다. 이름은 leading-frames지만 실제로는 &quot;앞 10초를 crop해서 재판정&quot;이므로 <strong>성인 콘텐츠가 앞부분에 짧게 나타나는 케이스를 특히 겨냥</strong>한 것으로 보인다 <span class="badge est">추정</span>.</li>
 <li>prior AdultContent violated policy가 있는데 <code>isNsfw</code>가 아닌 이유는 4세대+7의 3개 카테고리 cross-validator(ChildSafety·ViolentMedia·IllegalAndRegulatedBehaviors)에서 Grok 4.5 심판이 <strong>강등만 허용</strong>하기 때문에 primary가 AdultContent라 해도 NSFW 태그로 굳어지지 않을 수 있다. 이 경로는 <strong>강등된 판정을 다시 뒤집을 수 있는 두 번째 심판</strong>을 제공한다.</li>
 </ul>
-<p><strong>진입 임계 512 fav의 함의.</strong> deluxe 임계(<code>deluxe_fav_count_threshold</code>)는 훨씬 높은 값일 가능성이 크므로(4세대+7의 log에서 deluxe = 5,000 이상 추정 <code>[추정]</code>), 512 fav 이상의 prior AdultContent 없는 케이스만 unconditional 진입은 <strong>prior 판정이 AdultContent를 잡지 못한 저강도 signal 케이스를 커버</strong>하려는 것이다. 512는 트위터 중간 인기 포스트에 해당하는 값이고, 이 규모의 오탐/누락은 유저 반응(신고, 뮤트)이 이미 발생했을 확률이 높다.</p>
+<p><strong>진입 임계 512 fav의 함의.</strong> deluxe 임계(<code>deluxe_fav_count_threshold</code>)는 훨씬 높은 값일 가능성이 크므로(4세대+7의 log에서 deluxe = 5,000 이상 추정 <span class="badge est">추정</span>), 512 fav 이상의 prior AdultContent 없는 케이스만 unconditional 진입은 <strong>prior 판정이 AdultContent를 잡지 못한 저강도 signal 케이스를 커버</strong>하려는 것이다. 512는 트위터 중간 인기 포스트에 해당하는 값이고, 이 규모의 오탐/누락은 유저 반응(신고, 뮤트)이 이미 발생했을 확률이 높다.</p>
 <p><strong>한계.</strong> 실제 프로덕션에서 이 경로가 얼마나 활성화되는지, 재판정에서 실제로 뒤집는 비율(precision·recall)이 얼마인지, 어떤 심판 모델을 쓰는지(플랜 DAG를 보면 정규 category/policy/safemodel/cross-validation 모두 재실행)는 미공개. Rate limit(<code>TaskRateLimitSafetyPtosAdultContentLeadingFrames</code>)이 별도로 설정되어 비용 상한이 있다.</p>
-<h3 id="e-phoenix-fa4-attention-커널-forwardbackward-양쪽-sm80sm90-오픈소스-확인">E. Phoenix FA4 attention 커널: forward·backward 양쪽 SM80·SM90 오픈소스 <code>[확인]</code></h3>
-<p><code>[확인]</code> — <a href="https://github.com/xai-org/x-algorithm/tree/49815da/phoenix/xrex/cutedsl/ranker_fa4"><code>phoenix/xrex/cutedsl/ranker_fa4/</code></a>.</p>
+<h3 id="e-phoenix-fa4-attention-커널-forwardbackward-양쪽-sm80sm90-오픈소스-확인">E. Phoenix FA4 attention 커널: forward·backward 양쪽 SM80·SM90 오픈소스 <span class="badge ok">확인</span></h3>
+<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/49815da/phoenix/xrex/cutedsl/ranker_fa4" target="_blank" rel="noopener"><code>phoenix/xrex/cutedsl/ranker_fa4/</code></a>.</p>
 <p><strong>신규·수정 규모</strong> — 6개 파일 신규 + 4개 파일 수정:</p>
-<table>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col class="w8"><col class="w8"><col></colgroup>
 <thead>
 <tr>
 <th>파일</th>
@@ -443,14 +285,14 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <td>+2/−7</td>
 <td>기존 post-bwd 파일 정리</td>
 </tr>
-</tbody></table>
+</tbody></table></div>
 <p><strong>총 5,080줄 신규 + 대규모 수정.</strong> 이번 커밋에서 개별 라인 수가 가장 큰 축이다.</p>
 <p><strong>메타데이터.</strong> 파일 헤더에 라이센스 명기가 포함된다:</p>
-<pre><code class="language-python"># Derived from flash-attention (https://github.com/Dao-AILab/flash-attention);
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python"># Derived from flash-attention (https://github.com/Dao-AILab/flash-attention);
 # modified by X.AI Corp.
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2026 X.AI Corp.
-</code></pre>
+</code></pre></figure>
 <p>즉 <strong>Dao-AILab/flash-attention의 원본 코드를 base로 X.AI가 수정한 fork</strong>를 이번에 오픈소스로 공개한 것이다. Apache-2.0 라이센스(원본 BSD 3-Clause에서 재라이센스 가능). <code>phoenix/NOTICE</code> 파일도 +198줄로 flash-attention 서브구성요소의 저작권 표기 추가.</p>
 <p><strong>주요 특징 (<code>FlashAttentionForwardBase</code>·<code>FlashAttentionBackwardSm80</code>).</strong></p>
 <ul>
@@ -458,7 +300,7 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <li><strong><code>head_dim</code> != <code>head_dim_v</code> 지원</strong> — Q·K와 V의 hidden dim이 달라도 되는 asymmetric attention. 랭킹 모델에서 값 차원을 낮춰 memory footprint를 줄이는 트릭.</li>
 <li><strong><code>pack_gqa</code> 지원</strong> — Grouped Query Attention(여러 Q head가 하나의 KV head를 공유). LLM에서 흔한 최적화가 랭킹 attention에도 적용된다.</li>
 <li><strong><code>is_causal</code>·<code>is_local</code>·<code>score_mod</code>·<code>mask_mod</code> 지원</strong> — 랭킹에서 causal masking은 시퀀스 히스토리 attention에 필요하고, <code>score_mod</code>·<code>mask_mod</code>는 Flex Attention의 사용자 정의 modifier hook.</li>
-<li><strong><code>has_aux_tensors</code> 옵션</strong> — attention에 추가 sideband tensor를 흘려넣는 경로(4세대+14에서 도입된 backbone scores 등에 연결될 것 <code>[추정]</code>).</li>
+<li><strong><code>has_aux_tensors</code> 옵션</strong> — attention에 추가 sideband tensor를 흘려넣는 경로(4세대+14에서 도입된 backbone scores 등에 연결될 것 <span class="badge est">추정</span>).</li>
 <li><strong><code>SingleTileScheduler</code>·<code>SingleTileVarlenScheduler</code></strong> — 두 스케줄러가 각각 fixed-length·variable-length seqlen에 대응. 4세대+15에서 도입된 <code>build_dense_block_sparse_layout</code> 시그니처 확장이 이제 varlen backward까지 완결됐다.</li>
 </ul>
 <p><strong>backward-specific 특징 (<code>FlashAttentionBackwardSm80</code>).</strong></p>
@@ -474,15 +316,15 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <li><strong>flash-attention 상류 재사용.</strong> X는 CuTeDSL을 처음부터 새로 쓰기보다 Dao-AILab 원본을 fork해 수정하는 전략을 택했다. 이는 attention 커널이 LLM 커뮤니티가 검증한 표준화된 인프라이며, X도 그 표준을 벗어나지 않았다는 신호다.</li>
 </ul>
 <p><strong>한계.</strong> SM90/SM80 커널의 실제 벤치마크(GB/s·TFLOPS·baseline 대비 speedup)는 오픈소스에 없다. <code>block_sparse_utils.py</code>가 큰 폭으로 재작성됐지만 어떤 sparse pattern이 실제로 사용되는지는 모델 config에 명시되지 않았다.</p>
-<h3 id="f-부수-변화-요약-확인">F. 부수 변화 요약 <code>[확인]</code></h3>
+<h3 id="f-부수-변화-요약-확인">F. 부수 변화 요약 <span class="badge ok">확인</span></h3>
 <ul>
-<li><strong>CutlassCall device digest sanitization</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/xrex/utils/aot.py"><code>phoenix/xrex/utils/aot.py</code></a> (+54/−1). <code>_sanitize_cutlass_calls</code>가 StableHLO의 <code>stablehlo.custom_call{target=CuteDSLRT_NvJaxCutlassCall}</code>을 순회해 backend_config의 <code>module</code> 필드(ELF/fatbin 바이트열)를 SHA256 digest로 대체(<code>device_digest:&lt;hex&gt;</code>). <code>cutlass_module_device_digest</code>가 ELF 헤더를 파싱해 device blob 섹션만 hash. <code>AOT_CACHE_VERSION</code>도 <code>&quot;20260705&quot;</code> → <code>&quot;20260904&quot;</code>로 갱신. <strong>의미</strong>: JAX AOT 캐시가 동일한 CUDA kernel binary에 대해 안정적인 cache key를 갖게 해 재컴파일 지옥을 피한다. 랭킹 모델처럼 embedded kernel이 많은 경우 필수 배선.</li>
-<li><strong>번들 완료 checkpoint discovery</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a> (+207/−9). <code>full_prefixes_newest_first</code>가 채널 전체에 존재하는 prefix들을 최신 순으로 반환하는 헬퍼로 분리. <code>select_bundle_checkpoint</code>가 <code>export/MANIFEST.json</code>이 모든 채널에 non-empty로 존재하는 최신 checkpoint를 고른다. 아직 unbundled인 최신 checkpoint는 warn 로그와 함께 스킵. <code>download_named_files</code>가 신설돼 특정 파일 이름 리스트를 원자적으로 다운로드(모든 파일이 존재하는 채널을 랜덤 선택). <strong>의미</strong>: 4세대+13의 <code>.mlirbc</code> 번들 시스템(StableHLO export)이 서빙 로더에서도 완전 배선됐다. 번들이 완료된 checkpoint만 서빙에 실린다.</li>
-<li><strong>서빙용 sequence_len 자동 계산</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/xrex/train/recsys_bundle_export.py"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a> (+48). <code>_serving_sequence_len</code>이 training config의 <code>sequence_len</code>·<code>history_seq_len</code>·<code>candidate_seq_len</code>·<code>num_negatives_per_example</code>·<code>num_global_negatives_per_example</code>에서 prefix token 길이를 역산하고, serving 시 <code>serving_seq_len = prefix + history + candidate</code>로 attention kernel 크기 override. <code>num_user_prefix_tokens</code>와 어긋나면 <code>ValueError</code>로 실패 close. MANIFEST에도 <code>model_sequence_len</code> 추가.</li>
-<li><strong><code>quote_hydrator.rs</code> 대폭 확장</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/candidate_hydrators/quote_hydrator.rs"><code>home-mixer/candidate_hydrators/quote_hydrator.rs</code></a> (+142/−12). <code>MediaInfoCacheClient</code>가 새 dependency로 주입되고, <code>get_quoted_content</code>가 인용 포스트의 core data와 media info를 200ms timeout 안에서 병렬 조회. Cache miss 시 fallback. 4세대+17의 <code>ContentFeatures.quotedContentFeatures</code> 배선의 상류 조건이다.</li>
+<li><strong>CutlassCall device digest sanitization</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/xrex/utils/aot.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/aot.py</code></a> (+54/−1). <code>_sanitize_cutlass_calls</code>가 StableHLO의 <code>stablehlo.custom_call{target=CuteDSLRT_NvJaxCutlassCall}</code>을 순회해 backend_config의 <code>module</code> 필드(ELF/fatbin 바이트열)를 SHA256 digest로 대체(<code>device_digest:&lt;hex&gt;</code>). <code>cutlass_module_device_digest</code>가 ELF 헤더를 파싱해 device blob 섹션만 hash. <code>AOT_CACHE_VERSION</code>도 <code>&quot;20260705&quot;</code> → <code>&quot;20260904&quot;</code>로 갱신. <strong>의미</strong>: JAX AOT 캐시가 동일한 CUDA kernel binary에 대해 안정적인 cache key를 갖게 해 재컴파일 지옥을 피한다. 랭킹 모델처럼 embedded kernel이 많은 경우 필수 배선.</li>
+<li><strong>번들 완료 checkpoint discovery</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a> (+207/−9). <code>full_prefixes_newest_first</code>가 채널 전체에 존재하는 prefix들을 최신 순으로 반환하는 헬퍼로 분리. <code>select_bundle_checkpoint</code>가 <code>export/MANIFEST.json</code>이 모든 채널에 non-empty로 존재하는 최신 checkpoint를 고른다. 아직 unbundled인 최신 checkpoint는 warn 로그와 함께 스킵. <code>download_named_files</code>가 신설돼 특정 파일 이름 리스트를 원자적으로 다운로드(모든 파일이 존재하는 채널을 랜덤 선택). <strong>의미</strong>: 4세대+13의 <code>.mlirbc</code> 번들 시스템(StableHLO export)이 서빙 로더에서도 완전 배선됐다. 번들이 완료된 checkpoint만 서빙에 실린다.</li>
+<li><strong>서빙용 sequence_len 자동 계산</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a> (+48). <code>_serving_sequence_len</code>이 training config의 <code>sequence_len</code>·<code>history_seq_len</code>·<code>candidate_seq_len</code>·<code>num_negatives_per_example</code>·<code>num_global_negatives_per_example</code>에서 prefix token 길이를 역산하고, serving 시 <code>serving_seq_len = prefix + history + candidate</code>로 attention kernel 크기 override. <code>num_user_prefix_tokens</code>와 어긋나면 <code>ValueError</code>로 실패 close. MANIFEST에도 <code>model_sequence_len</code> 추가.</li>
+<li><strong><code>quote_hydrator.rs</code> 대폭 확장</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/candidate_hydrators/quote_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/quote_hydrator.rs</code></a> (+142/−12). <code>MediaInfoCacheClient</code>가 새 dependency로 주입되고, <code>get_quoted_content</code>가 인용 포스트의 core data와 media info를 200ms timeout 안에서 병렬 조회. Cache miss 시 fallback. 4세대+17의 <code>ContentFeatures.quotedContentFeatures</code> 배선의 상류 조건이다.</li>
 <li><strong><code>media_info_hydrator.rs</code> +70/−15</strong> — 미디어 정보 조회의 리팩터. Content features 계산에 필요한 max_video_duration_ms 등이 여기서 hydration되는 경로 확장.</li>
 <li><strong>PTOS 재분류 트리거 확장</strong> — <code>task_safety_ptos_policy.py</code> (+4/−1)에서 policy detection이 leading-frames 경로의 재판정에도 대응. <code>task_rate_limit.py</code>에 <code>TaskRateLimitSafetyPtosAdultContentLeadingFrames</code> 추가.</li>
-<li><strong><code>home-mixer/bin/pipeline_components_json.rs</code> 통째 삭제</strong>(76줄). 오프라인 debugging용 JSON dump 유틸이었던 것으로 보이나 더 이상 유지 불가능한 상태였을 것으로 추정 <code>[추정]</code>.</li>
+<li><strong><code>home-mixer/bin/pipeline_components_json.rs</code> 통째 삭제</strong>(76줄). 오프라인 debugging용 JSON dump 유틸이었던 것으로 보이나 더 이상 유지 불가능한 상태였을 것으로 추정 <span class="badge est">추정</span>.</li>
 <li><strong>candidate-pipeline 8파일 소수 수정</strong> (+103/−38). Pipeline 코어의 signature 정리, 별도 시맨틱 변화는 없음.</li>
 <li><strong>VF <code>safety_label_source/proto.rs</code> +34/−38</strong>. Proto 확장 소수, 시맨틱 변화 없음.</li>
 <li><strong>video_tools 소수 수정</strong> — <code>image.py</code> +42/−19, <code>subtitles.py</code> +3/−1, <code>video_frames.py</code> +7/−7. Video hydration 정확성 개선.</li>
@@ -521,7 +363,7 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <li><code>Exploring Bottom-Up Clustering for Creating Semantic IDs</code> — Semantic ID 생성 방법론. 이미 topics/semantic-ids.md에서 추적 중인 스레드에 붙일 근거 없음.</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<ul>
+<div class="next"><ul>
 <li><strong>weight perturbation 실 프로덕션 σ 값</strong> — 다음 커밋에서 <code>home-mixer/params/param.rs</code>의 default가 0.0에서 non-zero로 바뀌거나, <code>home-mixer/util/experiments/</code> 아래에 salt 배정 로직이 등장하는지 감시. <code>salt</code>가 experiment framework(GrowthBook 등)에서 세팅된다면 그 배선도 함께 공개될 가능성.</li>
 <li><strong><code>ContentFeatures</code>가 랭킹 헤드에서 어떻게 소비되는가</strong> — <code>phoenix/xrex/models/recsys_model.py</code> 또는 <code>recsys_two_tower_model.py</code>에 <code>weighted_text_len</code>·<code>newline_count</code>·<code>has_url</code>을 embedding하는 코드가 다음 커밋에서 붙는지가 wire+consume 완결 관측 포인트.</li>
 <li><strong>v8-search retrieval index 배선</strong> — Phoenix <code>xrex/data/retrieval_dataset.py</code> 또는 <code>phoenix-rankall</code>에 <code>grox-multimodal-embedding-v8-search</code> topic을 소비해 index를 만드는 코드가 언제 붙는지.</li>
@@ -529,76 +371,19 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <li><strong>FA4 SM90 벤치마크</strong> — Phoenix TRAINING.md 또는 후속 blog post에서 H100 학습 speedup·throughput 수치가 발표되는지.</li>
 <li><strong>arXiv cs.IR 후속</strong> — SequenceO1은 100K 시퀀스라는 축이 4세대 랭커의 <code>history_seq_len 1022</code>(4세대+4의 <code>xrecsys_search</code>)와 비교 가능성이 있으므로 프로덕션 근거가 붙는지 감시.</li>
 </ul>
-<p>조회 실패: 없음.</p>
+<p>조회 실패: 없음.</p></div>
 
 </div>
-<div class="wrap"><div class="pager"><a href="daily-2026-09-09.html"><div class="d">◂ 이전 리포트</div><div class="v">2026-09-09</div></a><a class="r" href="daily-2026-09-11.html"><div class="d">다음 리포트 ▸</div><div class="v">2026-09-11</div></a></div></div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-09-09.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-09-09</span></a><a class="pg-next" href="daily-2026-09-11.html" rel="next"><span class="pg-k">다음 리포트 →</span><span class="pg-v mono">2026-09-11</span></a></nav>
+</footer>
+</article>
 </main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL <span class="hits" id="hits" aria-hidden="true" hidden></span></p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
 </div>
-<script>
-(function () {
-  var C = document.getElementById("content");
-  // 근거 등급 → 컬러 칩
-  var map = { "[확인]": "ok", "[관찰]": "obs", "[추정]": "est" };
-  C.querySelectorAll("code").forEach(function (c) {
-    var t = c.textContent.trim();
-    if (map[t]) { var s = document.createElement("span"); s.className = "badge " + map[t]; s.textContent = t.slice(1, -1); c.replaceWith(s); }
-  });
-  // ⚠ 경고 문단
-  C.querySelectorAll("p, li").forEach(function (el) {
-    if (el.textContent.trim().startsWith("⚠")) el.classList.add("warn");
-  });
-  // 표 스크롤 래퍼
-  C.querySelectorAll("table").forEach(function (t) {
-    var w = document.createElement("div"); w.className = "tablewrap";
-    t.parentNode.insertBefore(w, t); w.appendChild(t);
-  });
-  // "다음에 볼 것" 체크리스트화
-  C.querySelectorAll("h2").forEach(function (h) {
-    if (!/다음에 볼 것|다음 관측|열린 질문/.test(h.textContent)) return;
-    var box = document.createElement("div"); box.className = "next";
-    var n = h.nextElementSibling;
-    while (n && n.tagName !== "H2") { var nx = n.nextElementSibling; box.appendChild(n); n = nx; }
-    h.parentNode.insertBefore(box, h.nextSibling);
-  });
-  // 목차 — h2는 번호 배지, h3는 들여쓰기
-  var toc = document.getElementById("toc");
-  var heads = C.querySelectorAll("h2, h3");
-  heads.forEach(function (h, i) {
-    if (!h.id) h.id = "s" + i;
-    var li = document.createElement("li");
-    var a = document.createElement("a");
-    a.href = "#" + h.id;
-    a.className = "s" + (h.tagName === "H3" ? " sub" : "");
-    var txt = h.textContent.trim();
-    var m = txt.match(/^(\d+[-A-Z]*)\.\s*(.*)$/);
-    if (m && h.tagName === "H2") {
-      a.innerHTML = '<span class="n">' + m[1] + '</span><span class="t"></span>';
-      a.querySelector(".t").textContent = m[2];
-      h.innerHTML = '<span class="num">' + m[1] + '</span><span></span>';
-      h.querySelector("span:last-child").textContent = m[2];
-    } else {
-      a.innerHTML = '<span class="t"></span>';
-      a.querySelector(".t").textContent = m ? m[2] : txt;
-    }
-    li.appendChild(a); toc.appendChild(li);
-  });
-  // 스크롤 위치 하이라이트 + 진행 바
-  var links = Array.prototype.slice.call(toc.querySelectorAll("a"));
-  var obs = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) links.forEach(function (l) { l.classList.toggle("active", l.hash === "#" + e.target.id); });
-    });
-  }, { rootMargin: "0px 0px -78% 0px" });
-  heads.forEach(function (h) { obs.observe(h); });
-  var bar = document.getElementById("prog");
-  addEventListener("scroll", function () {
-    var h = document.documentElement.scrollHeight - innerHeight;
-    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
-  }, { passive: true });
-  // 외부 링크는 새 탭
-  C.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = "_blank"; a.rel = "noopener"; });
-})();
-</script>
+</footer>
 </body>
 </html>
