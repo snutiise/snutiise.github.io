@@ -41,7 +41,7 @@
 <h1 id="시퀀스-트랜스포머-랭킹-in-context-candidate-scoring">시퀀스 트랜스포머 랭킹 (in-context candidate scoring)</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-08-09">2026-08-09</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-14">2026-10-14</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">17</span></summary><ol><li><a href="#왜-이-구조인가">왜 이 구조인가</a></li><li><a href="#핵심-설계-요소">핵심 설계 요소</a><ol><li><a href="#1-시퀀스-레이아웃">1. 시퀀스 레이아웃</a></li><li><a href="#2-어텐션-마스크--설계에서-가장-중요한-부분">2. 어텐션 마스크</a></li><li><a href="#3-파라미터가-어디에-있는가">3. 파라미터가 어디에 있는가</a></li><li><a href="#4-콘텐츠는-들어가지-않는다">4. 콘텐츠는 들어가지 않는다</a></li></ol></li><li><a href="#hand-engineered-feature-제거-주장의-실제-범위">&quot;hand-engineered feature 제거&quot; 주장의 실제 범위</a></li><li><a href="#meta--트랜스포머-계보가-하나가-아니라-둘이다">Meta</a></li><li><a href="#계보-a-organic--hstu--ultra-hstu">계보 A (organic)</a></li><li><a href="#계보-b-ads--dhen--wukong--interformer--gem-서빙은-marm">계보 B (ads)</a></li><li><a href="#두-계보가-서로를-인용하지-않는다--실측">두 계보가 서로를 인용하지 않는다</a></li><li><a href="#dv365--시퀀스를-늘리는-대신-미리-압축한다-instagram">DV365</a></li><li><a href="#통합-모델-주장을-읽는-법">&quot;통합 모델&quot; 주장을 읽는 법</a></li><li><a href="#x-vs-meta--이-주제에서의-대조">X vs Meta</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#아직-확인하지-못한-것">아직 확인하지 못한 것</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
@@ -181,10 +181,22 @@ c3    [  1    1   1   0   0   1 ]
 <td><span class="badge ok">확인</span> <a href="https://engineering.fb.com/2026/03/31/ml-applications/meta-adaptive-ranking-model-bending-the-inference-scaling-curve-to-serve-llm-scale-models-for-ads/" target="_blank" rel="noopener">MARM 블로그</a>, <span class="nw">2026-03-31</span></td>
 </tr>
 <tr>
+<td><span class="nw">2026-02</span></td>
+<td>Kunlun</td>
+<td>GDPA·HSP·Sliding Window Attention + CompSkip·Event-level Personalization. B200에서 MFU 17% → 37%, <em>&quot;deployed in major Meta Ads models&quot;</em></td>
+<td><span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">arXiv 2602.10016</a>, <span class="nw">2026-02-10</span> (v3 <span class="nw">2026-06-05</span>)</td>
+</tr>
+<tr>
 <td><span class="nw">2026-08</span></td>
 <td>GEM training</td>
 <td>훈련 인프라: 12개월 E2E MFU 2배, 총 FLOPs 4배. 커스텀 커널(JFA·GDPA·BlockAttention) + MXFP8 + 5D 병렬</td>
 <td><span class="badge ok">확인</span> <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">GEM Training 블로그</a>, <span class="nw">2026-08-03</span></td>
+</tr>
+<tr>
+<td><span class="nw">2026-10</span></td>
+<td>GEM <span class="nw">2026</span> 세대</td>
+<td>백본이 InterFormer → <strong>Kunlun</strong>으로 교체. 도메인별 모델을 단일 중앙 모델로 통합, 하위 모델 전이는 LoopFM·distillation·Solaris</td>
+<td><span class="badge ok">확인</span> <a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">GEM <span class="nw">2026</span> 블로그</a>, <span class="nw">2026-10-13</span></td>
 </tr>
 </tbody></table></div>
 <p>GEM 블로그가 계보를 직접 밝힌다 <span class="badge ok">확인</span>: <em>&quot;GEM enhances the <strong>Wukong</strong> architecture to use stackable factorization machines with cross-layer attention connections&quot;</em>, <em>&quot;Our design, <strong>InterFormer</strong>, employs parallel summarization with an interleaving structure that alternates between sequence learning ... and cross-feature interaction layers.&quot;</em></p>
@@ -204,6 +216,32 @@ c3    [  1    1   1   0   0   1 ]
 <li>Compute efficiency: <strong>JFA (Jagged Flash Attention), GDPA (Generalized Dot-Product Attention), BlockAttention</strong> + <strong>MXFP8 attention·MLP</strong>. Scaling efficiency: <strong>2D FSDP + Expert Parallelism (dense) + Fully Sharded 2D Model Parallelism (sparse)</strong> + <strong>SM-free collectives</strong>로 통신 오버헤드를 줄인다.</li>
 <li><strong>DHEN의 위치가 명확해진다.</strong> 블로그 본문에 *&quot;Deep Hierarchical Ensemble Network experts&quot;*가 GEM의 expert 모듈로 남아 있다. 대체가 아니라 흡수다. 계보 표의 &quot;GEM = Wukong·InterFormer 통합&quot;은 유효하고, DHEN도 그 안에 있다.</li>
 <li><strong>함의</strong>: 이 글로 계보 표의 GEM 항목이 처음으로 <strong>훈련 인프라 쪽에 구체적 수치</strong>를 갖게 된다. 지금까지 GEM은 아키텍처 통합(Wukong+InterFormer)만 알려져 있었다.</li>
+</ul>
+<p><strong>GEM 2026 세대 — 2026-10-13 블로그가 바꾼 것</strong> <span class="badge ok">확인</span> <a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM): Scaling the Central Model and Compute Engine for Frontier Ads AI</a>, 2026-10-13 (블로그, 저자 표기 없음):</p>
+<ul>
+<li class="warn"><p><strong>⚠ 주장 변경: 백본이 InterFormer에서 Kunlun으로 바뀌었다.</strong> 위 표의 &quot;GEM = Wukong·InterFormer 통합&quot;은 2025-11 세대 설명이다. 블로그는 Kunlun을 *&quot;the previous version (Interformer)&quot;*와 비교한다.</p>
+<blockquote>
+<p>&quot;Compared to the previous version (Interformer), Kunlun delivers 2x performance gains with the same computation scaling.&quot;</p>
+</blockquote>
+<p>Kunlun은 2026-02 논문(<a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">arXiv 2602.10016</a>)으로 먼저 나왔고, 논문 초록도 *&quot;Kunlun is now deployed in major Meta Ads models&quot;*라고 쓴다. CompSkip(일부 구성요소를 건너뛰는 계산 생략)은 *&quot;reduce FLOPS by 43% with negligible quality loss&quot;*로 설명된다.</p>
+</li>
+<li><p><strong>도메인별 모델을 하나로 합쳤다.</strong> 블로그 표현은 *&quot;The 2026 generation of GEM shifts from isolated per-domain optimizations — such as Facebook, Instagram, Reels — to a single central foundation model.&quot;*이다. 공유 expert와 도메인 전용 expert를 함께 두고, 지면별 데이터를 물리적으로 합치지 않고 가상으로 섞어 학습한다.</p>
+</li>
+<li><p><strong>시퀀스 길이:</strong> 프로덕션에서 장기 참여 이력 길이를 2배로 늘렸고, 25배까지 늘릴 수 있는 역량을 확인했다고 쓴다. 모델 복잡도는 이전 GEM 대비 2.5배다.</p>
+</li>
+<li><p><strong>하위(vertical) 모델로 지식을 옮기는 방법이 세 가지로 정리됐다.</strong> (1) LoopFM은 GEM의 내부 표현과 장기 이력 메모리를 하위 모델에 넘기는 post-training 기법이고, *&quot;2x of transfer effectiveness beyond knowledge distillation&quot;*이라고 주장한다. (2) soft label distillation을 함께 쓴다. (3) Solaris는 다음 요청에 필요할 user-ad 쌍의 GEM 임베딩을 미리 계산해 두는 방식이다.</p>
+<blockquote>
+<p>&quot;It speculatively precomputes foundation model embeddings for the user-ad pairs a future request is likely to need, and delivers them just-in-time on the serving hot path.&quot;</p>
+</blockquote>
+</li>
+<li><p><strong>성과 수치(블로그):</strong> <em>&quot;18.9% conversion improvement and 12% ad click-through rate (CTR) improvement across Meta&#39;s ad surfaces and objectives&quot;</em>, 그리고 *&quot;5.8%, 4.1%, and 1.6% conversion uplift on Facebook, Instagram, and off-site conversion for targeted users over the past year&quot;*다. 앞의 두 수치는 기간과 기준선을 밝히지 않았고, 뒤의 세 수치는 &quot;지난 1년&quot; 누적이다. A/B 설계는 공개하지 않았다 <span class="badge ok">확인</span>(본문에 설계 서술이 없다).</p>
+</li>
+<li><p><strong>유기 피드와의 관계:</strong> 지금은 광고 데이터만 학습한다. 앞으로 *&quot;extend GEM to learn from all of Meta&#39;s platform data, capturing behavior across organic and ads engagements&quot;*라고 쓴다. 계보 A(HSTU)와 계보 B가 데이터 수준에서 합쳐질 수 있다는 첫 공식 진술이다 <span class="badge est">추정</span> — 계획 진술이지 배포 사실이 아니다.</p>
+</li>
+<li><p>Solaris는 LLaTTE의 &quot;비동기 upstream user model&quot;과 같은 방향이다. 무거운 계산을 요청 경로 밖에서 미리 해 두고 랭커는 결과만 읽는다 <span class="badge est">추정</span> — 두 블로그가 서로를 인용하지 않으므로 같은 시스템인지는 알 수 없다.</p>
+</li>
+<li><p>같은 주(2026-10-12)에 나온 <a href="https://engineering.fb.com/2026/10/12/ml-applications/turning-opportunistic-ai-inference-capacity-into-better-ads-recommendations/" target="_blank" rel="noopener">Turning Opportunistic AI Inference Capacity Into Better Ads Recommendations</a>(블로그)는 유휴 추론 용량이 생길 때 랭킹 후보를 더 많이 평가하거나(Rank More Ads) 더 큰 모델로 요청을 보내는(Serve Better Models) 방식을 설명한다 <span class="badge ok">확인</span>. 효과 수치는 공개하지 않았다.</p>
+</li>
 </ul>
 <p><strong>MARM은 GEM을 서빙한다고 말하지 않는다.</strong> MARM 블로그 본문에 GEM은 <strong>등장하지 않는다</strong> (사이드바 &quot;Related Posts&quot; 링크에만 있다. 2026-08-09 전문 확인). 자기 규정은 <em>&quot;replaces a &#39;one-size-fits-all&#39; inference approach with intelligent request routing&quot;</em> + O(1T) 파라미터 스케일링이다. <strong>&quot;MARM이 GEM을 서빙한다&quot;는 그럴듯하지만 1차 출처가 없다.</strong> <span class="badge est">추정</span> — 근거는 같은 조직, 같은 시기, 같은 광고 지면이라는 정황뿐이다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
@@ -313,7 +351,7 @@ c3    [  1    1   1   0   0   1 ]
 <li><strong>X</strong> — Phoenix가 현행 프로덕션 랭커다. <span class="badge ok">확인</span> xai-org/x-algorithm, 2026-01 공개</li>
 <li><strong>X (2025 Scala 세대)</strong> — 같은 이름 <code>Phoenix</code>가 Scala home-mixer에도 rescorer로 들어가 있었다. 즉 트랜스포머 랭커가 기존 heavy ranker 옆에 붙는 형태로 먼저 들어갔고, 2026에 전면 교체되었다. <span class="badge ok">확인</span> twitter/the-algorithm <code>c54bec0</code>, 2025-09-03 — <code>PhoenixScorer</code> 외 7개 파일이 이 커밋에서 새로 추가되었다.</li>
 <li><strong>Meta (organic)</strong> — HSTU(ICML 2024) → ULTRA-HSTU(2026). <em>&quot;serving billions of users daily&quot;</em>. <strong>⚠ 논문이 지면을 익명화</strong>해서 어느 앱인지 확정할 수 없다. <span class="badge ok">확인</span>(존재) / <span class="badge est">추정</span>(지면) → <a href="facebook.html">facebook.md</a></li>
-<li><strong>Meta (ads)</strong> — DHEN → Wukong → InterFormer → GEM, 시퀀스 파트는 LLaTTE, 서빙은 MARM. Facebook Feed·Reels 광고에 배포되었다고 명시되어 있다. <span class="badge ok">확인</span></li>
+<li><strong>Meta (ads)</strong> — DHEN → Wukong → InterFormer → GEM, 시퀀스 파트는 LLaTTE, 서빙은 MARM. Facebook Feed·Reels 광고에 배포되었다고 명시되어 있다. 2026-10 블로그 기준 GEM 백본은 Kunlun이고 Facebook·Instagram·Reels를 한 모델로 다룬다. <span class="badge ok">확인</span></li>
 <li><strong>Instagram</strong> — DV365가 Instagram·Threads의 <strong>15개 product model</strong>에 upstream으로 공급된다. 시퀀스 모델을 랭커 밖으로 뺀 형태다. <span class="badge ok">확인</span> → <a href="instagram.html">instagram.md</a></li>
 <li><strong>Threads</strong> — 자체 시퀀스 모델에 대한 진술이 없다. DV365의 <strong>소비처</strong>로만 언급된다. <span class="badge ok">확인</span> → <a href="threads.html">threads.md</a></li>
 <li><strong>그 외 서비스</strong> — 아직 조사하지 않았다. Pinterest TransAct와 Kuaishou 쪽이 같은 계열에 속할 가능성이 높지만, 이 저장소에서 아직 1차 출처로 확인하지 않았다. <strong>열린 질문이다.</strong></li>
@@ -351,6 +389,9 @@ c3    [  1    1   1   0   0   1 ]
 <li><a href="https://arxiv.org/abs/2601.20083" target="_blank" rel="noopener">LLaTTE: Scaling Laws for Multi-Stage Sequence Modeling in Large-Scale Ads Recommendation</a> — 2026-01-27, 논문 / <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">From User Sequences to Scaling Laws</a> — 2026-08-05, 블로그.</li>
 <li><a href="https://engineering.fb.com/2026/03/31/ml-applications/meta-adaptive-ranking-model-bending-the-inference-scaling-curve-to-serve-llm-scale-models-for-ads/" target="_blank" rel="noopener">Meta Adaptive Ranking Model (MARM)</a> — 2026-03-31, 블로그.</li>
 <li><a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">Training GEM at LLM Scale</a> — 2026-08-03, 블로그. GEM 훈련 인프라(12개월 MFU 2×, JFA·GDPA·BlockAttention·MXFP8, 5D 병렬).</li>
+<li><a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">Kunlun: Establishing Scaling Laws for Massive-Scale Recommendation Systems through Unified Architecture Design</a> — 2026-02-10 (v3 2026-06-05), 논문. GEM 2026 세대의 백본.</li>
+<li><a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM): Scaling the Central Model and Compute Engine for Frontier Ads AI</a> — 2026-10-13, 블로그. InterFormer → Kunlun 교체, 단일 중앙 모델, LoopFM·Solaris.</li>
+<li><a href="https://engineering.fb.com/2026/10/12/ml-applications/turning-opportunistic-ai-inference-capacity-into-better-ads-recommendations/" target="_blank" rel="noopener">Turning Opportunistic AI Inference Capacity Into Better Ads Recommendations</a> — 2026-10-12, 블로그. 유휴 용량으로 후보 수·모델 크기를 늘리는 서빙 정책. 수치 없음.</li>
 </ul>
 <p><strong>발언</strong></p>
 <ul>
