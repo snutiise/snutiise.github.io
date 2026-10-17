@@ -41,6 +41,9 @@ python3 -m http.server 4000 --bind 127.0.0.1 -d /tmp/site
   리서치 생성기가 `/assets/css/site.css` 를 링크하고, 공통 헤더·푸터
   (`_includes/site-header.html`, `_includes/site-footer.html`)와 같은 바이트를 낸다.
   리서치 컴포넌트 규칙을 지우거나 헤더·푸터를 바꿀 때는 그쪽 템플릿도 같이 바꾼다.
+  리서치 내용 페이지에도 글과 같은 댓글 버튼이 있다. 그 페이지들의 CSP(생성기의 `withCsp`)는
+  Disqus 에 `embed.js` 와 `disqus.com/embed/comments/` iframe 만 열어 두므로, site.js 의 Disqus
+  코드가 다른 것을 불러오게 바꾸면 리서치 쪽에서는 막힌다.
 - **`feed-research/` 와 `_data/feed_research.yml` 을 손으로 고치지 않는다.**
   feed-research 저장소의 `scripts/publish-html.sh` 가 매일 생성해 이 저장소에
   커밋·푸시한다. 여기서 고치면 다음 게시 때 덮인다. 고칠 것은 그 저장소에서 고친다.
@@ -52,7 +55,7 @@ python3 -m http.server 4000 --bind 127.0.0.1 -d /tmp/site
 | `_posts/` | 글 (Markdown) |
 | `_layouts/`, `_includes/` | 템플릿. 테마 gem 없이 전부 여기 있는 것만 쓴다(`base`, `post` 두 레이아웃) |
 | `assets/css/site.css` | 사이트 전체 스타일(블로그 + feed-research). 웹폰트·외부 CSS 없음 |
-| `assets/js/site.js` | 메뉴 표시, 목차 따라가기, /posts/ 거르기, Disqus 클릭 로드, 방문자 카운터·Naver 분석(운영 주소에서만) |
+| `assets/js/site.js` | 메뉴 표시, 목차 따라가기, /posts/ 거르기, Disqus 클릭 로드(글·리서치), 방문자 카운터·Naver 분석(운영 주소의 블로그 페이지에서만) |
 | `assets/img/` | 글 이미지, 파비콘 |
 | `feed-research/`, `_data/feed_research.yml` | 생성물. 위 "하지 말 것" 참고 |
 | `scripts/test-site.sh` | 빌드 산출물 검사 |

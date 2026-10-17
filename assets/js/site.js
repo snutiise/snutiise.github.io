@@ -54,11 +54,15 @@ if (f) {
  });
 }
 
-// Disqus on click; no page.identifier. Blog pages only: on research pages an SVG id could be named load-comments
-const btn = 'track' in b.dataset && $('load-comments');
-if (btn) btn.addEventListener('click', () => {
- const th = $('disqus_thread'), n = $('cm-note'), s = d.createElement('script');
+// Disqus on click; no page.identifier. Posts and research pages. Research bodies are untrusted text: they can
+// carry an id (heading, SVG) but never a <button> or data-*, so match tag + data-url, not the id alone
+const btn = d.querySelector('button#load-comments'), th = d.querySelector('div#disqus_thread[data-url]');
+if (btn && th) btn.addEventListener('click', () => {
+ const n = d.querySelector('p#cm-note'), s = d.createElement('script');
  if (!prod) { n.textContent = '미리보기에서는 불러오지 않는다.'; n.hidden = false; return; }
+ // embed.js reads window.disqus_<k> globals; an element id in content (e.g. a heading named disqus_identifier) would
+ // clobber them through named access, so shadow them before configuring.
+ for (const k of ['shortname', 'identifier', 'url', 'documentTitle', 'title', 'integration', 'integrationVersion', 'slug', 'category_id', 'container_id']) window['disqus_' + k] = undefined;
  window.disqus_config = function () { this.page.url = th.dataset.url; this.page.title = th.dataset.title; };
  s.src = 'https://snutiise.disqus.com/embed.js';
  s.dataset.timestamp = Date.now();
