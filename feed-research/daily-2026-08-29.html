@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-08-29 — feed-research</title>
-<meta name="description" content="한 줄: X 4세대+10 커밋(24c6094, 2026-08-28, +2071/−265, 파일 41)이 올라왔다. MultiRiskAdsBlender 신설(4세대+7의 BrandSafetyVerdict::HighRisk tier와 광고 BsrHigh 옵트인을 결합한 인접성…">
+<meta name="description" content="한 줄: X가 포스트 위험도와 광고 등급을 함께 보고 광고 자리를 정하는 새 광고 블렌더를 추가했다. 아직 기본 블렌더가 아니라 실험 게이트 뒤에 있다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-08-29.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-08-29 — feed-research">
-<meta property="og:description" content="한 줄: X 4세대+10 커밋(24c6094, 2026-08-28, +2071/−265, 파일 41)이 올라왔다. MultiRiskAdsBlender 신설(4세대+7의 BrandSafetyVerdict::HighRisk tier와 광고 BsrHigh 옵트인을 결합한 인접성…">
+<meta property="og:description" content="한 줄: X가 포스트 위험도와 광고 등급을 함께 보고 광고 자리를 정하는 새 광고 블렌더를 추가했다. 아직 기본 블렌더가 아니라 실험 게이트 뒤에 있다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-08-29.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,23 +42,66 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>토요일</li>
-<li><span class="meta-k">읽는 시간</span>36분</li>
+<li><span class="meta-k">읽는 시간</span>41분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
-<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+10 커밋(<a href="https://github.com/xai-org/x-algorithm/commit/24c6094">24c6094</a>, 2026-08-28, +2071/−265, 파일 41)이 올라왔다. <strong><code>MultiRiskAdsBlender</code> 신설</strong>(4세대+7의 <code>BrandSafetyVerdict::HighRisk</code> tier와 광고 <code>BsrHigh</code> 옵트인을 결합한 인접성 매트릭스로, HighRisk 포스트는 어떤 광고와도 인접할 수 없고, BsrHigh 광고만 medium-medium 폴백 슬롯을 얻으며, <code>MultiRisk.enforcement</code>·<code>slot_outcome</code>·<code>serving_limitation</code> 3종 metric으로 슬롯이 왜 비었는지와 어느 제약이 binding이었는지를 관측한다) + <strong>safety-label twemcache 미스에 대한 sampled async 워머</strong>(<code>VF_CACHE_WARM_SAMPLE_PCT</code>로 확률 샘플링을 거친 뒤 500ms linger와 최대 50 ID 단위로 배치해 Strato batch fetch를 보내고 twemcache에 write-back한다. bounded 채널이 포화해도 요청은 전혀 막히지 않고 <code>DroppedChannelFull</code> 카운터만 올라간다) + <strong>Phoenix trainer가 <code>restore_streamed</code>를 실제로 소비</strong>(4세대+9의 <code>load_checkpoint_streamed</code> 스캐폴딩이 이제 <code>maybe_load_checkpoint</code>에 배선됐고, warm_start 케이스에서는 opt state의 pinned-host 사본이 아예 생기지 않으며, <code>_graft_replaced</code> 콜백이 loaded tensor를 원래 state tree 자리에 in-place로 grafting한다) + <strong>Phoenix gRPC compression의 트레일러 유실 버그픽스</strong>(zstd로 압축할 때 <code>grpc-status</code>·<code>grpc-message</code> 트레일러를 통째로 잃던 심각한 버그를 <code>Full::new(data).with_trailers(...)</code>로 복원했고, <code>recsys_engine_response_compress_ms{method}</code> 히스토그램을 새로 배선했다) + <strong>copy_port shard-schedule 셔플로 peer-load 균등화</strong>(<code>POD_NAME</code>과 tensor name의 hash로 결정론적 셔플을 걸어 각 pod가 서로 다른 순서로 shard를 요청하게 만들었고, shard 0 peer의 스파이크가 사라졌다) + <strong>home-mixer polling 요청 관측성 3종</strong>(<code>stratocontext</code> metadata에서 <code>is_polling</code> proto 필드를 뽑아 정기 refresh와 유저 초기 요청을 나눠서 본다) + <strong>grox reply_spam Kafka-first 저장 순서와 <code>&gt;=</code> idempotency</strong>(4세대+9의 monotone-only를 더 조인 것으로, 저장 순서가 Manhattan-first에서 Kafka-first로 뒤집혀 durability 정합성을 확보했다) + <strong>abuse-enforcement AIS thrift 스키마 conformance 테스트</strong> + <strong>home-mixer CJK muted keyword whole-token 회귀 테스트</strong> + <strong>simclusters <code>SimClustersInterestedIn2020</code> 스냅샷 폴백 인라이닝</strong>. Meta와 Netflix 블로그에는 새 글이 없다. arXiv cs.IR 30건을 triage해서 1건이 통과했다. <strong>VK Friend Recommendation GNN</strong>으로, 194M users·28B edges 규모의 프로덕션 소셜 그래프에서 friend additions from recommendations가 <strong>+16%</strong>, unique friend adders가 +11.5% 늘었다고 strong prod baseline 대비로 보고했고 CIKM 2026 accepted 상태다.</div>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 포스트 위험도와 광고 등급을 함께 보고 광고 자리를 정하는 새 광고 블렌더를 추가했다. 아직 기본 블렌더가 아니라 실험 게이트 뒤에 있다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">9</span></summary><ol><li><a href="#1-x-4세대10-커밋-multirisk-광고-블렌더--vf-안전라벨-워머--phoenix-streamed-restore--grpc-트레일러-픽스--copy_port-셔플--잡다한-하드닝-다수"><span class="num">1</span>X 4세대+10 커밋: MultiRisk 광고 블렌더 · VF 안전라벨 워머 · Phoenix streamed restore + gRPC 트레일러 픽스 + copy_port 셔플 · 잡다한 하드닝 다수</a><ol><li><a href="#1-a-multiriskadsblender-bsr-high-광고-tier--medium-risk-포스트-폴백-매트릭스">1-A. MultiRiskAdsBlender: BSR-high 광고 tier × medium-risk 포스트 폴백 매트릭스</a></li><li><a href="#1-b-vf-안전-라벨-twemcache-미스에-대한-sampled-async-워머">1-B. VF 안전-라벨 twemcache 미스에 대한 sampled async 워머</a></li><li><a href="#1-c-phoenix-trainer가-restore_streamed를-실제로-소비">1-C. Phoenix trainer가 restore_streamed를 실제로 소비</a></li><li><a href="#1-d-phoenix-grpc-compression-트레일러-유실-버그픽스--zstd-encode-시간-히스토그램">1-D. Phoenix gRPC compression 트레일러 유실 버그픽스 + zstd encode 시간 히스토그램</a></li><li><a href="#1-e-copy_port-shard-schedule-셔플로-peer-load-균등화">1-E. copy_port shard-schedule 셔플로 peer-load 균등화</a></li><li><a href="#1-f-잡다한-하드닝-6건">1-F. 잡다한 하드닝 6건</a></li></ol></li><li><a href="#2-레이더-arxiv-triage에서-통과한-1건"><span class="num">2</span>레이더: arXiv triage에서 통과한 1건</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">9</span></summary><ol><li><a href="#1-포스트-위험도와-광고-등급의-조합으로-광고-자리를-정하는-블렌더가-생겼다--x"><span class="num">1</span>포스트 위험도와 광고 등급의 조합으로 광고 자리를 정하는 블렌더가 생겼다 — X</a><ol><li><a href="#1-a-중위험-포스트-옆-광고-자리는-bsr-high-광고만-얻고-고위험-포스트-옆에는-광고를-두지-않는다">1-A. 중위험 포스트 옆 광고 자리는 BSR-high 광고만 얻고, 고위험 포스트 옆에는 광고를 두지 않는다</a></li><li><a href="#1-b-vf가-안전-라벨-캐시에서-놓친-항목을-표본으로-골라-비동기로-미리-채운다">1-B. VF가 안전 라벨 캐시에서 놓친 항목을 표본으로 골라 비동기로 미리 채운다</a></li><li><a href="#1-c-phoenix-학습-코드가-스트리밍-체크포인트-복원을-실제로-호출한다">1-C. Phoenix 학습 코드가 스트리밍 체크포인트 복원을 실제로 호출한다</a></li><li><a href="#1-d-grpc-응답-압축이-상태-트레일러를-잃던-버그를-고치고-압축-시간을-재기-시작했다">1-D. gRPC 응답 압축이 상태 트레일러를 잃던 버그를 고치고 압축 시간을 재기 시작했다</a></li><li><a href="#1-e-pod마다-shard를-다른-순서로-받게-해-peer-부하를-고르게-나눴다">1-E. pod마다 shard를 다른 순서로 받게 해 peer 부하를 고르게 나눴다</a></li><li><a href="#1-f-나머지-6건은-관측-지표를-늘리고-저장-순서-테스트-배치-폴백을-손봤다">1-F. 나머지 6건은 관측 지표를 늘리고 저장 순서, 테스트, 배치 폴백을 손봤다</a></li></ol></li><li><a href="#2-친구-추천-gnn을-프로덕션-소셜-그래프-규모로-키운-논문이-나왔다--arxiv"><span class="num">2</span>친구 추천 GNN을 프로덕션 소셜 그래프 규모로 키운 논문이 나왔다 — arXiv</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-x-4세대10-커밋-multirisk-광고-블렌더--vf-안전라벨-워머--phoenix-streamed-restore--grpc-트레일러-픽스--copy_port-셔플--잡다한-하드닝-다수"><span class="num">1</span>X 4세대+10 커밋: MultiRisk 광고 블렌더 · VF 안전라벨 워머 · Phoenix streamed restore + gRPC 트레일러 픽스 + copy_port 셔플 · 잡다한 하드닝 다수</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/24c60947968a3fbeb0fb01dbb001b8b0b23c04a3" target="_blank" rel="noopener">xai-org/x-algorithm@24c6094</a> — 2026-08-28T01:00:41Z 커밋(파일 41, +2071/−265). 커밋 메시지는 세대 시리즈 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이라, 실제 내용은 파일 diff로만 판독할 수 있다. 규모로 보면 4세대+7(+1,286)보다 크고 +6(+3,105)보다 작다. 건드린 서브시스템의 폭은 넓다. home-mixer 광고·필터·util, visibility-filtering 안전 라벨 조회 인프라, Phoenix 학습·서빙, grox reply_spam, abuse-enforcement, simclusters 배치 잡까지 7곳이다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>는 2026-08-13 헤드라인 공개(47c1bcd, +363,246/−11,640) 이후로 격일에서 매일 간격으로 후속 커밋이 붙고 있고, 이 문서 기준으로 오늘이 열한 번째 후속(4세대+10)이다. <a href="daily-2026-08-28.html">4세대+9(2026-08-26, 45b48ba)</a>가 Phoenix 체크포인트 스택의 저장·복원 정리, <code>trainer_recsys</code> valid_step lock-step 통일, grox reply_spam LM 프롬프트 확장, VF media fallback cache 제거를 한꺼번에 담은 넓은 인프라 커밋이었다면, 이번 4세대+10의 성격은 이렇다. (a) 어제 4세대+9에 들어온 Phoenix streamed restore와 grox monotone-only가 <strong>소비자 배선까지 완결됐고</strong>, (b) 광고 안전 스택의 마지막 조각인 <strong>tier×tier 블렌더 옵션</strong>이 신설됐으며, (c) VF의 요청 경로 P99 지연을 좌우하는 <strong>twemcache miss rate</strong>을 낮추는 워머 인프라가 추가됐다. 이틀 전(4세대+9)의 대칭 하드닝이 이번 커밋에서 실제 소비 경로로 이어지는 흐름이 반복되고 있다.</p></div>
-<p>이 절은 여섯 갈래로 나눠 설명한다.</p>
-<h3 id="1-a-multiriskadsblender-bsr-high-광고-tier--medium-risk-포스트-폴백-매트릭스">1-A. <code>MultiRiskAdsBlender</code>: BSR-high 광고 tier × medium-risk 포스트 폴백 매트릭스</h3>
-<p><code>home-mixer/ads/multi_risk_blender.rs</code>(332줄 신규)와 <code>home-mixer/ads/tests/multi_risk_blender_tests.rs</code>(215줄 신규), <code>home-mixer/selectors/blender_selector.rs</code>(+8/−4)에서 네 번째 광고 블렌더 옵션이 배선됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/multi_risk_blender.rs" target="_blank" rel="noopener"><code>home-mixer/ads/multi_risk_blender.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/selectors/blender_selector.rs" target="_blank" rel="noopener"><code>home-mixer/selectors/blender_selector.rs</code></a>.</p>
-<p>기존 세 블렌더 <code>safe_gap</code>·<code>partition_organic</code>·<code>time_gap</code>이 &quot;모든 광고 → Safe 포스트 옆에만 배치&quot;라는 대칭 정책을 강제했다면, <code>multi_risk</code>는 포스트를 3단(<code>Safe</code>·<code>MediumRisk</code>·<code>HighRisk</code>)으로, 광고를 2단(<code>BsrNormal</code>·<code>BsrHigh</code>)으로 분해해 인접성 매트릭스로 슬롯을 결정한다.</p>
-<p>포스트의 3단 분류는 <a href="x.html#%EA%B4%91%EA%B3%A0">4세대+7 (2026-08-24)에 신설된 <code>BrandSafetyVerdict::HighRisk</code></a> tier에 의존한다. <code>HighRisk</code>가 도입되면서 이전에 medium에 있던 <code>NSFW_HIGH_PRECISION</code>·<code>NSFW_HIGH_RECALL</code>·<code>GORE_AND_VIOLENCE_HIGH_PRECISION</code>·<code>PDNA</code>·<code>EGREGIOUS_NSFW</code> 5종과 신규 <code>SOFT_NSFW</code>가 승격됐다. 광고의 2단 분류는 <code>AdIndexInfo.ad_adjacency_control.brand_safety_risk</code> 필드의 <code>BsrNormal|BsrHigh</code> 값을 따르는데, 이 값은 광고주가 자기 광고를 medium-risk 컨텍스트에 노출하는 것을 감수하겠다고 밝히는 opt-in 신호로 보인다 <span class="badge est">추정</span>(코드에는 필드 정의만 있고, 광고주 UI 흐름은 공개되지 않았다).</p>
-<p><strong>슬롯 배치 규칙:</strong></p>
+<p>오늘 함께 본 다른 변화는 다음과 같다.</p>
+<ul>
+<li>X는 같은 커밋에서 노출 판정 서비스의 안전 라벨 캐시가 놓친 항목을 표본으로 골라 미리 채우는 워머를 추가했다.</li>
+<li>X 랭킹 모델의 학습 코드가 스트리밍 체크포인트 복원을 실제로 호출하게 됐고, 서빙은 gRPC 트레일러 유실 버그를 고쳤다.</li>
+<li>Meta와 Netflix 블로그에는 새 글이 없었고, arXiv에서는 친구 추천 GNN 논문 1건이 레이더를 통과했다.</li>
+</ul>
+<h2 id="1-포스트-위험도와-광고-등급의-조합으로-광고-자리를-정하는-블렌더가-생겼다--x"><span class="num">1</span>포스트 위험도와 광고 등급의 조합으로 광고 자리를 정하는 블렌더가 생겼다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/24c60947968a3fbeb0fb01dbb001b8b0b23c04a3" target="_blank" rel="noopener">xai-org/x-algorithm@24c6094</a> — xAI 공개 저장소, 2026-08-28T01:00:41Z 커밋(파일 41, +2071/−265), 코드. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+10이다.</p></div>
+<ul>
+<li>커밋 메시지는 세대 시리즈 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이다. 그래서 실제 내용은 파일 diff로만 판독할 수 있다.</li>
+<li>줄 수(+2071/−265, 파일 41)로 보면 4세대+7(+1,286)보다 크고 +6(+3,105)보다 작다.</li>
+<li>건드린 서브시스템은 7곳으로 폭이 넓다.<ul>
+<li>home-mixer(For You 피드를 조립하는 서비스)의 광고·필터·util</li>
+<li>visibility-filtering(VF, 포스트마다 이 뷰어에게 보여도 되는지 판정하는 서비스)의 안전 라벨 조회 인프라</li>
+<li>Phoenix(X For You의 랭킹 모델)의 학습·서빙</li>
+<li>grox(콘텐츠 분류 서비스)의 reply_spam</li>
+<li>abuse-enforcement</li>
+<li>simclusters 배치 잡</li>
+</ul>
+</li>
+</ul>
+<div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>는 2026-08-13 헤드라인 공개(47c1bcd, +363,246/−11,640) 뒤로 격일에서 매일 간격으로 후속 커밋이 이어지고 있다. 바로 앞 커밋인 <a href="daily-2026-08-28.html">4세대+9(2026-08-26, 45b48ba)</a>는 여러 인프라 정리를 한꺼번에 담은 넓은 커밋이었다. Phoenix 체크포인트 스택의 저장·복원 정리, <code>trainer_recsys</code> valid_step lock-step 통일, grox reply_spam LM 프롬프트 확장, VF media fallback cache 제거가 그 내용이다. 이번 4세대+10 커밋(<a href="https://github.com/xai-org/x-algorithm/commit/24c6094" target="_blank" rel="noopener">24c6094</a>)은 세 가지 성격을 띤다.</p></div>
+<ul>
+<li>어제 4세대+9에 들어온 Phoenix streamed restore와 grox monotone-only가 소비자 연결까지 완결됐다.</li>
+<li>광고 안전 스택의 마지막 조각인 tier×tier 블렌더 옵션이 새로 생겼다.</li>
+<li>VF 요청 경로의 P99 지연을 좌우하는 twemcache miss rate를 낮추는 워머 인프라가 추가됐다.</li>
+</ul>
+<p>이틀 전(4세대+9)의 대칭적 보강이 이번 커밋에서 실제 소비 경로로 이어지는 흐름이 되풀이되고 있다.</p>
+<h3 id="1-a-중위험-포스트-옆-광고-자리는-bsr-high-광고만-얻고-고위험-포스트-옆에는-광고를-두지-않는다">1-A. 중위험 포스트 옆 광고 자리는 BSR-high 광고만 얻고, 고위험 포스트 옆에는 광고를 두지 않는다</h3>
+<p>home-mixer에 네 번째 광고 블렌더 옵션이 생겼다. 광고 블렌더는 피드의 포스트 사이에 광고를 배치하는 단계이고, 새 블렌더는 포스트 위험도 3단과 광고 등급(BSR, brand safety risk) 2단의 조합표로 광고 자리를 정한다.</p>
+<ul>
+<li>새 블렌더 <code>MultiRiskAdsBlender</code>가 네 번째 광고 블렌더 옵션으로 연결됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/multi_risk_blender.rs" target="_blank" rel="noopener"><code>home-mixer/ads/multi_risk_blender.rs</code></a>.<ul>
+<li>구현은 <code>home-mixer/ads/multi_risk_blender.rs</code>(332줄 신규), 테스트는 <code>home-mixer/ads/tests/multi_risk_blender_tests.rs</code>(215줄 신규)다.</li>
+<li>블렌더를 고르는 <code>home-mixer/selectors/blender_selector.rs</code>(+8/−4)도 함께 바뀌었다(<a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/selectors/blender_selector.rs" target="_blank" rel="noopener"><code>home-mixer/selectors/blender_selector.rs</code></a>).</li>
+</ul>
+</li>
+<li>기존 세 블렌더 <code>safe_gap</code>·<code>partition_organic</code>·<code>time_gap</code>은 &quot;모든 광고 → Safe 포스트 옆에만 배치&quot;라는 대칭 정책을 강제했다.</li>
+<li>새 옵션 <code>multi_risk</code>는 포스트를 3단, 광고를 2단으로 나누고, 인접성 매트릭스로 슬롯을 정한다.<ul>
+<li>포스트 단계는 <code>Safe</code>·<code>MediumRisk</code>·<code>HighRisk</code>, 광고 단계는 <code>BsrNormal</code>·<code>BsrHigh</code>다.</li>
+</ul>
+</li>
+<li>포스트의 3단 분류는 <a href="x.html#%EA%B4%91%EA%B3%A0">4세대+7 (2026-08-24)에 신설된 <code>BrandSafetyVerdict::HighRisk</code></a> tier에 의존한다.<ul>
+<li><code>HighRisk</code>가 도입되면서, 이전에 medium에 있던 5종과 신규 <code>SOFT_NSFW</code>가 승격됐다.</li>
+<li>5종은 <code>NSFW_HIGH_PRECISION</code>·<code>NSFW_HIGH_RECALL</code>·<code>GORE_AND_VIOLENCE_HIGH_PRECISION</code>·<code>PDNA</code>·<code>EGREGIOUS_NSFW</code>다.</li>
+</ul>
+</li>
+<li>광고의 2단 분류는 BSR 필드 값을 따르는데, 이 값은 광고주가 자기 광고를 medium-risk 컨텍스트에 노출하는 것을 감수하겠다고 밝히는 opt-in 신호로 보인다 <span class="badge est">추정</span>(코드에는 필드 정의만 있고, 광고주 UI 흐름은 공개되지 않았다).<ul>
+<li>필드는 <code>AdIndexInfo.ad_adjacency_control.brand_safety_risk</code>이고, 값은 <code>BsrNormal|BsrHigh</code>다.</li>
+</ul>
+</li>
+</ul>
+<p>광고 등급마다 놓일 수 있는 자리는 다음 표와 같다.</p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col class="grow"><col class="w6"><col class="w10"><col class="w8"></colgroup>
 <thead>
 <tr>
@@ -81,91 +124,325 @@
 <td align="center">안 함</td>
 </tr>
 </tbody></table></div>
-<p>즉 <code>BsrHigh</code> 광고는 safe 슬롯이 소진되면 medium-medium 슬롯을 폴백으로 얻는다. 다만 광고주 handle이 이웃 포스트에 언급됐거나 광고 키워드가 이웃 텍스트와 겹치면 여전히 드롭된다. <code>HighRisk</code> 포스트는 어떤 광고와도 인접할 수 없다.</p>
-<p><strong>슬롯 예산 산정</strong> — 예산은 <code>safe_budget = min(num_ads, spacing_cap, safe_count / 2)</code>로 잡는다. 세 상한 중 어느 것이 binding이었는지는 <code>MultiRisk.serving_limitation{factor=ads_supply|spacing|safe_posts}</code> 카운터로 관측한다. 예를 들어 광고 공급이 충분한데도 슬롯이 채워지지 않으면 factor로 <code>safe_posts</code>가 뜨고, 이는 뷰어의 피드에 안전 포스트가 부족했다는 신호다.</p>
-<p><strong>슬롯 rejection 세분화</strong> — 각 슬롯이 결국 광고 하나로 채워졌는지, 아니면 어느 안전 필터에 걸려 비었는지를 <code>MultiRisk.slot_outcome{outcome=filled|unfilled_bsr_low|unfilled_handle|unfilled_keyword|unfilled_no_ads}</code>로 나눠서 관측한다. <code>SlotRejections::stuck_outcome()</code>은 세 rejection reason(bsr_low·handle·keyword) 중 가장 많이 발생한 것을 그 슬롯의 대표 원인으로 뽑는다. 그래서 A/B 대시보드에서 &quot;슬롯 하나가 비었을 때 가장 자주 걸린 안전 필터&quot;를 직접 관측할 수 있다.</p>
-<p>같은 커밋에서 <code>&quot;partition_organic_low_risk&quot;</code> 앨리어스도 <code>AdsBlenderType</code> param에 추가되어 옵션이 모두 5개가 됐다(<code>safe_gap</code> / <code>partition_organic</code> / <code>partition_organic_low_risk</code> / <code>time_gap</code> / <code>multi_risk</code>). 이 앨리어스는 기존 <code>PartitionOrganicAdsBlender</code>로 라우팅된다.</p>
+<p>즉 <code>BsrHigh</code> 광고는 safe 슬롯이 소진되면 medium-medium 슬롯을 폴백으로 얻는다. 다만 광고주 handle이 이웃 포스트에 언급됐거나 광고 키워드가 이웃 텍스트와 겹치면 여전히 빠진다. <code>HighRisk</code> 포스트는 어떤 광고와도 인접할 수 없다.</p>
+<ul>
+<li>슬롯이 왜 비었는지와 어느 제약이 binding이었는지는 새 metric 3종으로 관측한다.<ul>
+<li>3종은 <code>MultiRisk.enforcement</code>·<code>slot_outcome</code>·<code>serving_limitation</code>이다.</li>
+</ul>
+</li>
+<li>안전 슬롯 예산은 광고 수, 간격 상한, 안전 포스트 수의 절반 가운데 가장 작은 값이다.<ul>
+<li>식은 <code>safe_budget = min(num_ads, spacing_cap, safe_count / 2)</code>다.</li>
+<li>세 상한 중 어느 것이 binding이었는지는 <code>MultiRisk.serving_limitation{factor=ads_supply|spacing|safe_posts}</code> 카운터로 관측한다.</li>
+<li>예를 들어 광고 공급이 충분한데도 슬롯이 채워지지 않으면 factor로 <code>safe_posts</code>가 뜬다. 이는 뷰어의 피드에 안전 포스트가 부족했다는 신호다.</li>
+</ul>
+</li>
+<li>슬롯마다 광고로 채워졌는지, 아니면 어느 안전 필터에 걸려 비었는지를 나눠 기록한다.<ul>
+<li>카운터는 <code>MultiRisk.slot_outcome{outcome=filled|unfilled_bsr_low|unfilled_handle|unfilled_keyword|unfilled_no_ads}</code>다.</li>
+<li><code>SlotRejections::stuck_outcome()</code>은 세 rejection reason(bsr_low·handle·keyword) 중 가장 많이 발생한 것을 그 슬롯의 대표 원인으로 뽑는다.</li>
+<li>그래서 A/B 대시보드에서 &quot;슬롯 하나가 비었을 때 가장 자주 걸린 안전 필터&quot;를 직접 관측할 수 있다.</li>
+</ul>
+</li>
+<li>같은 커밋에서 기존 블렌더를 가리키는 앨리어스가 하나 생겨, 블렌더 옵션은 모두 5개가 됐다.<ul>
+<li><code>AdsBlenderType</code> param에 <code>&quot;partition_organic_low_risk&quot;</code> 앨리어스가 추가됐다. 이 앨리어스는 기존 <code>PartitionOrganicAdsBlender</code>로 라우팅된다.</li>
+<li>옵션은 <code>safe_gap</code> / <code>partition_organic</code> / <code>partition_organic_low_risk</code> / <code>time_gap</code> / <code>multi_risk</code>다.</li>
+</ul>
+</li>
+</ul>
 <blockquote>
 <p>&quot;if any_bsr_high &amp;&amp; max_medium_slots &gt; 0 &amp;&amp; spacing_cap &gt; 0 { ... } else if safe_budget == 0 { return posts_to_feed_items(scored_posts); }&quot;
 — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/multi_risk_blender.rs" target="_blank" rel="noopener"><code>home-mixer/ads/multi_risk_blender.rs</code></a>, 2026-08-28</p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28-24c6094--multiriskadsblender-%EC%8B%A0%EC%84%A4-bsr-high-%EA%B4%91%EA%B3%A0-tier--medium-risk-%ED%8F%B4%EB%B0%B1-%EC%8A%AC%EB%A1%AF">../services/x.md</a> 광고 절에 &quot;4세대+10 (2026-08-28, 24c6094) — <code>MultiRiskAdsBlender</code> 신설&quot; subsection을 추가했다. 인접성 매트릭스 표와 슬롯 예산 산정식, 3종 metric 정의를 담았다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> <a href="x.html#%EA%B4%91%EA%B3%A0">4세대+7 HighRisk tier 신설</a> → <a href="x.html#%EA%B4%91%EA%B3%A0-conversion-%EC%95%A1%EC%85%98-%EB%8C%80%ED%8F%AD-%ED%99%95%EC%9E%A5--4%EC%84%B8%EB%8C%806-2026-08-21-28e414f">4세대+9 광고 픽셀·<code>conv_asset_ids</code> 배선</a> → <strong>4세대+10 tier×tier 매트릭스 블렌더</strong>로 이어지는 5일치 흐름이 완결됐다. HighRisk가 tier로 분리됐고 광고 픽셀 컨버전 헤드가 붙었으니, 이제 <strong>광고주가 자기 노출 범위를 tier 축에서 opt-in할 수 있는 blender 옵션</strong>까지 갖춰진 셈이다. 광고주 관점에서는 BSR-high opt-in의 인센티브 구조가 명시적으로 배선됐다는 신호이기도 하다. medium-risk 컨텍스트를 감수하면 폴백 슬롯을 얻어 노출 총량이 늘어나기 때문이다. 다만 <code>AdsBlenderType</code>은 아직 default가 아니라 experiment 게이트 뒤에 있다. 다음 관측 포인트는 이 param의 기본값이 언제 <code>multi_risk</code>로 승격되는지다.</p></div>
-<h3 id="1-b-vf-안전-라벨-twemcache-미스에-대한-sampled-async-워머">1-B. VF 안전-라벨 twemcache 미스에 대한 sampled async 워머</h3>
-<p><code>visibility-filtering/safety_label_source/</code>에 새 파일 <code>warmer.rs</code>(203줄)가 생겼고, 그 옆의 <code>lookup.rs</code>는 twemcache miss ID를 워머로 fire-and-forget 방식으로 흘려보내도록 배선됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/visibility-filtering/safety_label_source/warmer.rs" target="_blank" rel="noopener"><code>visibility-filtering/safety_label_source/warmer.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/visibility-filtering/safety_label_source/lookup.rs" target="_blank" rel="noopener"><code>visibility-filtering/safety_label_source/lookup.rs</code></a>.</p>
-<div class="blk ctx"><p><span class="lbl">배경 정리</span> — VF는 매 요청마다 후보 수십~수백 tweet의 안전 라벨(<code>visibility/baseTweetSafetyLabelMap</code> Strato 컬럼)을 조회해서 3-tier 정책(<a href="x.html#4%EB%8B%A8%EA%B3%84-labeling-path-%ED%99%95%EC%9D%B8--readmemd-labeling-path"><code>base_home_rules()</code> 28개 + OON 추가 26개 = 54 규칙</a>)으로 Allow / Interstitial / Drop을 판정한다. 앞단에는 twemcache가 look-aside cache로 걸려 있고, miss가 나면 Manhattan으로 폴백한다. 이 조회의 hit rate가 VF P99 지연을 좌우하는 핵심 변수다.</p></div>
-<p><strong>동작 흐름:</strong></p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28-24c6094--multiriskadsblender-%EC%8B%A0%EC%84%A4-bsr-high-%EA%B4%91%EA%B3%A0-tier--medium-risk-%ED%8F%B4%EB%B0%B1-%EC%8A%AC%EB%A1%AF">services/x.md</a> 광고 절에 &quot;4세대+10 (2026-08-28, 24c6094) — <code>MultiRiskAdsBlender</code> 신설&quot; 소절을 추가했다. 소절에는 인접성 매트릭스 표, 슬롯 예산 산정식, 3종 metric 정의를 담았다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대+7의 HighRisk tier 신설에서 시작한 5일치 흐름이 이번 tier×tier 매트릭스 블렌더로 완결됐다. 흐름은 <a href="x.html#%EA%B4%91%EA%B3%A0">4세대+7 HighRisk tier 신설</a> → <a href="x.html#%EA%B4%91%EA%B3%A0-conversion-%EC%95%A1%EC%85%98-%EB%8C%80%ED%8F%AD-%ED%99%95%EC%9E%A5--4%EC%84%B8%EB%8C%806-2026-08-21-28e414f">4세대+9 광고 픽셀·<code>conv_asset_ids</code> 연결</a> → 4세대+10 매트릭스 블렌더 순이다.</p></div>
+<ul>
+<li>HighRisk가 tier로 분리됐고 광고 픽셀 컨버전 헤드가 붙었으니, 이제 광고주가 자기 노출 범위를 tier 축에서 opt-in할 수 있는 blender 옵션까지 갖춰진 셈이다.</li>
+<li>광고주 관점에서는 BSR-high opt-in의 인센티브 구조가 코드에 명시적으로 들어갔다는 신호이기도 하다. medium-risk 컨텍스트를 감수하면 폴백 슬롯을 얻어 노출 총량이 늘어나기 때문이다.</li>
+<li>다만 <code>AdsBlenderType</code>은 아직 default가 아니라 experiment 게이트 뒤에 있다. 다음 관측 포인트는 이 param의 기본값이 언제 <code>multi_risk</code>로 승격되는지다.</li>
+</ul>
+<h3 id="1-b-vf가-안전-라벨-캐시에서-놓친-항목을-표본으로-골라-비동기로-미리-채운다">1-B. VF가 안전 라벨 캐시에서 놓친 항목을 표본으로 골라 비동기로 미리 채운다</h3>
+<p>VF가 안전 라벨을 조회하다 캐시가 놓친 항목을 일부 골라, 요청과 따로 캐시를 미리 채우는 워머가 생겼다. 워머는 요청을 기다리게 하지 않고, 판정 규칙도 바꾸지 않는다.</p>
+<ul>
+<li>워머가 새 파일로 추가됐고, 기존 조회 코드가 캐시 miss ID를 워머로 fire-and-forget 방식으로 넘기도록 연결됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/visibility-filtering/safety_label_source/warmer.rs" target="_blank" rel="noopener"><code>visibility-filtering/safety_label_source/warmer.rs</code></a>.<ul>
+<li><code>visibility-filtering/safety_label_source/</code>에 새 파일 <code>warmer.rs</code>(203줄)가 생겼다.</li>
+<li>miss ID를 넘기는 쪽은 그 옆의 <code>lookup.rs</code>다(<a href="https://github.com/xai-org/x-algorithm/blob/24c6094/visibility-filtering/safety_label_source/lookup.rs" target="_blank" rel="noopener"><code>visibility-filtering/safety_label_source/lookup.rs</code></a>).</li>
+</ul>
+</li>
+</ul>
+<p>VF는 요청마다 후보 포스트 수십~수백 개의 안전 라벨을 조회해 Allow / Interstitial / Drop을 판정한다. 라벨 조회 앞단에는 twemcache가 look-aside cache로 있고, miss가 나면 Manhattan(KV 저장소)으로 폴백한다. 이 조회의 hit rate가 VF P99 지연을 좌우하는 핵심 변수다.</p>
+<ul>
+<li>라벨은 Strato(X 사내 gRPC 프록시)의 <code>visibility/baseTweetSafetyLabelMap</code> 컬럼에서 읽는다.</li>
+<li>판정은 3-tier 정책을 따르고, 규칙은 <a href="x.html#4%EB%8B%A8%EA%B3%84-labeling-path-%ED%99%95%EC%9D%B8--readmemd-labeling-path"><code>base_home_rules()</code> 28개 + OON 추가 26개 = 54 규칙</a>이다. OON(out-of-network)은 뷰어가 팔로우하지 않은 계정의 포스트다.</li>
+</ul>
+<p>워머는 네 단계로 동작한다.</p>
 <ol>
-<li><code>RemoteSource::get(ids)</code>가 twemcache 결과를 네 종류로 나눈다. <code>Hit</code>, <code>NotFound</code>(정의상 존재하지 않음), <code>Miss</code>(cache가 이 키를 모름), <code>FallThrough(reason)</code>(cache 에러나 타임아웃)이다. <strong><code>Miss</code>인 경우에만</strong> 별도 벡터 <code>warm_ids</code>에 모은다. <code>NotFound</code>는 정의상 라벨이 없는 트윗이라 워머 대상이 아니고, <code>FallThrough</code>는 캐시 인프라 문제라 워머로 해소할 성격이 아니다. 이 3분법이 워머 도입의 원칙이다. <strong>워머는 &quot;캐시가 아직 채워지지 않은 상태&quot;만 해소한다</strong>.</li>
-<li>Manhattan 폴백 요청이 나가기 <strong>전에</strong> <code>warmer.warm(warm_ids)</code>를 fire-and-forget으로 호출한다. 요청 응답 지연에는 영향을 주지 않는다.</li>
-<li><code>SampledWarmer</code>가 <code>VF_CACHE_WARM_SAMPLE_PCT</code> 환경변수(0–100, panic on out-of-range)로 확률 샘플링을 하고, 통과한 ID만 tokio <code>mpsc::channel</code> bounded queue(용량 1024)에 <code>try_send</code>한다. 채널이 가득 차서 실패하면 <code>WarmKeyResult::DroppedChannelFull</code> 카운터만 올리고 요청 처리를 계속한다. <strong>워머 채널이 포화되더라도 요청 경로에는 backpressure가 절대 걸리지 않도록 설계했다</strong>.</li>
-<li>백그라운드 drain 태스크가 큐에서 벡터를 pop한 뒤, <strong>500ms linger</strong> 동안 뒤따라 오는 벡터를 합쳐 최대 50 ID까지 한 배치로 묶고, <code>StratoWarmFetcher::fetch(chunk)</code>로 Strato에 <code>batch_call</code>을 보낸다(<code>WARM_COLUMN_PATH = &quot;visibility/baseTweetSafetyLabelMap&quot;</code>). Strato가 write-back한 결과가 twemcache에 채워진다. 다만 warmer 코드가 fetch 응답을 직접 twemcache에 쓰지는 않으므로, 별도의 read-through 캐시 계층이 있는 것으로 추정한다 <span class="badge est">추정</span>.</li>
+<li>캐시 결과를 네 종류로 나누고, 캐시가 키를 모르는 경우만 워머 대상으로 모은다.<ul>
+<li><code>RemoteSource::get(ids)</code>가 twemcache 결과를 <code>Hit</code>, <code>NotFound</code>, <code>Miss</code>, <code>FallThrough(reason)</code>으로 나눈다.</li>
+<li><code>Miss</code>(cache가 이 키를 모름)인 경우에만 별도 벡터 <code>warm_ids</code>에 모은다.</li>
+<li><code>NotFound</code>(정의상 존재하지 않음)는 정의상 라벨이 없는 트윗이라 워머 대상이 아니다.</li>
+<li><code>FallThrough</code>(cache 에러나 타임아웃)는 캐시 인프라 문제라 워머로 해소할 성격이 아니다.</li>
+<li>이 3분법이 워머 도입의 원칙이다. 워머는 &quot;캐시가 아직 채워지지 않은 상태&quot;만 해소한다.</li>
+</ul>
+</li>
+<li>Manhattan 폴백 요청이 나가기 전에 <code>warmer.warm(warm_ids)</code>를 fire-and-forget으로 호출한다. 요청 응답 지연에는 영향을 주지 않는다.</li>
+<li>환경변수로 정한 확률로 표본을 골라 bounded 큐에 넣고, 큐가 가득 차면 카운터만 올린 채 요청 처리를 계속한다.<ul>
+<li><code>SampledWarmer</code>가 <code>VF_CACHE_WARM_SAMPLE_PCT</code> 환경변수(0–100, panic on out-of-range)로 확률 샘플링을 한다.</li>
+<li>통과한 ID만 tokio <code>mpsc::channel</code> bounded queue(용량 1024)에 <code>try_send</code>한다.</li>
+<li>채널이 가득 차서 실패하면 <code>WarmKeyResult::DroppedChannelFull</code> 카운터만 올린다.</li>
+<li>워머 채널이 포화되더라도 요청 경로에는 backpressure가 절대 걸리지 않도록 설계했다.</li>
+</ul>
+</li>
+<li>백그라운드 drain 태스크가 ID를 모아 Strato에 일괄 조회를 보낸다.<ul>
+<li>태스크는 큐에서 벡터를 pop한 뒤, 500ms linger 동안 뒤따라 오는 벡터를 합쳐 최대 50 ID까지 한 배치로 묶는다.</li>
+<li>묶은 배치는 <code>StratoWarmFetcher::fetch(chunk)</code>로 Strato에 <code>batch_call</code>을 보낸다(<code>WARM_COLUMN_PATH = &quot;visibility/baseTweetSafetyLabelMap&quot;</code>).</li>
+<li>Strato가 write-back한 결과가 twemcache에 채워진다. 다만 warmer 코드가 fetch 응답을 직접 twemcache에 쓰지는 않으므로, 별도의 read-through 캐시 계층이 있는 것으로 추정한다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
 </ol>
-<p><strong>관측 카운터</strong> <code>record_cache_warm_keys(result, count)</code>가 6종 outcome을 남긴다. <code>EligibleMiss</code> (miss로 워머 대상이 된 총량이며 샘플링 이전 수치다) · <code>SampledOut</code> · <code>Enqueued</code> · <code>DroppedChannelFull</code> · <code>FetchIssued</code> · <code>FetchFailed</code>이다. 이 6종으로 워머의 단계별 통과율과 병목을 관측한다. 예를 들어 <code>FetchFailed / FetchIssued</code>가 높으면 Strato 인프라 문제이고, <code>DroppedChannelFull</code>이 계속 발생하면 채널 용량(1024)이 부족한 것이다.</p>
-<p><strong>같은 파일에서 config 정리 3건</strong> — <code>VF_GIZMODUCK_CLIENT_ID</code>·<code>VF_TWEMCACHE_CLIENT_NAME</code>·<code>APP_ENV</code> 3개 env를 새로 만들었다. <code>gizmoduck_client_id()</code>는 설정된 값이 없으면 <code>visibility-filtering-service.{APP_ENV|prod}</code> 템플릿으로 값을 자동 조립한다. VF가 <a href="x.html#4%EC%84%B8%EB%8C%804-2026-08-19--visibility-filtering-shadow-deployment-xai-vf-shadow-%EB%B0%B0%EC%84%A0">dark_traffic으로 staging에서 돌 때</a> staging용 gizmoduck 쿼터와 레이트리밋을 프로덕션과 분리하려는 목적으로 추정한다 <span class="badge est">추정</span>.</p>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28--safety-label-twemcache-miss%EC%97%90-%EB%8C%80%ED%95%9C-sampled-async-%EC%9B%8C%EB%A8%B8-%EB%B0%B0%EC%84%A0">../services/x.md</a> 안전성/visibility-filtering 절에 4세대+10 subsection을 추가했다. 워머 흐름과 bounded 채널 원칙, 6종 metric, config 정리를 담았다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> twemcache miss가 나는 경우는 두 가지다. (a) 트윗이 아직 어떤 라벨링도 받지 못한 신선한 상태여서 캐시는 물론 라벨도 없는 경우와 (b) TTL이 만료됐거나 evict되어 캐시만 비어 있는 경우다. 이 워머는 특히 (b), 즉 Manhattan에는 라벨이 있는데 캐시가 놓쳐서 매 요청마다 Manhattan을 때리는 낭비를 해소한다. sample-pct 게이트를 둬서 트래픽이 급증해도 워머 자체가 Strato 폭주를 유발하지 않도록 설계했다. <code>VF_CACHE_WARM_SAMPLE_PCT</code>를 낮게 시작해 점진적으로 올리는 dial-up 롤아웃도 가능한데, 4세대의 다른 dial-up 패턴(Grok 4.6 10%→30%→100%, <a href="x.html#grox--ptos-adult-content-cross-validation-4%EC%84%B8%EB%8C%802-%EC%8B%A0%EA%B7%9C-2026-08-17">4세대+4→+5→+6</a>)과 유사한 관행이다. VF의 요청 경로에 새 계층이 열린 것은 아니고 <strong>하부 인프라 최적화</strong>에 해당한다. 규칙 판정(3-tier / 54 규칙)은 그대로다.</p></div>
-<h3 id="1-c-phoenix-trainer가-restore_streamed를-실제로-소비">1-C. Phoenix trainer가 <code>restore_streamed</code>를 실제로 소비</h3>
-<p><a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">4세대+9(2026-08-26)에 도입된 <code>load_checkpoint_streamed</code></a>가 스캐폴딩만 배선된 상태였는데, 이 커밋에서 <code>Trainer.maybe_load_checkpoint</code>가 실제 소비자로 붙었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer.py:1177-1330</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py</code></a>.</p>
-<p>활성 조건은 세 가지가 모두 참일 때다. <code>restore_streamed=True</code>이고, <code>format == &quot;orbax&quot;</code>이며, <code>save_method != &quot;tensorstore&quot;</code>여야 한다. 하나라도 맞지 않으면 로그를 남기고 기존 <code>load_checkpoint</code>(전량 pinned-host 스테이지) 경로로 폴백한다. 즉 config를 잘못 설정했거나 orbax가 아닌 checkpoint(tensorstore 등)를 만나면 안전한 기본 경로로 fall-through하므로, 하위 호환이 유지된다.</p>
-<p><code>use_streamed_restore=True</code> 경로는 그 자체로 <code>checkpointing_load.copy_aliased_arrays(self.state)</code>를 호출해 aliased state leaves를 미리 분리한다. 새 함수 <code>_graft_replaced(pairs)</code>는 loaded tensor를 원래 state tree의 자리에 in-place로 grafting하는데, aliased leaf가 두 자리에 걸쳐 있으면 어느 슬롯에 넣을지 모호해지므로 조기에 assertion으로 막는다(<code>restore_streamed does not support aliased state leaves: multiple loaded tensors share one device array</code>).</p>
-<p><code>load_checkpoint_streamed</code>가 받는 새 인자 두 개도 이 커밋에서 라우팅됐다. <code>window_gb</code>는 해당 배치의 pinned-host 예산이고 None이면 auto-window로 동작하며, <code>on_replaced</code> 콜백은 완료된 배치의 old/new device array pair 리스트를 받아 호출자가 state tree에 grafting하도록 한다. <code>window_cap_gb</code>는 <code>window_gb</code>가 명시되지 않았을 때만 <code>restore_concurrent_gb</code> 값으로 세팅되는 안전벨트다. 이전 API의 concurrent_gb를 streamed 경로에서 window cap 상한으로 재활용했다.</p>
-<p>이 흐름의 핵심은 <strong>pinned-host에 optimizer state 사본을 만들지 않고, tensor를 하나씩 device로 옮긴 뒤 원래 참조 자리에 grafting하는 것</strong>이다. <code>warm_start</code> 케이스(pretrained params를 로드하고 opt state는 새로 만드는 경우)에서 특히 이득이 크다. 기존 <code>do_not_load_opt_state=True</code> 경로가 <code>warm_purge(self.state)</code>로 opt state 필드를 미리 잘라내고, streamed 경로에서는 host_state를 None으로 둔 채 loaded params만 grafting하기 때문에 <strong>opt state의 pinned-host 사본이 아예 생성되지 않는다</strong>. 4세대+6·+7의 Muon+GB300 flagship이 pretrained 파라미터에 새 optimizer를 붙여 시작하는 표준 흐름을, 이제 checkpoint stack이 원자적으로 지원하게 됐다.</p>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28-24c6094--trainer%EA%B0%80-streamed-restore%EB%A5%BC-%EC%8B%A4%EC%A0%9C%EB%A1%9C-%EC%86%8C%EB%B9%84--grpc-%ED%8A%B8%EB%A0%88%EC%9D%BC%EB%9F%AC-%EB%B3%B4%EC%A1%B4-%EB%B2%84%EA%B7%B8%ED%94%BD%EC%8A%A4--copy_port-shard-schedule-%EC%85%94%ED%94%8C">../services/x.md</a> Phoenix 학습·인덱스 절에 &quot;4세대+10 (2026-08-28, 24c6094)&quot; subsection의 첫 갈래로 추가했다.</p></div>
+<ul>
+<li>워머의 단계별 통과율과 병목은 6종 outcome 카운터로 관측한다.<ul>
+<li><code>record_cache_warm_keys(result, count)</code>가 <code>EligibleMiss</code>·<code>SampledOut</code>·<code>Enqueued</code>·<code>DroppedChannelFull</code>·<code>FetchIssued</code>·<code>FetchFailed</code>를 남긴다.</li>
+<li><code>EligibleMiss</code>는 miss로 워머 대상이 된 총량이며, 샘플링 이전 수치다.</li>
+<li>예를 들어 <code>FetchFailed / FetchIssued</code>가 높으면 Strato 인프라 문제이고, <code>DroppedChannelFull</code>이 계속 발생하면 채널 용량(1024)이 부족한 것이다.</li>
+</ul>
+</li>
+<li>같은 파일에서 환경변수 3개를 새로 만들어 설정을 정리했다.<ul>
+<li>새 env는 <code>VF_GIZMODUCK_CLIENT_ID</code>·<code>VF_TWEMCACHE_CLIENT_NAME</code>·<code>APP_ENV</code>다.</li>
+<li><code>gizmoduck_client_id()</code>는 설정된 값이 없으면 <code>visibility-filtering-service.{APP_ENV|prod}</code> 템플릿으로 값을 자동 조립한다.</li>
+<li>VF가 <a href="x.html#4%EC%84%B8%EB%8C%804-2026-08-19--visibility-filtering-shadow-deployment-xai-vf-shadow-%EB%B0%B0%EC%84%A0">dark_traffic으로 staging에서 돌 때</a> staging용 gizmoduck(X의 유저 정보 서비스) 쿼터와 레이트리밋을 프로덕션과 분리하려는 목적으로 추정한다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28--safety-label-twemcache-miss%EC%97%90-%EB%8C%80%ED%95%9C-sampled-async-%EC%9B%8C%EB%A8%B8-%EB%B0%B0%EC%84%A0">services/x.md</a> 안전성/visibility-filtering 절에 4세대+10 소절을 추가했다. 소절에는 워머 흐름, bounded 채널 원칙, 6종 metric, config 정리를 담았다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이 워머는 VF의 요청 경로에 새 계층을 연 것이 아니라 하부 인프라를 최적화한 것이다. 규칙 판정(3-tier / 54 규칙)은 그대로다.</p></div>
+<ul>
+<li>twemcache miss가 나는 경우는 두 가지다.<ul>
+<li>트윗이 아직 어떤 라벨링도 받지 못한 신선한 상태여서, 캐시는 물론 라벨도 없는 경우다.</li>
+<li>TTL이 만료됐거나 evict되어 캐시만 비어 있는 경우다.</li>
+</ul>
+</li>
+<li>이 워머는 특히 둘째 경우, 즉 Manhattan에는 라벨이 있는데 캐시가 놓쳐서 매 요청마다 Manhattan을 조회하는 낭비를 해소한다.</li>
+<li>sample-pct 게이트를 둬서, 트래픽이 급증해도 워머 자체가 Strato 폭주를 유발하지 않도록 설계했다.</li>
+<li><code>VF_CACHE_WARM_SAMPLE_PCT</code>를 낮게 시작해 점진적으로 올리는 dial-up 롤아웃도 가능하다. 4세대의 다른 dial-up 패턴(Grok 4.6 10%→30%→100%, <a href="x.html#grox--ptos-adult-content-cross-validation-4%EC%84%B8%EB%8C%802-%EC%8B%A0%EA%B7%9C-2026-08-17">4세대+4→+5→+6</a>)과 유사한 관행이다.</li>
+</ul>
+<h3 id="1-c-phoenix-학습-코드가-스트리밍-체크포인트-복원을-실제로-호출한다">1-C. Phoenix 학습 코드가 스트리밍 체크포인트 복원을 실제로 호출한다</h3>
+<p>4세대+9(2026-08-26)에 스캐폴딩만 들어왔던 스트리밍 체크포인트 복원을 이번 커밋부터 학습기가 실제로 호출한다. 이 경로의 핵심은 optimizer state 사본을 pinned-host에 만들지 않고, tensor를 하나씩 device로 옮겨 원래 참조 자리에 끼워 넣는 것이다.</p>
+<ul>
+<li>학습기의 체크포인트 로드 함수가 스트리밍 복원의 실제 소비자가 됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer.py:1177-1330</code></a>.<ul>
+<li><a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">4세대+9(2026-08-26)에 도입된 <code>load_checkpoint_streamed</code></a>는 그동안 스캐폴딩만 연결된 상태였고, 이번 커밋에서 <code>maybe_load_checkpoint</code>에 연결됐다.</li>
+<li>소비자의 전체 이름은 <code>Trainer.maybe_load_checkpoint</code>다. 복원 쪽 코드는 <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py</code></a>에 있다.</li>
+</ul>
+</li>
+<li>새 경로는 세 조건이 모두 맞을 때만 켜지고, 하나라도 어긋나면 기존 복원 경로로 돌아간다.<ul>
+<li>새 경로를 켜는 config 플래그는 <code>restore_streamed</code>다.</li>
+<li>세 조건은 <code>restore_streamed=True</code>, <code>format == &quot;orbax&quot;</code>, <code>save_method != &quot;tensorstore&quot;</code>다.</li>
+<li>하나라도 맞지 않으면 로그를 남기고 기존 <code>load_checkpoint</code>(전량 pinned-host 스테이지) 경로로 폴백한다.</li>
+<li>즉 config를 잘못 설정했거나 orbax가 아닌 checkpoint(tensorstore 등)를 만나면 안전한 기본 경로로 fall-through하므로, 하위 호환이 유지된다.</li>
+</ul>
+</li>
+<li>불러온 tensor는 원래 state tree의 자리에 in-place로 끼워 넣는다(grafting).<ul>
+<li><code>use_streamed_restore=True</code> 경로는 그 자체로 <code>checkpointing_load.copy_aliased_arrays(self.state)</code>를 호출해 aliased state leaves를 미리 분리한다.</li>
+<li>끼워 넣기는 새 함수 <code>_graft_replaced(pairs)</code>가 맡는다.</li>
+<li>aliased leaf가 두 자리에 걸쳐 있으면 어느 슬롯에 넣을지 모호해지므로, <code>_graft_replaced</code>는 이 경우를 조기에 assertion으로 막는다.</li>
+<li>assertion 메시지는 <code>restore_streamed does not support aliased state leaves: multiple loaded tensors share one device array</code>다.</li>
+</ul>
+</li>
+<li>스트리밍 복원 함수가 받는 새 인자 두 개도 이 커밋에서 라우팅됐다.<ul>
+<li>함수는 <code>load_checkpoint_streamed</code>이고, <code>window_gb</code>는 해당 배치의 pinned-host 예산이다. None이면 auto-window로 동작한다.</li>
+<li><code>on_replaced</code> 콜백은 완료된 배치의 old/new device array pair 리스트를 받아, 호출자가 state tree에 끼워 넣도록 한다.</li>
+<li><code>window_cap_gb</code>는 <code>window_gb</code>가 명시되지 않았을 때만 <code>restore_concurrent_gb</code> 값으로 세팅되는 안전벨트다. 이전 API의 concurrent_gb를 streamed 경로에서 window cap 상한으로 재활용한 것이다.</li>
+</ul>
+</li>
+<li>이 흐름의 이득은 <code>warm_start</code> 케이스에서 특히 크다. warm start는 pretrained params를 로드하고 opt state는 새로 만드는 경우다.<ul>
+<li>기존 <code>do_not_load_opt_state=True</code> 경로가 <code>warm_purge(self.state)</code>로 opt state 필드를 미리 잘라내고, streamed 경로는 host_state를 None으로 둔 채 loaded params만 끼워 넣는다. 그래서 opt state의 pinned-host 사본이 아예 생성되지 않는다.</li>
+<li>4세대+6·+7의 Muon과 GB300 조합 flagship이 pretrained 파라미터에 새 optimizer를 붙여 시작하는 표준 흐름을, 이제 checkpoint stack이 원자적으로 지원하게 됐다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28-24c6094--trainer%EA%B0%80-streamed-restore%EB%A5%BC-%EC%8B%A4%EC%A0%9C%EB%A1%9C-%EC%86%8C%EB%B9%84--grpc-%ED%8A%B8%EB%A0%88%EC%9D%BC%EB%9F%AC-%EB%B3%B4%EC%A1%B4-%EB%B2%84%EA%B7%B8%ED%94%BD%EC%8A%A4--copy_port-shard-schedule-%EC%85%94%ED%94%8C">services/x.md</a> Phoenix 학습·인덱스 절의 &quot;4세대+10 (2026-08-28, 24c6094)&quot; 소절에 첫 갈래로 추가했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> 4세대+9에서 +10으로 이어지는 이틀 흐름이 &quot;스캐폴딩 → 소비자 배선&quot;으로 완결됐다. <code>restore_streamed</code>가 현재 default인지 experiment flag 뒤에 있는지는 코드만으로 분명하지 않으나, config에 1줄만 추가된 것으로 보아 아직 default가 false라고 추정한다 <span class="badge est">추정</span>. 다음 관측 포인트는 flagship config에서 이 플래그가 True로 승격되는 커밋이다.</p></div>
-<h3 id="1-d-phoenix-grpc-compression-트레일러-유실-버그픽스--zstd-encode-시간-히스토그램">1-D. Phoenix gRPC compression 트레일러 유실 버그픽스 + zstd encode 시간 히스토그램</h3>
-<p><code>GrpcCompressionService</code>가 응답 본문을 zstd로 압축할 때, 이전 로직은 <code>collected.to_bytes()</code>로 body만 뽑아 새 <code>axum::body::Body::from(data)</code>로 다시 감쌌다. 이 과정에서 <strong>gRPC trailers</strong>(특히 <code>grpc-status</code>·<code>grpc-message</code>)가 통째로 유실됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/grpc_compression.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/grpc_compression.rs</code></a>.</p>
-<p>gRPC 프레임은 body 뒤에 trailer로 상태 코드를 실어 보내는 구조인데, 그 부분이 버려진 것이다. 클라이언트 쪽에서는 응답이 정상으로 도착하면서도 status trailer가 없어 UNKNOWN이나 EOF로 처리됐을 가능성이 있고, 그렇다면 재시도 로직과 에러 로깅, 서킷브레이커가 모두 오작동했을 것이다. 새 코드는 <code>collected.trailers().cloned()</code>로 trailer를 미리 뽑아 두고, <code>rebuild_response(parts, data, trailers)</code> 헬퍼가 <code>Full::new(data).with_trailers(async move { Some(Ok(tr)) })</code>로 트레일러를 다시 붙인 뒤 응답 본문을 구성한다. 압축에 성공하든 실패하든 트레일러가 유지되도록 통일했다.</p>
-<p>회귀 테스트 두 개(<code>compressed_response_forwards_trailers</code>, <code>non_compressed_response_forwards_trailers</code>)로 이 동작을 명시했다. 이 두 테스트가 남아 있는 한, 나중에 비슷한 리팩터링으로 trailer가 다시 새면 CI가 잡아낸다.</p>
-<p>같은 파일에 새 히스토그램 **<code>recsys_engine_response_compress_ms{method}</code>**을 배선했다. <code>tokio::task::spawn_blocking(compress_grpc_frame)</code>에 들어가기 직전에 <code>Instant::now()</code>를 찍고, 완료된 뒤 <code>elapsed().as_secs_f64() * 1000.0</code>으로 관측한다. 즉 zstd 인코딩의 큐잉 시간과 CPU 시간을 method별로 나눠 볼 수 있다. buckets는 request latency 버킷과 공유한다(<code>crate::request_metrics::latency_buckets_ms()</code>).</p>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28-24c6094--trainer%EA%B0%80-streamed-restore%EB%A5%BC-%EC%8B%A4%EC%A0%9C%EB%A1%9C-%EC%86%8C%EB%B9%84--grpc-%ED%8A%B8%EB%A0%88%EC%9D%BC%EB%9F%AC-%EB%B3%B4%EC%A1%B4-%EB%B2%84%EA%B7%B8%ED%94%BD%EC%8A%A4--copy_port-shard-schedule-%EC%85%94%ED%94%8C">../services/x.md</a> Phoenix 절의 두 번째 갈래로 추가했다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> trailer 유실은 서빙 계약을 조용히 깨뜨리는 심각한 버그다. 이 커밋으로 회귀 방지 테스트까지 붙어서 같은 문제가 다시 생길 확률이 크게 낮아졌다. <code>_compress_ms</code> 히스토그램은 GB300에서 큰 응답의 zstd 인코딩이 응답 지연에 얼마나 기여하는지 나눠 볼 수 있어서, 압축 레벨을 튜닝할 근거가 된다. 이 버그가 프로덕션에 언제부터 있었는지, 그리고 어떤 증거가 관측됐는지(고객 티켓인지 재시도 폭주인지)는 공개되지 않았다.</p></div>
-<h3 id="1-e-copy_port-shard-schedule-셔플로-peer-load-균등화">1-E. copy_port shard-schedule 셔플로 peer-load 균등화</h3>
-<p><code>shuffle_sharded_schedule(n, tensor_name)</code>이 신설됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs</code></a>.</p>
-<p>각 pod가 텐서의 여러 shard를 병렬로 내려받을 때, 이전에는 모든 pod가 index 0부터 순서대로 요청해서 첫 shard를 가진 owner peer가 순간적으로 과부하됐다. 새 로직은 <code>POD_NAME</code>(또는 <code>HOSTNAME</code>)과 tensor name을 hash로 섞어 <code>StdRng::seed_from_u64(hash)</code>로 초기화한 shuffle을 적용하고, 그 결과 <strong>각 pod가 서로 다른 순서로 shard를 요청</strong>한다. seed가 결정론적이라 같은 pod가 restart돼도 같은 순서를 유지하므로 로그를 재현할 수 있다. 대신 완료된 결과를 원래 순서로 되돌리기 위해 <code>restore_piece_order(shuffled, schedule) -&gt; Option&lt;Vec&lt;T&gt;&gt;</code> 헬퍼를 뒀다.</p>
-<p><code>emb_table.rs</code>와 <code>copy_port_client.rs</code> 두 소비 지점 모두 새 헬퍼로 통일했다. 셔플은 <code>sharded</code> ownership에만 적용하고 <code>replicated</code>는 in-order를 유지하는데, 모든 pod가 같은 데이터를 받으므로 셔플할 이득이 없기 때문이다.</p>
-<p>첫 8개 index만 로그(<code>copy_port: shard schedule shuffled name={tensor} n={total} first={:?}</code>)로 남겨서 셔플이 실제로 걸렸는지 진단할 수 있다. <code>TRANSFER_FAILED_SENTINEL</code>을 만나면 restore를 하기 전에 에러로 조기 반환한다.</p>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28-24c6094--trainer%EA%B0%80-streamed-restore%EB%A5%BC-%EC%8B%A4%EC%A0%9C%EB%A1%9C-%EC%86%8C%EB%B9%84--grpc-%ED%8A%B8%EB%A0%88%EC%9D%BC%EB%9F%AC-%EB%B3%B4%EC%A1%B4-%EB%B2%84%EA%B7%B8%ED%94%BD%EC%8A%A4--copy_port-shard-schedule-%EC%85%94%ED%94%8C">../services/x.md</a> Phoenix 절의 세 번째 갈래로 추가했다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> 대형 임베딩 테이블과 dense weight을 여러 pod가 restore할 때 shard 0을 담당하는 peer에 traffic spike가 몰리는 문제는 <a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">4세대+7의 노드-serialize + concurrent_gb</a>로 완화됐지만, peer 쪽 스파이크는 여전히 남아 있었다. 이번 shuffle은 그 마지막 병목을 pod 수에 반비례하게 나눈다. <strong>결정론적 셔플</strong>이 중요한 이유는 두 가지다. (a) 셔플 자체를 로그로 재현할 수 있고, (b) 같은 pod가 같은 tensor를 여러 번 로드해도 순서가 같아서 캐시 hit rate 관측이 안정적이다.</p></div>
-<h3 id="1-f-잡다한-하드닝-6건">1-F. 잡다한 하드닝 6건</h3>
-<p><strong>home-mixer polling 요청 관측성</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/util/strato_context.rs" target="_blank" rel="noopener"><code>home-mixer/util/strato_context.rs</code></a> (75줄 신규), <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/side_effects/response_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/response_stats_side_effect.rs</code></a> (+34/−0). 새 유틸이 tonic gRPC의 <code>MetadataMap</code>에서 <code>stratocontext</code> 또는 <code>stratocontext-bin</code> 키를 뽑아 base64로 디코드한 뒤 proto <code>StratoContext { is_polling: bool }</code>로 파싱한다. <code>response_stats_side_effect.rs</code>의 새 함수 <code>stat_request_context(feed, query)</code>는 요청마다 세 카운터를 발화한다. <code>&lt;feed&gt;.request.polling{polling=true|false, client}</code>, <code>&lt;feed&gt;.request.request_context{request_context, client}</code>, <code>&lt;feed&gt;.request.client{client, client_version}</code>이다. 즉 서빙 지표에서 <strong>정기 polling refresh와 유저 초기 요청을 나눠서</strong> 볼 수 있게 됐다. polling 요청은 시퀀스가 짧고 has_cached_posts 확률도 달라서, 이 축을 분리해 관측하는 것이 랭킹 실험 해석에 중요하다.</p>
-<p><strong>grox reply_spam Kafka-first + <code>&gt;=</code> idempotency + fetch fail-loud</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/grox/flows/reply_spam/task_write.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_write.py</code></a> (+15/−21), <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/grox/flows/reply_spam/classifier_coordinated_spam.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/classifier_coordinated_spam.py</code></a> (+5/−1). <code>_publish_to_reply_ranking_manhattan</code>이 4세대+9의 monotone-only 위에서 세 갈래로 더 조여졌다.</p>
-<ol>
-<li><strong>비교 연산자 <code>&gt;</code> → <code>&gt;=</code></strong> — 이전에는 새 스코어가 기존 값과 <strong>같으면 그대로 썼다</strong>(중복 write). 이번에는 <code>score &gt;= existing.score</code>이면 skip한다. 카운터 이름도 <code>higher_than_existing</code>에서 <code>not_lower_than_existing</code>으로 바꿔 시맨틱을 명시했다.</li>
-<li><strong>Kafka 이벤트를 Manhattan write 앞으로 이동</strong> — 이전 순서는 <code>save_reply_ranking_score(Manhattan)</code> 다음에 <code>save_reply_ranking_kafka_v2(Kafka)</code>였고, 새 순서는 그 반대다. Kafka는 append-only라 실패해도 재시도할 수 있지만, Manhattan은 monotone-only 로직에 걸려 재시도 자체가 skip될 수 있고 upsert side-effect까지 있어 무겁다. <strong>Kafka-first가 시스템 전체의 관측 가능성 정합성을 보장하는 durability 순서다.</strong> Kafka publish가 성공한 뒤 Manhattan write가 실패하면 오프라인 재처리 파이프라인이 복구할 수 있지만, 반대 순서에서는 downstream(서빙 캐시 warm-back, 다른 소비자)이 Manhattan에 이미 반영된 새 스코어를 보지 못하게 된다.</li>
-<li><strong><code>fetch_reply_ranking_score</code>의 try/except 제거</strong> — 이전에는 fetch가 실패하면 warning 로그를 남기고 <code>existing = None</code>으로 진행해서 결국 항상 write했다. 이번에는 예외를 그대로 위로 던져 flow task가 실패로 마크되고 재시도된다. 방어적인 예외 처리를 걷어내고 로직의 정확성을 우선했다.</li>
+<h3 id="1-d-grpc-응답-압축이-상태-트레일러를-잃던-버그를-고치고-압축-시간을-재기-시작했다">1-D. gRPC 응답 압축이 상태 트레일러를 잃던 버그를 고치고 압축 시간을 재기 시작했다</h3>
+<p>Phoenix 서빙이 응답을 zstd로 압축할 때 gRPC 상태 코드를 담은 트레일러가 사라지던 버그가 고쳐졌다. 같은 파일에 압축 시간을 method별로 재는 히스토그램도 생겼다.</p>
+<ul>
+<li>이전 로직은 압축 과정에서 gRPC trailers를 전부 잃었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/grpc_compression.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/grpc_compression.rs</code></a>.<ul>
+<li><code>GrpcCompressionService</code>가 응답 본문을 zstd로 압축할 때, <code>collected.to_bytes()</code>로 body만 뽑아 새 <code>axum::body::Body::from(data)</code>로 다시 감쌌다.</li>
+<li>이 과정에서 특히 <code>grpc-status</code>·<code>grpc-message</code>가 사라졌다.</li>
+</ul>
+</li>
+<li>gRPC 프레임은 body 뒤에 trailer로 상태 코드를 실어 보내는 구조인데, 그 부분이 버려진 것이다.</li>
+<li>클라이언트 쪽에서는 응답이 정상으로 도착하면서도 status trailer가 없어 UNKNOWN이나 EOF로 처리됐을 가능성이 있다. 그렇다면 재시도 로직과 에러 로깅, 서킷브레이커가 모두 오작동했을 것이다.</li>
+<li>새 코드는 trailer를 미리 뽑아 두었다가 응답을 다시 만들 때 붙인다. 압축에 성공하든 실패하든 트레일러가 유지되도록 통일했다.<ul>
+<li><code>collected.trailers().cloned()</code>로 trailer를 미리 뽑아 둔다.</li>
+<li><code>rebuild_response(parts, data, trailers)</code> 헬퍼가 <code>Full::new(data).with_trailers(async move { Some(Ok(tr)) })</code>로 트레일러를 다시 붙인 뒤 응답 본문을 구성한다. 줄여 말하면 <code>Full::new(data).with_trailers(...)</code>로 트레일러를 복원한 것이다.</li>
+</ul>
+</li>
+<li>회귀 테스트 두 개가 이 동작을 고정한다.<ul>
+<li>테스트는 <code>compressed_response_forwards_trailers</code>와 <code>non_compressed_response_forwards_trailers</code>다.</li>
+<li>이 두 테스트가 남아 있는 한, 나중에 비슷한 리팩터링으로 trailer가 다시 새면 CI가 잡아낸다.</li>
+</ul>
+</li>
+<li>압축 시간을 method별로 재는 히스토그램이 새로 생겼다.<ul>
+<li>이름은 <code>recsys_engine_response_compress_ms{method}</code>이고, 같은 파일에 넣었다.</li>
+<li><code>tokio::task::spawn_blocking(compress_grpc_frame)</code>에 들어가기 직전에 <code>Instant::now()</code>를 찍고, 완료된 뒤 <code>elapsed().as_secs_f64() * 1000.0</code>으로 관측한다.</li>
+<li>즉 zstd 인코딩의 큐잉 시간과 CPU 시간을 method별로 나눠 볼 수 있다.</li>
+<li>buckets는 request latency 버킷과 공유한다(<code>crate::request_metrics::latency_buckets_ms()</code>).</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28-24c6094--trainer%EA%B0%80-streamed-restore%EB%A5%BC-%EC%8B%A4%EC%A0%9C%EB%A1%9C-%EC%86%8C%EB%B9%84--grpc-%ED%8A%B8%EB%A0%88%EC%9D%BC%EB%9F%AC-%EB%B3%B4%EC%A1%B4-%EB%B2%84%EA%B7%B8%ED%94%BD%EC%8A%A4--copy_port-shard-schedule-%EC%85%94%ED%94%8C">services/x.md</a> Phoenix 절에 두 번째 갈래로 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> trailer 유실은 서빙 계약을 조용히 깨뜨리는 심각한 버그다. 이 커밋으로 회귀 방지 테스트까지 붙어서, 같은 문제가 다시 생길 확률이 크게 낮아졌다.</p></div>
+<ul>
+<li><code>_compress_ms</code> 히스토그램으로 GB300에서 큰 응답의 zstd 인코딩이 응답 지연에 얼마나 기여하는지 나눠 볼 수 있다. 그래서 압축 레벨을 튜닝할 근거가 된다.</li>
+<li>이 버그가 프로덕션에 언제부터 있었는지, 어떤 증거가 관측됐는지(고객 티켓인지 재시도 폭주인지)는 공개되지 않았다.</li>
+</ul>
+<h3 id="1-e-pod마다-shard를-다른-순서로-받게-해-peer-부하를-고르게-나눴다">1-E. pod마다 shard를 다른 순서로 받게 해 peer 부하를 고르게 나눴다</h3>
+<p>각 pod가 텐서의 여러 shard를 병렬로 내려받을 때, pod마다 shard 요청 순서를 다르게 섞는 셔플이 생겼다. 순서는 pod 이름과 텐서 이름의 hash로 결정론적으로 정해져서, 같은 pod는 restart돼도 같은 텐서에 대해 같은 순서로 요청한다.</p>
+<ul>
+<li>shard 요청 순서를 섞는 함수 <code>shuffle_sharded_schedule(n, tensor_name)</code>이 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs</code></a>.</li>
+<li>각 pod가 텐서의 여러 shard를 병렬로 내려받을 때, 이전에는 모든 pod가 index 0부터 순서대로 요청했다. 그래서 첫 shard를 가진 owner peer가 순간적으로 과부하됐다.</li>
+<li>새 로직은 pod 이름과 텐서 이름의 hash로 결정론적 셔플을 걸어 각 pod가 서로 다른 순서로 shard를 요청하게 만들었고, shard 0 peer의 스파이크가 사라졌다.<ul>
+<li>pod 이름은 <code>POD_NAME</code>(또는 <code>HOSTNAME</code>)을 쓰고, 셔플은 <code>StdRng::seed_from_u64(hash)</code>로 초기화한다.</li>
+</ul>
+</li>
+<li>seed가 결정론적이라 같은 pod가 restart돼도 같은 순서를 유지하므로, 로그를 재현할 수 있다.<ul>
+<li>대신 완료된 결과를 원래 순서로 되돌리기 위해 <code>restore_piece_order(shuffled, schedule) -&gt; Option&lt;Vec&lt;T&gt;&gt;</code> 헬퍼를 뒀다.</li>
+</ul>
+</li>
+<li><code>emb_table.rs</code>와 <code>copy_port_client.rs</code> 두 소비 지점 모두 새 헬퍼로 통일했다.</li>
+<li>셔플은 <code>sharded</code> ownership에만 적용하고 <code>replicated</code>는 in-order를 유지한다. 모든 pod가 같은 데이터를 받으므로 셔플할 이득이 없기 때문이다.</li>
+<li>첫 8개 index만 로그로 남겨, 셔플이 실제로 걸렸는지 진단할 수 있다.<ul>
+<li>로그 형식은 <code>copy_port: shard schedule shuffled name={tensor} n={total} first={:?}</code>다.</li>
+</ul>
+</li>
+<li><code>TRANSFER_FAILED_SENTINEL</code>을 만나면 restore를 하기 전에 에러로 조기 반환한다.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#4%EC%84%B8%EB%8C%8010-2026-08-28-24c6094--trainer%EA%B0%80-streamed-restore%EB%A5%BC-%EC%8B%A4%EC%A0%9C%EB%A1%9C-%EC%86%8C%EB%B9%84--grpc-%ED%8A%B8%EB%A0%88%EC%9D%BC%EB%9F%AC-%EB%B3%B4%EC%A1%B4-%EB%B2%84%EA%B7%B8%ED%94%BD%EC%8A%A4--copy_port-shard-schedule-%EC%85%94%ED%94%8C">services/x.md</a> Phoenix 절에 세 번째 갈래로 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이번 셔플은 shard 0 peer에 남아 있던 마지막 병목을 pod 수에 반비례하게 나눈다. 대형 임베딩 테이블과 dense weight을 여러 pod가 restore할 때 shard 0을 담당하는 peer에 traffic spike가 몰리는 문제가 있었다. 이 문제는 <a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">4세대+7의 노드-serialize와 concurrent_gb</a>로 완화됐지만, peer 쪽 스파이크는 여전히 남아 있었다.</p></div>
+<ul>
+<li>결정론적 셔플이 중요한 이유는 두 가지다.<ul>
+<li>셔플 자체를 로그로 재현할 수 있다.</li>
+<li>같은 pod가 같은 tensor를 여러 번 로드해도 순서가 같아서, 캐시 hit rate 관측이 안정적이다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-f-나머지-6건은-관측-지표를-늘리고-저장-순서-테스트-배치-폴백을-손봤다">1-F. 나머지 6건은 관측 지표를 늘리고 저장 순서, 테스트, 배치 폴백을 손봤다</h3>
+<p>4세대+10의 나머지 6건은 서로 독립적인 보강이다. home-mixer, grox, abuse-enforcement, simclusters에 걸쳐 관측 지표, 저장 순서, 회귀 테스트, 주석 정리, 스냅샷 폴백이 바뀌었다.</p>
+<ul>
+<li>home-mixer 서빙 지표에서 정기 polling refresh와 유저 초기 요청을 나눠 볼 수 있게 됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/util/strato_context.rs" target="_blank" rel="noopener"><code>home-mixer/util/strato_context.rs</code></a> (75줄 신규).<ul>
+<li>새 유틸이 tonic gRPC의 <code>MetadataMap</code>에서 <code>stratocontext</code> 또는 <code>stratocontext-bin</code> 키를 뽑아 base64로 디코드한 뒤, proto <code>StratoContext { is_polling: bool }</code>로 파싱한다.</li>
+<li>즉 <code>stratocontext</code> metadata에서 <code>is_polling</code> proto 필드를 뽑아 정기 refresh와 유저 초기 요청을 나눠 본다.</li>
+<li>카운터를 올리는 쪽은 <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/side_effects/response_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/response_stats_side_effect.rs</code></a>(+34/−0)다.</li>
+<li><code>response_stats_side_effect.rs</code>의 새 함수 <code>stat_request_context(feed, query)</code>가 요청마다 세 카운터를 발화한다.<ul>
+<li><code>&lt;feed&gt;.request.polling{polling=true|false, client}</code></li>
+<li><code>&lt;feed&gt;.request.request_context{request_context, client}</code></li>
+<li><code>&lt;feed&gt;.request.client{client, client_version}</code></li>
+</ul>
+</li>
+<li>polling 요청은 시퀀스가 짧고 has_cached_posts 확률도 달라서, 이 축을 분리해 관측하는 것이 랭킹 실험 해석에 중요하다.</li>
+</ul>
+</li>
+<li>grox reply_spam이 Manhattan 저장 조건을 더 조이고 저장 순서를 Kafka 먼저로 바꿨으며, coordinated spam 판정에 팔로워 수를 넣었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/grox/flows/reply_spam/task_write.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_write.py</code></a> (+15/−21).<ul>
+<li><code>_publish_to_reply_ranking_manhattan</code>이 4세대+9의 monotone-only 위에서 세 갈래로 더 조여졌다. <code>&gt;=</code> idempotency, Kafka-first 저장 순서, fetch fail-loud다.<ol>
+<li>비교 연산자가 <code>&gt;</code>에서 <code>&gt;=</code>로 바뀌었다. 이전에는 새 스코어가 기존 값과 같으면 그대로 썼다(중복 write). 이번에는 <code>score &gt;= existing.score</code>이면 건너뛴다. 카운터 이름도 <code>higher_than_existing</code>에서 <code>not_lower_than_existing</code>으로 바꿔 시맨틱을 명시했다.</li>
+<li>Kafka 이벤트를 Manhattan write 앞으로 옮겼다. 이전 순서는 <code>save_reply_ranking_score(Manhattan)</code> 다음에 <code>save_reply_ranking_kafka_v2(Kafka)</code>였고, 새 순서는 그 반대다.<ul>
+<li>Kafka는 append-only라 실패해도 재시도할 수 있다. 반면 Manhattan은 monotone-only 로직에 걸려 재시도 자체를 건너뛸 수 있고, upsert side-effect까지 있어 무겁다.</li>
+<li>Kafka-first가 시스템 전체의 관측 가능성 정합성을 보장하는 durability 순서다.</li>
+<li>Kafka publish가 성공한 뒤 Manhattan write가 실패하면 오프라인 재처리 파이프라인이 복구할 수 있다. 반대 순서에서는 downstream(서빙 캐시 warm-back, 다른 소비자)이 Manhattan에 이미 반영된 새 스코어를 보지 못하게 된다.</li>
+</ul>
+</li>
+<li><code>fetch_reply_ranking_score</code>의 try/except를 걷어냈다. 이전에는 fetch가 실패하면 warning 로그를 남기고 <code>existing = None</code>으로 진행해서 결국 항상 write했다. 이번에는 예외를 그대로 위로 던져 flow task가 실패로 마크되고 재시도된다. 방어적인 예외 처리를 걷어내고 로직의 정확성을 우선했다.</li>
 </ol>
-<p>같은 커밋에서 <code>classifier_coordinated_spam.py</code>의 <code>_to_convo</code>가 <code>PostRenderer.render(p, max_media=..., include_follower_count=True)</code>로 호출되도록 인자를 추가했다. 4세대+9에 옵션으로 도입된 <code>include_follower_count</code>가 여기서 <strong>상시 활성</strong>으로 채택된 것이다. 이제 coordinated spam 판정이 스레드에 참여한 각 계정의 팔로워 카운트를 프롬프트로 함께 받는다.</p>
-<p><strong>abuse-enforcement AIS thrift 스키마 conformance 테스트</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/abuse-enforcement-service/service-lib/src/service.rs" target="_blank" rel="noopener"><code>abuse-enforcement-service/service-lib/src/service.rs</code></a> (+58/−0). 새 테스트 <code>every_action_shape_encodes_against_the_ais_schema</code>가 8종 <code>EnforcementAction</code> 형태(suspend_user·add_user_label·add_post_label·bounce_arkose·bounce_captcha·spam_liveness_check)를 실제 AIS thrift 스키마(<code>ActionIntakeService.intakeAction</code>)로 인코드해 보면서 회귀를 막는다. <code>Transcoder::from_schema_bytes(SCHEMA_AIS)</code>로 스키마를 로드하고 <code>lookup_method</code>로 메서드를 찾은 다음, 각 action에 대해 <code>build_intake_request</code>와 <code>encode_call</code>을 수행한다. AES의 payload 스키마가 다운스트림 thrift 서비스와 drift하지 않도록 CI가 보장하는 셈이다. <a href="x.html#4%EC%84%B8%EB%8C%808-2026-08-25--aes-generic_actions-%ED%8C%A8%EC%8A%A4%EC%8A%A4%EB%A3%A8-%EB%B0%B0%EC%84%A0">4세대+8에서 도입된 <code>generic_actions</code> 패스스루</a>로 스코어러가 임의의 action을 실어 보낼 수 있게 된 흐름에 붙인 안전벨트다.</p>
-<p><strong>home-mixer CJK muted keyword whole-token 회귀 테스트</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/filters/viewer_muted_keyword_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/viewer_muted_keyword_filter.rs</code></a> (+18/−0). 새 테스트 <code>test_cjk_keyword_whole_token_only</code>가 다음을 명시한다. <code>京都</code> 뮤트는 <code>I visited 京都 last week</code>(공백 경계 안에 京都가 온전히 등장한다)를 걸러내지만, <code>東京都に行くのが楽しみ</code>(京都가 東京都의 부분 문자열이다)는 걸러내지 않아야 한다. 필터 본체의 diff는 없다. 즉 필터는 이미 CJK word boundary를 다루고 있었고, 이번에는 그 시맨틱을 회귀 테스트로 고정했다. 뮤트 키워드가 부분 문자열 매칭으로 확장되어 유저가 예상 밖의 포스트를 보지 못하게 되는 사고를 막는다.</p>
-<p><strong>Brazil2026ElectionFilter 계정 리스트 주석 재정리</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs</code></a> (+63/−77). 이전에는 665개 계정을 <code>no live account was found</code>나 <code>deleted his account</code> 같은 반복 주석 하나로 나열했는데, 이번에는 10개 계정에 대해 &quot;We believe the account @X reported by the candidate is not the candidate&#39;s actual account, so we are not currently filtering it&quot;라는 판정을 달고, 나머지 다수는 <code>no live account found</code>로 정리했다. 필터의 시맨틱은 그대로이고 팔로우 예외도 유지된다. <a href="x.html#4%EC%84%B8%EB%8C%808-2026-08-25--aes-generic_actions-%ED%8C%A8%EC%8A%A4%EC%8A%A4%EB%A3%A8-%EB%B0%B0%EC%84%A0">4세대+8의 리스트 갱신 관행</a>과는 별개로, 이번 변경에서는 문서와 주석의 서술을 정리했다.</p>
-<p><strong>simclusters <code>SimClustersInterestedIn2020</code> 스냅샷 폴백 인라이닝</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/simclusters/simclusters_v2/scalding/embedding/EntityToSimClustersEmbeddingsJob.scala" target="_blank" rel="noopener"><code>simclusters/simclusters_v2/scalding/embedding/EntityToSimClustersEmbeddingsJob.scala</code></a> (+17/−2). <code>InterestedInSources.simClustersInterestedIn2020Source(dateRange, timeZone)</code> 헬퍼를 <code>DAL.readMostRecentSnapshot(interestedIn2020WithFallback, dateRange.prepend(Days(28)(timeZone)))</code>와 <code>.withRemoteReadPolicy(ExplicitLocation(ProcAtla))</code>, <code>fallbackPath = Some(&quot;viewfs://.../simclusters_v2_interested_in_20M_145K_2020/_TMP_RECOVERY/{timestamp}&quot;)</code>로 직접 인라이닝했다. 즉 <strong>28일 룩백에 특정 데이터센터(ProcAtla) pin과 임시 복구 경로 폴백을 함께 적용한 것</strong>이다. 배치 잡이 스냅샷 결측(dataset partition 유실이나 업스트림 지연 등)에 더 관대해졌다. SimClusters 임베딩 잡의 데이터 신뢰도를 하드닝한 변경이다.</p>
-<div class="blk app"><p><span class="lbl">정본 반영</span> — 이 여섯 가지 잡다한 하드닝은 x.md의 <a href="x.html#4%EC%84%B8%EB%8C%8010-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-28">4세대+10 공개로 해소된 것 / 신규</a> 버킷에 각각 한 줄씩 체크마크로 남겼다. 항목들이 서로 독립적이라 별도의 절로 뽑기보다 버킷에서 인덱싱하는 편이 찾기 쉽다.</p></div>
-<h2 id="2-레이더-arxiv-triage에서-통과한-1건"><span class="num">2</span>레이더: arXiv triage에서 통과한 1건</h2>
-<p>30건을 훑어서 수용 기준(플랫폼 기업 저자 / 프로덕션·A/B / 메커니즘 신규성 / 스케일)을 넘긴 것은 하나뿐이다. 나머지 29건은 순수 학술 증분이거나, 도메인이 한정되어 있거나, 프로덕션 진술이 없어서 탈락했다.</p>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.27413" target="_blank" rel="noopener">Scaling Graph Neural Networks for Friend Recommendation: Multi-Hash User Embeddings and Temporal Neighbor Sampling</a> — arXiv 2608.27413, 2026-08-27 v1, CIKM 2026 accepted. 저자는 3명(Maksim Utushkin·Andrei Ovsiannikov·Alexander D&#39;yakonov)이다. arXiv abstract 페이지에 소속이 표기되어 있지 않지만, 본문에서 참조하는 그래프 규모와 러시아어 저자명을 함께 놓고 보면 VK(러시아의 대형 소셜 네트워크)로 추정한다 <span class="badge est">추정</span>.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 친구 추천(social platform의 People You May Know / Suggested Friends)은 유저 속성(관심사·나이·위치)보다 <strong>다중 홉 소셜 컨텍스트</strong>(친구의 친구, 공통 친구 수)가 관련성의 주된 신호다. 그래서 GNN(Graph Neural Network — 노드가 자기 이웃의 임베딩을 aggregate해서 자기 임베딩을 갱신하는 message-passing 모델)이 자연스러운 프레임워크가 된다. 다만 프로덕션 소셜 그래프는 수억 유저와 수백억 엣지 규모라, (a) 유저 ID 임베딩 테이블이 폭발하고 (b) 슈퍼노드(팔로우 수가 극단적으로 많은 계정)의 이웃 순회가 O(deg) 비용으로 병목이 된다. 이 논문은 이 두 시스템 문제를 정면으로 푼다.</p></div>
+</li>
+<li>팔로워 수 변경은 두 번째 파일 <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/grox/flows/reply_spam/classifier_coordinated_spam.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/classifier_coordinated_spam.py</code></a> (+5/−1)에 있다.</li>
+<li>같은 커밋에서 <code>classifier_coordinated_spam.py</code>의 <code>_to_convo</code>가 <code>PostRenderer.render(p, max_media=..., include_follower_count=True)</code>로 호출되도록 인자가 추가됐다.</li>
+<li>4세대+9에 옵션으로 도입된 <code>include_follower_count</code>가 여기서 상시 활성으로 채택된 것이다. 이제 coordinated spam 판정이 스레드에 참여한 각 계정의 팔로워 카운트를 프롬프트로 함께 받는다.</li>
+</ul>
+</li>
+<li>abuse-enforcement에는 모든 action 형태가 실제 AIS(ActionIntakeService) thrift 스키마로 인코드되는지 확인하는 conformance 테스트가 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/abuse-enforcement-service/service-lib/src/service.rs" target="_blank" rel="noopener"><code>abuse-enforcement-service/service-lib/src/service.rs</code></a> (+58/−0).<ul>
+<li>새 테스트는 <code>every_action_shape_encodes_against_the_ais_schema</code>다.</li>
+<li>이 테스트는 8종 <code>EnforcementAction</code> 형태를 실제 AIS thrift 스키마로 인코드해 보면서 회귀를 막는다.<ul>
+<li>형태 목록은 suspend_user·add_user_label·add_post_label·bounce_arkose·bounce_captcha·spam_liveness_check다.</li>
+</ul>
+</li>
+<li>대상 메서드는 <code>ActionIntakeService.intakeAction</code>이다.</li>
+<li><code>Transcoder::from_schema_bytes(SCHEMA_AIS)</code>로 스키마를 로드하고 <code>lookup_method</code>로 메서드를 찾은 다음, 각 action에 대해 <code>build_intake_request</code>와 <code>encode_call</code>을 수행한다.</li>
+<li>AES(abuse-enforcement-service)의 payload 스키마가 다운스트림 thrift 서비스와 drift하지 않도록 CI가 보장하는 셈이다.</li>
+<li><a href="x.html#4%EC%84%B8%EB%8C%808-2026-08-25--aes-generic_actions-%ED%8C%A8%EC%8A%A4%EC%8A%A4%EB%A3%A8-%EB%B0%B0%EC%84%A0">4세대+8에서 도입된 <code>generic_actions</code> 패스스루</a>로 스코어러가 임의의 action을 실어 보낼 수 있게 된 흐름에 붙인 안전벨트다.</li>
+</ul>
+</li>
+<li>home-mixer 뮤트 키워드 필터가 CJK 키워드를 온전한 토큰으로 나올 때만 거른다는 동작을 회귀 테스트로 고정했다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/filters/viewer_muted_keyword_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/viewer_muted_keyword_filter.rs</code></a> (+18/−0).<ul>
+<li>새 테스트는 <code>test_cjk_keyword_whole_token_only</code>다.</li>
+<li><code>京都</code> 뮤트는 <code>I visited 京都 last week</code>를 걸러낸다. 이 문장에서는 공백 경계 안에 京都가 온전히 등장한다.</li>
+<li><code>東京都に行くのが楽しみ</code>는 걸러내지 않아야 한다. 여기서 京都는 東京都의 부분 문자열이다.</li>
+<li>필터 본체의 diff는 없다. 즉 필터는 이미 CJK word boundary를 다루고 있었고, 이번에는 그 시맨틱을 회귀 테스트로 고정했다.</li>
+<li>뮤트 키워드가 부분 문자열 매칭으로 확장되어 유저가 예상 밖의 포스트를 보지 못하게 되는 사고를 막는다.</li>
+</ul>
+</li>
+<li>Brazil2026ElectionFilter의 계정 목록 주석을 다시 정리했고, 필터 동작은 그대로다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs</code></a> (+63/−77).<ul>
+<li>이전에는 665개 계정을 <code>no live account was found</code>나 <code>deleted his account</code> 같은 반복 주석 하나로 나열했다.</li>
+<li>이번에는 10개 계정에 &quot;We believe the account @X reported by the candidate is not the candidate&#39;s actual account, so we are not currently filtering it&quot;라는 판정을 달고, 나머지 다수는 <code>no live account found</code>로 정리했다.</li>
+<li>필터의 시맨틱은 그대로이고 팔로우 예외도 유지된다.</li>
+<li><a href="x.html#4%EC%84%B8%EB%8C%808-2026-08-25--aes-generic_actions-%ED%8C%A8%EC%8A%A4%EC%8A%A4%EB%A3%A8-%EB%B0%B0%EC%84%A0">4세대+8의 리스트 갱신 관행</a>과는 별개로, 이번 변경은 문서와 주석의 서술을 정리한 것이다.</li>
+</ul>
+</li>
+<li>SimClusters(팔로우 그래프를 커뮤니티로 나눠 만든 임베딩) 배치 잡이 스냅샷을 읽을 때 28일 룩백, 데이터센터 pin, 임시 복구 경로 폴백을 함께 쓰도록 헬퍼를 인라이닝했다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/simclusters/simclusters_v2/scalding/embedding/EntityToSimClustersEmbeddingsJob.scala" target="_blank" rel="noopener"><code>simclusters/simclusters_v2/scalding/embedding/EntityToSimClustersEmbeddingsJob.scala</code></a> (+17/−2).<ul>
+<li>대상은 <code>SimClustersInterestedIn2020</code> 스냅샷이다.</li>
+<li><code>InterestedInSources.simClustersInterestedIn2020Source(dateRange, timeZone)</code> 헬퍼를 다음 세 설정으로 직접 인라이닝했다.<ul>
+<li><code>DAL.readMostRecentSnapshot(interestedIn2020WithFallback, dateRange.prepend(Days(28)(timeZone)))</code></li>
+<li><code>.withRemoteReadPolicy(ExplicitLocation(ProcAtla))</code></li>
+<li><code>fallbackPath = Some(&quot;viewfs://.../simclusters_v2_interested_in_20M_145K_2020/_TMP_RECOVERY/{timestamp}&quot;)</code></li>
+</ul>
+</li>
+<li>즉 28일 룩백에 특정 데이터센터(ProcAtla) pin과 임시 복구 경로 폴백을 함께 적용한 것이다.</li>
+<li>배치 잡이 스냅샷 결측(dataset partition 유실이나 업스트림 지연 등)에 더 관대해졌다. SimClusters 임베딩 잡의 데이터 신뢰도를 보강한 변경이다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> 이 여섯 가지 변경은 x.md의 <a href="x.html#4%EC%84%B8%EB%8C%8010-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-28">4세대+10 공개로 해소된 것 / 신규</a> 버킷에 각각 한 줄씩 체크마크로 남겼다. 항목들이 서로 독립적이어서, 별도의 절로 뽑기보다 버킷에서 색인하는 편이 찾기 쉽다.</p></div>
+<h2 id="2-친구-추천-gnn을-프로덕션-소셜-그래프-규모로-키운-논문이-나왔다--arxiv"><span class="num">2</span>친구 추천 GNN을 프로덕션 소셜 그래프 규모로 키운 논문이 나왔다 — arXiv</h2>
+<p>arXiv cs.IR 30건을 훑어 수용 기준(플랫폼 기업 저자 / 프로덕션·A/B / 메커니즘 신규성 / 스케일)을 넘긴 것은 1건뿐이다. 나머지 29건은 순수 학술 증분이거나, 도메인이 한정되어 있거나, 프로덕션 진술이 없어서 탈락했다.</p>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.27413" target="_blank" rel="noopener">Scaling Graph Neural Networks for Friend Recommendation: Multi-Hash User Embeddings and Temporal Neighbor Sampling</a> — arXiv 2608.27413, 2026-08-27 v1, 논문, CIKM 2026 accepted. 저자는 3명(Maksim Utushkin·Andrei Ovsiannikov·Alexander D&#39;yakonov)이다. arXiv abstract 페이지에 소속이 표기되어 있지 않지만, 본문에서 참조하는 그래프 규모와 러시아어 저자명을 함께 놓고 보면 VK(러시아의 대형 소셜 네트워크)로 추정한다 <span class="badge est">추정</span>.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 친구 추천(People You May Know, Suggested Friends 같은 소셜 플랫폼 기능)에서는 관심사·나이·위치 같은 유저 속성보다, 친구의 친구나 공통 친구 수 같은 다중 홉 소셜 컨텍스트가 관련성의 주된 신호다. 그래서 GNN(Graph Neural Network, 노드가 자기 이웃의 임베딩을 aggregate해서 자기 임베딩을 갱신하는 message-passing 모델)이 자연스러운 프레임워크가 된다. 다만 프로덕션 소셜 그래프는 수억 유저와 수백억 엣지 규모라 시스템 문제가 두 가지 생긴다.</p></div>
+<ul>
+<li>유저 ID 임베딩 테이블이 폭발한다.</li>
+<li>슈퍼노드(팔로우 수가 극단적으로 많은 계정)의 이웃 순회가 O(deg) 비용으로 병목이 된다.</li>
+</ul>
+<p>이 논문은 이 두 시스템 문제를 정면으로 푼다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <ul>
-<li><strong>Multi-hash user embeddings</strong>로 ID 임베딩 테이블을 <strong>98% 이상 축소</strong> <span class="badge ok">확인</span> — 각 유저 ID를 여러 해시 함수의 임베딩 lookup 조합으로 표현한다. hash collision은 감수하되 ranking quality는 유지한다. <a href="https://arxiv.org/abs/2608.27413" target="_blank" rel="noopener">원문</a></li>
-<li><strong>Temporal neighbor sampling</strong> — timestamp-sorted CSR(Compressed Sparse Row — 그래프 저장의 표준 자료구조로, 인접 리스트를 하나의 큰 array와 offset array로 압축한다) 저장과 binary search를 결합해 이웃 샘플링을 <code>O(deg(v) + k)</code>에서 <strong><code>O(log(deg(v)) + k)</code></strong> 로 단축했다 <span class="badge ok">확인</span>. 즉 팔로우 수가 큰 노드도 이웃 순회 비용이 로그 시간에 그친다.</li>
-<li>프로덕션 소셜 그래프의 규모는 <strong>194M users · 28B edges</strong>다 <span class="badge ok">확인</span>.</li>
-<li>Strong production baseline 대비 온라인 지표는 **friend additions from recommendations +16%, unique friend adders +11.5%**다 <span class="badge ok">확인</span>.</li>
+<li>Multi-hash user embeddings가 ID 임베딩 테이블을 98% 이상 줄였다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2608.27413" target="_blank" rel="noopener">원문</a>.<ul>
+<li>각 유저 ID를 여러 해시 함수의 임베딩 lookup 조합으로 표현한다.</li>
+<li>hash collision은 감수하되 ranking quality는 유지한다.</li>
+</ul>
+</li>
+<li>Temporal neighbor sampling은 이웃 샘플링 비용을 로그 시간으로 줄였다 <span class="badge ok">확인</span>.<ul>
+<li>timestamp-sorted CSR(Compressed Sparse Row, 인접 리스트를 큰 array 하나와 offset array로 압축하는 그래프 저장의 표준 자료구조) 저장과 binary search를 결합했다.</li>
+<li>복잡도는 <code>O(deg(v) + k)</code>에서 <code>O(log(deg(v)) + k)</code>로 단축됐다.</li>
+<li>즉 팔로우 수가 큰 노드도 이웃 순회 비용이 로그 시간에 그친다.</li>
+</ul>
+</li>
+<li>프로덕션 소셜 그래프의 규모는 194M users · 28B edges다 <span class="badge ok">확인</span>.</li>
+<li>Strong production baseline 대비 온라인 지표는 friend additions from recommendations +16%, unique friend adders +11.5%다 <span class="badge ok">확인</span>.</li>
 </ul>
 <blockquote>
 <p>&quot;On a graph with 194M users and 28B edges, our system increases friend additions from recommendations by 16 percent and unique friend adders by 11.5 percent over a strong production baseline.&quot;
 — <a href="https://arxiv.org/abs/2608.27413" target="_blank" rel="noopener">arXiv 2608.27413</a> abstract, 2026-08-27</p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">레이더 반영</span> <a href="radar.html#vk-friend-recommendation-gnn--194m-%EC%9C%A0%EC%A0%8028b-%EC%97%A3%EC%A7%80-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-%EC%86%8C%EC%85%9C-%EA%B7%B8%EB%9E%98%ED%94%84%EC%97%90%EC%84%9C-message-passing-gnn%EC%9D%84-%EC%8A%A4%EC%BC%80%EC%9D%BC%ED%95%9C-%EC%82%AC%EB%A1%80">radar.md</a>의 &quot;이번 달 신규&quot;에 새 항목으로 추가했다. LLM-native나 스케일링 법칙 흐름에는 걸리지 않지만, <strong>명시적 그래프 도메인에서 GNN이 여전히 살아남는 사례</strong>로서 <a href="facebook.html">Meta ConnectionMind</a>(그래프 위에서 LLM으로 경로를 추론하는 모델)와 대조하는 역할을 한다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> strong prod baseline 대비 두 자릿수 uplift(+16%)는 GNN 논문에서 드물다. GNN이 실무에서 결국 살아남는 도메인은 <strong>완전히 명시적인 그래프</strong>(친구 그래프, follow 그래프)라는 관찰이 강화된다. Meta ConnectionMind가 LLM으로 그래프 경로 추론을 시도하는 것과는 방향이 다르다. VK는 순수 GNN을 소셜 그래프의 스케일 한계까지 밀어붙였다. Multi-hash 임베딩 -98% 축소는 embedding table 크기가 서빙 인프라의 핵심 제약이라는 X SimClusters의 관측과도 방향이 같다. 서빙 지연을 늘리지 않고 적용했다는 진술은 abstract에 없지만, 두 최적화의 목적이 정확히 그것이다(테이블 축소와 이웃 순회의 로그화). 다음 관찰 포인트는 CIKM 2026(10월) 발표에서 소속과 인프라 세부가 추가로 공개되는지, 그리고 LinkedIn People You May Know와 Facebook People You May Know의 GNN 갱신 진술이 나오는지다.</p></div>
+<div class="blk app"><p><span class="lbl">레이더 반영</span> <a href="radar.html#vk-friend-recommendation-gnn--194m-%EC%9C%A0%EC%A0%8028b-%EC%97%A3%EC%A7%80-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-%EC%86%8C%EC%85%9C-%EA%B7%B8%EB%9E%98%ED%94%84%EC%97%90%EC%84%9C-message-passing-gnn%EC%9D%84-%EC%8A%A4%EC%BC%80%EC%9D%BC%ED%95%9C-%EC%82%AC%EB%A1%80">radar.md</a>의 &quot;이번 달 신규&quot;에 새 항목으로 추가했다. 이 논문은 LLM-native나 스케일링 법칙 흐름에는 걸리지 않는다. 대신 명시적 그래프 도메인에서 GNN이 여전히 살아남는 사례로서, <a href="facebook.html">Meta ConnectionMind</a>(그래프 위에서 LLM으로 경로를 추론하는 모델)와 대조하는 역할을 한다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> strong prod baseline 대비 두 자릿수 uplift(+16%)는 GNN 논문에서 드물다. GNN이 실무에서 결국 살아남는 도메인은 완전히 명시적인 그래프(친구 그래프, follow 그래프)라는 관찰이 강화된다.</p></div>
+<ul>
+<li>Meta ConnectionMind가 LLM으로 그래프 경로 추론을 시도하는 것과는 방향이 다르다. VK는 순수 GNN을 소셜 그래프의 스케일 한계까지 밀어붙였다.</li>
+<li>Multi-hash 임베딩 -98% 축소는, embedding table 크기가 서빙 인프라의 핵심 제약이라는 X SimClusters의 관측과도 방향이 같다.</li>
+<li>서빙 지연을 늘리지 않고 적용했다는 진술은 abstract에 없다. 다만 두 최적화(테이블 축소와 이웃 순회의 로그화)의 목적이 정확히 그것이다.</li>
+<li>다음 관찰 포인트는 두 가지다. CIKM 2026(10월) 발표에서 소속과 인프라 세부가 추가로 공개되는지, 그리고 LinkedIn People You May Know와 Facebook People You May Know의 GNN 갱신 진술이 나오는지다.</li>
+</ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li><strong><code>AdsBlenderType</code> param의 기본값이 <code>multi_risk</code>로 승격되는 커밋</strong> — 그 시점이 실제로 노출되는 광고에 이 매트릭스가 적용되는 순간이다</li>
-<li><strong><code>VF_CACHE_WARM_SAMPLE_PCT</code>의 초기 프로덕션 값과 dial-up 커밋</strong> — Grok 4.6 shadow와 같은 dial-up 관행이 여기서도 나오는지 확인한다</li>
-<li><strong>Phoenix <code>restore_streamed</code> config의 default 승격</strong> — flagship에서 True로 바뀌는 커밋이 곧 warm_start 흐름이 프로덕션 학습에 붙는 신호다</li>
-<li><strong><code>recsys_engine_response_compress_ms</code> 히스토그램 도입 이후의 압축 레벨 튜닝</strong> — GB300 응답에서 zstd가 P99에 기여하는 비율이 눈에 보이면 압축 파라미터를 후속으로 조정할 것이다</li>
-<li><strong>grox reply_spam Manhattan write skip율의 시간축 변화</strong> — monotone-only와 <code>&gt;=</code>를 적용한 뒤 실제로 몇 %가 skip되는지 확인한다(<code>not_lower_than_existing</code> 카운터가 관측 대상이다)</li>
-<li><strong>AIS conformance 테스트가 실제로 회귀를 잡아내는 첫 사례</strong> — 이 테스트가 붙은 데에는 이유가 있을 것이다(과거 스코어러 개발 사이클에서 실제로 drift가 있었을 가능성)</li>
+<li>광고 블렌더의 기본값이 새 매트릭스 블렌더로 승격되는 커밋을 확인한다 — 그 시점이 실제로 노출되는 광고에 이 매트릭스가 적용되는 순간이다. param은 <code>AdsBlenderType</code>, 값은 <code>multi_risk</code>다.</li>
+<li>VF 캐시 워머의 초기 프로덕션 샘플 비율과 dial-up 커밋을 확인한다 — Grok 4.6 shadow와 같은 dial-up 관행이 여기서도 나오는지 본다. 환경변수는 <code>VF_CACHE_WARM_SAMPLE_PCT</code>다.</li>
+<li>Phoenix 스트리밍 복원 config의 default 승격을 확인한다 — flagship에서 True로 바뀌는 커밋이 곧 warm_start 흐름이 프로덕션 학습에 붙는 신호다. 플래그는 <code>restore_streamed</code>다.</li>
+<li>압축 시간 히스토그램 도입 이후의 압축 레벨 튜닝을 본다 — GB300 응답에서 zstd가 P99에 기여하는 비율이 눈에 보이면, 압축 파라미터를 후속으로 조정할 것이다. 히스토그램은 <code>recsys_engine_response_compress_ms</code>다.</li>
+<li>grox reply_spam의 Manhattan write 건너뛰기 비율이 시간에 따라 어떻게 바뀌는지 본다 — monotone-only와 <code>&gt;=</code>를 적용한 뒤 write 가운데 실제로 몇 %를 건너뛰는지 확인한다. 관측 대상은 <code>not_lower_than_existing</code> 카운터다.</li>
+<li>AIS conformance 테스트가 실제로 회귀를 잡아내는 첫 사례를 본다 — 이 테스트가 붙은 데에는 이유가 있을 것이다(과거 스코어러 개발 사이클에서 실제로 drift가 있었을 가능성).</li>
 </ul></div>
 
 </div>

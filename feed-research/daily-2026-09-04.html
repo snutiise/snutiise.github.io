@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-04 — feed-research</title>
-<meta name="description" content="한 줄: X 4세대+14(2026-09-02, 85ac72a)에서 (1) home-mixer가 5개 피드 엔드포인트 전체에서 Phoenix에 &quot;backbone scores&quot;를 강제로 요청하기 시작했고 이에 맞춰 Phoenix proto가…">
+<meta name="description" content="한 줄: X의 피드 서버가 5개 피드 모두에서 랭킹 모델 Phoenix에 backbone 점수를 요청하기 시작했다. Phoenix가 공용 backbone과 재순위 헤드의 두 층 구조라는 점이 처음 코드로 드러났다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-04.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-04 — feed-research">
-<meta property="og:description" content="한 줄: X 4세대+14(2026-09-02, 85ac72a)에서 (1) home-mixer가 5개 피드 엔드포인트 전체에서 Phoenix에 &quot;backbone scores&quot;를 강제로 요청하기 시작했고 이에 맞춰 Phoenix proto가…">
+<meta property="og:description" content="한 줄: X의 피드 서버가 5개 피드 모두에서 랭킹 모델 Phoenix에 backbone 점수를 요청하기 시작했다. Phoenix가 공용 backbone과 재순위 헤드의 두 층 구조라는 점이 처음 코드로 드러났다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-04.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,20 +42,32 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>금요일</li>
-<li><span class="meta-k">읽는 시간</span>53분</li>
+<li><span class="meta-k">읽는 시간</span>56분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+14(2026-09-02, <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633">85ac72a</a>)에서 (1) <strong>home-mixer가 5개 피드 엔드포인트 전체에서 Phoenix에 &quot;backbone scores&quot;를 강제로 요청</strong>하기 시작했고 이에 맞춰 Phoenix proto가 <code>backboneTopLogProbs</code>·<code>backboneContinuousValues</code> 두 필드를 응답에 새로 실었으며, 이는 Phoenix 랭커가 <strong>공용 backbone + reranker head</strong> 두 층 구조라는 점을 코드로 드러낸 첫 사례다. (2) <strong>scarecrow(=구 Botmaker)에 XReview 인테이크 gRPC 파이프라인이 신설</strong>됐다 — 자동 탐지 봇이 유저 리포트인 척 XReview에 프로그램적으로 신고를 넣는 &quot;proactive&quot; 경로가 처음 공개됐다. (3) VF rules 재구조화가 phase 2로 넘어가 <code>Box&lt;dyn Rule&gt;</code> 런타임 조립이 사라지고 정적 <code>&amp;&#39;static [&amp;&#39;static [RuleSpec]]</code> 테이블로 옮겨졌으며 <code>Policies</code>가 <code>RuleEngine</code>으로 개명됐다. (4) 학습 체크포인트 암호화가 in-envelope 파생 마스터 키(<code>xai-dek1:</code> prefix)를 지원하고 <code>encryption_context</code>에 <code>domain</code>/<code>run</code> 키를 강제하며, <code>mint_nonce = sha256(path)</code>가 자동으로 붙는다. (5) two-tower 학습 config가 <code>qk_norm=True</code>·<code>attn_logit_cap=-1</code>로 바뀌었다. Meta·Netflix 신규 없음, arXiv cs.IR 30건 파싱 성공 0건 통과.</div>
+<div class="lead"><span class="lb">한 줄 요약</span>X의 피드 서버가 5개 피드 모두에서 랭킹 모델 Phoenix에 backbone 점수를 요청하기 시작했다. Phoenix가 공용 backbone과 재순위 헤드의 두 층 구조라는 점이 처음 코드로 드러났다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">9</span></summary><ol><li><a href="#1-phoenix가-backbonereranker-head-두-층으로-서빙된다는-사실이-처음-코드에-드러났다--x-4세대14"><span class="num">1</span>Phoenix가 backbone/reranker head 두 층으로 서빙된다는 사실이 처음 코드에 드러났다 — X 4세대+14</a></li><li><a href="#2-scarecrow구-botmaker에-xreview-인테이크-grpc-파이프라인이-신설됐다--x-4세대14-신규-canon"><span class="num">2</span>Scarecrow(구 Botmaker)에 XReview 인테이크 gRPC 파이프라인이 신설됐다 — X 4세대+14, 신규 canon</a></li><li><a href="#3-vf-rules-재구조화-phase-2--boxdyn-rule이-소거되고-정적-테이블로-옮겼다--x-4세대14"><span class="num">3</span>VF rules 재구조화 phase 2 — Box&lt;dyn Rule>이 소거되고 정적 테이블로 옮겼다 — X 4세대+14</a></li><li><a href="#4-체크포인트-암호화-진화--in-envelope-파생-마스터-키-지원--context-강제-필드--mint_nonce-자동-첨부--x-4세대14"><span class="num">4</span>체크포인트 암호화 진화 — in-envelope 파생 마스터 키 지원 + context 강제 필드 + mint_nonce 자동 첨부 — X 4세대+14</a></li><li><a href="#5-two-tower-학습-config-qk_normtrue-attn_logit_cap-해제--x-4세대14"><span class="num">5</span>two-tower 학습 config: qk_norm=True, attn_logit_cap 해제 — X 4세대+14</a></li><li><a href="#6-arxiv-csir-triage--30건-파싱-통과-0건"><span class="num">6</span>arXiv cs.IR triage — 30건 파싱, 통과 0건</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">9</span></summary><ol><li><a href="#1-phoenix-랭커의-backbone재순위-헤드-두-층-구조가-처음-코드로-드러났다--x"><span class="num">1</span>Phoenix 랭커의 backbone·재순위 헤드 두 층 구조가 처음 코드로 드러났다 — X</a></li><li><a href="#2-scarecrow구-botmaker가-xreview에-자동-신고를-넣는-경로가-생겼다--x"><span class="num">2</span>scarecrow(구 Botmaker)가 XReview에 자동 신고를 넣는 경로가 생겼다 — X</a></li><li><a href="#3-노출-판정-규칙의-정책이-힙-조립-대신-정적-테이블에-실린다--x"><span class="num">3</span>노출 판정 규칙의 정책이 힙 조립 대신 정적 테이블에 실린다 — X</a></li><li><a href="#4-학습-체크포인트를-사이드카-키-파일-없이-파일-헤더에서-키를-꺼내-복호화할-수-있게-됐다--x"><span class="num">4</span>학습 체크포인트를 사이드카 키 파일 없이 파일 헤더에서 키를 꺼내 복호화할 수 있게 됐다 — X</a></li><li><a href="#5-two-tower-학습의-기본-설정이-logit-상한-대신-qk-norm을-쓰게-됐다--x"><span class="num">5</span>two-tower 학습의 기본 설정이 logit 상한 대신 QK-norm을 쓰게 됐다 — X</a></li><li><a href="#6-신규-논문-30건-가운데-레이더-기준을-통과한-것은-0건이다--arxiv-csir"><span class="num">6</span>신규 논문 30건 가운데 레이더 기준을 통과한 것은 0건이다 — arXiv cs.IR</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-phoenix가-backbonereranker-head-두-층으로-서빙된다는-사실이-처음-코드에-드러났다--x-4세대14"><span class="num">1</span>Phoenix가 backbone/reranker head 두 층으로 서빙된다는 사실이 처음 코드에 드러났다 — X 4세대+14</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02 19:46 UTC, X.AI Corp.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X의 랭킹 모델(코드명 Phoenix)은 4세대 공개(2026-08-13)에서 문서당 24개 참여 확률을 뽑는 트랜스포머라는 사실이 알려졌고, 4세대+11(2026-08-28, <a href="https://github.com/xai-org/x-algorithm/commit/bc8e5f0" target="_blank" rel="noopener">bc8e5f0</a>)에서 응답 스코어에 <code>rerankerHeadTag</code>(재순위 헤드 태그) 필드가 붙으면서 &quot;여러 재순위 헤드가 존재한다&quot;는 정황이 처음 드러났다. 다만 그 헤드들이 얹혀 있는 아래 층(backbone)이 무엇을 뱉는지는 canon에 없었다 — proto 응답에 backbone 층 출력이 노출되지 않았기 때문이다. 이번 4세대+14가 그 backbone 출력 필드를 응답에 노출하고 home-mixer가 5개 피드 전체에서 이를 강제로 요청하기 시작했다. <strong>backbone</strong>은 다중-태스크 랭커의 공용 인코더/타워를 가리키는 표준 용어로, 그 출력이 여러 태스크 헤드(재순위·다양성·slate 등)로 분기된다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h2 id="1-phoenix-랭커의-backbone재순위-헤드-두-층-구조가-처음-코드로-드러났다--x"><span class="num">1</span>Phoenix 랭커의 backbone·재순위 헤드 두 층 구조가 처음 코드로 드러났다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02 19:46 UTC, X.AI Corp. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+14다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X의 랭킹 모델 Phoenix는 4세대 공개(2026-08-13)에서 문서당 24개 참여 확률을 뽑는 트랜스포머라는 사실이 알려졌다. 4세대+11(2026-08-28, <a href="https://github.com/xai-org/x-algorithm/commit/bc8e5f0" target="_blank" rel="noopener">bc8e5f0</a>)에서는 응답 스코어에 <code>rerankerHeadTag</code>(재순위 헤드 태그) 필드가 붙으면서 &quot;여러 재순위 헤드가 존재한다&quot;는 정황이 처음 드러났다. 다중-태스크 랭커에서 backbone은 공용 인코더/타워를 가리키는 표준 용어이고, 그 출력이 여러 태스크 헤드(재순위·다양성·slate 등)로 갈라진다. 다만 proto 응답에 backbone 층 출력이 노출되지 않아, Phoenix의 헤드들이 올라가 있는 아래 층이 무엇을 출력하는지는 canon(이 저장소의 정본 노트)에 없었다. 이번 커밋(4세대+14)은 그 backbone 출력 필드를 응답에 노출하고, home-mixer(X의 피드 응답을 조립하는 서버)가 5개 피드 전체에서 이를 강제로 요청하게 했다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. home-mixer가 5개 피드 요청 모두에서 backbone 점수를 함께 요구한다</span></p></div>
 <ul>
-<li><p><strong>home-mixer가 5개 피드 엔드포인트에서 <code>query.return_backbone_scores = true</code>를 하드코딩으로 설정하기 시작했다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/server.rs" target="_blank" rel="noopener"><code>home-mixer/server.rs</code></a>. ScoredPostsService(내부용 스코어드-포스트), ForYouFeedService(For You 메인), ForYouFeed의 폴링 변형, RankedFollowingFeedService, FollowingFeedService — 다섯 개 gRPC 엔드포인트가 모두 요청을 Phoenix로 넘기기 직전에 이 플래그를 켠다. 파라미터 게이팅이 없다 — 프로덕션 default가 곧 on이다.</p>
+<li><p>home-mixer가 5개 피드 엔드포인트 모두에서 backbone 점수 요청 플래그를 하드코딩으로 켜기 시작했다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/server.rs" target="_blank" rel="noopener"><code>home-mixer/server.rs</code></a>.</p>
+<ul>
+<li>켜는 줄은 <code>query.return_backbone_scores = true</code>다.</li>
+<li>다섯 gRPC 엔드포인트가 모두 요청을 Phoenix로 넘기기 직전에 이 플래그를 켠다.<ul>
+<li>ScoredPostsService(내부용 스코어드-포스트)</li>
+<li>ForYouFeedService(For You 메인)</li>
+<li>ForYouFeed의 폴링 변형</li>
+<li>RankedFollowingFeedService</li>
+<li>FollowingFeedService</li>
+</ul>
+</li>
+<li>파라미터 게이팅이 없다. 즉 프로덕션 기본값이 on이다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let RequestContext {
     b3_info,
@@ -68,7 +80,33 @@ let output = self.get_for_you_feed(query).instrument(root_span).await?;
 <p>— <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/server.rs" target="_blank" rel="noopener"><code>home-mixer/server.rs</code></a>, 2026-09-02</p>
 </blockquote>
 </li>
-<li><p><strong>Phoenix proto가 request/response 양쪽에 backbone 필드를 새로 실었다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>.</p>
+<li><p>backbone 점수를 요청할지 정하는 bool 필드가 요청 구조체에 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/models/query.rs" target="_blank" rel="noopener"><code>home-mixer/models/query.rs</code></a>.</p>
+<ul>
+<li>구조체는 <code>ScoredPostsQuery</code>이고, 필드는 <code>return_backbone_scores: bool</code>이다.</li>
+<li>기본 생성자(<code>ScoredPostsQuery::new</code>)에서는 <code>false</code>로 초기화되고, 서버 진입점에서만 <code>true</code>로 세팅된다.</li>
+<li>즉 내부 pipeline이나 테스트 경로에서는 기본 off이고, gRPC 서버로 들어온 5개 피드 요청만 backbone scores를 요구한다.</li>
+</ul>
+</li>
+<li><p>Phoenix 요청 빌더는 이 플래그를 그대로 실어 넘긴다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/util/phoenix_request.rs" target="_blank" rel="noopener"><code>home-mixer/util/phoenix_request.rs</code></a>.</p>
+<ul>
+<li><code>return_backbone_scores: query.return_backbone_scores</code> 한 줄로 request context의 값이 proto 필드로 넘어간다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. Phoenix 응답에 backbone 출력이 따로 실리고, 후보는 두 층의 점수를 함께 들고 다닌다</span></p></div>
+<ul>
+<li><p>Phoenix proto가 요청과 응답 양쪽에 backbone 필드를 새로 실었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>.</p>
+<ul>
+<li>요청 필드 하나와 응답 필드 두 개가 짝을 이룬다.<ul>
+<li>요청: <code>returnBackboneScores</code>(#20)</li>
+<li>응답: <code>backboneTopLogProbs</code>(#10, <code>repeated float</code>)</li>
+<li>응답: <code>backboneContinuousValues</code>(#11, <code>repeated float</code>)</li>
+</ul>
+</li>
+<li><code>Top</code>은 discrete-head의 상위 로그확률(예: action 어휘의 top-K 로짓)을, <code>Continuous</code>는 dense 회귀 출력을 가리키는 것으로 읽힌다 <span class="badge est">추정</span>.</li>
+<li>근거는 이름 규약이고, <code>NextActionDistribution</code>에 이미 있는 <code>topLogProbs</code>(reranker head가 출력하는 discrete 값)와 대응한다는 점이다 <span class="badge est">추정</span>.</li>
+<li>reranker head가 이 backbone 위에 올라가 미세조정된 헤드라는 구조는 canon 이전 판이 관찰한 <code>rerankerHeadTag</code> 필드와 정합적이다 <span class="badge est">추정</span>.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">message PredictNextActionsRequest {
   ...
@@ -84,9 +122,13 @@ message NextActionDistribution {
 }
 </code></pre></figure>
 </blockquote>
-<p>request 필드 <code>returnBackboneScores</code>(#20)와 response 필드 <code>backboneTopLogProbs</code>(#10, <code>repeated float</code>)·<code>backboneContinuousValues</code>(#11, <code>repeated float</code>)가 짝을 이룬다. **<code>Top</code>**은 discrete-head의 상위 로그확률(예: action 어휘의 top-K 로짓), **<code>Continuous</code>**는 dense 회귀 출력을 가리키는 것으로 읽힌다 — 이름 규약이 그렇고, <code>NextActionDistribution</code>에 이미 존재하는 <code>topLogProbs</code>(reranker head가 뱉는 discrete)와 대응한다. <span class="badge est">추정</span> reranker head가 이 backbone 위에 얹혀 미세조정된 헤드라는 구조는 canon 이전 판이 관찰한 <code>rerankerHeadTag</code> 필드와 정합적이다.</p>
 </li>
-<li><p><strong>PostCandidate에 <code>backbone_scores: Option&lt;PhoenixScores&gt;</code> 필드가 신설됐고 scorer가 응답을 두 층으로 파싱해 저장한다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/scorers/phoenix_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/phoenix_scorer.rs</code></a>.</p>
+<li><p>후보 객체에 backbone 점수 필드가 새로 생겼고, scorer가 응답을 두 층으로 파싱해 저장한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/scorers/phoenix_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/phoenix_scorer.rs</code></a>.</p>
+<ul>
+<li>새 필드는 PostCandidate의 <code>backbone_scores: Option&lt;PhoenixScores&gt;</code>다.</li>
+<li>Scorer는 같은 예측 응답을 두 번 파싱한다. <code>candidate_scores</code>는 reranker head 출력(기존 <code>phoenix_scores</code>)이고, <code>candidate_backbone_scores</code>는 이번에 새로 노출된 backbone 출력이다.</li>
+<li>즉 candidate는 한 예측 라운드에서 두 층의 스코어를 함께 들고 다음 단계로 나간다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">// candidate.rs
 pub struct PostCandidate {
@@ -105,15 +147,28 @@ pub struct PostCandidate {
 })
 </code></pre></figure>
 </blockquote>
-<p>Scorer가 같은 예측 응답을 두 번 파싱한다 — <code>candidate_scores</code>는 reranker head 출력(기존 <code>phoenix_scores</code>), <code>candidate_backbone_scores</code>는 이번에 새로 노출된 backbone 출력이다. 즉 candidate는 한 예측 라운드에서 두 층의 스코어를 함께 들고 다음 단계로 나간다.</p>
-</li>
-<li><p><strong>Phoenix 요청 빌더가 flag를 그대로 실어 넘긴다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/util/phoenix_request.rs" target="_blank" rel="noopener"><code>home-mixer/util/phoenix_request.rs</code></a>. <code>return_backbone_scores: query.return_backbone_scores</code> 한 줄로 request context에서 proto 필드로 이월된다.</p>
-</li>
-<li><p><strong><code>ScoredPostsQuery</code> 구조체에 <code>return_backbone_scores: bool</code>이 신설됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/models/query.rs" target="_blank" rel="noopener"><code>home-mixer/models/query.rs</code></a>. 기본 생성자(<code>ScoredPostsQuery::new</code>)에서 <code>false</code>로 초기화되고, 서버 진입점에서만 <code>true</code>로 세팅된다 — 즉 내부 pipeline이나 테스트 경로에서는 기본 off, gRPC 서버로 들어온 5개 피드 요청만 backbone scores를 요구한다.</p>
 </li>
 </ul>
-<p><strong>어디에 쓰는가 (해석)</strong> <span class="badge est">추정</span> — 코드가 backbone_scores를 어떻게 소비하는지는 이 커밋에서 아직 보이지 않는다(scorer가 저장까지만 하고 downstream 소비처는 이번 diff 밖). 다만 backbone 출력을 candidate에 계속 들고 다닌다는 사실은 다음 중 하나 이상을 뜻한다: (a) 재순위·다양성 단계가 backbone 로짓을 부가 특성으로 소비, (b) 광고/피드 mixer가 backbone 출력을 debug/attribution용 payload로 기록, (c) 다른 스코어러(예: VMRanker의 slate 재정렬, MultiRiskAdsBlender)가 backbone 출력을 입력으로 사용, (d) 오프라인 분석·A/B 판정에서 &quot;reranker head가 아닌 backbone이 얼마나 움직였는가&quot;를 볼 수 있게 하기 위한 관측용 채널. 근거: <code>backbone_scores</code>가 <code>PostCandidate</code>의 필드로 들어가 있고 스캐폴딩 상 값을 dropped하는 경로가 없다. 새 소비처가 다음 커밋들에서 보일 가능성이 높다.</p>
-<p><strong>부수 변경 — Phoenix retrieval 집계 기본이 짧은 dwell → 긴 dwell로 바뀌었다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. backbone 점수를 어디에 쓰는지는 이번 커밋에서 아직 보이지 않는다</span></p></div>
+<ul>
+<li>scorer가 저장까지만 하고, downstream 소비처는 이번 diff 밖에 있다 <span class="badge est">추정</span>.</li>
+<li>다만 backbone 출력을 candidate에 계속 들고 다닌다는 사실은 다음 가운데 하나 이상을 뜻한다 <span class="badge est">추정</span>. 근거는 <code>backbone_scores</code>가 <code>PostCandidate</code>의 필드로 들어가 있고, 스캐폴딩상 값을 버리는(dropped) 경로가 없다는 점이다.<ul>
+<li>재순위·다양성 단계가 backbone 로짓을 부가 특성으로 소비한다.</li>
+<li>광고/피드 mixer가 backbone 출력을 debug/attribution용 payload로 기록한다.</li>
+<li>다른 스코어러가 backbone 출력을 입력으로 쓴다. 예를 들면 VMRanker의 slate 재정렬이나 광고 블렌더 MultiRiskAdsBlender다.</li>
+<li>오프라인 분석·A/B 판정에서 &quot;reranker head가 아닌 backbone이 얼마나 움직였는가&quot;를 볼 수 있게 하는 관측용 채널이다.</li>
+</ul>
+</li>
+<li>새 소비처는 다음 커밋들에서 보일 가능성이 높다 <span class="badge est">추정</span>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">D. Phoenix retrieval의 유저 히스토리 집계 기본값이 긴 dwell 쪽으로 바뀌었다</span></p></div>
+<ul>
+<li><p>Phoenix retrieval이 유저 히스토리를 집계하는 기본값이 짧은 dwell(체류 시간)에서 긴 dwell로 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+<ul>
+<li>파일 상단 헤더의 sync 시각이 <code>2026-09-01T16:42:25Z</code> → <code>2026-09-02T16:03:45Z</code>로 갱신됐으므로, 이 값은 프로덕션 feature-switch가 하루 사이에 실제로 바뀌었고 소스 미러가 그것을 따라잡은 것이다.</li>
+<li>파일 상단 주석에는 이렇게 적혀 있다: <em>&quot;mirrored from config feature-switch defaults; last sync ...&quot;</em>.</li>
+<li>long-dwell 집계는 유저가 오래 머문 후보들만 히스토리 임베딩에 합류시키는 방식으로, retrieval의 시그널을 좀 더 &quot;고품질 참여 쪽으로 편향&quot;시키는 방향이다 <span class="badge est">추정</span>. 근거는 X가 4세대+6(2026-08-21) 이후 광고 conversion 헤드를 대폭 확장하면서 dwell-based positive signal에 무게를 옮겨 온 흐름과 정합적이라는 점이다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">param!(
     PhoenixRetrievalAggregationType,
@@ -123,8 +178,17 @@ pub struct PostCandidate {
 );
 </code></pre></figure>
 </blockquote>
-<p>Phoenix retrieval의 유저 히스토리 집계 기본값이 short-dwell → long-dwell로 옮겨졌다. 파일 상단 헤더의 sync 시각이 <code>2026-09-01T16:42:25Z</code> → <code>2026-09-02T16:03:45Z</code>로 갱신됐으므로, 이 값은 <strong>프로덕션 feature-switch가 하루 사이에 실제로 바뀌었고 소스 미러가 그것을 따라잡은 것</strong>이다 (파일 상단 주석: <em>&quot;mirrored from config feature-switch defaults; last sync ...&quot;</em>). long-dwell 집계는 유저가 오래 머문 후보들만 히스토리 임베딩에 합류시키는 방식으로, retrieval의 시그널을 좀 더 &quot;고품질 참여 쪽으로 편향&quot;시키는 방향이다. <span class="badge est">추정</span> 근거: X가 4세대+6(2026-08-21) 이후 광고 conversion 헤드를 대폭 확장하면서 dwell-based positive signal에 무게를 옮겨온 흐름과 정합적이다.</p>
-<p><strong>부수 변경 — Phoenix 서빙 배치 준비 코드에서 zero-fill 방어가 두 곳에 추가됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/crates/serving/xai-recsys-engine/src/python.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/python.rs</code></a>.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
+<ul>
+<li><p>Phoenix 서빙의 배치 준비 코드가 버퍼를 채우기 전에 zero로 초기화하는 방어를 두 곳에 넣었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/crates/serving/xai-recsys-engine/src/python.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/python.rs</code></a>.</p>
+<ul>
+<li>초기화하는 곳은 candidate embedding 슬라이스와 search-query embedding 슬라이스다.</li>
+<li>이전에는 재사용 버퍼에 이전 배치의 값이 남아 있다가, <code>copy_len &lt; embedding_row.len()</code>인 경우(채운 길이가 슬롯 크기보다 작을 때) 잔여 바이트가 유출됐다.</li>
+<li><code>copy_len &gt; 0</code> 조건도 함께 걸었다. <code>copy_from_slice(&amp;src[..0])</code>이 panic을 던지는 엣지 케이스를 막는 방어다.</li>
+<li>4세대+13(2026-09-01)에서 emb_table gRPC 수신 파이프라인을 정리한 흐름의 후속으로, 배치 재사용 경계에서 생기던 잠재적 correctness 이슈를 막은 것이다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">.par_chunks(chunk_size)
 .zip(candidate_embeddings_slices.par_iter_mut())
@@ -143,22 +207,46 @@ if search_query_embedding_dim &gt; 0 &amp;&amp; let Some(sq_slice) = ... {
 }
 </code></pre></figure>
 </blockquote>
-<p>candidate embedding 슬라이스와 search-query embedding 슬라이스를 채우기 전에 zero로 초기화한다. 이전에는 재사용 버퍼에 이전 배치의 값이 남아 있다가 <code>copy_len &lt; embedding_row.len()</code>인 경우(즉 채운 길이가 슬롯 크기보다 작을 때) 잔여 바이트가 유출됐다. <code>copy_len &gt; 0</code> 조건도 함께 걸었다 — <code>copy_from_slice(&amp;src[..0])</code>이 panic을 던지는 엣지 케이스 방어다. 이건 4세대+13에서 emb_table gRPC 수신 파이프라인을 정리한 흐름의 후속으로, 배치 재사용 경계에서 발생하던 잠재적 correctness 이슈를 잠근 것이다.</p>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> &quot;안전성 / visibility-filtering / labeling 파이프라인&quot; 절에 &quot;4세대+14 (2026-09-02, 85ac72a) — home-mixer가 Phoenix backbone scores 요청 + scarecrow XReview 인테이크 신설 + VF rules Box&lt;dyn> 소거 + 체크포인트 in-envelope 파생 마스터 키&quot; 서브섹션 신규. &quot;한 줄 요약&quot;과 세대 대비 헤더에 4세대+14 행을 추가. &quot;Phoenix 학습·인덱스&quot; 절에 backbone scores 응답 필드와 xrecsys_two_tower 하이퍼 변경을 반영. &quot;## 출처&quot;의 커밋 sha 목록에 <code>85ac72a(2026-09-02, 4세대+14)</code> 추가하고 관련 파일 인용 8건을 신규 등재. <code>최종 갱신</code> 2026-09-03 → 2026-09-04. <code>git 로그 직접 확인</code> 라인 갱신(2026-09-03 → 2026-09-04, 커밋 13개 → 14개).</p></div>
-<div class="blk why"><p><span class="lbl">의미</span></p></div>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 &quot;안전성 / visibility-filtering / labeling 파이프라인&quot; 절에 &quot;4세대+14 (2026-09-02, 85ac72a) — home-mixer가 Phoenix backbone scores 요청 + scarecrow XReview 인테이크 신설 + VF rules Box&lt;dyn> 소거 + 체크포인트 in-envelope 파생 마스터 키&quot; 소절을 새로 만들었다. &quot;한 줄 요약&quot;과 세대 대비 헤더에 4세대+14 행을 추가했다. &quot;Phoenix 학습·인덱스&quot; 절에는 backbone scores 응답 필드와 xrecsys_two_tower 하이퍼파라미터 변경을 반영했다. &quot;## 출처&quot;의 커밋 sha 목록에 <code>85ac72a(2026-09-02, 4세대+14)</code>를 추가하고, 관련 파일 인용 8건을 새로 올렸다. <code>최종 갱신</code>은 2026-09-03 → 2026-09-04로 올렸고, <code>git 로그 직접 확인</code> 줄도 2026-09-03 → 2026-09-04, 커밋 13개 → 14개로 고쳤다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> Phoenix 랭커의 층 구조가 코드로 확정됐다.</p></div>
 <ul>
-<li><strong>Phoenix 랭커의 층 구조가 코드로 확정됐다.</strong> 4세대 공개 이후 canon은 &quot;Phoenix가 후보당 24개 확률을 뱉는 트랜스포머&quot;라는 최상위 시맨틱만 알았고, 4세대+11의 <code>rerankerHeadTag</code> 필드로 &quot;여러 재순위 헤드가 존재&quot;까지 관찰했으며, 이번 4세대+14로 &quot;그 헤드들 아래에 backbone 층이 있고 그 출력이 별도 응답 필드&quot;라는 것을 확정한다. 다중-태스크 랭커의 표준 형태(shared bottom + task-specific heads)가 X 프로덕션에도 그대로 있다는 뜻이다.</li>
-<li><strong><code>return_backbone_scores</code>가 파라미터 게이팅 없이 5개 피드에서 강제 on</strong>이라는 사실은, 이 응답 추가가 A/B 실험 단계가 아니라 이미 프로덕션 default로 서빙되고 있다는 강한 신호다. Phoenix 서빙 측이 이미 backbone 출력을 계산해서 응답에 실을 준비가 되어 있고 지연 예산도 여유가 있다는 뜻이다.</li>
-<li><strong>&quot;backbone score를 candidate에 들고 다닌다&quot; = 다음 층에서 소비할 수 있다는 예약.</strong> 이 커밋에서는 저장까지만 보이지만, downstream(MultiRiskAdsBlender, VMRanker, DPP re-rank 등)이 backbone 로짓을 부가 특성으로 쓰는 코드가 곧 붙을 가능성이 높다. 이는 4세대+11의 <code>rerankerHeadTag</code>와 짝을 이뤄 &quot;hydra 헤드 사이의 스위칭·앙상블·attribution&quot; 코드가 후속 커밋에서 열릴 관전 포인트를 만든다.</li>
-<li><strong>Phoenix retrieval의 dwell 기본이 long으로 옮겨간 사실</strong>은 4세대+6 이후 광고 conversion 헤드 확대 흐름과 정합적이다. 두 층 랭커에서 backbone이 학습하는 신호와 retrieval이 참조하는 유저 히스토리 집계가 같은 방향(long-dwell-heavy)으로 정렬되는 셈이다.</li>
+<li>4세대 공개 이후 canon은 &quot;Phoenix가 후보당 24개 확률을 뱉는 트랜스포머&quot;라는 최상위 시맨틱만 알았다. 4세대+11의 <code>rerankerHeadTag</code> 필드로 &quot;여러 재순위 헤드가 존재&quot;까지 관찰했고, 이번 4세대+14로 &quot;그 헤드들 아래에 backbone 층이 있고 그 출력이 별도 응답 필드&quot;라는 것을 확정한다. 다중-태스크 랭커의 표준 형태(shared bottom과 task-specific heads)가 X 프로덕션에도 그대로 있다는 뜻이다.</li>
+<li><code>return_backbone_scores</code>는 파라미터 게이팅 없이 5개 피드에서 강제로 켜진다. 이는 이 응답 추가가 A/B 실험 단계가 아니라 이미 프로덕션 기본값으로 서빙되고 있다는 강한 신호다. Phoenix 서빙 측이 backbone 출력을 계산해 응답에 실을 준비가 되어 있고, 지연 예산에도 여유가 있다는 뜻이다.</li>
+<li>&quot;backbone score를 candidate에 들고 다닌다&quot;는 것은 다음 층에서 소비할 수 있게 해 둔 예약이다. 이 커밋에서는 저장까지만 보이지만, MultiRiskAdsBlender, VMRanker, DPP re-rank(후보 다양성을 반영한 재정렬) 같은 downstream이 backbone 로짓을 부가 특성으로 쓰는 코드가 곧 붙을 가능성이 높다. 이는 4세대+11의 <code>rerankerHeadTag</code>와 짝을 이뤄, &quot;hydra 헤드 사이의 스위칭·앙상블·attribution&quot; 코드가 후속 커밋에서 열릴 관전 포인트를 만든다.</li>
+<li>Phoenix retrieval의 dwell 기본값이 long으로 옮겨 간 사실은 4세대+6 이후 광고 conversion 헤드 확대 흐름과 정합적이다. 두 층 랭커에서 backbone이 학습하는 신호와 retrieval이 참조하는 유저 히스토리 집계가 같은 방향(long-dwell-heavy)으로 정렬되는 셈이다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="2-scarecrow구-botmaker에-xreview-인테이크-grpc-파이프라인이-신설됐다--x-4세대14-신규-canon"><span class="num">2</span>Scarecrow(구 Botmaker)에 XReview 인테이크 gRPC 파이프라인이 신설됐다 — X 4세대+14, 신규 canon</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02, X.AI Corp. 관련 파일 3개 신규 + 1개 수정 (총 333줄).</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> scarecrow는 X 내부의 &quot;규칙 기반 자동 탐지·조치&quot; 시스템이다 — 옛 Twitter의 Botmaker(트래픽에 룰을 매기고 조치를 취하는 엔진, <code>com.twitter.botmaker</code> 패키지 유산이 이번 커밋의 Scala 파일에도 그대로 남아 있다)를 X.AI가 인수 후에도 유지·확장 중이다. 반면 XReview는 신고·모더레이션 큐 이름 — 유저가 UI에서 &quot;신고&quot;를 누르면 리포트가 XReview로 흘러가 리뷰 대상이 된다(2025~2026 X 내부 명칭). 이번 커밋 전까지 canon은 scarecrow와 XReview 사이의 프로그램적 연결을 갖고 있지 않았다. 이번 커밋이 새로 여는 것은 <strong>scarecrow의 자동 탐지 봇이 XReview에 리포트를 &quot;유저가 신고한 것처럼&quot; 프로그램적으로 넣는 gRPC 파이프라인</strong>이다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h2 id="2-scarecrow구-botmaker가-xreview에-자동-신고를-넣는-경로가-생겼다--x"><span class="num">2</span>scarecrow(구 Botmaker)가 XReview에 자동 신고를 넣는 경로가 생겼다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02, X.AI Corp. 관련 파일은 3개 신규, 1개 수정이고 총 333줄이다. 이 노트들이 붙인 번호로는 4세대+14, 내용으로는 canon에 처음 들어오는 항목이다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> scarecrow(구 Botmaker)는 X 내부의 &quot;규칙 기반 자동 탐지·조치&quot; 시스템이다. 옛 Twitter의 Botmaker(트래픽에 룰을 매기고 조치를 취하는 엔진)를 X.AI가 인수 후에도 유지·확장하고 있는 것이 scarecrow이고, 이번 커밋의 Scala 파일에도 <code>com.twitter.botmaker</code> 패키지 유산이 그대로 남아 있다. XReview는 신고·모더레이션 큐의 이름(2025~2026 X 내부 명칭)이고, 유저가 UI에서 &quot;신고&quot;를 누르면 리포트가 XReview로 흘러가 리뷰 대상이 된다. 이번 커밋 전까지 canon에는 scarecrow와 XReview 사이의 프로그램적 연결이 없었다. 이번 커밋은 scarecrow의 자동 탐지 봇이 XReview에 리포트를 &quot;유저가 신고한 것처럼&quot; 프로그램적으로 넣는 gRPC 파이프라인을 새로 연다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. scarecrow 룰이 호출하는 함수 두 개로 XReview에 신고를 넣는다</span></p></div>
 <ul>
-<li><p><strong>downstream service 목록에 <code>XReviewIntake</code>가 등록됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/DownstreamServices.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/DownstreamServices.scala</code></a>.</p>
+<li><p>scarecrow에서 XReview로 리포트를 보내는 함수 유닛 두 개가 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/XReviewIntakeRegistry.scala</code></a> (179줄 신규).</p>
+<ul>
+<li>두 함수는 <code>CreateXReviewReportProd</code>와 <code>CreateXReviewReportStaging</code>이다. scarecrow의 룰 DSL에서 호출할 수 있고, 각각 프로덕션과 스테이징 XReview로 리포트를 보낸다.</li>
+<li>scarecrow 룰이 이 함수를 호출할 때 넘기는 인자는 7개다.<ul>
+<li><code>entityType</code>: &quot;post&quot; 또는 &quot;profile&quot;</li>
+<li><code>entityId</code>: 트윗 id 또는 유저 id</li>
+<li><code>userId</code>: 신고 대상 유저</li>
+<li><code>reportType</code>: XReview allowlist 값(예: <code>bystander_impersonation</code>)</li>
+<li><code>botId</code>: 이 신고를 만든 자동 탐지 봇</li>
+<li>선택적 <code>note</code></li>
+<li>선택적 <code>victimId</code>: 피해자 유저 id</li>
+</ul>
+</li>
+<li>CreateXReviewReportProd 클래스에 붙은 자체 설명은 아래 인용과 같다.</li>
+</ul>
+<blockquote>
+<p><em>&quot;Submits a report to production XReview Intake over gRPC. entityType must be post or profile. reportType must be an XReview-allowlisted value. Impersonation bots should use bystander_impersonation (lane tags key on that type, not generic impersonation). Each evaluation includes detection_timestamp_ms so intake&#39;s content-hash report id is unique; evidence rollup then applies.&quot;</em>
+— <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>, CreateXReviewReportProd 클래스의 <code>description</code></p>
+</blockquote>
+</li>
+<li><p>다운스트림 서비스 목록에 XReview 인테이크가 등록됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/DownstreamServices.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/DownstreamServices.scala</code></a>.</p>
+<ul>
+<li>등록된 이름은 <code>XReviewIntake</code>다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">case object XReviewIntake extends DownstreamService {
   override val name = &quot;XREVIEW_INTAKE&quot;
@@ -166,15 +254,46 @@ if search_query_embedding_dim &gt; 0 &amp;&amp; let Some(sq_slice) = ... {
 </code></pre></figure>
 </blockquote>
 </li>
-<li><p><strong>scarecrow에서 XReview로 리포트를 보내는 함수 유닛이 두 개 신설됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/XReviewIntakeRegistry.scala</code></a> (179줄 신규). <code>CreateXReviewReportProd</code>와 <code>CreateXReviewReportStaging</code> — scarecrow의 룰 DSL에서 호출 가능한 함수로, 각각 프로덕션과 스테이징 XReview로 리포트를 보낸다.</p>
-<p>함수 시그니처와 자체 문서:</p>
-<blockquote>
-<p><em>&quot;Submits a report to production XReview Intake over gRPC. entityType must be post or profile. reportType must be an XReview-allowlisted value. Impersonation bots should use bystander_impersonation (lane tags key on that type, not generic impersonation). Each evaluation includes detection_timestamp_ms so intake&#39;s content-hash report id is unique; evidence rollup then applies.&quot;</em>
-— <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>, CreateXReviewReportProd 클래스의 <code>description</code></p>
-</blockquote>
-<p>scarecrow 룰이 이 함수를 호출할 때 넘기는 인자는 7개다: <code>entityType</code>(&quot;post&quot; 또는 &quot;profile&quot;), <code>entityId</code>(트윗 id 또는 유저 id), <code>userId</code>(신고 대상 유저), <code>reportType</code>(XReview allowlist 값, 예: <code>bystander_impersonation</code>), <code>botId</code>(어떤 자동 탐지 봇이 이 신고를 만들었는지), 선택적 <code>note</code>, 선택적 <code>victimId</code>(피해자 유저 id).</p>
+<li><p>스테이징용 클라이언트가 따로 있고, 스테이징 함수는 실제 조치가 없는 실험용으로 표시된다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>.</p>
+<ul>
+<li><code>CreateXReviewReportStaging</code>은 action level을 <code>NO_ACTION</code>으로 설정한다.</li>
+<li>scarecrow의 action level은 이 함수가 실제 조치인지 dry-run인지를 표시하는 메타데이터다. 스테이징 버전은 <code>NO_ACTION</code>으로 표시돼, 룰이 실전에 반영되지 않는 실험용임을 명시한다.</li>
+<li>프로덕션 버전은 <code>PROD_AGENT_WORKFLOW_ACTION</code>이다. &quot;agent workflow&quot;라는 표현은 자동 조치 파이프라인의 일부라는 뜻이다.</li>
+</ul>
 </li>
-<li><p><strong>리포트 페이로드는 XReview의 SubmitReportRequest gRPC proto를 그대로 채운다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewReportBuilder.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/XReviewReportBuilder.scala</code></a> (59줄 신규).</p>
+<li><p>개발자 로컬 환경이나 개인 계정 인스턴스에서는 실제 XReview 서버를 호출하지 않는다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>.</p>
+<ul>
+<li><code>localMode</code>나 <code>personalAccountMode</code>에서는 noop으로 대체된다.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">if (localMode() || personalAccountMode()) {
+  XReviewReportSubmitter.noop(statsReceiver)
+} else {
+  ...
+}
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>scarecrow는 mTLS로 XReview intake에 붙는다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li>flag <code>xreview.tls.ca-cert</code>가 CA 인증서 경로를 받고, <code>SharedXReviewIntakeClientModule.provideXReviewIntakeClient</code>가 이를 소비해 mTLS 연결을 만든다.</li>
+<li>클라이언트는 <code>com.twitter.useng.common.xreview</code> 패키지에 있는 공용 모듈에서 온다. useng는 X 사내 공용 라이브러리 네임스페이스다.</li>
+<li>즉 scarecrow만이 아니라 다른 시스템도 XReview intake에 프로그램적으로 접근한다는 정황이다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 봇 신고는 유저 신고와 같은 표면으로 들어가되, 자동 탐지라는 출처가 붙는다</span></p></div>
+<ul>
+<li><p>리포트 페이로드는 XReview의 SubmitReportRequest gRPC proto를 그대로 채운다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewReportBuilder.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/XReviewReportBuilder.scala</code></a> (59줄 신규).</p>
+<ul>
+<li>키 몇 개가 이 파이프라인의 성격을 그대로 보여 준다.<ul>
+<li><code>report_surface = &quot;x_app&quot;</code>: 유저 신고와 같은 표면에서 들어온다.</li>
+<li><code>report_source = &quot;proactive&quot;</code>: 유저 신고(&quot;user&quot;)가 아니라 자동 탐지(&quot;proactive&quot;)임을 XReview에게 알린다. 즉 XReview는 어떤 리포트를 사람이 눌러서 만들었고 어떤 리포트를 봇이 만들어 넣었는지를 이 필드로 구분한다.</li>
+<li><code>subject = &quot;Botmaker report&quot;</code>: 리포트의 최상단 문구가 고정된다.</li>
+<li><code>reporter_id = &quot;0&quot;</code>: 봇 리포트에는 신고자 유저 id가 없다. 대신 <code>detection_bot_id</code>에 어떤 봇이 만든 리포트인지가 들어간다.</li>
+</ul>
+</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">val ReportSurfaceValue = &quot;x_app&quot;
 val ReportSourceValue = &quot;proactive&quot;
@@ -195,56 +314,78 @@ val reportFields = Seq(
   ++ victimId.filter(_ != null).map(id =&gt; pb(XReviewReportKeys.VictimUserId, id.toString)).toSeq
 </code></pre></figure>
 </blockquote>
-<p>키 몇 개가 이 파이프라인의 성격을 그대로 보여준다:</p>
+</li>
+<li><p>entityType 화이트리스트는 &quot;post&quot;와 &quot;profile&quot;로 제한된다 <span class="badge ok">확인</span>.</p>
 <ul>
-<li><code>report_surface = &quot;x_app&quot;</code> — 유저 신고와 같은 표면에서 들어온다.</li>
-<li><code>report_source = &quot;proactive&quot;</code> — <strong>유저 신고(&quot;user&quot;)가 아니라 자동 탐지(&quot;proactive&quot;)임을 XReview에게 알린다.</strong> 즉 XReview는 어떤 리포트가 사람이 눌러서 만들어졌고 어떤 리포트가 봇이 만들어 넣은 것인지를 이 필드로 구분한다.</li>
-<li><code>subject = &quot;Botmaker report&quot;</code> — 리포트의 최상단 문구가 고정된다.</li>
-<li><code>reporter_id = &quot;0&quot;</code> — 봇 리포트에는 신고자 유저 id가 없다. 대신 <code>detection_bot_id</code>에 어떤 봇이 만든 리포트인지가 들어간다.</li>
+<li><code>normalizeEntityType</code> 함수가 잘못된 값이면 <code>IllegalArgumentException</code>을 던져, scarecrow 룰이 임의의 entity type을 XReview에 넣지 못하게 막는다.</li>
 </ul>
 </li>
-<li><p><strong>entityType 화이트리스트가 &quot;post&quot;와 &quot;profile&quot;로 잠긴다</strong> <span class="badge ok">확인</span>. <code>normalizeEntityType</code> 함수가 잘못된 값이면 <code>IllegalArgumentException</code>을 던져 scarecrow 룰에서 임의의 entity type을 XReview에 넣지 못하게 막는다.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. 중복 신고는 XReview가 사후에 묶고, 신고 유형이 리뷰 lane을 정한다</span></p></div>
+<ul>
+<li>report id의 고유성은 내용 해시와 timestamp가 함께 정한다 <span class="badge ok">확인</span>.<ul>
+<li>위 인용문에는 이렇게 적혀 있다: <em>&quot;intake&#39;s content-hash report id is unique; evidence rollup then applies&quot;</em>. XReview 서버가 내용 해시와 <code>detection_timestamp_ms</code>로 report id를 만든다는 뜻이다.</li>
+<li>같은 봇이 같은 콘텐츠를 두 번 감지해도 timestamp가 다르면 별개의 report가 되고, XReview가 사후에 evidence를 rollup(집계)한다.</li>
+<li>즉 봇 리포트에서는 자연스럽게 중복 감지가 여러 번 생기고, 그 중복을 XReview가 처리하는 구조다.</li>
+</ul>
 </li>
-<li><p><strong>content-hash + timestamp가 report id의 uniqueness를 결정한다</strong> <span class="badge ok">확인</span>. 위 인용문의 <em>&quot;intake&#39;s content-hash report id is unique; evidence rollup then applies&quot;</em> 문구는 XReview 서버가 (내용 해시 + <code>detection_timestamp_ms</code>)로 report id를 만든다는 뜻이다. 같은 봇이 같은 콘텐츠를 두 번 감지해도 timestamp가 다르면 별개의 report가 되고 XReview가 사후에 evidence를 rollup(집계)한다. 즉 봇 리포트는 자연스럽게 여러 번 중복 감지가 발생하며 그 중복을 XReview가 처리하는 구조다.</p>
-</li>
-<li><p><strong>impersonation 봇은 <code>bystander_impersonation</code>을 써야 한다</strong> <span class="badge ok">확인</span>. <em>&quot;Impersonation bots should use bystander_impersonation (lane tags key on that type, not generic impersonation).&quot;</em> 여기서 lane tag는 XReview 큐 라우팅(어떤 인간 리뷰어 팀·SLA로 갈지)을 뜻하는 것으로 읽힌다. 즉 XReview에는 리포트를 리뷰어 팀으로 라우팅하는 &quot;lane&quot; 개념이 있고, <code>report_type</code> 값이 lane을 결정한다. 봇이 잘못된 <code>report_type</code>을 쓰면 잘못된 lane으로 라우팅돼서 검토가 지연되거나 무시된다.</p>
-</li>
-<li><p><strong>staging 클라이언트가 별도로 있고 <code>CreateXReviewReportStaging</code>은 action level을 <code>NO_ACTION</code>으로 설정한다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>. scarecrow의 action level은 이 함수가 실제 조치인지 dry-run인지를 표시하는 메타데이터인데, staging 버전은 <code>NO_ACTION</code>으로 표시돼 룰이 실전에 반영되지 않는 실험용임을 명시한다. 프로덕션 버전은 <code>PROD_AGENT_WORKFLOW_ACTION</code> — &quot;agent workflow&quot;라는 표현은 자동 조치 파이프라인의 일부라는 뜻이다.</p>
-</li>
-<li><p><strong><code>localMode</code>나 <code>personalAccountMode</code>에서는 noop으로 대체된다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>.</p>
-<blockquote>
-<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">if (localMode() || personalAccountMode()) {
-  XReviewReportSubmitter.noop(statsReceiver)
-} else {
-  ...
-}
-</code></pre></figure>
-</blockquote>
-<p>개발자 로컬 환경이나 개인 계정 인스턴스에서는 실제 XReview 서버를 호출하지 않는다.</p>
-</li>
-<li><p><strong>관측(metrics) 카운터가 5종</strong>이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewReportSubmitter.scala" target="_blank" rel="noopener"><code>XReviewReportSubmitter.scala</code></a> (91줄 신규). <code>attempted</code>(호출 수), <code>submitted</code>(성공), <code>skipped</code>(prodClient/stagingClient가 없어서 스킵), <code>unsupported_entity</code>(entityType 화이트리스트 밖), <code>rpc_failed</code>(gRPC 실패). 실패는 <code>warn</code> 로그로 남기고 예외를 다시 던진다.</p>
-</li>
-<li><p><strong>mTLS로 XReview intake에 붙는다</strong> <span class="badge ok">확인</span>. flag <code>xreview.tls.ca-cert</code>가 CA 인증서 경로를 받고, <code>SharedXReviewIntakeClientModule.provideXReviewIntakeClient</code>가 이를 소비해 mTLS 연결을 만든다. 클라이언트는 <code>com.twitter.useng.common.xreview</code> 패키지에 있는 공용 모듈에서 온다 — 즉 scarecrow만이 아니라 다른 시스템도 XReview intake에 프로그램적으로 접근한다는 정황이다(useng는 X 사내 공용 라이브러리 네임스페이스).</p>
+<li>사칭(impersonation) 탐지 봇은 <code>bystander_impersonation</code>을 써야 한다 <span class="badge ok">확인</span>.<ul>
+<li>자체 설명은 이렇게 적었다: <em>&quot;Impersonation bots should use bystander_impersonation (lane tags key on that type, not generic impersonation).&quot;</em></li>
+<li>여기서 lane tag는 XReview 큐 라우팅(어떤 인간 리뷰어 팀·SLA로 갈지)을 뜻하는 것으로 읽힌다.</li>
+<li>즉 XReview에는 리포트를 리뷰어 팀으로 라우팅하는 &quot;lane&quot; 개념이 있고, <code>report_type</code> 값이 lane을 결정한다.</li>
+<li>봇이 잘못된 <code>report_type</code>을 쓰면 잘못된 lane으로 라우팅돼 검토가 지연되거나 무시된다.</li>
+</ul>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> &quot;안전성 / visibility-filtering / labeling 파이프라인&quot; 절 아래에 4세대+14 서브섹션 신설(위 §1과 함께 통합). scarecrow → XReview 인테이크 파이프라인은 canon에 처음 들어오는 항목이라 별도 소절 &quot;scarecrow → XReview 자동 신고 파이프라인 (2026-09-02 신규 공개)&quot;로 배치. 파일 3개(XReviewIntakeRegistry·XReviewReportBuilder·XReviewReportSubmitter)와 DownstreamServices 수정본을 &quot;## 출처&quot;에 등재.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
 <ul>
-<li><strong>X의 모더레이션 파이프라인이 이번 커밋으로 확장됐다.</strong> canon 이전 판이 알던 안전 레이어는 두 층이었다: (a) visibility-filtering — 스코어링·서빙 경로에서 inline으로 후보를 drop하거나 interstitial을 붙이는 층, (b) grox PtOS — 콘텐츠 라벨링 층(Grok LLM이 트윗 요약·라벨 부여). 이번 4세대+14가 세 번째 층을 코드로 노출한다: (c) <strong>scarecrow → XReview</strong> — 자동 탐지 봇이 유저 리포트인 척 인테이크를 통해 XReview 큐로 리포트를 밀어넣고, 이후 XReview가 evidence rollup + 인간 리뷰어 라우팅(lane tag)을 담당한다. 이것은 inline drop이 아닌 <strong>비동기 신고·집계 파이프라인</strong>이다.</li>
-<li><strong><code>report_source = &quot;proactive&quot;</code>라는 필드의 존재가 시사하는 것.</strong> XReview에는 유저 리포트(&quot;user&quot;)와 봇 리포트(&quot;proactive&quot;)가 같은 큐로 들어가지만 소스가 태깅된다. 이는 XReview 대시보드나 리뷰어 UI가 &quot;유저 압박이 있는 사례&quot;와 &quot;봇이 감지한 사례&quot;를 구분해 표시하고, 아마도 evidence rollup 로직도 두 소스를 가중치 다르게 처리한다는 것을 뜻한다. <span class="badge est">추정</span> 이 부분은 XReview 서버 측 로직이 공개되어야 확정된다.</li>
-<li><strong><code>bystander_impersonation</code> 타입의 존재는 사칭 대응 라인이 세분화되어 있다는 뜻이다.</strong> <em>&quot;bystander_impersonation (lane tags key on that type, not generic impersonation)&quot;</em> — 봇이 발견한 사칭 케이스는 &quot;제3자가 신고한 사칭&quot;으로 라벨링해서 별도 lane으로 라우팅한다. 왜 &quot;generic impersonation&quot;을 쓰지 말라고 명시했는가는 lane tag 라우팅이 report_type 자체를 discriminator로 쓰기 때문이다 — 잘못 태그하면 잘못된 팀·SLA·심각도로 라우팅된다.</li>
-<li><strong><code>useng.common.xreview</code> 공용 모듈의 존재.</strong> scarecrow가 쓴 XReview 클라이언트 모듈이 <code>com.twitter.useng.common.xreview</code> 패키지에 있다는 사실은 이 인테이크가 scarecrow 전용이 아니라 X 내부의 여러 백엔드가 공용으로 호출한다는 뜻이다. 예컨대 grox PtOS 파이프라인도 이 라이브러리를 통해 XReview에 리포트를 넣을 수 있다. <span class="badge est">추정</span> 다음 커밋들에서 이 사용처가 더 드러날 가능성이 높다.</li>
-<li class="warn"><strong>⚠ 주장 보강</strong>: 이전 canon은 X의 자동 탐지 → 인간 리뷰 핸드오프 구조를 &quot;grox PtOS가 라벨을 붙이면 policy service가 조치를 취한다&quot; 정도로 이해했다. 이번 커밋으로 그 핸드오프의 <strong>한 축이 XReview 큐를 유저 신고와 같은 채널로 공유한다</strong>는 사실이 코드로 잠겼다. 즉 XReview는 유저 신고만 처리하는 큐가 아니라 자동 탐지의 종착지 중 하나이기도 하다.</li>
+<li>관측(metrics) 카운터는 5종이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewReportSubmitter.scala" target="_blank" rel="noopener"><code>XReviewReportSubmitter.scala</code></a> (91줄 신규).<ul>
+<li><code>attempted</code>: 호출 수</li>
+<li><code>submitted</code>: 성공</li>
+<li><code>skipped</code>: prodClient/stagingClient가 없어서 건너뜀</li>
+<li><code>unsupported_entity</code>: entityType 화이트리스트 밖</li>
+<li><code>rpc_failed</code>: gRPC 실패</li>
+<li>실패는 <code>warn</code> 로그로 남기고 예외를 다시 던진다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 &quot;안전성 / visibility-filtering / labeling 파이프라인&quot; 절 아래에 4세대+14 소절을 새로 만들고, 위 1절의 내용과 함께 묶었다. scarecrow → XReview 인테이크 파이프라인은 canon에 처음 들어오는 항목이라 별도 소절 &quot;scarecrow → XReview 자동 신고 파이프라인 (2026-09-02 신규 공개)&quot;에 두었다. 파일 3개(XReviewIntakeRegistry·XReviewReportBuilder·XReviewReportSubmitter)와 DownstreamServices 수정본을 &quot;## 출처&quot;에 올렸다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> X의 모더레이션 파이프라인이 이번 커밋으로 확장됐다.</p></div>
+<ul>
+<li>canon 이전 판이 알던 안전 레이어는 두 층이었다.<ul>
+<li>visibility-filtering은 스코어링·서빙 경로에서 inline으로 후보를 drop하거나 interstitial(경고 화면을 덮어씌우는 조치)을 붙이는 층이다.</li>
+<li>grox PtOS는 Grok LLM이 트윗을 요약하고 라벨을 붙이는 콘텐츠 라벨링 층이다.</li>
+</ul>
+</li>
+<li>이번 커밋(4세대+14)은 세 번째 층인 scarecrow → XReview를 코드로 노출한다. 자동 탐지 봇이 유저 리포트인 척 인테이크를 통해 XReview 큐로 리포트를 밀어 넣고, 이후 XReview가 evidence rollup과 인간 리뷰어 라우팅(lane tag)을 맡는다. 이것은 inline drop이 아닌 비동기 신고·집계 파이프라인이다.</li>
+<li><code>report_source = &quot;proactive&quot;</code> 필드가 있다는 것은, XReview에 유저 리포트(&quot;user&quot;)와 봇 리포트(&quot;proactive&quot;)가 같은 큐로 들어가되 소스가 태깅된다는 것을 시사한다. 이는 XReview 대시보드나 리뷰어 UI가 &quot;유저 압박이 있는 사례&quot;와 &quot;봇이 감지한 사례&quot;를 구분해 표시하고, 아마도 evidence rollup 로직도 두 소스에 가중치를 다르게 준다는 것을 뜻한다 <span class="badge est">추정</span>. 이 부분은 XReview 서버 측 로직이 공개되어야 확정된다.</li>
+<li><code>bystander_impersonation</code> 타입이 있다는 것은 사칭 대응 라인이 세분화되어 있다는 뜻이다. 근거 문구는 이렇다: <em>&quot;bystander_impersonation (lane tags key on that type, not generic impersonation)&quot;</em>. 봇이 발견한 사칭 케이스는 &quot;제3자가 신고한 사칭&quot;으로 라벨링해 별도 lane으로 라우팅한다. &quot;generic impersonation&quot;을 쓰지 말라고 명시한 이유는 lane tag 라우팅이 report_type 자체를 discriminator로 쓰기 때문이다. 잘못 태그하면 잘못된 팀·SLA·심각도로 라우팅된다.</li>
+<li>scarecrow가 쓴 XReview 클라이언트는 <code>useng.common.xreview</code> 공용 모듈, 즉 <code>com.twitter.useng.common.xreview</code> 패키지에 있다. 이는 이 인테이크가 scarecrow 전용이 아니라 X 내부의 여러 백엔드가 공용으로 호출한다는 뜻이다. 예컨대 grox PtOS 파이프라인도 이 라이브러리를 통해 XReview에 리포트를 넣을 수 있다 <span class="badge est">추정</span>. 다음 커밋들에서 이 사용처가 더 드러날 가능성이 높다 <span class="badge est">추정</span>.</li>
+<li class="warn">⚠ 주장 보강: 이전 canon은 X의 자동 탐지 → 인간 리뷰 핸드오프 구조를 &quot;grox PtOS가 라벨을 붙이면 policy service가 조치를 취한다&quot; 정도로 이해했다. 이번 커밋으로 그 핸드오프의 한 축이 XReview 큐를 유저 신고와 같은 채널로 공유한다는 사실이 코드로 확정됐다. 즉 XReview는 유저 신고만 처리하는 큐가 아니라 자동 탐지의 종착지 중 하나이기도 하다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="3-vf-rules-재구조화-phase-2--boxdyn-rule이-소거되고-정적-테이블로-옮겼다--x-4세대14"><span class="num">3</span>VF rules 재구조화 phase 2 — Box&lt;dyn Rule>이 소거되고 정적 테이블로 옮겼다 — X 4세대+14</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 4세대+13(2026-09-01, <a href="https://github.com/xai-org/x-algorithm/commit/7ba776848b12d8422eb0f291ee03ea5c17ab0188" target="_blank" rel="noopener">7ba7768</a>)에서 visibility-filtering 규칙 표현이 struct-per-rule에서 data-driven <code>RuleSpec</code> enum으로 옮겨졌다. 다만 <code>RuleEngine</code>(당시 이름 <code>Policies</code>)이 여전히 <code>Vec&lt;Box&lt;dyn Rule&gt;&gt;</code> 세 개를 힙에 조립해서 들고 있었다 — 규칙 자체는 데이터 리터럴이 됐지만 정책(safety level별 규칙 시퀀스)은 런타임 vec으로 남아 있었다. 이번 4세대+14가 그 마지막 층을 걷어냈다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h2 id="3-노출-판정-규칙의-정책이-힙-조립-대신-정적-테이블에-실린다--x"><span class="num">3</span>노출 판정 규칙의 정책이 힙 조립 대신 정적 테이블에 실린다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02. 이 노트들이 붙인 번호로는 4세대+14다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> visibility-filtering(VF)은 포스트마다 이 뷰어에게 보여도 되는지를 판정하는 서비스다. 4세대+13(2026-09-01, <a href="https://github.com/xai-org/x-algorithm/commit/7ba776848b12d8422eb0f291ee03ea5c17ab0188" target="_blank" rel="noopener">7ba7768</a>)에서 VF 규칙 표현이 struct-per-rule에서 data-driven <code>RuleSpec</code> enum으로 옮겨졌다. 다만 <code>RuleEngine</code>(당시 이름 <code>Policies</code>)은 여전히 <code>Vec&lt;Box&lt;dyn Rule&gt;&gt;</code> 세 개를 힙에 조립해서 들고 있었다. 규칙 자체는 데이터 리터럴이 됐지만, 정책(safety level별 규칙 시퀀스)은 런타임 vec으로 남아 있었던 것이다. 이번 커밋(4세대+14)은 재구조화의 phase 2로, 그 마지막 층을 걷어 냈다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 세 정책이 힙에 조립하는 벡터 대신 프로그램 이미지의 정적 테이블이 됐다</span></p></div>
 <ul>
-<li><p><strong><code>Rule</code> trait과 <code>Vec&lt;Box&lt;dyn Rule&gt;&gt;</code>이 코드에서 사라졌다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/mod.rs</code></a>. <code>Rule</code> trait 정의(name·evaluate 두 메서드)와 <code>Box&lt;dyn Rule&gt;</code> 컬렉션을 순회하며 verdict를 만들던 <code>evaluate_rules</code> 함수, 그리고 관련 unit test 5개가 통째로 제거됐다(mod.rs에서 −155줄).</p>
+<li><p>규칙 trait과 힙에 쌓던 규칙 벡터가 코드에서 사라졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/mod.rs</code></a>.</p>
+<ul>
+<li>사라진 것은 <code>Rule</code> trait과 <code>Vec&lt;Box&lt;dyn Rule&gt;&gt;</code>이다.</li>
+<li>함께 제거된 것은 아래 셋이고, mod.rs에서 −155줄이다.<ul>
+<li><code>Rule</code> trait 정의(name·evaluate 두 메서드)</li>
+<li><code>Box&lt;dyn Rule&gt;</code> 컬렉션을 순회하며 verdict를 만들던 <code>evaluate_rules</code> 함수</li>
+<li>관련 unit test 5개</li>
+</ul>
 </li>
-<li><p><strong>정책이 <code>&amp;&#39;static [&amp;&#39;static [RuleSpec]]</code> 형태로 프로그램 이미지의 rodata 섹션에 실린다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/registry.rs</code></a>.</p>
+</ul>
+</li>
+<li><p>세 정책은 이제 프로그램 이미지의 rodata 섹션에 정적 테이블로 실린다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/registry.rs</code></a>.</p>
+<ul>
+<li>테이블 형태는 <code>&amp;&#39;static [&amp;&#39;static [RuleSpec]]</code>이다.</li>
+<li>세 정책(<code>FILTER_ALL_POLICY</code>·<code>TIMELINE_HOME_POLICY</code>·<code>TIMELINE_HOME_RECOMMENDATIONS_POLICY</code>)이 모두 <code>static</code>이다.</li>
+<li><code>RuleEngine::new()</code>는 이제 힙 할당을 하지 않고, <code>NsfwGatingCountries</code> 참조만 감싼다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(super) struct Policy {
     rules: &amp;&#39;static [&amp;&#39;static [RuleSpec]],
@@ -278,11 +419,26 @@ static TIMELINE_HOME_RECOMMENDATIONS_POLICY: Policy = Policy {
 };
 </code></pre></figure>
 </blockquote>
-<p>세 정책(<code>FILTER_ALL_POLICY</code>·<code>TIMELINE_HOME_POLICY</code>·<code>TIMELINE_HOME_RECOMMENDATIONS_POLICY</code>)이 모두 <code>static</code>이다. <code>RuleEngine::new()</code>는 이제 힙 할당을 하지 않는다 — <code>NsfwGatingCountries</code> 참조만 감싼다.</p>
 </li>
-<li><p><strong><code>Policies</code> → <code>RuleEngine</code>으로 개명됐다</strong> <span class="badge ok">확인</span>. 이유는 이 struct가 더 이상 규칙 벡터를 소유하지 않기 때문이다 — 이름이 상태(collection)를 더 이상 반영하지 않는다. 새 이름은 dispatch 층임을 명시한다.</p>
+<li><p><code>Policies</code>의 이름이 <code>RuleEngine</code>으로 바뀌었다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li>이유는 이 struct가 더 이상 규칙 벡터를 소유하지 않기 때문이다. 옛 이름은 더 이상 상태(collection)를 반영하지 않는다.</li>
+<li>새 이름은 dispatch 층임을 명시한다.</li>
+</ul>
 </li>
-<li><p><strong><code>Policy::evaluate</code>가 rule iterator에서 순차 평가한다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/registry.rs</code></a>.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 규칙을 평가하는 순서와 판정 방식은 그대로다</span></p></div>
+<ul>
+<li><p>정책은 규칙을 앞에서부터 차례로 평가한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/registry.rs</code></a>.</p>
+<ul>
+<li>평가 함수는 <code>Policy::evaluate</code>이고, rule iterator를 순서대로 돈다.</li>
+<li>시맨틱은 그대로다.<ul>
+<li><code>Drop</code>은 즉시 short-circuit한다.</li>
+<li><code>Interstitial</code>이 먼저 나와도, 이후 rule이 <code>Drop</code>을 반환하면 <code>Drop</code>이 이긴다.</li>
+<li><code>Allow</code>가 마지막까지 유지되면 <code>decided_by = None</code>이다.</li>
+</ul>
+</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(super) fn evaluate(&amp;self, context: &amp;RuleContext&lt;&#39;_&gt;) -&gt; Verdict {
     let mut action = VfAction::Allow;
@@ -306,25 +462,67 @@ static TIMELINE_HOME_RECOMMENDATIONS_POLICY: Policy = Policy {
 }
 </code></pre></figure>
 </blockquote>
-<p>시맨틱은 그대로다: <code>Drop</code>은 즉시 short-circuit, <code>Interstitial</code>은 이후 rule이 <code>Drop</code>을 반환하면 그것이 이긴다. <code>Allow</code>가 마지막까지 유지되면 <code>decided_by = None</code>.</p>
-</li>
-<li><p><strong>새 테스트가 15개 rule slice 이름의 유일성을 검증한다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs</code></a>. <code>wired_rule_names_are_unique_and_nonempty</code>가 tweet 축 슬라이스 11개와 author 축 슬라이스 4개(총 15개 slice) 안의 모든 규칙 이름이 non-empty이고 중복이 없음을 보장한다. 규칙 이름이 감사·메트릭·golden corpus에서 리터럴로 참조되기 때문에 이 어설션이 중요하다.</p>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> 4세대+13 서브섹션 뒤에 4세대+14의 VF-refactor 파트를 짧게 이어붙인다(4세대+13이 이미 재구조화 phase 1을 자세히 설명하므로 phase 2는 델타만).</p></div>
-<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
 <ul>
-<li><strong>런타임 힙에서 rodata로.</strong> 규칙 그래프 전체가 이제 프로그램 시작 시점에 아무 alloc 없이 dispatch 가능하다. VF 서버가 fork 후 즉시 evaluate 가능하고, 규칙 목록이 프로그램 이미지의 <code>readelf</code>에서 그대로 관찰 가능한 데이터로 남는다.</li>
-<li><strong>정책 시맨틱은 여전히 그대로.</strong> 홈 공통 9 slice + 추천 전용 5 slice의 구성은 4세대+13과 동일. 규칙 개수도 그대로. 다만 <code>RuleEngine::rule_counts()</code>가 벡터 길이를 세는 대신 static <code>Policy::len()</code>을 부른다.</li>
-<li><strong><code>Policies</code> → <code>RuleEngine</code> 개명이 신호하는 것.</strong> 4세대+11부터 4세대+14까지 네 커밋에 걸쳐 진행된 이 리팩터의 지향점이 명확해졌다: 규칙을 코드에서 데이터로 옮기고, 정책을 힙에서 rodata로 옮기고, 이름을 dispatch 관점으로 정리한다. 다음 단계는 규칙 리터럴을 config 파일(TOML/JSON)에서 로드하는 것 — 그렇게 되면 규칙 변경이 코드 배포 없이 가능해진다. <span class="badge est">추정</span> 다만 rust 정적 dispatch의 이점(inlining, jump table)을 포기하는 방향이라 실제로 이 방향으로 갈지는 앞으로 커밋을 봐야 안다.</li>
+<li>15개 rule slice 이름의 유일성을 검증하는 테스트가 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs</code></a>.<ul>
+<li><code>wired_rule_names_are_unique_and_nonempty</code>는 tweet 축 슬라이스 11개와 author 축 슬라이스 4개, 모두 15개 slice 안의 규칙 이름이 non-empty이고 중복이 없음을 보장한다.</li>
+<li>규칙 이름이 감사·메트릭·golden corpus에서 리터럴로 참조되기 때문에 이 어설션이 중요하다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 4세대+13 소절 뒤에 4세대+14의 VF 리팩터 부분을 짧게 이어 붙인다. 4세대+13 소절이 재구조화 phase 1을 이미 자세히 설명하므로, phase 2는 바뀐 부분만 적는다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 정책이 런타임 힙에서 rodata로 옮겨졌고, 판정 시맨틱은 그대로다.</p></div>
+<ul>
+<li>규칙 그래프 전체를 이제 프로그램 시작 시점에 아무 alloc 없이 dispatch할 수 있다. VF 서버는 fork 후 즉시 evaluate할 수 있고, 규칙 목록은 프로그램 이미지에서 <code>readelf</code>로 그대로 관찰할 수 있는 데이터로 남는다.</li>
+<li>홈 공통 9 slice와 추천 전용 5 slice의 구성은 4세대+13과 같고, 규칙 개수도 그대로다. 다만 <code>RuleEngine::rule_counts()</code>는 벡터 길이를 세는 대신 static <code>Policy::len()</code>을 부른다.</li>
+<li><code>Policies</code> → <code>RuleEngine</code> 개명으로, 4세대+11부터 4세대+14까지 네 커밋에 걸쳐 진행된 이 리팩터의 지향점이 분명해졌다.<ul>
+<li>규칙을 코드에서 데이터로 옮긴다.</li>
+<li>정책을 힙에서 rodata로 옮긴다.</li>
+<li>이름을 dispatch 관점으로 정리한다.</li>
+</ul>
+</li>
+<li>다음 단계는 규칙 리터럴을 config 파일(TOML/JSON)에서 로드하는 것이고, 그렇게 되면 코드 배포 없이 규칙을 바꿀 수 있다 <span class="badge est">추정</span>. 다만 이는 rust 정적 dispatch의 이점(inlining, jump table)을 포기하는 방향이라, 실제로 이 방향으로 갈지는 앞으로의 커밋을 봐야 안다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="4-체크포인트-암호화-진화--in-envelope-파생-마스터-키-지원--context-강제-필드--mint_nonce-자동-첨부--x-4세대14"><span class="num">4</span>체크포인트 암호화 진화 — in-envelope 파생 마스터 키 지원 + context 강제 필드 + mint_nonce 자동 첨부 — X 4세대+14</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02. 5개 파일 수정 (총 +305/−88).</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 4세대+13(2026-09-01)에서 xrex 학습 코드에 envelope-encrypted Orbax checkpoint writer가 신설됐다 — KMS로 감싼 DEK(Data Encryption Key)를 사이드카 파일(<code>_DEK</code>)에 저장하고 그 DEK로 checkpoint 파일들을 대칭 암호화하는 표준 envelope 패턴이었다. 이번 4세대+14가 (a) 그 사이드카 파일이 없어도 checkpoint 파일 자체의 envelope 헤더에서 마스터 키를 뽑아 복호화할 수 있게 하고, (b) 저장 시점에 encryption_context에 필수 필드를 강제하고 mint nonce를 자동으로 붙인다. 즉 파일 포맷·키 관리·context 스키마를 모두 하나씩 정돈한다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h2 id="4-학습-체크포인트를-사이드카-키-파일-없이-파일-헤더에서-키를-꺼내-복호화할-수-있게-됐다--x"><span class="num">4</span>학습 체크포인트를 사이드카 키 파일 없이 파일 헤더에서 키를 꺼내 복호화할 수 있게 됐다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02. 5개 파일을 고쳤다(총 +305/−88). 이 노트들이 붙인 번호로는 4세대+14다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 2026-09-01 커밋(4세대+13)은 xrex 학습 코드에 envelope 방식으로 암호화하는 Orbax checkpoint writer를 새로 넣었다. KMS로 감싼 DEK(Data Encryption Key)를 <code>_DEK</code> 사이드카 파일에 저장하고, 그 DEK로 checkpoint 파일들을 대칭 암호화하는 표준 envelope 패턴이었다. 이번 커밋(4세대+14)은 사이드카 파일이 없어도 checkpoint 파일 자체의 envelope 헤더에서 마스터 키를 뽑아 복호화할 수 있게 한다. 또 저장 시점에 encryption_context에 필수 필드를 강제하고, mint nonce를 자동으로 붙인다. 즉 파일 포맷·키 관리·context 스키마를 모두 하나씩 정돈한다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 사이드카 키 파일이 없으면 파일 헤더에서 키를 풀어 체크포인트를 읽는다</span></p></div>
 <ul>
-<li><p><strong>checkpoint 파일 envelope 헤더 포맷이 4096 바이트, magic <code>XAIENC01</code>, wrapped_len/context_len으로 구성된다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py</code></a>.</p>
+<li><p>DEK를 읽는 함수는 사이드카 파일이 있으면 그것을 쓰고, 없으면 envelope 헤더에서 키를 푼다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li>함수 이름은 <code>adopt_tree_dek</code>다.</li>
+<li>2026-09-01 커밋(4세대+13)에서 만든 <code>_DEK</code> 사이드카 방식 checkpoint와, 앞으로 만들 in-envelope 파생 방식 checkpoint를 모두 같은 함수로 읽는다.</li>
+<li>마이그레이션 경로가 backward-compatible이다.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def adopt_tree_dek(path: pathlib.Path, kms_client) -&gt; bytes:
+    ...
+    if dek_path.exists():
+        entry = _read_wrapped_dek(dek_path) or {}
+        raw = bytes(xai_kms.nfs.unwrap_shared_dek(kms_client, dek_path))
+        key_id = entry.get(&quot;key_id&quot;)
+    else:
+        raw = _unwrap_header_master(kms_client, path)
+        key_id = &quot;header&quot;
+    rank_logger.info(&quot;KMS unwrap OK for %s (key_id=%s)&quot;, path, key_id)
+    return raw
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>checkpoint 파일의 envelope 헤더는 4096바이트이고, magic <code>XAIENC01</code>과 wrapped_len/context_len 필드로 구성된다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py</code></a>.</p>
+<ul>
+<li>헤더 구조는 이렇다.<ul>
+<li>처음 8바이트는 magic <code>XAIENC01</code>이다.</li>
+<li>28~32 바이트 offset에 wrapped 필드 길이(big-endian u32)가 있다.</li>
+<li>32~36 바이트 offset에 context 길이(u32)가 있다.</li>
+<li>이어서 4096바이트 안에 wrapped 필드와 context JSON이 들어간다.</li>
+</ul>
+</li>
+<li>wrapped 필드가 <code>xai-dek1:&lt;salt&gt;:&lt;master&gt;</code> 형식이면 &quot;derived&quot; 방식으로 취급하고, 그렇지 않으면 legacy per-file 감싸기로 판정해 예외를 던진다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">_ENVELOPE_HEADER_SIZE = 4096
 _ENVELOPE_FIXED_LEN = 36
@@ -349,9 +547,13 @@ def _header_wrapped_master(path: pathlib.Path) -&gt; tuple[str, dict]:
     ...
 </code></pre></figure>
 </blockquote>
-<p>헤더 구조: 처음 8바이트 magic <code>XAIENC01</code>, 28<del>32 바이트 offset에 wrapped 필드 길이(big-endian u32), 32</del>36 바이트 offset에 context 길이(u32), 이어서 4096바이트 안에 wrapped 필드와 context JSON이 들어간다. wrapped 필드가 <code>xai-dek1:&lt;salt&gt;:&lt;master&gt;</code> 형식이면 &quot;derived&quot; 방식으로 취급하고, 그렇지 않으면 legacy per-file 감싸기로 판정해 예외를 던진다.</p>
 </li>
-<li><p><strong>읽기 경로가 <code>xai_encrypted</code> tensorstore 드라이버를 직접 쓰는 방식으로 바뀌었다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py</code></a>. 이전(4세대+13)에는 KMS-proxy KvStore(<code>xai_kms.KvServe</code>)가 매 IO마다 KMS를 호출했지만, 이제는 DEK를 한 번 unwrap한 뒤 <code>xai_encrypted</code> 드라이버가 대칭 복호화를 직접 수행한다.</p>
+<li><p>읽기 경로가 tensorstore 드라이버 <code>xai_encrypted</code>를 직접 쓰는 방식으로 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py</code></a>.</p>
+<ul>
+<li>이전(2026-09-01 커밋, 4세대+13)에는 KMS-proxy KvStore(<code>xai_kms.KvServe</code>)가 매 IO마다 KMS를 호출했다. 이제는 DEK를 한 번 unwrap한 뒤 <code>xai_encrypted</code> 드라이버가 대칭 복호화를 직접 수행한다.</li>
+<li>이 방식은 KMS 왕복 지연을 IO 경로에서 걷어 낸다. DEK는 한 번만 unwrap하고, 이후에는 로컬에서 대칭 복호화한다.</li>
+<li>Prev/next 파일 포맷을 모두 지원한다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">raw = adopt_tree_dek(path, kms_client)
 kvstore_base = {
@@ -363,26 +565,17 @@ metadata_json = json.loads(_read_encrypted_file(path, &quot;_METADATA&quot;, kvs
 return kvstore_base, metadata_json, _names_from_tree_metadata(metadata_json), ts_context
 </code></pre></figure>
 </blockquote>
-<p>이는 KMS 왕복 지연을 IO 경로에서 걷어낸다 — DEK 한 번 unwrap, 이후 로컬 대칭 복호화. Prev/next 파일 포맷을 모두 지원한다.</p>
 </li>
-<li><p><strong><code>adopt_tree_dek</code>가 사이드카가 있으면 그것을, 없으면 envelope 헤더에서 unwrap한다</strong> <span class="badge ok">확인</span>.</p>
-<blockquote>
-<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def adopt_tree_dek(path: pathlib.Path, kms_client) -&gt; bytes:
-    ...
-    if dek_path.exists():
-        entry = _read_wrapped_dek(dek_path) or {}
-        raw = bytes(xai_kms.nfs.unwrap_shared_dek(kms_client, dek_path))
-        key_id = entry.get(&quot;key_id&quot;)
-    else:
-        raw = _unwrap_header_master(kms_client, path)
-        key_id = &quot;header&quot;
-    rank_logger.info(&quot;KMS unwrap OK for %s (key_id=%s)&quot;, path, key_id)
-    return raw
-</code></pre></figure>
-</blockquote>
-<p>즉 4세대+13에서 만든 checkpoint(<code>_DEK</code> 사이드카 방식)와 앞으로 만들 checkpoint(in-envelope 파생 방식) 모두 같은 함수로 읽힌다. 마이그레이션 경로가 backward-compatible이다.</p>
-</li>
-<li><p><strong>저장 시점에 encryption_context가 <code>domain</code>과 <code>run</code> 두 키를 필수로 요구한다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/train/checkpoint_write.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/checkpoint_write.py</code></a>.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 암호화 저장은 필수 context 키를 요구하고, 경로 해시를 nonce로 자동으로 넣는다</span></p></div>
+<ul>
+<li><p>저장 시점에 encryption_context가 두 키를 필수로 요구한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/train/checkpoint_write.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/checkpoint_write.py</code></a>.</p>
+<ul>
+<li>두 키는 <code>domain</code>과 <code>run</code>이다.</li>
+<li>이름으로 보아 <code>domain</code>은 이 checkpoint가 속하는 시스템 도메인(예: &quot;recsys&quot;, &quot;grox&quot;)이고, <code>run</code>은 학습 run id다.</li>
+<li>이 두 값이 KMS 호출의 encryption_context로 실려, 감사 로그에 &quot;어떤 domain의 어떤 run이 어떤 checkpoint를 언제 unwrap했는가&quot;가 남는다.</li>
+<li>즉 KMS 감사 흐름이 이 코드에서 강제된다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">missing_context = {&quot;domain&quot;, &quot;run&quot;} - self.checkpoint_config.encryption_context.keys()
 if missing_context:
@@ -391,9 +584,13 @@ if missing_context:
     )
 </code></pre></figure>
 </blockquote>
-<p>두 키의 이름이 시사하는 것: <code>domain</code>은 이 checkpoint가 속하는 시스템 도메인(예: &quot;recsys&quot;, &quot;grox&quot;), <code>run</code>은 학습 run id. 이 두 값이 KMS 호출의 encryption_context로 실려서 감사 로그가 &quot;어떤 domain의 어떤 run이 어떤 checkpoint를 언제 unwrap했는가&quot;를 남긴다. 즉 KMS 감사 흐름이 이 코드에서 강제된다.</p>
 </li>
-<li><p><strong><code>mint_nonce</code>가 자동으로 encryption_context에 추가된다</strong> <span class="badge ok">확인</span>.</p>
+<li><p>저장할 때 <code>mint_nonce</code>가 encryption_context에 자동으로 추가된다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li>값은 체크포인트 경로의 sha256 해시이고, <code>encryption_context</code>의 <code>mint_nonce</code> 값으로 자동 삽입된다. 식으로 쓰면 <code>mint_nonce = sha256(path)</code>다.</li>
+<li>이는 KMS가 unwrap 시점에 context 매칭을 검사하는 표준 AWS-KMS 패턴을 이용해, 같은 KMS 키로 다른 체크포인트를 unwrap하려는 시도를 실패시킨다.</li>
+<li>예컨대 공격자가 체크포인트 파일을 다른 경로로 복사하고 unwrap을 시도하면, mint_nonce가 어긋나 KMS가 거부한다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">encryption_context = dict(self.checkpoint_config.encryption_context)
 encryption_context[&quot;mint_nonce&quot;] = hashlib.sha256(os.fsencode(path)).hexdigest()
@@ -403,33 +600,54 @@ kms_client = xai_kms.KmsClient.from_cluster_env(
 )
 </code></pre></figure>
 </blockquote>
-<p>체크포인트 경로의 sha256 해시가 encryption_context의 <code>mint_nonce</code> 값으로 자동 삽입된다. 이는 KMS가 unwrap 시점에 context 매칭을 검사하는 표준 AWS-KMS 패턴을 이용해 <strong>같은 KMS 키로 다른 체크포인트를 unwrap하려는 시도를 실패시킨다</strong>. 예컨대 공격자가 체크포인트 파일을 다른 경로로 복사하고 unwrap을 시도하면 mint_nonce가 어긋나서 KMS가 거부한다.</p>
 </li>
-<li><p><strong><code>_uses_tensorstore_save</code>가 더 이상 encrypt를 강제하지 않는다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer.py</code></a>.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
+<ul>
+<li><p>암호화 옵션과 tensorstore 저장 방식이 분리됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer.py</code></a>.</p>
+<ul>
+<li><code>_uses_tensorstore_save</code>가 더 이상 encrypt를 강제하지 않는다.</li>
+<li>이전에는 <code>encrypt=True</code>가 tensorstore save 방식을 자동으로 켰다.</li>
+<li>이제는 <code>checkpoint_write.save_checkpoint</code>가 <code>kms_client</code>를 인자로 받아 자체적으로 <code>orbax_encrypted.get_encrypted_checkpointer</code>를 조립한다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def _uses_tensorstore_save(self) -&gt; bool:
     return self.checkpoint_config.save_method == &quot;tensorstore&quot;
 </code></pre></figure>
 </blockquote>
-<p>이전에는 <code>encrypt=True</code>가 tensorstore save 방식을 자동으로 켰지만, 이제 두 옵션이 분리됐다. <code>checkpoint_write.save_checkpoint</code>가 <code>kms_client</code>를 인자로 받아 자체적으로 <code>orbax_encrypted.get_encrypted_checkpointer</code>를 조립한다.</p>
 </li>
-<li><p><strong>downgrade 방지 메시지가 구체화됐다</strong> <span class="badge ok">확인</span>. &quot;restored from an ENCRYPTED checkpoint but orbax writer cannot produce encrypted saves&quot; → &quot;restored from an ENCRYPTED checkpoint but checkpoint_config.encrypt is false — refusing to downgrade to plaintext saves; set checkpoint_config.encrypt=true with encryption_key_id/encryption_context&quot;. 오류 메시지가 &quot;왜 실패했고 무엇을 하면 되는가&quot;를 명시한다.</p>
+<li><p>평문 저장으로 내려가는 것(downgrade)을 막는 오류 메시지가 구체적으로 바뀌었다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li>이전 메시지는 &quot;restored from an ENCRYPTED checkpoint but orbax writer cannot produce encrypted saves&quot;였다.</li>
+<li>새 메시지는 &quot;restored from an ENCRYPTED checkpoint but checkpoint_config.encrypt is false — refusing to downgrade to plaintext saves; set checkpoint_config.encrypt=true with encryption_key_id/encryption_context&quot;다.</li>
+<li>새 메시지는 &quot;왜 실패했고 무엇을 하면 되는가&quot;를 명시한다.</li>
+</ul>
 </li>
-<li><p><strong><code>_AsyncCheckpointer</code>가 orbax_encrypted 모듈의 wait_until_finished까지 대기하도록 확장됐다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/utils/checkpointing.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/checkpointing.py</code></a>. checkpoint save의 flush 완료 시점에 암호화 IO도 다 끝난 것을 보장한다.</p>
+<li><p><code>_AsyncCheckpointer</code>가 orbax_encrypted 모듈의 wait_until_finished까지 기다리도록 확장됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/utils/checkpointing.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/checkpointing.py</code></a>.</p>
+<ul>
+<li>checkpoint save의 flush가 끝나는 시점에 암호화 IO도 모두 끝났음을 보장한다.</li>
+</ul>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> 4세대+13 subsection의 &quot;envelope-encrypted Orbax checkpoint writer&quot; 블록 뒤에 4세대+14의 evolution 델타를 이어붙인다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span></p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 4세대+13 소절에 있는 &quot;envelope-encrypted Orbax checkpoint writer&quot; 블록 뒤에, 4세대+14에서 바뀐 부분을 이어 붙인다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 암호화 checkpoint의 읽기·쓰기 경로는 갖춰졌지만, 프로덕션 기본값으로 켜졌다는 증거는 아직 없다.</p></div>
 <ul>
-<li><strong>아직 프로덕션 default에서 켜졌다는 증거는 없다.</strong> 이번 커밋은 write path의 검증(<code>domain</code>/<code>run</code> 강제, <code>mint_nonce</code> 자동 삽입)과 read path의 두 포맷 지원을 완성한다. 그러나 <code>CheckpointConfig.encrypt = True</code>가 실제 트레이닝 config에서 default로 켜졌는지는 이 diff에 없다. 이는 여전히 관전 포인트다.</li>
-<li><strong>파일 포맷이 문서화됐다.</strong> 4096바이트 헤더, <code>XAIENC01</code> magic, wrapped_len/context_len 오프셋이 코드에 남았기 때문에 미래의 외부 도구(체크포인트 뷰어, 감사 툴)가 이 포맷을 파싱할 수 있다.</li>
-<li><strong><code>xai-dek1:</code> prefix가 signals a key derivation scheme.</strong> &quot;derived master&quot; 표현이 시사하는 것은 salt로부터 파생된 마스터 키를 헤더에 담고, 감쌈은 wrapped 필드에 담는 KDF-based 방식이다. legacy per-file wrapped key(각 파일마다 KMS-wrapped DEK를 별도 저장)와 대비된다. <span class="badge est">추정</span> X.AI가 만든 자체 KDF 스펙(&quot;xai-dek1&quot;)의 세부는 코드에 없다 — 아마 <code>xai_kms.nfs</code> 모듈에 있다.</li>
-<li><strong>KMS-proxy KvStore 소거의 성능적 의미.</strong> 이전에는 매 IO(ocdbt operation 하나)가 KMS 호출을 필요로 했지만 이제는 DEK 한 번 unwrap 후 로컬 대칭 복호화. checkpoint restore 지연이 tokens/s 규모로 떨어진다. Phoenix가 3만 개 파일로 구성된 체크포인트를 로드할 때 KMS 호출 3만 번이 1번으로 준다.</li>
+<li>이번 커밋은 write path의 검증(<code>domain</code>/<code>run</code> 강제와 <code>mint_nonce</code> 자동 삽입)과 read path의 두 포맷 지원을 완성한다. 그러나 <code>CheckpointConfig.encrypt = True</code>가 실제 트레이닝 config에서 기본값으로 켜졌는지는 이 diff에 없다. 이는 여전히 관전 포인트다.</li>
+<li>파일 포맷이 문서화됐다. 4096바이트 헤더, <code>XAIENC01</code> magic, wrapped_len/context_len 오프셋이 코드에 남았기 때문에, 미래의 외부 도구(체크포인트 뷰어, 감사 툴)가 이 포맷을 파싱할 수 있다.</li>
+<li><code>xai-dek1:</code> prefix는 키 파생 방식(key derivation scheme)을 나타낸다 <span class="badge est">추정</span>. &quot;derived master&quot;라는 표현은 salt로부터 파생된 마스터 키를 헤더에 담고, 감쌈은 wrapped 필드에 담는 KDF 기반 방식을 시사한다 <span class="badge est">추정</span>. 이는 legacy per-file wrapped key(각 파일마다 KMS-wrapped DEK를 별도 저장)와 대비된다 <span class="badge est">추정</span>. X.AI가 만든 자체 KDF 스펙(&quot;xai-dek1&quot;)의 세부는 코드에 없다. 아마 <code>xai_kms.nfs</code> 모듈에 있다 <span class="badge est">추정</span>.</li>
+<li>KMS-proxy KvStore를 걷어 낸 것은 성능 면에서 의미가 있다. 이전에는 매 IO(ocdbt operation 하나)가 KMS 호출을 필요로 했지만, 이제는 DEK를 한 번 unwrap한 뒤 로컬에서 대칭 복호화한다. checkpoint restore 지연이 tokens/s 규모로 떨어진다. Phoenix가 3만 개 파일로 구성된 체크포인트를 로드할 때 KMS 호출 3만 번이 1번으로 준다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="5-two-tower-학습-config-qk_normtrue-attn_logit_cap-해제--x-4세대14"><span class="num">5</span>two-tower 학습 config: qk_norm=True, attn_logit_cap 해제 — X 4세대+14</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a>.</p></div>
+<h2 id="5-two-tower-학습의-기본-설정이-logit-상한-대신-qk-norm을-쓰게-됐다--x"><span class="num">5</span>two-tower 학습의 기본 설정이 logit 상한 대신 QK-norm을 쓰게 됐다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02. 이 노트들이 붙인 번호로는 4세대+14다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> two-tower는 유저와 아이템을 각각 다른 인코더(타워)로 임베딩해 그 유사도로 후보를 찾는 retrieval 모델 구조다. 4세대+5(2026-08-21, <a href="https://github.com/xai-org/x-algorithm/commit/d0cef2f" target="_blank" rel="noopener">d0cef2f</a>)에서 xrecsys_two_tower에 <code>qk_norm=True</code>·<code>attn_logit_cap=-1</code>·<code>right_anchored_rope=True</code> 세 옵션이 처음 도입됐다. 다만 그때는 옵션 정의만 추가됐고, 실제 조합 base config의 기본값은 <code>qk_norm=False</code>·<code>attn_logit_cap=80.0</code>이었다. 이번 커밋(4세대+14)은 그 기본값을 뒤집어, QK-norm을 실제로 조합 two-tower 학습의 기본으로 만들었다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 조합 two-tower의 기본 config가 QK-norm을 켜고 attention logit 상한을 껐다</span></p></div>
+<ul>
+<li><p>조합 two-tower의 base config에서 attention 관련 기본값 두 개가 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a>.</p>
+<ul>
+<li><code>qk_norm: False → True</code>: attention의 query·key 벡터에 정규화(L2)를 추가한다. QK-norm은 트랜스포머 학습 안정화의 표준 기법 중 하나다.</li>
+<li><code>attn_logit_cap: 80.0 → -1</code>: attention softmax 이전에 로짓 값을 clip하던 상한(80)이 -1(=off)로 바뀌었다. QK-norm이 켜지면 QK 내적이 이미 bounded되므로 별도 로짓 상한이 불필요해진다.</li>
+</ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def _xrecsys_two_tower_combined_base() -&gt; dict:
     return {
@@ -443,24 +661,33 @@ kms_client = xai_kms.KmsClient.from_cluster_env(
     }
 </code></pre></figure>
 </blockquote>
-<ul>
-<li><strong><code>qk_norm: False → True</code></strong> — attention의 query·key 벡터에 대해 정규화(L2)를 추가한다. QK-norm은 트랜스포머 학습 안정화의 표준 기법 중 하나다.</li>
-<li><strong><code>attn_logit_cap: 80.0 → -1</code></strong> — attention softmax 이전에 로짓 값을 clip하던 상한(80)이 -1(=off)로 바뀌었다. QK-norm이 켜지면 QK 내적이 이미 bounded되므로 별도 로짓 상한이 불필요해진다.</li>
+</li>
 </ul>
-<div class="blk ctx"><p><span class="lbl">배경</span> 4세대+5(2026-08-21, <a href="https://github.com/xai-org/x-algorithm/commit/d0cef2f" target="_blank" rel="noopener">d0cef2f</a>)에서 처음 <code>qk_norm=True</code>·<code>attn_logit_cap=-1</code>·<code>right_anchored_rope=True</code> 세 옵션이 xrecsys_two_tower에 도입됐다. 다만 그때는 <strong>옵션 정의만</strong> 추가됐고 실제 조합 base config에서는 <code>qk_norm=False</code>·<code>attn_logit_cap=80.0</code>이 default였다. 이번 4세대+14가 그 default를 뒤집는다 — QK-norm이 실제로 조합 두-타워 학습의 기본이 됐다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> 4세대+14 서브섹션에 이 hyperparameter flip을 짧게 기록.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> two-tower retrieval의 학습 안정화 방식이 (a) logit clamp에서 (b) QK-norm으로 옮겨졌다. 두 기법은 등가는 아니지만 유사한 목적(soft attention의 dynamic range 제어)에 쓰인다. 4세대+5의 옵션 도입에서 4세대+14의 default flip까지 12일이 걸린 것은 아마 짧은 A/B에서 QK-norm 쪽이 학습 loss나 다운스트림 metric 상 우세를 보였기 때문일 것이다 <span class="badge est">추정</span>.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 4세대+14 소절에 이 하이퍼파라미터 변경을 짧게 기록했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> two-tower retrieval의 학습 안정화 방식이 logit clamp에서 QK-norm으로 옮겨졌다. 두 기법은 같지는 않지만 비슷한 목적(soft attention의 dynamic range 제어)에 쓰인다. 4세대+5(2026-08-21)의 옵션 도입에서 이번 4세대+14의 기본값 전환까지 12일이 걸린 것은, 아마 짧은 A/B에서 QK-norm 쪽이 학습 loss나 다운스트림 metric에서 우세를 보였기 때문일 것이다 <span class="badge est">추정</span>.</p></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="6-arxiv-csir-triage--30건-파싱-통과-0건"><span class="num">6</span>arXiv cs.IR triage — 30건 파싱, 통과 0건</h2>
-<p><strong>triage 요약</strong>: arXiv cs.IR 신규 30건(파싱 성공, 조회 정상) 중 radar 수용 기준(플랫폼 기업 저자 또는 프로덕션 배포·A/B 진술 + 피드/랭킹 메커니즘의 신규성 + 대규모 스케일 결과)을 통과한 것은 0건이다.</p>
+<h2 id="6-신규-논문-30건-가운데-레이더-기준을-통과한-것은-0건이다--arxiv-csir"><span class="num">6</span>신규 논문 30건 가운데 레이더 기준을 통과한 것은 0건이다 — arXiv cs.IR</h2>
+<p>arXiv cs.IR 신규 30건(파싱 성공, 조회 정상) 가운데 radar 수용 기준을 통과한 것은 0건이다. 수용 기준은 플랫폼 기업 저자 또는 프로덕션 배포·A/B 진술, 피드/랭킹 메커니즘의 신규성, 대규모 스케일 결과다. 이날 Meta와 Netflix의 신규 자료는 없었다.</p>
 <ul>
-<li><strong><a href="https://arxiv.org/abs/2609.01240" target="_blank" rel="noopener">ReST</a></strong> (<a href="https://arxiv.org/abs/2609.01240" target="_blank" rel="noopener">From Language to Behavior: Scaling Sequence Transformers for Industrial Recommendation Ranking with Rec-Native Designs</a>) — 이번 triage 창에 잡혔지만 어제 2026-09-03 daily에서 이미 <a href="radar.html#rest-bytedance--tiktok-shop-ads--behavior-sequence-transformer-scaling%EC%9D%84-%EA%B4%91%EA%B3%A0-%EB%9E%AD%ED%82%B9%EC%97%90-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-%EB%B0%B0%ED%8F%AC">radar.md 이번 달 신규</a>에 등재. 중복 등록하지 않는다.</li>
-<li><strong><a href="https://arxiv.org/abs/2609.01807" target="_blank" rel="noopener">hLLM</a></strong> — &quot;Single Pass Decoding for Generative Reranking&quot; — Emil Laftchiev·Prachi Agrawal·Moe Kayali 외. LoRA fine-tuning + Hungarian algorithm으로 N개 순위를 O(1) forward pass에 뽑는 decoding scheme으로 28ms end-to-end에 도달했다고 주장. <strong>방법론 논문이고 프로덕션 배포 진술 없음</strong>. 저자 소속을 open-review author profile로 확인해야 하지만 초록만으로는 플랫폼 기업 시그니처가 없다. 생성형 rerank 방향의 흥미로운 decoding 최적화지만 radar 기준을 못 넘어 탈락. 향후 platform-company에서 이 방향의 프로덕션 진술이 나오면 재고 대상.</li>
-<li><strong><a href="https://arxiv.org/abs/2609.02..." target="_blank" rel="noopener">SPAR</a></strong> — Generative POI Recommendation, POI-limited로 원칙적 탈락(레이더 도메인 제한).</li>
-<li><strong><a href="https://arxiv.org/abs/2609.01571" target="_blank" rel="noopener">GenCAR</a></strong> — OOD recommendation, 학술 실험, 탈락.</li>
-<li>그 외 27건은 (a) benchmark/RAG 방법론(플랫폼 프로덕션 진술 없음), (b) 도메인 제한(POI·법률·의료·과학), (c) 저자 소속 학술 기관 위주로 확인 → 탈락.</li>
+<li><a href="https://arxiv.org/abs/2609.01240" target="_blank" rel="noopener">ReST</a> (<a href="https://arxiv.org/abs/2609.01240" target="_blank" rel="noopener">From Language to Behavior: Scaling Sequence Transformers for Industrial Recommendation Ranking with Rec-Native Designs</a>)는 이번 triage 창에 잡혔지만, 어제 2026-09-03 daily에서 이미 <a href="radar.html#rest-bytedance--tiktok-shop-ads--behavior-sequence-transformer-scaling%EC%9D%84-%EA%B4%91%EA%B3%A0-%EB%9E%AD%ED%82%B9%EC%97%90-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-%EB%B0%B0%ED%8F%AC">radar.md 이번 달 신규</a>에 올렸다. 중복 등록하지 않는다.</li>
+<li><a href="https://arxiv.org/abs/2609.01807" target="_blank" rel="noopener">hLLM</a>은 생성형 rerank 방향의 흥미로운 decoding 최적화지만, radar 기준을 넘지 못해 탈락했다.<ul>
+<li>제목은 &quot;Single Pass Decoding for Generative Reranking&quot;이고, 저자는 Emil Laftchiev·Prachi Agrawal·Moe Kayali 외다.</li>
+<li>LoRA fine-tuning과 Hungarian algorithm으로 N개 순위를 O(1) forward pass에 뽑는 decoding scheme이며, 28ms end-to-end에 도달했다고 주장한다.</li>
+<li>방법론 논문이고 프로덕션 배포 진술이 없다.</li>
+<li>저자 소속은 open-review author profile로 확인해야 하지만, 초록만으로는 플랫폼 기업 시그니처가 없다.</li>
+<li>앞으로 플랫폼 기업에서 이 방향의 프로덕션 진술이 나오면 다시 검토할 대상이다.</li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> 없음(radar 신규 등록 없음).</p></div>
+</li>
+<li><a href="https://arxiv.org/abs/2609.02..." target="_blank" rel="noopener">SPAR</a>는 Generative POI Recommendation 논문이다. POI에 한정된 연구라 원칙적으로 탈락했다(레이더 도메인 제한).</li>
+<li><a href="https://arxiv.org/abs/2609.01571" target="_blank" rel="noopener">GenCAR</a>도 탈락했다. OOD recommendation을 다룬 학술 실험이다.</li>
+<li>그 외 27건도 탈락했다. 확인한 사유는 세 갈래다.<ul>
+<li>benchmark/RAG 방법론(플랫폼 프로덕션 진술 없음)</li>
+<li>도메인 제한(POI·법률·의료·과학)</li>
+<li>저자 소속이 학술 기관 위주</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> 없다(radar 신규 등록 없음).</p></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
 <p>없음.</p>
@@ -470,12 +697,12 @@ kms_client = xai_kms.KmsClient.from_cluster_env(
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li><strong>backbone_scores의 downstream 소비처</strong> — 이번 커밋에서는 home-mixer가 candidate에 저장만 하고 소비하는 코드가 아직 열리지 않았다. 다음 커밋들에서 <code>MultiRiskAdsBlender</code>, <code>VMRanker</code>, DPP re-rank, side-effect 로거 중 어느 것이 backbone_scores를 소비하는지 관찰하면 backbone/head 두 층 아키텍처의 실제 목적이 드러난다.</li>
-<li><strong>scarecrow 룰 중 어떤 봇이 <code>CreateXReviewReportProd</code>를 호출하는지</strong> — 함수 유닛이 신설됐지만 이를 호출하는 실제 scarecrow 룰 정의(<code>bystander_impersonation</code> 감지 로직 등)는 아직 리포에 없다. 다음 커밋들에서 룰 DSL이 열리면 어떤 봇이 어떤 조건에서 자동 리포트를 넣는지가 드러난다.</li>
-<li><strong><code>useng.common.xreview</code> 라이브러리의 다른 사용처</strong> — grox PtOS, home-mixer, phoenix 어느 쪽이 이 라이브러리를 통해 XReview에 리포트를 넣는지. 특히 grox의 adult content cross-validation 결과가 XReview lane으로 흘러들어가는지가 핵심.</li>
-<li><strong><code>CheckpointConfig.encrypt=True</code>가 프로덕션 config에 등장하는 시점</strong> — 4세대+13에서 wire, 4세대+14에서 write-path validation과 read-path 완비. 다음은 config default flip. 언제 트레이닝 config에서 켜지는지 관찰하면 X가 학습 checkpoint를 실제로 rest 암호화하기 시작한 시점이 확정된다.</li>
-<li><strong>XReview 서버의 lane tag 라우팅과 evidence rollup 로직</strong> — 이번 커밋이 클라이언트 측 스키마만 노출했다. <code>report_type</code> → lane tag 매핑, evidence rollup 알고리즘(같은 콘텐츠에 대한 N개 리포트 → 판정) 등은 XReview 서버 코드가 리포에 노출되어야 확정된다.</li>
-<li><strong><code>xai-dek1:</code> KDF 스펙</strong> — envelope 헤더에 담기는 파생 마스터 키의 salt→master 파생 알고리즘. <code>xai_kms.nfs</code> 모듈이 공개 리포에 나오면 확정된다.</li>
+<li>backbone 점수의 downstream 소비처를 본다 — 이번 커밋에서는 home-mixer가 candidate에 저장만 하고, 소비하는 코드는 아직 열리지 않았다. 다음 커밋들에서 <code>MultiRiskAdsBlender</code>, <code>VMRanker</code>, DPP re-rank, side-effect 로거 중 어느 것이 backbone_scores를 소비하는지 관찰하면 backbone/head 두 층 아키텍처의 실제 목적이 드러난다.</li>
+<li>어떤 scarecrow 봇이 <code>CreateXReviewReportProd</code>를 호출하는지 본다 — 함수 유닛은 새로 생겼지만, 이를 호출하는 실제 scarecrow 룰 정의(<code>bystander_impersonation</code> 감지 로직 등)는 아직 리포에 없다. 다음 커밋들에서 룰 DSL이 열리면 어떤 봇이 어떤 조건에서 자동 리포트를 넣는지가 드러난다.</li>
+<li><code>useng.common.xreview</code> 라이브러리의 다른 사용처를 본다 — grox PtOS, home-mixer, phoenix 중 어느 쪽이 이 라이브러리를 통해 XReview에 리포트를 넣는지 확인한다. 특히 grox의 adult content cross-validation 결과가 XReview lane으로 흘러 들어가는지가 핵심이다.</li>
+<li><code>CheckpointConfig.encrypt=True</code>가 프로덕션 config에 나타나는 시점을 본다 — 4세대+13(2026-09-01)에서 연결됐고, 이번 4세대+14에서 write-path 검증과 read-path가 갖춰졌다. 다음은 config 기본값 전환이다. 트레이닝 config에서 켜지는 시점을 보면, X가 학습 checkpoint를 실제로 저장 상태에서 암호화(rest 암호화)하기 시작한 시점이 확정된다.</li>
+<li>XReview 서버의 lane tag 라우팅과 evidence rollup 로직을 본다 — 이번 커밋은 클라이언트 측 스키마만 노출했다. <code>report_type</code> → lane tag 매핑, evidence rollup 알고리즘(같은 콘텐츠에 대한 N개 리포트 → 판정) 등은 XReview 서버 코드가 리포에 노출되어야 확정된다.</li>
+<li><code>xai-dek1:</code> KDF 스펙을 본다 — envelope 헤더에 담기는 파생 마스터 키의 salt→master 파생 알고리즘이다. <code>xai_kms.nfs</code> 모듈이 공개 리포에 나오면 확정된다.</li>
 </ul></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 

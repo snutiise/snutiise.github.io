@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-08-22 — feed-research</title>
-<meta name="description" content="한 줄: X가 4세대 이후 여섯 번째 후속 커밋(d0cef2f, 2026-08-20)을 공개했고, 여기에는 여섯 가지 변경이 담겼다. (1) AI trend feedback context hydrator(157줄 신규)를 추가해 For You에 &quot;AI trend&quot; 라벨을 붙이고,…">
+<meta name="description" content="한 줄: X For You 랭킹 단계가, Phoenix 랭킹 모델이 서빙 중에 계산한 재순위용 slate context를 그대로 받아 쓸 수 있게 됐다. 이 경로를 켜는 게이트의 기본값은 false다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-08-22.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-08-22 — feed-research">
-<meta property="og:description" content="한 줄: X가 4세대 이후 여섯 번째 후속 커밋(d0cef2f, 2026-08-20)을 공개했고, 여기에는 여섯 가지 변경이 담겼다. (1) AI trend feedback context hydrator(157줄 신규)를 추가해 For You에 &quot;AI trend&quot; 라벨을 붙이고,…">
+<meta property="og:description" content="한 줄: X For You 랭킹 단계가, Phoenix 랭킹 모델이 서빙 중에 계산한 재순위용 slate context를 그대로 받아 쓸 수 있게 됐다. 이 경로를 켜는 게이트의 기본값은 false다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-08-22.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,34 +42,78 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>토요일</li>
-<li><span class="meta-k">읽는 시간</span>38분</li>
+<li><span class="meta-k">읽는 시간</span>42분</li>
 </ul>
 <div class="doc-intro">
-<div class="lead"><span class="lb">한 줄 요약</span>X가 4세대 이후 여섯 번째 후속 커밋(<a href="https://github.com/xai-org/x-algorithm/commit/d0cef2f">d0cef2f</a>, 2026-08-20)을 공개했고, 여기에는 여섯 가지 변경이 담겼다. (1) <strong>AI trend feedback context hydrator</strong>(157줄 신규)를 추가해 For You에 &quot;AI trend&quot; 라벨을 붙이고, topic feedback과 나란한 두 번째 컨텍스트 채널을 열었다. top-2 trend id를 후보 빈도로 뽑은 다음 각 trend마다 후보 하나씩을 무작위로 지정하고, <code>https://x.com/i/trending/{trend_id}</code> 랜딩 URL과 함께 URT <code>ContextType::TOPIC</code>으로 렌더한다. (2) <strong><code>served_slate_context</code> 배선이 시작됐다.</strong> 4세대+4에서 proto에 신설된 <code>SlateContext</code>가 실제 파이프라인에서 소비되기 시작했고, PhoenixScorer가 예측 응답의 <code>candidate_slate_context()</code>를 뽑아 새 필드 <code>served_slate_context</code>에 세팅한다. <code>UseServedSlateContext</code> 게이트가 켜지면 RankingScorer는 로컬 계산이나 캐시 참조 대신, Phoenix가 서빙에서 산출한 slate context(pool_rank·fatigue·pre_diversity·SID 3계층·SID gap 3계층)를 그대로 사용한다. (3) <strong><code>emb_table.rs</code>를 리팩터했다</strong>(+189/−169). <code>load_tensor</code>를 Python-facing 얇은 wrapper와 core <code>load_tensor_into</code>(pyo3-free, <code>&amp;mut [u8]</code> 인터페이스, <code>Result&lt;(), String&gt;</code> 반환)로 분리해 core를 non-Python 컨텍스트에서도 재사용할 수 있게 만들었고, tokio runtime의 <code>unwrap()</code>을 <code>map_err</code>로 교체했으며, <code>checkpoint path too short</code> 방어를 추가했다. (4) <strong>Grok 4.6 internal dial이 0.1에서 0.3으로 올랐다.</strong> 하루 만에 3배로 올렸다(4세대+4의 shadow가 잘 돌고 있다는 정황이다). (5) <strong>grok_sampler에 <code>stop_predicate</code> callback을 추가해</strong> 스트리밍 응답을 조기에 종료할 수 있게 했다. <code>async with aclosing</code>으로 raw stream을 명시적으로 정리하고, <code>llm.sample.early_stop.count</code> 카운터로 관측한다. (6) <strong><code>profile_image</code> 필드를 배선했다.</strong> Grox <code>User</code> 데이터 로더에 <code>profile_image: Image | None</code> 필드를 추가하고, <code>AuthorMetadata.profileImageUrl</code>이 있을 때 <code>Image(url=...)</code>로 채운다. 커밋 규모는 14 파일 +479/−200으로 4세대+4의 1/7 정도지만, <strong>4세대+4에서 준비한 <code>SlateContext</code> proto가 실제 소비 배선으로 이어지는 첫 커밋</strong>이라 진행 방향을 확인해 주는 신호로서 의미가 있다. 별개로 arXiv에서 <strong>Xiaohongshu OneModel</strong>(v2, 프로덕션 A/B 3개 지면 배포)이 수용 기준을 통과해 레이더에 추가했다.</div>
+<ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일(services/x.md, radar.md)</li><li class="chip">레이더 <b>1</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X For You 랭킹 단계가, Phoenix 랭킹 모델이 서빙 중에 계산한 재순위용 slate context를 그대로 받아 쓸 수 있게 됐다. 이 경로를 켜는 게이트의 기본값은 false다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">12</span></summary><ol><li><a href="#1-phoenix가-산출한-slate-context를-home-mixer가-소비하기-시작--x-4세대5-d0cef2f--for-you"><span class="num">1</span>Phoenix가 산출한 slate context를 home-mixer가 소비하기 시작 — X (4세대+5, d0cef2f) — For You</a><ol><li><a href="#ai-trend-feedback-context-hydrator--157줄-신규">AI Trend Feedback Context Hydrator — 157줄 신규</a></li><li><a href="#served_slate_context--phoenix가-서빙에서-계산한-slate-context를-home-mixer가-소비">served_slate_context — Phoenix가 서빙에서 계산한 slate context를 home-mixer가 소비</a></li><li><a href="#emb_tablers-리팩터--python-wrapper와-pyo3-free-core-분리">emb_table.rs 리팩터 — Python wrapper와 pyo3-free core 분리</a></li><li><a href="#grok-46-internal-dial-01--03">Grok 4.6 internal dial 0.1 → 0.3</a></li><li><a href="#grok_sampler-stop_predicate--스트리밍-응답-조기-종료">grok_sampler stop_predicate — 스트리밍 응답 조기 종료</a></li><li><a href="#profile_image-필드-배선">profile_image 필드 배선</a></li><li><a href="#요약-표--이-커밋의-6개-방향">요약 표 — 이 커밋의 6개 방향</a></li></ol></li><li><a href="#2-xiaohongshu-onemodel--유기광고상점-3개-지면-통합-랭커-프로덕션-ab-레이더-승격"><span class="num">2</span>Xiaohongshu OneModel — 유기·광고·상점 3개 지면 통합 랭커, 프로덕션 A/B [레이더 승격]</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">12</span></summary><ol><li><a href="#1-for-you-랭킹에-phoenix-서빙의-slate-context를-받는-경로가-생겼다--x"><span class="num">1</span>For You 랭킹에 Phoenix 서빙의 slate context를 받는 경로가 생겼다 — X</a><ol><li><a href="#for-you-원본-포스트에-ai-trend-라벨을-붙이는-hydrator가-생겼다">For You 원본 포스트에 AI trend 라벨을 붙이는 hydrator가 생겼다</a></li><li><a href="#phoenix가-서빙에서-계산한-slate-context를-랭킹-단계가-받아-쓴다">Phoenix가 서빙에서 계산한 slate context를 랭킹 단계가 받아 쓴다</a></li><li><a href="#임베딩-테이블-로더의-핵심-로직을-python-바인딩에서-떼어-냈다">임베딩 테이블 로더의 핵심 로직을 Python 바인딩에서 떼어 냈다</a></li><li><a href="#두-심판-호출-위치에서-grok-46을-쓰는-비율이-01에서-03으로-올랐다">두 심판 호출 위치에서 Grok 4.6을 쓰는 비율이 0.1에서 0.3으로 올랐다</a></li><li><a href="#grok-스트리밍-응답을-조건이-맞으면-중간에-끊을-수-있게-됐다">Grok 스트리밍 응답을 조건이 맞으면 중간에 끊을 수 있게 됐다</a></li><li><a href="#grok-분류기가-작성자-프로필-이미지를-참조할-수-있게-됐다">Grok 분류기가 작성자 프로필 이미지를 참조할 수 있게 됐다</a></li><li><a href="#이-커밋4세대5-d0cef2f의-6개-방향-요약">이 커밋(4세대+5, d0cef2f)의 6개 방향 요약</a></li></ol></li><li><a href="#2-onemodel이-유기광고상점-3개-지면의-랭킹을-하나로-합쳤다--xiaohongshu"><span class="num">2</span>OneModel이 유기·광고·상점 3개 지면의 랭킹을 하나로 합쳤다 — Xiaohongshu</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-phoenix가-산출한-slate-context를-home-mixer가-소비하기-시작--x-4세대5-d0cef2f--for-you"><span class="num">1</span>Phoenix가 산출한 slate context를 home-mixer가 소비하기 시작 — X (4세대+5, d0cef2f) — For You</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/d0cef2f" target="_blank" rel="noopener">xai-org/x-algorithm @ d0cef2f — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-20 20:22 UTC, 공개 소스코드. 파일 14개, <strong>+479/−200</strong>. 4세대+4(2026-08-19, aad7179, 파일 79 +3.3k/−0.7k)에 비하면 1/7 정도 규모지만, <strong>4세대+4에서 proto와 config로 준비만 해 둔 두 스캐폴딩이 처음으로 실제 파이프라인 배선까지 이어진 커밋</strong>이다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 4세대 이후 X 저장소에는 매일 커밋하는 리듬으로 후속 공개가 이어져 왔다: 8/14 4세대+1(c65aa17) → 8/17 4세대+2(b089ce6) → 8/18 4세대+3(11a71f8) → 8/19 4세대+4(aad7179, 대형). 그 다음으로 8/20에 나온 이번 커밋은 4세대+4의 대형 확장 뒤에 이어진 만큼 규모는 작지만, 4세대+4가 준비한 두 스캐폴딩(Phoenix proto의 <code>SlateContext.sid*</code> 필드 신설, <code>RewardOutputs</code> 신설, <code>xrecsys_search</code> config)이 <strong>실제 서빙·랭킹 파이프라인 배선으로 넘어가는 시점</strong>이라는 점이 이 커밋의 성격이다. 4세대부터 4세대+4까지의 canon 반영은 &quot;proto와 config가 준비됐다&quot;까지였는데, 지금은 <strong><code>SlateContext</code>가 Phoenix 예측 응답을 통해 home-mixer로 실제 흘러들어가는 배선</strong>이 처음으로 코드에서 확인된다.</p></div>
-<p>이 커밋에서 새로 등장하는 개념은 다음과 같다.</p>
+<p>오늘 함께 본 다른 변화는 다음과 같다.</p>
 <ul>
-<li><strong>AI trend</strong> — X의 &quot;Trending&quot; 지면(사람들이 많이 이야기하는 이벤트)에 올라오는 항목이다. 이 커밋 이전에는 tweet에 &quot;AI trend&quot; 라벨을 붙이는 로직이 home-mixer 파이프라인에 없었다. Grok이 트윗을 관찰해 어떤 AI trend에 속하는지 판정하고 그 결과를 Strato에 저장해 두는 upstream 파이프라인이 있었으리라고 보이지만(<code>batch_get_tweet_ai_trend</code> API), 그 파이프라인은 이 저장소 밖에 있다 <span class="badge est">추정</span>.</li>
-<li><strong>served slate context</strong> — Phoenix 서빙 응답이 후보마다 재순위에 쓸 재료(pool 랭크, fatigue, pre-diversity score, SID 3계층, SID gap 3계층)를 담아 돌려주는 스키마 필드다. 4세대+4의 proto에는 정의만 되어 있었고, 이 커밋에서 소비 경로가 배선됐다.</li>
-<li><strong>SlateContext</strong> — DPP 재순위 슬레이트에서 각 슬롯이 갖는 컨텍스트 벡터다. <code>k</code>는 슬롯 인덱스, <code>pool_rank</code>는 원 스코어 정렬 순위, <code>pool_rank_gap</code>은 위 슬롯과의 pool rank 차이이고, 여기에 <code>fatigue</code>, <code>pre_diversity_score</code>, <code>sid_known</code>이 더해지며, <code>sid_k_l1/l2/l3</code>은 3계층 SID 각각의 슬롯 인덱스를, <code>sid_gap_l1/l2/l3</code>은 각 계층 SID의 슬롯 간 gap을 담는다. 4세대+3 VMRanker에서 SID 필드 7개가 배선됐을 때와 같은 필드 세트다.</li>
+<li>X는 같은 커밋에서 For You의 원본 포스트에 AI trend 라벨을 붙이는 경로를 추가했다. 기본값은 꺼져 있다.</li>
+<li>같은 커밋에서 아동 안전 cross-model validation과 deluxe 4.3 카테고리 재분류 호출을 Grok 4.6으로 보내는 비율이 0.1에서 0.3으로 올랐다.</li>
+<li>유기 추천·광고·상점 3개 지면을 랭커 하나로 통합한 Xiaohongshu OneModel 논문이 프로덕션 A/B 결과와 함께 레이더에 올랐다.</li>
 </ul>
-<h3 id="ai-trend-feedback-context-hydrator--157줄-신규">AI Trend Feedback Context Hydrator — 157줄 신규</h3>
-<p>파일 신규 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs</code></a>. 파이프라인 배선은 <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:424-428</code></a>에 있고, 기존 <code>TopicFeedbackContextHydrator</code> 바로 뒤에 나란히 추가됐다.</p>
+<h2 id="1-for-you-랭킹에-phoenix-서빙의-slate-context를-받는-경로가-생겼다--x"><span class="num">1</span>For You 랭킹에 Phoenix 서빙의 slate context를 받는 경로가 생겼다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/d0cef2f" target="_blank" rel="noopener">xai-org/x-algorithm @ d0cef2f — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-20 20:22 UTC, 공개 소스코드. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+5다. 바뀐 파일은 14개, 규모는 +479/−200이다. 4세대+4(2026-08-19, aad7179, 파일 79 +3.3k/−0.7k)와 비교하면 1/7 정도 규모다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 4세대 공개 뒤 X 저장소에는 매일 커밋하는 리듬으로 후속 공개가 이어져 왔다. 순서는 8/14 4세대+1(c65aa17) → 8/17 4세대+2(b089ce6) → 8/18 4세대+3(11a71f8) → 8/19 4세대+4(aad7179, 대형)다. 4세대부터 4세대+4까지 canon(이 저장소의 정본 문서)에 반영한 내용은 &quot;proto와 config가 준비됐다&quot;는 데까지였다. 8/20에 나온 이번 커밋은 4세대+4의 대형 확장 뒤에 이어진 만큼 규모는 작지만, 4세대+4가 proto와 config로 준비만 해 둔 두 스캐폴딩이 처음으로 실제 서빙·랭킹 파이프라인 연결까지 이어진 커밋이다.</p></div>
+<ul>
+<li>4세대+4가 준비한 것은 Phoenix(X For You의 랭킹 모델) proto의 <code>SlateContext.sid*</code> 필드 신설, <code>RewardOutputs</code> 신설, <code>xrecsys_search</code> config다.</li>
+<li>이번 커밋에서 <code>SlateContext</code>가 Phoenix 예측 응답을 타고 home-mixer(For You 피드를 조립하는 서비스)로 실제로 흘러드는 연결이 코드에서 처음 확인된다.</li>
+</ul>
+<p>이 커밋에서 새로 나오는 개념은 세 가지다.</p>
+<ul>
+<li>AI trend는 X의 &quot;Trending&quot; 지면(사람들이 많이 이야기하는 이벤트)에 올라오는 항목이다.<ul>
+<li>이 커밋 전에는 tweet에 &quot;AI trend&quot; 라벨을 붙이는 로직이 home-mixer 파이프라인에 없었다.</li>
+<li>Strato는 X의 실시간 스토리지와 서비스 조회를 담당하는 레이어다.</li>
+<li>Grok이 트윗을 보고 어느 AI trend에 속하는지 판정해 그 결과를 Strato에 저장해 두는 upstream 파이프라인이 있었으리라고 보이지만(<code>batch_get_tweet_ai_trend</code> API), 그 파이프라인은 이 저장소 밖에 있다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+<li>SlateContext는 DPP(비슷한 아이템이 함께 뽑히면 점수가 깎이도록 집합 단위로 고르는 다양성 기법) 재순위 슬레이트에서 각 슬롯이 갖는 컨텍스트 벡터다.<ul>
+<li><code>k</code>는 슬롯 인덱스, <code>pool_rank</code>는 원 스코어 정렬 순위, <code>pool_rank_gap</code>은 위 슬롯과의 pool rank 차이다.</li>
+<li>여기에 <code>fatigue</code>, <code>pre_diversity_score</code>, <code>sid_known</code>이 더해진다.</li>
+<li><code>sid_k_l1/l2/l3</code>은 3계층 SID(semantic ID, 아이템을 계층 코드로 표현한 토큰 열) 각각의 슬롯 인덱스를 담는다.</li>
+<li><code>sid_gap_l1/l2/l3</code>은 각 계층 SID의 슬롯 간 gap을 담는다.</li>
+<li>8/18 커밋인 4세대+3에서 VMRanker(DPP 슬레이트 재정렬을 맡는 서비스)에 SID 필드 7개를 넣었을 때와 같은 필드 세트다.</li>
+</ul>
+</li>
+<li>served slate context는 Phoenix 서빙 응답이 후보마다 재순위에 쓸 재료를 담아 돌려주는 스키마 필드다.<ul>
+<li>재료는 pool 랭크, fatigue, pre-diversity score, SID 3계층, SID gap 3계층이다.</li>
+<li>4세대+4의 proto에는 정의만 되어 있었고, 이 커밋에서 소비 경로가 연결됐다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="for-you-원본-포스트에-ai-trend-라벨을-붙이는-hydrator가-생겼다">For You 원본 포스트에 AI trend 라벨을 붙이는 hydrator가 생겼다</h3>
+<p>이번 커밋은 For You 후보 가운데 독립 원본 포스트를 골라 AI trend 라벨을 붙이는 단계를 새로 넣었다 <span class="badge ok">확인</span>. 한 페이지에 붙는 라벨은 최대 2개이고, 이 단계를 켜는 게이트의 기본값은 false다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li><p>AI trend 정보를 후보 포스트에 채워 넣는 hydrator가 157줄짜리 새 파일로 추가됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs</code></a>.</p>
+<ul>
+<li>파이프라인 연결은 <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:424-428</code></a>에 있다.</li>
+<li>기존 <code>TopicFeedbackContextHydrator</code> 바로 뒤에 나란히 추가됐다. topic feedback context는 사용자의 관심 topic을 추론하는 데 쓰는 컨텍스트 라벨이다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">Box::new(TopicFeedbackContextHydrator { strato_client: strato_client.clone() }),
 Box::new(AiTrendFeedbackContextHydrator { strato_client: strato_client.clone() }),
 </code></pre></figure>
-<p><strong>게이트 3중 조건</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:54-58</code></a>:</p>
+</li>
+<li><p>이 hydrator는 게이트 3중 조건을 모두 만족할 때만 돈다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:54-58</code></a>.</p>
+<ul>
+<li>게이트 파라미터 <code>rust_home_mixer_enable_ai_trend_feedback_context</code>가 켜져 있어야 한다. 기본값은 false다.</li>
+<li>topic 요청이 아니어야 한다(topic 지면과 겹치지 않게).</li>
+<li>Following 지면이 아니어야 한다. OON(out-of-network) 후보만 대상으로 삼는다는 뜻이다.</li>
+<li>Following 파이프라인에는 연결되지 않았다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">query.params.get(EnableAiTrendFeedbackContext)
     &amp;&amp; !query.is_topic_request()
     &amp;&amp; !query.in_network_only
 </code></pre></figure>
-<p>정리하면 (a) 게이트 파라미터 <code>rust_home_mixer_enable_ai_trend_feedback_context</code>가 켜져 있고(기본값 false), (b) topic 요청이 아니며(topic 지면과 겹치지 않게), (c) Following 지면이 아닌(OON 후보만 대상으로 삼는) 세 조건을 모두 만족해야 한다. Following 파이프라인에는 배선되지 않았다.</p>
-<p><strong>후보 필터 — &quot;standalone original post&quot; 4중 조건</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:17-22</code></a>:</p>
+</li>
+<li><p>후보는 &quot;standalone original post&quot;만 남기는 4중 조건을 거친다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:17-22</code></a>.</p>
+<ul>
+<li>답글이거나, 리트윗이거나, 대화 조상이 있거나, 팔로잉한 사용자가 답글을 단 대상이면 후보에서 뺀다. 넷 중 하나라도 해당하면 빠진다.</li>
+<li>결국 인용이 아닌 원본 포스트에만 AI trend 라벨을 붙일 수 있다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn is_eligible_original_post(candidate: &amp;PostCandidate) -&gt; bool {
     candidate.in_reply_to_tweet_id.is_none()
         &amp;&amp; candidate.retweeted_tweet_id.is_none()
@@ -77,8 +121,20 @@ Box::new(AiTrendFeedbackContextHydrator { strato_client: strato_client.clone() }
         &amp;&amp; candidate.following_replied_user_ids.is_empty()
 }
 </code></pre></figure>
-<p>답글이거나, 리트윗이거나, 대화 조상이 있거나, 팔로잉한 사용자가 답글을 단 대상이거나, 이 넷 중 하나라도 해당하면 후보에서 제외한다. 결국 <strong>인용이 아닌 원본 포스트에만</strong> AI trend 라벨을 붙일 수 있다.</p>
-<p><strong>Top-2 trend 선택 + trend당 후보 1개 랜덤</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:24-52</code></a>:</p>
+</li>
+<li><p>후보 빈도로 Top-2 trend를 고르고, trend마다 후보 1개를 무작위로 골라 라벨을 붙인다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:24-52</code></a>.</p>
+<ul>
+<li>절차는 다섯 단계다.<ol>
+<li>조건을 만족하는 후보마다 Strato <code>batch_get_tweet_ai_trend</code>로 trend_id를 조회한다.</li>
+<li>후보들의 trend_id 빈도 히스토그램을 만든다.</li>
+<li>상위 2개 trend를 고른다. 동률이면 trend_id가 작은 쪽이 우선이다.</li>
+<li>각 trend에 대해 후보 1개를 무작위로 고른다.</li>
+<li>Strato <code>batch_get_ai_trend_name</code>으로 그 trend의 표시 이름을 조회한다.</li>
+</ol>
+</li>
+<li>결국 한 페이지에 최대 2개의 AI trend 라벨이 붙고, 각 trend마다 후보 하나에만 붙는다.</li>
+<li>같은 trend에 속한 여러 후보에 같은 라벨을 되풀이해 붙이지 않도록 막는 억제 장치다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const TOP_TREND_COUNT: usize = 2;
 
 fn select_feedback_targets(candidate_trends: &amp;[(usize, i64)]) -&gt; HashMap&lt;usize, i64&gt; {
@@ -106,8 +162,14 @@ fn select_feedback_targets(candidate_trends: &amp;[(usize, i64)]) -&gt; HashMap&
     selected
 }
 </code></pre></figure>
-<p>절차는 다음과 같다. (1) 조건을 만족하는 후보마다 Strato <code>batch_get_tweet_ai_trend</code>로 trend_id를 조회한다 → (2) 후보들의 trend_id 빈도 히스토그램을 만든다 → (3) 상위 2개 trend를 고른다(동률이면 trend_id가 작은 쪽이 우선이다) → (4) 각 trend에 대해 후보 1개를 무작위로 선택한다 → (5) Strato <code>batch_get_ai_trend_name</code>로 그 trend의 표시 이름을 조회한다. 결국 <strong>한 페이지에 최대 2개의 AI trend 라벨이 붙고, 각 trend마다 후보 하나에만 붙는다</strong>. 같은 trend에 속한 여러 후보에 같은 라벨을 반복해서 붙이지 않도록 막는 억제 장치다.</p>
-<p><strong>렌더 — URT <code>TweetContext</code>의 topic 파이프에 fallback으로 합류</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/util/urt/post_marshaller.rs" target="_blank" rel="noopener"><code>home-mixer/util/urt/post_marshaller.rs:72-110</code></a>:</p>
+</li>
+<li><p>화면에는 topic 라벨과 같은 형태로 나가며, topic feedback이 없을 때만 AI trend가 쓰인다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/util/urt/post_marshaller.rs" target="_blank" rel="noopener"><code>home-mixer/util/urt/post_marshaller.rs:72-110</code></a>.</p>
+<ul>
+<li>렌더 단계에서 URT(X의 응답 렌더링 스키마) <code>TweetContext</code>의 topic 경로에 fallback으로 합류한다.</li>
+<li>둘 다 URT에서는 <code>ContextType::TOPIC</code>이라는 같은 컨텍스트 타입으로 나간다.</li>
+<li>AI trend 경로는 두 가지가 topic 경로와 다르다. <code>landing_url</code>이 채워지고, <code>TopicFeedbackContext.topic_id</code>가 <code>None</code>이다.</li>
+<li>그래서 사용자가 이 트윗 위에 붙은 topic 형태의 chip을 탭하면, topic feedback 페이지가 아니라 <code>x.com/i/trending/{trend_id}</code>, 즉 해당 trend 지면으로 이동한다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if let Some(topic) = post.topic_feedback_topic.as_ref().filter(|t| !t.is_empty()) {
     return Some(TweetContext {
         context_type: ContextType::TOPIC,
@@ -140,15 +202,33 @@ Some(TweetContext {
     ..
 })
 </code></pre></figure>
-<p>렌더 우선순위는 <strong>topic feedback이 있으면 topic을 쓰고</strong>, 없을 때만 <strong>AI trend로 넘어가는</strong> 순서다. 둘 다 URT에서는 <code>ContextType::TOPIC</code>이라는 같은 컨텍스트 타입으로 나가지만, AI trend 경로는 (a) <code>landing_url</code>이 채워진다는 점과 (b) <code>TopicFeedbackContext.topic_id</code>가 <code>None</code>이라는 점에서 topic 경로와 다르다. 그래서 사용자 화면에서 이 트윗 위에 붙은 topic 형태의 chip을 탭하면, topic feedback 페이지가 아니라 <code>x.com/i/trending/{trend_id}</code>, 즉 해당 trend 지면으로 이동한다.</p>
 <blockquote>
 <p>&quot;<code>https://x.com/i/trending/{trend_id}</code>&quot; — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/util/urt/post_marshaller.rs" target="_blank" rel="noopener"><code>post_marshaller.rs:92</code></a></p>
 </blockquote>
-<div class="blk why"><p><span class="lbl">의미</span> X가 지금까지 사용해 온 topic feedback context(사용자의 관심 topic을 추론하는 데 쓰는 컨텍스트 라벨)와 나란한 두 번째 컨텍스트 채널을 열었다. topic이 이미 있으면 topic이 이기고 없을 때만 AI trend가 들어가는 폴백 구조라, 둘이 서로 겹치지 않는다. <strong>관측 신호도 함께 넓어진다.</strong> 사용자가 이 chip을 탭하거나 닫거나 무시하는 반응이 곧 &quot;이 사용자는 이 AI trend에 관심이 있는가&quot;를 판단하는 라벨 소스가 되기 때문이다. 4세대부터 4세대+4까지 반영해 온 &quot;안전 파이프라인의 계층 확장&quot;과는 다른 방향으로, <strong>랭킹 상류의 시그널 소스 자체를 넓히는 흐름</strong>이 확인된다.</p></div>
-<p><strong>미공개:</strong> <code>AI trend</code>의 정의(누가 어떻게 trend id를 만드는지, Grok으로 트윗을 클러스터링하는지 아니면 사람이 큐레이션하는지), <code>batch_get_tweet_ai_trend</code> upstream 파이프라인, <code>EnableAiTrendFeedbackContext</code>의 실제 배포 여부, <code>TOP_TREND_COUNT = 2</code>의 튜닝 이력은 모두 공개되지 않았다. 게이트 이름의 <code>rust_home_mixer_</code> 접두사가 이 저장소의 다른 rust-migration 게이트와 같은 규칙을 따르므로, A/B 실험을 진행하는 중일 가능성이 있다 <span class="badge est">추정</span>.</p>
-<h3 id="served_slate_context--phoenix가-서빙에서-계산한-slate-context를-home-mixer가-소비"><code>served_slate_context</code> — Phoenix가 서빙에서 계산한 slate context를 home-mixer가 소비</h3>
-<p>4세대+4에서 Phoenix proto에 신설된 <code>SlateContext.sid*</code> 필드(각 슬롯의 SID 3계층과 gap 3계층)가 이 커밋에서 <strong>실제 파이프라인의 소비 경로로 배선</strong>됐다. 다음 네 곳이 동시에 열렸다.</p>
-<p><strong>(a) <code>PostCandidate</code>에 새 필드</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs:26-27, 76-77</code></a>:</p>
+</li>
+</ul>
+<p>다음 네 가지는 공개되지 않았다.</p>
+<ul>
+<li><code>AI trend</code>의 정의(누가 어떻게 trend id를 만드는지, Grok으로 트윗을 클러스터링하는지 아니면 사람이 큐레이션하는지)</li>
+<li><code>batch_get_tweet_ai_trend</code> upstream 파이프라인</li>
+<li><code>EnableAiTrendFeedbackContext</code>의 실제 배포 여부</li>
+<li><code>TOP_TREND_COUNT = 2</code>의 튜닝 이력</li>
+</ul>
+<p>게이트 이름의 <code>rust_home_mixer_</code> 접두사가 이 저장소의 다른 rust-migration 게이트와 같은 규칙을 따르므로, A/B 실험을 진행하는 중일 가능성이 있다 <span class="badge est">추정</span>.</p>
+<div class="blk why"><p><span class="lbl">의미</span> X가 지금까지 써 온 topic feedback context와 나란한 두 번째 컨텍스트 채널을 열었다. topic이 이미 있으면 topic이 이기고 없을 때만 AI trend가 들어가는 폴백 구조라, 둘이 서로 겹치지 않는다.</p></div>
+<ul>
+<li>관측 신호도 함께 넓어진다. 사용자가 이 chip을 탭하거나 닫거나 무시하는 반응이 &quot;이 사용자는 이 AI trend에 관심이 있는가&quot;를 판단하는 라벨 소스가 되기 때문이다.</li>
+<li>4세대부터 4세대+4까지 반영해 온 &quot;안전 파이프라인의 계층 확장&quot;과는 다른 방향이다. 랭킹 상류의 시그널 소스 자체를 넓히는 흐름이 확인된다.</li>
+</ul>
+<h3 id="phoenix가-서빙에서-계산한-slate-context를-랭킹-단계가-받아-쓴다">Phoenix가 서빙에서 계산한 slate context를 랭킹 단계가 받아 쓴다</h3>
+<p>8/19의 4세대+4 커밋에서 Phoenix proto에 생긴 SID 필드(각 슬롯의 SID 3계층과 gap 3계층)가 이번 커밋에서 실제 파이프라인의 소비 경로로 연결됐다. proto 필드 이름은 <code>SlateContext.sid*</code>다. 다음 네 곳이 동시에 열렸다.</p>
+<ul>
+<li><p>후보 구조체에 slate context를 담는 슬롯이 하나 더 생겨 두 개가 됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs:26-27, 76-77</code></a>.</p>
+<ul>
+<li>구조체 이름은 <code>PostCandidate</code>이고, 새로 생긴 필드는 <code>served_slate_context</code>다.</li>
+<li>기존 <code>slate_context</code>는 home-mixer가 계산해 캐시한 값이다.</li>
+<li>신규 <code>served_slate_context</code>는 Phoenix가 서빙에서 산출해 응답에 담아 보낸 값이다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub struct PostCandidate {
     pub score: Option&lt;f64&gt;,
     pub slate_context: Option&lt;SlateContext&gt;,
@@ -159,8 +239,12 @@ Some(TweetContext {
     pub ai_trend_id: Option&lt;String&gt;,     // ← 위 절 신규
 }
 </code></pre></figure>
-<p>이제 후보 구조체에는 slate context를 담는 슬롯이 두 개가 됐다. 하나는 기존 <code>slate_context</code>로 home-mixer가 계산해 캐시한 값이고, 다른 하나는 신규 <code>served_slate_context</code>로 Phoenix가 서빙에서 산출해 응답에 담아 보낸 값이다.</p>
-<p><strong>(b) Proto ↔ Rust 변환 impl</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>candidate.rs:99-118</code></a>:</p>
+</li>
+<li><p>proto와 Rust 사이의 변환 impl이 proto의 짧은 필드 이름을 home-mixer 쪽 이름으로 바꾼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>candidate.rs:99-118</code></a>.</p>
+<ul>
+<li>proto의 <code>sid_k1/2/3</code>·<code>sid_gap1/2/3</code>를 home-mixer 명명 규칙인 <code>sid_k_l1/l2/l3</code>·<code>sid_gap_l1/l2/l3</code>로 rename한다.</li>
+<li>여기서 &quot;l&quot;은 level을 뜻한다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">impl From&lt;xai_recsys_proto::SlateContext&gt; for SlateContext {
     fn from(c: xai_recsys_proto::SlateContext) -&gt; Self {
         Self {
@@ -180,8 +264,12 @@ Some(TweetContext {
     }
 }
 </code></pre></figure>
-<p>proto의 <code>sid_k1/2/3</code>·<code>sid_gap1/2/3</code>라는 짧은 이름을 home-mixer 쪽 명명 규칙(<code>sid_k_l1/l2/l3</code>·<code>sid_gap_l1/l2/l3</code>이며, 여기서 &quot;l&quot;은 level을 뜻한다)으로 rename하는 것이 이 impl의 역할이다.</p>
-<p><strong>(c) PhoenixScorer가 예측 응답에서 뽑아 채움</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/scorers/phoenix_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/phoenix_scorer.rs:107-125</code></a>:</p>
+</li>
+<li><p>PhoenixScorer가 Phoenix 예측 응답에서 slate context를 뽑아 새 필드에 채운다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/scorers/phoenix_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/phoenix_scorer.rs:107-125</code></a>.</p>
+<ul>
+<li>Phoenix 예측 응답이 후보 스코어 24개(참여 확률 헤드)와 나란히 <code>SlateContext</code>까지 담아 오면, PhoenixScorer가 그 값을 <code>served_slate_context</code>에 세팅해 파이프라인으로 흘려보낸다.</li>
+<li>값은 예측 응답의 <code>candidate_slate_context()</code>에서 꺼낸다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">.map(|c| PostCandidate {
     phoenix_scores: predictions.candidate_scores(&amp;c.get_original_tweet_id()),
     served_slate_context: predictions
@@ -192,8 +280,16 @@ Some(TweetContext {
     ..Default::default()
 })
 </code></pre></figure>
-<p>즉 Phoenix 예측 응답이 후보 스코어 24개(참여 확률 헤드)와 나란히 <code>SlateContext</code>까지 담아 오면, PhoenixScorer가 그 값을 <code>served_slate_context</code>에 세팅해 파이프라인으로 흘려보낸다.</p>
-<p><strong>(d) RankingScorer가 세 갈래 폴백으로 소비</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs:700-710, 806-825, 875-895</code></a>:</p>
+</li>
+<li><p>RankingScorer는 세 갈래 폴백으로 slate context를 정한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs:700-710, 806-825, 875-895</code></a>.</p>
+<ol>
+<li><code>UseServedSlateContext</code> 게이트가 켜져 있고 Phoenix가 모든 후보에 대해 slate context를 보내왔으면, 그 값을 그대로 쓴다.</li>
+<li>게이트가 꺼졌거나 데이터가 모자라면서 Redis 워밍 캐시가 히트하면, 이전 요청에 저장해 둔 slate context를 재사용한다.</li>
+<li>그 밖의 경우에는 로컬에서 <code>compute_slate_contexts(candidates, weighted_scores)</code>로 계산한다.</li>
+</ol>
+<ul>
+<li>이 순서는 두 랭킹 브랜치에 똑같이 적용된다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn served_slate_contexts(
     query: &amp;ScoredPostsQuery,
     candidates: &amp;[PostCandidate],
@@ -212,11 +308,31 @@ let persisted_contexts: Option&lt;Vec&lt;SlateContext&gt;&gt; =
         None =&gt; Some(Self::compute_slate_contexts(candidates, &amp;weighted_scores)),
     };
 </code></pre></figure>
-<p>폴백은 세 갈래다. (1) <code>UseServedSlateContext</code> 게이트가 켜져 있고 Phoenix가 모든 후보에 대해 slate context를 보내왔으면 그 값을 그대로 사용한다. (2) 게이트가 꺼졌거나 데이터가 모자라면서 Redis 워밍 캐시가 히트하면, 이전 요청에 저장해 둔 slate context를 재사용한다. (3) 그 밖의 경우에는 로컬에서 <code>compute_slate_contexts(candidates, weighted_scores)</code>로 계산한다. 이 순서는 두 랭킹 브랜치에 동일하게 적용된다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> slate context를 계산하는 지점이 <strong>home-mixer 로컬에서 Phoenix 서빙으로</strong> 옮겨 가는 마이그레이션의 첫 단계다. Phoenix는 예측을 만드는 그 순간에 이미 각 후보의 pool 랭크와 fatigue, pre-diversity, SID 3계층 정보를 알고 있으므로, home-mixer가 다시 계산하는 대신 서빙 응답에 실어 보내면 (a) 랭커의 CPU를 절약할 수 있고, (b) Phoenix가 가진 더 풍부한 컨텍스트(예를 들어 SID 3계층은 Phoenix 없이는 계산할 수 없다)를 랭킹 재순위에 반영할 수 있으며, (c) home-mixer가 후보 배분과 재순위만 담당하는 얇은 층으로 계속 축소되는 방향이다. 4세대+3에서 SID가 VMRanker에 배선된 것과 방향이 같다. SID는 정의상 Phoenix 학습 산출물이라 home-mixer가 로컬에서 계산할 수 없는데, 이 커밋으로 그 문제가 서빙 시점에 해결됐다.</p></div>
-<p><code>UseServedSlateContext</code>는 기본값 false로 배선됐다. 게이트만 만들어 두고 실제 롤아웃은 후속 파라미터 변경으로 미뤄 둔 상태다. <strong>관전 포인트:</strong> 이 게이트가 true로 승격되는 커밋이 나오는 시점이 곧, Phoenix 서빙의 slate context 산출이 프로덕션 트래픽에 반영되는 시점이다.</p>
-<h3 id="emb_tablers-리팩터--python-wrapper와-pyo3-free-core-분리"><code>emb_table.rs</code> 리팩터 — Python wrapper와 pyo3-free core 분리</h3>
-<p>파일 개편 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs</code></a> (+189/−169, 근본적으로는 동치 리팩터다). 기존 <code>load_tensor</code> 함수는 pyo3 타입(<code>Bound&lt;&#39;py, PyString&gt;</code>, <code>PyReadwriteArray1&lt;&#39;py, u8&gt;</code>, <code>Bound&lt;&#39;py, PyList&gt;</code>)과 pyo3 에러(<code>PyValueError</code>, <code>PyOSError</code>, <code>PyTypeError</code>)에 묶여 있어서 non-Python 컨텍스트에서는 재사용할 수 없었다. 이 커밋에서는 core 로직을 pyo3에 의존하지 않는 <code>load_tensor_into</code>로 분리하고, 기존 <code>load_tensor</code>는 그 core를 감싸는 얇은 wrapper로 다시 정의했다.</p>
+</li>
+<li><p>이 경로를 켜는 게이트는 기본값 false로 들어왔다. 게이트만 만들어 두고, 실제 롤아웃은 후속 파라미터 변경으로 미뤄 둔 상태다.</p>
+<ul>
+<li>게이트 이름은 <code>UseServedSlateContext</code>다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> slate context를 계산하는 지점이 home-mixer 로컬에서 Phoenix 서빙으로 옮겨 가는 마이그레이션의 첫 단계다. Phoenix는 예측을 만드는 그 순간에 이미 각 후보의 pool 랭크와 fatigue, pre-diversity, SID 3계층 정보를 알고 있으므로, home-mixer가 다시 계산하는 대신 서빙 응답에 실어 보낼 수 있다.</p></div>
+<ul>
+<li>그러면 랭커의 CPU를 아낄 수 있다.</li>
+<li>Phoenix가 가진 더 풍부한 컨텍스트를 랭킹 재순위에 반영할 수 있다. 예를 들어 SID 3계층은 Phoenix 없이는 계산할 수 없다.</li>
+<li>home-mixer가 후보 배분과 재순위만 맡는 얇은 층으로 계속 줄어드는 방향이다.</li>
+<li>8/18 커밋(4세대+3)에서 SID가 VMRanker에 연결된 것과 방향이 같다. SID는 정의상 Phoenix 학습 산출물이라 home-mixer가 로컬에서 계산할 수 없는데, 이 커밋으로 그 문제가 서빙 시점에 해결됐다.</li>
+<li><code>UseServedSlateContext</code>가 true로 승격되는 커밋이 나오는 시점이 Phoenix 서빙의 slate context 산출이 프로덕션 트래픽에 반영되는 시점이다.</li>
+</ul>
+<h3 id="임베딩-테이블-로더의-핵심-로직을-python-바인딩에서-떼어-냈다">임베딩 테이블 로더의 핵심 로직을 Python 바인딩에서 떼어 냈다</h3>
+<p>Phoenix 서빙 엔진의 임베딩 테이블 로더가, Python 쪽 wrapper와 pyo3에 의존하지 않는 core로 나뉘었다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li><p><code>emb_table.rs</code>에서 core 로직을 <code>load_tensor_into</code>로 떼어 내고, 기존 <code>load_tensor</code>는 그 core를 감싸는 얇은 wrapper로 다시 정의했다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs</code></a>.</p>
+<ul>
+<li>파일 개편 규모는 +189/−169, 성격은 근본적으로 동치 리팩터다.</li>
+<li>기존 <code>load_tensor</code>는 pyo3 타입과 pyo3 에러에 묶여 있어서 non-Python 컨텍스트에서는 재사용할 수 없었다.</li>
+<li>묶여 있던 타입은 <code>Bound&lt;&#39;py, PyString&gt;</code>, <code>PyReadwriteArray1&lt;&#39;py, u8&gt;</code>, <code>Bound&lt;&#39;py, PyList&gt;</code>이고, 에러는 <code>PyValueError</code>, <code>PyOSError</code>, <code>PyTypeError</code>다.</li>
+<li>새 core는 pyo3에 의존하지 않으며, <code>&amp;mut [u8]</code> 인터페이스로 받고 <code>Result&lt;(), String&gt;</code>을 반환한다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub fn load_tensor_into(
     path: &amp;str,
     urls: &amp;str,
@@ -246,18 +362,46 @@ pub fn load_tensor&lt;&#39;py&gt;(
     })
 }
 </code></pre></figure>
-<p>안전성도 함께 손봤다. (a) tokio runtime 생성의 <code>unwrap()</code>을 <code>map_err(|e| format!(&quot;tokio runtime: {e}&quot;))</code>로 바꿨고, (b) <code>prefix.len() &lt; 3</code> 방어를 추가했으며(<code>checkpoint path too short: {path}</code>), (c) <code>row_segment_size % num_row_segments != 0</code> 같은 modulo 체크를 <code>is_multiple_of</code> API로 통일했다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> 임베딩 테이블 로더 core를 순수 Rust 인터페이스로 노출해서, (i) 학습 파이프라인이나 (ii) Rust-native 서빙 코드의 다른 경로에서 pyo3 스택 없이도 재사용할 수 있도록 준비한 것이다. 4세대+4에서 Phoenix <code>xrecsys_search</code>의 vocab이 100M/100M/30M로 커진 것과 방향이 같다. 큰 임베딩 테이블을 여러 서빙·학습 컨텍스트에서 로드해야 할 필요가 커지고 있다는 정황이다.</p></div>
-<h3 id="grok-46-internal-dial-01--03">Grok 4.6 internal dial 0.1 → 0.3</h3>
-<p>한 줄 변경 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py:114</code></a>:</p>
+</li>
+<li><p>안전성도 함께 손봤다.</p>
+<ul>
+<li>tokio runtime 생성의 <code>unwrap()</code>을 <code>map_err</code>로 바꿨다. 바뀐 코드는 <code>map_err(|e| format!(&quot;tokio runtime: {e}&quot;))</code>다.</li>
+<li><code>checkpoint path too short</code> 방어를 추가했다. 조건은 <code>prefix.len() &lt; 3</code>이고, 메시지는 <code>checkpoint path too short: {path}</code>다.</li>
+<li><code>row_segment_size % num_row_segments != 0</code> 같은 modulo 체크를 <code>is_multiple_of</code> API로 통일했다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 임베딩 테이블 로더 core를 순수 Rust 인터페이스로 노출해서, 학습 파이프라인이나 Rust-native 서빙 코드의 다른 경로에서 pyo3 스택 없이도 재사용할 수 있도록 준비한 것이다. 8/19 커밋(4세대+4)에서 Phoenix <code>xrecsys_search</code>의 vocab이 100M/100M/30M로 커진 것과 방향이 같다. 큰 임베딩 테이블을 여러 서빙·학습 컨텍스트에서 로드해야 할 필요가 커지고 있다는 정황이다.</p></div>
+<h3 id="두-심판-호출-위치에서-grok-46을-쓰는-비율이-01에서-03으로-올랐다">두 심판 호출 위치에서 Grok 4.6을 쓰는 비율이 0.1에서 0.3으로 올랐다</h3>
+<p>grox(Grok 기반 nearline 분류기 서브레포)에서, 2026-08-19의 4세대+4가 도입한 Grok 4.6 shadow dial이 하루 만에 10%에서 30%로, 3배 올랐다 <span class="badge ok">확인</span>. 이 dial은 두 심판 호출 위치(아동 안전 cross-model validation, deluxe 4.3 카테고리 재분류)에서 호출을 Grok 4.5 대신 4.6으로 보낼 확률이다.</p>
+<ul>
+<li><p>바뀐 것은 상수 한 줄이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py:114</code></a>.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">-_GROK_4_6_INTERNAL_DIAL = 0.1
 +_GROK_4_6_INTERNAL_DIAL = 0.3
 </code></pre></figure>
-<p>4세대+4(2026-08-19)에서 도입된 shadow dial이 <strong>하루 만에 10%에서 30%로, 3배 올랐다</strong>. <code>_EAPI_4_6_INTERNAL_BREAKER_CONFIG</code> 회로차단기(실패율 50%, 창 600초, 회복 600초, half-open 5회)의 파라미터는 그대로다. dial이 적용되는 두 위치, 즉 아동 안전 cross-model validation과 deluxe 4.3 카테고리 재분류도 그대로다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> 4.5에서 4.6으로 넘어가는 gradual rollout에서 shadow가 (a) 회로차단을 트립시키지 않았고, (b) 판정 disagreement rate도 허용 범위였다는 점을 뒷받침한다 <span class="badge est">추정</span>. 그렇지 않았다면 dial을 3배로 올리지 못했을 것이다. 4세대+2가 도입한 Grok 4.5 심판 계층이 매일 정교해지는 흐름(+2 도입 → +3 로깅 세분화 → +4 4.6 shadow 10% → +5 30%)에서 네 번째 커밋에 해당한다. <strong>관전 포인트:</strong> 다음 커밋에서 50%나 100%로 뛰면 4.6 완전 전환에 가까워진 것이고, 다시 낮아지면 회귀를 관측한 것이다.</p></div>
-<h3 id="grok_sampler-stop_predicate--스트리밍-응답-조기-종료">grok_sampler <code>stop_predicate</code> — 스트리밍 응답 조기 종료</h3>
-<p><code>grox/libs/grok_sampler/llm.py</code> (+27/−13) <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/grox/libs/grok_sampler/llm.py" target="_blank" rel="noopener">해당 파일</a>:</p>
-<p>기존 <code>_sample_streaming</code>은 raw stream에서 토큰을 받는 대로 계속 소비했다. 이 커밋에서는 (a) <code>async with aclosing(...)</code>으로 raw stream을 명시적인 컨텍스트에 감싸서 조기에 종료하더라도 정리를 보장하고, (b) 토큰을 yield한 뒤마다 <code>stop_predicate(resp)</code>를 확인해 True이면 즉시 break하면서 카운터 <code>llm.sample.early_stop.count</code>를 증가시킨다.</p>
+</li>
+<li><p>회로차단기 설정과 dial이 적용되는 위치는 그대로다.</p>
+<ul>
+<li><code>_EAPI_4_6_INTERNAL_BREAKER_CONFIG</code> 회로차단기의 파라미터(실패율 50%, 창 600초, 회복 600초, half-open 5회)는 바뀌지 않았다.</li>
+<li>dial이 적용되는 두 위치, 즉 아동 안전 cross-model validation과 deluxe 4.3 카테고리 재분류도 그대로다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 이번 상향은 4.5에서 4.6으로 넘어가는 gradual rollout에서 shadow가 회로차단을 트립시키지 않았고, 판정 disagreement rate도 허용 범위였다는 점을 뒷받침한다 <span class="badge est">추정</span>. 그렇지 않았다면 dial을 3배로 올리지 못했을 것이다.</p></div>
+<ul>
+<li>4세대+2가 도입한 Grok 4.5 심판 계층은 매일 정교해지고 있고, 이번 커밋은 그 흐름의 네 번째 커밋에 해당한다. 흐름은 +2 도입 → +3 로깅 세분화 → +4 4.6 shadow 10% → +5 30%다.</li>
+<li>다음 커밋에서 50%나 100%로 뛰면 4.6 완전 전환에 가까워진 것이고, 다시 낮아지면 회귀를 관측한 것이다.</li>
+</ul>
+<h3 id="grok-스트리밍-응답을-조건이-맞으면-중간에-끊을-수-있게-됐다">Grok 스트리밍 응답을 조건이 맞으면 중간에 끊을 수 있게 됐다</h3>
+<p>grox의 Grok 샘플러에 스트리밍 응답을 일찍 끝내는 콜백이 생겼고, 끊을 때마다 카운터를 올린다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li><p><code>grox/libs/grok_sampler/llm.py</code>에 <code>stop_predicate</code> 콜백이 추가됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/grox/libs/grok_sampler/llm.py" target="_blank" rel="noopener">해당 파일</a>.</p>
+<ul>
+<li>규모는 +27/−13이다.</li>
+<li>기존 <code>_sample_streaming</code>은 raw stream에서 토큰을 받는 대로 계속 소비했다.</li>
+<li>이제 <code>async with aclosing(...)</code>으로 raw stream을 명시적인 컨텍스트에 감싸서, 조기에 종료하더라도 정리를 보장한다. 토큰은 이 <code>async with aclosing</code> 블록 안에서 받는다.</li>
+<li>토큰을 yield한 뒤마다 <code>stop_predicate(resp)</code>를 확인해, True이면 즉시 break하면서 카운터 <code>llm.sample.early_stop.count</code>를 증가시킨다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">stop_predicate: Callable[[str], bool] | None = kwargs.get(&quot;stop_predicate&quot;)
 ...
 async with aclosing(self._sample_streaming_raw(request, **kwargs)) as raw_stream:
@@ -269,17 +413,33 @@ async with aclosing(self._sample_streaming_raw(request, **kwargs)) as raw_stream
             Metrics.counter(&quot;llm.sample.early_stop.count&quot;).add(1, attributes=attributes)
             break
 </code></pre></figure>
-<div class="blk why"><p><span class="lbl">의미</span> 안전 판정 응답은 JSON 태그(<code>&lt;json&gt;...&lt;/json&gt;</code>)에 감싸여 오는 경우가 많은데, 태그가 닫히고 나면 뒤따르는 토큰은 의미가 없다. <code>stop_predicate=lambda r: &quot;&lt;/json&gt;&quot; in r</code> 같은 콜백으로 일찍 끊으면 (a) 토큰 비용을 줄이고, (b) TTFT 이후의 지연도 줄일 수 있다. 4세대+4에서 도입된 Grok 4.6 shadow가 늘어난 트래픽을 감당하려는 sampling 인프라 최적화로 볼 여지가 있다 <span class="badge est">추정</span>. dial이 30%로 오르는 변경과 같은 커밋에 들어 있다는 정황이다.</p></div>
-<h3 id="profile_image-필드-배선"><code>profile_image</code> 필드 배선</h3>
-<p><code>grox/core/data_loaders/data_types.py</code> + <code>post_mapper.py</code> <span class="badge ok">확인</span>:</p>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 이 변경은 4세대+4에서 도입된 Grok 4.6 shadow가 늘어난 트래픽을 감당하려는 sampling 인프라 최적화로 볼 여지가 있다 <span class="badge est">추정</span>. 근거는 dial이 30%로 오르는 변경과 같은 커밋에 들어 있다는 정황이다.</p></div>
+<ul>
+<li>안전 판정 응답은 JSON 태그(<code>&lt;json&gt;...&lt;/json&gt;</code>)에 감싸여 오는 경우가 많은데, 태그가 닫히고 나면 뒤따르는 토큰은 의미가 없다.</li>
+<li><code>stop_predicate=lambda r: &quot;&lt;/json&gt;&quot; in r</code> 같은 콜백으로 일찍 끊으면 토큰 비용을 줄이고, TTFT 이후의 지연도 줄일 수 있다.</li>
+</ul>
+<h3 id="grok-분류기가-작성자-프로필-이미지를-참조할-수-있게-됐다">Grok 분류기가 작성자 프로필 이미지를 참조할 수 있게 됐다</h3>
+<p>grox 데이터 로더의 User 스키마에 프로필 이미지 필드가 추가됐다 <span class="badge ok">확인</span>. 작성자 메타데이터에 프로필 이미지 URL이 있으면 이 필드를 채운다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li><p>Grox <code>User</code> 데이터 로더에 <code>profile_image</code> 필드가 생겼다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li>타입은 <code>profile_image: Image | None</code>이다.</li>
+<li>바뀐 파일은 <code>grox/core/data_loaders/data_types.py</code>와 <code>post_mapper.py</code>다.</li>
+<li><code>AuthorMetadata.profileImageUrl</code>이 존재하면 <code>Image(url=...)</code>로 채운다.</li>
+<li>이전에는 User 스키마가 URL과 affiliated business, 최근 포스트만 담았고 프로필 이미지는 없었다.</li>
+</ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">class User(BaseModel):
     urls: list[str] | None = None
     affiliated_business: AffiliatedBusiness | None = None
     recent_posts: list[&quot;Post&quot;] | None = None
     profile_image: &quot;Image | None&quot; = None   # ← 신규
 </code></pre></figure>
-<p><code>AuthorMetadata.profileImageUrl</code>이 존재하면 <code>Image(url=...)</code>로 채운다. 이전에는 User 스키마가 URL과 affiliated business, 최근 포스트만 담았고 프로필 이미지는 없었다. 이제 Grok classifier가 프로필 이미지를 판정 컨텍스트로 참조할 수 있다(예를 들어 광고 브랜드 안전 판정에서 프로필 이미지에 성인 콘텐츠가 있는지 참고하는 상황을 생각할 수 있다). 4세대+2에서 도입된 성인 콘텐츠 cross-validation 심판이나 후속 판정 계층 확장을 위한 upstream 데이터 배선 준비로 볼 여지가 있다 <span class="badge est">추정</span>.</p>
-<h3 id="요약-표--이-커밋의-6개-방향">요약 표 — 이 커밋의 6개 방향</h3>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 이제 Grok classifier가 프로필 이미지를 판정 컨텍스트로 참조할 수 있다. 예를 들어 광고 브랜드 안전 판정에서 프로필 이미지에 성인 콘텐츠가 있는지 참고하는 상황을 생각할 수 있다. 4세대+2에서 도입된 성인 콘텐츠 cross-validation 심판이나 후속 판정 계층 확장을 위해 upstream 데이터 연결을 준비한 것으로 볼 여지가 있다 <span class="badge est">추정</span>.</p></div>
+<h3 id="이-커밋4세대5-d0cef2f의-6개-방향-요약">이 커밋(4세대+5, d0cef2f)의 6개 방향 요약</h3>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col><col class="w10"><col></colgroup>
 <thead>
 <tr>
@@ -291,69 +451,109 @@ async with aclosing(self._sample_streaming_raw(request, **kwargs)) as raw_stream
 </thead>
 <tbody><tr>
 <td>AI trend feedback context</td>
-<td><code>ai_trend_feedback_context_hydrator.rs</code> + <code>post_marshaller.rs</code> + <code>candidate.rs</code> + <code>param.rs</code></td>
+<td><code>ai_trend_feedback_context_hydrator.rs</code>, <code>post_marshaller.rs</code>, <code>candidate.rs</code>, <code>param.rs</code></td>
 <td align="right">+157/+29+ ...</td>
-<td><strong>신규 기능</strong> — For You 컨텍스트 라벨 채널 하나 추가</td>
+<td>신규 기능: For You 컨텍스트 라벨 채널 하나 추가</td>
 </tr>
 <tr>
 <td>served_slate_context</td>
-<td><code>phoenix_scorer.rs</code> + <code>ranking_scorer.rs</code> + <code>candidate.rs</code> + <code>param.rs</code></td>
+<td><code>phoenix_scorer.rs</code>, <code>ranking_scorer.rs</code>, <code>candidate.rs</code>, <code>param.rs</code></td>
 <td align="right">+22/−10 등</td>
-<td><strong>배선 시작</strong> — 4세대+4 proto 소비 경로</td>
+<td>연결 시작: 4세대+4 proto 소비 경로</td>
 </tr>
 <tr>
 <td>emb_table 리팩터</td>
 <td><code>emb_table.rs</code></td>
 <td align="right">+189/−169</td>
-<td><strong>리팩터 (동치)</strong> — core를 pyo3-free로</td>
+<td>리팩터(동치): core를 pyo3-free로</td>
 </tr>
 <tr>
 <td>Grok 4.6 dial 3배</td>
 <td><code>classifier.py</code></td>
 <td align="right">+1/−1</td>
-<td><strong>파라미터 변경</strong> — shadow 10% → 30%</td>
+<td>파라미터 변경: shadow 10% → 30%</td>
 </tr>
 <tr>
 <td>grok_sampler stop_predicate</td>
 <td><code>llm.py</code></td>
 <td align="right">+27/−13</td>
-<td><strong>인프라</strong> — 조기 종료 콜백</td>
+<td>인프라: 조기 종료 콜백</td>
 </tr>
 <tr>
 <td>profile_image 필드</td>
-<td><code>data_types.py</code> + <code>post_mapper.py</code></td>
+<td><code>data_types.py</code>, <code>post_mapper.py</code></td>
 <td align="right">+7/+0</td>
-<td><strong>스키마 확장</strong> — User에 이미지 필드</td>
+<td>스키마 확장: User에 이미지 필드</td>
 </tr>
 </tbody></table></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>:</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 다음 부분을 고쳤다.</p></div>
 <ul>
-<li>세대 테이블에 <strong>4세대+5 (d0cef2f, 2026-08-20)</strong> 행 추가 (+479/−200, 파일 14)</li>
-<li>한 줄 요약에 (1) AI trend feedback context hydrator, (2) served_slate_context 배선 시작, (3) emb_table core 분리, (4) Grok 4.6 dial 0.3, (5) grok_sampler stop_predicate, (6) profile_image 6개 항목 반영</li>
-<li>&quot;후보 생성&quot; 대신 새 하위 절 <strong>&quot;AI trend feedback context — 4세대+5 신규&quot;</strong> 를 랭킹·필터 사이에 삽입 (topic feedback과 나란한 채널로 위치)</li>
-<li>&quot;Phoenix 학습·인덱스&quot; 절의 4세대+4 하위 소절 뒤에 <strong>&quot;4세대+5 (2026-08-20) — Phoenix 서빙이 산출한 slate context를 home-mixer가 소비 시작&quot;</strong> 소절 신설</li>
-<li>&quot;Grox → PtOS Adult Content Cross-Validation&quot; 절의 4세대+4 항목 뒤에 <strong>&quot;4세대+5 (2026-08-20) Grok 4.6 internal dial 0.1 → 0.3 (3배 상향)&quot;</strong> 한 줄 추가</li>
-<li>열린 질문 절에 <strong>&quot;4세대+5 공개로 해소된 것 / 신규 (2026-08-22)&quot;</strong> 서브섹션 추가 (5개 해소 + 5개 심층 분석 필요)</li>
-<li>출처 절에 d0cef2f 관련 파일 6개 링크 추가</li>
+<li>세대 테이블에 4세대+5(d0cef2f, 2026-08-20) 행을 추가했다(+479/−200, 파일 14).</li>
+<li>한 줄 요약에 다음 6개 항목을 반영했다.<ol>
+<li>AI trend feedback context hydrator</li>
+<li>served_slate_context 연결 시작</li>
+<li>emb_table core 분리</li>
+<li>Grok 4.6 dial 0.3</li>
+<li>grok_sampler stop_predicate</li>
+<li>profile_image</li>
+</ol>
+</li>
+<li>&quot;후보 생성&quot; 대신 새 하위 절 &quot;AI trend feedback context — 4세대+5 신규&quot;를 랭킹·필터 사이에 넣었다. topic feedback과 나란한 채널로 위치를 잡았다.</li>
+<li>&quot;Phoenix 학습·인덱스&quot; 절의 4세대+4 하위 소절 뒤에 &quot;4세대+5 (2026-08-20) — Phoenix 서빙이 산출한 slate context를 home-mixer가 소비 시작&quot; 소절을 새로 만들었다.</li>
+<li>&quot;Grox → PtOS Adult Content Cross-Validation&quot; 절의 4세대+4 항목 뒤에 &quot;4세대+5 (2026-08-20) Grok 4.6 internal dial 0.1 → 0.3 (3배 상향)&quot; 한 줄을 추가했다.</li>
+<li>열린 질문 절에 &quot;4세대+5 공개로 해소된 것 / 신규 (2026-08-22)&quot; 서브섹션을 추가했다. 해소 5개와 심층 분석 필요 5개를 적었다.</li>
+<li>출처 절에 d0cef2f 관련 파일 6개 링크를 추가했다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> 4세대부터 4세대+4까지 반영해 온 canon의 성격이 다시 확인됐다. <strong>매일 이어지는 커밋 리듬 속에서 proto 스캐폴딩과 실제 소비 배선이 하루나 이틀 차이로 연달아 나온다.</strong> 4세대+4의 <code>SlateContext</code> proto가 4세대+5에서 소비되기 시작한 것은 이 리듬의 세 번째 사례다(첫 번째는 4세대+2의 V2 라벨이 +3의 dual-write 재설계로, 두 번째는 4세대+3의 VMRanker SID 배선이 +4 proto의 sid* 필드 정식화로, 세 번째는 4세대+4의 SlateContext proto가 +5의 phoenix_scorer 배선으로 이어진 경우다). AI trend 컨텍스트 채널을 새로 만든 것과 함께 놓고 보면, <strong>X의 랭킹·후보 파이프라인이 (a) 상류 시그널 소스를 넓히는 축(AI trend)과 (b) Phoenix 서빙 산출물을 home-mixer가 더 얇게 소비하는 축</strong>이라는 두 방향으로 동시에 확장되고 있다는 관찰이 굳어진다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대부터 4세대+4까지 canon에 반영해 온 성격이 이번에도 확인됐다. 매일 이어지는 커밋 리듬 속에서 proto 스캐폴딩과 실제 소비 연결이 하루나 이틀 차이로 연달아 나온다는 것이다. AI trend 컨텍스트 채널을 새로 만든 것과 함께 놓고 보면, X의 랭킹·후보 파이프라인이 두 방향으로 동시에 확장되고 있다는 관찰이 굳어진다.</p></div>
+<ul>
+<li>4세대+4의 <code>SlateContext</code> proto가 4세대+5에서 소비되기 시작한 것은 이 리듬의 세 번째 사례다.<ul>
+<li>첫 번째는 4세대+2의 V2 라벨이 +3의 dual-write 재설계로 이어진 경우다.</li>
+<li>두 번째는 4세대+3의 VMRanker SID 연결이 +4 proto의 <code>sid*</code> 필드 정식화로 이어진 경우다.</li>
+<li>세 번째는 4세대+4의 SlateContext proto가 +5의 phoenix_scorer 연결로 이어진 경우다.</li>
+</ul>
+</li>
+<li>두 방향은 상류 시그널 소스를 넓히는 축(AI trend)과, Phoenix 서빙 산출물을 home-mixer가 더 얇게 소비하는 축이다.</li>
+</ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="2-xiaohongshu-onemodel--유기광고상점-3개-지면-통합-랭커-프로덕션-ab-레이더-승격"><span class="num">2</span>Xiaohongshu <strong>OneModel</strong> — 유기·광고·상점 3개 지면 통합 랭커, 프로덕션 A/B <code>[레이더 승격]</code></h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.18606" target="_blank" rel="noopener">OneModel: A Unified Foundation for Platform-Scale Multi-Scenario Ranking (arXiv 2608.18606)</a> — 2026-08-19 arXiv 제출 (v2, v1은 초기 제출), 논문. 저자는 14명이고(Yinqi Zhang, Peiyu Hu, Yuntian Tang, Siying Gu, Jiahao Liang, Longxin Kou, Haiqing Hu, Shuman Zhuang 등), 초록에 명시된 배포 서비스는 Xiaohongshu(小红书, 중국 라이프스타일 소셜 플랫폼)이다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> Xiaohongshu는 canon이 아직 추적하지 않는 서비스지만, 여러 비즈니스 스트림(유기 추천, 광고, 상점 상품)을 하나의 앱에서 통합해 서빙한다는 점이 X와 Meta, Netflix의 서비스별 파편 랭커와 비교하면 이례적이다. 이 논문은 <strong>세 개 지면을 하나의 랭커로 통합</strong>했다는 프로덕션 배포 진술이고, 다음 세 갈래의 프로덕션 진술군에 새로운 각도를 더한다. (a) Netflix Foundation Model은 단일 FM 위에 서비스별 head를 두었고, (b) Meta GEM은 광고 domain 안에서 IG와 FB를 통합하는 backbone을 만들었으며, (c) Yandex Music Gryphon-v2/Sona는 retrieval과 ranking을 통합했다. OneModel은 그 중 <strong>하나의 backbone이 서로 다른 비즈니스 스트림(유기·광고·상점)을 동시에 서빙하는</strong> 각도로 넘어간다.</p></div>
-<p><strong>핵심 주장</strong> (arxiv abstract):</p>
+<h2 id="2-onemodel이-유기광고상점-3개-지면의-랭킹을-하나로-합쳤다--xiaohongshu"><span class="num">2</span>OneModel이 유기·광고·상점 3개 지면의 랭킹을 하나로 합쳤다 — Xiaohongshu</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.18606" target="_blank" rel="noopener">OneModel: A Unified Foundation for Platform-Scale Multi-Scenario Ranking (arXiv 2608.18606)</a> — 2026-08-19 arXiv 제출(v2, v1은 초기 제출), 논문. 저자는 14명이다(Yinqi Zhang, Peiyu Hu, Yuntian Tang, Siying Gu, Jiahao Liang, Longxin Kou, Haiqing Hu, Shuman Zhuang 등). 초록에 명시된 배포 서비스는 Xiaohongshu(小红书, 중국 라이프스타일 소셜 플랫폼)다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> Xiaohongshu는 canon이 아직 추적하지 않는 서비스다. 그래도 여러 비즈니스 스트림(유기 추천, 광고, 상점 상품)을 하나의 앱에서 통합해 서빙한다는 점이, X와 Meta, Netflix의 서비스별 파편 랭커와 비교하면 이례적이다. 이 논문은 세 개 지면을 하나의 랭커로 통합했다는 프로덕션 배포 진술이고, 다음 세 갈래의 프로덕션 진술군에 새로운 각도를 더한다.</p></div>
+<ul>
+<li>Netflix Foundation Model(FM)은 단일 FM 위에 서비스별 head를 두었다.</li>
+<li>Meta GEM은 광고 domain 안에서 IG와 FB를 통합하는 backbone을 만들었다.</li>
+<li>Yandex Music Gryphon-v2/Sona는 retrieval과 ranking을 통합했다.</li>
+</ul>
+<p>OneModel은 하나의 backbone이 서로 다른 비즈니스 스트림(유기·광고·상점)을 동시에 서빙하는 각도로 넘어간다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 세 스트림의 최종 랭킹을 공유 이벤트 시퀀스 기반의 프레임워크 하나로 통합한다</span></p></div>
+<ul>
+<li><p>초록은 스트림마다 랭킹 시스템을 따로 두면 사용자 표현이 쪼개지고 엔지니어링 비용이 늘어난다고 지적하고, 최종 랭킹을 하나로 합친 OneModel을 제안한다.</p>
 <blockquote>
 <p>&quot;Platform-scale recommender systems often span multiple business streams such as organic recommendation, advertising, and merchant services, where user behaviors form a continuous cross-stream trajectory. Maintaining separate ranking systems fragments user representations and increases engineering cost. We propose OneModel, a unified framework for multi-stream final ranking. OneModel maps heterogeneous behaviors into shared event sequences, learns long-context user representations with an action-oriented backbone, and introduces Scenario-aware Information Modulation to balance cross-stream transfer and stream-specific specialization.&quot;</p>
 <p>— <a href="https://arxiv.org/abs/2608.18606" target="_blank" rel="noopener">OneModel (arXiv 2608.18606)</a> abstract (논문)</p>
 </blockquote>
-<p>핵심 아키텍처 요소:</p>
+</li>
+<li><p>핵심 아키텍처 요소는 세 가지다.</p>
 <ul>
-<li><strong>공유 이벤트 시퀀스</strong> — 유기·광고·상점 세 스트림의 사용자 행동을 하나의 이벤트 시퀀스 스키마로 통합한다</li>
-<li><strong>action-oriented backbone</strong> — long-context user representation을 학습하는 부분이다 (구체적인 아키텍처는 abstract에 나오지 않는다)</li>
-<li><strong>Scenario-aware Information Modulation</strong> — cross-stream transfer(공유)와 stream-specific specialization(전용) 사이의 균형을 스위칭과 게이팅으로 조절한다</li>
+<li>공유 이벤트 시퀀스는 유기·광고·상점 세 스트림의 사용자 행동을 하나의 이벤트 시퀀스 스키마로 통합한다.</li>
+<li>action-oriented backbone은 long-context user representation을 학습하는 부분이다. 구체적인 아키텍처는 abstract에 나오지 않는다.</li>
+<li>Scenario-aware Information Modulation은 cross-stream transfer와 stream-specific specialization 사이의 균형을 스위칭과 게이팅으로 조절한다. 앞의 것은 공유, 뒤의 것은 전용에 해당한다.</li>
 </ul>
-<p>프로덕션 배포를 위한 최적화 요소로는 <strong>stratified user representation, multi-objective training, feature decomposition, user feature prefetching, shared user-tower computation, graph-level inference optimization</strong>을 든다.</p>
-<p><strong>A/B 결과</strong> — Xiaohongshu 프로덕션 배포:</p>
+</li>
+<li><p>프로덕션 배포를 위한 최적화 요소로는 여섯 가지를 든다.</p>
+<ul>
+<li>stratified user representation</li>
+<li>multi-objective training</li>
+<li>feature decomposition</li>
+<li>user feature prefetching</li>
+<li>shared user-tower computation</li>
+<li>graph-level inference optimization</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. Xiaohongshu 프로덕션 A/B에서 세 지면의 지표가 모두 올랐다</span></p></div>
+<ul>
+<li>A/B 결과는 Xiaohongshu 프로덕션 배포에서 나왔다.</li>
+</ul>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col><col class="w8"></colgroup>
 <thead>
 <tr>
@@ -393,23 +593,42 @@ async with aclosing(self._sample_streaming_raw(request, **kwargs)) as raw_stream
 <td align="right"><strong>+2.1585%</strong></td>
 </tr>
 </tbody></table></div>
-<div class="blk why"><p><span class="lbl">의미</span> <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 랭킹 스레드</a>와는 방향이 조금 다르지만, <strong>&quot;단일 랭커가 여러 비즈니스 스트림을 통합 서빙한다&quot;는 회사 차원 아키텍처 결단의 세 번째 프로덕션 진술</strong>이다. 첫째는 Netflix FM(서비스 다양성, foundation에서 head로), 둘째는 Meta GEM(광고 domain 안에서의 지면 다양성), 셋째가 Xiaohongshu OneModel(비즈니스 스트림 다양성)이다. Meta GEM은 광고와 IG, FB로 확장했지만 여전히 광고 domain이 중심인 데 비해, Xiaohongshu OneModel은 <strong>광고와 유기, 상점을 대등하게 통합</strong>한다는 점이 새롭다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot; 절에 OneModel 엔트리를 추가했다 (2~4줄 포인터). 아직 서비스 정본(services/xiaohongshu.md 신설)으로 승격시키지는 않는다. canon이 추적하는 서비스가 아니기 때문이며, 중국 밖 플랫폼에서 두 번째 회사의 유사한 진술이 나오면 그때 topic(multi-task-ranking.md 또는 새로 만드는 unified-multi-scenario topic)으로 승격시킬 후보가 된다.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot; 절에 OneModel 엔트리(2~4줄 포인터)를 추가했다 <code>[레이더 승격]</code>. OneModel은 arXiv에서 레이더 수용 기준을 통과했다. 서비스 정본(services/xiaohongshu.md 신설)으로는 아직 승격시키지 않는다. canon이 추적하는 서비스가 아니기 때문이다. 중국 밖 플랫폼에서 두 번째 회사의 비슷한 진술이 나오면, 그때 topic(multi-task-ranking.md 또는 새로 만드는 unified-multi-scenario topic)으로 승격시킬 후보가 된다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> OneModel은 &quot;단일 랭커가 여러 비즈니스 스트림을 통합 서빙한다&quot;는 회사 차원 아키텍처 결단의 세 번째 프로덕션 진술이다. <a href="radar.html#llm-native-%EB%9E%AD%ED%82%B9%EC%9D%98-%ED%99%95%EC%82%B0--genrec-%EC%9D%B4%ED%9B%84-%EB%88%84%EA%B0%80-%EB%94%B0%EB%9D%BC%EC%98%A4%EB%82%98">LLM-native 랭킹 스레드</a>와는 방향이 조금 다르다. Meta GEM은 광고와 IG, FB로 확장했지만 여전히 광고 domain이 중심인 데 비해, Xiaohongshu OneModel은 광고와 유기, 상점을 대등하게 통합한다는 점이 새롭다.</p></div>
+<ul>
+<li>첫째는 Netflix FM(서비스 다양성, foundation에서 head로)이다.</li>
+<li>둘째는 Meta GEM(광고 domain 안에서의 지면 다양성)이다.</li>
+<li>셋째가 Xiaohongshu OneModel(비즈니스 스트림 다양성)이다.</li>
+</ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
 <p>없음.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="레이더">레이더</h2>
 <ul>
-<li><strong>OneModel (Xiaohongshu)</strong> (<a href="https://arxiv.org/abs/2608.18606" target="_blank" rel="noopener">arXiv 2608.18606</a>, 2026-08-19) — 위 절을 참조한다. radar.md &quot;이번 달 신규&quot;에 추가했다</li>
+<li>OneModel(Xiaohongshu, <a href="https://arxiv.org/abs/2608.18606" target="_blank" rel="noopener">arXiv 2608.18606</a>, 2026-08-19)은 위 2절에서 다뤘고, radar.md &quot;이번 달 신규&quot;에 추가했다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li><strong>X d0cef2f 후속 커밋 관찰</strong> — <code>UseServedSlateContext</code> 게이트가 프로덕션에서 true로 승격되는 시점(Phoenix 서빙이 산출한 slate context가 실제 트래픽에 반영되는 시점이다), <code>EnableAiTrendFeedbackContext</code> 게이트 활성화, Grok 4.6 dial의 다음 이동(30%에서 50%나 100%로 오르는지, 아니면 내려가는지)을 확인한다. 매일 커밋하는 리듬이 유지된다면 다음 커밋에서 관측할 수 있다</li>
-<li><strong>X <code>AiTrend</code> 정의 upstream 추적</strong> — <code>batch_get_tweet_ai_trend</code>와 <code>batch_get_ai_trend_name</code>이 읽는 Strato 컬럼은 이 저장소 밖에 있지만, 앞으로 관련 문서(예를 들어 <code>docs/</code> 하위의 새 md 파일이나 README 갱신)가 나오면 반영한다</li>
-<li><strong>Xiaohongshu OneModel 후속</strong> — v2가 8/19 제출이라 논문 자체는 아직 프리프린트다. 학회(RecSys/KDD/WWW 2026·2027) 게재 여부, 저자들의 후속 발표(특히 &quot;action-oriented backbone&quot; 아키텍처 세부와 cross-stream transfer 게이팅 메커니즘), Xiaohongshu가 다른 지면(검색 등)에도 배포했다는 진술이 나오는지 확인한다</li>
-<li><strong>X 4세대+4 심층 분석 (지연):</strong> aad7179의 <code>phoenix/xrex/models/recsys_model.py</code> (+265/−25) 트레이스는 여전히 끝내지 못했다. <code>RewardOutputs</code>가 어느 학습 루프에서 채워지고 소비되는지, link-open 5분위가 quantile regression인지 확인해야 한다. 사람이 요청할 때 착수한다</li>
+<li>X d0cef2f의 후속 커밋에서 세 가지를 확인한다 — 매일 커밋하는 리듬이 유지된다면 다음 커밋에서 관측할 수 있다.<ul>
+<li><code>UseServedSlateContext</code> 게이트가 프로덕션에서 true로 승격되는 시점을 본다. Phoenix 서빙이 산출한 slate context가 실제 트래픽에 반영되는 시점이다.</li>
+<li><code>EnableAiTrendFeedbackContext</code> 게이트가 활성화되는지 본다.</li>
+<li>Grok 4.6 dial의 다음 이동을 본다. 30%에서 50%나 100%로 오르는지, 아니면 내려가는지가 관심사다.</li>
+</ul>
+</li>
+<li>X <code>AiTrend</code> 정의의 upstream을 추적한다 — <code>batch_get_tweet_ai_trend</code>와 <code>batch_get_ai_trend_name</code>이 읽는 Strato 컬럼은 이 저장소 밖에 있다. 앞으로 관련 문서(예를 들어 <code>docs/</code> 아래의 새 md 파일이나 README 갱신)가 나오면 반영한다.</li>
+<li>Xiaohongshu OneModel의 후속을 확인한다 — v2가 8/19 제출이라 논문 자체는 아직 프리프린트다.<ul>
+<li>학회(RecSys/KDD/WWW 2026·2027) 게재 여부를 본다.</li>
+<li>저자들의 후속 발표를 본다. 특히 &quot;action-oriented backbone&quot; 아키텍처 세부와 cross-stream transfer 게이팅 메커니즘을 본다.</li>
+<li>Xiaohongshu가 다른 지면(검색 등)에도 배포했다는 진술이 나오는지 본다.</li>
+</ul>
+</li>
+<li>X 4세대+4(aad7179) 심층 분석은 미뤄 둔다 — 사람이 요청할 때 착수한다.<ul>
+<li>aad7179의 <code>phoenix/xrex/models/recsys_model.py</code>(+265/−25) 트레이스는 여전히 끝내지 못했다.</li>
+<li><code>RewardOutputs</code>가 어느 학습 루프에서 채워지고 소비되는지, link-open 5분위가 quantile regression인지 확인해야 한다.</li>
+</ul>
+</li>
 </ul></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 

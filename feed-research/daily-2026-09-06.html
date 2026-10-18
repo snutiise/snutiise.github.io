@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-06 — feed-research</title>
-<meta name="description" content="한 줄: X 4세대+16(902a06f)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에…">
+<meta name="description" content="한 줄: X가 콜드스타트 실험에서 control과 treatment 두 arm이 똑같은 bucket 관측 기록을 남기도록 고쳤다. treatment arm의 콜드스타트 후보는 Phoenix MoE 후보로 좁혔다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-06.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-06 — feed-research">
-<meta property="og:description" content="한 줄: X 4세대+16(902a06f)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에…">
+<meta property="og:description" content="한 줄: X가 콜드스타트 실험에서 control과 treatment 두 arm이 똑같은 bucket 관측 기록을 남기도록 고쳤다. treatment arm의 콜드스타트 후보는 Phoenix MoE 후보로 좁혔다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-06.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,26 +42,27 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>일요일</li>
-<li><span class="meta-k">읽는 시간</span>32분</li>
+<li><span class="meta-k">읽는 시간</span>35분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
-<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+16(<a href="https://github.com/xai-org/x-algorithm/commit/902a06f">902a06f</a>)이 콜드스타트 experiment에 codivert impression 패턴을 배선했고(양 arm이 동일한 bucket impression을 남김) treatment arm의 cold-start 후보를 Phoenix MoE 후보에 국한했으며, Phoenix serving 요청에 <code>experiment_overrides map</code>과 <code>SlateContext.exact_k/exact_gap</code> 필드를 신설했고, VF dark-traffic 미러링 대상에 <code>devel</code> app_env(PR별 프리뷰 배포)를 추가했다.</div>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 콜드스타트 실험에서 control과 treatment 두 arm이 똑같은 bucket 관측 기록을 남기도록 고쳤다. treatment arm의 콜드스타트 후보는 Phoenix MoE 후보로 좁혔다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">11</span></summary><ol><li><a href="#1-x-4세대16--cold-start-codivert-impression-배선--treatment-스코프를-phoenix-moe로-국한--phoenix-serving-계약-확장-experiment_overrides-exact_k--dark-traffic-devel-확장--예정된-muted-keyword-rule-신호--x"><span class="num">1</span>X 4세대+16 — cold-start codivert impression 배선 + treatment 스코프를 Phoenix MoE로 국한 + Phoenix serving 계약 확장 (experiment_overrides, exact_k) + dark-traffic devel 확장 + 예정된 muted-keyword rule 신호 — X</a><ol><li><a href="#a-cold-start-experiment에-codivert-impression-패턴이-배선됐다--두-arm이-동일한-experiment-bucket-impression을-남기게-강제">A. Cold-start experiment에 codivert impression 패턴이 배선됐다 — 두 arm이 동일한 experiment bucket impression을 남기게 강제</a></li><li><a href="#b-cold-start-treatment-후보-필터가-phoenix-moe-후보만-남기도록-좁혀졌다">B. Cold-start Treatment 후보 필터가 Phoenix MoE 후보만 남기도록 좁혀졌다</a></li><li><a href="#c-engagement-counts-hydration이-cold-start-게이팅과-분리됐다">C. Engagement counts hydration이 cold-start 게이팅과 분리됐다</a></li><li><a href="#d-phoenix-serving-요청-계약에-experiment_overrides-map과-slatecontextexact_kexact_gap-추가">D. Phoenix serving 요청 계약에 experiment_overrides map과 SlateContext.exact_k/exact_gap 추가</a></li><li><a href="#e-vf-dark-traffic-미러링에-devel-app_env가-추가돼-pr별-프리뷰-배포도-프로덕션-트래픽을-받는다">E. VF dark-traffic 미러링에 devel app_env가 추가돼 PR별 프리뷰 배포도 프로덕션 트래픽을 받는다</a></li><li><a href="#f-corefeaturetext가-예정된-muted-keyword-rule을-위해-dead-code로-보존됐다">F. CoreFeature.text가 예정된 muted-keyword rule을 위해 dead-code로 보존됐다</a></li><li><a href="#g-부수-변화-요약">G. 부수 변화 요약</a></li></ol></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">11</span></summary><ol><li><a href="#1-콜드스타트-실험의-두-arm이-같은-관측-기록을-남기게-됐다--x"><span class="num">1</span>콜드스타트 실험의 두 arm이 같은 관측 기록을 남기게 됐다 — X</a><ol><li><a href="#a-콜드스타트-실험의-두-arm이-같은-bucket-관측-기록을-남기도록-실행-순서를-바꿨다">A. 콜드스타트 실험의 두 arm이 같은 bucket 관측 기록을 남기도록 실행 순서를 바꿨다</a></li><li><a href="#b-treatment-뷰어의-콜드스타트-후보가-phoenix-moe-후보로-좁혀졌다">B. treatment 뷰어의 콜드스타트 후보가 Phoenix MoE 후보로 좁혀졌다</a></li><li><a href="#c-engagement-counts-hydration이-cold-start-스위치에서-분리됐다">C. engagement counts hydration이 cold-start 스위치에서 분리됐다</a></li><li><a href="#d-phoenix-서빙-요청에-실험-파라미터-오버라이드-필드와-slate-지표-두-개가-생겼다">D. Phoenix 서빙 요청에 실험 파라미터 오버라이드 필드와 slate 지표 두 개가 생겼다</a></li><li><a href="#e-vf-미러링에-devel-배포가-추가돼-pr별-프리뷰-배포도-프로덕션-트래픽을-받는다">E. VF 미러링에 devel 배포가 추가돼 PR별 프리뷰 배포도 프로덕션 트래픽을 받는다</a></li><li><a href="#f-vf가-예정된-muted-keyword-rule에-쓸-포스트-텍스트-필드를-미리-남겨-뒀다">F. VF가 예정된 muted-keyword rule에 쓸 포스트 텍스트 필드를 미리 남겨 뒀다</a></li><li><a href="#g-그-밖의-변경">G. 그 밖의 변경</a></li></ol></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-x-4세대16--cold-start-codivert-impression-배선--treatment-스코프를-phoenix-moe로-국한--phoenix-serving-계약-확장-experiment_overrides-exact_k--dark-traffic-devel-확장--예정된-muted-keyword-rule-신호--x"><span class="num">1</span>X 4세대+16 — cold-start codivert impression 배선 + treatment 스코프를 Phoenix MoE로 국한 + Phoenix serving 계약 확장 (<code>experiment_overrides</code>, <code>exact_k</code>) + dark-traffic devel 확장 + 예정된 muted-keyword rule 신호 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/902a06f" target="_blank" rel="noopener">xai-org/x-algorithm@902a06f</a> — GitHub, 2026-09-04 21:03 UTC, 코드. <code>Open-source X Recommendation Algorithm</code> 정기 크론 미러. 파일 25개, +472/−179.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X의 오픈소스 미러는 프로덕션 캐넌을 크론으로 흘려보내는 정기 커밋이다. 어제(2026-09-05) 판이 4세대+15(<a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">9b0dc31</a>)까지 반영됐고, 이 커밋(902a06f)이 그 다음 판이다. Phoenix MoE(Mixture of Experts — 검색·랭킹 백본을 서로 다른 전문가 서브네트워크에 배분해 서빙하는 아키텍처)의 A/B 인프라를 다시 손봤고, 부수적으로 Phoenix serving 요청 계약, VF dark-traffic(프로덕션 트래픽을 별도 배포로 복제 전송해 응답 없이 관측만 하는 미러링) 배선, 예정된 muted-keyword VF rule의 실마리가 붙었다.</p></div>
+<h2 id="1-콜드스타트-실험의-두-arm이-같은-관측-기록을-남기게-됐다--x"><span class="num">1</span>콜드스타트 실험의 두 arm이 같은 관측 기록을 남기게 됐다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/902a06f" target="_blank" rel="noopener">xai-org/x-algorithm@902a06f</a> — GitHub, 2026-09-04 21:03 UTC, 코드. <code>Open-source X Recommendation Algorithm</code> 정기 크론 미러이고, 바뀐 파일은 25개(+472/−179)다. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+16이다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X의 오픈소스 미러는 크론이 프로덕션 캐넌을 정기적으로 흘려보내는 커밋으로, 어제(2026-09-05) 판에는 4세대+15(<a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">9b0dc31</a>)까지 반영됐고 이 커밋(902a06f)이 그다음 판이다. Phoenix는 X For You 피드의 트랜스포머 랭킹 모델이고, Phoenix MoE(Mixture of Experts)는 검색·랭킹 백본을 서로 다른 전문가 서브네트워크에 배분해 서빙하는 아키텍처다. VF는 포스트마다 이 뷰어에게 보여도 되는지를 판정하는 visibility-filtering 서비스다. 이번 커밋은 Phoenix MoE의 A/B 인프라를 다시 손본 것이 중심이고, 부수적으로 Phoenix serving 요청 계약과 VF dark-traffic 연결이 바뀌었으며 예정된 muted-keyword VF rule의 실마리도 드러났다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
-<h3 id="a-cold-start-experiment에-codivert-impression-패턴이-배선됐다--두-arm이-동일한-experiment-bucket-impression을-남기게-강제">A. Cold-start experiment에 codivert impression 패턴이 배선됐다 — 두 arm이 동일한 experiment bucket impression을 남기게 강제</h3>
-<p><em>Codivert</em>는 X 내부 용어로 보인다 <span class="badge est">추정</span>(bucket 관측 시점을 두 arm에서 동일하게 맞춰서 A/B 분석에 편향이 들지 않게 하는 패턴, &quot;co-divert&quot;는 두 arm이 같은 시점에서 각자 분기한다는 의미). 이번 커밋은 이 패턴을 코드로 구체화했다.</p>
-<p><strong>신규 param 두 개</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>:</p>
+<h3 id="a-콜드스타트-실험의-두-arm이-같은-bucket-관측-기록을-남기도록-실행-순서를-바꿨다">A. 콜드스타트 실험의 두 arm이 같은 bucket 관측 기록을 남기도록 실행 순서를 바꿨다</h3>
+<p>이제 control과 treatment 두 arm이 똑같은 실험 bucket 관측 기록(impression)을 남긴다 <span class="badge ok">확인</span>. codivert는 X 내부 용어로 보인다 <span class="badge est">추정</span>. 뜻은 bucket 관측 시점을 두 arm에서 똑같이 맞춰 A/B 분석에 편향이 들지 않게 하는 패턴이고, &quot;co-divert&quot;는 두 arm이 같은 시점에서 각자 분기한다는 의미다 <span class="badge est">추정</span>. 이번 커밋은 이 패턴을 코드로 구체화했다.</p>
 <ul>
-<li><code>rust_home_mixer_phoenix_moe_codivert_viewer_is_control</code> (bool, default false)</li>
-<li><code>rust_home_mixer_phoenix_moe_codivert_viewer_is_treatment</code> (bool, default false)</li>
-</ul>
-<p>두 param은 <code>moe_codivert_viewer</code> experiment의 bucket membership으로 흘러 들어온다. YAML rule의 짝은 다음과 같이 대칭적이다:</p>
+<li>home-mixer(For You 피드 요청을 처리하는 서비스)에 뷰어가 이 실험의 control인지 treatment인지를 나타내는 bool param 두 개가 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.<ul>
+<li><p><code>rust_home_mixer_phoenix_moe_codivert_viewer_is_control</code> (bool, default false)</p>
+</li>
+<li><p><code>rust_home_mixer_phoenix_moe_codivert_viewer_is_treatment</code> (bool, default false)</p>
+</li>
+<li><p>두 param의 값은 <code>moe_codivert_viewer</code> experiment의 bucket membership에서 들어온다. 두 arm의 YAML rule도 다음처럼 서로 대칭이다.</p>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-yaml" data-lang="yaml">- description: &quot;co-divert viewer treatment&quot;
   query: &gt;
@@ -80,24 +81,28 @@
 </code></pre></figure>
 <p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a> 테스트 fixture, 2026-09-04</p>
 </blockquote>
-<p><strong>핵심 배선: <code>AuthorColdStart::apply</code>가 실행 순서를 재정렬</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>. 이전 판(4세대+3까지)에서는 이렇게 흘렀다:</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>핵심 변화는 <code>AuthorColdStart::apply</code>의 실행 순서를 다시 정렬한 것이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>. 이전 판(4세대+3까지)에서는 다음 순서로 실행됐다.</p>
 <ol>
-<li><code>ColdStartTrackedIds</code> 조회 + <code>record_tracked_ids</code> 호출</li>
-<li><code>EnableViewerColdStart</code>가 false면 여기서 조기 반환</li>
-<li><code>viewer_arm(query)</code> 호출(experiment bucket 실 조회, 이때 첫 impression이 남음)</li>
-<li><code>author_corpus(...)</code> 호출(author bucket 실 조회, 이때 author-side impression이 남음)</li>
-<li>cold-start 로직 실행</li>
+<li><code>ColdStartTrackedIds</code>를 조회하고 <code>record_tracked_ids</code>를 호출한다.</li>
+<li><code>EnableViewerColdStart</code>가 false면 여기서 조기 반환한다.</li>
+<li><code>viewer_arm(query)</code>를 호출한다. experiment bucket을 실제로 조회하며, 이때 첫 impression이 남는다.</li>
+<li><code>author_corpus(...)</code>를 호출한다. author bucket을 실제로 조회하며, 이때 author-side impression이 남는다.</li>
+<li>cold-start 로직을 실행한다.</li>
 </ol>
-<p>문제는 2단계 조기 반환이었다. <code>EnableViewerColdStart=false</code>인 control arm은 3·4단계를 아예 밟지 않는다. 그러면 experiment analysis에서 두 arm의 impression 로그 shape 자체가 달라진다. Treatment는 viewer bucket + author bucket을 모두 관측한 사용자만 세고, control은 관측 자체가 아예 없다. 이렇게 되면 triggered-analysis(파이프라인에 실제로 진입한 사용자만 비교)와 intent-to-treat(할당된 모든 사용자를 비교) 사이의 정의가 어긋나고, 파이프라인 진입 편향이 lift 추정을 오염시킨다.</p>
-<p>이번 커밋의 재정렬은 다음과 같다:</p>
+<p>문제는 2단계의 조기 반환이었다. <code>EnableViewerColdStart=false</code>인 control arm은 3·4단계를 아예 거치지 않는다. 그러면 실험 분석에서 두 arm의 impression 로그 형태 자체가 달라진다. treatment는 viewer bucket과 author bucket을 모두 관측한 사용자만 세고, control에는 관측이 아예 없다. 이렇게 되면 triggered-analysis와 intent-to-treat 사이의 정의가 어긋나고, 파이프라인 진입 편향이 lift 추정을 오염시킨다. triggered-analysis는 파이프라인에 실제로 진입한 사용자만 비교하고, intent-to-treat는 할당된 모든 사용자를 비교한다.</p>
+<p>이번 커밋은 순서를 이렇게 바꿨다.</p>
 <ol>
-<li><code>ColdStartParams::read(query)</code>가 <strong>모든 param을 한 번에 읽고</strong>(이 시점에 <code>viewer_arm</code>도 함께 호출돼 viewer bucket impression이 남음), <code>params.arm</code>으로 저장.</li>
-<li><code>record_tracked_ids(candidates, &amp;params.tracked_ids)</code> 호출.</li>
-<li><strong><code>params.arm</code>이 Control 또는 Treatment이면(즉 어느 arm이든 codivert에 속하면), enabled 여부와 무관하게 <code>author_corpus(...)</code>를 호출해 author-side bucket impression을 남긴다.</strong></li>
-<li><strong>그 다음에</strong> <code>!params.enabled</code>이면 scores 원본을 그대로 반환하는 조기 반환. Impression이 이미 남은 뒤이므로 관측 로그는 두 arm에서 대칭.</li>
-<li>cold-start 로직 실행.</li>
+<li><code>ColdStartParams::read(query)</code>가 모든 param을 한 번에 읽고 <code>params.arm</code>으로 저장한다. 이때 <code>viewer_arm</code>도 함께 호출돼 viewer bucket impression이 남는다.</li>
+<li><code>record_tracked_ids(candidates, &amp;params.tracked_ids)</code>를 호출한다.</li>
+<li><code>params.arm</code>이 Control이나 Treatment이면, 즉 어느 arm이든 codivert에 속하면 enabled 여부와 상관없이 <code>author_corpus(...)</code>를 호출해 author-side bucket impression을 남긴다.</li>
+<li>그다음에 <code>!params.enabled</code>이면 scores 원본을 그대로 반환하며 조기 반환한다. impression이 이미 남은 뒤이므로 관측 로그는 두 arm에서 대칭이다.</li>
+<li>cold-start 로직을 실행한다.</li>
 </ol>
-<p><strong>회귀 테스트가 이 대칭을 잠근다</strong> <span class="badge ok">확인</span>. 새로 추가된 두 테스트:</p>
+<p>새 회귀 테스트 두 개가 이 대칭을 고정한다 <span class="badge ok">확인</span>. control이든 treatment든 <code>moe_codivert_viewer</code> bucket 관측을 정확히 3회, <code>moe_exp</code>(author 대상) bucket 관측을 정확히 2회 남겨야 한다.</p>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[test]
 fn both_arms_log_the_same_codivert_impressions() {
@@ -120,10 +125,16 @@ fn both_viewer_arms_log_the_same_author_impressions() {
 </code></pre></figure>
 <p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>, 2026-09-04</p>
 </blockquote>
-<p>즉 control이든 treatment든 (a) <code>moe_codivert_viewer</code> bucket 관측을 정확히 3회, (b) <code>moe_exp</code>(author 대상) bucket 관측을 정확히 2회 남긴다. 관측 count가 arm과 무관하게 같아야 한다는 대칭성이 assertion으로 잠긴 것.</p>
-<div class="blk why"><p><span class="lbl">의미</span> — canon 이전 판은 4세대+1(2026-08-14) Thompson sampling 배선과 4세대+3(2026-08-18) <code>count_tracked_ids</code> 단순화까지 알았고, 이 두 흐름은 콜드스타트 <strong>로직</strong>의 진화였다. 이번 커밋은 처음으로 콜드스타트의 <strong>A/B 관측 방법론</strong> 자체를 코드로 잠근다. <code>SpyingBucketImpressor</code>라는 테스트 유틸(experiment SDK가 노출한 impression 계측 스파이)의 존재까지 드러난다. X가 A/B 실험에서 <strong>bucket 관측 대칭성</strong>을 회귀 테스트로 강제한다는 문화 관찰이 canon에 붙는다.</p></div>
-<h3 id="b-cold-start-treatment-후보-필터가-phoenix-moe-후보만-남기도록-좁혀졌다">B. Cold-start Treatment 후보 필터가 Phoenix MoE 후보만 남기도록 좁혀졌다</h3>
-<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>:</p>
+<p>관측 횟수가 arm과 상관없이 같아야 한다는 대칭성을 assertion으로 고정한 것이다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> 이번 커밋은 처음으로 콜드스타트의 A/B 관측 방법론 자체를 코드로 고정한다. 정본(서비스별 현재 이해를 담는 이 저장소의 노트)의 이전 판은 4세대+1(2026-08-14)의 Thompson sampling 연결과 4세대+3(2026-08-18)의 <code>count_tracked_ids</code> 단순화까지 알았고, 이 두 흐름은 콜드스타트 로직의 진화였다. <code>SpyingBucketImpressor</code>라는 테스트 유틸(experiment SDK가 노출한 impression 계측 스파이)이 있다는 사실까지 드러난다. X가 A/B 실험에서 bucket 관측 대칭성을 회귀 테스트로 강제한다는 문화 관찰이 정본에 더해진다.</p></div>
+<h3 id="b-treatment-뷰어의-콜드스타트-후보가-phoenix-moe-후보로-좁혀졌다">B. treatment 뷰어의 콜드스타트 후보가 Phoenix MoE 후보로 좁혀졌다</h3>
+<p>treatment 뷰어의 cold-start 후보는 이제 Phoenix MoE 소스에서 온 후보로 한정된다 <span class="badge ok">확인</span>. treatment corpus author의 포스트라도 Phoenix MoE 소스에서 온 것이 아니면 cold-start boost 대상에서 빠진다.</p>
+<ul>
+<li><p>후보 자격을 판정하는 함수의 treatment 분기에 Phoenix MoE 조건이 추가됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>.</p>
+<ul>
+<li><p>이전 판의 <code>ViewerArm::Treatment</code> 분기는 <code>corpus == AuthorCorpus::Treatment</code> 조건만 확인했다. 이번 커밋에서 <code>&amp;&amp; is_phoenix_moe(c)</code>가 추가됐다.</p>
+</li>
+<li><p>treatment 뷰어의 cold-start 후보는 이제 treatment corpus author의 포스트이면서 <code>served_type == ForYouPhoenixRetrievalMoe</code>인 후보만이다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn cold_start_corpus_eligible(arm: ViewerArm, c: &amp;PostCandidate, corpus: AuthorCorpus) -&gt; bool {
     match arm {
         ViewerArm::Holdout =&gt; !is_phoenix_moe(c),
@@ -132,37 +143,77 @@ fn both_viewer_arms_log_the_same_author_impressions() {
     }
 }
 </code></pre></figure>
-<p>이전 판은 <code>ViewerArm::Treatment</code> 분기가 <code>corpus == AuthorCorpus::Treatment</code> 조건만 확인했다. 이번 커밋에서 <strong><code>&amp;&amp; is_phoenix_moe(c)</code>가 추가</strong>됐다. Treatment 뷰어의 cold-start 후보는 이제 (a) treatment corpus author의 포스트이면서 (b) <code>served_type == ForYouPhoenixRetrievalMoe</code>인 후보만이다.</p>
-<p>테스트도 이름부터 바뀌었다:</p>
+</li>
+</ul>
+</li>
+<li><p>테스트 이름도 treatment MoE 후보만 cold-start한다는 뜻으로 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>.</p>
 <ul>
 <li>이전: <code>treatment_viewer_keeps_treatment_moe_and_cold_starts_treatment_corpus</code></li>
-<li>이번: <code>treatment_viewer_cold_starts_treatment_moe_only</code> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a></li>
+<li>이번: <code>treatment_viewer_cold_starts_treatment_moe_only</code></li>
+<li>fixture가 <code>cold_start_candidate(...)</code>에서 <code>moe_candidate(...)</code>로 바뀐 것도 같은 뜻이다.</li>
 </ul>
-<p>즉 treatment corpus author의 포스트라도 Phoenix MoE 소스에서 온 것이 아니면 cold-start boost 대상에서 제외된다. <code>cold_start_candidate(...)</code>가 아니라 <code>moe_candidate(...)</code>로 fixture가 대체된 것도 같은 의미다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> — Phoenix MoE와 cold-start를 <strong>하나의 codivert 실험 안에 묶어</strong> 서로 confounded되지 않게 하려는 배선이다. Treatment 뷰어는 (a) MoE 배선을 활성화하고 (b) cold-start도 MoE 후보에만 적용해서, &quot;MoE의 효과&quot;와 &quot;cold-start 부스트의 효과&quot;가 겹치지 않게 격리한다. <code>enable_viewer_cold_start_boost</code>가 treatment에서 <code>true</code>·control에서 <code>false</code>로 YAML에 못 박힌 것도 같은 방향이다. Cold-start는 이제 <strong>Phoenix MoE의 실 트래픽 실험 옆칸에 재배치</strong>됐다.</p></div>
-<h3 id="c-engagement-counts-hydration이-cold-start-게이팅과-분리됐다">C. Engagement counts hydration이 cold-start 게이팅과 분리됐다</h3>
-<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a>:</p>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 이 변경은 Phoenix MoE와 cold-start를 하나의 codivert 실험 안에 묶어, 둘이 서로 confounded되지 않게 하려는 연결이다. treatment 뷰어에서는 MoE 연결을 활성화하고 cold-start도 MoE 후보에만 적용해, &quot;MoE의 효과&quot;와 &quot;cold-start 부스트의 효과&quot;가 겹치지 않게 격리한다. YAML에서 <code>enable_viewer_cold_start_boost</code>가 treatment에서는 <code>true</code>, control에서는 <code>false</code>로 고정된 것도 같은 방향이다. cold-start는 이제 Phoenix MoE의 실 트래픽 실험 옆칸으로 재배치됐다.</p></div>
+<h3 id="c-engagement-counts-hydration이-cold-start-스위치에서-분리됐다">C. engagement counts hydration이 cold-start 스위치에서 분리됐다</h3>
+<p>engagement counts hydration을 켜는 조건에서 cold-start 스위치와 캐시 조건이 빠졌다 <span class="badge ok">확인</span>. cold-start와 engagement counts hydration은 이제 서로 독립된 정책 축이다.</p>
 <ul>
+<li>hydrator를 켜는 조건식이 짧아졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a>.<ul>
 <li>이전: <code>fn enable(&amp;self, query) -&gt; bool { query.params.get(EnableViewerColdStart) || (!query.has_cached_posts &amp;&amp; (query.params.get(EnableEngagementCountsHydration) || query.is_shadow_traffic)) }</code></li>
 <li>이후: <code>fn enable(&amp;self, query) -&gt; bool { query.params.get(EnableEngagementCountsHydration) || query.is_shadow_traffic }</code></li>
 </ul>
-<p>세 가지 변화가 있다: (a) <code>EnableViewerColdStart</code> 종속 제거, (b) <code>!query.has_cached_posts</code> 게이팅 제거(캐시가 있어도 항상 갱신), (c) 정책 축이 순수 hydration flag + shadow traffic으로 좁혀졌다. Cold-start와 engagement counts hydration은 이제 서로 독립적 정책 축이다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> — 이전 배선은 &quot;cold-start가 켜지면 반드시 engagement counts를 hydrate한다&quot;는 강결합이었다. Cold-start Thompson sampling이 <code>view_count_on_home</code>·<code>fav_count</code>에 의존하는 4세대+1의 초기 배선 유물로 보인다. 이번 분리로 두 파이프라인의 rollout이 서로 걸림 없이 진행된다. 특히 codivert 대칭성(A절)과 결합하면 &quot;Treatment는 cold-start 켜짐 + engagement counts 켜짐, Control은 cold-start 꺼짐 + engagement counts는 자기 flag대로&quot;라는 명확한 실험 축 분리가 가능해진다.</p></div>
-<h3 id="d-phoenix-serving-요청-계약에-experiment_overrides-map과-slatecontextexact_kexact_gap-추가">D. Phoenix serving 요청 계약에 <code>experiment_overrides map</code>과 <code>SlateContext.exact_k/exact_gap</code> 추가</h3>
-<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>:</p>
-<p>**<code>PredictNextActionsRequest.experiment_overrides = 21</code>**은 <code>map&lt;string, string&gt;</code> 타입의 새 필드다. 이전엔 Phoenix 서빙이 서비스 배포 시점의 config·feature switch로 experiment 파라미터를 정해 뒀는데, 이 필드가 붙으면 <strong>요청마다 experiment 파라미터를 오버라이드</strong>할 수 있다. Home-mixer(요청자)가 자기가 이미 A/B 배정된 결정을 Phoenix에 그대로 전달해 downstream(Phoenix)의 experiment 배정이 upstream(home-mixer)과 일관되게 흐르도록 하는 배선으로 읽힌다 <span class="badge est">추정</span>. Codivert 패턴(A절)이 upstream에서 자리를 잡으면서 downstream까지 동일한 experiment 스코프를 지도록 전달 채널이 필요해진 것.</p>
-<p>**<code>SlateContext.exact_k = 16</code>과 <code>SlateContext.exact_gap = 17</code>**은 새 <code>Option&lt;uint32&gt;</code> 필드다. 이전 SlateContext 필드는:</p>
-<ul>
-<li><code>sid_known</code> (필드 6), <code>sid_k_l1/2/3</code> (7–9), <code>sid_gap_l1/2/3</code> (10–12) — 4세대+3(2026-08-18) VMRanker에서 SID 배선</li>
-<li><code>recon_cos_milli</code> (13) — 4세대+9(2026-08-26)</li>
-<li><code>recon_count_above</code> (14), <code>recon_gap_above</code> (15) — 4세대+11 무렵</li>
+</li>
+<li>바뀐 점은 세 가지다.<ul>
+<li><code>EnableViewerColdStart</code>에 대한 종속이 없어졌다.</li>
+<li><code>!query.has_cached_posts</code> 게이팅이 없어져, 캐시가 있어도 항상 갱신한다.</li>
+<li>정책 축이 순수 hydration flag와 shadow traffic으로 좁혀졌다.</li>
 </ul>
-<p><code>exact_k/exact_gap</code>는 이 시리즈의 연장이다. <code>sid_k/sid_gap</code>이 semantic ID 코드북 매치 기반 metric이라면, <code>exact_k/exact_gap</code>는 이름 그대로 <strong>정확 일치</strong> 기반 metric일 가능성이 높다 <span class="badge est">추정</span>. Slate 안의 후보 사이에서 특정 신호(post_id? 저자? 미디어 hash?)가 정확 일치하는 이웃 후보 수(<code>exact_k</code>)와 정확 일치가 나타나기 시작하는 slot 갭(<code>exact_gap</code>)으로 해석하는 것이 SID 계열 필드와 자연스러운 대응이다. 실제 정의는 미공개(Phoenix 서빙 코드가 이 필드를 채우는 곳은 오픈소스에 없음).</p>
-<p>Home-mixer 쪽에서도 대응 필드가 배선됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>. <code>SlateContext</code> struct와 <code>From&lt;xai_recsys_proto::SlateContext&gt;</code> 변환 impl 양쪽에 <code>exact_k: Option&lt;u32&gt;</code>, <code>exact_gap: Option&lt;u32&gt;</code> 두 필드가 추가됐다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> — Phoenix serving이 slate context에 관측 metric을 계속 추가하는 흐름이 이어진다. SID 계열(4세대+3)에서 시작해 recon 계열(4세대+9~+11)로 확장됐고, 이번엔 exact 계열이 붙었다. 소비 경로(RankingScorer 폴백)는 이미 4세대+5 <code>UseServedSlateContext</code> 게이트에 배선돼 있으니, 새 metric이 붙어도 자동으로 흡수된다. <code>experiment_overrides</code>는 upstream/downstream experiment 스코프 일관성 이슈에 대한 계약적 대응으로, codivert 배선(A절)과 시점이 겹치는 게 우연이 아니다.</p></div>
-<h3 id="e-vf-dark-traffic-미러링에-devel-app_env가-추가돼-pr별-프리뷰-배포도-프로덕션-트래픽을-받는다">E. VF dark-traffic 미러링에 <code>devel</code> app_env가 추가돼 PR별 프리뷰 배포도 프로덕션 트래픽을 받는다</h3>
-<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/dark_traffic_setup.rs" target="_blank" rel="noopener"><code>visibility-filtering/dark_traffic_setup.rs</code></a>:</p>
-<p>이전 판(4세대+6에서 shadow→staging 리네임 완료)은 <code>parse_staging_listener</code>가 <code>.staging.visibility:grpc</code> 접미사만 인식했다. 이번 커밋은 함수를 <code>parse_mirror_listener</code>로 리네임하고 <strong>staging + devel 두 app_env를 모두 인식</strong>하도록 확장했다. 통과하는 리스너 이름 예시가 회귀 테스트에 잠긴다:</p>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 이번 분리로 두 파이프라인의 rollout이 서로 걸림 없이 진행된다. 이전 연결은 &quot;cold-start가 켜지면 반드시 engagement counts를 hydrate한다&quot;는 강결합이었다. cold-start Thompson sampling이 <code>view_count_on_home</code>·<code>fav_count</code>에 의존하는 4세대+1 초기 연결의 유물로 보인다. 특히 codivert 대칭성(A절)과 결합하면 &quot;Treatment는 cold-start 켜짐 + engagement counts 켜짐, Control은 cold-start 꺼짐 + engagement counts는 자기 flag대로&quot;라는 명확한 실험 축 분리가 가능해진다.</p></div>
+<h3 id="d-phoenix-서빙-요청에-실험-파라미터-오버라이드-필드와-slate-지표-두-개가-생겼다">D. Phoenix 서빙 요청에 실험 파라미터 오버라이드 필드와 slate 지표 두 개가 생겼다</h3>
+<p>Phoenix 서빙 요청 계약에 필드 세 개가 새로 생겼다 <span class="badge ok">확인</span>. 하나는 요청마다 experiment 파라미터를 오버라이드하는 map이고, 나머지 둘은 slate(함께 노출되는 후보 묶음) 문맥에 붙는 metric이다. 새 필드는 <code>experiment_overrides</code>와 <code>exact_k</code>·<code>exact_gap</code>이다.</p>
+<ul>
+<li>Phoenix 서빙 요청에 <code>experiment_overrides map</code>이 생겨, 요청마다 experiment 파라미터를 오버라이드할 수 있다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>.<ul>
+<li>필드는 <code>PredictNextActionsRequest.experiment_overrides = 21</code>이고, 타입은 <code>map&lt;string, string&gt;</code>이다.</li>
+<li>이전에는 Phoenix 서빙이 서비스 배포 시점의 config·feature switch로 experiment 파라미터를 정해 뒀다.</li>
+</ul>
+</li>
+<li>이 필드는 요청자인 home-mixer가 이미 정해진 자기 A/B 배정을 Phoenix에 그대로 전달해, downstream인 Phoenix의 experiment 배정이 upstream인 home-mixer와 일관되게 흐르도록 하는 연결로 읽힌다 <span class="badge est">추정</span>.<ul>
+<li>upstream에서 codivert 패턴(A절)이 자리를 잡으면서, downstream까지 같은 experiment 스코프를 지게 할 전달 채널이 필요해진 것이다.</li>
+</ul>
+</li>
+<li>slate 문맥에 <code>SlateContext.exact_k/exact_gap</code> 두 필드가 추가됐다 <span class="badge ok">확인</span>. 같은 두 proto 파일의 변경이다.<ul>
+<li><code>SlateContext.exact_k = 16</code>과 <code>SlateContext.exact_gap = 17</code>은 새 <code>Option&lt;uint32&gt;</code> 필드다.</li>
+<li>이전 SlateContext 필드와 각 필드가 붙은 시점은 다음과 같다.<ul>
+<li>SID(semantic ID) 계열 <code>sid_known</code> (필드 6), <code>sid_k_l1/2/3</code> (7–9), <code>sid_gap_l1/2/3</code> (10–12): 4세대+3(2026-08-18), VMRanker(슬레이트를 재정렬하는 스코어러)의 SID 연결</li>
+<li><code>recon_cos_milli</code> (13): 4세대+9(2026-08-26)</li>
+<li><code>recon_count_above</code> (14), <code>recon_gap_above</code> (15): 4세대+11 무렵</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>exact_k/exact_gap</code>는 이 시리즈의 연장이다. <code>sid_k/sid_gap</code>이 semantic ID 코드북 매치 기반 metric이라면, <code>exact_k/exact_gap</code>는 이름 그대로 정확 일치 기반 metric일 가능성이 높다 <span class="badge est">추정</span>.<ul>
+<li>slate 안의 후보 사이에서 특정 신호(post_id? 저자? 미디어 hash?)가 정확히 일치하는 이웃 후보 수를 <code>exact_k</code>로, 정확 일치가 나타나기 시작하는 slot 갭을 <code>exact_gap</code>으로 해석하는 것이 SID 계열 필드와 자연스럽게 대응한다.</li>
+<li>실제 정의는 공개되지 않았다. Phoenix 서빙 코드에서 이 필드를 채우는 곳은 오픈소스에 없다.</li>
+</ul>
+</li>
+<li>home-mixer 쪽에도 대응 필드가 연결됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>.<ul>
+<li><code>SlateContext</code> struct와 <code>From&lt;xai_recsys_proto::SlateContext&gt;</code> 변환 impl 양쪽에 <code>exact_k: Option&lt;u32&gt;</code>, <code>exact_gap: Option&lt;u32&gt;</code> 두 필드가 추가됐다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> Phoenix serving이 slate context에 관측 metric을 계속 추가하는 흐름이 이어진다. SID 계열(4세대+3)에서 시작해 recon 계열(4세대+9~+11)로 넓어졌고, 이번에는 exact 계열이 붙었다. 소비 경로(RankingScorer 폴백)는 이미 4세대+5의 <code>UseServedSlateContext</code> 게이트에 연결돼 있으니, 새 metric이 붙어도 자동으로 흡수된다. <code>experiment_overrides</code>는 upstream과 downstream의 experiment 스코프 일관성 문제에 대한 계약 차원의 대응이고, codivert 연결(A절)과 시점이 겹치는 것은 우연이 아니다.</p></div>
+<h3 id="e-vf-미러링에-devel-배포가-추가돼-pr별-프리뷰-배포도-프로덕션-트래픽을-받는다">E. VF 미러링에 devel 배포가 추가돼 PR별 프리뷰 배포도 프로덕션 트래픽을 받는다</h3>
+<p>VF dark-traffic은 프로덕션 트래픽을 별도 배포로 복제 전송해 응답 없이 관측만 하는 미러링이다. 이번 커밋으로 미러링 대상이 staging에 더해 devel app_env까지 넓어졌다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li><p>미러 대상 리스너를 고르는 함수가 staging과 <code>devel</code> 두 app_env를 모두 인식하도록 확장됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/dark_traffic_setup.rs" target="_blank" rel="noopener"><code>visibility-filtering/dark_traffic_setup.rs</code></a>.</p>
+<ul>
+<li><p>이전 판(4세대+6에서 shadow→staging 리네임 완료)의 <code>parse_staging_listener</code>는 <code>.staging.visibility:grpc</code> 접미사만 인식했다.</p>
+</li>
+<li><p>이번 커밋은 이 함수를 <code>parse_mirror_listener</code>로 리네임했다.</p>
+</li>
+<li><p>통과하는 리스너 이름의 예가 회귀 테스트에 고정됐다.</p>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">(&quot;xai-vf-service.devel.visibility:grpc&quot;, &quot;xai-vf-service.devel&quot;),
 (&quot;xai-vf-service-pr-123.devel.visibility:grpc&quot;, &quot;xai-vf-service-pr-123.devel&quot;),
@@ -173,8 +224,20 @@ fn both_viewer_arms_log_the_same_author_impressions() {
 </code></pre></figure>
 <p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/dark_traffic_setup.rs" target="_blank" rel="noopener"><code>visibility-filtering/dark_traffic_setup.rs</code></a> 테스트, 2026-09-04</p>
 </blockquote>
-<p><code>MirrorChannelFactory</code>는 대상 리스너의 <code>xds_dest</code>에 <code>.devel.</code>이 있으면 devel용 TLS 도메인(<code>visibility.xai-vf-service.devel.{dc}.s2s.twttr.net</code>)의 채널 팩토리를, 그렇지 않으면 staging용(<code>visibility.visibility-filtering-service.staging.{dc}.s2s.twttr.net</code>)의 채널 팩토리를 골라 사용한다. <code>xai-vf-service-pr-123.devel.visibility:grpc</code> 형태의 리스너 이름은 GitHub PR 번호 기반으로 자동 생성되는 프리뷰 배포(Kubernetes preview environments)의 관행을 시사한다 <span class="badge est">추정</span>.</p>
-<p>Reject 케이스 회귀 테스트도 좁혀졌다:</p>
+</li>
+</ul>
+</li>
+<li><p>채널 팩토리는 리스너가 devel인지 staging인지에 따라 TLS 도메인이 다른 것을 고른다 <span class="badge ok">확인</span>. 같은 파일의 <code>MirrorChannelFactory</code>다.</p>
+<ul>
+<li>대상 리스너의 <code>xds_dest</code>에 <code>.devel.</code>이 있으면 devel용 TLS 도메인(<code>visibility.xai-vf-service.devel.{dc}.s2s.twttr.net</code>)의 채널 팩토리를 쓴다.</li>
+<li>그렇지 않으면 staging용(<code>visibility.visibility-filtering-service.staging.{dc}.s2s.twttr.net</code>)의 채널 팩토리를 쓴다.</li>
+</ul>
+</li>
+<li><p><code>xai-vf-service-pr-123.devel.visibility:grpc</code> 형태의 리스너 이름은 GitHub PR 번호 기반으로 자동 생성되는 프리뷰 배포(Kubernetes preview environments)의 관행을 시사한다 <span class="badge est">추정</span>.</p>
+</li>
+<li><p>비슷한 이름은 거부하고, 정확히 <code>staging</code> 또는 <code>devel</code> 두 app_env만 허용한다 <span class="badge ok">확인</span>. 같은 파일의 reject 케이스 회귀 테스트도 좁혀졌다.</p>
+<ul>
+<li><p><code>development</code>나 <code>staging-devel</code> 같은 유사 이름이 거부 대상이다.</p>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">&quot;xai-vf-service.development.visibility:grpc&quot;,
 &quot;xai-vf-service.staging-devel.visibility:grpc&quot;,
@@ -184,10 +247,15 @@ fn both_viewer_arms_log_the_same_author_impressions() {
 </code></pre></figure>
 <p>— 위 파일의 <code>parse_rejects_out_of_scope_listeners</code> 테스트</p>
 </blockquote>
-<p><code>development</code>나 <code>staging-devel</code> 같은 유사 이름은 거부한다. 정확히 <code>staging</code> 또는 <code>devel</code> 두 app_env만 허용한다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> — VF 재작성의 검증 인프라(4세대+4 dark_traffic → 4세대+6 shadow→staging 리네임 → 4세대+7 reference_compare까지 이어진 감사 스택)에 PR-level 검증까지 붙었다. 개발자가 VF 규칙 변경 PR을 올리면 그 PR용 devel 배포에 프로덕션 트래픽 미러가 흘러 들어와 실제 프로덕션 규모에서의 verdict 차이를 사전 검증할 수 있다. VF는 fail-closed(canon 주의 목록 #1)라 규칙 변경 리스크가 크므로, 미러링 스택이 staging 배포 → PR 배포까지 확장되는 것이 자연스러운 진화 경로다.</p></div>
-<h3 id="f-corefeaturetext가-예정된-muted-keyword-rule을-위해-dead-code로-보존됐다">F. <code>CoreFeature.text</code>가 예정된 muted-keyword rule을 위해 dead-code로 보존됐다</h3>
-<p><span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/tweet.rs</code></a>:</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> VF 재작성의 검증 인프라에 PR 단위 검증까지 붙었다. 이 인프라는 4세대+4 dark_traffic → 4세대+6 shadow→staging 리네임 → 4세대+7 reference_compare까지 이어진 감사 스택이다. 개발자가 VF 규칙 변경 PR을 올리면 그 PR용 devel 배포에 프로덕션 트래픽 미러가 흘러 들어와, 실제 프로덕션 규모에서 verdict 차이를 미리 검증할 수 있다. VF는 fail-closed(정본 x.md의 주의 목록 #1)라 규칙 변경 리스크가 크므로, 미러링 스택이 staging 배포에서 PR 배포까지 넓어지는 것이 자연스러운 진화 경로다.</p></div>
+<h3 id="f-vf가-예정된-muted-keyword-rule에-쓸-포스트-텍스트-필드를-미리-남겨-뒀다">F. VF가 예정된 muted-keyword rule에 쓸 포스트 텍스트 필드를 미리 남겨 뒀다</h3>
+<p>VF가 지금은 어떤 rule도 쓰지 않는 포스트 텍스트 필드를, 앞으로 붙을 muted-keyword rule을 위해 남겨 뒀다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li><p><code>CoreFeature.text</code>에 dead-code 경고를 억제하는 어트리뷰트가 붙었고, 이 어트리뷰트가 명시적으로 &quot;upcoming muted-keyword rule에 쓰기 위해 남겨 둔다&quot;고 밝힌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/tweet.rs</code></a>.</p>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[derive(Clone, Debug, Default)]
 pub struct CoreFeature {
@@ -201,55 +269,145 @@ pub struct CoreFeature {
 </code></pre></figure>
 <p>— <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/tweet.rs</code></a>, 2026-09-04</p>
 </blockquote>
-<p>즉 VF 서비스가 hydration 단계에서 각 tweet의 <code>text</code>를 이미 채우고 있지만 현재 어떤 rule도 그것을 소비하지 않는다. Dead-code 억제 어트리뷰트가 명시적으로 &quot;upcoming muted-keyword rule에 쓰기 위해 남겨 둔다&quot;고 밝힌다. 새 테스트 <code>assemble_hydrates_text_from_core_data</code>가 hydration 경로에서 text가 실제로 채워지는지 회귀로 잠근다.</p>
-<p>4세대+4(2026-08-19, aad7179)에서 신설된 <code>FollowingViewerMutedKeywordFilter</code>는 Following 파이프라인 전용(65줄)이었다. 이번 signal은 <strong>VF 서비스 자체에도 muted-keyword rule이 곧 붙는다</strong>는 예고다. VF는 For You 파이프라인 전역을 커버하므로, 뷰어의 muted-keyword 리스트가 Following뿐 아니라 추천 전체에서 필터되는 정책 확장 방향이다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> — Muted keyword 필터가 두 파이프라인에서 별개로 구현되던 것이 통합되거나(Following 필터가 VF 서비스로 이관), 아니면 병렬 두 층 배선으로 남을지가 다음 커밋의 관측 포인트다.</p></div>
-<h3 id="g-부수-변화-요약">G. 부수 변화 요약</h3>
 <ul>
-<li><strong>checkpoint DEK KMS 재시도</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py</code></a>. <code>_unwrap_with_backoff</code>가 신설돼 KMS unwrap이 transient 오류(<code>429</code>·<code>502</code>·<code>503</code>·<code>504</code>·<code>&quot;KMS transport&quot;</code> 마커)일 때 4회, 총 2초 상한, jittered exponential backoff로 재시도한다. <code>publish_tree_dek</code>·<code>adopt_tree_dek</code>·<code>_unwrap_header_master</code>가 모두 이 wrapper를 통해 호출된다. <code>assert_all_enveloped</code>는 finalize 전에 <code>_DEK</code> 마스터 파일 존재를 필수로 확인한다(<code>encrypted save left no master _DEK at {path}; not committing</code>). 4세대+13 신설된 envelope-encrypted Orbax writer의 안정화 후속.</li>
-<li><strong><code>retrieval_dataset.py</code> 리팩터</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/data/retrieval_dataset.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/retrieval_dataset.py</code></a>. SID snapshot window 경로 생성을 <code>_sid_window(filename) -&gt; (primary, backup)</code> 헬퍼로 DRY. 실 경로 규칙은 그대로(<code>post_sid_v8_256x6_snapshots</code>·<code>_backup</code>).</li>
-<li><strong>StableHLO bundle 매니페스트 타임스탬프 갱신</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>trainer_recsys.py</code></a>. <code>restamp_manifest(data)</code>가 매 export 시점에 <code>MANIFEST.json</code>의 <code>created_timestamp</code>를 <code>time.time()</code>으로 재기록. 4세대+13에서 도입한 <code>.mlirbc</code> 번들 시스템의 fresh-detection용 배선.</li>
-<li><strong>Backbone score bfloat16 다운캐스트</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_recsys.py</code></a>:</li>
+<li>VF 서비스가 hydration 단계에서 각 tweet의 <code>text</code>를 이미 채우고 있지만, 현재 어떤 rule도 그것을 소비하지 않는다.</li>
+<li>새 테스트 <code>assemble_hydrates_text_from_core_data</code>가 hydration 경로에서 text가 실제로 채워지는지 회귀로 확인한다.</li>
 </ul>
+</li>
+<li><p>4세대+4(2026-08-19, aad7179)에서 새로 생긴 <code>FollowingViewerMutedKeywordFilter</code>는 Following 파이프라인 전용(65줄)이었다. 이번 신호는 VF 서비스 자체에도 muted-keyword rule이 곧 붙는다는 예고다.</p>
+</li>
+<li><p>VF는 For You 파이프라인 전역을 커버하므로, 뷰어의 muted-keyword 리스트가 Following뿐 아니라 추천 전체에서 필터되는 쪽으로 정책이 넓어지는 방향이다.</p>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 다음 커밋에서 관측할 점은 두 파이프라인에서 따로 구현되던 muted keyword 필터가 통합될지(Following 필터가 VF 서비스로 이관), 아니면 나란히 두 층으로 남을지다.</p></div>
+<h3 id="g-그-밖의-변경">G. 그 밖의 변경</h3>
+<p>나머지 변경은 Phoenix 학습 코드와 VF·home-mixer 코드를 손본 것이다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li><p>Phoenix 체크포인트의 DEK를 KMS로 unwrap하다가 일시적 오류가 나면 재시도한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py</code></a>.</p>
+<ul>
+<li>새 함수 <code>_unwrap_with_backoff</code>가 transient 오류(<code>429</code>·<code>502</code>·<code>503</code>·<code>504</code>·<code>&quot;KMS transport&quot;</code> 마커)에서 4회, 총 2초 상한으로 jittered exponential backoff 재시도를 한다.</li>
+<li><code>publish_tree_dek</code>·<code>adopt_tree_dek</code>·<code>_unwrap_header_master</code>가 모두 이 wrapper를 거쳐 호출된다.</li>
+<li><code>assert_all_enveloped</code>는 finalize 전에 <code>_DEK</code> 마스터 파일이 있는지 반드시 확인한다(<code>encrypted save left no master _DEK at {path}; not committing</code>).</li>
+<li>4세대+13에서 새로 생긴 envelope-encrypted Orbax writer를 안정화하는 후속 작업이다.</li>
+</ul>
+</li>
+<li><p><code>retrieval_dataset.py</code>에서 SID snapshot window 경로를 만드는 코드를 헬퍼 하나로 모았다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/data/retrieval_dataset.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/retrieval_dataset.py</code></a>.</p>
+<ul>
+<li>헬퍼는 <code>_sid_window(filename) -&gt; (primary, backup)</code>이다.</li>
+<li>실제 경로 규칙은 그대로다(<code>post_sid_v8_256x6_snapshots</code>·<code>_backup</code>).</li>
+</ul>
+</li>
+<li><p>StableHLO bundle을 export할 때마다 매니페스트의 생성 시각을 새로 적는다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>trainer_recsys.py</code></a>.</p>
+<ul>
+<li><code>restamp_manifest(data)</code>가 export 시점마다 <code>MANIFEST.json</code>의 <code>created_timestamp</code>를 <code>time.time()</code>으로 다시 기록한다.</li>
+<li>4세대+13에서 도입한 <code>.mlirbc</code> 번들 시스템의 fresh-detection용 연결이다.</li>
+</ul>
+</li>
+<li><p>backbone score를 bfloat16으로 명시적으로 내렸다가 float32로 다시 올린다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_recsys.py</code></a>.</p>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">log_probs = jax.nn.log_sigmoid(logits).astype(jnp.bfloat16).astype(jnp.float32)
 cont_preds = candidate_continuous_predictions.astype(jnp.bfloat16).astype(jnp.float32)
 </code></pre></figure>
 </blockquote>
-<p>명시적 bfloat16 다운캐스트 후 float32 재승격. 서빙 정밀도(bfloat16으로 뿌리는 것으로 추정 <span class="badge est">추정</span>)와 학습 시 관측 numerics를 맞추려는 계산 층이다. 4세대+14에서 신설된 backbone scores 요청 시맨틱과 짝이 되는 numerics 정합 배선.</p>
 <ul>
-<li><strong><code>log_util</code> 구조화 로깅</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/utils/log_util.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/log_util.py</code></a>. <code>LogRecord.__dict__</code>에서 표준 어트리뷰트를 뺀 나머지 extras를 자동으로 <code>key=value</code> 시리즈로 이어 붙여 로그 라인 뒤에 추가한다. <code>event=X</code> extra는 앞에 배치. bool은 <code>true</code>/<code>false</code>, 나머지는 <code>json.dumps(default=str)</code>. 학습 로그의 grep 가능성과 downstream 파서 지원.</li>
-<li><strong>VF <code>pub</code> → <code>pub(crate)</code> 정리</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/lib.rs" target="_blank" rel="noopener"><code>visibility-filtering/lib.rs</code></a>. <code>clients</code>·<code>hydration</code>·<code>models</code>·<code>rules</code>·<code>safety_label_source</code>·<code>twemcache</code> 모듈이 crate-internal로 좁혀졌다. <code>config.rs</code>·<code>params.rs</code>·<code>server.rs</code>·<code>twemcache/{client,mod}.rs</code>에서 여러 pub 함수와 상수가 <code>pub(crate)</code>나 dead-code 제거로 정리됐다. 4세대+15(9b0dc31)의 800줄 순감소 흐름과 방향이 같다: 재작성 안정화 이후 외부에 노출할 필요가 없어진 API를 좁힌다.</li>
-<li><strong>hydrator 소소한 변경</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/side_effects/mutual_follow_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/mutual_follow_stats_side_effect.rs</code></a> <code>PhoenixRetrievalMOEInferenceClusterId</code> 조회가 <code>moe_enabled</code> 조건 안팎으로 이동해 borrow 수명 정리. <code>assemble_tweet_features</code> 테스트가 <code>text</code> 하드코딩에서 <code>source_tweet_id</code>로 옮겨졌다(위 F의 muted-keyword 예고와 짝).</li>
+<li>서빙 정밀도(bfloat16으로 뿌리는 것으로 추정 <span class="badge est">추정</span>)와 학습 시 관측 numerics를 맞추려는 계산 층이다.</li>
+<li>4세대+14에서 새로 생긴 backbone scores 요청 시맨틱과 짝이 되는 numerics 정합 연결이다.</li>
+</ul>
+</li>
+<li><p>학습 로그 줄 끝에 extra 필드를 자동으로 덧붙이는 구조화 로깅이 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/phoenix/xrex/utils/log_util.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/log_util.py</code></a>.</p>
+<ul>
+<li><code>log_util</code>이 <code>LogRecord.__dict__</code>에서 표준 어트리뷰트를 뺀 나머지 extras를 <code>key=value</code> 시리즈로 이어 붙여 로그 라인 뒤에 추가한다.</li>
+<li><code>event=X</code> extra는 앞에 둔다. bool은 <code>true</code>/<code>false</code>로, 나머지는 <code>json.dumps(default=str)</code>로 적는다.</li>
+<li>학습 로그를 grep할 수 있게 하고 downstream 파서를 지원하는 변경이다.</li>
+</ul>
+</li>
+<li><p>VF가 외부에 노출하던 모듈과 함수를 crate 내부용으로 좁혔다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/lib.rs" target="_blank" rel="noopener"><code>visibility-filtering/lib.rs</code></a>.</p>
+<ul>
+<li><code>clients</code>·<code>hydration</code>·<code>models</code>·<code>rules</code>·<code>safety_label_source</code>·<code>twemcache</code> 모듈이 <code>pub</code>에서 <code>pub(crate)</code>로, 즉 crate-internal로 좁혀졌다.</li>
+<li><code>config.rs</code>·<code>params.rs</code>·<code>server.rs</code>·<code>twemcache/{client,mod}.rs</code>의 여러 pub 함수와 상수도 <code>pub(crate)</code>로 바뀌거나 dead-code로 제거됐다.</li>
+<li>4세대+15(9b0dc31)의 800줄 순감소 흐름과 방향이 같다. 재작성이 안정된 뒤 외부에 노출할 필요가 없어진 API를 좁힌다.</li>
+</ul>
+</li>
+<li><p>hydrator 쪽에 작은 변경이 있었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/home-mixer/side_effects/mutual_follow_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/mutual_follow_stats_side_effect.rs</code></a>.</p>
+<ul>
+<li><code>PhoenixRetrievalMOEInferenceClusterId</code> 조회가 <code>moe_enabled</code> 조건 안팎으로 옮겨져 borrow 수명이 정리됐다.</li>
+<li><code>assemble_tweet_features</code> 테스트는 <code>text</code> 하드코딩에서 <code>source_tweet_id</code>로 옮겨졌다(위 F의 muted-keyword 예고와 짝).</li>
+</ul>
+</li>
 </ul>
 <blockquote>
 <p>&quot;retained for the upcoming muted-keyword rule&quot;
 — <a href="https://github.com/xai-org/x-algorithm/blob/902a06f/visibility-filtering/models/tweet.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/tweet.rs</code></a>, 2026-09-04</p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>:</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>에 다음을 반영했다.</p></div>
 <ul>
-<li>4세대 세대 표에 4세대+16 행 추가.</li>
-<li>콜드스타트 절에 codivert impression 대칭 배선·treatment Phoenix MoE 국한·engagement counts 게이팅 분리를 추가.</li>
-<li>4세대+4 dark traffic 절 아래에 devel app_env 확장 언급 추가.</li>
-<li><code>SlateContext.exact_k/exact_gap</code>을 SlateContext 진화 계열에 추가. <code>experiment_overrides map</code>을 <code>PredictNextActionsRequest</code> 필드 계열에 추가.</li>
-<li>새 절 &quot;### 4세대+16 (2026-09-04, 902a06f)&quot; 신설(4세대+15와 canon 주의 목록 사이).</li>
+<li>4세대 세대 표에 4세대+16 행을 추가했다.</li>
+<li>콜드스타트 절에 codivert impression 대칭 연결, treatment의 Phoenix MoE 국한, engagement counts 게이팅 분리를 추가했다.</li>
+<li>4세대+4 dark traffic 절 아래에 devel app_env 확장을 언급했다.</li>
+<li><code>SlateContext.exact_k/exact_gap</code>을 SlateContext 진화 계열에, <code>experiment_overrides map</code>을 <code>PredictNextActionsRequest</code> 필드 계열에 추가했다.</li>
+<li>새 절 &quot;### 4세대+16 (2026-09-04, 902a06f)&quot;을 4세대+15와 정본 주의 목록 사이에 만들었다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> — 이번 커밋에는 세 개의 축이 정합적으로 얽혀 있다: (1) A/B 관측 방법론의 코드화(codivert impression 대칭성이 회귀 테스트로 잠김), (2) experiment 스코프의 수직 전달(<code>experiment_overrides map</code>으로 upstream 배정을 downstream까지 일관되게 흐름), (3) cold-start의 Phoenix MoE 실험 축 병합(treatment 뷰어의 cold-start 후보가 MoE 후보에만 걸림). 세 축이 함께 움직였다는 사실이 <strong>X가 지금 Phoenix MoE 롤아웃의 A/B 인프라를 재정비하는 국면</strong>이라는 문화 관찰이다. VF 스택은 검증 인프라(dark_traffic)를 PR 배포까지 확장하는 방향으로 자체적으로 진화 중이고, 예정된 muted-keyword rule의 실마리가 dead-code 어트리뷰트에 명시됐다. Phoenix 학습 스택은 4세대+13~+15에서 신설된 envelope encryption·StableHLO bundle·H100 remat 등의 안정화 후속이 이어진다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이번 커밋에서 얻은 문화 관찰은 X가 지금 Phoenix MoE 롤아웃의 A/B 인프라를 재정비하는 국면이라는 것이다. 근거는 다음 세 축이 정합적으로 얽혀 함께 움직였다는 사실이다.</p></div>
+<ol>
+<li>A/B 관측 방법론의 코드화: codivert impression 대칭성이 회귀 테스트로 고정됐다.</li>
+<li>experiment 스코프의 수직 전달: <code>experiment_overrides map</code>으로 upstream 배정이 downstream까지 일관되게 흐른다.</li>
+<li>cold-start의 Phoenix MoE 실험 축 병합: treatment 뷰어의 cold-start 후보가 MoE 후보에만 걸린다.</li>
+</ol>
+<p>VF 스택은 검증 인프라(dark_traffic)를 PR 배포까지 넓히는 방향으로 자체적으로 진화하는 중이고, 예정된 muted-keyword rule의 실마리가 dead-code 어트리뷰트에 명시됐다. Phoenix 학습 스택에서는 4세대+13~+15에서 새로 생긴 envelope encryption·StableHLO bundle·H100 remat 등의 안정화 후속이 이어진다.</p>
 <h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
-<p>없음. 이번 커밋은 canon의 방향과 정합적이다. 다만 4세대+3에서 관찰됐던 &quot;<code>count_tracked_ids</code> 로직 단순화 이후 <code>record_tracked_ids</code> 호출자와 param의 실 배선&quot;이 이번 커밋에서 명확해진다: <code>record_tracked_ids</code>는 <code>ColdStartTrackedIds</code> param을 그대로 소비하고, <code>EnableViewerColdStart</code> 게이팅과 무관하게 항상 호출된다(A절 재정렬의 결과). tracked ID 관측 훅이 A/B와 무관한 상시 관측 채널이 됐다는 사실이 확정된다.</p>
-<h2 id="레이더">레이더</h2>
-<p>없음. arXiv cs.IR 30건 파싱 성공, 산업 블로그는 일요일이라 스킵. 30건 triage 결과 통과 0건.</p>
+<p>뒤집힌 것은 없다. 이번 커밋은 정본의 방향과 맞는다. 다만 4세대+3에서 관찰됐던 &quot;<code>count_tracked_ids</code> 로직 단순화 이후 <code>record_tracked_ids</code> 호출자와 param의 실 배선&quot;이 이번 커밋에서 명확해진다.</p>
 <ul>
-<li>추천/CTR/reranker 관련은 CORE(MLLM 임베딩 compositional), EPIC(SID diffusion recommendation), LLM4AIGQ(e-commerce guidance query), HypRQ-VAE(hyperbolic long-tail generative rec), SelfDR(LLM 기반 rec reasoning distillation), DoPR(LLM reranker 압축 문서 프리픽스), UniCon(CTR unified context), Recommender System as Slow and Fast Thinkers, Training seeds and model-selection stability 등 9건. 모두 학술 기관 저자 위주로 프로덕션 배포·A/B 주장 없음. 탈락.</li>
-<li>나머지 21건은 (a) benchmark·평가 방법론(SHELF, MultiGhostBench, Incremental Pooled Eval), (b) 도메인 제한(POI·법률·의료·과학·야구·music·finance QA), (c) RAG·private retrieval·essay grading 등 LLM 응용 방법론. 탈락.</li>
+<li><code>record_tracked_ids</code>는 <code>ColdStartTrackedIds</code> param을 그대로 소비한다.</li>
+<li><code>EnableViewerColdStart</code> 게이팅과 상관없이 항상 호출된다(A절 재정렬의 결과).</li>
+</ul>
+<p>tracked ID 관측 훅이 A/B와 무관한 상시 관측 채널이 됐다는 사실이 확정된다.</p>
+<h2 id="레이더">레이더</h2>
+<p>레이더에 올린 자료는 없다. arXiv cs.IR 30건을 파싱했고, 산업 블로그는 일요일이라 건너뛰었다. 30건을 triage한 결과 통과한 것은 0건이다.</p>
+<ul>
+<li>추천·CTR·reranker 관련 9건은 모두 학술 기관 저자 위주이고, 프로덕션 배포나 A/B 주장이 없다. 이 9건은 탈락했다.<ul>
+<li>CORE(MLLM 임베딩 compositional)</li>
+<li>EPIC(SID diffusion recommendation)</li>
+<li>LLM4AIGQ(e-commerce guidance query)</li>
+<li>HypRQ-VAE(hyperbolic long-tail generative rec)</li>
+<li>SelfDR(LLM 기반 rec reasoning distillation)</li>
+<li>DoPR(LLM reranker 압축 문서 프리픽스)</li>
+<li>UniCon(CTR unified context)</li>
+<li>Recommender System as Slow and Fast Thinkers</li>
+<li>Training seeds and model-selection stability 등</li>
+</ul>
+</li>
+<li>나머지 21건도 탈락했다. 성격은 세 갈래다.<ul>
+<li>benchmark·평가 방법론: SHELF, MultiGhostBench, Incremental Pooled Eval</li>
+<li>도메인 제한: POI·법률·의료·과학·야구·music·finance QA</li>
+<li>RAG·private retrieval·essay grading 등 LLM 응용 방법론</li>
+</ul>
+</li>
 </ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
-<div class="next"><ul>
-<li><strong><code>moe_codivert_viewer</code> experiment의 초기 트래픽 비율과 활성 시점</strong> — 이번 diff에서 YAML rule과 param default(false)만 잠겼다. 실 트래픽이 언제 붙는지가 다음 관측 포인트다. <code>moe_exp</code>와 <code>moe_codivert_viewer</code> 두 experiment의 관계(전자가 author-side 배정, 후자가 viewer-side 배정)와 두 배정의 orthogonality(독립 랜덤화인지 layered인지).</li>
-<li><strong><code>experiment_overrides</code> 소비 경로</strong> — Phoenix 서빙 쪽에서 이 map을 어떻게 파싱해서 어느 layer의 experiment param을 override하는지. Home-mixer에서 이 필드를 채우는 build 지점(하이드레이터 이름 관측).</li>
-<li><strong><code>exact_k</code>·<code>exact_gap</code>의 실 정의</strong> — Phoenix 서빙이 이 두 필드를 어떤 metric으로 채우는지. SID 계열과 대응되는 exact 계열이라는 해석의 검증. Home-mixer의 RankingScorer 폴백에서 이 필드를 어떻게 소비하는지.</li>
-<li><strong>VF muted-keyword rule의 실물 등장 시점</strong> — 4세대+16의 dead-code 어트리뷰트가 몇 커밋 뒤에 실제 rule로 물질화되는지. Following 파이프라인의 <code>FollowingViewerMutedKeywordFilter</code>(4세대+4)와의 통합 방식(중복 층인지, Following 필터 이관인지).</li>
-<li><strong>VF <code>devel</code> 배포 미러링의 실 사용 이력</strong> — PR별 프리뷰 배포에 프로덕션 트래픽 미러가 붙는 흐름이 어떤 규모의 트래픽을 다루는지, 프리뷰 배포의 리소스 예산이 미러 부하를 감당할 수 있게 설계됐는지(관측할 방법은 오픈소스에 없음, dark_traffic 대상 규모의 코드 상 상수만 관측 가능).</li>
+<div class="next"><p>이번 커밋에 나온 codivert 실험과 새 필드, 예고만 된 VF muted-keyword rule, PR 배포 미러링이 실제로 어떻게 쓰이는지가 남은 질문이다.</p>
+<ul>
+<li><code>moe_codivert_viewer</code> 실험의 초기 트래픽 비율과 활성 시점 — 이번 diff에서는 YAML rule과 param default(false)만 고정됐고, 실 트래픽이 언제 붙는지가 다음 관측 포인트다.<ul>
+<li><code>moe_exp</code>와 <code>moe_codivert_viewer</code> 두 experiment의 관계도 본다(전자가 author-side 배정, 후자가 viewer-side 배정).</li>
+<li>두 배정의 orthogonality도 본다(독립 랜덤화인지 layered인지).</li>
+</ul>
+</li>
+<li><code>experiment_overrides</code>의 소비 경로 — Phoenix 서빙 쪽에서 이 map을 어떻게 파싱해서 어느 layer의 experiment param을 override하는지가 질문이다.<ul>
+<li>home-mixer에서 이 필드를 채우는 build 지점도 본다(하이드레이터 이름 관측).</li>
+</ul>
+</li>
+<li><code>exact_k</code>·<code>exact_gap</code>의 실제 정의 — Phoenix 서빙이 이 두 필드를 어떤 metric으로 채우는지가 질문이다.<ul>
+<li>SID 계열과 대응되는 exact 계열이라는 해석을 검증한다.</li>
+<li>home-mixer의 RankingScorer 폴백에서 이 필드를 어떻게 소비하는지도 본다.</li>
+</ul>
+</li>
+<li>VF muted-keyword rule이 실제로 등장하는 시점 — 4세대+16의 dead-code 어트리뷰트가 몇 커밋 뒤에 실제 rule로 구현되는지가 질문이다.<ul>
+<li>Following 파이프라인의 <code>FollowingViewerMutedKeywordFilter</code>(4세대+4)와의 통합 방식도 본다. 중복 층으로 남는지, Following 필터가 이관되는지가 질문이다.</li>
+</ul>
+</li>
+<li>VF <code>devel</code> 배포 미러링의 실제 사용 이력 — PR별 프리뷰 배포에 붙는 프로덕션 트래픽 미러가 어떤 규모의 트래픽을 다루는지, 프리뷰 배포의 리소스 예산이 미러 부하를 감당하도록 설계됐는지가 질문이다.<ul>
+<li>이를 관측할 방법은 오픈소스에 없다. dark_traffic 대상 규모에 관한 코드 상 상수만 관측할 수 있다.</li>
+</ul>
+</li>
 </ul></div>
 
 </div>

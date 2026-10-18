@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-08-27 — feed-research</title>
-<meta name="description" content="한 줄: X 4세대+8 커밋이 공개됐다(0d3cdd8, 2026-08-25, +5,850/−586, 파일 47). abuse-enforcement-service에 generic_actions 패스스루가 신설됐고(663줄 신규, growthbook 동적 allowlist…">
+<meta name="description" content="한 줄: X가 계정 조치 엔진에 스코어러가 조치를 직접 요청하는 일반 경로를 열었다. 요청은 코드에 고정된 종류와 동적 allowlist를 모두 통과해야 실행된다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-08-27.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-08-27 — feed-research">
-<meta property="og:description" content="한 줄: X 4세대+8 커밋이 공개됐다(0d3cdd8, 2026-08-25, +5,850/−586, 파일 47). abuse-enforcement-service에 generic_actions 패스스루가 신설됐고(663줄 신규, growthbook 동적 allowlist…">
+<meta property="og:description" content="한 줄: X가 계정 조치 엔진에 스코어러가 조치를 직접 요청하는 일반 경로를 열었다. 요청은 코드에 고정된 종류와 동적 allowlist를 모두 통과해야 실행된다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-08-27.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,26 +42,72 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>목요일</li>
-<li><span class="meta-k">읽는 시간</span>46분</li>
+<li><span class="meta-k">읽는 시간</span>50분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>4</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일(services/x.md, radar.md)</li><li class="chip">레이더 <b>2</b>건</li></ul>
-<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+8 커밋이 공개됐다(<a href="https://github.com/xai-org/x-algorithm/commit/0d3cdd8">0d3cdd8</a>, 2026-08-25, +5,850/−586, 파일 47). <strong>abuse-enforcement-service에 <code>generic_actions</code> 패스스루가 신설</strong>됐고(663줄 신규, growthbook 동적 allowlist +126), <strong><code>panda_reports_embedding_v10_rough_spam</code> 신규 검출기가 유입</strong>됐으며, <strong>VM Ranker 경로가 대폭 단순화</strong>됐다(<code>author_diversity</code> 값 모델을 삭제하고 <code>dpp</code> 서버 측 다양성으로 옮겼으며, <code>ranking_scorer::effective_head_weights</code> 88줄과 MPN 폴드백 128줄을 제거했다). 여기에 <strong>Following 파이프라인의 블록 관계가 확장</strong>됐고(<code>FollowingBlockedByHydrator</code> 신규, <code>AuthorSocialgraphFilter</code> 신설, 인용하거나 리트윗한 저자가 뷰어를 블록한 경우도 필터링한다), <strong>Brazil2026ElectionFilter 계정 리스트가 갱신</strong>됐으며(2026-08-25 기준, +3,379줄, TSE dadosabertos 원본 반영), <strong><code>phoenix-rankall</code> prefloor 스냅샷</strong>이 배선됐고(min_age가 있는 window에 대해 <code>prefloor_&lt;window&gt;.parquet</code>을 함께 로드한다), <strong>Phoenix <code>copy_port</code> <code>tokio::spawn</code> 하드닝</strong>이 들어갔다(rate-limit이 병렬 폴링 없이도 in-flight cap을 지키도록 고쳤고, 회귀 테스트 2개를 새로 추가했다). Meta와 Netflix는 신규 자료가 없었다. arXiv cs.IR triage에서는 <strong>WeChat/Tencent Tlow</strong>(flow-based item tokenizer, 프로덕션 CTR이 글로벌 +10.32%, 신규 아이템 +11.64%)와 <strong>TAGR</strong>(익명 대형 live-stream 광고 플랫폼, revenue +16.1%) 2건이 통과했다.</div>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 계정 조치 엔진에 스코어러가 조치를 직접 요청하는 일반 경로를 열었다. 요청은 코드에 고정된 종류와 동적 allowlist를 모두 통과해야 실행된다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">13</span></summary><ol><li><a href="#1-x-4세대8-커밋--aes-일반-액션-패스스루--vm-ranker-대폭-단순화--following-블록-확장--brazil-계정-갱신--prefloor-스냅샷--copy_port-하드닝"><span class="num">1</span>X 4세대+8 커밋 — AES 일반 액션 패스스루 + VM Ranker 대폭 단순화 + Following 블록 확장 + Brazil 계정 갱신 + prefloor 스냅샷 + copy_port 하드닝</a><ol><li><a href="#1-1-abuse-enforcement-serviceservice-libsrcgeneric_actionsrs-663줄-신규--스코어러가-직접-액션을-요청하는-일반-패스스루">1-1. abuse-enforcement-service/service-lib/src/generic_actions.rs (663줄 신규) — 스코어러가 직접 액션을 요청하는 일반 패스스루</a></li><li><a href="#1-2-vm-ranker-경로-대폭-단순화--author_diversity-값-모델-삭제--서버-측-dpp로-이동-ranking_scorereffective_head_weights-88줄-제거">1-2. VM Ranker 경로 대폭 단순화 — author_diversity 값 모델 삭제 → 서버 측 dpp로 이동, ranking_scorer::effective_head_weights 88줄 제거</a></li><li><a href="#1-3-following-파이프라인-블록-관계-확장--followingblockedbyhydrator--authorsocialgraphfilter-신설">1-3. Following 파이프라인 블록 관계 확장 — FollowingBlockedByHydrator + AuthorSocialgraphFilter 신설</a></li><li><a href="#1-4-brazil2026electionfilter-계정-리스트-갱신-3379줄--tse-dadosabertos-원본-반영">1-4. Brazil2026ElectionFilter 계정 리스트 갱신 (+3,379줄) — TSE dadosabertos 원본 반영</a></li><li><a href="#1-5-phoenix-rankall-prefloor-스냅샷-배선--min_age-있는-window에-대해-pre-min-age-데이터-동시-로드">1-5. phoenix-rankall prefloor 스냅샷 배선 — min_age 있는 window에 대해 pre-min-age 데이터 동시 로드</a></li><li><a href="#1-6-phoenix-copy_port-tokiospawn-하드닝--rate-limit이-병렬-폴링-없이도-in-flight-cap-지키게">1-6. Phoenix copy_port tokio::spawn 하드닝 — rate-limit이 병렬 폴링 없이도 in-flight cap 지키게</a></li><li><a href="#1-7-소소한-변경-4건-grox-reply_spam--grox-upa--engagement-counts--urt-마셜링">1-7. 소소한 변경 4건 (grox reply_spam · grox upa · engagement counts · URT 마셜링)</a></li></ol></li><li><a href="#2-tlow--wechattencent-프로덕션-ab-flow-based-item-tokenizer가-rq-vae-대안으로-등장-레이더"><span class="num">2</span>Tlow — WeChat/Tencent 프로덕션 A/B, flow-based item tokenizer가 RQ-VAE 대안으로 등장 (레이더)</a></li><li><a href="#3-tagr--익명-대형-live-stream-광고-플랫폼-revenue-161-레이더"><span class="num">3</span>TAGR — 익명 대형 live-stream 광고 플랫폼, revenue +16.1% (레이더)</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">13</span></summary><ol><li><a href="#1-스코어러가-계정-조치를-직접-요청하는-경로가-생겼다--x"><span class="num">1</span>스코어러가 계정 조치를 직접 요청하는 경로가 생겼다 — X</a><ol><li><a href="#1-1-스코어러가-계정-조치를-직접-요청하는-일반-경로가-생겼다">1-1. 스코어러가 계정 조치를 직접 요청하는 일반 경로가 생겼다</a></li><li><a href="#1-2-vm-ranker가-로컬-계산을-걷어-내고-서버가-돌려준-점수를-그대로-쓴다">1-2. VM Ranker가 로컬 계산을 걷어 내고 서버가 돌려준 점수를 그대로 쓴다</a></li><li><a href="#1-3-following-피드가-인용리트윗-원-저자의-블록까지-따른다">1-3. Following 피드가 인용·리트윗 원 저자의 블록까지 따른다</a></li><li><a href="#1-4-브라질-선거-필터의-계정-명단이-tse-원본으로-크게-늘었다">1-4. 브라질 선거 필터의 계정 명단이 TSE 원본으로 크게 늘었다</a></li><li><a href="#1-5-phoenix-인덱스가-최소-경과-시간을-채우기-전의-데이터도-함께-불러온다">1-5. Phoenix 인덱스가 최소 경과 시간을 채우기 전의 데이터도 함께 불러온다</a></li><li><a href="#1-6-phoenix-다운로드-클라이언트가-동시-실행-상한을-실제로-지키게-됐다">1-6. Phoenix 다운로드 클라이언트가 동시 실행 상한을 실제로 지키게 됐다</a></li><li><a href="#1-7-grox-engagement-counts-urt의-소소한-변경-4건과-그-밖의-정비">1-7. grox, engagement counts, URT의 소소한 변경 4건과 그 밖의 정비</a></li></ol></li><li><a href="#2-tlow가-flow-기반-tokenizer로-프로덕션-ctr을-올렸다--wechat"><span class="num">2</span>Tlow가 flow 기반 tokenizer로 프로덕션 CTR을 올렸다 — WeChat</a></li><li><a href="#3-tagr은-라이브-커머스-광고에서-revenue를-161-올렸다--익명-플랫폼"><span class="num">3</span>TAGR은 라이브 커머스 광고에서 revenue를 +16.1% 올렸다 — 익명 플랫폼</a></li><li><a href="#검증에서-뒤집힌-것">검증에서 뒤집힌 것</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-x-4세대8-커밋--aes-일반-액션-패스스루--vm-ranker-대폭-단순화--following-블록-확장--brazil-계정-갱신--prefloor-스냅샷--copy_port-하드닝"><span class="num">1</span>X 4세대+8 커밋 — AES 일반 액션 패스스루 + VM Ranker 대폭 단순화 + Following 블록 확장 + Brazil 계정 갱신 + prefloor 스냅샷 + copy_port 하드닝</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/0d3cdd8b5d7ed49b6d47ce1746077f4d6a29f24f" target="_blank" rel="noopener">xai-org/x-algorithm@0d3cdd8</a> — 2026-08-25T23:20:04Z 커밋(파일 47, +5,850/−586). 커밋 메시지는 세대 시리즈 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이라서 커밋 내용은 파일 diff로만 판독했다. 이번 커밋은 규모(5,850줄)로 보면 4세대+4(+3,303) 이후 가장 크지만, 그중 3,379줄은 <strong>Brazil 2026 election 필터의 계정 데이터 갱신</strong>이 차지한다. 코드가 새롭다기보다 6개 서브시스템에 나란히 배선이 들어가서 <strong>폭이 넓어진</strong> 공개다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>는 2026-08-13 첫 공개(47c1bcd, +363,246/−11,640) 이후 격일에서 매일 간격으로 후속 커밋이 붙고 있다. 이 문서를 기준으로 아홉 번째 후속(4세대+8)이 오늘 다루는 대상이다. 08-25 23:20 UTC 커밋을 어제(08-26) 배치가 놓쳤기 때문에 오늘 27일 배치에서 따라잡았다. 이전 4세대+7(d011592)이 <strong>VF 검증</strong>(reference_compare)과 <strong>브랜드 안전 tier 확장</strong>(HighRisk), <strong>PTOS 심판 3카테고리</strong>로 안전 스택을 세로로 심화했다면, 이번 4세대+8은 <strong>enforcement</strong>와 <strong>랭커</strong>, <strong>Following</strong>, <strong>Brazil 컴플라이언스</strong>, <strong>Phoenix rankall</strong>, <strong>Phoenix 학습 인프라</strong> 여섯 곳에 나란히 손을 댔다.</p></div>
-<p>README의 표제도 바뀌었다. <code>## Latest Updates</code>가 <code>## Notable Updates</code>로 바뀌었고, 그 아래 August 14th 섹션의 Brazil 항목에는 <code>*(Account list updated August 25, 2026.)*</code> 문구가 붙었다. 이 <strong>표제 변경</strong>은 해당 섹션을 항상 최신 상태로 두지는 않고 특기할 만한 변경 위주로 유지하겠다는 의미로 해석한다 <span class="badge est">추정</span>. 후속 커밋이 매일 붙는 상황에서 README까지 매일 갱신하지는 않겠다고 선언한 것이다.</p>
-<h3 id="1-1-abuse-enforcement-serviceservice-libsrcgeneric_actionsrs-663줄-신규--스코어러가-직접-액션을-요청하는-일반-패스스루">1-1. <code>abuse-enforcement-service/service-lib/src/generic_actions.rs</code> (663줄 신규) — 스코어러가 직접 액션을 요청하는 일반 패스스루</h3>
-<p><strong>AES 배경</strong> <a href="https://github.com/xai-org/x-algorithm/tree/0d3cdd8/abuse-enforcement-service" target="_blank" rel="noopener"><code>abuse-enforcement-service/</code></a> (AES)는 4세대 첫 공개 때 통째로 드러난 서브레포로, 모델 스코어(BDSM 봇 헤드, LLM slop 라벨, PandaReports 등)를 받아 실제 계정 조치(label / bounce_captcha / bounce_arkose / spam_liveness_check / suspend)로 매핑하는 규칙 엔진이다. 종전의 AES 규칙은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/abuse-enforcement-service/service-lib/rules/enforcement_user.yaml" target="_blank" rel="noopener"><code>abuse-enforcement-service/service-lib/rules/enforcement_user.yaml</code></a>과 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/abuse-enforcement-service/service-lib/rules/enforcement_post.yaml" target="_blank" rel="noopener"><code>enforcement_post.yaml</code></a>에 <strong>정적으로</strong> 인코딩되어 있었다. 어떤 라벨이 붙으면 어떤 액션을 취하라는 매핑을 CEL 표현식으로 명시하는 방식이며, 예를 들면 다음과 같다.</p>
+<p>오늘 함께 본 다른 변화는 다음과 같다.</p>
+<ul>
+<li>같은 X 커밋에서 VM Ranker(후보 묶음을 다시 정렬하는 원격 서비스) 경로가 로컬 다양성 계산을 버리고, 서버가 돌려준 점수를 그대로 쓰게 됐다.</li>
+<li>X의 Following 피드는 인용하거나 리트윗한 원 저자가 뷰어를 블록한 포스트도 걸러 낸다.</li>
+<li>Meta와 Netflix는 신규 자료가 없었다. arXiv에서는 WeChat의 Tlow와 익명 라이브 광고 플랫폼의 TAGR이 레이더를 통과했다.</li>
+</ul>
+<h2 id="1-스코어러가-계정-조치를-직접-요청하는-경로가-생겼다--x"><span class="num">1</span>스코어러가 계정 조치를 직접 요청하는 경로가 생겼다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/0d3cdd8b5d7ed49b6d47ce1746077f4d6a29f24f" target="_blank" rel="noopener">xai-org/x-algorithm@0d3cdd8</a> — xai-org 공개 저장소, 2026-08-25T23:20:04Z 커밋(파일 47, +5,850/−586), 공개 소스코드. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+8이다. 커밋 메시지는 세대 시리즈 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이어서, 커밋 내용은 파일 diff로만 판독했다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>는 2026-08-13 첫 공개(47c1bcd, +363,246/−11,640) 이후 격일에서 매일 간격으로 후속 커밋이 붙고 있다. 이 커밋은 08-25 23:20 UTC에 올라왔는데, 어제(08-26) 배치가 놓쳐서 오늘 27일 배치에서 따라잡았다. 직전 커밋인 4세대+7(d011592)이 안전 스택을 세로로 심화했다면, 이번 4세대+8은 여섯 곳에 나란히 손을 댔다.</p></div>
+<ul>
+<li>4세대+7이 안전 스택을 심화한 내용은 세 가지다.<ul>
+<li>VF(visibility filtering, 노출 가능 여부를 판정하는 안전 계층) 검증인 reference_compare</li>
+<li>브랜드 안전 tier 확장인 HighRisk</li>
+<li>PTOS(정책 기반 위반 카테고리 판정) 심판 3카테고리</li>
+</ul>
+</li>
+<li>4세대+8이 손댄 여섯 곳은 enforcement, 랭커, Following, Brazil 컴플라이언스, Phoenix rankall, Phoenix 학습 인프라다.<ul>
+<li>Phoenix는 X For You에서 후보마다 참여 확률을 예측하는 Grok 기반 트랜스포머다.</li>
+</ul>
+</li>
+<li>규모(5,850줄)로 보면 4세대+4(+3,303) 이후 가장 크다. 다만 그중 3,379줄은 Brazil 2026 election 필터의 계정 데이터 갱신이 차지한다.<ul>
+<li>코드가 새롭다기보다, 6개 서브시스템에 나란히 새 연결이 들어가서 폭이 넓어진 공개다.</li>
+</ul>
+</li>
+</ul>
+<p>이번 커밋(<a href="https://github.com/xai-org/x-algorithm/commit/0d3cdd8" target="_blank" rel="noopener">0d3cdd8</a>, 2026-08-25, +5,850/−586, 파일 47)은 스코어러가 계정 조치를 직접 요청하는 경로를 열고, 랭커와 Following, Brazil 필터의 계정 명단, Phoenix 인덱스와 학습 인프라에도 함께 손을 댔다.</p>
+<p>README의 표제도 바뀌었다.</p>
+<ul>
+<li><code>## Latest Updates</code>가 <code>## Notable Updates</code>로 바뀌었다.</li>
+<li>그 아래 August 14th 섹션의 Brazil 항목에는 <code>*(Account list updated August 25, 2026.)*</code> 문구가 붙었다.</li>
+<li>이 표제 변경은 해당 섹션을 항상 최신 상태로 두지 않고, 특기할 만한 변경 위주로 유지하겠다는 의미로 해석한다 <span class="badge est">추정</span>. 후속 커밋이 매일 붙는 상황에서 README까지 매일 갱신하지는 않겠다고 선언한 것이다.</li>
+</ul>
+<h3 id="1-1-스코어러가-계정-조치를-직접-요청하는-일반-경로가-생겼다">1-1. 스코어러가 계정 조치를 직접 요청하는 일반 경로가 생겼다</h3>
+<p>AES(abuse-enforcement-service)는 이제 정적 YAML 규칙 말고도, 스코어러가 직접 붙여 보낸 조치 요청을 받아 실행한다. 요청은 코드에 고정된 종류와 동적 allowlist를 통과한 것만 실행되고, 거부된 요청은 이유와 함께 기록된다.</p>
+<div class="blk ctx"><p><span class="lbl">배경</span> <a href="https://github.com/xai-org/x-algorithm/tree/0d3cdd8/abuse-enforcement-service" target="_blank" rel="noopener"><code>abuse-enforcement-service/</code></a> (AES)는 4세대 첫 공개 때 전부 드러난 서브레포다. AES는 모델 스코어를 받아 실제 계정 조치로 매핑하는 규칙 엔진이다.</p></div>
+<ul>
+<li>받는 모델 스코어의 예는 BDSM(계정 행동 시퀀스 부정 계정 탐지) 봇 헤드, LLM slop 라벨, PandaReports 등이다.</li>
+<li>계정 조치는 label / bounce_captcha / bounce_arkose / spam_liveness_check / suspend다.</li>
+</ul>
+<p>종전의 AES 규칙은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/abuse-enforcement-service/service-lib/rules/enforcement_user.yaml" target="_blank" rel="noopener"><code>abuse-enforcement-service/service-lib/rules/enforcement_user.yaml</code></a>과 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/abuse-enforcement-service/service-lib/rules/enforcement_post.yaml" target="_blank" rel="noopener"><code>enforcement_post.yaml</code></a>에 정적으로 인코딩되어 있었다. 어떤 라벨이 붙으면 어떤 액션을 취하라는 매핑을 CEL 표현식으로 명시하는 방식이다. 예를 들면 다음과 같다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-yaml" data-lang="yaml">- id: anchor_campaign_suspend_cse
   when: &#39;&quot;anchor_campaign_suspend_cse&quot; in score.labels&#39;
   then: { kind: act_suspend_user, perm: true, policy: &quot;Cse&quot; }
 </code></pre></figure>
-<p>이 방식에는 <strong>새 스코어러를 추가할 때마다 AES YAML을 편집해야</strong> 한다는 한계가 있었다. 4세대+8이 이 결합을 끊었다. <code>generic_actions.rs</code>(663줄 신규)와 여기에 대응하는 YAML 규칙 두 개(<code>act_requested_actions</code>와 <code>platform_row_without_requested_actions</code>)가 일반 패스스루를 배선했다. <strong>스코어러가 <code>requested_actions</code> 리스트를 직접 붙여서 보내면, AES는 정해진 allowlist를 통과한 것만 실행한다.</strong></p>
-<p><strong>하드코딩된 kind allowlist</strong>: 스코어러가 요청할 수 있는 액션 종류는 코드 상수로 고정되어 있다.</p>
+<p>이 방식에는 새 스코어러를 추가할 때마다 AES YAML을 편집해야 한다는 한계가 있었다. 4세대+8이 이 결합을 끊었다.</p>
+<ul>
+<li><p>스코어러가 요청 목록을 직접 붙여서 보내면, AES는 정해진 allowlist를 통과한 것만 실행한다.</p>
+<ul>
+<li>이 일반 패스스루는 <code>generic_actions.rs</code>(663줄 신규)와 여기에 대응하는 YAML 규칙 두 개(<code>act_requested_actions</code>와 <code>platform_row_without_requested_actions</code>)가 연결한다.</li>
+<li>새 파일의 전체 경로는 <code>abuse-enforcement-service/service-lib/src/generic_actions.rs</code>이고, 663줄 전부가 신규다.</li>
+<li>스코어러가 붙이는 요청 목록은 <code>requested_actions</code> 리스트다.</li>
+</ul>
+</li>
+<li><p>스코어러가 요청할 수 있는 액션 종류는 코드 상수로 고정되어 있다.</p>
+<ul>
+<li><p>user entity에는 5종, post entity에는 2종만 요청할 수 있다. 클라이언트가 임의의 kind 문자열을 만들어 낼 수는 없다.</p>
+</li>
+<li><p>메시지 하나당 요청 가능한 액션은 16개로 제한된다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub const USER_KINDS: &amp;[&amp;str] = &amp;[
     &quot;suspend&quot;,
     &quot;label&quot;,
@@ -72,17 +118,32 @@
 pub const POST_KINDS: &amp;[&amp;str] = &amp;[&quot;post_label&quot;, &quot;suspend_author&quot;];
 pub const MAX_REQUESTED_ACTIONS_PER_MESSAGE: usize = 16;
 </code></pre></figure>
-<p>즉 <strong>user entity에는 5종, post entity에는 2종</strong>만 요청할 수 있다. 클라이언트가 임의의 kind 문자열을 만들어 낼 수는 없다. 메시지 하나당 요청 가능한 액션은 16개로 제한된다.</p>
-<p><strong>이중 fail-closed 검증</strong>은 <code>action_to_spec(entity_type, action, allowlist)</code>에서 이루어진다.</p>
+</li>
+</ul>
+</li>
+<li><p>요청은 이중 fail-closed(조건을 통과하지 못하면 거부하는 방식) 검증을 거친다. 검증은 <code>action_to_spec(entity_type, action, allowlist)</code>에서 다음 다섯 단계로 이루어진다.</p>
 <ol>
 <li><code>hardcoded_kinds</code>를 통과해야 한다. 통과하지 못하면 <code>&quot;unknown_kind&quot;</code>이고, 다른 엔티티 타입에 속한 kind라면 <code>&quot;entity_type_mismatch&quot;</code>로 구분한다.</li>
 <li>동적 <code>GenericActionAllowlist.kinds</code>에 해당 kind가 들어 있어야 한다. 없으면 <code>&quot;kind_not_allowlisted&quot;</code>다.</li>
 <li><code>suspend</code>나 <code>suspend_author</code> kind라면 <code>allowlist.suspend_policies</code>에 policy가 들어 있어야 한다. 없으면 <code>&quot;policy_not_allowlisted&quot;</code>다.</li>
-<li><code>label</code>이나 <code>post_label</code> kind라면 (a) <code>action.labels</code>가 비어 있지 않아야 하고(<code>&quot;no_labels&quot;</code>), (b) 모든 label이 <code>allowlist.labels</code>에 포함되어야 하며(<code>&quot;label_not_allowlisted&quot;</code>), (c) <code>ttl_msec &gt;= 0</code>을 만족해야 한다(<code>&quot;invalid_ttl&quot;</code>).</li>
+<li><code>label</code>이나 <code>post_label</code> kind라면 세 조건을 모두 만족해야 한다.<ul>
+<li><code>action.labels</code>가 비어 있지 않아야 한다(<code>&quot;no_labels&quot;</code>).</li>
+<li>모든 label이 <code>allowlist.labels</code>에 포함되어야 한다(<code>&quot;label_not_allowlisted&quot;</code>).</li>
+<li><code>ttl_msec &gt;= 0</code>을 만족해야 한다(<code>&quot;invalid_ttl&quot;</code>).</li>
+</ul>
+</li>
 <li>중복을 제거한다. 같은 spec이 이미 리스트에 있으면 <code>&quot;duplicate_action&quot;</code>이다.</li>
 </ol>
-<p>거부된 액션은 <strong>그냥 버려지지 않고 관측</strong>된다. <code>SkippedRequestedAction { kind, head, reason, count }</code> 구조체로 수집되어 <code>outcome.info[&quot;requested_actions_skipped&quot;]</code>에 JSON으로 붙고, 별도 메트릭인 <code>GENERIC_ACTION_TOTAL{entity_type, kind, outcome=resolved|skipped, reason}</code>으로도 집계된다. 즉 <strong>요청이 왜 통과하지 못했는지가 그대로 로그에 남는다</strong>. 스코어러 팀은 자기 요청이 거부된 이유를 바로 확인할 수 있다.</p>
-<p><strong>YAML 규칙 배선</strong>은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/abuse-enforcement-service/service-lib/rules/enforcement_user.yaml" target="_blank" rel="noopener">enforcement_user.yaml</a>에 들어갔다.</p>
+</li>
+<li><p>거부된 액션은 그냥 버려지지 않고 관측된다.</p>
+<ul>
+<li>거부된 액션은 <code>SkippedRequestedAction { kind, head, reason, count }</code> 구조체로 수집되어 <code>outcome.info[&quot;requested_actions_skipped&quot;]</code>에 JSON으로 붙는다.</li>
+<li>별도 메트릭인 <code>GENERIC_ACTION_TOTAL{entity_type, kind, outcome=resolved|skipped, reason}</code>으로도 집계된다.</li>
+<li>즉 요청이 왜 통과하지 못했는지가 그대로 로그에 남는다. 스코어러 팀은 자기 요청이 거부된 이유를 바로 확인할 수 있다.</li>
+</ul>
+</li>
+</ul>
+<p>YAML 규칙은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/abuse-enforcement-service/service-lib/rules/enforcement_user.yaml" target="_blank" rel="noopener">enforcement_user.yaml</a>에 두 개가 짝으로 들어갔다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-yaml" data-lang="yaml">- id: platform_row_without_requested_actions
   when: &#39;&quot;abuse_platform_requested_actions&quot; in score.labels &amp;&amp; size(score.requested_actions) == 0&#39;
   then:
@@ -94,8 +155,16 @@ pub const MAX_REQUESTED_ACTIONS_PER_MESSAGE: usize = 16;
   then:
     kind: act_requested_actions
 </code></pre></figure>
-<p>두 규칙은 짝을 이룬다. <strong>스코어러가 자기 라벨(<code>abuse_platform_requested_actions</code>)로 일반 액션 파이프라인임을 선언해 놓고도 실제 액션 리스트가 비어 있으면 skip</strong>하고, 액션이 하나라도 있으면 <code>act_requested_actions</code> decision을 통해 위의 검증 파이프라인으로 라우팅한다. <code>enforcement_post.yaml</code>에는 대칭되는 규칙 하나만 들어갔고, post 쪽에는 platform_row skip이 없다.</p>
-<p><strong>Decision 확장</strong>은 <code>abuse-enforcement-service/service-lib/src/lib.rs</code>(+276/−19)에서 이루어졌고, <code>Decision::ActRequestedActions</code> variant가 새로 생겼다. <code>run_enforcement_inner</code>가 이 variant를 만나면 다음과 같이 처리한다.</p>
+<ul>
+<li>스코어러가 자기 라벨(<code>abuse_platform_requested_actions</code>)로 일반 액션 파이프라인임을 선언해 놓고도 실제 액션 리스트가 비어 있으면, 그 요청은 건너뛴다.</li>
+<li>액션이 하나라도 있으면 <code>act_requested_actions</code> decision을 통해 위의 검증 파이프라인으로 라우팅한다.</li>
+<li><code>enforcement_post.yaml</code>에는 대칭되는 규칙 하나만 들어갔고, post 쪽에는 platform_row 건너뛰기 규칙이 없다.</li>
+</ul>
+<p>AES의 decision에도 요청 목록을 처리하는 새 variant가 생겼다.</p>
+<ul>
+<li><p><code>abuse-enforcement-service/service-lib/src/lib.rs</code>(+276/−19)에 <code>Decision::ActRequestedActions</code> variant가 새로 생겼다.</p>
+</li>
+<li><p><code>run_enforcement_inner</code>는 이 variant를 만나면 다음과 같이 처리한다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let (decision, mut requested_actions_skipped) = match decision {
     Decision::ActRequestedActions =&gt; expand_requested_actions_decision(
         facts.entity_type,
@@ -106,25 +175,56 @@ pub const MAX_REQUESTED_ACTIONS_PER_MESSAGE: usize = 16;
     Decision::Act(specs) =&gt; (ExpandedDecision::Act(specs), None),
 };
 </code></pre></figure>
-<p>allowlist를 통과한 액션이 하나도 없으면 <code>Skip(REQUESTED_ACTIONS_DENIED)</code>가 되고, 하나라도 있으면 <code>Act(specs)</code>가 된다. 즉 <strong>요청이 전부 거부되더라도 outcome이 skip으로 명시</strong>되기 때문에, 무엇이 요청됐고 왜 거부됐는지가 outcome.info의 JSON에 남는다.</p>
-<p><strong>dynamic_config에서 generic_action_allowlist로 이어지는 경로</strong>도 생겼다. <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/abuse-enforcement-service/service-lib/src/growthbook.rs" target="_blank" rel="noopener"><code>growthbook.rs</code>(+126)</a>에 새 메서드가 추가됐다. GrowthBook은 X의 dynamic config이자 feature-flag 시스템으로 보인다 <span class="badge est">추정</span>. 그렇다면 allowlist, 즉 스코어러가 어떤 kind를 요청할 수 있고 어떤 policy와 label을 쓸 수 있는지는 <strong>런타임에 A/B로 게이팅할 수 있다.</strong> 새 스코어러를 붙일 때 코드를 배포하지 않고도 GrowthBook 콘솔에서 allowlist 항목을 켜고 끌 수 있다.</p>
-<p><strong>이 구조의 첫 클라이언트로 <code>panda_reports_embedding_v10_rough_spam</code>이 함께 유입됐다.</strong> enforcement_user.yaml에 규칙이 새로 추가됐다.</p>
+</li>
+<li><p>allowlist를 통과한 액션이 하나도 없으면 <code>Skip(REQUESTED_ACTIONS_DENIED)</code>가 되고, 하나라도 있으면 <code>Act(specs)</code>가 된다.</p>
+</li>
+<li><p>즉 요청이 전부 거부되더라도 outcome이 skip으로 명시되기 때문에, 무엇이 요청됐고 왜 거부됐는지가 outcome.info의 JSON에 남는다.</p>
+</li>
+</ul>
+<p>dynamic_config에서 generic_action_allowlist로 이어지는 경로도 생겼다.</p>
+<ul>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/abuse-enforcement-service/service-lib/src/growthbook.rs" target="_blank" rel="noopener"><code>growthbook.rs</code>(+126)</a>에 새 메서드가 추가됐다.</li>
+<li>GrowthBook은 X의 dynamic config이자 feature-flag 시스템으로 보인다 <span class="badge est">추정</span>.<ul>
+<li>그렇다면 allowlist, 즉 스코어러가 어떤 kind를 요청할 수 있고 어떤 policy와 label을 쓸 수 있는지는 런타임에 A/B로 게이팅할 수 있다.</li>
+<li>새 스코어러를 붙일 때 코드를 배포하지 않고도 GrowthBook 콘솔에서 allowlist 항목을 켜고 끌 수 있다.</li>
+</ul>
+</li>
+</ul>
+<p>이 구조의 첫 클라이언트로 <code>panda_reports_embedding_v10_rough_spam</code>이 함께 유입됐다. enforcement_user.yaml에 규칙이 새로 추가됐다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-yaml" data-lang="yaml">- id: panda_reports_embedding_v10_rough_spam
   when: &#39;&quot;panda_reports_embedding_v10_rough_spam&quot; in score.labels&#39;
   then: { kind: act_suspend_user, perm: false, policy: &quot;PlatformManipulation&quot; }
 </code></pre></figure>
-<p>이 규칙 자체는 예전 방식 그대로의 정적 매핑이다. 다만 <strong>라벨 이름 자체가 새로운 정보</strong>를 담고 있다. <code>panda</code>는 X의 내부 spam 검출 시스템 이름으로 보이고 <span class="badge est">추정</span>, <code>reports_embedding_v10</code>은 리포트 embedding을 기반으로 하는 검출기의 10번째 버전이며, <code>rough_spam</code>은 확신도는 낮지만 스팸일 가능성이 높다는 판정이다. 조치는 임시(perm: false) suspend에 PlatformManipulation policy를 붙이는 것이다. 즉 이 검출기는 embedding을 기반으로 하고 <strong>버전이 v10까지 올라왔다</strong>. 계속 재학습되는 파이프라인이라고 볼 수 있다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> [의미 절 참조].</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>:</p></div>
+<ul>
+<li>이 규칙 자체는 예전 방식 그대로의 정적 매핑이다. 다만 라벨 이름 자체가 새로운 정보를 담고 있다.<ul>
+<li><code>panda</code>는 X의 내부 spam 검출 시스템 이름으로 보인다 <span class="badge est">추정</span>.</li>
+<li><code>reports_embedding_v10</code>은 리포트 embedding을 기반으로 하는 검출기의 10번째 버전이다.</li>
+<li><code>rough_spam</code>은 확신도는 낮지만 스팸일 가능성이 높다는 판정이다.</li>
+</ul>
+</li>
+<li>조치는 임시(perm: false) suspend에 PlatformManipulation policy를 붙이는 것이다.</li>
+<li>즉 이 검출기는 embedding을 기반으로 하고, 버전이 v10까지 올라왔다. 계속 재학습되는 파이프라인이라고 볼 수 있다.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>에서 세 군데를 고쳤다.</p></div>
 <ol>
-<li>4세대 표에 4세대+8 행 추가</li>
-<li>한 줄 요약 문단을 확장해 아홉 번째 후속 커밋을 서술</li>
-<li><a href="x.html#bdsm-%EA%B3%84%EC%A0%95-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4-%EB%B6%80%EC%A0%95-%EA%B3%84%EC%A0%95-%ED%83%90%EC%A7%80--4%EC%84%B8%EB%8C%801%EC%97%90%EC%84%9C-enforcement-note-%EC%83%9D%EC%84%B1-%EB%A1%9C%EC%A7%81-%EB%B6%80%EB%B6%84-%EA%B3%B5%EA%B0%9C">BDSM 절</a> 뒤에 <strong>&quot;4세대+8 (2026-08-25) — AES <code>generic_actions</code> 패스스루 배선&quot;</strong> subsection 추가</li>
+<li>4세대 표에 4세대+8 행을 추가했다.</li>
+<li>한 줄 요약 문단을 확장해 4세대+8 커밋을 서술했다.</li>
+<li><a href="x.html#bdsm-%EA%B3%84%EC%A0%95-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4-%EB%B6%80%EC%A0%95-%EA%B3%84%EC%A0%95-%ED%83%90%EC%A7%80--4%EC%84%B8%EB%8C%801%EC%97%90%EC%84%9C-enforcement-note-%EC%83%9D%EC%84%B1-%EB%A1%9C%EC%A7%81-%EB%B6%80%EB%B6%84-%EA%B3%B5%EA%B0%9C">BDSM 절</a> 뒤에 &quot;4세대+8 (2026-08-25) — AES <code>generic_actions</code> 패스스루 배선&quot; 소절을 추가했다.</li>
 </ol>
-<h3 id="1-2-vm-ranker-경로-대폭-단순화--author_diversity-값-모델-삭제--서버-측-dpp로-이동-ranking_scorereffective_head_weights-88줄-제거">1-2. VM Ranker 경로 대폭 단순화 — <code>author_diversity</code> 값 모델 삭제 → 서버 측 <code>dpp</code>로 이동, <code>ranking_scorer::effective_head_weights</code> 88줄 제거</h3>
-<div class="blk ctx"><p><span class="lbl">배경</span> VMRanker는 home-mixer에서 slate reranker 역할을 하는 원격 gRPC 서비스로, Phoenix가 뽑은 후보 점수 위에서 <a href="x.html#%EB%8B%A4%EC%96%91%EC%84%B1">DPP(Determinantal Point Process) 기반 다양성 재정렬</a>(θ=0.65, K=150)을 수행한다. 지금까지 <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a>는 value model 두 개를 지원했다. 하나는 <code>author_diversity</code>로, MPN 폴드백을 기반으로 저자 다양성을 감쇠시키는 값을 home-mixer가 로컬에서 계산해 rank server에 전달했다. 다른 하나는 default로, rank server가 반환한 점수를 그대로 사용했다. 4세대+3(2026-08-18)의 <a href="x.html#phoenix-2026-%ED%98%84%ED%96%89--4%EC%84%B8%EB%8C%80-%EA%B3%B5%EA%B0%9C-%EB%B0%98%EC%98%81">SID 필드 7개 배선</a>이 이 vm_ranker에 붙은 것이다.</p></div>
-<p>4세대+8이 이 경로를 <strong>크게 단순화했다.</strong></p>
-<p>**<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a> (+11/−128)**에서 삭제된 것은 다음과 같다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> 이 변경의 의미는 1-7 끝에서 4세대+8 공개 전체의 세 축과 함께 정리한다.</p></div>
+<h3 id="1-2-vm-ranker가-로컬-계산을-걷어-내고-서버가-돌려준-점수를-그대로-쓴다">1-2. VM Ranker가 로컬 계산을 걷어 내고 서버가 돌려준 점수를 그대로 쓴다</h3>
+<p>VM Ranker 경로에서 home-mixer(For You와 Following 등 X 홈 타임라인 피드 요청을 서빙하는 서비스)가 하던 로컬 계산 층이 빠졌다. 이제 home-mixer는 rank server가 돌려준 점수를 그대로 쓰고, 다양성은 서버 쪽 DPP(다양성 재정렬 기법)가 처리한다.</p>
+<div class="blk ctx"><p><span class="lbl">배경</span> VMRanker는 home-mixer에서 slate reranker 역할을 하는 원격 gRPC 서비스다. Phoenix가 뽑은 후보 점수 위에서 <a href="x.html#%EB%8B%A4%EC%96%91%EC%84%B1">DPP(Determinantal Point Process) 기반 다양성 재정렬</a>을 수행하고, 그 파라미터는 θ=0.65, K=150이다. 지금까지 <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a>는 value model 두 개를 지원했다.</p></div>
+<ul>
+<li><code>author_diversity</code>는 MPN 폴드백을 기반으로 저자 다양성을 감쇠시키는 값을 home-mixer가 로컬에서 계산해 rank server에 전달했다.</li>
+<li>default는 rank server가 반환한 점수를 그대로 사용했다.</li>
+<li>4세대+3(2026-08-18)의 <a href="x.html#phoenix-2026-%ED%98%84%ED%96%89--4%EC%84%B8%EB%8C%80-%EA%B3%B5%EA%B0%9C-%EB%B0%98%EC%98%81">SID 필드 7개 연결</a>이 이 vm_ranker에 붙은 것이다. SID(semantic ID)는 아이템을 discrete token ID 시퀀스로 나타낸 것이다.</li>
+</ul>
+<p>4세대+8이 이 경로를 크게 단순화했다. <code>ranking_scorer::effective_head_weights</code> 88줄과 MPN 폴드백 128줄을 제거했다.</p>
+<ul>
+<li><p>VM Ranker 스코어러에서 저자 다양성 값 모델과 MPN 폴드백 로직이 삭제됐다(<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a>, +11/−128).</p>
+<ul>
+<li><p>삭제된 코드는 다음과 같다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">// 삭제됨:
 const AUTHOR_DIVERSITY_VALUE_MODEL_ID: &amp;str = &quot;author_diversity&quot;;
 const MPN_FOLD_MULTIPLIER_MAX: f64 = 10.0;
@@ -142,20 +242,48 @@ let fold_weights = (query.params.get(EnableMpnScoring)
 // ...MpnParts.pos/neg × (returned/sent).clamp(0, MPN_FOLD_MULTIPLIER_MAX) 계산
 // ...AuthorColdStart.apply로 후처리
 </code></pre></figure>
-<p>새로 추가된 상수는 <code>const DPP_VALUE_MODEL_ID: &amp;str = &quot;dpp&quot;;</code> 하나다. 즉 값 모델 ID 하나를 <strong>삭제</strong>하고 다른 하나로 <strong>교체</strong>했다. 새 score() 로직은 다음과 같다.</p>
+</li>
+</ul>
+</li>
+<li><p>새로 추가된 상수는 <code>const DPP_VALUE_MODEL_ID: &amp;str = &quot;dpp&quot;;</code> 하나다. 즉 값 모델 ID 하나(<code>author_diversity</code>)를 삭제하고 다른 하나(<code>dpp</code>)로 교체했다.</p>
+</li>
+<li><p>새 score()는 VM Ranker가 반환한 점수를 그대로 통과시키고, 로컬에서 다시 계산하지 않는다. MPN 폴드백과 AuthorColdStart 후처리가 모두 사라졌다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">candidates.iter().map(|c| Ok(PostCandidate {
     score: score_map.get(&amp;c.tweet_id).copied().or(c.score),
     ..Default::default()
 })).collect()
 </code></pre></figure>
-<p>MPN 폴드백과 AuthorColdStart 후처리가 모두 사라졌고, <strong>VM Ranker가 반환한 점수를 그대로 통과시킨다.</strong> 로컬에서 다시 계산하지 않는다.</p>
-<p>**<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a> (+28/−201)**에서는 <code>ScoringWeights::effective_head_weights</code> 메서드가 <strong>88줄 삭제</strong>됐다. 이 메서드는 candidate마다 <code>xai_vm_ranker_proto::HeadWeights</code> 프로토버프를 만들어 VMRanker에 전송하는 로직이었다. post_unexplored 승수 계산, click_dwell_time의 low-fav-rate 페널티, quoted_vqv duration 체크, reply weight의 후보별 조정처럼 후보마다 가중치를 조합하는 처리였는데, 지금은 통째로 사라졌다.</p>
-<p><strong>층위별 의미:</strong></p>
+</li>
+<li><p>후보마다 가중치를 조합해 VMRanker로 보내던 메서드 88줄도 삭제됐다(<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a>, +28/−201).</p>
 <ul>
-<li><strong>아키텍처 이동</strong>: 다양성 계산이 home-mixer(client)에서 VMRanker(server)로 옮겨 갔다. 이전에는 home-mixer가 다양성 요구사항을 담은 head weights를 후보마다 만들어 rank server에 전송했는데, 이제는 rank server가 자체 DPP 로직으로 다양성을 처리하고 home-mixer는 반환된 점수만 소비한다.</li>
-<li><strong><code>author_diversity</code>에서 <code>dpp</code>로 바뀐 명칭의 실체는 아직 분명하지 않다.</strong> <code>dpp</code>가 정말로 <a href="x.html#%EB%8B%A4%EC%96%91%EC%84%B1">기존 재순위 절의 DPP(θ=0.65, K=150)</a>를 가리키는지, 아니면 rank server 안에서만 쓰는 다른 DPP 인스턴스인지는 이 커밋만으로 확정할 수 없다 <span class="badge est">추정</span>. <strong>VMRankerValueModelId</strong> 파라미터도 함께 정리된 흔적이 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>에 남아 있다(+10/−29로 순 감소).</li>
-<li><strong><code>AuthorColdStart</code>는 사라진 것이 아니라 자리를 옮겼다.</strong> <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a> 파일은 여전히 존재하고 +12/−9로 수정됐다. VMRanker의 후처리에서만 빠졌으므로, RankingScorer나 Phoenix 파이프라인 같은 다른 지점에서는 여전히 적용될 가능성이 있다.</li>
-<li><strong>삭제된 <code>effective_head_weights</code>의 도착지</strong>: 이 메서드가 계산하던 head weights(favorite·reply·retweet·share·dwell·quoted_vqv 등)를 이제 서버가 자체 로직으로 계산하거나, 아니면 head weights라는 개념 자체가 다른 방식으로 대체된 것으로 보인다. <strong>VMRanker가 원래의 phoenix 점수를 그대로 소비하고 자체 DPP만 적용</strong>한다고 해석하는 편이 자연스럽다 <span class="badge est">추정</span>.</li>
+<li>삭제된 메서드는 <code>ScoringWeights::effective_head_weights</code>다.</li>
+<li>이 메서드는 candidate마다 <code>xai_vm_ranker_proto::HeadWeights</code> 프로토버프를 만들어 VMRanker에 전송하는 로직이었다.</li>
+<li>post_unexplored 승수 계산, click_dwell_time의 low-fav-rate 페널티, quoted_vqv duration 체크, reply weight의 후보별 조정처럼 후보마다 가중치를 조합하는 처리였는데, 지금은 전부 사라졌다.</li>
+</ul>
+</li>
+</ul>
+<p>이 단순화가 뜻하는 바는 네 가지다.</p>
+<ul>
+<li>다양성 계산이 클라이언트인 home-mixer에서 서버인 VMRanker로 옮겨 갔다.<ul>
+<li>이전에는 home-mixer가 다양성 요구사항을 담은 head weights를 후보마다 만들어 rank server에 전송했다.</li>
+<li>이제는 rank server가 자체 DPP 로직으로 다양성을 처리하고, home-mixer는 반환된 점수만 소비한다.</li>
+</ul>
+</li>
+<li><code>author_diversity</code>에서 <code>dpp</code>로 바뀐 명칭의 실체는 아직 분명하지 않다.<ul>
+<li><code>dpp</code>가 정말로 <a href="x.html#%EB%8B%A4%EC%96%91%EC%84%B1">기존 재순위 절의 DPP(θ=0.65, K=150)</a>를 가리키는지, 아니면 rank server 안에서만 쓰는 다른 DPP 인스턴스인지는 이 커밋만으로 확정할 수 없다 <span class="badge est">추정</span>.</li>
+<li>VMRankerValueModelId 파라미터도 함께 정리된 흔적이 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>에 남아 있다(+10/−29로 순 감소).</li>
+</ul>
+</li>
+<li><code>AuthorColdStart</code>는 사라진 것이 아니라 자리를 옮겼다.<ul>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a> 파일은 여전히 존재하고 +12/−9로 수정됐다.</li>
+<li>VMRanker의 후처리에서만 빠졌으므로, RankingScorer나 Phoenix 파이프라인 같은 다른 지점에서는 여전히 적용될 가능성이 있다.</li>
+</ul>
+</li>
+<li>삭제된 <code>effective_head_weights</code>가 계산하던 값은 이제 서버가 자체 로직으로 계산하거나, head weights라는 개념 자체가 다른 방식으로 대체된 것으로 보인다.<ul>
+<li>이 메서드가 계산하던 head weights는 favorite·reply·retweet·share·dwell·quoted_vqv 등이다.</li>
+<li>VMRanker가 원래의 phoenix 점수를 그대로 소비하고 자체 DPP만 적용한다고 해석하는 편이 자연스럽다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
 </ul>
 <p>이 단순화는 4세대의 큰 방향, 즉 home-mixer에서 로컬 계산과 캐시를 걷어내고 서빙 산출을 우선 사용하는 흐름의 연장이다. <a href="x.html#4%EC%84%B8%EB%8C%805-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-22">4세대+5의 <code>UseServedSlateContext</code> 게이트</a>가 slate context 계산을 로컬에서 Phoenix 서빙으로 옮겼던 것과 짝을 이룬다.</p>
 <blockquote>
@@ -163,15 +291,21 @@ let fold_weights = (query.params.get(EnableMpnScoring)
 &quot;DPP_VALUE_MODEL_ID: &amp;str = &quot;dpp&quot;&quot; ← 신규
 — <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a></p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>:</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>에서 세 군데를 고쳤다.</p></div>
 <ol>
-<li><a href="x.html#%EB%9E%AD%ED%82%B9">랭킹 절</a>의 VMRanker 서술 갱신: 값 모델 명칭 변경과 effective_head_weights 삭제</li>
-<li><a href="x.html#%EB%8B%A4%EC%96%91%EC%84%B1">다양성 절</a>에 DPP가 VMRanker의 유일한 값 모델이 됐다는 사실 반영</li>
-<li><a href="x.html#%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-%EB%B3%80%EA%B2%BD%EC%9D%84-%EB%AC%B8%EC%84%9C%ED%99%94%ED%95%98%EB%8A%94-%EA%B4%80%ED%96%89--4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">파라미터 변경 관행</a>에 파라미터 -29줄(MPN·author_diversity 관련 상수 정리)</li>
+<li><a href="x.html#%EB%9E%AD%ED%82%B9">랭킹 절</a>의 VMRanker 서술에 값 모델 명칭 변경과 effective_head_weights 삭제를 반영했다.</li>
+<li><a href="x.html#%EB%8B%A4%EC%96%91%EC%84%B1">다양성 절</a>에 DPP가 VMRanker의 유일한 값 모델이 됐다는 사실을 반영했다.</li>
+<li><a href="x.html#%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-%EB%B3%80%EA%B2%BD%EC%9D%84-%EB%AC%B8%EC%84%9C%ED%99%94%ED%95%98%EB%8A%94-%EA%B4%80%ED%96%89--4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">파라미터 변경 관행</a>에 파라미터 -29줄(MPN·author_diversity 관련 상수 정리)을 적었다.</li>
 </ol>
-<h3 id="1-3-following-파이프라인-블록-관계-확장--followingblockedbyhydrator--authorsocialgraphfilter-신설">1-3. Following 파이프라인 블록 관계 확장 — <code>FollowingBlockedByHydrator</code> + <code>AuthorSocialgraphFilter</code> 신설</h3>
-<div class="blk ctx"><p><span class="lbl">배경</span> <a href="x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4">Following 지면</a>은 인네트워크 최신 포스트만 노출하는 reverse-chron 파이프라인이다. <a href="x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4">4세대+3에서 Following 전용 VF hydrator가 분기</a>된 이후 이 파이프라인이 계속 정교해지는 흐름이 이어지고 있는데, 이번에는 <strong>블록 관계 처리를 인용 저자와 리트윗 저자까지 확장</strong>하는 작업이 추가됐다.</p></div>
-<p>**<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/candidate_hydrators/following_blocked_by_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/following_blocked_by_hydrator.rs</code></a> (65줄 신규)**는 새로 추가된 hydrator다. 각 candidate에 대해 다음 처리를 수행한다.</p>
+<h3 id="1-3-following-피드가-인용리트윗-원-저자의-블록까지-따른다">1-3. Following 피드가 인용·리트윗 원 저자의 블록까지 따른다</h3>
+<p>Following 피드가 블록 관계를 인용 저자와 리트윗 저자까지 넓혀 확인한다. 원 저자가 뷰어를 블록했다면, 뷰어가 팔로우하는 사람이 그 포스트를 인용하거나 리트윗해도 뷰어에게는 보이지 않는다.</p>
+<div class="blk ctx"><p><span class="lbl">배경</span> <a href="x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4">Following 지면</a>은 인네트워크 최신 포스트만 노출하는 reverse-chron 파이프라인이다. <a href="x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4">4세대+3에서 Following 전용 VF hydrator가 분기</a>된 이후 이 파이프라인은 계속 정교해지고 있다. 이번에는 블록 관계 처리를 인용 저자와 리트윗 저자까지 확장하는 작업이 추가됐다.</p></div>
+<ul>
+<li><p>새 hydrator(후보마다 필드를 채워 붙이는 단계)인 <code>FollowingBlockedByHydrator</code>는 인용 저자와 리트윗 저자 가운데 누가 뷰어를 블록하고 있는지 SocialGraphClient에 묻는다.</p>
+<ul>
+<li><p>파일은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/candidate_hydrators/following_blocked_by_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/following_blocked_by_hydrator.rs</code></a> (65줄 신규)다.</p>
+</li>
+<li><p>candidate마다 quoted 저자와 retweeted 저자의 user_id 리스트를 모아 한 번에 묻는다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let user_ids: Vec&lt;u64&gt; = candidates
     .iter()
     .flat_map(|c| c.quoted_user_id.into_iter().chain(c.retweeted_user_id))
@@ -181,12 +315,16 @@ let blocked_by_user_ids = self.socialgraph_client
     .check_blocked_by(query.user_id, &amp;user_ids)
     .await?;
 </code></pre></figure>
-<p>즉 candidate의 <strong>quoted 저자</strong>와 <strong>retweeted 저자</strong>의 user_id 리스트를 모아 SocialGraphClient에 이들 중 누가 뷰어를 블록하고 있는지 물어보고, 그 결과를 후보 필드 두 개에 설정한다.</p>
-<ul>
-<li><code>author_blocks_viewer</code> — retweeted 저자가 뷰어를 블록하면 true</li>
-<li><code>quoted_author_blocks_viewer</code> — quoted 저자가 뷰어를 블록하면 true</li>
+</li>
+<li><p>그 결과는 후보 필드 두 개에 설정된다. <code>author_blocks_viewer</code>는 retweeted 저자가 뷰어를 블록하면 true다. <code>quoted_author_blocks_viewer</code>는 quoted 저자가 뷰어를 블록하면 true다.</p>
+</li>
 </ul>
-<p>**<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/filters/author_socialgraph_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/author_socialgraph_filter.rs</code></a>**는 4세대에 이미 존재하던 파일인데, 여기에 새 배선이 들어갔다. 필터는 <strong>6개 조건 중 하나라도 참이면</strong> candidate를 제거한다.</p>
+</li>
+<li><p>4세대에 이미 있던 필터 <code>AuthorSocialgraphFilter</code>에 새 조건이 연결됐고, 이제 6개 조건 중 하나라도 참이면 candidate를 제거한다.</p>
+<ul>
+<li><p>필터 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/filters/author_socialgraph_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/author_socialgraph_filter.rs</code></a>다.</p>
+</li>
+<li><p>이전에는 뷰어에서 저자로 향하는 block과 mute만 확인했다. 이제는 저자에서 뷰어로 향하는 방향과 quote·retweet 체인의 원 저자까지 여섯 갈래로 확장됐다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if muted                          // 뷰어가 저자를 mute
     || blocked                    // 뷰어가 저자를 block
     || author_blocks_viewer       // 저자(=retweeted 저자)가 뷰어를 block
@@ -199,8 +337,10 @@ let blocked_by_user_ids = self.socialgraph_client
     kept.push(candidate);
 }
 </code></pre></figure>
-<p>이전에는 뷰어에서 저자로 향하는 block과 mute만 확인했는데, 이제는 <strong>저자에서 뷰어로 향하는 방향</strong>과 <strong>quote·retweet 체인의 원 저자</strong>까지 여섯 갈래로 확장됐다.</p>
-<p>**<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/candidate_pipeline/reverse_chron_posts_pipeline.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_pipeline/reverse_chron_posts_pipeline.rs</code></a> (+27/−2)**에서는 파이프라인에 신규 hydrator와 filter를 배선했다.</p>
+</li>
+</ul>
+</li>
+<li><p>두 단계는 reverse-chron 파이프라인에 연결됐고, 필터는 VF 필터 앞에 놓였다(<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/candidate_pipeline/reverse_chron_posts_pipeline.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_pipeline/reverse_chron_posts_pipeline.rs</code></a>, +27/−2).</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let post_selection_hydrators = vec![
     Box::new(FollowingBlockedByHydrator::new(socialgraph_client).await),  // 신규
     Box::new(VFFollowingCandidateHydrator::new(...)),
@@ -212,22 +352,50 @@ let post_selection_filters = vec![
     Box::new(AncillaryVFFilter),
 ];
 </code></pre></figure>
-<p><code>AuthorSocialgraphFilter</code>는 <strong>VF 필터 앞에 위치한다.</strong> 즉 블록이나 뮤트로 걸러진 후보는 VF 판정 조회 자체를 건너뛰기 때문에 성능도 함께 개선된다. <code>SocialGraphClient</code>는 XAI candidate_pipeline component_library에 속한 클라이언트로 TLS S2S로 flock에 접속하며, 서비스 자체는 공개되지 않았다.</p>
-<p><strong>층위별 의미:</strong></p>
 <ul>
-<li><strong>블록 의미의 전이 확장</strong>: 이전에는 &quot;당신이 A를 팔로우하지 않으면 A의 포스트가 보이지 않는다&quot;였는데, 이제는 &quot;당신이 A를 팔로우하더라도 A가 원 저자 B를 리트윗했고 B가 당신을 블록하고 있으면 보이지 않는다&quot;까지 확장됐다. B가 당신을 블록한 사실이 팔로잉 관계와 무관하게 존중된다. 적용 범위가 넓은 정책 결정이며, X가 quote와 retweet을 통한 우회 노출을 명시적으로 막기 시작했다는 신호로 해석한다 <span class="badge est">추정</span>.</li>
-<li><strong>성능 트레이드오프</strong>: 요청마다 SocialGraphClient에 <strong>원격 조회</strong>가 하나 추가된다. 다만 모든 candidate의 quoted·retweeted user_id를 한꺼번에 <code>check_blocked_by</code>로 묻는 batch 조회이므로, 고정 비용이 아니라 후보 수 대비 sub-linear로 늘어난다.</li>
-<li><strong>Following에만 배선됐다</strong>: For You(algorithmic) 파이프라인의 hydrator 목록에는 이 hydrator가 아직 없다. 배선이 대칭을 이룬다면 다음 커밋에서 For You에도 붙을 가능성이 있다 <span class="badge est">추정</span>.</li>
+<li><code>AuthorSocialgraphFilter</code>는 VF 필터 앞에 위치한다. 즉 블록이나 뮤트로 걸러진 후보는 VF 판정 조회 자체를 건너뛰기 때문에 성능도 함께 개선된다.</li>
+<li><code>SocialGraphClient</code>는 XAI candidate_pipeline component_library에 속한 클라이언트다. TLS S2S로 flock에 접속하며, 서비스 자체는 공개되지 않았다.</li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>:</p></div>
+</li>
+</ul>
+<p>이 변경이 뜻하는 바는 세 가지다.</p>
+<ul>
+<li>블록의 의미가 전이적으로 넓어졌다.<ul>
+<li>이전에는 &quot;당신이 A를 팔로우하지 않으면 A의 포스트가 보이지 않는다&quot;였는데, 이제는 &quot;당신이 A를 팔로우하더라도 A가 원 저자 B를 리트윗했고 B가 당신을 블록하고 있으면 보이지 않는다&quot;까지 확장됐다.</li>
+<li>B가 당신을 블록한 사실이 팔로잉 관계와 무관하게 존중된다.</li>
+<li>적용 범위가 넓은 정책 결정이며, X가 quote와 retweet을 통한 우회 노출을 명시적으로 막기 시작했다는 신호로 해석한다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+<li>성능 면에서는 요청마다 SocialGraphClient에 원격 조회가 하나 추가된다.<ul>
+<li>다만 모든 candidate의 quoted·retweeted user_id를 한꺼번에 <code>check_blocked_by</code>로 묻는 batch 조회이므로, 고정 비용이 아니라 후보 수 대비 sub-linear로 늘어난다.</li>
+</ul>
+</li>
+<li>이 hydrator는 Following에만 연결됐다.<ul>
+<li>For You(algorithmic) 파이프라인의 hydrator 목록에는 이 hydrator가 아직 없다.</li>
+<li>연결이 대칭을 이룬다면 다음 커밋에서 For You에도 붙을 가능성이 있다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>에서 두 군데를 고쳤다.</p></div>
 <ol>
-<li><a href="x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4">Following 지면 서술</a>에 블록 확장 subsection 추가</li>
-<li><a href="x.html#%ED%95%84%ED%84%B0-21%EA%B0%9C-2026-08-4%EC%84%B8%EB%8C%801--%EC%8A%A4%EC%BD%94%EC%96%B4%EB%A7%81-%EC%A0%84-18--%ED%9B%84-3">필터 21개 표</a>의 <code>AuthorSocialgraphFilter</code> 상세 갱신 (기존에도 있었지만 의미가 확장됐음을 반영)</li>
+<li><a href="x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4">Following 지면 서술</a>에 블록 확장 소절을 추가했다.</li>
+<li><a href="x.html#%ED%95%84%ED%84%B0-21%EA%B0%9C-2026-08-4%EC%84%B8%EB%8C%801--%EC%8A%A4%EC%BD%94%EC%96%B4%EB%A7%81-%EC%A0%84-18--%ED%9B%84-3">필터 21개 표</a>의 <code>AuthorSocialgraphFilter</code> 상세를 갱신했다. 기존에도 있던 필터지만 의미가 확장됐음을 반영했다.</li>
 </ol>
-<h3 id="1-4-brazil2026electionfilter-계정-리스트-갱신-3379줄--tse-dadosabertos-원본-반영">1-4. <code>Brazil2026ElectionFilter</code> 계정 리스트 갱신 (+3,379줄) — TSE dadosabertos 원본 반영</h3>
-<p><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs</code></a> (+3,379/−5, 파일 전체 4,947줄)에 계정 리스트가 대폭 추가됐다. README 알림란에도 *&quot;Account list updated August 25, 2026.&quot;*라고 명시됐다. 데이터 원본은 <a href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026" target="_blank" rel="noopener">dadosabertos.tse.jus.br/dataset/candidatos-2026</a>으로, 브라질 선거관리위원회(TSE)가 공개한 2026 선거 후보자 데이터셋이다.</p>
-<p><strong>필터의 동작 자체는 바뀌지 않았다.</strong> 4세대+1에서 신설된 로직 그대로다. (1) <code>dadosabertos.tse.jus.br</code>의 신고 계정 명단을 하드코딩하고, (2) For You 파이프라인에서 이들 계정의 포스트를 제거하되, (3) <strong>뷰어가 명시적으로 팔로우한 계정은 예외로 둔다.</strong> Art. 28 § 1º-A of Electoral Resolution 23.610을 준수하기 위한 조치다.</p>
-<p><strong>투명성 관행: 공개 소스와 사용자 프라이버시 사이의 절충</strong></p>
+<h3 id="1-4-브라질-선거-필터의-계정-명단이-tse-원본으로-크게-늘었다">1-4. 브라질 선거 필터의 계정 명단이 TSE 원본으로 크게 늘었다</h3>
+<p>브라질 2026 선거 필터의 계정 명단에 브라질 선거관리위원회 공개 데이터를 바탕으로 +3,379줄이 추가됐다. 필터의 동작 자체는 바뀌지 않았다.</p>
+<ul>
+<li>필터 <code>Brazil2026ElectionFilter</code>의 파일 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs</code></a>에 계정 리스트가 대폭 추가됐다(+3,379/−5, 파일 전체 4,947줄).</li>
+<li>README 알림란에도 이 갱신이 명시됐다: <em>&quot;Account list updated August 25, 2026.&quot;</em></li>
+<li>데이터 원본은 <a href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026" target="_blank" rel="noopener">dadosabertos.tse.jus.br/dataset/candidatos-2026</a>이다. 브라질 선거관리위원회(TSE)가 공개한 2026 선거 후보자 데이터셋이다.</li>
+</ul>
+<p>필터 로직은 4세대+1에서 신설된 그대로이며, 세 단계로 동작한다.</p>
+<ol>
+<li><code>dadosabertos.tse.jus.br</code>의 신고 계정 명단을 하드코딩한다.</li>
+<li>For You 파이프라인에서 이들 계정의 포스트를 제거한다.</li>
+<li>뷰어가 명시적으로 팔로우한 계정은 예외로 둔다.</li>
+</ol>
+<p>이는 Art. 28 § 1º-A of Electoral Resolution 23.610을 준수하기 위한 조치다.</p>
+<p>명단을 싣는 방식에서는 투명성 관행이 보인다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">// User ids below are obfuscated; usernames are included for transparency.
 
 // @OmarAzizSenador deleted his account at the time this code was written.
@@ -236,11 +404,24 @@ let post_selection_filters = vec![
 // @ADALBERTO_1111 no live account was found.
 ...
 </code></pre></figure>
-<p>즉 <strong>user_id는 obfuscated 처리해 내부 X ID가 노출되지 않게</strong> 하면서도, <strong>@username은 그대로</strong> 코드에 남긴다. 각 계정 옆에는 &quot;deleted his account&quot;나 &quot;no live account was found&quot; 같은 상태 주석까지 붙어 있다. <strong>공개 소스와 사용자 프라이버시</strong>(내부 user_id 유출 방지) 사이의 절충으로, 검증 가능성은 유지하면서 X의 내부 user_id 매핑은 감추는 방식이다. 규모는 4세대+1의 665개보다 훨씬 늘어난 것으로 보인다(정확한 계정 수는 diff 라인을 세어 따로 계산해야 하는데, 4947줄 파일에 계정당 2<del>4줄이 들어간다면 대략 1200</del>2000개 규모다) <span class="badge est">추정</span>.</p>
+<ul>
+<li>user_id는 obfuscated 처리해 내부 X ID가 노출되지 않게 하면서도, @username은 그대로 코드에 남긴다.</li>
+<li>각 계정 옆에는 &quot;deleted his account&quot;나 &quot;no live account was found&quot; 같은 상태 주석까지 붙어 있다.</li>
+<li>공개 소스와 사용자 프라이버시(내부 user_id 유출 방지) 사이의 절충으로, 검증 가능성은 유지하면서 X의 내부 user_id 매핑은 감추는 방식이다.</li>
+<li>규모는 4세대+1의 665개보다 훨씬 늘어난 것으로 보인다 <span class="badge est">추정</span>.<ul>
+<li>정확한 계정 수는 diff 라인을 세어 따로 계산해야 한다. 4947줄 파일에 계정당 2~4줄이 들어간다면 대략 1200~2000개 규모다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+</ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#%ED%95%84%ED%84%B0-21%EA%B0%9C-2026-08-4%EC%84%B8%EB%8C%801--%EC%8A%A4%EC%BD%94%EC%96%B4%EB%A7%81-%EC%A0%84-18--%ED%9B%84-3">services/x.md</a>의 <code>Brazil2026ElectionFilter</code> 항목을 갱신해, 계정 리스트를 정기적으로 갱신하는 관행이라는 사실을 명시했다.</p></div>
-<h3 id="1-5-phoenix-rankall-prefloor-스냅샷-배선--min_age-있는-window에-대해-pre-min-age-데이터-동시-로드">1-5. <code>phoenix-rankall</code> prefloor 스냅샷 배선 — <code>min_age</code> 있는 window에 대해 pre-min-age 데이터 동시 로드</h3>
-<div class="blk ctx"><p><span class="lbl">배경</span> <a href="https://github.com/xai-org/x-algorithm/tree/0d3cdd8/phoenix-rankall" target="_blank" rel="noopener"><code>phoenix-rankall/</code></a>는 Phoenix의 offline 인덱싱·집계 파이프라인으로, 여러 window(예를 들어 <code>1fav_uec_1day</code>, <code>video_14day</code>, <code>evergreen_video_1825day</code>)로 후보 pool을 유지한다. <a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">4세대+1에서 <code>video_14day</code> SID window가 추가</a>됐고 <a href="x.html#4%EC%84%B8%EB%8C%806-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-23">4세대+6에서 <code>EVERGREEN</code> retrieval dataset이 <code>evergreen_video_1825day</code> → <code>video_4to14day</code>로 축소</a>된 흐름을 이어받아, 4세대+8은 rankall base 저장소 자체를 확장했다.</p></div>
-<p>**<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix-rankall/src/store/base.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/store/base.rs</code></a> (+202/−61)**에 새 상수와 로딩 로직이 추가됐다.</p>
+<h3 id="1-5-phoenix-인덱스가-최소-경과-시간을-채우기-전의-데이터도-함께-불러온다">1-5. Phoenix 인덱스가 최소 경과 시간을 채우기 전의 데이터도 함께 불러온다</h3>
+<p>Phoenix의 offline 인덱싱 파이프라인이 게시 후 최소 경과 시간 조건이 있는 window마다, 아직 그 조건을 채우지 못한 데이터를 별도 스냅샷으로 함께 불러온다. 이 변경은 Phoenix rankall 파이프라인의 base 저장소에 들어갔다.</p>
+<div class="blk ctx"><p><span class="lbl">배경</span> <a href="https://github.com/xai-org/x-algorithm/tree/0d3cdd8/phoenix-rankall" target="_blank" rel="noopener"><code>phoenix-rankall/</code></a>는 Phoenix의 offline 인덱싱·집계 파이프라인이다. 후보 pool을 여러 window로 나눠 유지하며, 예를 들어 <code>1fav_uec_1day</code>, <code>video_14day</code>, <code>evergreen_video_1825day</code>가 있다. 4세대+8은 아래 두 변경의 흐름을 이어받아 <code>phoenix-rankall</code>의 base 저장소 자체를 확장했다.</p></div>
+<ul>
+<li><a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">4세대+1에서 <code>video_14day</code> SID window가 추가</a>됐다.</li>
+<li><a href="x.html#4%EC%84%B8%EB%8C%806-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-23">4세대+6에서 <code>EVERGREEN</code> retrieval dataset이 <code>evergreen_video_1825day</code> → <code>video_4to14day</code>로 축소</a>됐다.</li>
+</ul>
+<p>변경은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix-rankall/src/store/base.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/store/base.rs</code></a> (+202/−61)의 새 상수와 로딩 로직이다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const PREFLOOR_SLACK_SECS: f64 = 6.0 * 3600.0;
 
 // window config에 min_age가 있으면:
@@ -255,12 +436,29 @@ if wc.min_age.is_some() {
     // pf_path에서 배치 로딩...
 }
 </code></pre></figure>
-<p>즉 특정 window가 <code>min_age</code> 조건(예를 들어 &quot;이 pool에는 게시 후 최소 N시간이 지난 것만 포함한다&quot;)을 가지면, 그 조건을 아직 통과하지 못한 <strong>min_age 이전</strong> 데이터를 별도의 <code>prefloor_&lt;window&gt;.parquet</code> 파일로 유지해 함께 로드한다. <code>PREFLOOR_SLACK_SECS = 6시간</code>은 prefloor 데이터가 min_age 문턱을 넘기 전까지 유지되는 여유 시간이다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> <a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">4세대+2에서 <code>phoenix-rankall-strato</code>의 <code>favoriteCount&gt;=1</code> 게이트가 제거</a>됐던 흐름의 연장이다. 이전에는 인덱스에 들어가려면 조건을 통과해야 했는데, 이제는 rankall이 <strong>아직 조건을 통과하지 못한 후보도 별도 pool에 유지</strong>해서 조건을 통과하는 시점에 즉시 프로덕션에 반영할 수 있게 한다. 콜드스타트와 freshness 관점의 개선이며, 신규 포스트의 인덱스 지연을 줄이는 방향이다 <span class="badge est">추정</span>.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 <a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">Phoenix 학습·인덱스 절</a>에 subsection &quot;4세대+8 (2026-08-25) — rankall prefloor 스냅샷 배선&quot; 추가.</p></div>
-<h3 id="1-6-phoenix-copy_port-tokiospawn-하드닝--rate-limit이-병렬-폴링-없이도-in-flight-cap-지키게">1-6. Phoenix <code>copy_port</code> <code>tokio::spawn</code> 하드닝 — rate-limit이 병렬 폴링 없이도 in-flight cap 지키게</h3>
-<p>**<a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a> (+155)**의 copy_port는 Phoenix 서빙에서 오브젝트 스토리지(S3/xai-o2)로부터 임베딩 테이블과 체크포인트를 다운로드하는 클라이언트다. 이전 코드는 <code>join_all(futures).await</code>로 여러 다운로드를 병렬로 진행했는데, <strong>rate limit 배치 안에서 <code>join_all</code>이 futures를 순차적으로 poll</strong>하면 실제 in-flight concurrency가 <code>max_concurrent</code>를 넘을 수 있다는 문제가 있었다.</p>
-<p>수정 내용은 다음과 같다.</p>
+<ul>
+<li>특정 window가 <code>min_age</code> 조건을 가지면, 그 조건을 아직 통과하지 못한 min_age 이전 데이터를 별도의 <code>prefloor_&lt;window&gt;.parquet</code> 파일로 유지해 함께 로드한다.<ul>
+<li><code>min_age</code> 조건의 예는 &quot;이 pool에는 게시 후 최소 N시간이 지난 것만 포함한다&quot; 같은 것이다.</li>
+</ul>
+</li>
+<li><code>PREFLOOR_SLACK_SECS = 6시간</code>은 prefloor 데이터가 min_age 문턱을 넘기 전까지 유지되는 여유 시간이다.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 <a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">Phoenix 학습·인덱스 절</a>에 소절 &quot;4세대+8 (2026-08-25) — rankall prefloor 스냅샷 배선&quot;을 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이 변경은 <a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">4세대+2에서 <code>phoenix-rankall-strato</code>의 <code>favoriteCount&gt;=1</code> 게이트가 제거</a>됐던 흐름의 연장이다. 이전에는 인덱스에 들어가려면 조건을 통과해야 했지만, 이제 rankall은 아직 조건을 통과하지 못한 후보도 별도 pool에 유지해서 통과하는 시점에 즉시 프로덕션에 반영할 수 있게 한다. 콜드스타트와 freshness 관점의 개선이며, 신규 포스트의 인덱스 지연을 줄이는 방향이다 <span class="badge est">추정</span>.</p></div>
+<h3 id="1-6-phoenix-다운로드-클라이언트가-동시-실행-상한을-실제로-지키게-됐다">1-6. Phoenix 다운로드 클라이언트가 동시 실행 상한을 실제로 지키게 됐다</h3>
+<p>Phoenix 서빙이 임베딩 테이블과 체크포인트를 내려받을 때, 실제 동시 다운로드 수가 설정한 상한을 넘을 수 있던 문제를 고쳤다. 회귀 테스트도 2개 새로 추가됐다.</p>
+<ul>
+<li><p><code>copy_port</code>는 Phoenix 서빙에서 오브젝트 스토리지(S3/xai-o2)로부터 임베딩 테이블과 체크포인트를 다운로드하는 클라이언트다.</p>
+<ul>
+<li>파일은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a> (+155)다.</li>
+</ul>
+</li>
+<li><p>이전 코드는 <code>join_all(futures).await</code>로 여러 다운로드를 병렬로 진행했다.</p>
+<ul>
+<li>그런데 rate limit 배치 안에서 <code>join_all</code>이 futures를 순차적으로 poll하면, 실제 in-flight concurrency가 <code>max_concurrent</code>를 넘을 수 있다는 문제가 있었다.</li>
+</ul>
+</li>
+<li><p>수정 후에는 각 future를 <code>tokio::task::spawn</code>으로 별도 태스크에 감싼다. 이 <code>tokio::spawn</code> 하드닝은 rate-limit이 병렬 폴링 없이도 in-flight cap을 지키도록 고친 것이다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">// Before:
 let batch_results = join_all(batch).await;
 
@@ -271,97 +469,228 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
     .collect::&lt;Result&lt;Vec&lt;_&gt;, _&gt;&gt;()
     .map_err(|e| CopyPortError::Other(format!(&quot;copy_port download task join: {e}&quot;)))?;
 </code></pre></figure>
-<p>각 future를 <code>tokio::task::spawn</code>으로 별도 태스크에 감싸면 <strong>런타임 스케줄러가 실제로 병렬 실행</strong>하고, rate limit 로직(<code>join_rate_limited</code>)이 다음 배치를 issue할 시점을 in-flight 카운트에 근거해 정확히 결정한다. 회귀 테스트도 2개 새로 추가됐다.</p>
 <ul>
-<li><code>rate_limit_caps_in_flight_despite_spawn</code> — 6개 다운로드에 concurrency=2 상한 → peak in-flight이 정확히 2</li>
-<li><code>rate_limit_paces_between_spawned_batches</code> — 배치 사이의 페이싱이 유지됨</li>
+<li>이렇게 감싸면 런타임 스케줄러가 실제로 병렬 실행한다.</li>
+<li>rate limit 로직(<code>join_rate_limited</code>)은 다음 배치를 issue할 시점을 in-flight 카운트에 근거해 정확히 결정한다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> <a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">4세대+7에서 Phoenix 체크포인트 로더 다중 노드 하드닝</a>이 restore path의 OOM을 잡았다면, 이번 변경은 서빙 시점의 병렬 다운로드 스로틀링 정확성을 잡는 하드닝이다. 두 작업은 짝을 이루며, 4세대+6에서 Muon+GB300 학습이 export에 정식 포함된 이후 이어지는 학습·서빙 양쪽 인프라 성숙 사이클의 연장이다. 이런 stability 픽스가 매일 커밋에 붙는다는 사실 자체가, <strong>X가 4세대 오픈소스 릴리스를 검증 가능하고 프로덕션에서 신뢰할 수 있는 상태로 유지하는 데 조직 자원을 계속 투입</strong>하고 있다는 증거다.</p></div>
-<h3 id="1-7-소소한-변경-4건-grox-reply_spam--grox-upa--engagement-counts--urt-마셜링">1-7. 소소한 변경 4건 (grox reply_spam · grox upa · engagement counts · URT 마셜링)</h3>
+</li>
+<li><p>새로 추가된 회귀 테스트 두 개는 각각 다음을 확인한다.</p>
 <ul>
-<li><strong><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/task_rate_limit.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_rate_limit.py</code></a> −10줄, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/plan_reply_ranking.py" target="_blank" rel="noopener"><code>plan_reply_ranking.py</code></a> −6, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/plan_spam_comment.py" target="_blank" rel="noopener"><code>plan_spam_comment.py</code></a> −6, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py</code></a> +2/−2</strong> — reply_spam 파이프라인을 소소하게 정리했다. <code>task_rate_limit</code>에서 −10줄이라 rate limit 로직 일부가 사라진 것으로 보이지만, 순수 삭제 규모만 드러나므로 정확한 변화는 별도로 diff를 확인해야 한다. <code>task_filter.py</code>는 임계값을 바꾸지 않고 실행 흐름만 미세하게 조정했고, 11일 동안 15k에서 100k로 이어진 <a href="x.html#grox-llm-%EC%A3%BC%EC%84%9D--3%EC%84%B8%EB%8C%80-%EA%B7%B8%EB%8C%80%EB%A1%9C--2026-08-14-%EC%9E%84%EA%B3%84-%EC%83%81%ED%96%A5">follower 임계 완화 흐름</a>은 이번 커밋에서도 유지된다.</li>
-<li><strong><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/upa/constants.py" target="_blank" rel="noopener"><code>grox/flows/upa/constants.py</code></a> +2, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/upa/generators.py" target="_blank" rel="noopener"><code>generators.py</code></a> +11</strong> — <code>upa/</code>(grox의 프로필·유저 분석 파이프라인으로 보인다 <span class="badge est">추정</span>)에 새 상수 2개와 새 generator 하나가 추가됐다. 이 서브플로우가 무엇을 하는지는 4세대에서 공개된 이후로도 정본에 아직 명시하지 못했으므로, 다음 커밋을 계속 지켜봐야 한다.</li>
-<li><strong><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a> +16/−1</strong> — engagement count(favorite/reply/retweet 카운트)를 후보에 붙이는 hydrator를 소소하게 확장했다. 새로 추가된 로직은 더 확인해야 하는데, 필드 하나를 추가한 것으로 보인다.</li>
-<li><strong>URT 마셜링 층 확장</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/mod.rs" target="_blank" rel="noopener"><code>home-mixer/util/urt/mod.rs</code></a> (+13/−8), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/ad_marshaller.rs" target="_blank" rel="noopener"><code>ad_marshaller.rs</code></a> (+18/−8), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/client_event.rs" target="_blank" rel="noopener"><code>client_event.rs</code></a> (+27/−7), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/wtf_marshaller.rs" target="_blank" rel="noopener"><code>wtf_marshaller.rs</code></a> (+14/−3), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/reverse_chron_following/mod.rs" target="_blank" rel="noopener"><code>reverse_chron_following/mod.rs</code></a> (+12/−5)에서 URT(Universal Response Tree, X의 응답 렌더링 스키마)의 광고와 WTF(Who To Follow), client event 마셜링 로직을 소소하게 확장했다. 개별 변화보다는 이번 공개가 URT 층 전반에 골고루 손을 댔다는 점이 특징이다.</li>
-<li><strong>Phoenix training 소소한 정비</strong> — <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/xrex/driver/hooks.py" target="_blank" rel="noopener"><code>phoenix/xrex/driver/hooks.py</code></a> (+24/−11), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>train/trainer.py</code></a> (+7), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/xrex/train/checkpoint_write.py" target="_blank" rel="noopener"><code>train/checkpoint_write.py</code></a> (+2), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/xrex/utils/metadata.py" target="_blank" rel="noopener"><code>utils/metadata.py</code></a> (+18/−4), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/python/common/xai-configlib/src/xai_configlib/__init__.py" target="_blank" rel="noopener"><code>python/common/xai-configlib/src/xai_configlib/__init__.py</code></a> (+15/−13), <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato" target="_blank" rel="noopener"><code>phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato</code></a> (+15)는 4세대+7 restore 하드닝의 후속으로 학습·인덱싱 인프라를 소소하게 손질한 것이다.</li>
-<li><strong><code>home-mixer/scorers/author_cold_start.rs</code> +12/−9</strong> — VMRanker에서 AuthorColdStart 소비가 사라진 것과 별개로 스코어러 자체는 남아서 정비됐다. 새 소비자가 어디인지는 더 확인해야 한다.</li>
-<li><strong><code>home-mixer/sources/following_night_owl_source.rs</code> +5</strong> — Night Owl(밤 시간대 fatigue 조정) 소스를 소소하게 확장했다.</li>
+<li><code>rate_limit_caps_in_flight_despite_spawn</code>은 6개 다운로드에 concurrency=2 상한을 걸었을 때 peak in-flight이 정확히 2인지 본다.</li>
+<li><code>rate_limit_paces_between_spawned_batches</code>는 배치 사이의 페이싱이 유지되는지 본다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미: 이번 공개의 세 축</span></p></div>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 이번 변경은 서빙 시점의 병렬 다운로드 스로틀링 정확성을 잡는 하드닝으로, <a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">4세대+7에서 Phoenix 체크포인트 로더 다중 노드 하드닝</a>이 restore path의 OOM을 잡은 것과 짝을 이룬다. 두 작업은 4세대+6에서 Muon·GB300 학습이 export에 정식 포함된 이후 이어지는 학습·서빙 양쪽 인프라 성숙 사이클의 연장이다. 이런 stability 픽스가 매일 커밋에 붙는다는 사실 자체가, X가 4세대 오픈소스 릴리스를 검증 가능하고 프로덕션에서 신뢰할 수 있는 상태로 유지하는 데 조직 자원을 계속 투입하고 있다는 증거다.</p></div>
+<h3 id="1-7-grox-engagement-counts-urt의-소소한-변경-4건과-그-밖의-정비">1-7. grox, engagement counts, URT의 소소한 변경 4건과 그 밖의 정비</h3>
+<p>나머지는 규모가 작은 정리와 확장이다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
+<ul>
+<li>grox(Grok 기반 nearline 주석 파이프라인)의 reply_spam 파이프라인을 소소하게 정리했다.<ul>
+<li>바뀐 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/task_rate_limit.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_rate_limit.py</code></a> −10줄, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/plan_reply_ranking.py" target="_blank" rel="noopener"><code>plan_reply_ranking.py</code></a> −6, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/plan_spam_comment.py" target="_blank" rel="noopener"><code>plan_spam_comment.py</code></a> −6, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py</code></a> +2/−2다.</li>
+<li><code>task_rate_limit</code>에서 −10줄이라 rate limit 로직 일부가 사라진 것으로 보인다. 다만 순수 삭제 규모만 드러나므로, 정확한 변화는 별도로 diff를 확인해야 한다.</li>
+<li><code>task_filter.py</code>는 임계값을 바꾸지 않고 실행 흐름만 미세하게 조정했다. 11일 동안 15k에서 100k로 이어진 <a href="x.html#grox-llm-%EC%A3%BC%EC%84%9D--3%EC%84%B8%EB%8C%80-%EA%B7%B8%EB%8C%80%EB%A1%9C--2026-08-14-%EC%9E%84%EA%B3%84-%EC%83%81%ED%96%A5">follower 임계 완화 흐름</a>은 이번 커밋에서도 유지된다.</li>
+</ul>
+</li>
+<li>grox의 <code>upa/</code>(grox의 프로필·유저 분석 파이프라인으로 보인다 <span class="badge est">추정</span>)에 새 상수 2개와 새 generator 하나가 추가됐다.<ul>
+<li>바뀐 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/upa/constants.py" target="_blank" rel="noopener"><code>grox/flows/upa/constants.py</code></a> +2, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/upa/generators.py" target="_blank" rel="noopener"><code>generators.py</code></a> +11이다.</li>
+<li>이 서브플로우가 무엇을 하는지는 4세대에서 공개된 이후로도 정본에 아직 명시하지 못했으므로, 다음 커밋을 계속 지켜봐야 한다.</li>
+</ul>
+</li>
+<li>engagement count(favorite/reply/retweet 카운트)를 후보에 붙이는 hydrator를 소소하게 확장했다.<ul>
+<li>바뀐 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a> +16/−1이다.</li>
+<li>새로 추가된 로직은 더 확인해야 하는데, 필드 하나를 추가한 것으로 보인다.</li>
+</ul>
+</li>
+<li>URT(Universal Response Tree, X의 응답 렌더링 스키마) 마셜링 층을 소소하게 확장했다.<ul>
+<li>대상은 광고와 WTF(Who To Follow), client event 마셜링 로직이다.</li>
+<li>바뀐 파일은 다섯 개다.<ul>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/mod.rs" target="_blank" rel="noopener"><code>home-mixer/util/urt/mod.rs</code></a> (+13/−8)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/ad_marshaller.rs" target="_blank" rel="noopener"><code>ad_marshaller.rs</code></a> (+18/−8)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/client_event.rs" target="_blank" rel="noopener"><code>client_event.rs</code></a> (+27/−7)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/wtf_marshaller.rs" target="_blank" rel="noopener"><code>wtf_marshaller.rs</code></a> (+14/−3)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/util/urt/reverse_chron_following/mod.rs" target="_blank" rel="noopener"><code>reverse_chron_following/mod.rs</code></a> (+12/−5)</li>
+</ul>
+</li>
+<li>개별 변화보다는 이번 공개가 URT 층 전반에 골고루 손을 댔다는 점이 특징이다.</li>
+</ul>
+</li>
+<li>4세대+7 restore 하드닝의 후속으로 Phoenix 학습·인덱싱 인프라를 소소하게 손질했다.<ul>
+<li>바뀐 파일은 여섯 개다.<ul>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/xrex/driver/hooks.py" target="_blank" rel="noopener"><code>phoenix/xrex/driver/hooks.py</code></a> (+24/−11)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>train/trainer.py</code></a> (+7)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/xrex/train/checkpoint_write.py" target="_blank" rel="noopener"><code>train/checkpoint_write.py</code></a> (+2)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/xrex/utils/metadata.py" target="_blank" rel="noopener"><code>utils/metadata.py</code></a> (+18/−4)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix/python/common/xai-configlib/src/xai_configlib/__init__.py" target="_blank" rel="noopener"><code>python/common/xai-configlib/src/xai_configlib/__init__.py</code></a> (+15/−13)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato" target="_blank" rel="noopener"><code>phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato</code></a> (+15)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>AuthorColdStart 스코어러는 VMRanker에서 소비가 사라진 것과 별개로 남아서 정비됐다.<ul>
+<li>바뀐 파일은 <code>home-mixer/scorers/author_cold_start.rs</code> +12/−9다.</li>
+<li>새 소비자가 어디인지는 더 확인해야 한다.</li>
+</ul>
+</li>
+<li>Night Owl(밤 시간대 fatigue 조정) 소스를 소소하게 확장했다.<ul>
+<li>바뀐 파일은 <code>home-mixer/sources/following_night_owl_source.rs</code> +5다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대+8 공개 전체로 보면 축은 셋이다.</p></div>
 <ol>
-<li><strong>enforcement 관행의 유연화</strong>: AES가 하드코딩된 YAML 규칙에 더해 스코어러가 직접 요청하는 일반 액션 파이프라인도 함께 지원한다. 새 스코어러를 붙이는 배포 사이클이 짧아졌다. <code>panda_reports_embedding_v10_rough_spam</code>처럼 embedding을 기반으로 하는 spam 검출기가 계속 재학습되며 붙는 인프라가 자리를 잡았다.</li>
-<li><strong>랭커 경로의 대폭 단순화</strong>: VMRanker의 로컬 계산 층을 걷어내고 서버 측 DPP에 위임했다. 4세대+5의 slate context 이관과 짝을 이루는 아키텍처 리팩터링이며, home-mixer는 얇은 어그리게이터 역할만 맡고 계산은 gRPC 서버들이 담당한다.</li>
-<li><strong>Following 지면의 정책 확장</strong>: 인용과 리트윗 체인에 있는 저자의 블록 관계까지 존중한다. quote를 통한 블록 우회를 명시적으로 막았다.</li>
+<li>enforcement 관행이 유연해졌다.<ul>
+<li>AES가 하드코딩된 YAML 규칙에 더해, 스코어러가 직접 요청하는 일반 액션 파이프라인도 함께 지원한다. 새 스코어러를 붙이는 배포 사이클이 짧아졌다.</li>
+<li><code>panda_reports_embedding_v10_rough_spam</code>처럼 embedding을 기반으로 하는 spam 검출기가 계속 재학습되며 붙는 인프라가 자리를 잡았다.</li>
+</ul>
+</li>
+<li>랭커 경로가 크게 단순해졌다.<ul>
+<li>VMRanker의 로컬 계산 층을 걷어내고 서버 측 DPP에 위임했다.</li>
+<li>4세대+5의 slate context 이관과 짝을 이루는 아키텍처 리팩터링이며, home-mixer는 얇은 어그리게이터 역할만 맡고 계산은 gRPC 서버들이 담당한다.</li>
+</ul>
+</li>
+<li>Following 지면의 정책이 넓어졌다.<ul>
+<li>인용과 리트윗 체인에 있는 저자의 블록 관계까지 존중한다. quote를 통한 블록 우회를 명시적으로 막았다.</li>
+</ul>
+</li>
 </ol>
-<p>4세대 전체의 흐름은 여전히 코드 공개, 검증 인프라 배선, experiment 트래킹, 아키텍처 정리, 정책 확장으로 이어지는 성숙 곡선을 그리고 있다. 매일이나 격일 간격의 커밋이 4세대+8(08-25)까지 12일 동안 계속 이어졌다는 사실 자체가, X가 이 오픈소스 릴리스를 마케팅 이벤트가 아니라 <strong>지속되는 코드 미러 관계</strong>로 유지하고 있다는 증거다.</p>
+<p>4세대 전체의 흐름은 여전히 코드 공개, 검증 인프라 연결, experiment 트래킹, 아키텍처 정리, 정책 확장으로 이어지는 성숙 곡선을 그리고 있다. 매일이나 격일 간격의 커밋이 4세대+8(08-25)까지 12일 동안 계속 이어졌다는 사실 자체가, X가 이 오픈소스 릴리스를 마케팅 이벤트가 아니라 지속되는 코드 미러 관계로 유지하고 있다는 증거다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="2-tlow--wechattencent-프로덕션-ab-flow-based-item-tokenizer가-rq-vae-대안으로-등장-레이더"><span class="num">2</span>Tlow — WeChat/Tencent 프로덕션 A/B, flow-based item tokenizer가 RQ-VAE 대안으로 등장 (레이더)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.24176" target="_blank" rel="noopener">Tlow: Flow-based Item Tokenizer for Recommendation</a> — arXiv 2608.24176, 2026-08-25 v1, 저자 6명 Nian Li, Chonggang Song, Jingtao Ding, Lingling Yi, Yong Li, Qingmin Liao. <strong>China&#39;s largest social media platform WeChat</strong>의 프로덕션 A/B라고 명시되어 있어 소속을 확인했다(HTML 판 abstract에 명시).</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">Semantic ID(SID)</a> 라인의 핵심 컴포넌트인 <strong>item tokenizer</strong>는 각 아이템의 의미 임베딩을 discrete token ID 시퀀스로 변환하는 모듈이다. 사실상의 표준은 <strong>RQ-VAE</strong>(Residual-Quantized VAE)로, Google의 2023 TIGER 논문 이후 여러 프로덕션 시스템(Netflix Foundation Model, Kuaishou PushDualGen 등)이 채택했다. 하지만 RQ-VAE에는 알려진 문제가 세 가지 있다. (a) <strong>codebook collapse</strong>가 일어나서 대부분의 code slot이 죽고 소수만 활용된다. (b) <strong>quantization 오류가 residual로 축적</strong>되어 deep quantization 층에서 오차가 커진다. (c) <strong>불연속성</strong> 때문에 유사한 아이템이 완전히 다른 token 시퀀스로 매핑되어 학습이 어렵다.</p></div>
-<p>Tlow는 이 문제들을 <strong>normalizing flow</strong>로 접근한다. Flow-based model은 invertible neural network로 임베딩 공간을 학습 가능한 분포로 변환하고 역변환한다. 저자들은 flow 기반 tokenization이 codebook 활용률과 semantic locality 두 축에서 RQ-VAE보다 낫다고 주장한다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h2 id="2-tlow가-flow-기반-tokenizer로-프로덕션-ctr을-올렸다--wechat"><span class="num">2</span>Tlow가 flow 기반 tokenizer로 프로덕션 CTR을 올렸다 — WeChat</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.24176" target="_blank" rel="noopener">Tlow: Flow-based Item Tokenizer for Recommendation</a> — arXiv 2608.24176, 2026-08-25 v1, 논문. 저자는 6명이다(Nian Li, Chonggang Song, Jingtao Ding, Lingling Yi, Yong Li, Qingmin Liao). HTML 판 abstract에 <strong>China&#39;s largest social media platform WeChat</strong>의 프로덕션 A/B라고 명시되어 있어 소속을 확인했다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">Semantic ID(SID)</a> 라인의 핵심 컴포넌트인 item tokenizer는 각 아이템의 의미 임베딩을 discrete token ID 시퀀스로 변환하는 모듈이다. 사실상의 표준은 RQ-VAE(Residual-Quantized VAE)다. Google의 2023 TIGER 논문 이후 Netflix Foundation Model, Kuaishou PushDualGen 등 여러 프로덕션 시스템이 채택했다. 하지만 RQ-VAE에는 알려진 문제가 세 가지 있다.</p></div>
 <ul>
-<li><p><strong>프로덕션 A/B</strong> <span class="badge ok">확인</span>:</p>
+<li>codebook collapse가 일어나서 대부분의 code slot이 죽고 소수만 활용된다.</li>
+<li>quantization 오류가 residual로 축적되어, deep quantization 층에서 오차가 커진다.</li>
+<li>불연속성 때문에 유사한 아이템이 완전히 다른 token 시퀀스로 매핑되어 학습이 어렵다.</li>
+</ul>
+<p>Flow-based model은 invertible neural network로 임베딩 공간을 학습 가능한 분포로 변환하고 역변환한다. 이번 논문(Tlow)은 위 문제들을 normalizing flow로 접근하고, 저자들은 flow 기반 tokenization이 codebook 활용률과 semantic locality 두 축에서 RQ-VAE보다 낫다고 주장한다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 프로덕션 A/B에서 신규 아이템의 CTR 개선 폭이 더 컸다</span></p></div>
+<ul>
+<li><p>프로덕션 A/B에서 글로벌 CTR이 +10.32%, 신규 아이템 CTR이 +11.64% 올랐다 <span class="badge ok">확인</span>.</p>
 <blockquote>
 <p>&quot;The retrieval model based on token IDs improves user CTR by 10.32% globally and by 11.64% for new items.&quot;
 — <a href="https://arxiv.org/abs/2608.24176" target="_blank" rel="noopener">Tlow abstract</a>, 2026-08-25</p>
 </blockquote>
-<p>즉 <strong>글로벌 CTR이 +10.32%, 신규 아이템 CTR이 +11.64%</strong> 올랐다. 신규 아이템에서 개선 폭이 더 크다는 것은 <strong>콜드스타트에 특히 강하다</strong>는 시사다. semantic tokenization 라인의 핵심 이점, 즉 cold item에 대해서도 유의미한 표현을 확보한다는 점이 프로덕션 지표로 확인됐다.</p>
-</li>
-<li><p><strong>평가 지면</strong> <span class="badge ok">확인</span> — WeChat retrieval model이다. 광고인지 유기 콘텐츠인지, 그리고 Look/Video Channels/Moments 가운데 어느 세부 지면인지는 abstract에 공개되지 않았다.</p>
-</li>
-<li><p><strong>저자 소속 확인 채널</strong> — Tencent 관련 저자 이름(<code>Chonggang Song</code>)이 있고 WeChat이 China&#39;s largest social platform으로 abstract에 명시되어 있으므로, Tencent WeChat rec 그룹으로 확정했다.</p>
+<ul>
+<li>신규 아이템에서 개선 폭이 더 크다는 것은 콜드스타트에 특히 강하다는 시사다 <span class="badge ok">확인</span> — 같은 abstract.</li>
+<li>semantic tokenization 라인의 핵심 이점, 즉 cold item에 대해서도 유의미한 표현을 확보한다는 점이 프로덕션 지표로 확인됐다 <span class="badge ok">확인</span> — 같은 abstract.</li>
+</ul>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <code>### Tlow (WeChat/Tencent) — flow-based item tokenizer가 RQ-VAE 대안으로 프로덕션 CTR +10.32%</code> 절 추가 (HEGM보다 위, <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">SID 스레드</a>에 링크).</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 평가 지면은 WeChat retrieval model이고, 세부 지면은 공개되지 않았다</span></p></div>
+<ul>
+<li>평가 지면은 WeChat retrieval model이다 <span class="badge ok">확인</span>.</li>
+<li>광고인지 유기 콘텐츠인지, 그리고 Look/Video Channels/Moments 가운데 어느 세부 지면인지는 abstract에 공개되지 않았다 <span class="badge ok">확인</span>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. 저자 소속은 Tencent WeChat rec 그룹으로 확정했다</span></p></div>
+<ul>
+<li>Tencent 관련 저자 이름이 있고 WeChat이 China&#39;s largest social platform으로 abstract에 명시되어 있으므로, Tencent WeChat rec 그룹으로 확정했다.<ul>
+<li>Tencent 관련 저자 이름은 <code>Chonggang Song</code>이다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <code>### Tlow (WeChat/Tencent) — flow-based item tokenizer가 RQ-VAE 대안으로 프로덕션 CTR +10.32%</code> 절을 추가했다. 위치는 HEGM보다 위이고, <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">SID 스레드</a>에 링크했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <ul>
-<li><strong>SID/generative retrieval 스레드의 새 축으로, tokenizer 아키텍처 자체가 프로덕션에서 갈리기 시작했다.</strong> 지금까지 SID 라인은 대체로 RQ-VAE와 downstream 모델을 조합하는 방식이었다. Tlow는 tokenizer 층을 flow 기반으로 대체해도 프로덕션에서 유효한 지표 개선이 나온다고 밝힌 첫 진술이다. RQ-VAE의 codebook collapse가 실제 서빙에서 문제였다는 방증이며 <span class="badge est">추정</span>, Tencent가 이 문제를 겪고 대안을 내놓은 것으로 해석한다.</li>
-<li><strong>Tencent WeChat이 오랜만에 내놓은 프로덕션 진술이다.</strong> WeChat rec은 <a href="radar.html#%EC%B6%94%EC%B2%9C-%EB%AA%A8%EB%8D%B8-%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81-%EB%B2%95%EC%B9%99--%ED%9A%8C%EC%82%AC%EB%B3%84-%EB%8F%85%EB%A6%BD-%ED%99%95%EC%9D%B8%EC%9D%B4-%EC%8C%93%EC%9D%B4%EB%8A%94-%EC%A4%91">최근 몇 년 조용한 편이었다</a>. Tlow가 나오면서 유기 콘텐츠 지면의 실제 아키텍처 진술이 재개되는 신호로 보인다. Weixin Video Channels(WeChat의 짧은 비디오 지면)의 rec 스택 논문이 이어질지 관찰할 가치가 있다.</li>
-<li><strong>관전 포인트</strong> — (a) code와 상세한 block-wise flow structure가 후속 자료에서 나올지, (b) Kuaishou나 ByteDance, Xiaohongshu 같은 두 번째 회사가 유사한 tokenizer 대안을 진술하면 <code>topics/</code> 승격 후보가 된다.</li>
+<li>SID/generative retrieval 스레드의 새 축으로, tokenizer 아키텍처 자체가 프로덕션에서 갈리기 시작했다.<ul>
+<li>지금까지 SID 라인은 대체로 RQ-VAE와 downstream 모델을 조합하는 방식이었다.</li>
+<li>Tlow는 tokenizer 층을 flow 기반으로 대체해도 프로덕션에서 유효한 지표 개선이 나온다고 밝힌 첫 진술이다.</li>
+<li>RQ-VAE의 codebook collapse가 실제 서빙에서 문제였다는 방증이며 <span class="badge est">추정</span>, Tencent가 이 문제를 겪고 대안을 내놓은 것으로 해석한다.</li>
+</ul>
+</li>
+<li>Tencent WeChat이 오랜만에 내놓은 프로덕션 진술이다.<ul>
+<li>WeChat rec은 <a href="radar.html#%EC%B6%94%EC%B2%9C-%EB%AA%A8%EB%8D%B8-%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81-%EB%B2%95%EC%B9%99--%ED%9A%8C%EC%82%AC%EB%B3%84-%EB%8F%85%EB%A6%BD-%ED%99%95%EC%9D%B8%EC%9D%B4-%EC%8C%93%EC%9D%B4%EB%8A%94-%EC%A4%91">최근 몇 년 조용한 편이었다</a>.</li>
+<li>Tlow가 나오면서 유기 콘텐츠 지면의 실제 아키텍처 진술이 재개되는 신호로 보인다.</li>
+<li>Weixin Video Channels(WeChat의 짧은 비디오 지면)의 rec 스택 논문이 이어질지 관찰할 가치가 있다.</li>
+</ul>
+</li>
+<li>앞으로 볼 지점은 두 가지다.<ul>
+<li>code와 상세한 block-wise flow structure가 후속 자료에서 나오는지 본다.</li>
+<li>Kuaishou나 ByteDance, Xiaohongshu 같은 두 번째 회사가 유사한 tokenizer 대안을 진술하면 <code>topics/</code> 승격 후보가 된다.</li>
+</ul>
+</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="3-tagr--익명-대형-live-stream-광고-플랫폼-revenue-161-레이더"><span class="num">3</span>TAGR — 익명 대형 live-stream 광고 플랫폼, revenue +16.1% (레이더)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.24034" target="_blank" rel="noopener">TAGR: Temporally Adaptive Generative Recommendation for Industrial Live-Streaming Advertising</a> — arXiv 2608.24034, 2026-08-25 v1, 저자 10명 Wencai Ye, Guangyi Liu, Chaoyi Wang, Wenbin Luo, Shengyu Wang 외. <strong>저자 소속과 플랫폼 이름은 abstract에 명시되지 않았다.</strong> abstract에서는 &quot;a large-scale e-commerce live-stream advertising platform&quot;이라고만 언급한다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 라이브 스트리밍 광고는 콘텐츠와 상품, 유저 피드백이 실시간으로 바뀌기 때문에 recommender에 강한 <strong>freshness 요구</strong>를 부과한다. 지금까지 generative recommender(SID 기반) 라인은 대부분 static 카탈로그를 가정했는데, 라이브는 스트림이 열리고 닫히는 시간 척도가 분 단위라서 static token vocab의 유효 기간이 짧다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h2 id="3-tagr은-라이브-커머스-광고에서-revenue를-161-올렸다--익명-플랫폼"><span class="num">3</span>TAGR은 라이브 커머스 광고에서 revenue를 +16.1% 올렸다 — 익명 플랫폼</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.24034" target="_blank" rel="noopener">TAGR: Temporally Adaptive Generative Recommendation for Industrial Live-Streaming Advertising</a> — arXiv 2608.24034, 2026-08-25 v1, 논문. 저자는 10명이다(Wencai Ye, Guangyi Liu, Chaoyi Wang, Wenbin Luo, Shengyu Wang 외). 저자 소속과 플랫폼 이름은 abstract에 명시되지 않았다. abstract에서는 &quot;a large-scale e-commerce live-stream advertising platform&quot;이라고만 언급한다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 라이브 스트리밍 광고는 콘텐츠와 상품, 유저 피드백이 실시간으로 바뀌기 때문에 recommender에 강한 freshness 요구를 부과한다. 지금까지 generative recommender(SID 기반) 라인은 대부분 static 카탈로그를 가정했다. 라이브는 스트림이 열리고 닫히는 시간 척도가 분 단위라서 static token vocab의 유효 기간이 짧다. 이번 논문(TAGR)은 빠르게 바뀌는 라이브 콘텐츠와 상품, 유저 피드백에 맞춘 generative recommendation을 내놓았다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 프로덕션 A/B에서 진입률, 장바구니 클릭률, revenue가 모두 올랐다</span></p></div>
 <ul>
-<li><strong>프로덕션 A/B 결과</strong> <span class="badge ok">확인</span>:<ul>
-<li>live-room entry rate <strong>+8.5%</strong></li>
-<li>shopping-cart click rate <strong>+7.4%</strong></li>
-<li><strong>revenue +16.1%</strong> over production baseline</li>
+<li>프로덕션 A/B 결과는 다음과 같다 <span class="badge ok">확인</span>.<ul>
+<li>live-room entry rate +8.5%</li>
+<li>shopping-cart click rate +7.4%</li>
+<li>revenue +16.1% over production baseline</li>
 </ul>
 </li>
-<li><strong>아키텍처</strong> — Temporally Adaptive Generative Recommendation이다. abstract에서는 &quot;designed for rapidly changing live content, promoted products, and user feedback&quot;라고 표현한다. tokenizer 재학습 주기나 online update처럼 구체적인 시간축 adaptation 메커니즘은 abstract에 나오지 않는다. 본문을 확인해야 하지만 이번 배치에서는 넘어갔다.</li>
-<li><strong>플랫폼 미공개</strong> — 저자 이름만으로는 확정할 수 없다. 중국 e-commerce live-stream의 대표 후보로는 Kuaishou(Kwai), Alibaba(Taobao Live), Douyin/ByteDance(Douyin E-commerce), Xiaohongshu가 있는데, 저자 이름은 이 가운데 어느 회사와도 직접 매칭되지 않는다 <span class="badge est">추정</span>.</li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <code>### TAGR — 익명 대형 e-commerce live-stream 광고 플랫폼, revenue +16.1%</code> 절 추가.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 시간축에 적응하는 구체적 메커니즘은 abstract에 나오지 않는다</span></p></div>
+<ul>
+<li>아키텍처는 Temporally Adaptive Generative Recommendation이다.<ul>
+<li>abstract에서는 &quot;designed for rapidly changing live content, promoted products, and user feedback&quot;라고 표현한다.</li>
+</ul>
+</li>
+<li>tokenizer 재학습 주기나 online update처럼 구체적인 시간축 adaptation 메커니즘은 abstract에 나오지 않는다. 본문을 확인해야 하지만 이번 배치에서는 넘어갔다.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. 플랫폼은 저자 이름만으로 확정할 수 없다</span></p></div>
+<ul>
+<li>중국 e-commerce live-stream의 대표 후보로는 Kuaishou(Kwai), Alibaba(Taobao Live), Douyin/ByteDance(Douyin E-commerce), Xiaohongshu가 있는데, 저자 이름은 이 가운데 어느 회사와도 직접 매칭되지 않는다 <span class="badge est">추정</span>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 <code>### TAGR — 익명 대형 e-commerce live-stream 광고 플랫폼, revenue +16.1%</code> 절을 추가했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <ul>
-<li><strong>라이브 스트리밍 랭킹 스레드에 세 번째 회사가 붙었다.</strong> 기존의 <a href="radar.html#multi-objective-ranking-for-live-streaming-twitch--delayed-feedback-window">Twitch(Amazon) Multi-Objective</a>와 Netflix의 <a href="netflix.html">라이브 콜드스타트</a>에 이어, TAGR은 광고 지면이자 중국 e-commerce 라이브라는 세 번째 각도를 더한다.</li>
-<li><strong>generative recommender가 광고와 라이브처럼 빠르게 변하는 도메인에서도 프로덕션 진술을 쌓고 있다.</strong> 이전까지는 static short-video나 e-commerce catalog를 기준으로 한 진술이 많았는데, 이번에는 시간축 adaptation이 필요한 도메인에서 나온 진술이다.</li>
-<li><strong>플랫폼을 확인하지 못한 것이 가장 큰 약점이다.</strong> v2 이후 소속이 공개되거나 저자 이메일 도메인을 확인할 수 있으면 정본 승격을 다시 검토한다.</li>
+<li>라이브 스트리밍 랭킹 스레드에 세 번째 회사가 붙었다.<ul>
+<li>기존의 <a href="radar.html#multi-objective-ranking-for-live-streaming-twitch--delayed-feedback-window">Twitch(Amazon) Multi-Objective</a>와 Netflix의 <a href="netflix.html">라이브 콜드스타트</a>에 이어, TAGR은 광고 지면이자 중국 e-commerce 라이브라는 세 번째 각도를 더한다.</li>
+</ul>
+</li>
+<li>generative recommender가 광고와 라이브처럼 빠르게 변하는 도메인에서도 프로덕션 진술을 쌓고 있다.<ul>
+<li>이전까지는 static short-video나 e-commerce catalog를 기준으로 한 진술이 많았다. 이번에는 시간축 adaptation이 필요한 도메인에서 나온 진술이다.</li>
+</ul>
+</li>
+<li>플랫폼을 확인하지 못한 것이 가장 큰 약점이다.<ul>
+<li>v2 이후 소속이 공개되거나 저자 이메일 도메인을 확인할 수 있으면 정본 승격을 다시 검토한다.</li>
+</ul>
+</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="검증에서-뒤집힌-것">검증에서 뒤집힌 것</h2>
-<p>없다. 이번 배치의 신규 자료(X 4세대+8, Tlow, TAGR)는 기존 정본을 뒤집지 않는다. VM Ranker 단순화(4세대+8)는 4세대의 아키텍처 정리 흐름과 맞아떨어지고, Following 블록 확장은 정책 방향을 넓힌 것이며, Brazil 계정 갱신은 기존 컴플라이언스 관행을 유지한 것이다. Tlow와 TAGR은 각각의 관찰 스레드(SID/generative retrieval, live-stream)에 새 데이터 포인트로 붙는다.</p>
+<p>없다. 이번 배치의 신규 자료(X 4세대+8, Tlow, TAGR)는 기존 정본을 뒤집지 않는다.</p>
+<ul>
+<li>VM Ranker 단순화(4세대+8)는 4세대의 아키텍처 정리 흐름과 맞아떨어진다.</li>
+<li>Following 블록 확장은 정책 방향을 넓힌 것이고, Brazil 계정 갱신은 기존 컴플라이언스 관행을 유지한 것이다.</li>
+<li>Tlow와 TAGR은 각각의 관찰 스레드(SID/generative retrieval, live-stream)에 새 데이터 포인트로 붙는다.</li>
+</ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="레이더">레이더</h2>
 <ul>
 <li>신규 2건:<ul>
-<li><strong>Tlow</strong> (Tencent WeChat, <a href="https://arxiv.org/abs/2608.24176" target="_blank" rel="noopener">arXiv 2608.24176</a>) — flow-based item tokenizer 프로덕션 CTR +10.32%</li>
-<li><strong>TAGR</strong> (익명 e-commerce live-stream, <a href="https://arxiv.org/abs/2608.24034" target="_blank" rel="noopener">arXiv 2608.24034</a>) — temporally adaptive generative recommendation revenue +16.1%</li>
+<li>Tlow(Tencent WeChat, <a href="https://arxiv.org/abs/2608.24176" target="_blank" rel="noopener">arXiv 2608.24176</a>): flow-based item tokenizer, 프로덕션 CTR +10.32%</li>
+<li>TAGR(익명 e-commerce live-stream, <a href="https://arxiv.org/abs/2608.24034" target="_blank" rel="noopener">arXiv 2608.24034</a>): temporally adaptive generative recommendation, revenue +16.1%</li>
 </ul>
 </li>
 </ul>
-<p>arXiv cs.IR triage 30건 가운데 2건이 통과했다. 통과하지 못한 자료는 대체로 offline 벤치마크 위주였고 industry provenance가 없었다. 그중 주목한 미통과 후보는 4건이다. <strong>Native Multimodal for CTR</strong>(Alibaba로 추정되나 프로덕션 진술 미확인), <strong>RecGPT-Mobile-V2</strong>(Alibaba 온디바이스 query prediction, 이전 V1을 정본에서 추적하지 않음), <strong>WeMM-Embedding</strong>(Tencent WeChat multimodal embedding technical report, retrieval 프로덕션 진술 없음), <strong>RetrievalFormer</strong>(dual-encoder로 search와 rec을 통합한 index, 프로덕션 규모가 명확하지 않음)이다.</p>
+<p>arXiv cs.IR triage 30건 가운데 2건이 통과했다. 통과하지 못한 자료는 대체로 offline 벤치마크 위주였고 industry provenance가 없었다. 그중 주목한 미통과 후보는 4건이다.</p>
+<ul>
+<li>Native Multimodal for CTR: Alibaba로 추정되나 프로덕션 진술은 확인하지 못했다.</li>
+<li>RecGPT-Mobile-V2: Alibaba 온디바이스 query prediction이다. 이전 V1을 정본에서 추적하지 않았다.</li>
+<li>WeMM-Embedding: Tencent WeChat multimodal embedding technical report다. retrieval 프로덕션 진술이 없다.</li>
+<li>RetrievalFormer: dual-encoder로 search와 rec을 통합한 index다. 프로덕션 규모가 명확하지 않다.</li>
+</ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li><strong>X 4세대+9(다음 커밋)</strong> — 4세대 원본이 나온 08-13부터 12일 연속으로 매일이나 격일 간격의 커밋이 이어지고 있다. 확인할 지점은 다음과 같다. (a) AES <code>generic_actions</code> allowlist가 GrowthBook을 통해 어떤 스코어러들에게 열리는지, (b) VMRanker의 <code>dpp</code> 값 모델이 유일한 선택지로 정착하는지 아니면 다른 값 모델이 추가되는지, (c) <code>AuthorSocialgraphFilter</code>가 For You 파이프라인에도 배선되는지, (d) <code>panda_reports_embedding_v10</code> 다음으로 v11이 언제 나오는지(embedding 검출기의 재학습 주기 관측), (e) <code>prefloor</code> 스냅샷이 어떤 window에 처음 활성화되는지, (f) 4세대+7의 <a href="x.html#grox--ptos-adult-content-cross-validation-4%EC%84%B8%EB%8C%802-%EC%8B%A0%EA%B7%9C-2026-08-17"><code>SafetyPtosPolicyCrossValidator</code></a>가 스팸과 혐오 발화 카테고리로 확장되는지.</li>
+<li><strong>X 4세대+9(다음 커밋)</strong> — 4세대 원본이 나온 08-13부터 12일 연속으로 매일이나 격일 간격의 커밋이 이어지고 있다. 확인할 지점은 여섯 가지다.<ul>
+<li>AES <code>generic_actions</code> allowlist가 GrowthBook을 통해 어떤 스코어러들에게 열리는지 본다.</li>
+<li>VMRanker의 <code>dpp</code> 값 모델이 유일한 선택지로 정착하는지, 아니면 다른 값 모델이 추가되는지 본다.</li>
+<li><code>AuthorSocialgraphFilter</code>가 For You 파이프라인에도 연결되는지 본다.</li>
+<li><code>panda_reports_embedding_v10</code> 다음으로 v11이 언제 나오는지 본다. embedding 검출기의 재학습 주기를 관측하는 지점이다.</li>
+<li><code>prefloor</code> 스냅샷이 어떤 window에 처음 활성화되는지 본다.</li>
+<li>4세대+7의 <a href="x.html#grox--ptos-adult-content-cross-validation-4%EC%84%B8%EB%8C%802-%EC%8B%A0%EA%B7%9C-2026-08-17"><code>SafetyPtosPolicyCrossValidator</code></a>가 스팸과 혐오 발화 카테고리로 확장되는지 본다.</li>
+</ul>
+</li>
 <li><strong>Tlow 후속</strong> — code 공개 여부와, Tencent의 다른 WeChat 지면(Video Channels·Moments·Look)에 대한 진술을 추적한다.</li>
 <li><strong>TAGR 플랫폼 확인</strong> — v2 이후 저자 소속이 공개되면 정본 승격을 결정한다. 저자 이름으로 Kuaishou / Xiaohongshu / Douyin 매칭을 다시 확인한다.</li>
-<li><strong>월요일(2026-08-31) 산업 블로그 스윕</strong> — Pinterest engineering, research.atspotify.com, Google Research blog, LinkedIn engineering.</li>
+<li><strong>월요일(2026-08-31) 산업 블로그 스윕</strong> — Pinterest engineering, research.atspotify.com, Google Research blog, LinkedIn engineering을 본다.</li>
 </ul></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 

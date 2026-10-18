@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>시퀀스 트랜스포머 랭킹 (in-context candidate scoring) — feed-research</title>
-<meta name="description" content="유저의 행동 이력을 토큰 시퀀스로 놓고, 점수를 매길 후보들을 같은 시퀀스 뒤에 붙여서 한 번의 forward pass로 전부 채점하는 랭킹 구조다.">
+<meta name="description" content="시퀀스 트랜스포머 랭킹은 유저의 행동 이력을 토큰 시퀀스로 놓고, 점수를 매길 후보들을 같은 시퀀스 뒤에 붙여서 한 번의 forward pass로 전부 채점하는 구조다. 전통적인 &quot;피처 벡터 → MLP/DCN/MaskNet&quot; 랭커와 대비된다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/sequence-transformer-ranking.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="시퀀스 트랜스포머 랭킹 (in-context candidate scoring) — feed-research">
-<meta property="og:description" content="유저의 행동 이력을 토큰 시퀀스로 놓고, 점수를 매길 후보들을 같은 시퀀스 뒤에 붙여서 한 번의 forward pass로 전부 채점하는 랭킹 구조다.">
+<meta property="og:description" content="시퀀스 트랜스포머 랭킹은 유저의 행동 이력을 토큰 시퀀스로 놓고, 점수를 매길 후보들을 같은 시퀀스 뒤에 붙여서 한 번의 forward pass로 전부 채점하는 구조다. 전통적인 &quot;피처 벡터 → MLP/DCN/MaskNet&quot; 랭커와 대비된다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/sequence-transformer-ranking.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -43,22 +43,31 @@
 <ul class="meta">
 <li><span class="meta-k">갱신</span><time datetime="2026-10-14">2026-10-14</time></li>
 </ul>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">17</span></summary><ol><li><a href="#왜-이-구조인가">왜 이 구조인가</a></li><li><a href="#핵심-설계-요소">핵심 설계 요소</a><ol><li><a href="#1-시퀀스-레이아웃">1. 시퀀스 레이아웃</a></li><li><a href="#2-어텐션-마스크--설계에서-가장-중요한-부분">2. 어텐션 마스크</a></li><li><a href="#3-파라미터가-어디에-있는가">3. 파라미터가 어디에 있는가</a></li><li><a href="#4-콘텐츠는-들어가지-않는다">4. 콘텐츠는 들어가지 않는다</a></li></ol></li><li><a href="#hand-engineered-feature-제거-주장의-실제-범위">&quot;hand-engineered feature 제거&quot; 주장의 실제 범위</a></li><li><a href="#meta--트랜스포머-계보가-하나가-아니라-둘이다">Meta</a></li><li><a href="#계보-a-organic--hstu--ultra-hstu">계보 A (organic)</a></li><li><a href="#계보-b-ads--dhen--wukong--interformer--gem-서빙은-marm">계보 B (ads)</a></li><li><a href="#두-계보가-서로를-인용하지-않는다--실측">두 계보가 서로를 인용하지 않는다</a></li><li><a href="#dv365--시퀀스를-늘리는-대신-미리-압축한다-instagram">DV365</a></li><li><a href="#통합-모델-주장을-읽는-법">&quot;통합 모델&quot; 주장을 읽는 법</a></li><li><a href="#x-vs-meta--이-주제에서의-대조">X vs Meta</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#아직-확인하지-못한-것">아직 확인하지 못한 것</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc toc-long"><summary>목차<span class="toc-n">13</span></summary><ol><li><a href="#왜-이-구조인가">왜 이 구조인가</a></li><li><a href="#핵심-설계-요소">핵심 설계 요소</a><ol><li><a href="#1-시퀀스-레이아웃">1. 시퀀스 레이아웃</a></li><li><a href="#2-어텐션-마스크--설계에서-가장-중요한-부분">2. 어텐션 마스크</a></li><li><a href="#3-파라미터가-어디에-있는가">3. 파라미터가 어디에 있는가</a></li><li><a href="#4-콘텐츠는-들어가지-않는다">4. 콘텐츠는 들어가지 않는다</a></li></ol></li><li><a href="#hand-engineered-feature-제거-주장의-실제-범위">&quot;hand-engineered feature 제거&quot; 주장의 실제 범위</a></li><li><a href="#meta--트랜스포머-계보가-하나가-아니라-둘이다">Meta</a></li><li><a href="#계보-a-organic--hstu--ultra-hstu">계보 A (organic)</a><ol><li><a href="#1-피처-전체를-하나의-시계열로-합친다">1. 피처 전체를 하나의 시계열로 합친다</a></li><li><a href="#2-numerical-feature를-버리는-근거를-밝힌다">2. numerical feature를 버리는 근거를 밝힌다</a></li><li><a href="#3-retrieval과-ranking이-같은-시퀀스-위의-다른-태스크가-된다">3. retrieval과 ranking이 같은 시퀀스 위의 다른 태스크가 된다</a></li><li><a href="#4-softmax를-버리고-그-이유-두-가지를-밝힌다">4. softmax를 버리고, 그 이유 두 가지를 밝힌다</a></li><li><a href="#5-상대-위치-bias가-위치와-시간을-모두-담는다">5. 상대 위치 bias가 위치와 시간을 모두 담는다</a></li><li><a href="#6-m-falcon-x의-후보-블록-마스크와-같은-문제를-다르게-푼다">6. M-FALCON: X의 후보 블록 마스크와 같은 문제를 다르게 푼다</a></li><li><a href="#hstu의-성과-수치와-배포-지면">HSTU의 성과 수치와 배포 지면</a></li><li><a href="#ultra-hstu-2026">ULTRA-HSTU (2026)</a></li></ol></li><li><a href="#계보-b-ads--dhen--wukong--interformer--gem-서빙은-marm">계보 B (ads)</a><ol><li><a href="#llatte-시퀀스-모델을-랭커-밖으로-빼낸다">LLaTTE: 시퀀스 모델을 랭커 밖으로 빼낸다</a></li><li><a href="#gem-훈련-인프라">GEM 훈련 인프라</a></li><li><a href="#gem-2026-세대">GEM 2026 세대</a></li><li><a href="#marm은-gem을-서빙한다고-말하지-않는다">MARM은 GEM을 서빙한다고 말하지 않는다</a></li></ol></li><li><a href="#두-계보가-서로를-인용하지-않는다--실측">두 계보가 서로를 인용하지 않는다</a></li><li><a href="#dv365--시퀀스를-늘리는-대신-미리-압축한다-instagram">DV365</a></li><li><a href="#통합-모델-주장을-읽는-법">&quot;통합 모델&quot; 주장을 읽는 법</a></li><li><a href="#x-vs-meta--이-주제에서의-대조">X vs Meta</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#아직-확인하지-못한-것">아직 확인하지 못한 것</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
-<p>유저의 행동 이력을 토큰 시퀀스로 놓고, 점수를 매길 후보들을 <strong>같은 시퀀스 뒤에 붙여서</strong> 한 번의 forward pass로 전부 채점하는 랭킹 구조다.
-전통적인 &quot;피처 벡터 → MLP/DCN/MaskNet&quot; 랭커와 대비된다.</p>
-<p>이 노트는 X(Phoenix)와 Meta(HSTU 계보 / ads 계보) 둘을 함께 다룬다. <strong>두 회사가 독립적으로 같은 결론에 도달한 부분</strong>(후보를 시퀀스에 넣고 마스크로 격리해서 점수를 캐시할 수 있게 만든다)과 <strong>갈라진 부분</strong>(Meta는 계보가 둘인데 서로를 인용하지 않는다), 이 두 가지가 이 노트를 관통하는 기준이다.</p>
+<p>시퀀스 트랜스포머 랭킹은 유저의 행동 이력을 토큰 시퀀스로 놓고, 점수를 매길 후보들을 <strong>같은 시퀀스 뒤에 붙여서</strong> 한 번의 forward pass로 전부 채점하는 구조다. 전통적인 &quot;피처 벡터 → MLP/DCN/MaskNet&quot; 랭커와 대비된다.</p>
+<p>이 노트는 X의 Phoenix(X의 현행 프로덕션 랭킹 트랜스포머)와 Meta의 두 계보를 함께 다룬다. Meta의 계보 하나는 유기(organic, 광고가 아닌 일반 콘텐츠) 쪽에서 생성형 추천 모델 HSTU로 시작했고, 다른 하나는 광고 쪽에서 DHEN으로 시작해 GEM으로 이어진다. 노트 전체를 관통하는 기준은 두 가지다.</p>
+<ul>
+<li><strong>두 회사가 독립적으로 같은 결론에 도달한 부분:</strong> 후보를 시퀀스에 넣고 마스크로 격리해서, 점수를 캐시할 수 있게 만든다. <span class="badge est">추정</span>(<a href="#6-m-falcon-x%EC%9D%98-%ED%9B%84%EB%B3%B4-%EB%B8%94%EB%A1%9D-%EB%A7%88%EC%8A%A4%ED%81%AC%EC%99%80-%EA%B0%99%EC%9D%80-%EB%AC%B8%EC%A0%9C%EB%A5%BC-%EB%8B%A4%EB%A5%B4%EA%B2%8C-%ED%91%BC%EB%8B%A4">교차점</a>)</li>
+<li><strong>갈라진 부분:</strong> Meta는 계보가 둘인데, 두 계보가 서로를 인용하지 않는다. <span class="badge obs">관찰</span>(<a href="#%EB%91%90-%EA%B3%84%EB%B3%B4%EA%B0%80-%EC%84%9C%EB%A1%9C%EB%A5%BC-%EC%9D%B8%EC%9A%A9%ED%95%98%EC%A7%80-%EC%95%8A%EB%8A%94%EB%8B%A4--%EC%8B%A4%EC%B8%A1">실측</a>)</li>
+</ul>
 <h2 id="왜-이-구조인가">왜 이 구조인가</h2>
+<p>이 구조는 손으로 만들던 피처를 어텐션으로 대신하고, 이력 인코딩 비용을 후보들이 나눠 쓰게 한다. <span class="badge est">추정</span></p>
 <ul>
 <li>피처 엔지니어링을 어텐션으로 대체한다. 유저×아이템 cross feature를 손으로 만드는 대신, 후보 토큰이 이력 토큰을 직접 어텐션으로 참조한다. <span class="badge est">추정</span> — X가 &quot;hand-engineered feature를 전부 없앴다&quot;고 주장하는 근거가 이 구조다.</li>
 <li>후보 N개를 한 시퀀스에 담으면 이력 인코딩 비용을 N개가 공유한다. 후보마다 따로 forward를 돌리는 것보다 비용이 적다. <span class="badge est">추정</span> — 어텐션 마스크 설계상 그렇게 되며, X가 후보 블록을 시퀀스에 넣는 이유로 달리 설명하기 어렵다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="핵심-설계-요소">핵심 설계 요소</h2>
+<p>X Phoenix는 유저, 이력, 후보를 한 시퀀스에 넣고, 어텐션 마스크로 후보끼리 서로 보지 못하게 한다. <span class="badge ok">확인</span> 파라미터는 대부분 ID 임베딩 테이블에 있다. <span class="badge est">추정</span> 텍스트나 이미지 같은 콘텐츠는 입력에 들어가지 않는다. <span class="badge ok">확인</span></p>
 <h3 id="1-시퀀스-레이아웃">1. 시퀀스 레이아웃</h3>
-<p><code>[user] + [history × S] + [candidates × C]</code> 를 하나의 flat 시퀀스로 만드는 것이 X의 방식이다. <span class="badge ok">확인</span> xai-org/x-algorithm, 2026 — <code>phoenix/recsys_model.py:617-624</code></p>
+<p>X는 유저 토큰, 이력 토큰 S개, 후보 토큰 C개를 이어 붙여 하나의 flat 시퀀스를 만든다. <span class="badge ok">확인</span> xai-org/x-algorithm, 2026 — <code>phoenix/recsys_model.py:617-624</code></p>
+<ul>
+<li>순서는 <code>[user] + [history × S] + [candidates × C]</code>다.</li>
+</ul>
 <h3 id="2-어텐션-마스크--설계에서-가장-중요한-부분">2. 어텐션 마스크 — 설계에서 가장 중요한 부분</h3>
-<p>후보끼리 서로 볼 수 있게 하느냐가 <strong>pointwise 랭킹이냐 slate 최적화냐</strong>를 가른다.</p>
+<p>X는 어텐션 마스크로 후보끼리 서로 보지 못하게 해서, 후보 점수가 같은 배치에 무엇이 들어왔는지와 무관하게 만든다. 다만 기본 설정에서는 RoPE가 이 배치 독립성을 다시 깨뜨린다. <span class="badge ok">확인</span></p>
+<p>후보끼리 서로 볼 수 있게 하느냐가 <strong>pointwise 랭킹이냐 slate 최적화냐</strong>를 가른다. pointwise 랭킹은 후보마다 따로 점수를 매기는 방식이고, slate 최적화는 함께 보여 줄 목록 전체를 한꺼번에 고르는 방식이다.</p>
 <p>X는 후보 블록에서 <strong>대각선만 남긴다</strong>(self-attend only). <span class="badge ok">확인</span> — <code>phoenix/grok.py:39-71</code>, 유닛테스트 <code>phoenix/test_recsys_model.py:94-121</code></p>
 <pre tabindex="0"><code>        user  h1  h2  c1  c2  c3
 user  [  1    0   0   0   0   0 ]
@@ -71,70 +80,137 @@ c3    [  1    1   1   0   0   1 ]
 <p>결과적으로 후보 점수는 같은 배치에 무엇이 들어왔는지와 무관하다. 그래서 <strong>점수를 캐시할 수 있고</strong>, 리스트를 잘라 여러 번 호출해도 결과가 같다. X가 README에서 명시적으로 목표라고 밝힌 성질이다. <span class="badge ok">확인</span> — <code>README.md:328</code></p>
 <p>주의할 점이 세 가지 있다.</p>
 <ul>
-<li>유저 토큰(position 0)은 causal mask 때문에 <strong>자기 자신만 본다</strong>. 이력을 요약하는 토큰이 아니라 다른 토큰이 읽어가는 prefix/bias 토큰이다. <span class="badge ok">확인</span> — <code>test_recsys_model.py:105-107</code></li>
-<li>X의 <code>phoenix/README.md:158</code>은 &quot;User + History: Full bidirectional attention among themselves&quot;라고 쓰는데 <strong>코드는 strictly causal이다.</strong> README와 코드가 정면으로 어긋난다. <span class="badge ok">확인</span> — <code>grok.py:62</code> (<code>jnp.tril</code>) vs <code>phoenix/README.md:158</code></li>
-<li>마스크가 배치 독립성을 보장해도 <strong>RoPE가 깨뜨린다.</strong> <code>right_anchored_rope=False</code>(기본값)면 후보 슬롯 0과 슬롯 40이 서로 다른 회전을 받아 점수가 달라진다. 이를 고치는 헬퍼(<code>right_anchored_rope_positions</code>)가 코드에 있는데, 공개된 파이프라인은 그 헬퍼를 켜지 않는다. <span class="badge ok">확인</span> — <code>grok.py:88-109</code>, <code>recsys_model.py:362</code>, <code>run_pipeline.py:132-162</code></li>
+<li>유저 토큰(position 0)은 causal mask 때문에 <strong>자기 자신만 본다</strong>. 이력을 요약하는 토큰이 아니라, 다른 토큰이 읽어 가는 prefix/bias 토큰이다. <span class="badge ok">확인</span> — <code>test_recsys_model.py:105-107</code><ul>
+<li>causal mask는 각 토큰이 자기 자신과 앞쪽 토큰만 보게 하는 마스크다.</li>
+</ul>
+</li>
+<li>README는 유저와 이력 토큰이 서로를 양방향으로 본다고 쓰지만, <strong>코드는 strictly causal이다.</strong> README와 코드가 정면으로 어긋난다. <span class="badge ok">확인</span> — <code>grok.py:62</code> (<code>jnp.tril</code>) vs <code>phoenix/README.md:158</code><ul>
+<li>X의 <code>phoenix/README.md:158</code> 원문은 &quot;User + History: Full bidirectional attention among themselves&quot;다.</li>
+</ul>
+</li>
+<li>마스크가 배치 독립성을 보장해도 <strong>RoPE가 깨뜨린다.</strong> 기본값에서는 후보가 놓인 슬롯에 따라 점수가 달라진다. <span class="badge ok">확인</span> — <code>grok.py:88-109</code>, <code>recsys_model.py:362</code>, <code>run_pipeline.py:132-162</code><ul>
+<li>RoPE(rotary position embedding)는 토큰 위치에 따라 쿼리·키 벡터를 회전시키는 위치 인코딩이다.</li>
+<li><code>right_anchored_rope=False</code>(기본값)면 후보 슬롯 0과 슬롯 40이 서로 다른 회전을 받아 점수가 달라진다.</li>
+<li>이를 고치는 헬퍼(<code>right_anchored_rope_positions</code>)가 코드에 있는데, 공개된 파이프라인은 그 헬퍼를 켜지 않는다.</li>
+</ul>
+</li>
 </ul>
 <h3 id="3-파라미터가-어디에-있는가">3. 파라미터가 어디에 있는가</h3>
-<p>X Phoenix의 경우 <strong>99.8%가 ID 임베딩 테이블이고 트랜스포머는 0.8M</strong>에 그친다. <span class="badge est">추정</span> — 공개 mini config(128-dim, 4-layer, vocab 1M×3)로 계산한 값이며, 체크포인트가 Git LFS에 있어서 직접 세어 보지는 못했다. 근거 수치는 <code>phoenix/README.md:222-230</code>이 밝힌 파일 크기(<code>model_params.npz</code> 3MB, <code>embedding_tables.npz</code> 1.4GB)와 일치한다.</p>
-<p>이것이 함의하는 바는 다음과 같다. 임베딩 테이블은 별도 서비스나 호스트 메모리에 두고 <strong>트랜스포머만 가속기에서 돌리는</strong> 서빙 구조가 자연스럽다. 실제로 공개 코드는 임베딩 lookup을 모델 바깥에서 numpy fancy-indexing으로 처리한다. <span class="badge ok">확인</span> — <code>recsys_model.py:103-116</code>, <code>run_pipeline.py:292-297</code></p>
+<p>X Phoenix 파라미터의 <strong>99.8%는 ID 임베딩 테이블이고, 트랜스포머는 0.8M</strong>에 그친다. <span class="badge est">추정</span></p>
+<ul>
+<li>공개 mini config(128-dim, 4-layer, vocab 1M×3)로 계산한 값이다. 체크포인트가 Git LFS에 있어서 직접 세어 보지는 못했다.</li>
+<li>이 계산은 <code>phoenix/README.md:222-230</code>이 밝힌 파일 크기와 일치한다. <code>model_params.npz</code>는 3MB, <code>embedding_tables.npz</code>는 1.4GB다.</li>
+</ul>
+<p>이 비율이라면 임베딩 테이블은 별도 서비스나 호스트 메모리에 두고, <strong>트랜스포머만 가속기에서 돌리는</strong> 서빙 구조가 자연스럽다. 실제로 공개 코드는 임베딩 lookup을 모델 바깥에서 numpy fancy-indexing으로 처리한다. <span class="badge ok">확인</span> — <code>recsys_model.py:103-116</code>, <code>run_pipeline.py:292-297</code></p>
 <h3 id="4-콘텐츠는-들어가지-않는다">4. 콘텐츠는 들어가지 않는다</h3>
-<p>X Phoenix에는 텍스트도 이미지도 들어가지 않는다. 토큰은 <strong>해시된 ID + 소수의 categorical/scalar 채널</strong>뿐이다. <span class="badge ok">확인</span> — <code>recsys_model.py:238-250</code>, <code>:307-314</code></p>
-<p>들어가는 것은 post ID 해시 2개, author ID 해시 2개, 행동 multi-hot, product surface(16종), post age 버킷, dwell time이다. 들어가지 않는 것은 팔로워 수, 참여 수, 작성자 평판, 텍스트/토픽/언어, cross feature다.</p>
+<p>X Phoenix에는 텍스트도 이미지도 들어가지 않는다. 토큰은 <strong>해시된 ID와 소수의 categorical/scalar 채널</strong>뿐이다. <span class="badge ok">확인</span> — <code>recsys_model.py:238-250</code>, <code>:307-314</code></p>
+<ul>
+<li>들어가는 것: post ID 해시 2개, author ID 해시 2개, 행동 multi-hot, product surface(16종), post age 버킷, dwell time</li>
+<li>들어가지 않는 것: 팔로워 수, 참여 수, 작성자 평판, 텍스트/토픽/언어, cross feature</li>
+</ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="hand-engineered-feature-제거-주장의-실제-범위">&quot;hand-engineered feature 제거&quot; 주장의 실제 범위</h2>
-<p>X README는 &quot;We have eliminated <strong>every single</strong> hand-engineered feature and most heuristics from the system&quot;이라고 쓴다. <span class="badge ok">확인</span> — <code>README.md:55</code></p>
-<p><strong>문자 그대로는 거짓이다.</strong> 모델 안에 손으로 만든 것이 다음과 같이 남아 있다.</p>
+<p>X README는 hand-engineered feature를 하나도 남김없이 없앴다고 쓰지만, <strong>문자 그대로는 거짓이다.</strong> 모델 안에는 손으로 만든 것이 여럿 남아 있다.</p>
+<p>README는 다음처럼 쓴다. <span class="badge ok">확인</span> — <code>README.md:55</code></p>
+<blockquote>
+<p>&quot;We have eliminated <strong>every single</strong> hand-engineered feature and most heuristics from the system&quot;</p>
+</blockquote>
+<p>모델 안에 남은 것을 하나씩 보면 이렇다.</p>
 <ul>
-<li>post age 버킷은 4800분(80시간) 지평, 60분 granularity, overflow/missing 센티널까지 전부 사람이 고른 값이다. <span class="badge ok">확인</span> <code>recsys_model.py:33-55</code></li>
+<li>post age 버킷은 4800분(80시간)까지를 60분 단위로 나누고, overflow/missing 센티널을 둔다. 이 값들은 전부 사람이 골랐다. <span class="badge ok">확인</span> <code>recsys_model.py:33-55</code></li>
 <li>dwell 정규화는 30초에서 clip하고 선형으로 스케일한다. <span class="badge ok">확인</span> <code>recsys_model.py:58-90</code></li>
 <li>product surface는 16-way categorical이고, 그 값은 Rust 쪽 <code>if</code>문이 정한다. <span class="badge ok">확인</span> <code>home-mixer/scorers/phoenix_scorer.rs:73-77</code></li>
-<li>ID 해싱은 직접 만든 linear-congruential 해시를 쓰고, entity당 해시가 2개이며, magic offset은 <code>pad = 65</code>이다. <span class="badge ok">확인</span> <code>run_pipeline.py:76-129</code></li>
+<li>ID 해싱에는 직접 만든 linear-congruential 해시를 쓴다. entity당 해시가 2개이고, magic offset은 <code>pad = 65</code>이다. <span class="badge ok">확인</span> <code>run_pipeline.py:76-129</code></li>
 <li>행동 어휘 19종과 <code>2x-1</code> signed 인코딩도 사람이 정했다. <span class="badge ok">확인</span> <code>recsys_model.py:425</code></li>
 </ul>
-<p>정확한 표현은 **&quot;콘텐츠·작성자 피처를 없앴다&quot;**이다. 시간·표면·해싱 처리는 그대로 남아 있다.
-그리고 이것은 모델 안의 이야기이고, 그 바깥 서빙 레이어에는 필터 17개와 손으로 튜닝한 상수가 많이 있다. <a href="x.html">x.md</a>를 참조하라.</p>
+<p>정확한 표현은 &quot;콘텐츠·작성자 피처를 없앴다&quot;이다. 시간·표면·해싱 처리는 그대로 남아 있다.</p>
+<p>그리고 이것은 모델 안의 이야기다. 모델 바깥의 서빙 레이어에는 필터 17개와 손으로 튜닝한 상수가 많이 있다. 자세한 내용은 <a href="x.html">x.md</a>에 있다.</p>
 <hr>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="meta--트랜스포머-계보가-하나가-아니라-둘이다" class="part">Meta — 트랜스포머 계보가 하나가 아니라 둘이다</h2>
-<p>&quot;Meta의 시퀀스 모델&quot;을 단수로 말하면 틀린다. <strong>유기(organic) 쪽 HSTU 계보</strong>와 <strong>광고 쪽 DHEN→GEM 계보</strong>가 따로 있으며, 아래에서 확인한 대로 <strong>서로를 인용하지 않는다.</strong></p>
+<p>&quot;Meta의 시퀀스 모델&quot;을 단수로 말하면 틀린다. <strong>유기(organic) 쪽 HSTU 계보</strong>와 <strong>광고 쪽 DHEN→GEM 계보</strong>가 따로 있으며, <a href="#%EB%91%90-%EA%B3%84%EB%B3%B4%EA%B0%80-%EC%84%9C%EB%A1%9C%EB%A5%BC-%EC%9D%B8%EC%9A%A9%ED%95%98%EC%A7%80-%EC%95%8A%EB%8A%94%EB%8B%A4--%EC%8B%A4%EC%B8%A1">아래에서 확인한 대로</a> <strong>서로를 인용하지 않는다.</strong></p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="계보-a-organic--hstu--ultra-hstu">계보 A (organic) — HSTU → ULTRA-HSTU</h2>
-<p><span class="badge ok">확인</span> <a href="https://arxiv.org/html/2402.17152v3" target="_blank" rel="noopener">Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations</a>, ICML 2024 (arXiv 2024-02)</p>
-<p>X의 Phoenix가 &quot;기존 랭커를 트랜스포머로 바꾼다&quot;라면 HSTU는 <strong>문제 정의 자체를 바꾼다.</strong></p>
-<p><strong>(1) 피처 전체를 하나의 시계열로 합친다</strong></p>
-<p><em>&quot;In GRs, we consolidate and encode these features into a single unified time series.&quot;</em> <span class="badge ok">확인</span></p>
-<p>방법도 구체적으로 밝혀져 있다. 카테고리 피처는 가장 긴 시계열(주로 유저가 engage한 아이템)을 <strong>main time series</strong>로 삼고, 천천히 변하는 것(데모그래픽, 팔로우한 크리에이터)은 <em>&quot;keeping the earliest entry per consecutive segment&quot;</em> 로 압축해 병합한다. <span class="badge ok">확인</span></p>
-<p><strong>(2) numerical feature를 버리는 근거가 명시되어 있다</strong></p>
-<p>X README의 &quot;hand-engineered feature를 전부 없앴다&quot;는 주장(위 절 참조)과 겉보기가 비슷한데, HSTU는 <strong>왜 버려도 되는지</strong>를 논증한다:</p>
+<p>X의 Phoenix가 &quot;기존 랭커를 트랜스포머로 바꾼다&quot;라면, HSTU는 <strong>문제 정의 자체를 바꾼다.</strong> 피처 전체를 하나의 시계열로 합치고, retrieval과 ranking을 같은 시퀀스 위의 다른 태스크로 다룬다. <span class="badge ok">확인</span> — <a href="https://arxiv.org/html/2402.17152v3" target="_blank" rel="noopener">Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations</a>, ICML 2024 (arXiv 2024-02)</p>
+<h3 id="1-피처-전체를-하나의-시계열로-합친다">1. 피처 전체를 하나의 시계열로 합친다</h3>
+<p>HSTU는 모든 피처를 하나의 통합 시계열로 합쳐 인코딩한다. <span class="badge ok">확인</span> 논문은 이런 모델을 GR(generative recommender)이라고 부른다.</p>
+<blockquote>
+<p>&quot;In GRs, we consolidate and encode these features into a single unified time series.&quot;</p>
+</blockquote>
+<p>합치는 방법도 구체적으로 밝혀져 있다.</p>
+<ul>
+<li>카테고리 피처는 가장 긴 시계열을 <strong>main time series</strong>로 삼는다. 주로 유저가 engage한 아이템의 시계열이다. <span class="badge ok">확인</span></li>
+<li>천천히 변하는 피처(데모그래픽, 팔로우한 크리에이터)는 연속 구간마다 가장 이른 항목만 남기는 식으로 압축해 병합한다. <span class="badge ok">확인</span> 논문 표현은 &quot;keeping the earliest entry per consecutive segment&quot;다.</li>
+</ul>
+<h3 id="2-numerical-feature를-버리는-근거를-밝힌다">2. numerical feature를 버리는 근거를 밝힌다</h3>
+<p>HSTU는 numerical feature를 <strong>왜 버려도 되는지</strong> 논증한다. 겉보기에는 X README의 &quot;hand-engineered feature를 전부 없앴다&quot;는 주장(<a href="#hand-engineered-feature-%EC%A0%9C%EA%B1%B0-%EC%A3%BC%EC%9E%A5%EC%9D%98-%EC%8B%A4%EC%A0%9C-%EB%B2%94%EC%9C%84">위 절</a>)과 비슷하다.</p>
 <blockquote>
 <p><em>&quot;the categorical features (e.g., item topics, locations) over which we perform these aggregations are already sequentialized and encoded in GRs. Hence, we can remove numerical features in GRs given a sufficiently expressive sequential transduction architecture coupled with a target-aware formulation ... can meaningfully capture numerical features as we increase the overall sequence length and compute&quot;</em> <span class="badge ok">확인</span></p>
 </blockquote>
-<p>즉 <strong>counter/ratio는 카테고리 시퀀스의 집계값이니 시퀀스가 충분히 길면 모델이 재구성한다</strong>는 논리다. 그리고 검증도 함께 붙어 있다. DLRM에 GR과 같은 피처만 주면 *&quot;the performance of DLRMs is significantly degraded&quot;*라는 결과가 나온다. <span class="badge ok">확인</span> <span class="badge est">추정</span> X의 동일 주장에는 이런 ablation이 없다. 같은 문장이라도 뒷받침하는 근거의 양이 다르다.</p>
-<p><strong>(3) retrieval과 ranking이 같은 시퀀스 위의 다른 태스크가 된다</strong></p>
+<p>즉 counter나 ratio는 카테고리 시퀀스의 집계값이니, 시퀀스가 충분히 길면 모델이 재구성한다는 논리다.</p>
+<p>논문은 검증도 함께 붙였다. DLRM(피처 벡터를 입력으로 받는 기존 딥러닝 추천 모델)에 GR과 같은 피처만 주면 성능이 크게 떨어진다. <span class="badge ok">확인</span> 논문 표현은 &quot;the performance of DLRMs is significantly degraded&quot;다.</p>
+<p><span class="badge est">추정</span> X의 같은 주장에는 이런 ablation(구성 요소를 빼거나 바꿔 성능을 비교하는 실험)이 없다. 같은 문장이라도 뒷받침하는 근거의 양이 다르다.</p>
+<h3 id="3-retrieval과-ranking이-같은-시퀀스-위의-다른-태스크가-된다">3. retrieval과 ranking이 같은 시퀀스 위의 다른 태스크가 된다</h3>
+<p>HSTU에서 retrieval은 다음 아이템을 예측하는 일이고, ranking은 아이템과 액션 토큰을 번갈아 끼운 시퀀스에서 다음 액션을 예측하는 일이다.</p>
 <ul>
 <li>retrieval: 다음 아이템 예측 <code>p(Φ_{i+1}|u_i)</code></li>
 <li>ranking: 아이템과 액션 토큰을 <strong>번갈아 끼워서</strong> <code>p(a_{i+1}|Φ_0, a_0, Φ_1, a_1, ..., Φ_{i+1})</code></li>
 </ul>
-<p>interleaving을 하는 이유는 X의 마스크 설계가 다루는 문제와 정확히 같은 종류다. 논문의 설명은 다음과 같다: <em>&quot;&#39;interaction&#39; of target ... and historical features needs to occur as early as possible, which is infeasible with a standard autoregressive setup where &#39;interaction&#39; happens late (e.g., via softmax after encoder output)&quot;</em>. <span class="badge ok">확인</span></p>
-<p><strong>(4) softmax를 버린다 — 두 가지 이유가 명시되어 있다</strong></p>
-<p>HSTU는 *&quot;pointwise aggregated (normalized) attention&quot;*을 쓴다. 비선형 함수로는 SiLU를 쓴다. <span class="badge ok">확인</span></p>
+<p>번갈아 끼우는(interleaving) 이유는 X의 마스크 설계가 다루는 문제와 정확히 같은 종류다. 논문은 타깃과 이력 피처의 상호작용이 최대한 일찍 일어나야 한다고 설명한다. 표준 autoregressive 구성에서는 상호작용이 늦게 일어나서(예: 인코더 출력 뒤의 softmax) 일찍 일어나게 할 수 없다는 것이다. <span class="badge ok">확인</span></p>
+<blockquote>
+<p>&quot;&#39;interaction&#39; of target ... and historical features needs to occur as early as possible, which is infeasible with a standard autoregressive setup where &#39;interaction&#39; happens late (e.g., via softmax after encoder output)&quot;</p>
+</blockquote>
+<h3 id="4-softmax를-버리고-그-이유-두-가지를-밝힌다">4. softmax를 버리고, 그 이유 두 가지를 밝힌다</h3>
+<p>HSTU는 softmax 대신 &quot;pointwise aggregated (normalized) attention&quot;을 쓰고, 비선형 함수로는 SiLU를 쓴다. <span class="badge ok">확인</span> 논문은 softmax를 버린 이유를 두 가지로 밝힌다.</p>
 <ul>
-<li><em>&quot;the number of prior data points related to target serves as a strong feature indicating the intensity of user preferences, which is hard to capture after softmax normalization&quot;</em>. 즉 softmax는 정규화 때문에 <strong>&quot;몇 번 봤는가&quot;라는 정보를 지운다.</strong> dwell/time-spent 같은 강도를 예측하는 것이 목표라면 치명적이다.</li>
-<li><em>&quot;while softmax activation is robust to noise by construction, it is less suited for non-stationary vocabularies in streaming settings&quot;</em> <span class="badge ok">확인</span></li>
+<li>softmax는 정규화 때문에 <strong>&quot;몇 번 봤는가&quot;라는 정보를 지운다.</strong> 타깃과 관련된 과거 데이터의 개수는 선호 강도를 보여 주는 강한 피처인데, softmax로 정규화한 뒤에는 이것을 잡기 어렵다는 것이다. dwell/time-spent 같은 강도를 예측하는 것이 목표라면 치명적이다.<blockquote>
+<p>&quot;the number of prior data points related to target serves as a strong feature indicating the intensity of user preferences, which is hard to capture after softmax normalization&quot;</p>
+</blockquote>
+</li>
+<li>softmax는 구조상 노이즈에 강하지만, 스트리밍 환경에서 계속 바뀌는(non-stationary) 어휘에는 덜 맞는다. <span class="badge ok">확인</span><blockquote>
+<p>&quot;while softmax activation is robust to noise by construction, it is less suited for non-stationary vocabularies in streaming settings&quot;</p>
+</blockquote>
+</li>
 </ul>
-<p><strong>(5) 상대 위치 bias가 위치와 시간을 모두 담는다</strong></p>
-<p><code>rab^{p,t}</code>는 <em>&quot;relative attention bias that incorporates positional&quot;</em> 항이며, 시간 항도 함께 담는다. <span class="badge ok">확인</span> X는 이 자리를 RoPE로 처리했고, 그것이 배치 독립성을 깨는 원인이 되었다(위 주의할 점 3). <strong>같은 슬롯을 두 회사가 다르게 채웠고, 부작용도 다르다.</strong> <span class="badge est">추정</span></p>
-<p><strong>(6) M-FALCON — X의 후보 블록 마스크와 같은 문제를 다르게 푼다</strong></p>
-<p>*&quot;M-FALCON (Microbatched-Fast Attention Leveraging Cacheable OperatioNs)&quot;*을 쓴다. 후보 <code>m</code>개를 <code>b_m</code>개씩 마이크로배치로 나누고 어텐션 마스크와 bias를 조정한다: <em>&quot;modifying attention masks and rab^{p,t} biases such that the attention operations performed for b_m candidates are identical&quot;</em>. 그리고 캐시를 이렇게 활용한다: <em>&quot;leverage encoder-level KV caching ... either across forward passes to reduce cost, or across requests to minimize tail latency&quot;</em>. <span class="badge ok">확인</span></p>
-<p><strong>여기가 이 노트에서 제일 중요한 교차점이다.</strong> X는 후보 블록을 대각선 마스크로 격리해 점수를 캐시 가능하게 만들었고, Meta는 후보 마이크로배치 + KV 캐시로 이력 인코딩 비용을 상각했다. <strong>두 회사가 독립적으로 &quot;후보를 시퀀스에 넣되 후보끼리는 격리한다&quot;에 도달했다.</strong> <span class="badge est">추정</span> — 근거는 두 문헌의 마스크 설명이 기능적으로 같은 성질(후보 간 독립 + 재사용 가능한 prefix)을 목표로 한다는 것이다.</p>
-<p><strong>성과 수치</strong> <span class="badge ok">확인</span>: 8192 길이에서 FlashAttention2 기반 Transformer 대비 **5.3×–15.2×**이고, DLRM 대비 <strong>285× 복잡한 모델을 1.50×–2.99× 높은 QPS</strong>로 처리하며, 프로덕션 지표는 <strong>12.4%</strong> 개선되었다.</p>
-<p class="warn"><strong>⚠ 지면이 익명화되어 있다.</strong> 논문은 *&quot;a large internet platform&quot;*이라고만 쓴다. Facebook Feed에 적용되었는지는 확인하지 못했다. <a href="facebook.html">facebook.md</a>의 열린 질문 5를 보라.</p>
-<p><strong>ULTRA-HSTU (2026)</strong> <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2602.16986" target="_blank" rel="noopener">arXiv 2602.16986</a>, 2026-02-19. 후속작인데 <strong>직전 세대를 비판하면서 시작한다</strong>: <em>&quot;many recent approaches rely heavily on cross-attention mechanisms to address the quadratic computational bottleneck in sequential modeling, which can limit the representational power gained from self-attention.&quot;</em> 결과로는 <em>&quot;over 5x faster training scaling and 21x faster inference scaling&quot;</em>, <em>&quot;serving billions of users daily&quot;</em>, *&quot;4% to 8% consumption and engagement improvements&quot;*를 제시한다.</p>
-<p><span class="badge est">추정</span> cross-attention 비판은 DV365처럼 &quot;미리 압축해서 덧붙이는&quot; 접근을 견제하는 말로 읽힌다. 같은 회사 안에서 초장기 히스토리를 처리하는 두 전략이 경쟁하고 있다는 뜻이다. 다만 논문이 DV365를 직접 지목하지는 않는다.</p>
+<h3 id="5-상대-위치-bias가-위치와-시간을-모두-담는다">5. 상대 위치 bias가 위치와 시간을 모두 담는다</h3>
+<p>HSTU의 상대 위치 bias(토큰 사이의 거리에 따라 어텐션 점수에 더하는 값)는 위치와 시간을 모두 담는다. <span class="badge ok">확인</span> 논문은 이 항을 <code>rab^{p,t}</code>로 쓰고 &quot;relative attention bias that incorporates positional&quot; 항이라고 설명하며, 이 항은 시간 항도 함께 담는다. <span class="badge ok">확인</span></p>
+<p>X는 이 자리를 RoPE로 처리했고, 그것이 배치 독립성을 깨는 원인이 되었다(<a href="#2-%EC%96%B4%ED%85%90%EC%85%98-%EB%A7%88%EC%8A%A4%ED%81%AC--%EC%84%A4%EA%B3%84%EC%97%90%EC%84%9C-%EA%B0%80%EC%9E%A5-%EC%A4%91%EC%9A%94%ED%95%9C-%EB%B6%80%EB%B6%84">위 주의할 점 3</a>). <strong>같은 슬롯을 두 회사가 다르게 채웠고, 부작용도 다르다.</strong> <span class="badge est">추정</span></p>
+<h3 id="6-m-falcon-x의-후보-블록-마스크와-같은-문제를-다르게-푼다">6. M-FALCON: X의 후보 블록 마스크와 같은 문제를 다르게 푼다</h3>
+<p>HSTU는 M-FALCON으로 후보를 마이크로배치로 나누고, 인코더 단계의 KV 캐시를 활용해 비용과 tail latency를 줄인다. <span class="badge ok">확인</span> 이름은 &quot;M-FALCON (Microbatched-Fast Attention Leveraging Cacheable OperatioNs)&quot;에서 왔다.</p>
+<ul>
+<li>후보 <code>m</code>개를 <code>b_m</code>개씩 마이크로배치로 나누고, 어텐션 마스크와 bias를 조정해 마이크로배치 안의 후보들에 대한 어텐션 연산이 같아지게 한다. <span class="badge ok">확인</span><blockquote>
+<p>&quot;modifying attention masks and rab^{p,t} biases such that the attention operations performed for b_m candidates are identical&quot;</p>
+</blockquote>
+</li>
+<li>인코더 단계의 KV 캐시를 forward pass 사이에서 재사용해 비용을 줄이거나, 요청 사이에서 재사용해 tail latency를 줄인다. <span class="badge ok">확인</span><blockquote>
+<p>&quot;leverage encoder-level KV caching ... either across forward passes to reduce cost, or across requests to minimize tail latency&quot;</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>여기가 이 노트에서 제일 중요한 교차점이다.</strong> X는 후보 블록을 대각선 마스크로 격리해 점수를 캐시 가능하게 만들었고, Meta는 후보 마이크로배치와 KV 캐시로 이력 인코딩 비용을 상각했다. <strong>두 회사가 독립적으로 &quot;후보를 시퀀스에 넣되 후보끼리는 격리한다&quot;에 도달했다.</strong> <span class="badge est">추정</span> — 근거는 두 문헌의 마스크 설명이 기능적으로 같은 성질(후보 간 독립과 재사용 가능한 prefix)을 목표로 한다는 것이다.</p>
+<h3 id="hstu의-성과-수치와-배포-지면">HSTU의 성과 수치와 배포 지면</h3>
+<p>논문이 보고한 주요 성과 수치는 다음과 같다.</p>
+<ul>
+<li>8192 길이에서 FlashAttention2 기반 Transformer 대비 5.3×–15.2×다. <span class="badge ok">확인</span></li>
+<li>DLRM 대비 <strong>285× 복잡한 모델을 1.50×–2.99× 높은 QPS</strong>로 처리한다. <span class="badge ok">확인</span></li>
+<li>프로덕션 지표는 <strong>12.4%</strong> 개선되었다. <span class="badge ok">확인</span></li>
+</ul>
+<p class="warn"><strong>⚠ 지면이 익명화되어 있다.</strong> 논문은 &quot;a large internet platform&quot;이라고만 쓴다. Facebook Feed에 적용되었는지는 확인하지 못했다. <a href="facebook.html">facebook.md</a>의 열린 질문 5를 보라.</p>
+<h3 id="ultra-hstu-2026">ULTRA-HSTU (2026)</h3>
+<p>ULTRA-HSTU는 HSTU의 후속작인데, <strong>직전 세대를 비판하면서 시작한다.</strong> 시퀀스 모델링의 2차 계산 병목을 풀려고 cross-attention에 크게 기대는 최근의 많은 접근이 self-attention의 표현력을 제한할 수 있다는 비판이다. <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2602.16986" target="_blank" rel="noopener">arXiv 2602.16986</a>, 2026-02-19</p>
+<blockquote>
+<p>&quot;many recent approaches rely heavily on cross-attention mechanisms to address the quadratic computational bottleneck in sequential modeling, which can limit the representational power gained from self-attention.&quot;</p>
+</blockquote>
+<p>논문은 결과로 학습·추론 스케일링 속도, 서비스 규모, 소비·참여 개선을 제시한다. <span class="badge ok">확인</span></p>
+<ul>
+<li>&quot;over 5x faster training scaling and 21x faster inference scaling&quot;</li>
+<li>&quot;serving billions of users daily&quot;</li>
+<li>&quot;4% to 8% consumption and engagement improvements&quot;</li>
+</ul>
+<p><span class="badge est">추정</span> cross-attention 비판은 DV365(Instagram의 초장기 이력 압축 모델, <a href="#dv365--%EC%8B%9C%ED%80%80%EC%8A%A4%EB%A5%BC-%EB%8A%98%EB%A6%AC%EB%8A%94-%EB%8C%80%EC%8B%A0-%EB%AF%B8%EB%A6%AC-%EC%95%95%EC%B6%95%ED%95%9C%EB%8B%A4-instagram">아래 절</a>)처럼 &quot;미리 압축해서 덧붙이는&quot; 접근을 견제하는 말로 읽힌다. 같은 회사 안에서 초장기 히스토리를 처리하는 두 전략이 경쟁하고 있다는 뜻이다. 다만 논문이 DV365를 직접 지목하지는 않는다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="계보-b-ads--dhen--wukong--interformer--gem-서빙은-marm">계보 B (ads) — DHEN → Wukong → InterFormer → GEM, 서빙은 MARM</h2>
-<p>광고 쪽은 <strong>피처 상호작용(feature interaction) 계보</strong>에서 출발해 뒤늦게 시퀀스를 추가했다. HSTU와 출발점이 다르다. <span class="badge est">추정</span> — 아래 표의 발표 순서(2022 DHEN·2024 Wukong은 interaction, 2024 InterFormer부터 시퀀스)가 근거다.</p>
+<p>광고 쪽은 <strong>피처 상호작용(feature interaction, 피처끼리의 조합 효과) 계보</strong>에서 출발해 뒤늦게 시퀀스를 추가했다. HSTU와 출발점이 다르다. <span class="badge est">추정</span> — 아래 표의 발표 순서(2022 DHEN·2024 Wukong은 interaction, 2024 InterFormer부터 시퀀스)가 근거다. GEM은 Meta의 광고 추천 foundation model이고, 2026-10-13 블로그 기준 백본은 Kunlun이다. <span class="badge ok">확인</span>(<a href="#gem-2026-%EC%84%B8%EB%8C%80">GEM 2026 세대</a>)</p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col class="w6"><col class="w10"><col class="grow"><col></colgroup>
 <thead>
 <tr>
@@ -147,7 +223,7 @@ c3    [  1    1   1   0   0   1 ]
 <tbody><tr>
 <td><span class="nw">2022</span></td>
 <td>DHEN</td>
-<td>이종 interaction 모듈의 계층적 앙상블. NE 0.27%, 학습 throughput 1.2×</td>
+<td>이종 interaction 모듈의 계층적 앙상블. NE(normalized entropy) 0.27%, 학습 throughput 1.2×</td>
 <td><span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2203.11014" target="_blank" rel="noopener">arXiv 2203.11014</a></td>
 </tr>
 <tr>
@@ -171,7 +247,7 @@ c3    [  1    1   1   0   0   1 ]
 <tr>
 <td><span class="nw">2026</span></td>
 <td>LLaTTE</td>
-<td>GEM의 시퀀스 파트. 2-stage + 비동기 upstream user model</td>
+<td>GEM의 시퀀스 파트. 2-stage 구조와 비동기 upstream user model</td>
 <td><span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2601.20083" target="_blank" rel="noopener">arXiv 2601.20083</a>, <span class="nw">2026-01-27</span></td>
 </tr>
 <tr>
@@ -183,13 +259,13 @@ c3    [  1    1   1   0   0   1 ]
 <tr>
 <td><span class="nw">2026-02</span></td>
 <td>Kunlun</td>
-<td>GDPA·HSP·Sliding Window Attention + CompSkip·Event-level Personalization. B200에서 MFU 17% → 37%, <em>&quot;deployed in major Meta Ads models&quot;</em></td>
+<td>GDPA·HSP·Sliding Window Attention, CompSkip·Event-level Personalization. B200에서 MFU 17% → 37%, <em>&quot;deployed in major Meta Ads models&quot;</em></td>
 <td><span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">arXiv 2602.10016</a>, <span class="nw">2026-02-10</span> (v3 <span class="nw">2026-06-05</span>)</td>
 </tr>
 <tr>
 <td><span class="nw">2026-08</span></td>
 <td>GEM training</td>
-<td>훈련 인프라: 12개월 E2E MFU 2배, 총 FLOPs 4배. 커스텀 커널(JFA·GDPA·BlockAttention) + MXFP8 + 5D 병렬</td>
+<td>훈련 인프라: 12개월 E2E MFU 2배, 총 FLOPs 4배. 커스텀 커널(JFA·GDPA·BlockAttention), MXFP8, 5D 병렬</td>
 <td><span class="badge ok">확인</span> <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">GEM Training 블로그</a>, <span class="nw">2026-08-03</span></td>
 </tr>
 <tr>
@@ -199,54 +275,142 @@ c3    [  1    1   1   0   0   1 ]
 <td><span class="badge ok">확인</span> <a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">GEM <span class="nw">2026</span> 블로그</a>, <span class="nw">2026-10-13</span></td>
 </tr>
 </tbody></table></div>
-<p>GEM 블로그가 계보를 직접 밝힌다 <span class="badge ok">확인</span>: <em>&quot;GEM enhances the <strong>Wukong</strong> architecture to use stackable factorization machines with cross-layer attention connections&quot;</em>, <em>&quot;Our design, <strong>InterFormer</strong>, employs parallel summarization with an interleaving structure that alternates between sequence learning ... and cross-feature interaction layers.&quot;</em></p>
-<p><strong>LLaTTE가 이 노트에서 중요한 이유</strong> <span class="badge ok">확인</span> (블로그 <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">From User Sequences to Scaling Laws</a>, 2026-08-05 + arXiv 2601.20083):</p>
+<p>GEM 블로그가 계보를 직접 밝힌다. GEM은 Wukong 구조를 확장했고, InterFormer는 시퀀스 학습과 cross-feature interaction 층을 번갈아 두는 구조다. <span class="badge ok">확인</span></p>
+<blockquote>
+<p>&quot;GEM enhances the <strong>Wukong</strong> architecture to use stackable factorization machines with cross-layer attention connections&quot;</p>
+</blockquote>
+<blockquote>
+<p>&quot;Our design, <strong>InterFormer</strong>, employs parallel summarization with an interleaving structure that alternates between sequence learning ... and cross-feature interaction layers.&quot;</p>
+</blockquote>
+<h3 id="llatte-시퀀스-모델을-랭커-밖으로-빼낸다">LLaTTE: 시퀀스 모델을 랭커 밖으로 빼낸다</h3>
+<p>LLaTTE는 GEM의 시퀀스 파트이고, 무거운 시퀀스 모델을 랭커 밖으로 빼낸 구조다. <span class="badge ok">확인</span> — 블로그 <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">From User Sequences to Scaling Laws</a>, 2026-08-05와 arXiv 2601.20083. 다만 LLaTTE에서 나온 것으로 인용된 문장 몇 개는 블로그 본문에 없다. <span class="badge obs">관찰</span></p>
 <ul>
-<li>시퀀스 모델을 랭커 안에 두지 않고 <strong>비동기 upstream user model로 빼낸다</strong>: <em>&quot;a two-stage architecture that offloads the heavy computation of large, long-context models to an asynchronous upstream user model&quot;</em>. Instagram DV365와 같은 전략이며, 이는 아래에서 다시 다룬다.</li>
-<li class="warn">⚠ **어제(2026-08-09) 정본이 인용한 <em>&quot;Deployed as the largest user model at Meta&quot;</em>, <em>&quot;4.3% conversion uplift on Facebook Feed and Reels&quot;<em>는 2026-08-05 블로그 본문에 없다</em></em> <span class="badge obs">관찰</span> 2026-08-10 원문 재확인. 논문에서 인용한 문장일 가능성이 있으나 아직 재검증하지 못했다. <strong>블로그 본문의 실측 A/B 수치는</strong> *&quot;a cumulative lift of 6% in conversions on Instagram, 3% in conversions on Facebook and 3.5% in ad clicks on Facebook&quot;*이다. 여기에는 <strong>&quot;cumulative&quot;와 <em>&quot;broader model innovations&quot;</em> 포함이 명시</strong>되어 있어서 LLaTTE 단독 효과가 아니다 <span class="badge ok">확인</span></li>
-<li><strong>핵심 정식화 (블로그 원문):</strong> <em>&quot;(1) a multi-stage sequence model that decouples heavy offline user modeling from lightweight online ranking tasks and (2) a learning technique based on <strong>dense tokenization and target-aware attention</strong> that efficiently learns feature interactions directly from data&quot;</em>. 스케일링 법칙을 &quot;prerequisite&quot;라는 표현으로 확인하려면 논문을 봐야 한다(위 재검증 항목).</li>
-<li><em>&quot;semantic features bend the scaling curve: they are a prerequisite for scaling&quot;</em>. 이것은 <strong>의미 피처 없이는 스케일링 자체가 되지 않는다</strong>는 주장이다. HSTU가 &quot;raw categorical engagement feature만으로 간다&quot;고 한 것과 방향이 반대다. <strong>⚠ 이 인용도 블로그 본문에는 없다</strong> <span class="badge obs">관찰</span> 2026-08-10, 논문을 다시 확인해야 한다. 블로그의 대응 문장은 *&quot;Semantic content features from foundation models complement traditional collaborative filtering... especially helpful in cold-start scenarios&quot;*이고, 이는 &quot;prerequisite&quot;보다 완화된 표현이다. LLM에서 유래한 피처 이야기는 <a href="llm-in-recsys.html">llm-in-recsys.md</a>에 있다.</li>
-<li>블로그 본문: <em>&quot;This unified platform for sequence modeling is a core component of Meta&#39;s Generative Ads Recommendation Model (GEM)&quot;</em>. 이 문장으로 LLaTTE ⊂ GEM 관계는 1차 출처로 확정된다.</li>
+<li>시퀀스 모델을 랭커 안에 두지 않고 <strong>비동기 upstream user model로 빼낸다.</strong> <span class="badge ok">확인</span>(LLaTTE 블로그) Instagram DV365와 같은 전략이며, <a href="#dv365--%EC%8B%9C%ED%80%80%EC%8A%A4%EB%A5%BC-%EB%8A%98%EB%A6%AC%EB%8A%94-%EB%8C%80%EC%8B%A0-%EB%AF%B8%EB%A6%AC-%EC%95%95%EC%B6%95%ED%95%9C%EB%8B%A4-instagram">DV365 절</a>에서 다시 다룬다.<blockquote>
+<p>&quot;a two-stage architecture that offloads the heavy computation of large, long-context models to an asynchronous upstream user model&quot;</p>
+</blockquote>
+<ul>
+<li>upstream user model은 무거운 유저 모델링을 가벼운 온라인 랭킹과 떼어 내 앞단에서 따로 돌리는 모델이다.</li>
 </ul>
-<p><strong>GEM training 인프라 — 2026-08-03 블로그가 들어가는 자리</strong> <span class="badge ok">확인</span> <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">Training GEM at LLM Scale</a>, 2026-08-03:</p>
-<ul>
-<li>GEM의 규모 정의: <em>&quot;the foundation model behind ads recommendations across Instagram and Facebook, now trains at LLM scale on several thousand of the latest-generation GPUs&quot;</em>. 하이브리드 아키텍처는 *&quot;trillions of sparse embedding parameters and billions of dense parameters&quot;*로 설명한다.</li>
-<li>12개월 결과 명시: <em>&quot;we doubled GEM&#39;s E2E training efficiency to 20-25% MFU while scaling total training FLOPs 4x over the past 12 months&quot;</em>. 여기서 baseline은 GEM 초기 공개(2025-11) 이전이고, metric은 end-to-end Model FLOPs Utilization이다.</li>
-<li><strong>커스텀 커널이 필요한 이유가 흥미롭다</strong>: <em>&quot;AI infrastructure optimized for LLM training (kernels, parallelism, low precision recipes etc.) does <strong>not directly transfer</strong>&quot;</em>. LLM 스택을 그대로 재사용하지 못한다는 뜻이다. 추천 시스템의 sparse embedding과 jagged tensor, 이질적인 attention이 그 원인이다.</li>
-<li>Compute efficiency: <strong>JFA (Jagged Flash Attention), GDPA (Generalized Dot-Product Attention), BlockAttention</strong> + <strong>MXFP8 attention·MLP</strong>. Scaling efficiency: <strong>2D FSDP + Expert Parallelism (dense) + Fully Sharded 2D Model Parallelism (sparse)</strong> + <strong>SM-free collectives</strong>로 통신 오버헤드를 줄인다.</li>
-<li><strong>DHEN의 위치가 명확해진다.</strong> 블로그 본문에 *&quot;Deep Hierarchical Ensemble Network experts&quot;*가 GEM의 expert 모듈로 남아 있다. 대체가 아니라 흡수다. 계보 표의 &quot;GEM = Wukong·InterFormer 통합&quot;은 유효하고, DHEN도 그 안에 있다.</li>
-<li><strong>함의</strong>: 이 글로 계보 표의 GEM 항목이 처음으로 <strong>훈련 인프라 쪽에 구체적 수치</strong>를 갖게 된다. 지금까지 GEM은 아키텍처 통합(Wukong+InterFormer)만 알려져 있었다.</li>
+</li>
+<li class="warn">⚠ 2026-08-09에 정본이 인용한 두 문장은 2026-08-05 블로그 본문에 없다. <span class="badge obs">관찰</span> 2026-08-10 원문 재확인. 논문에서 인용한 문장일 가능성이 있으나 아직 재검증하지 못했다.<ul>
+<li>두 문장은 &quot;Deployed as the largest user model at Meta&quot;와 &quot;4.3% conversion uplift on Facebook Feed and Reels&quot;다.</li>
 </ul>
-<p><strong>GEM 2026 세대 — 2026-10-13 블로그가 바꾼 것</strong> <span class="badge ok">확인</span> <a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM): Scaling the Central Model and Compute Engine for Frontier Ads AI</a>, 2026-10-13 (블로그, 저자 표기 없음):</p>
+</li>
+<li><strong>블로그 본문의 실측 A/B 수치는</strong> 누적 효과이고 다른 모델 개선도 포함돼 있어서, LLaTTE 단독 효과가 아니다. <span class="badge ok">확인</span><ul>
+<li>블로그 수치는 &quot;a cumulative lift of 6% in conversions on Instagram, 3% in conversions on Facebook and 3.5% in ad clicks on Facebook&quot;이다.</li>
+<li>블로그는 &quot;cumulative&quot;라고 쓰고, &quot;broader model innovations&quot;가 포함됐다고 명시한다.</li>
+</ul>
+</li>
+<li>LLaTTE의 핵심 정식화는 두 가지다. 무거운 오프라인 유저 모델링을 가벼운 온라인 랭킹과 떼어 놓는 다단계 시퀀스 모델, 그리고 dense tokenization과 target-aware attention으로 피처 상호작용을 데이터에서 직접 배우는 학습 기법이다. <span class="badge ok">확인</span>(LLaTTE 블로그)<blockquote>
+<p>&quot;(1) a multi-stage sequence model that decouples heavy offline user modeling from lightweight online ranking tasks and (2) a learning technique based on <strong>dense tokenization and target-aware attention</strong> that efficiently learns feature interactions directly from data&quot;</p>
+</blockquote>
 <ul>
-<li class="warn"><p><strong>⚠ 주장 변경: 백본이 InterFormer에서 Kunlun으로 바뀌었다.</strong> 위 표의 &quot;GEM = Wukong·InterFormer 통합&quot;은 2025-11 세대 설명이다. 블로그는 Kunlun을 *&quot;the previous version (Interformer)&quot;*와 비교한다.</p>
+<li>스케일링 법칙을 &quot;prerequisite&quot;라는 표현으로 확인하려면 논문을 봐야 한다(위의 재검증 항목).</li>
+</ul>
+</li>
+<li class="warn"><strong>⚠ 의미(semantic) 피처가 스케일링의 전제조건이라는 인용도 블로그 본문에는 없다.</strong> <span class="badge obs">관찰</span> 2026-08-10, 논문을 다시 확인해야 한다.<ul>
+<li>인용문은 &quot;semantic features bend the scaling curve: they are a prerequisite for scaling&quot;이다. 이것은 <strong>의미 피처 없이는 스케일링 자체가 되지 않는다</strong>는 주장이다.</li>
+<li>HSTU가 &quot;raw categorical engagement feature만으로 간다&quot;고 한 것과 방향이 반대다.</li>
+<li>블로그의 대응 문장은 &quot;Semantic content features from foundation models complement traditional collaborative filtering... especially helpful in cold-start scenarios&quot;이다. &quot;prerequisite&quot;보다 완화된 표현이다.</li>
+<li>LLM에서 유래한 피처 이야기는 <a href="llm-in-recsys.html">llm-in-recsys.md</a>에 있다.</li>
+</ul>
+</li>
+<li>LLaTTE가 GEM의 일부(LLaTTE ⊂ GEM)라는 점은 블로그 본문의 다음 문장이 1차 출처로 확정한다. <span class="badge ok">확인</span>(LLaTTE 블로그)<blockquote>
+<p>&quot;This unified platform for sequence modeling is a core component of Meta&#39;s Generative Ads Recommendation Model (GEM)&quot;</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="gem-훈련-인프라">GEM 훈련 인프라</h3>
+<p>2026-08-03 블로그로 계보 표의 GEM 항목이 처음으로 <strong>훈련 인프라 쪽에 구체적 수치</strong>를 갖게 됐다. 그전까지 GEM은 아키텍처 통합(Wukong·InterFormer)만 알려져 있었다. <span class="badge ok">확인</span> — <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">Training GEM at LLM Scale</a>, 2026-08-03</p>
+<ul>
+<li>GEM은 Instagram과 Facebook 광고 추천의 foundation model이고, 최신 세대 GPU 수천 장에서 LLM 규모로 학습한다. <span class="badge ok">확인</span>(GEM Training 블로그)<blockquote>
+<p>&quot;the foundation model behind ads recommendations across Instagram and Facebook, now trains at LLM scale on several thousand of the latest-generation GPUs&quot;</p>
+</blockquote>
+<ul>
+<li>하이브리드 아키텍처는 &quot;trillions of sparse embedding parameters and billions of dense parameters&quot;로 설명한다.</li>
+</ul>
+</li>
+<li>지난 12개월 동안 E2E 학습 효율을 두 배로 올리면서 총 학습 FLOPs를 네 배로 늘렸다. <span class="badge ok">확인</span>(GEM Training 블로그)<blockquote>
+<p>&quot;we doubled GEM&#39;s E2E training efficiency to 20-25% MFU while scaling total training FLOPs 4x over the past 12 months&quot;</p>
+</blockquote>
+<ul>
+<li>여기서 baseline은 GEM 초기 공개(2025-11) 이전이고, metric은 end-to-end Model FLOPs Utilization이다.</li>
+</ul>
+</li>
+<li>LLM 학습에 맞춘 인프라는 추천 모델로 <strong>그대로 옮겨지지 않아서</strong> 커스텀 커널이 필요했다. <span class="badge ok">확인</span>(GEM Training 블로그) LLM 스택을 그대로 재사용하지 못하는 원인은 추천 시스템의 sparse embedding과 jagged tensor(길이가 제각각인 시퀀스 텐서), 이질적인 attention이다.<blockquote>
+<p>&quot;AI infrastructure optimized for LLM training (kernels, parallelism, low precision recipes etc.) does <strong>not directly transfer</strong>&quot;</p>
+</blockquote>
+</li>
+<li>계산 효율 쪽 기법은 커스텀 attention 커널과 MXFP8 저정밀 연산이다. <span class="badge ok">확인</span>(GEM Training 블로그)<ul>
+<li>커널은 <strong>JFA (Jagged Flash Attention), GDPA (Generalized Dot-Product Attention), BlockAttention</strong>이다.</li>
+<li>MXFP8은 attention과 MLP에 쓴다.</li>
+</ul>
+</li>
+<li>확장 효율 쪽에서는 2D FSDP, Expert Parallelism (dense), Fully Sharded 2D Model Parallelism (sparse), SM-free collectives로 통신 오버헤드를 줄인다. <span class="badge ok">확인</span>(GEM Training 블로그)</li>
+<li><strong>DHEN은 대체되지 않고 흡수됐다.</strong> <span class="badge ok">확인</span>(GEM Training 블로그) 블로그 본문에서 &quot;Deep Hierarchical Ensemble Network experts&quot;가 GEM의 expert 모듈로 남아 있다.<ul>
+<li>계보 표의 &quot;GEM = Wukong·InterFormer 통합&quot;은 유효하고, DHEN도 그 안에 있다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="gem-2026-세대">GEM 2026 세대</h3>
+<p>2026-10-13 블로그 기준으로 GEM의 백본은 InterFormer에서 Kunlun으로 바뀌었고, 도메인별 모델은 하나의 중앙 모델로 합쳐졌다. <span class="badge ok">확인</span> — <a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM): Scaling the Central Model and Compute Engine for Frontier Ads AI</a>, 2026-10-13 (블로그, 저자 표기 없음)</p>
+<ul>
+<li class="warn"><p><strong>⚠ 주장 변경: 백본이 InterFormer에서 Kunlun으로 바뀌었다.</strong> <span class="badge ok">확인</span>(GEM 2026 블로그) 위 표의 &quot;GEM = Wukong·InterFormer 통합&quot;은 2025-11 세대 설명이다. 블로그는 Kunlun을 &quot;the previous version (Interformer)&quot;와 비교한다.</p>
 <blockquote>
 <p>&quot;Compared to the previous version (Interformer), Kunlun delivers 2x performance gains with the same computation scaling.&quot;</p>
 </blockquote>
-<p>Kunlun은 2026-02 논문(<a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">arXiv 2602.10016</a>)으로 먼저 나왔고, 논문 초록도 *&quot;Kunlun is now deployed in major Meta Ads models&quot;*라고 쓴다. CompSkip(일부 구성요소를 건너뛰는 계산 생략)은 *&quot;reduce FLOPS by 43% with negligible quality loss&quot;*로 설명된다.</p>
+<ul>
+<li>Kunlun은 2026-02 논문(<a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">arXiv 2602.10016</a>)으로 먼저 나왔고, 논문 초록도 &quot;Kunlun is now deployed in major Meta Ads models&quot;라고 쓴다.</li>
+<li>CompSkip(일부 구성요소를 건너뛰는 계산 생략)은 &quot;reduce FLOPS by 43% with negligible quality loss&quot;로 설명된다.</li>
+</ul>
 </li>
-<li><p><strong>도메인별 모델을 하나로 합쳤다.</strong> 블로그 표현은 *&quot;The 2026 generation of GEM shifts from isolated per-domain optimizations — such as Facebook, Instagram, Reels — to a single central foundation model.&quot;*이다. 공유 expert와 도메인 전용 expert를 함께 두고, 지면별 데이터를 물리적으로 합치지 않고 가상으로 섞어 학습한다.</p>
+<li><p><strong>도메인별 모델을 하나로 합쳤다.</strong> <span class="badge ok">확인</span>(GEM 2026 블로그) 공유 expert와 도메인 전용 expert를 함께 두고, 지면별 데이터를 물리적으로 합치지 않고 가상으로 섞어 학습한다.</p>
+<blockquote>
+<p>&quot;The 2026 generation of GEM shifts from isolated per-domain optimizations — such as Facebook, Instagram, Reels — to a single central foundation model.&quot;</p>
+</blockquote>
 </li>
-<li><p><strong>시퀀스 길이:</strong> 프로덕션에서 장기 참여 이력 길이를 2배로 늘렸고, 25배까지 늘릴 수 있는 역량을 확인했다고 쓴다. 모델 복잡도는 이전 GEM 대비 2.5배다.</p>
+<li><p>프로덕션에서 장기 참여 이력 길이를 2배로 늘렸고, 25배까지 늘릴 수 있는 역량을 확인했다고 쓴다. <span class="badge ok">확인</span>(GEM 2026 블로그) 모델 복잡도는 이전 GEM 대비 2.5배다.</p>
 </li>
-<li><p><strong>하위(vertical) 모델로 지식을 옮기는 방법이 세 가지로 정리됐다.</strong> (1) LoopFM은 GEM의 내부 표현과 장기 이력 메모리를 하위 모델에 넘기는 post-training 기법이고, *&quot;2x of transfer effectiveness beyond knowledge distillation&quot;*이라고 주장한다. (2) soft label distillation을 함께 쓴다. (3) Solaris는 다음 요청에 필요할 user-ad 쌍의 GEM 임베딩을 미리 계산해 두는 방식이다.</p>
+<li><p><strong>하위(vertical) 모델로 지식을 옮기는 방법이 세 가지로 정리됐다.</strong> <span class="badge ok">확인</span>(GEM 2026 블로그)</p>
+<ol>
+<li><p>LoopFM은 GEM의 내부 표현과 장기 이력 메모리를 하위 모델에 넘기는 post-training 기법이다. 블로그는 &quot;2x of transfer effectiveness beyond knowledge distillation&quot;이라고 주장한다.</p>
+</li>
+<li><p>soft label distillation을 함께 쓴다.</p>
+</li>
+<li><p>Solaris는 다음 요청에 필요할 user-ad 쌍의 GEM 임베딩을 미리 계산해 두는 방식이다.</p>
 <blockquote>
 <p>&quot;It speculatively precomputes foundation model embeddings for the user-ad pairs a future request is likely to need, and delivers them just-in-time on the serving hot path.&quot;</p>
 </blockquote>
 </li>
-<li><p><strong>성과 수치(블로그):</strong> <em>&quot;18.9% conversion improvement and 12% ad click-through rate (CTR) improvement across Meta&#39;s ad surfaces and objectives&quot;</em>, 그리고 *&quot;5.8%, 4.1%, and 1.6% conversion uplift on Facebook, Instagram, and off-site conversion for targeted users over the past year&quot;*다. 앞의 두 수치는 기간과 기준선을 밝히지 않았고, 뒤의 세 수치는 &quot;지난 1년&quot; 누적이다. A/B 설계는 공개하지 않았다 <span class="badge ok">확인</span>(본문에 설계 서술이 없다).</p>
+</ol>
 </li>
-<li><p><strong>유기 피드와의 관계:</strong> 지금은 광고 데이터만 학습한다. 앞으로 *&quot;extend GEM to learn from all of Meta&#39;s platform data, capturing behavior across organic and ads engagements&quot;*라고 쓴다. 계보 A(HSTU)와 계보 B가 데이터 수준에서 합쳐질 수 있다는 첫 공식 진술이다 <span class="badge est">추정</span> — 계획 진술이지 배포 사실이 아니다.</p>
+<li><p>블로그가 밝힌 성과 수치는 다음과 같다. <span class="badge ok">확인</span>(GEM 2026 블로그)</p>
+<ul>
+<li>Meta 광고 지면·목표 전반: &quot;18.9% conversion improvement and 12% ad click-through rate (CTR) improvement across Meta&#39;s ad surfaces and objectives&quot;. 이 두 수치는 기간과 기준선을 밝히지 않았다.</li>
+<li>타깃 유저: &quot;5.8%, 4.1%, and 1.6% conversion uplift on Facebook, Instagram, and off-site conversion for targeted users over the past year&quot;. 이 세 수치는 &quot;지난 1년&quot; 누적이다.</li>
+<li>A/B 설계는 공개하지 않았다 <span class="badge ok">확인</span>(본문에 설계 서술이 없다).</li>
+</ul>
+</li>
+<li><p>유기 피드와의 관계: 블로그 시점에 GEM은 광고 데이터만 학습한다. <span class="badge ok">확인</span>(GEM 2026 블로그) 앞으로는 &quot;extend GEM to learn from all of Meta&#39;s platform data, capturing behavior across organic and ads engagements&quot;라고 쓴다.</p>
+<ul>
+<li>계보 A(HSTU)와 계보 B가 데이터 수준에서 합쳐질 수 있다는 첫 공식 진술이다 <span class="badge est">추정</span> — 계획 진술이지 배포 사실이 아니다.</li>
+</ul>
 </li>
 <li><p>Solaris는 LLaTTE의 &quot;비동기 upstream user model&quot;과 같은 방향이다. 무거운 계산을 요청 경로 밖에서 미리 해 두고 랭커는 결과만 읽는다 <span class="badge est">추정</span> — 두 블로그가 서로를 인용하지 않으므로 같은 시스템인지는 알 수 없다.</p>
 </li>
-<li><p>같은 주(2026-10-12)에 나온 <a href="https://engineering.fb.com/2026/10/12/ml-applications/turning-opportunistic-ai-inference-capacity-into-better-ads-recommendations/" target="_blank" rel="noopener">Turning Opportunistic AI Inference Capacity Into Better Ads Recommendations</a>(블로그)는 유휴 추론 용량이 생길 때 랭킹 후보를 더 많이 평가하거나(Rank More Ads) 더 큰 모델로 요청을 보내는(Serve Better Models) 방식을 설명한다 <span class="badge ok">확인</span>. 효과 수치는 공개하지 않았다.</p>
+<li><p>같은 주(2026-10-12)에 나온 블로그 <a href="https://engineering.fb.com/2026/10/12/ml-applications/turning-opportunistic-ai-inference-capacity-into-better-ads-recommendations/" target="_blank" rel="noopener">Turning Opportunistic AI Inference Capacity Into Better Ads Recommendations</a>는 유휴 추론 용량을 랭킹에 쓰는 방식을 설명한다. <span class="badge ok">확인</span> Rank More Ads는 용량이 생길 때 랭킹 후보를 더 많이 평가하는 방식이고, Serve Better Models는 요청을 더 큰 모델로 보내는 방식이다. <span class="badge ok">확인</span> 효과 수치는 공개하지 않았다.</p>
 </li>
 </ul>
-<p><strong>MARM은 GEM을 서빙한다고 말하지 않는다.</strong> MARM 블로그 본문에 GEM은 <strong>등장하지 않는다</strong> (사이드바 &quot;Related Posts&quot; 링크에만 있다. 2026-08-09 전문 확인). 자기 규정은 <em>&quot;replaces a &#39;one-size-fits-all&#39; inference approach with intelligent request routing&quot;</em> + O(1T) 파라미터 스케일링이다. <strong>&quot;MARM이 GEM을 서빙한다&quot;는 그럴듯하지만 1차 출처가 없다.</strong> <span class="badge est">추정</span> — 근거는 같은 조직, 같은 시기, 같은 광고 지면이라는 정황뿐이다.</p>
+<h3 id="marm은-gem을-서빙한다고-말하지-않는다">MARM은 GEM을 서빙한다고 말하지 않는다</h3>
+<p>MARM 블로그 본문에 GEM은 <strong>등장하지 않는다.</strong> 사이드바 &quot;Related Posts&quot; 링크에만 있다(2026-08-09 전문 확인). MARM의 자기 규정은 요청별 라우팅과 O(1T) 파라미터 스케일링이고, 라우팅은 &quot;replaces a &#39;one-size-fits-all&#39; inference approach with intelligent request routing&quot;이라고 설명한다. <strong>&quot;MARM이 GEM을 서빙한다&quot;는 그럴듯하지만 1차 출처가 없다.</strong> <span class="badge est">추정</span> — 근거는 같은 조직, 같은 시기, 같은 광고 지면이라는 정황뿐이다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="두-계보가-서로를-인용하지-않는다--실측">두 계보가 서로를 인용하지 않는다 — 실측</h2>
-<p><span class="badge obs">관찰</span> 2026-08-09 — 검사한 코퍼스는 아래 표의 세 블로그 <strong>본문 3건</strong>이며(사이드바·Related Posts 제외), 각 본문을 받아 문자열을 센 결과다. 재현 방법은 다음과 같다. 각 URL의 본문을 받아 <code>HSTU</code>/<code>Wukong</code>/<code>InterFormer</code>/<code>GEM</code>의 등장 횟수를 센다. 이 코퍼스 밖(논문·내부 문서)에 대해서는 아무 말도 하지 않는다.</p>
+<p>광고 쪽 블로그 본문 세 건은 자기 계보를 밝히면서 HSTU를 한 번도 언급하지 않는다. <span class="badge obs">관찰</span> 2026-08-09</p>
+<ul>
+<li>검사한 코퍼스는 아래 표의 세 블로그 <strong>본문 3건</strong>이다. 사이드바와 Related Posts는 제외했다.</li>
+<li>각 본문을 받아 문자열을 센 결과다. 재현하려면 각 URL의 본문을 받아 <code>HSTU</code>/<code>Wukong</code>/<code>InterFormer</code>/<code>GEM</code>의 등장 횟수를 센다.</li>
+<li>이 코퍼스 밖(논문·내부 문서)에 대해서는 아무 말도 하지 않는다.</li>
+</ul>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col class="grow"><col class="w4"><col class="w6"><col class="w8"><col class="w6"></colgroup>
 <thead>
 <tr>
@@ -279,24 +443,39 @@ c3    [  1    1   1   0   0   1 ]
 <td>4</td>
 </tr>
 </tbody></table></div>
-<p><strong>독립된 세 문서에서 0이다.</strong> 광고 쪽이 자기 계보를 밝힐 때 HSTU를 한 번도 언급하지 않는다.</p>
-<p><span class="badge est">추정</span> <strong>&quot;Meta에 통합 추천 트랜스포머가 하나 있다&quot;는 흔한 오해다.</strong> 최소한 2026-08 시점 공개 문헌상으로는 organic 계보와 ads 계보가 별개의 논문 계통·별개의 인용 그래프를 갖는다. 다만 인용이 없다는 사실이 코드를 공유하지 않는다는 점을 증명하지는 않는다. 블로그는 원래 인용이 드물다.</p>
+<p><strong>독립된 세 문서에서 0이다.</strong></p>
+<p><span class="badge est">추정</span> <strong>&quot;Meta에 통합 추천 트랜스포머가 하나 있다&quot;는 흔한 오해다.</strong> 최소한 2026-08 시점 공개 문헌상으로는 organic 계보와 ads 계보가 별개의 논문 계통과 별개의 인용 그래프를 갖는다. 다만 인용이 없다는 사실이 코드를 공유하지 않는다는 점을 증명하지는 않는다. 블로그는 원래 인용이 드물다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="dv365--시퀀스를-늘리는-대신-미리-압축한다-instagram">DV365 — 시퀀스를 늘리는 대신 미리 압축한다 (Instagram)</h2>
-<p><span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2506.00450" target="_blank" rel="noopener">DV365: Extremely Long User History Modeling at Instagram</a>, KDD 2025. 수치와 운영 상세는 <a href="instagram.html">instagram.md</a>에 있다. 여기서는 <strong>구조적 위치</strong>만 정리한다.</p>
-<p>최대 70,000 / 평균 40,000 인터랙션을 다루는데, <strong>모델의 시퀀스 길이를 늘리지 않는다.</strong> offline에서 multi-slicing + pooling으로 200개 임베딩을 만들어 downstream 15개 모델에 공급한다. 논문의 주장은 기존 attention 계열 시퀀스 모델(HSTU 포함)에 추가로 적용해도 incremental하다는 것이다. 즉 <strong>attention은 40K 길이에서 수확이 체감한다</strong>고 본다. <span class="badge ok">확인</span></p>
-<p><span class="badge est">추정</span> <strong>Meta 안에 &quot;초장기 히스토리&quot;의 답이 셋 있다.</strong> ① HSTU는 시퀀스를 그대로 길게 쓰고, 비용은 Stochastic Length와 M-FALCON으로 상각한다. ② DV365는 오프라인에서 압축해 피처로 만든다. ③ LLaTTE는 비동기 upstream user model로 분리한다. ②와 ③은 &quot;무거운 계산을 랭커 밖으로 뺀다&quot;는 같은 형태이고, ULTRA-HSTU는 그 접근을 명시적으로 비판한다. <strong>세 방향이 동시에 프로덕션에 있다.</strong></p>
+<p>Instagram의 DV365는 <strong>모델의 시퀀스 길이를 늘리지 않고</strong>, 긴 이력을 오프라인에서 임베딩으로 미리 압축해 여러 모델에 공급한다. <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2506.00450" target="_blank" rel="noopener">DV365: Extremely Long User History Modeling at Instagram</a>, KDD 2025</p>
+<p>수치와 운영 상세는 <a href="instagram.html">instagram.md</a>에 있다. 여기서는 <strong>구조적 위치</strong>만 정리한다.</p>
+<ul>
+<li>다루는 이력은 최대 70,000 인터랙션이고, 평균은 40,000 인터랙션이다. <span class="badge ok">확인</span></li>
+<li>offline에서 multi-slicing과 pooling으로 임베딩 200개를 만들어 downstream 모델 15개에 공급한다. <span class="badge ok">확인</span></li>
+<li>논문은 기존 attention 계열 시퀀스 모델(HSTU 포함)에 추가로 적용해도 incremental하다고 주장한다. 즉 <strong>attention은 40K 길이에서 수확이 체감한다</strong>고 본다. <span class="badge ok">확인</span></li>
+</ul>
+<p>Meta 안에는 &quot;초장기 히스토리&quot;에 대한 답이 셋 있다. <span class="badge est">추정</span></p>
+<ul>
+<li>HSTU는 시퀀스를 그대로 길게 쓰고, 비용은 Stochastic Length와 M-FALCON으로 상각한다.</li>
+<li>DV365는 오프라인에서 압축해 피처로 만든다.</li>
+<li>LLaTTE는 비동기 upstream user model로 분리한다.</li>
+</ul>
+<p>DV365와 LLaTTE는 &quot;무거운 계산을 랭커 밖으로 뺀다&quot;는 같은 형태이고, ULTRA-HSTU는 그 접근을 명시적으로 비판한다. <strong>세 방향이 동시에 프로덕션에 있다.</strong> <span class="badge est">추정</span></p>
 <p>X에는 이런 구분 자체가 없다. Phoenix 공개 설정의 이력 길이는 훨씬 짧고, 이력을 압축하는 장치도 코드에 없다. <span class="badge ok">확인</span> xai-org/x-algorithm, 2026</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="통합-모델-주장을-읽는-법">&quot;통합 모델&quot; 주장을 읽는 법</h2>
+<p>Meta의 추천 모델 <strong>통합은 목표로 선언되었고, 아직 문헌상 증거가 없다.</strong> <span class="badge est">추정</span> <a href="#%EB%91%90-%EA%B3%84%EB%B3%B4%EA%B0%80-%EC%84%9C%EB%A1%9C%EB%A5%BC-%EC%9D%B8%EC%9A%A9%ED%95%98%EC%A7%80-%EC%95%8A%EB%8A%94%EB%8B%A4--%EC%8B%A4%EC%B8%A1">위 실측</a>(HSTU 인용 0회)과 아래 두 발언이 같은 방향을 가리킨다.</p>
 <p>이 노트를 쓰는 동안 가장 많이 잘못 인용된 부분이라 분명히 적어 둔다. 원문과 상세한 내용은 <a href="facebook.html">facebook.md</a>에 있다.</p>
 <ul>
-<li><span class="badge ok">확인</span> Zuckerberg Q3 2025: <em>&quot;there are <strong>three giant transformers</strong> that run Facebook, Instagram, and ads recommendations&quot;</em> 그리고 통합은 <em>&quot;working on&quot;</em> 단계라고 말한다. 따라서 <strong>현재 셋은 별개다.</strong> 또한 이 목록에 <strong>Threads가 없다.</strong> <a href="threads.html">threads.md</a>를 보라.</li>
-<li><span class="badge ok">확인</span> <strong>⚠ Susan Li Q4 2025의 &quot;consolidation&quot; 발언은 organic이 아니다.</strong> 문장에 &quot;Facebook Feed&quot;가 나오지만 성과 지표가 *&quot;a 12% increase in <strong>ads quality</strong>&quot;*다. 광고 랭킹 모델의 지면별 통합이지 유기 Feed 랭킹 통합이 아니다.</li>
+<li>Zuckerberg는 Q3 2025에 Facebook, Instagram, 광고 추천을 <strong>거대 트랜스포머 셋</strong>이 돌린다고 말했고, 통합은 &quot;working on&quot; 단계라고 했다. <span class="badge ok">확인</span> 따라서 <strong>Q3 2025 발언 기준으로 셋은 별개다.</strong> 또한 이 목록에 <strong>Threads가 없다.</strong> <a href="threads.html">threads.md</a>를 보라.<blockquote>
+<p>&quot;there are <strong>three giant transformers</strong> that run Facebook, Instagram, and ads recommendations&quot;</p>
+</blockquote>
+</li>
+<li class="warn"><strong>⚠ Susan Li의 Q4 2025 &quot;consolidation&quot; 발언은 organic 통합 이야기가 아니다.</strong> <span class="badge ok">확인</span> 문장에 &quot;Facebook Feed&quot;가 나오지만 성과 지표가 &quot;a 12% increase in <strong>ads quality</strong>&quot;다. 광고 랭킹 모델의 지면별 통합이지 유기 Feed 랭킹 통합이 아니다.</li>
 </ul>
-<p><span class="badge est">추정</span> 위 실측(HSTU 인용 0회)과 이 두 발언은 같은 방향을 가리킨다. <strong>통합은 목표로 선언되었고, 아직 문헌상 증거가 없다.</strong></p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="x-vs-meta--이-주제에서의-대조">X vs Meta — 이 주제에서의 대조</h2>
+<p><strong>&quot;dense feature를 없앤다&quot;는 같은 슬로건을 세 시스템이 서로 다른 정도로 실행한다.</strong> <span class="badge est">추정</span> 그리고 ads 계보는 아예 반대 방향으로 간다. LLaTTE는 semantic feature가 scaling의 전제조건이라고 말한다. 하나의 업계 트렌드로 묶어 서술하면 이 대립이 지워진다. <span class="badge est">추정</span></p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col class="w10"><col><col><col></colgroup>
 <thead>
 <tr>
@@ -315,25 +494,25 @@ c3    [  1    1   1   0   0   1 ]
 <tr>
 <td>후보 처리</td>
 <td>후보 블록 대각선 마스크</td>
-<td>interleaving + M-FALCON 마이크로배치</td>
+<td>interleaving과 M-FALCON 마이크로배치</td>
 <td>2-stage, upstream user model 분리</td>
 </tr>
 <tr>
 <td>정규화</td>
 <td>표준 softmax attention</td>
-<td><strong>pointwise aggregated + SiLU</strong></td>
+<td><strong>pointwise aggregated, SiLU</strong></td>
 <td>미공개</td>
 </tr>
 <tr>
 <td>위치/시간</td>
 <td>RoPE (배치 독립성 깨짐)</td>
-<td><code>rab^{p,t}</code> (위치+시간)</td>
+<td><code>rab^{p,t}</code> (위치와 시간)</td>
 <td>미공개</td>
 </tr>
 <tr>
 <td>dense feature</td>
 <td>남아 있음(age 버킷, dwell clip)</td>
-<td><strong>제거 + ablation으로 정당화</strong></td>
+<td><strong>제거, ablation으로 정당화</strong></td>
 <td>semantic feature가 <strong>필수</strong>라고 주장</td>
 </tr>
 <tr>
@@ -343,28 +522,33 @@ c3    [  1    1   1   0   0   1 ]
 <td>비율만 (블로그)</td>
 </tr>
 </tbody></table></div>
-<p><span class="badge est">추정</span> <strong>&quot;dense feature를 없앤다&quot;는 같은 슬로건을 세 시스템이 서로 다른 정도로 실행한다.</strong> 그리고 ads 계보는 아예 반대 방향으로 간다. LLaTTE는 semantic feature가 scaling의 전제조건이라고 말한다. 하나의 업계 트렌드로 묶어 서술하면 이 대립이 지워진다.</p>
 <hr>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="누가-이걸-쓰는가">누가 이걸 쓰는가</h2>
+<p>1차 출처로 확인한 사용처는 X와 Meta다. <span class="badge ok">확인</span> 그 밖의 서비스는 아직 조사하지 않았다.</p>
 <ul>
-<li><strong>X</strong> — Phoenix가 현행 프로덕션 랭커다. <span class="badge ok">확인</span> xai-org/x-algorithm, 2026-01 공개</li>
-<li><strong>X (2025 Scala 세대)</strong> — 같은 이름 <code>Phoenix</code>가 Scala home-mixer에도 rescorer로 들어가 있었다. 즉 트랜스포머 랭커가 기존 heavy ranker 옆에 붙는 형태로 먼저 들어갔고, 2026에 전면 교체되었다. <span class="badge ok">확인</span> twitter/the-algorithm <code>c54bec0</code>, 2025-09-03 — <code>PhoenixScorer</code> 외 7개 파일이 이 커밋에서 새로 추가되었다.</li>
-<li><strong>Meta (organic)</strong> — HSTU(ICML 2024) → ULTRA-HSTU(2026). <em>&quot;serving billions of users daily&quot;</em>. <strong>⚠ 논문이 지면을 익명화</strong>해서 어느 앱인지 확정할 수 없다. <span class="badge ok">확인</span>(존재) / <span class="badge est">추정</span>(지면) → <a href="facebook.html">facebook.md</a></li>
-<li><strong>Meta (ads)</strong> — DHEN → Wukong → InterFormer → GEM, 시퀀스 파트는 LLaTTE, 서빙은 MARM. Facebook Feed·Reels 광고에 배포되었다고 명시되어 있다. 2026-10 블로그 기준 GEM 백본은 Kunlun이고 Facebook·Instagram·Reels를 한 모델로 다룬다. <span class="badge ok">확인</span></li>
-<li><strong>Instagram</strong> — DV365가 Instagram·Threads의 <strong>15개 product model</strong>에 upstream으로 공급된다. 시퀀스 모델을 랭커 밖으로 뺀 형태다. <span class="badge ok">확인</span> → <a href="instagram.html">instagram.md</a></li>
-<li><strong>Threads</strong> — 자체 시퀀스 모델에 대한 진술이 없다. DV365의 <strong>소비처</strong>로만 언급된다. <span class="badge ok">확인</span> → <a href="threads.html">threads.md</a></li>
-<li><strong>그 외 서비스</strong> — 아직 조사하지 않았다. Pinterest TransAct와 Kuaishou 쪽이 같은 계열에 속할 가능성이 높지만, 이 저장소에서 아직 1차 출처로 확인하지 않았다. <strong>열린 질문이다.</strong></li>
+<li><strong>X</strong>: Phoenix가 현행 프로덕션 랭커다. <span class="badge ok">확인</span> xai-org/x-algorithm, 2026-01 공개</li>
+<li><strong>X (2025 Scala 세대)</strong>: 같은 이름 <code>Phoenix</code>가 Scala home-mixer(For You 피드를 조립하는 서비스)에도 rescorer로 들어가 있었다. 트랜스포머 랭커가 기존 heavy ranker 옆에 붙는 형태로 먼저 들어갔고, 2026에 전면 교체되었다. <span class="badge ok">확인</span> twitter/the-algorithm <code>c54bec0</code>, 2025-09-03<ul>
+<li><code>PhoenixScorer</code> 외 7개 파일이 이 커밋에서 새로 추가되었다.</li>
+<li>heavy ranker는 2025 Scala 세대의 프로덕션 랭커이고, x.md에서는 Navi라는 이름으로 나온다.</li>
+</ul>
+</li>
+<li><strong>Meta (organic)</strong>: HSTU(ICML 2024)에서 ULTRA-HSTU(2026)로 이어지고, ULTRA-HSTU는 &quot;serving billions of users daily&quot;라고 쓴다. <strong>⚠ 논문이 지면을 익명화</strong>해서 어느 앱인지 확정할 수 없다. <span class="badge ok">확인</span>(존재) / <span class="badge est">추정</span>(지면) 자세한 내용은 <a href="facebook.html">facebook.md</a>에 있다.</li>
+<li><strong>Meta (ads)</strong>: DHEN → Wukong → InterFormer → GEM으로 이어지고, 시퀀스 파트는 LLaTTE, 서빙은 MARM이다. Facebook Feed·Reels 광고에 배포되었다고 명시되어 있다. 2026-10 블로그 기준 GEM 백본은 Kunlun이고, Facebook·Instagram·Reels를 한 모델로 다룬다. <span class="badge ok">확인</span></li>
+<li><strong>Instagram</strong>: DV365가 Instagram·Threads의 <strong>product model 15개</strong>에 upstream으로 공급된다. 시퀀스 모델을 랭커 밖으로 뺀 형태다. <span class="badge ok">확인</span> 자세한 내용은 <a href="instagram.html">instagram.md</a>에 있다.</li>
+<li><strong>Threads</strong>: 자체 시퀀스 모델에 대한 진술이 없다. DV365의 <strong>소비처</strong>로만 언급된다. <span class="badge ok">확인</span> 자세한 내용은 <a href="threads.html">threads.md</a>에 있다.</li>
+<li><strong>그 외 서비스</strong>: 아직 조사하지 않았다. Pinterest TransAct와 Kuaishou 쪽이 같은 계열에 속할 가능성이 높지만, 이 저장소에서 아직 1차 출처로 확인하지 않았다. <strong>열린 질문이다.</strong></li>
 </ul>
 <p>재학습·신선도 쪽(GEM continuous online training, DV365 6시간 갱신)은 <a href="model-freshness.html">model-freshness.md</a>에 있다. 여기서 반복하지 않는다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="아직-확인하지-못한-것">아직 확인하지 못한 것</h2>
+<p>Meta 쪽은 HSTU의 배포 지면, 두 계보의 관계, MARM이 서빙하는 대상, 어텐션 마스크 형태 등을 아직 확인하지 못했다. X 쪽은 Phoenix의 프로덕션 시퀀스 길이를 모른다.</p>
 <ul>
-<li><strong>HSTU가 어느 지면에 돌아가는가.</strong> <em>&quot;a large internet platform&quot;</em>. ULTRA-HSTU가 *&quot;a large-scale production <strong>video serving platform</strong> that reaches billions of users daily&quot;*로 좁힌 것이 현재로서는 가장 구체적인 정보다. <a href="facebook.html">facebook.md</a>의 열린 질문 5를 보라.</li>
-<li><strong>두 계보가 실제로 코드를 공유하는가.</strong> 인용이 없다는 것은 실측했지만(위 표), 그것이 인프라 분리를 증명하지는 않는다.</li>
+<li><strong>HSTU가 어느 지면에 돌아가는가.</strong> HSTU 논문은 &quot;a large internet platform&quot;이라고만 쓴다. ULTRA-HSTU가 &quot;a large-scale production <strong>video serving platform</strong> that reaches billions of users daily&quot;로 좁힌 것이 현재로서는 가장 구체적인 정보다. <a href="facebook.html">facebook.md</a>의 열린 질문 5를 보라.</li>
+<li><strong>두 계보가 실제로 코드를 공유하는가.</strong> 인용이 없다는 것은 실측했지만(<a href="#%EB%91%90-%EA%B3%84%EB%B3%B4%EA%B0%80-%EC%84%9C%EB%A1%9C%EB%A5%BC-%EC%9D%B8%EC%9A%A9%ED%95%98%EC%A7%80-%EC%95%8A%EB%8A%94%EB%8B%A4--%EC%8B%A4%EC%B8%A1">위 표</a>), 그것이 인프라 분리를 증명하지는 않는다.</li>
 <li><strong>MARM이 무엇을 서빙하는가.</strong> 본문에 GEM이 없다. LLaTTE·GEM과의 관계는 정황뿐이다.</li>
 <li><strong>ULTRA-HSTU의 &quot;sparse attention&quot;과 &quot;model topology&quot; 실체.</strong> 초록 수준의 서술만 확인했다.</li>
-<li><strong>Meta 쪽 어텐션 마스크 형태.</strong> X는 코드로 마스크를 볼 수 있는데 Meta는 M-FALCON이 마스크를 *&quot;수정한다&quot;*는 데까지만 공개했다. 후보 간 격리가 정확히 어떤 형태인지는 확인하지 못했다.</li>
+<li><strong>Meta 쪽 어텐션 마스크 형태.</strong> X는 코드로 마스크를 볼 수 있는데, Meta는 M-FALCON이 마스크를 &quot;수정한다&quot;는 데까지만 공개했다. 후보 간 격리가 정확히 어떤 형태인지는 확인하지 못했다.</li>
 <li><strong>Phoenix의 프로덕션 시퀀스 길이.</strong> 공개된 것은 mini config뿐이다. Meta의 8192 / 40K와는 직접 비교할 수 없다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>

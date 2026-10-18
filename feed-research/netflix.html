@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self' 'sha256-SQoM1waKvArawtgHOajGQ6qVA/XBeZreK7kqaKNRUD0='; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Netflix — feed-research</title>
-<meta name="description" content="편성 카탈로그(수천~수만 타이틀) 위에서 &quot;소스별 후보 배분&quot;이 아니라 페이지(행×열) 구성을 최적화하는 시스템이다. 2015년부터 템플릿 없는 ML 페이지 생성을 적용했고 [확인], 2025년에는 Foundation Model로 회원 표현을 중앙화했으며 [확인], 2026년에는…">
+<meta name="description" content="Netflix 추천은 편성 카탈로그(수천~수만 타이틀) 위에서 &quot;소스별 후보 배분&quot;이 아니라 페이지(행×열) 구성을 최적화하는 시스템이다. 2015년부터 템플릿 없이 ML로 페이지를 생성했고 [확인], 2025년에는 Foundation Model(FM)로 회원 표현을 중앙화했다…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/netflix.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="Netflix — feed-research">
-<meta property="og:description" content="편성 카탈로그(수천~수만 타이틀) 위에서 &quot;소스별 후보 배분&quot;이 아니라 페이지(행×열) 구성을 최적화하는 시스템이다. 2015년부터 템플릿 없는 ML 페이지 생성을 적용했고 [확인], 2025년에는 Foundation Model로 회원 표현을 중앙화했으며 [확인], 2026년에는…">
+<meta property="og:description" content="Netflix 추천은 편성 카탈로그(수천~수만 타이틀) 위에서 &quot;소스별 후보 배분&quot;이 아니라 페이지(행×열) 구성을 최적화하는 시스템이다. 2015년부터 템플릿 없이 ML로 페이지를 생성했고 [확인], 2025년에는 Foundation Model(FM)로 회원 표현을 중앙화했다…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/netflix.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -46,7 +46,7 @@
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc toc-long"><summary>목차<span class="toc-n">13</span></summary><ol><li><a href="#한-줄-요약">한 줄 요약</a></li><li><a href="#세대-구분--이것을-먼저-알아야-자료가-헷갈리지-않는다">세대 구분</a></li><li><a href="#피드-지면">피드 지면</a></li><li><a href="#후보-생성-retrieval">후보 생성 (retrieval)</a></li><li><a href="#랭킹">랭킹</a><ol><li><a href="#foundation-model-2025-프로덕션">Foundation Model (2025, 프로덕션)</a></li><li><a href="#genrec-2026-대규모-ab">GenRec (2026, 대규모 A/B)</a></li><li><a href="#genrec의-서빙-층--별도-블로그로-공개-2026-07">GenRec의 서빙 층</a></li><li><a href="#genrec-arxiv-논문--블로그가-안-밝힌-정량치-2026-08-10">GenRec arXiv 논문</a></li><li><a href="#목적함수--가중합이-아니라-retention-계열">목적함수</a></li><li><a href="#고전-세대-랭커-참고용-2015">고전 세대 랭커 (참고용, 2015)</a></li></ol></li><li><a href="#재순위다양성필터">재순위·다양성·필터</a></li><li><a href="#아트워크비디오-프리뷰-개인화--maps-multimodal-asset-personalization-at-scale-2026-08-프로덕션">아트워크·비디오 프리뷰 개인화</a><ol><li><a href="#clip-기반-통합-two-tower--5개-캔버스-타입-단일-모델">CLIP 기반 통합 two-tower</a></li><li><a href="#mediafm--자체-tri-modal-foundation-model-비디오-프리뷰용">MediaFM</a></li><li><a href="#popularity-based-winner--오프라인-프록시-태스크">Popularity-Based Winner</a></li><li><a href="#netflix-embedding-store--인프라-레이어">Netflix Embedding Store</a></li><li><a href="#의미--아트워크프리뷰가-개인화-스택의-별개-축이-됐다">의미</a></li></ol></li><li><a href="#콜드스타트">콜드스타트</a></li><li><a href="#피드백-신호">피드백 신호</a></li><li><a href="#학습-주기평가">학습 주기·평가</a><ol><li><a href="#counterfactual-observability-프레임워크-2026-09-recsys-2026">Counterfactual observability 프레임워크 (2026-09, RecSys 2026)</a></li><li><a href="#추천의-가치-측정--선택-모델--소규모-nudge-ab-검증-ijio-논문-ec-26">추천의 가치 측정</a></li></ol></li><li><a href="#광고">광고</a></li><li><a href="#열린-질문">열린 질문</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
 <h2 id="한-줄-요약">한 줄 요약</h2>
-<p>편성 카탈로그(수천~수만 타이틀) 위에서 &quot;소스별 후보 배분&quot;이 아니라 <strong>페이지(행×열) 구성</strong>을 최적화하는 시스템이다. 2015년부터 템플릿 없는 ML 페이지 생성을 적용했고 <span class="badge ok">확인</span>, 2025년에는 Foundation Model로 회원 표현을 중앙화했으며 <span class="badge ok">확인</span>, 2026년에는 GenRec(LLM 랭커)과 GenPage(페이지 전체를 트랜스포머 하나로 생성)로 세대 전환이 진행 중이다 <span class="badge ok">확인</span>.</p>
+<p>Netflix 추천은 편성 카탈로그(수천~수만 타이틀) 위에서 &quot;소스별 후보 배분&quot;이 아니라 <strong>페이지(행×열) 구성</strong>을 최적화하는 시스템이다. 2015년부터 템플릿 없이 ML로 페이지를 생성했고 <span class="badge ok">확인</span>, 2025년에는 Foundation Model(FM)로 회원 표현을 중앙화했다 <span class="badge ok">확인</span>. 2026년에는 LLM 랭커 GenRec와, 페이지 전체를 트랜스포머 하나로 생성하는 GenPage로 세대 전환이 진행 중이다 <span class="badge ok">확인</span>.</p>
 <figure class="diagram" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 0 900 578" font-family="-apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif" role="img" aria-label="Netflix 추천 파이프라인 다이어그램">
 <style>
 .db{fill:var(--card,#fff);stroke:var(--line,#d9d5cd);stroke-width:1}
@@ -123,6 +123,7 @@
 <figcaption>Netflix 추천 파이프라인 — 페이지 구성 구조와 세대 전환</figcaption></figure>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="세대-구분--이것을-먼저-알아야-자료가-헷갈리지-않는다">세대 구분 — 이것을 먼저 알아야 자료가 헷갈리지 않는다</h2>
+<p>Netflix 추천 자료는 고전, 통합, FM, LLM-네이티브의 네 세대에 걸쳐 있다 <span class="badge ok">확인</span>(아래 표). LLM-네이티브 세대에서는 LLM 랭커 GenRec가 배치 연산 지면(요청이 올 때 계산하지 않고 미리 일괄 계산해 두는 추천 지면)의 10% 트래픽 A/B에서 이겼다 <span class="badge ok">확인</span>(<a href="#genrec-2026-%EB%8C%80%EA%B7%9C%EB%AA%A8-ab">GenRec 절</a>). 홈페이지를 생성하는 GenPage(RecSys 2026)도 나왔다 <span class="badge ok">확인</span>(<a href="#%EC%9E%AC%EC%88%9C%EC%9C%84%EB%8B%A4%EC%96%91%EC%84%B1%ED%95%84%ED%84%B0">재순위·다양성·필터 절</a>). 아직 전면 롤아웃 진술은 없다 <span class="badge ok">확인</span>(아래 표). 이 문서가 TMIS 2015라고 부르는 자료는 Gomez-Uribe와 Hunt의 논문 The Netflix Recommender System(2015)이다.</p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col class="w8"><col class="w8"><col class="grow"><col></colgroup>
 <thead>
 <tr>
@@ -135,266 +136,549 @@
 <tbody><tr>
 <td>고전</td>
 <td>~<span class="nw">2015</span>-<span class="nw">2022</span></td>
-<td>전용 랭커 여러 개(PVR, Top-N, Trending, CW, sims)와 템플릿-프리 페이지 생성, 밴딧(아트워크/빌보드)을 함께 썼다</td>
+<td>전용 랭커 여러 개(PVR, Top-N, Trending, Continue Watching, sims)와 템플릿 없는 페이지 생성, 밴딧(아트워크/빌보드)을 함께 썼다</td>
 <td><span class="badge ok">확인</span> TMIS <span class="nw">2015</span> 논문이 프로덕션 시스템을 서술한다</td>
 </tr>
 <tr>
 <td>통합</td>
 <td><span class="nw">2023</span>-<span class="nw">2024</span></td>
-<td>모델을 통합하는 흐름이다: consolidation(<span class="nw">2023</span>) → UniCoRn(검색과 추천을 합친 단일 랭커, RecSys <span class="nw">2024</span>)</td>
+<td>모델을 하나로 합치는 흐름이다. consolidation(<span class="nw">2023</span>)에 이어 UniCoRn(검색과 추천을 합친 단일 랭커, RecSys <span class="nw">2024</span>)이 나왔다</td>
 <td><span class="badge ok">확인</span></td>
 </tr>
 <tr>
 <td>FM</td>
 <td><span class="nw">2025</span>~</td>
-<td>Foundation Model(GPT식 시퀀스 트랜스포머)이 회원 표현을 중앙에서 생산하고, 월 단위로 사전학습하고 일 단위로 파인튜닝한다</td>
+<td>Foundation Model(GPT식 시퀀스 트랜스포머)이 회원 표현을 중앙에서 만든다. 월 단위로 사전학습하고 일 단위로 파인튜닝한다</td>
 <td><span class="badge ok">확인</span></td>
 </tr>
 <tr>
 <td>LLM-네이티브</td>
 <td><span class="nw">2026</span>~</td>
-<td>GenRec(LLM 랭커, <strong>배치 연산 지면</strong> 10% 트래픽 A/B 승리), GenPage(홈페이지 생성, RecSys <span class="nw">2026</span>)가 나왔다. 아직 전면 롤아웃 진술은 없다</td>
+<td>LLM 랭커 GenRec가 <strong>배치 연산 지면</strong> 10% 트래픽 A/B에서 이겼다. 홈페이지를 생성하는 GenPage(RecSys <span class="nw">2026</span>)도 나왔다. 아직 전면 롤아웃 진술은 없다</td>
 <td><span class="badge ok">확인</span> 실험 단계라는 점까지 포함한다</td>
 </tr>
 </tbody></table></div>
-<p>시중 분석 대부분은 고전 세대(2015 논문)를 기준으로 삼는다. X의 2023 스냅샷 고착과 같은 패턴이다.</p>
+<p>시중 분석은 대부분 고전 세대, 즉 2015 논문을 기준으로 삼는다. X의 2023 스냅샷 고착과 같은 패턴이다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="피드-지면">피드 지면</h2>
+<p>Netflix 홈페이지는 행과 열로 된 2차원 격자다. 행은 약 40개이고 행마다 최대 75개 타이틀이 들어가며, 개수는 디바이스마다 다르다 <span class="badge ok">확인</span> <a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">TMIS 2015</a>.</p>
 <ul>
-<li>홈페이지는 2차원 격자다. 행이 약 40개이고 행마다 최대 75개 타이틀이 들어가며, 개수는 디바이스별로 다르다 <span class="badge ok">확인</span> <a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">TMIS 2015</a></li>
-<li>행 종류는 장르행(PVR), Top Picks(Top-N 랭커), Trending Now, Continue Watching, Because You Watched(sims)이다 <span class="badge ok">확인</span> TMIS 2015. 각 행이 <strong>별도 랭커</strong>를 가졌다는 점이 고전 세대의 특징이다</li>
-<li>추천이 시청 시간의 약 80%에 영향을 주고, 나머지 20%는 검색이 담당한다 <span class="badge ok">확인</span> TMIS 2015 (2015년 수치라는 점에 주의한다)</li>
-<li>개인화와 추천으로 얻는 절감 효과는 &quot;$1B 이상/년&quot;이다 <span class="badge ok">확인</span> TMIS 2015. Netflix가 자체적으로 추산한 값이다</li>
-<li>2025-05에 TV 홈을 개편했다. 순간의 기분과 관심에 반응하는 추천을 넣었고, 모바일에서는 세로 클립 피드를 테스트한다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">About Netflix 2025</a></li>
+<li>행 종류는 장르행(PVR), Top Picks(Top-N 랭커), Trending Now, Continue Watching, Because You Watched(BYW, sims)다 <span class="badge ok">확인</span> TMIS 2015. 행마다 <strong>별도 랭커</strong>를 가졌다는 점이 고전 세대의 특징이다.</li>
+<li>추천은 시청 시간의 약 80%에 영향을 주고, 나머지 20%는 검색이 담당한다 <span class="badge ok">확인</span> TMIS 2015. 2015년 수치라는 점에 주의한다.</li>
+<li>개인화와 추천으로 얻는 절감 효과는 &quot;$1B 이상/년&quot;이다 <span class="badge ok">확인</span> TMIS 2015. Netflix가 자체적으로 추산한 값이다.</li>
+<li>2025-05에 TV 홈을 개편하면서 순간의 기분과 관심에 반응하는 추천을 넣었다. 모바일에서는 세로 클립 피드를 테스트한다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">About Netflix 2025</a>.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="후보-생성-retrieval">후보 생성 (retrieval)</h2>
-<p><strong>retrieval 레이어가 사실상 없다.</strong> PVR은 &quot;카탈로그 전체(또는 장르 필터된 부분집합)를 회원별로 정렬&quot;한다 <span class="badge ok">확인</span> TMIS 2015. 코퍼스가 수천~수만 규모라서 전 카탈로그 채점이 가능하고, X의 500/400 같은 소스별 상한이 등장할 이유가 없다. 배분 문제는 아이템 선별이 아니라 <strong>행 선택</strong>으로 옮겨간다 (→ <a href="candidate-allocation.html">candidate-allocation.md</a>).</p>
+<p><strong>retrieval 레이어가 사실상 없다.</strong> PVR은 &quot;카탈로그 전체(또는 장르 필터된 부분집합)를 회원별로 정렬&quot;한다 <span class="badge ok">확인</span> TMIS 2015. 코퍼스가 수천~수만 규모라서 카탈로그 전체를 채점할 수 있고, X의 500/400 같은 소스별 상한이 등장할 이유가 없다. 배분 문제는 아이템 선별이 아니라 <strong>행 선택</strong>으로 옮겨 간다(→ <a href="candidate-allocation.html">candidate-allocation.md</a>).</p>
 <ul>
-<li>행 후보는 회원당 수만 개(&quot;tens of thousands of rows&quot;)에 이르고, 행 선택 알고리즘이 관련성과 다양성을 기준으로 선별하고 정렬한다 <span class="badge ok">확인</span> TMIS 2015</li>
-<li>2015년부터 템플릿을 폐지해서 &quot;BYW 행이 하나도 없는 홈도, 절반이 BYW인 홈도&quot; 허용한다 <span class="badge ok">확인</span> TMIS 2015</li>
-<li>FM 시대에는 임베딩 스토어에 회원 임베딩과 타이틀 임베딩을 일 단위로 배치 생산한다. 검색용이 아니라 다운스트림 모델의 피처이면서 후보 소스로도 함께 쓴다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">FM 통합 블로그 2025</a></li>
+<li>행 후보는 회원당 수만 개(&quot;tens of thousands of rows&quot;)에 이르고, 행 선택 알고리즘이 관련성과 다양성을 기준으로 골라 정렬한다 <span class="badge ok">확인</span> TMIS 2015.</li>
+<li>2015년부터 템플릿을 없애, &quot;BYW 행이 하나도 없는 홈도, 절반이 BYW인 홈도&quot; 허용한다 <span class="badge ok">확인</span> TMIS 2015.</li>
+<li>FM 시대에는 임베딩 스토어에 회원 임베딩과 타이틀 임베딩을 일 단위로 배치 생산한다. 이 임베딩은 검색용이 아니라 다운스트림 모델의 피처이고, 후보 소스로도 함께 쓴다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">FM 통합 블로그 2025</a>.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="랭킹">랭킹</h2>
+<p>프로덕션에서는 Foundation Model(FM)이 회원 표현을 만들고, 다운스트림 모델이 이를 세 가지 방식으로 가져다 쓴다 <span class="badge ok">확인</span>(<a href="#foundation-model-2025-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98">Foundation Model 절</a>). LLM 랭커 GenRec는 배치 연산 지면의 대규모 A/B에서 단기·장기 지표를 모두 개선했지만, 블로그와 논문 모두 전면 롤아웃을 밝히지 않았다 <span class="badge ok">확인</span>(<a href="#genrec-2026-%EB%8C%80%EA%B7%9C%EB%AA%A8-ab">GenRec 절</a>, <a href="#genrec-arxiv-%EB%85%BC%EB%AC%B8--%EB%B8%94%EB%A1%9C%EA%B7%B8%EA%B0%80-%EC%95%88-%EB%B0%9D%ED%9E%8C-%EC%A0%95%EB%9F%89%EC%B9%98-2026-08-10">논문 절</a>). 2024년 장기 만족 블로그 기준으로 목적함수는 행동 확률의 가중합이 아니라, retention을 north star로 둔 프록시 보상이다 <span class="badge ok">확인</span>(<a href="#%EB%AA%A9%EC%A0%81%ED%95%A8%EC%88%98--%EA%B0%80%EC%A4%91%ED%95%A9%EC%9D%B4-%EC%95%84%EB%8B%88%EB%9D%BC-retention-%EA%B3%84%EC%97%B4">목적함수 절</a>).</p>
 <h3 id="foundation-model-2025-프로덕션">Foundation Model (2025, 프로덕션)</h3>
-<p><span class="badge ok">확인</span> <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" rel="noopener">FM 블로그 2025-03</a>:</p>
+<p>FM은 회원의 상호작용 이력을 토큰 시퀀스로 바꿔, GPT식 autoregressive next-token prediction으로 학습하는 모델이다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" rel="noopener">FM 블로그 2025-03</a>. 다운스트림 모델이 FM을 쓰는 방식은 3가지이고, 모두 프로덕션이다 <span class="badge ok">확인</span> 두 글을 합산한 결과다.</p>
 <ul>
-<li>GPT식 autoregressive next-token prediction을 쓰고, 상호작용 이력을 토큰화한다(BPE에 비유하자면 인접 행동을 병합한다)</li>
-<li>토큰마다 이질적인 피처를 담되 request-time(시각·디바이스·위치)과 post-action(타이틀·시청시간)을 분리한다</li>
-<li>가중 목적함수를 쓴다: &quot;5분 트레일러 재생과 2시간 완주가 같은 가중치일 수 없다&quot;. 여기에 multi-token prediction을 더해 근시안적 최적화를 방지한다</li>
-<li>스케일링 법칙을 확인했다는 진술이 있다: &quot;데이터·모델 크기 증가에 따라 일관된 개선&quot;이라고 서술한다</li>
-<li>파라미터 수는 비공개다. 2M→1B 스케일 연구(2026)는 production-shadow 단계에 있다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2605.23312" target="_blank" rel="noopener">arXiv 2605.23312</a></li>
-<li>소비 방식은 3모드이고 전부 프로덕션이다: ① 다중 예측 헤드 직결(FM 블로그 2025-03), ② 임베딩 스토어, ③ 서브그래프와 파인튜닝이다(②③은 통합 블로그 2025-11이 열거한다) <span class="badge ok">확인</span> 두 글을 합산한 결과다</li>
+<li>다중 예측 헤드에 직접 연결한다(FM 블로그 2025-03).</li>
+<li>임베딩 스토어를 거쳐 쓴다(통합 블로그 2025-11).</li>
+<li>서브그래프와 파인튜닝 방식으로 쓴다(통합 블로그).</li>
+</ul>
+<p>모델 설계와 규모에 대해 알려진 것은 이렇다.</p>
+<ul>
+<li>상호작용 이력을 토큰으로 바꿀 때 인접한 행동을 병합한다. BPE에 비유할 수 있는 방식이다 <span class="badge ok">확인</span> FM 블로그.</li>
+<li>토큰마다 이질적인 피처를 담되, request-time 피처와 post-action 피처를 분리한다 <span class="badge ok">확인</span> FM 블로그.<ul>
+<li>request-time 피처는 시각·디바이스·위치다.</li>
+<li>post-action 피처는 타이틀·시청시간이다.</li>
+</ul>
+</li>
+<li>목적함수에 가중을 두고, multi-token prediction을 더해 근시안적 최적화를 막는다 <span class="badge ok">확인</span> FM 블로그.<ul>
+<li>블로그의 표현은 &quot;5분 트레일러 재생과 2시간 완주가 같은 가중치일 수 없다&quot;이다.</li>
+</ul>
+</li>
+<li>스케일링 법칙을 확인했다는 진술이 있다 <span class="badge ok">확인</span> FM 블로그. 블로그는 &quot;데이터·모델 크기 증가에 따라 일관된 개선&quot;이라고 서술한다.</li>
+<li>프로덕션 FM의 파라미터 수는 비공개다. 2M→1B 스케일 연구(2026)는 production-shadow 단계에 있다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2605.23312" target="_blank" rel="noopener">arXiv 2605.23312</a>.<ul>
+<li>production-shadow는 실제 트래픽으로 모델을 돌리되, 그 결과를 회원에게 보여 주지 않는 단계다.</li>
+</ul>
+</li>
 </ul>
 <h3 id="genrec-2026-대규모-ab">GenRec (2026, 대규모 A/B)</h3>
-<p><span class="badge ok">확인</span> <a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec 블로그 2026-07</a>:</p>
+<p>GenRec는 내부 LLM을 Netflix 데이터로 post-training한 랭커다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec 블로그 2026-07</a>. 입력을 피처 벡터 대신 문장으로 풀어 넣고, 후보 집합 전체를 forward pass 한 번으로 채점한다 <span class="badge ok">확인</span> GenRec 블로그. 배치 연산 지면에서 돌린 대규모 A/B에서는 단기 지표와 장기 지표가 모두 유의미하게 개선됐다 <span class="badge ok">확인</span> GenRec 블로그.</p>
 <ul>
-<li>내부 LLM을 Netflix 데이터로 post-training한 랭커다. 2단계로 구성된다: Netflix-adapted LLM(&quot;updated relatively infrequently&quot;)과 랭킹 post-training(&quot;refreshed more frequently&quot;)이다</li>
-<li>피처 벡터 대신 **언어화(verbalization)**를 쓴다: &quot;The context window becomes our new &#39;feature budget&#39;&quot;. User message는 *&quot;verbalized context, profile, history, item metadata, and task&quot;*로 구성된다</li>
-<li><strong>채점은 텍스트 생성이 아니다.</strong> 백본에서 *&quot;we extract a pooled hidden state h&quot;*를 뽑고, 아이템 i의 학습된 임베딩 eᵢ와 scoring head ϕ가 <em>&quot;(e.g., via dot product or small MLP)&quot;</em> 결합해 sᵢ를 내며, softmax로 순위를 매긴다. <em>&quot;All parameters — the backbone, scoring head, and item embeddings — are trained jointly.&quot;</em> 즉 LLM 백본에 학습형 아이템 임베딩 채점기를 붙인 구조이지 생성 모델이 아니다</li>
-<li>prefill-only 방식이다: <em>&quot;the model consumes the prompt once and scores the entire candidate set in a single forward pass, with no token-by-token decoding&quot;</em>. 후보당 1패스가 아니라 <strong>후보 집합 전체가 1패스</strong>다. 서빙 비용 동인 3개를 명시하고(모델 크기, 컨텍스트 길이, prefill vs autoregressive), vLLM을 쓴다</li>
-<li>컨텍스트 엔지니어링 규칙은 4개다: high-signal(long play·thumbs-up)은 <em>retain in full</em>, low-signal(아주 짧은 재생·quick hover)은 <em>omit</em>, 반복 행동(binge-watching)은 <em>summarize or compress</em>, 신작과 콜드스타트 아이템은 <em>elaborate selectively</em>로 처리한다. 압축 결과는 *&quot;roughly one-third of the original budget with negligible degradation in offline ranking metrics&quot;*다 (⚠ 열화가 무시할 만하다는 것은 <strong>오프라인 지표 한정</strong>이다)</li>
-<li>reward-weighted loss로 장기 만족을 정렬한다(full RL은 아니고, GRPO는 &quot;higher cost&quot; 때문에 future work로 남겼다). 가중치의 출처는 둘이다: 장기 만족 프록시(<em>&quot;return behavior, catalog exploration, or sustained engagement&quot;</em>)와 콘텐츠 타입·출시 단계 리밸런싱(<em>&quot;games vs. movies, new releases vs. evergreen titles&quot;</em>)이다</li>
-<li>성과는 이렇다. Phase-2 라벨을 &quot;roughly 40×&quot; 적게 쓰고 오프라인 MRR은 &quot;about +1.6%&quot;였다 (별도로 프로덕션과 대등하거나 그 이상이라는 점을 *&quot;10–40× fewer Phase-2 labeled examples, depending on configuration&quot;*로 서술한다. 40×는 MRR 진술에만 묶어서 써야 한다)</li>
-<li>온라인 실험은 이렇다: <em>&quot;we ran a large A/B test on batch-compute recommendation surfaces, covering ~10% of Netflix traffic over ~4 weeks&quot;</em>. 단기 지표와 장기 지표가 모두 유의미하게 개선됐다. ⚠ <strong>배치 연산 지면 한정</strong>이라는 조건이 명시돼 있다. <span class="badge est">추정</span> 실시간 서빙 지면에 적용했는지는 글이 긍정도 부정도 하지 않는다. &quot;실시간엔 아직 안 갔다&quot;고 읽으면 그것은 우리 추론이지 출처가 아니다</li>
-<li>랭킹 백본은 *&quot;~1B to ~10B parameters&quot;*다. <strong>유기 피드 랭킹 경로에 LLM이 들어갔다는, 업계 최초급의 1차 진술이다</strong> (→ <a href="llm-in-recsys.html">llm-in-recsys.md</a>의 주장을 수정했다)</li>
-<li>Limitations/Future Work 절이 없다 <span class="badge obs">관찰</span> 2026-08-09 재확인. 전망을 담은 문장은 여기저기 흩어져 있다: <em>&quot;substantial headroom as we further scale data and input signals&quot;</em>, <em>&quot;opens the door to natural-language steering for future experiences&quot;</em>, 추천 이유 설명 같은 *&quot;text-generation use cases&quot;*가 그것이다</li>
+<li>GenRec는 2단계로 구성된다 <span class="badge ok">확인</span> GenRec 블로그.<ul>
+<li>첫 단계(Phase 1)는 Netflix-adapted LLM이고, 비교적 드물게 갱신한다(&quot;updated relatively infrequently&quot;).</li>
+<li>둘째 단계(Phase 2)는 랭킹 post-training이고, 더 자주 갱신한다(&quot;refreshed more frequently&quot;).</li>
+</ul>
+</li>
+<li>피처 벡터 대신 <strong>언어화</strong>(verbalization)를 쓴다 <span class="badge ok">확인</span> GenRec 블로그.<ul>
+<li>블로그는 이를 &quot;The context window becomes our new &#39;feature budget&#39;&quot;이라고 표현한다.</li>
+<li>User message는 다음 요소로 구성된다: <em>&quot;verbalized context, profile, history, item metadata, and task&quot;</em>.</li>
+</ul>
+</li>
+<li><strong>채점은 텍스트 생성이 아니다.</strong> LLM 백본에 학습형 아이템 임베딩 채점기를 붙인 구조이지, 생성 모델이 아니다 <span class="badge ok">확인</span> GenRec 블로그.<ul>
+<li>백본에서 pooled hidden state h를 뽑는다: <em>&quot;we extract a pooled hidden state h&quot;</em>.</li>
+<li>아이템 i의 학습된 임베딩 eᵢ와 scoring head ϕ가 결합해 sᵢ를 내고, softmax로 순위를 매긴다. 결합 방식의 예는 이렇다: <em>&quot;(e.g., via dot product or small MLP)&quot;</em>.</li>
+<li>세 부분은 함께 학습한다: <em>&quot;All parameters — the backbone, scoring head, and item embeddings — are trained jointly.&quot;</em></li>
+</ul>
+</li>
+<li>prefill(프롬프트를 읽어 내부 상태만 만드는 단계)만 쓰는 방식이고, 후보당 1패스가 아니라 <strong>후보 집합 전체가 1패스</strong>다 <span class="badge ok">확인</span> GenRec 블로그.<ul>
+<li>블로그의 설명은 이렇다: <em>&quot;the model consumes the prompt once and scores the entire candidate set in a single forward pass, with no token-by-token decoding&quot;</em>.</li>
+<li>서빙 비용 동인 3개(모델 크기, 컨텍스트 길이, prefill vs autoregressive)를 명시하고, vLLM을 쓴다.</li>
+</ul>
+</li>
+<li>컨텍스트 엔지니어링 규칙은 4개다 <span class="badge ok">확인</span> GenRec 블로그.<ul>
+<li>long play·thumbs-up 같은 high-signal 행동은 전부 남긴다(<em>retain in full</em>).</li>
+<li>아주 짧은 재생·quick hover 같은 low-signal 행동은 뺀다(<em>omit</em>).</li>
+<li>binge-watching 같은 반복 행동은 요약하거나 압축한다(<em>summarize or compress</em>).</li>
+<li>신작과 콜드스타트 아이템은 골라서 자세히 쓴다(<em>elaborate selectively</em>).</li>
+<li>블로그는 압축 결과를 이렇게 적는다: <em>&quot;roughly one-third of the original budget with negligible degradation in offline ranking metrics&quot;</em>. ⚠ 열화가 무시할 만하다는 것은 <strong>오프라인 지표 한정</strong>이다.</li>
+</ul>
+</li>
+<li>reward-weighted loss로 장기 만족에 맞춘다. full RL은 아니고, 강화학습 계열인 GRPO는 &quot;higher cost&quot; 때문에 future work로 남겼다 <span class="badge ok">확인</span> GenRec 블로그.<ul>
+<li>가중치의 한 출처는 장기 만족 프록시다: <em>&quot;return behavior, catalog exploration, or sustained engagement&quot;</em>.</li>
+<li>다른 출처는 콘텐츠 타입·출시 단계 리밸런싱이다: <em>&quot;games vs. movies, new releases vs. evergreen titles&quot;</em>.</li>
+</ul>
+</li>
+<li>Phase-2 라벨을 &quot;roughly 40×&quot; 적게 쓰고, 오프라인 MRR(정답 아이템 순위의 역수 평균)은 &quot;about +1.6%&quot;였다 <span class="badge ok">확인</span> GenRec 블로그.<ul>
+<li>블로그는 이와 별도로, 프로덕션과 대등하거나 그 이상이라는 점을 이렇게 쓴다: <em>&quot;10–40× fewer Phase-2 labeled examples, depending on configuration&quot;</em>.</li>
+<li>40×는 MRR 진술에만 묶어서 써야 한다.</li>
+</ul>
+</li>
+<li>배치 연산 지면의 온라인 A/B에서는 단기 지표와 장기 지표가 모두 유의미하게 개선됐다 <span class="badge ok">확인</span> GenRec 블로그.<ul>
+<li>실험 규모는 이렇다: <em>&quot;we ran a large A/B test on batch-compute recommendation surfaces, covering ~10% of Netflix traffic over ~4 weeks&quot;</em>.</li>
+<li class="warn">⚠ <strong>배치 연산 지면 한정</strong>이라는 조건이 명시돼 있다.</li>
+<li>실시간 서빙 지면에 적용했는지는 글이 긍정도 부정도 하지 않는다 <span class="badge est">추정</span>. &quot;실시간엔 아직 안 갔다&quot;고 읽으면 그것은 우리 추론이지 출처가 아니다.</li>
+</ul>
+</li>
+<li>랭킹 백본의 크기는 이렇다: <em>&quot;~1B to ~10B parameters&quot;</em>. <strong>유기 피드 랭킹 경로에 LLM이 들어갔다는, 업계 최초급의 1차 진술이다.</strong> <span class="badge ok">확인</span> GenRec 블로그 (→ <a href="llm-in-recsys.html">llm-in-recsys.md</a>의 주장을 수정했다)</li>
+<li>Limitations/Future Work 절이 없다 <span class="badge obs">관찰</span> 2026-08-09 재확인. 전망을 담은 문장은 본문 곳곳에 흩어져 있다.<ul>
+<li><em>&quot;substantial headroom as we further scale data and input signals&quot;</em></li>
+<li><em>&quot;opens the door to natural-language steering for future experiences&quot;</em></li>
+<li>추천 이유 설명 같은 <em>&quot;text-generation use cases&quot;</em></li>
+</ul>
+</li>
 </ul>
 <h3 id="genrec의-서빙-층--별도-블로그로-공개-2026-07">GenRec의 서빙 층 — 별도 블로그로 공개 (2026-07)</h3>
-<p><span class="badge ok">확인</span> <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a>, 2026-07-17. GenRec가 어느 인프라 위에서 돌아가는지를 절반쯤 알려주는 글이다. 원문은 archive.org 스냅샷으로 확보했다.</p>
+<p>별도의 서빙 블로그는 GenRec가 어느 인프라 위에서 돌아가는지를 절반쯤 알려 준다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a>, 2026-07-17. Netflix는 2025년 여름까지 추론 엔진을 TensorRT-LLM에서 vLLM으로 바꿨고, XGBoost부터 LLM까지 모든 모델을 같은 gRPC 호출로 채점한다 <span class="badge ok">확인</span> 서빙 블로그. 원문은 archive.org 스냅샷으로 확보했다.</p>
 <ul>
-<li><strong>엔진 전환 시점과 워크로드 폭이 곧 근거다.</strong> 원래 TensorRT-LLM으로 시작했고, *&quot;By summer 2025&quot;*에 vLLM으로 전환했다. 결정적인 이유는 워크로드 확장이다: <em>&quot;embedding generation, <strong>prefill-only inference for ranking and retrieval</strong>, autoregressive decoding, and custom models with non-trivial per-step constraint logic&quot;</em>. GenRec가 서빙 스택 선정 기준이 된 4대 워크로드 중 하나로 명시돼 등장한다</li>
-<li><strong>모델 종류를 가리지 않는 공통 서빙</strong> — Model Scoring Service(MSS)가 *&quot;the shared inference backend, supporting XGBoost, TensorFlow, PyTorch, and LLMs behind a unified interface&quot;*이고, Triton 위에 Java control plane을 올렸다. 설계 원칙도 명시한다: <em>&quot;A key design goal of our system was that LLM models should NOT be special snowflakes. Every model — XGBoost ensemble or large-scale LLMs — is scored via the same gRPC call&quot;</em>. OpenAI-compatible API는 <strong>추가 프론트엔드</strong>로만 붙였다</li>
-<li><strong>콜드스타트를 인프라로 해결한다</strong> — <em>&quot;We materialize models on Amazon FSx at the time of model announcement&quot;</em>. 큰 LLM을 부트 시점에 S3나 HF에서 받으면 스케줄러 타임아웃을 넘기기 때문에, 모델 공표 시점에 고성능 파일 시스템으로 미리 물질화해 둔다. Netflix 특유의 &quot;편성 카탈로그 = 아이템 유입이 이벤트&quot;라는 성질이 서빙 층에도 그대로 나타난다</li>
-<li><strong>constrained decoding scaling — 배치 사이즈 상한을 결정한 사건</strong> — vLLM V0에서는 커스텀 logits processor가 요청별로 순차 실행됐다: <em>&quot;the GIL prevents Python from parallelizing the per-request work. CPU time in logit processing therefore grows linearly with batch size&quot;</em>. V1(Q4 2025)에서 batch-level로 재구조화하고 *&quot;reimplemented the hot path in C++ with multi-threading to step around the GIL&quot;*를 더한 결과, *&quot;logits processing time staying flat as batch size grows&quot;*를 얻었다. GenRec의 &quot;후보 집합 전체 1패스&quot; 채점이 배치 스케일에서 성립하는 이유가 여기에 있다. 그리고 partial prefill과 preemption에서 state machine을 재동기화해야 한다는 운영상 주의할 점 2개가 뒤이어 나온다</li>
-<li><strong>배포 전략의 결정</strong> — Red-Black(안정 인터페이스)과 Versioned(스키마 변경)를 함께 쓴다. <em>&quot;Versioned solves that gap by maintaining an independent deployment for every (modelId, modelVersion) pair&quot;</em>. 스키마가 바뀌는 GenRec 세대 전환에서 구 모델과 신 모델이 동시에 서비스되는 기간을 GPU 비용으로 사는 구조다</li>
-<li><strong>미공개</strong>: GPU 세대, QPS, batch size, latency 절대값은 이 글에도 없다 <span class="badge obs">관찰</span> 2026-08-10 원문 재확인. Model FLOPs 지표나 스루풋 수치도 나오지 않는다. GenRec의 배치 서빙 비용 상한선을 계산하려면 이 항목을 열린 질문으로 유지해야 한다</li>
+<li>엔진 전환 시점과 워크로드의 폭이 근거다 <span class="badge ok">확인</span> 서빙 블로그.<ul>
+<li>처음에는 TensorRT-LLM으로 시작했고, <em>&quot;By summer 2025&quot;</em> 시점에 vLLM으로 전환했다.</li>
+<li>결정적인 이유는 워크로드 확장이다: <em>&quot;embedding generation, <strong>prefill-only inference for ranking and retrieval</strong>, autoregressive decoding, and custom models with non-trivial per-step constraint logic&quot;</em>.</li>
+<li>GenRec가 서빙 스택 선정 기준이 된 4대 워크로드 중 하나로 명시돼 등장한다.</li>
+</ul>
+</li>
+<li>모델 종류를 가리지 않는 공통 서빙 경로를 쓴다 <span class="badge ok">확인</span> 서빙 블로그.<ul>
+<li>Model Scoring Service(MSS)가 공용 추론 백엔드다: <em>&quot;the shared inference backend, supporting XGBoost, TensorFlow, PyTorch, and LLMs behind a unified interface&quot;</em>.</li>
+<li>구조는 Triton 위에 Java control plane을 올린 형태다.</li>
+<li>설계 원칙도 명시한다: <em>&quot;A key design goal of our system was that LLM models should NOT be special snowflakes. Every model — XGBoost ensemble or large-scale LLMs — is scored via the same gRPC call&quot;</em>.</li>
+<li>OpenAI-compatible API는 <strong>추가 프론트엔드</strong>로만 붙였다.</li>
+</ul>
+</li>
+<li>콜드스타트를 인프라로 해결한다 <span class="badge ok">확인</span> 서빙 블로그.<ul>
+<li>큰 LLM을 부트 시점에 S3나 HF에서 받으면 스케줄러 타임아웃을 넘긴다.</li>
+<li>그래서 모델 공표 시점에 고성능 파일 시스템으로 미리 물질화해 둔다: <em>&quot;We materialize models on Amazon FSx at the time of model announcement&quot;</em>.</li>
+<li>Netflix 특유의 &quot;편성 카탈로그 = 아이템 유입이 이벤트&quot;라는 성질이 서빙 층에도 그대로 나타난다.</li>
+</ul>
+</li>
+<li>constrained decoding의 확장 문제가 배치 크기의 상한을 정했다 <span class="badge ok">확인</span> 서빙 블로그.<ul>
+<li>constrained decoding은 디코딩할 때 고를 수 있는 토큰을 규칙으로 제한하는 방식이다.</li>
+<li>vLLM V0에서는 커스텀 logits processor가 요청마다 순차로 실행됐다: <em>&quot;the GIL prevents Python from parallelizing the per-request work. CPU time in logit processing therefore grows linearly with batch size&quot;</em>.</li>
+<li>V1(Q4 2025)은 이 처리를 batch-level로 재구조화하고, hot path를 C++ 멀티스레딩으로 다시 짰다: <em>&quot;reimplemented the hot path in C++ with multi-threading to step around the GIL&quot;</em>.</li>
+<li>그 결과 배치가 커져도 logits 처리 시간이 늘지 않았다: <em>&quot;logits processing time staying flat as batch size grows&quot;</em>.</li>
+<li>GenRec의 &quot;후보 집합 전체 1패스&quot; 채점이 배치 스케일에서 성립하는 이유가 여기에 있다.</li>
+<li>운영상 주의할 점 2개가 뒤이어 나온다. partial prefill과 preemption에서 state machine을 재동기화해야 한다는 것이다.</li>
+</ul>
+</li>
+<li>배포에는 Red-Black과 Versioned를 함께 쓴다 <span class="badge ok">확인</span> 서빙 블로그.<ul>
+<li>Red-Black은 인터페이스가 안정적일 때, Versioned는 스키마가 바뀔 때 쓴다: <em>&quot;Versioned solves that gap by maintaining an independent deployment for every (modelId, modelVersion) pair&quot;</em>.</li>
+<li>스키마가 바뀌는 GenRec 세대 전환에서는 구 모델과 신 모델이 동시에 서비스되는 기간을 GPU 비용으로 사는 구조다.</li>
+</ul>
+</li>
+<li>GPU 세대, QPS, batch size, latency 절대값은 이 글에도 없다 <span class="badge obs">관찰</span> 2026-08-10 원문 재확인.<ul>
+<li>Model FLOPs 지표나 스루풋 수치도 나오지 않는다.</li>
+<li>GenRec의 배치 서빙 비용 상한선을 계산하려면 이 항목을 열린 질문으로 유지해야 한다.</li>
+</ul>
+</li>
 </ul>
 <h3 id="genrec-arxiv-논문--블로그가-안-밝힌-정량치-2026-08-10">GenRec arXiv 논문 — 블로그가 안 밝힌 정량치 (2026-08-10)</h3>
-<p><span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a>, 2026-08-10. 블로그와 같은 시스템을 다룬 학술판이다. 저자는 6명이고(Ying Li, Shradha Sehgal, Arjun Rao, Rein Houthooft, Yaochen Zhu, Ashish Rastogi), §8에 팀별 전체 기여자 명단이 실려 있다. 블로그와 명시적으로 모순되는 내용은 없고, <strong>정량 세부·손실 수식·팀 구조</strong>가 새로 나온다.</p>
+<p>GenRec 논문은 블로그와 같은 시스템을 다룬 학술판이다. 블로그와 명시적으로 모순되는 내용은 없고, <strong>정량 세부·손실 수식·팀 구조</strong>가 새로 나온다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a>, 2026-08-10. 저자는 6명이고(Ying Li, Shradha Sehgal, Arjun Rao, Rein Houthooft, Yaochen Zhu, Ashish Rastogi), §8에 팀별 전체 기여자 명단이 실려 있다.</p>
 <ul>
-<li><strong>온라인 코어 지표의 실측값을 처음으로 공개했다</strong> — <em>&quot;we observe a +0.006% relative improvement on our core online metric, which is statistically meaningful at Netflix scale&quot;</em>. 블로그는 &quot;statistically significant&quot;만 썼고 절대값이 없었다. 그리고 논문이 스스로 이 값을 &quot;at Netflix scale에서 유의미&quot;로 규정한다 <span class="badge ok">확인</span> §5.1</li>
-<li><strong>Phase 1과 Phase 2의 기여를 각각 분해했다</strong> — Phase 1은 OSS 백본 대비 offline MRR이 +10–20%이고, Phase 2는 Phase 1의 최신 시점 대비 +35–50%다. <strong>Phase 1 학습 2주 후에는 Phase 2의 상대 이득이 ~80%로 벌어진다.</strong> 논문이 그 이유를 명시한다: <em>&quot;increasing staleness of the less frequently updated Phase-1 backbone&quot;</em> <span class="badge ok">확인</span> §5.3. <strong>시간 축이 두 phase의 상대적 가치를 결정한다</strong>는 사실이 새로 드러났다</li>
-<li><strong>컨텍스트 압축의 절대 예시와 서빙 비용 1/3</strong> — *&quot;the context length can be reduced to roughly a third of the original token budget (for example, from about 5,000 tokens down to about 1,700 tokens) with only negligible degradation&quot;*와 *&quot;serving cost is reduced to roughly a third of original cost as well&quot;*가 나란히 나온다. 블로그의 &quot;roughly one-third&quot;에 절대 토큰 예시가 붙었고, 비용도 함께 1/3로 줄어든다는 정량 주장이 더해졌다 <span class="badge ok">확인</span> §5.4</li>
-<li><strong>손실 함수 수식</strong>은 ℒ = α·ℒ_ranking + β·ℒ_language + γ·ℒ_miscellaneous이고 α+β+γ=1이다. 랭킹 손실은 catalog(또는 candidate set) 전체에 대한 softmax cross-entropy이고, 카탈로그가 너무 크면 sampled softmax로 대체한다. <strong>추론 시에는 랭킹 헤드만 쓰고 LM 헤드는 학습 정규화용으로 둔다.</strong> 나아가 *&quot;future text generation use cases (e.g., natural-language explanations)&quot;*까지 미래 확장으로 명시한다. α·β·γ 수치는 공개하지 않았다 <span class="badge ok">확인</span> §4.4-§4.5</li>
-<li><strong>학습 데이터 스키마 = user/assistant 대화</strong> — user message에는 context와 profile, history, item metadata, task가 들어가고, <strong>assistant message에는 실제 engagement</strong>(play, play duration, abandon, thumb, etc.)가 들어간다. 블로그는 user message 쪽만 나열했다. positive label은 이렇게 정의한다: <em>&quot;high-quality engaged events (e.g., high-duration plays, strong explicit feedback), with denoising logic and thresholds that vary by content types&quot;</em> <span class="badge ok">확인</span> §4.2, §4.4</li>
-<li><strong>GRPO는 실제로 더 나았다</strong> — 블로그는 &quot;future work&quot;로 처리했지만 논문은 이렇게 적는다: <em>&quot;In preliminary experiments, RL-style methods (e.g. GRPO) showed additional gains over supervised finetuning, but their high training overhead makes them better suited for future work&quot;</em>. 시도해서 SFT 대비 개선을 확인했으나 비용 때문에 reward-weighted loss를 최종 채택했다 <span class="badge ok">확인</span> §4.6</li>
-<li><strong>데이터 스케일링 스윕</strong> — Phase-2 데이터를 1x~20x로 키우는 실험을 ~1B와 ~10B 두 백본에서 각각 실행했고, 양쪽 모두 monotonic 개선과 유사한 scaling pattern을 보였다. 절대 곡선과 기울기는 공개하지 않았다 <span class="badge ok">확인</span> §5.2</li>
-<li><strong>서빙 비용 근사</strong> — <em>&quot;inference cost in practice is roughly proportional to the product of model size and context length&quot;</em>. 비용 최적화 축은 둘이다: 더 작은 모델 또는 <strong>distilled</strong> 모델(블로그에 없던 distillation 언급이다)과 컨텍스트 압축이다 <span class="badge ok">확인</span> §4.7</li>
-<li><strong>Semantic-ID 계열이 아님을 명시적으로 자리매김한다</strong> — §2.2 말미에 이렇게 적혀 있다: <em>&quot;Most LLM-based generative retrieval systems rely on autoregressive decoding with beam search at inference time... Our work avoids these limitations by augmenting the base LLM architecture with a catalog-aware ranking head, so that it can rank a large candidate set in a single forward pass&quot;</em>. Google PLUM, Kuaishou OneRec-Think, Spotify GLIDE, Yandex Gryphon 등 SID/생성 계열과 무엇이 다른지를 논문이 스스로 정리한다 (→ <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>, <a href="radar.html">radar.md</a> 생성형 retrieval 스레드) <span class="badge ok">확인</span> §2</li>
-<li><strong>팀 구조</strong> — 블로그에 없던 3팀 협업이 §8에서 드러난다: <strong>AI for members</strong>(22명, 주 저자단과 Justin Basilico 포함), <strong>AI platform and serving</strong>(13명, 서빙 인프라), <strong>Product</strong>(4명)이다. Justin Basilico는 Netflix 개인화 총괄로 알려진 인물인데, 그의 이름이 GenRec 인접 문서에서 확인된 것은 이번이 처음이다 <span class="badge ok">확인</span> §8</li>
-<li><strong>논문도 전면 롤아웃을 확언하지는 않는다</strong> — §7에서 이렇게 적는다: <em>&quot;GenRec represents an initial step toward a more LLM-centric recommendation stack at Netflix. Our results suggest that this is a viable and promising path for large-scale personalization in <strong>at least some scenarios</strong>&quot;</em>. batch-compute 지면 한정, &quot;some scenarios&quot;, &quot;initial step&quot;이라는 표현이 이어진다. 정본의 열린 질문(전면 롤아웃 여부, 실시간 지면 여부, 후보 집합 출처)은 논문에도 답이 없어서 그대로 유지한다 <span class="badge ok">확인</span> §7</li>
-<li><strong>논문에도 여전히 공개되지 않은 것</strong>: α/β/γ 수치, GPU 세대·QPS·latency 절대값, prefill vs autoregressive의 정량 speedup, Phase 1의 학습 데이터와 목적 함수 상세, 베이스 OSS 모델의 정체(Llama? Mistral?), A/B 지면의 구체적 이름, secondary metrics/guardrails, 후보 집합을 만드는 주체가 여기에 해당한다</li>
+<li><strong>온라인 코어 지표의 실측값을 처음으로 공개했다</strong> <span class="badge ok">확인</span> §5.1.<ul>
+<li>논문의 문장은 이렇다: <em>&quot;we observe a +0.006% relative improvement on our core online metric, which is statistically meaningful at Netflix scale&quot;</em>.</li>
+<li>블로그는 &quot;statistically significant&quot;라고만 썼고 절대값이 없었다. 논문은 이 값을 스스로 &quot;at Netflix scale에서 유의미&quot;하다고 규정한다.</li>
+</ul>
+</li>
+<li><strong>Phase 1과 Phase 2의 기여를 따로 분해했다</strong> <span class="badge ok">확인</span> §5.3.<ul>
+<li>Phase 1은 OSS 백본 대비 offline MRR이 +10–20%이고, Phase 2는 Phase 1의 최신 시점 대비 +35–50%다.</li>
+<li><strong>Phase 1을 학습하고 2주가 지나면 Phase 2의 상대 이득이 ~80%로 벌어진다.</strong> 논문이 밝힌 이유는 이렇다: <em>&quot;increasing staleness of the less frequently updated Phase-1 backbone&quot;</em>.</li>
+<li><strong>시간 축이 두 phase의 상대적 가치를 결정한다</strong>는 사실이 새로 드러났다.</li>
+</ul>
+</li>
+<li><strong>컨텍스트 압축의 절대 예시가 나왔고, 서빙 비용 1/3이라는 수치도 더해졌다</strong> <span class="badge ok">확인</span> §5.4.<ul>
+<li>컨텍스트 쪽 문장: <em>&quot;the context length can be reduced to roughly a third of the original token budget (for example, from about 5,000 tokens down to about 1,700 tokens) with only negligible degradation&quot;</em></li>
+<li>비용 쪽 문장: <em>&quot;serving cost is reduced to roughly a third of original cost as well&quot;</em></li>
+<li>블로그의 &quot;roughly one-third&quot;에 절대 토큰 예시가 붙었고, 비용도 함께 1/3로 줄어든다는 정량 주장이 더해졌다.</li>
+</ul>
+</li>
+<li><strong>손실 함수 수식을 공개했다</strong> <span class="badge ok">확인</span> §4.4-§4.5.<ul>
+<li>ℒ = α·ℒ_ranking + β·ℒ_language + γ·ℒ_miscellaneous이고 α+β+γ=1이다. α·β·γ 수치는 공개하지 않았다.</li>
+<li>랭킹 손실은 catalog(또는 candidate set) 전체에 대한 softmax cross-entropy이고, 카탈로그가 너무 크면 sampled softmax로 대체한다.</li>
+<li><strong>추론 시에는 랭킹 헤드만 쓰고 LM 헤드는 학습 정규화용으로 둔다.</strong></li>
+<li>미래 확장으로 텍스트 생성 용도까지 명시한다: <em>&quot;future text generation use cases (e.g., natural-language explanations)&quot;</em>.</li>
+</ul>
+</li>
+<li><strong>학습 데이터는 user/assistant 대화 형식이다</strong> <span class="badge ok">확인</span> §4.2, §4.4.<ul>
+<li>user message에는 context, profile, history, item metadata, task가 들어간다. 블로그는 이쪽만 나열했다.</li>
+<li><strong>assistant message에는 실제 engagement</strong>(play, play duration, abandon, thumb, etc.)가 들어간다.</li>
+<li>positive label은 이렇게 정의한다: <em>&quot;high-quality engaged events (e.g., high-duration plays, strong explicit feedback), with denoising logic and thresholds that vary by content types&quot;</em>.</li>
+</ul>
+</li>
+<li><strong>GRPO는 실제로 더 나았다</strong> <span class="badge ok">확인</span> §4.6.<ul>
+<li>블로그는 &quot;future work&quot;로 처리했지만, 논문은 이렇게 적는다: <em>&quot;In preliminary experiments, RL-style methods (e.g. GRPO) showed additional gains over supervised finetuning, but their high training overhead makes them better suited for future work&quot;</em>.</li>
+<li>시도해서 SFT 대비 개선을 확인했으나, 비용 때문에 reward-weighted loss를 최종 채택했다.</li>
+</ul>
+</li>
+<li><strong>Phase-2 데이터를 1x~20x로 키우는 스윕에서, ~1B와 ~10B 두 백본 모두 monotonic하게 개선됐다</strong> <span class="badge ok">확인</span> §5.2.<ul>
+<li>두 백본의 scaling pattern도 비슷했다. 절대 곡선과 기울기는 공개하지 않았다.</li>
+</ul>
+</li>
+<li><strong>서빙 비용은 모델 크기와 컨텍스트 길이의 곱에 대략 비례한다</strong> <span class="badge ok">확인</span> §4.7.<ul>
+<li>논문의 문장: <em>&quot;inference cost in practice is roughly proportional to the product of model size and context length&quot;</em></li>
+<li>비용 최적화 축은 둘이다. 더 작은 모델 또는 <strong>distilled</strong> 모델을 쓰는 것과 컨텍스트 압축이다.</li>
+<li>distillation(큰 모델의 출력을 작은 모델이 따라 하도록 학습시키는 방법)은 블로그에 없던 언급이다.</li>
+</ul>
+</li>
+<li><strong>논문은 GenRec가 Semantic ID(SID) 계열이 아님을 명시적으로 자리매김한다</strong> <span class="badge ok">확인</span> §2.<ul>
+<li>Semantic ID는 아이템을 계층 코드로 표현한 토큰 열이다.</li>
+<li>§2.2 말미의 문장: <em>&quot;Most LLM-based generative retrieval systems rely on autoregressive decoding with beam search at inference time... Our work avoids these limitations by augmenting the base LLM architecture with a catalog-aware ranking head, so that it can rank a large candidate set in a single forward pass&quot;</em></li>
+<li>Google PLUM, Kuaishou OneRec-Think, Spotify GLIDE, Yandex Gryphon 등 SID/생성 계열과의 차이를 논문이 스스로 정리한다 (→ <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>, <a href="radar.html">radar.md</a> 생성형 retrieval 스레드).</li>
+</ul>
+</li>
+<li><strong>팀 구조가 드러났다</strong> <span class="badge ok">확인</span> §8. 블로그에 없던 3팀 협업이 §8에 나온다.<ul>
+<li><strong>AI for members</strong>(22명): 주 저자단과 Justin Basilico가 포함된다.</li>
+<li><strong>AI platform and serving</strong>(13명): 서빙 인프라를 맡는다.</li>
+<li><strong>Product</strong>: 4명이다.</li>
+<li>Justin Basilico는 Netflix 개인화 총괄로 알려진 인물이다. 그의 이름이 GenRec 인접 문서에서 확인된 것은 이번이 처음이다.</li>
+</ul>
+</li>
+<li><strong>논문도 전면 롤아웃을 확언하지는 않는다</strong> <span class="badge ok">확인</span> §7.<ul>
+<li>§7의 문장: <em>&quot;GenRec represents an initial step toward a more LLM-centric recommendation stack at Netflix. Our results suggest that this is a viable and promising path for large-scale personalization in <strong>at least some scenarios</strong>&quot;</em></li>
+<li>batch-compute 지면 한정, &quot;some scenarios&quot;, &quot;initial step&quot;이라는 표현이 이어진다.</li>
+<li>정본의 열린 질문(전면 롤아웃 여부, 실시간 지면 여부, 후보 집합 출처)은 논문에도 답이 없어서 그대로 둔다.</li>
+</ul>
+</li>
+<li><strong>논문에도 여전히 공개되지 않은 것</strong>은 다음과 같다.<ul>
+<li>α/β/γ 수치</li>
+<li>GPU 세대·QPS·latency 절대값</li>
+<li>prefill vs autoregressive의 정량 speedup</li>
+<li>Phase 1의 학습 데이터와 목적 함수 상세</li>
+<li>베이스 OSS 모델의 정체(Llama? Mistral?)</li>
+<li>A/B 지면의 구체적 이름</li>
+<li>secondary metrics/guardrails</li>
+<li>후보 집합을 만드는 주체</li>
+</ul>
+</li>
 </ul>
 <h3 id="목적함수--가중합이-아니라-retention-계열">목적함수 — 가중합이 아니라 retention 계열</h3>
-<p><span class="badge ok">확인</span> <a href="https://netflixtechblog.com/recommending-for-long-term-member-satisfaction-at-netflix-ac15cada49ef" target="_blank" rel="noopener">장기 만족 블로그 2024</a>:</p>
+<p>Netflix 추천의 north star는 retention이지만, 실제로 최적화하는 것은 프록시 보상이다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/recommending-for-long-term-member-satisfaction-at-netflix-ac15cada49ef" target="_blank" rel="noopener">장기 만족 블로그 2024</a>.</p>
 <ul>
-<li>컨텍스추얼 밴딧 프레임을 쓴다. north star는 retention이지만 직접 최적화하지는 못한다(&quot;계정당 월 1회 신호&quot;, 노이즈, 귀속 곤란)</li>
-<li>공개된 프록시 보상의 형태는 **r(user, item) = f(play, complete, thumb)**이다</li>
-<li>지연 피드백은 이렇게 다룬다: Delayed Feedback Prediction Model이 p(최종 피드백 | 관측 피드백)을 예측해서 보상에 주입한다</li>
-<li>&quot;CTR 과최적화는 클릭베이트 조장&quot;이라고 명시한다. X와 Meta의 <code>Σ w·P(action)</code> 가중합 프레임과는 구조적으로 다르다 (→ <a href="multi-task-ranking.html">multi-task-ranking.md</a>)</li>
-<li>가중치와 보상을 결정하는 방법은 reward engineering 루프다(가설→보상 수정→밴딧 정책→A/B) <span class="badge ok">확인</span></li>
+<li>문제를 컨텍스추얼 밴딧(상황을 보고 행동을 고른 뒤, 받은 보상으로 정책을 고치는 틀)으로 다룬다 <span class="badge ok">확인</span> 장기 만족 블로그.</li>
+<li>retention을 직접 최적화하지 못하는 이유로 &quot;계정당 월 1회 신호&quot;, 노이즈, 귀속의 어려움을 든다 <span class="badge ok">확인</span> 장기 만족 블로그.</li>
+<li>공개된 프록시 보상은 다음 형태다: <strong>r(user, item) = f(play, complete, thumb)</strong> <span class="badge ok">확인</span> 장기 만족 블로그.</li>
+<li>지연 피드백은 Delayed Feedback Prediction Model이 다룬다. 이 모델이 p(최종 피드백 | 관측 피드백)을 예측해서 보상에 주입한다 <span class="badge ok">확인</span> 장기 만족 블로그.</li>
+<li>블로그는 &quot;CTR 과최적화는 클릭베이트 조장&quot;이라고 명시한다. X와 Meta의 <code>Σ w·P(action)</code> 가중합 프레임과는 구조적으로 다르다 <span class="badge ok">확인</span> 장기 만족 블로그 (→ <a href="multi-task-ranking.html">multi-task-ranking.md</a>).</li>
+<li>가중치와 보상은 reward engineering 루프(가설→보상 수정→밴딧 정책→A/B)로 정한다 <span class="badge ok">확인</span>.</li>
 </ul>
 <h3 id="고전-세대-랭커-참고용-2015">고전 세대 랭커 (참고용, 2015)</h3>
-<p>고전 세대의 랭커는 다음과 같다. PVR(전 카탈로그 정렬, 인기와 개인화를 블렌딩), Top-N(헤드만 최적화), Trending(분~일 단위 트렌드와 개인화), Continue Watching(재개와 포기를 판별하며 경과시간·중단 지점·중간 시청·디바이스를 쓴다), sims(비개인화 유사도와 개인화된 행 선택)가 있었다 <span class="badge ok">확인</span> TMIS 2015. UniCoRn(2024)은 검색과 pre-query, More Like This를 단일 컨텍스추얼 랭커로 통합했고, 개인화로 <strong>오프라인 지표</strong>가 검색 7%, 추천 10% 리프트했다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2408.10394" target="_blank" rel="noopener">RecSys 2024</a></p>
+<p>고전 세대에는 행 종류마다 전용 랭커가 있었다 <span class="badge ok">확인</span> TMIS 2015.</p>
+<ul>
+<li>PVR: 카탈로그 전체를 정렬하고, 인기와 개인화를 블렌딩한다 <span class="badge ok">확인</span> TMIS 2015.</li>
+<li>Top-N: 헤드만 최적화한다 <span class="badge ok">확인</span> TMIS 2015.</li>
+<li>Trending: 분~일 단위 트렌드에 개인화를 더한다 <span class="badge ok">확인</span> TMIS 2015.</li>
+<li>Continue Watching: 재개와 포기를 판별한다. 경과시간·중단 지점·중간 시청·디바이스를 쓴다 <span class="badge ok">확인</span> TMIS 2015.</li>
+<li>sims: 유사도는 비개인화이고, 행 선택은 개인화한다 <span class="badge ok">확인</span> TMIS 2015.</li>
+</ul>
+<p>통합 세대의 UniCoRn(2024)은 검색과 pre-query, More Like This를 단일 컨텍스추얼 랭커로 통합했다. 개인화로 <strong>오프라인 지표</strong>가 검색에서 7%, 추천에서 10% 올랐다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2408.10394" target="_blank" rel="noopener">RecSys 2024</a>.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="재순위다양성필터">재순위·다양성·필터</h2>
+<p>Netflix의 다양성은 리스트 재순위가 아니라 <strong>페이지 구성 단계</strong>에 있다. 행 선택을 &quot;관련성과 다양성으로 최적화&quot;한다 <span class="badge ok">확인</span> TMIS 2015 (→ <a href="feed-diversity.html">feed-diversity.md</a>).</p>
 <ul>
-<li>다양성은 리스트 재순위가 아니라 <strong>페이지 구성 단계</strong>에 있다. 행 선택을 &quot;관련성과 다양성으로 최적화&quot;한다 <span class="badge ok">확인</span> TMIS 2015 (→ <a href="feed-diversity.html">feed-diversity.md</a>)</li>
-<li>Calibrated Recommendations (Steck, RecSys 2018)는 시청 이력의 장르 비율을 추천 리스트에 보존하는 재순위 방식이고, 수식이 공개돼 있다 <span class="badge ok">확인</span>. 다만 <strong>프로덕션 배포 진술은 없다</strong> <span class="badge est">추정</span> 배포 여부를 알 수 없다고 적는 것이 정확한 상태다 (<a href="https://dl.acm.org/doi/10.1145/3240323.3240372" target="_blank" rel="noopener">논문</a>)</li>
-<li>같은 타이틀이 여러 행에 중복해서 나오는 경우, 허용 규칙이나 상한 규칙의 1차 출처는 찾지 못했다. 중복이 버그가 아니라 &quot;다른 추천 이유&quot;로 기능할 가능성이 있다 <span class="badge est">추정</span> 행마다 다른 테마와 아트워크 개인화가 결합하면 중복 노출이 설계일 수 있다. 실제 홈에서 직접 관찰해야 하는데 아직 하지 않았다</li>
-<li>아트워크와 비디오 프리뷰 개인화는 지각된 다양성을 조절하는 별도 수단이다. 같은 타이틀이라도 회원마다 다른 이미지와 비디오 프리뷰를 본다. 2017 밴딧에서 2026 MediaFM tri-modal foundation model로 세대가 바뀌었다 (아래 절을 참조한다)</li>
-<li>GenPage(2026)는 페이지 구성 자체를 단일 트랜스포머의 autoregressive 생성으로 대체한다. 엔드투엔드 지연이 20% 줄었고 핵심 참여 지표가 개선됐다. 아직 실험 단계다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">arXiv 2606.31031</a></li>
+<li>Calibrated Recommendations(Steck, RecSys 2018)는 시청 이력의 장르 비율을 추천 리스트에 보존하는 재순위 방식이고, 수식이 공개돼 있다 <span class="badge ok">확인</span>. 다만 <strong>프로덕션 배포 진술은 없다</strong> <span class="badge est">추정</span>. 배포 여부를 알 수 없다고 적는 것이 정확한 상태다 (<a href="https://dl.acm.org/doi/10.1145/3240323.3240372" target="_blank" rel="noopener">논문</a>).</li>
+<li>같은 타이틀이 여러 행에 중복해서 나올 때의 허용 규칙이나 상한 규칙은 1차 출처를 찾지 못했다. 중복이 버그가 아니라 &quot;다른 추천 이유&quot;로 기능할 가능성이 있다 <span class="badge est">추정</span>.<ul>
+<li>행마다 다른 테마와 아트워크 개인화가 결합하면 중복 노출이 설계일 수 있다.</li>
+<li>실제 홈에서 직접 관찰해야 하는데 아직 하지 않았다.</li>
+</ul>
+</li>
+<li>아트워크와 비디오 프리뷰 개인화는 지각된 다양성을 조절하는 별도 수단이다. 같은 타이틀이라도 회원마다 다른 이미지와 비디오 프리뷰를 본다.<ul>
+<li>2017 밴딧에서 2026 MediaFM tri-modal foundation model로 세대가 바뀌었다(<a href="#%EC%95%84%ED%8A%B8%EC%9B%8C%ED%81%AC%EB%B9%84%EB%94%94%EC%98%A4-%ED%94%84%EB%A6%AC%EB%B7%B0-%EA%B0%9C%EC%9D%B8%ED%99%94--maps-multimodal-asset-personalization-at-scale-2026-08-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98">아트워크·비디오 프리뷰 개인화</a> 절 참조).</li>
+</ul>
+</li>
+<li>GenPage(2026)는 페이지 구성 자체를 단일 트랜스포머의 autoregressive 생성으로 대체한다. 엔드투엔드 지연이 20% 줄었고 핵심 참여 지표가 개선됐다. 아직 실험 단계다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">arXiv 2606.31031</a>.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="아트워크비디오-프리뷰-개인화--maps-multimodal-asset-personalization-at-scale-2026-08-프로덕션">아트워크·비디오 프리뷰 개인화 — MAPS (Multimodal Asset Personalization at Scale, 2026-08 프로덕션)</h2>
-<p>세대 흐름은 이렇게 이어진다. <strong>2017 밴딧</strong>(<a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76" target="_blank" rel="noopener">Artwork Personalization</a>, 전면 배포)에서 <strong>2026 CLIP two-tower + MediaFM</strong>으로 넘어갔다. 2026-08-18 arXiv 논문(<a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">Multimedia Asset Personalization via Multimodal Embeddings at Netflix</a>)이 정량치를 담고, 2026-08-28 <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">블로그</a>에서 <strong>MAPS</strong>라는 시스템 이름과 아키텍처 맥락을 공개했다. 확장 방향은 둘이다.</p>
+<p>Netflix는 같은 타이틀이라도 회원마다 다른 아트워크와 비디오 프리뷰를 보여 주고, 2026-08 기준으로 이 일은 MAPS라는 프로덕션 시스템이 맡는다 <span class="badge ok">확인</span>(<a href="#clip-%EA%B8%B0%EB%B0%98-%ED%86%B5%ED%95%A9-two-tower--5%EA%B0%9C-%EC%BA%94%EB%B2%84%EC%8A%A4-%ED%83%80%EC%9E%85-%EB%8B%A8%EC%9D%BC-%EB%AA%A8%EB%8D%B8">CLIP 절</a>, <a href="#mediafm--%EC%9E%90%EC%B2%B4-tri-modal-foundation-model-%EB%B9%84%EB%94%94%EC%98%A4-%ED%94%84%EB%A6%AC%EB%B7%B0%EC%9A%A9">MediaFM 절</a>). MAPS 블로그는 CLIP 아트워크, query-aware 아트워크, MediaFM 비디오 프리뷰의 세 프로덕트를 이 이름으로 묶는다.</p>
+<p>세대는 <strong>2017 밴딧</strong>(<a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76" target="_blank" rel="noopener">Artwork Personalization</a>, 전면 배포)에서 <strong>2026 CLIP two-tower와 MediaFM</strong>으로 넘어갔다. two-tower는 회원과 아이템을 따로 인코딩한 뒤 둘을 맞춰 점수를 내는 구조다. 정량치는 2026-08-18 arXiv 논문(<a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">Multimedia Asset Personalization via Multimodal Embeddings at Netflix</a>)에 있고, 2026-08-28 <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">블로그</a>는 <strong>MAPS</strong>라는 시스템 이름과 아키텍처 맥락을 공개했다. 확장 방향은 아트워크 쪽의 CLIP 통합 모델과 비디오 프리뷰 쪽의 MediaFM, 둘이다.</p>
 <h3 id="clip-기반-통합-two-tower--5개-캔버스-타입-단일-모델">CLIP 기반 통합 two-tower — 5개 캔버스 타입 단일 모델</h3>
-<p>아트워크 캔버스 5종(billboard / vertical box / horizontal panel / short panel / landscape panel)마다 별도 모델을 학습하고 서빙하던 구조가 <strong>CLIP 이미지 임베딩(768-d)을 item tower에 concat한 단일 two-tower</strong>로 통합됐다 <span class="badge ok">확인</span> §3.</p>
+<p>예전에는 아트워크 캔버스 5종(billboard / vertical box / horizontal panel / short panel / landscape panel)마다 모델을 따로 학습하고 서빙했다 <span class="badge ok">확인</span> §3. 이 구조가 <strong>CLIP 이미지 임베딩(768-d)을 item tower에 concat한 단일 two-tower</strong>로 통합됐다 <span class="badge ok">확인</span> §3.</p>
 <ul>
-<li><strong>Reward-weighted 학습</strong>: 캔버스별 학습 예제를 reward 가중치로 균형 잡는다 (특정 캔버스로 쏠리는 것을 막는다)</li>
-<li><strong>콜드스타트</strong>: 신규 타이틀과 에셋이 상호작용 이력 없이도 CLIP 임베딩만으로 &quot;day zero&quot;부터 서빙된다. ID-only 모델이 원천적으로 갖던 한계를 해소한다</li>
-<li><strong>온라인 A/B 결과</strong> <span class="badge ok">확인</span> §5.1: 코어 discovery 메트릭이 상대적으로 <strong>+0.127%</strong> 올랐다 (p&lt;0.005). Eclipse UI 홀드백 대비로는 discovery가 <strong>+0.233%</strong>, streaming hours가 <strong>+0.184%</strong> 늘었고, 저자는 연간 <strong>≈350M streaming hours</strong>가 추가된다고 추산한다</li>
-<li><strong>Ablation은 V1·V2 단독은 온라인에서 안 움직였다</strong> <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그 2026-08-28</a>. V1(이미지 임베딩만)·V2(캔버스 통합만) 단독은 오프라인·온라인 둘 다 non-significant flat이었고, 두 아이디어를 합친 V3만이 통계적으로 유의한 리프트를 얻어 프로덕션에 배포됐다. short-panel에서 V3 오프라인 IPS 상대 리프트는 **+5.691%**로 V1+V2 합보다 컸다. &quot;content feature 하나만 켜서는 안 움직이더라&quot;라는 관찰이 명시적으로 서술된 사례다<blockquote>
+<li><p><strong>Reward-weighted 학습</strong>: 캔버스별 학습 예제를 reward 가중치로 균형 잡아, 특정 캔버스로 쏠리지 않게 한다.</p>
+</li>
+<li><p><strong>콜드스타트</strong>: 신규 타이틀과 에셋은 상호작용 이력이 없어도 CLIP 임베딩만으로 &quot;day zero&quot;부터 서빙된다. ID-only 모델이 원천적으로 갖던 한계를 해소한다.</p>
+</li>
+<li><p><strong>온라인 A/B 결과</strong>: 코어 discovery 메트릭이 상대적으로 <strong>+0.127%</strong> 올랐다(p&lt;0.005) <span class="badge ok">확인</span> §5.1.</p>
+<ul>
+<li>Eclipse UI 홀드백(새 변경을 적용하지 않고 남겨 둔 대조군) 대비로는 discovery가 <strong>+0.233%</strong>, streaming hours가 <strong>+0.184%</strong> 늘었고, 저자는 연간 <strong>≈350M streaming hours</strong>가 추가된다고 추산한다.</li>
+</ul>
+</li>
+<li><p><strong>V1과 V2를 각각 단독으로 켰을 때는 온라인 지표가 움직이지 않았다</strong> <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그 2026-08-28</a>.</p>
+<ul>
+<li>V1은 이미지 임베딩만, V2는 캔버스 통합만 적용한 버전이다. 둘 다 오프라인·온라인 모두 non-significant flat이었다.</li>
+<li>두 아이디어를 합친 V3만 통계적으로 유의한 리프트를 얻어 프로덕션에 배포됐다.</li>
+<li>short-panel에서 V3의 오프라인 IPS 상대 리프트(<strong>+5.691%</strong>)는 V1과 V2의 리프트를 더한 값보다 컸다.</li>
+<li>IPS는 off-policy evaluation에서 자주 쓰는 오프라인 지표로, 로그로 남은 무작위 노출 데이터로 새 모델의 counterfactual 성능을 추정한다.</li>
+<li>&quot;content feature 하나만 켜서는 안 움직이더라&quot;라는 관찰이 명시적으로 서술된 사례다.</li>
+</ul>
+<blockquote>
 <p>&quot;Neither idea moved our online core member metrics on its own. V1 and V2 were both flat and non-significant, and only V3 won a statistically significant lift.&quot;
 — <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그</a>, 2026-08-28</p>
 </blockquote>
 </li>
-<li><strong>2025 TV 홈스크린 대개편 홀드백</strong> <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그</a>, 2026-08-28. UI 개편으로 short-panel이 갑자기 지배적 캔버스가 되는 콜드스타트 상황이었는데, 개편 직전에 V3를 배포하고 한 달간 홀드백 A/B(소규모 대조군은 이전 캔버스별 모델 유지)를 돌렸다. <strong>core discovery 지표와 streaming hours 둘 다 통계적으로 유의한 리프트</strong>를 얻었고, 정상 상태의 ablation보다 더 큰 리프트였다. 단일 모델의 캔버스 간 신호 전이가 실측된 사례다</li>
-<li><strong>검색 확장</strong>: CLIP의 joint text-image space를 재활용해 <strong>query-aware artwork</strong>를 검색 캔버스에 적용했고, playthrough rate가 <strong>+0.36%</strong> 올랐다 (p&lt;0.05) <span class="badge ok">확인</span>. 랭킹 점수 = α · personalization + (1−α) · cos(text_emb(query), image_emb(asset))로 blend하고 α를 온라인 A/B로 튜닝한다. <strong>추가 모델링 노력이 사실상 0</strong>이라고 블로그는 명시한다(CLIP 임베딩이 이미 asset 표현에 있으므로) <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그</a></li>
+<li><p><strong>2025 TV 홈스크린 대개편 때 돌린 홀드백에서는 정상 상태의 ablation보다 리프트가 더 컸다</strong> <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그</a>, 2026-08-28.</p>
+<ul>
+<li>UI 개편으로 short-panel이 갑자기 지배적 캔버스가 되는 콜드스타트 상황이었다.</li>
+<li>개편 직전에 V3를 배포하고 한 달간 홀드백 A/B를 돌렸다. 소규모 대조군은 이전 캔버스별 모델을 유지했다.</li>
+<li><strong>core discovery 지표와 streaming hours 둘 다 통계적으로 유의한 리프트</strong>를 얻었다.</li>
+<li>단일 모델의 캔버스 간 신호 전이가 실측된 사례다.</li>
+</ul>
+</li>
+<li><p><strong>검색으로도 확장했다.</strong> CLIP의 joint text-image space를 재활용해 검색 캔버스에 <strong>query-aware artwork</strong>를 적용했고, playthrough rate가 <strong>+0.36%</strong> 올랐다(p&lt;0.05) <span class="badge ok">확인</span>.</p>
+<ul>
+<li>랭킹 점수 = α · personalization + (1−α) · cos(text_emb(query), image_emb(asset))로 blend하고, α는 온라인 A/B로 튜닝한다.</li>
+<li>블로그는 <strong>추가 모델링 노력이 사실상 0</strong>이라고 명시한다(CLIP 임베딩이 이미 asset 표현에 있으므로) <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그</a>.</li>
+</ul>
+</li>
 </ul>
 <h3 id="mediafm--자체-tri-modal-foundation-model-비디오-프리뷰용">MediaFM — 자체 tri-modal foundation model (비디오 프리뷰용)</h3>
-<p>Netflix가 자체 학습한 <strong>shot-level tri-modal FM</strong>을 프로덕션에서 서빙한다 <span class="badge ok">확인</span> §4.</p>
+<p>MediaFM은 Netflix가 자체 학습한 <strong>shot-level tri-modal FM</strong>이고, 프로덕션에서 서빙한다 <span class="badge ok">확인</span> §4. shot은 카메라가 끊기지 않고 이어 찍은 한 구간이다.</p>
 <ul>
-<li><strong>모달리티</strong>: 시각(SeqCLIP, CLIP 스타일 프레임 인코더)과 음성(<strong>wav2vec 2.0</strong>), timed-text(<strong>text-embedding-3-large</strong>)를 쓴다. shot마다 concat한 뒤 <strong>2,304-d unit-normed</strong> 벡터를 만든다</li>
-<li><strong>인코더</strong>: BERT 스타일 3-layer / 8-head transformer다. <strong>Masked Shot Modeling</strong>(20% shot 마스킹)과 <strong>cosine distance loss</strong>로 self-supervised 사전학습을 한다. 프리뷰 표현은 contextualized shot embedding을 <strong>mean-pool</strong>해서 얻는다</li>
-<li><strong>학습 코퍼스</strong>: Netflix 쇼 카탈로그에서 뽑은 대규모 shot corpus를 쓴다 (구체적인 규모는 공개하지 않았다)</li>
-<li><strong>적용 지면</strong>: 모든 디바이스 플랫폼의 비디오 프리뷰 개인화에 적용한다 (프리뷰 길이는 30~90초다). TV UI 서피스에서 이득이 가장 컸다</li>
-<li><strong>온라인 A/B 결과</strong> <span class="badge ok">확인</span> §5.2: streaming 메트릭이 상대적으로 <strong>+0.193%</strong> 올랐다 (p&lt;0.02). 오프라인 IPS lift는 **0.380%**다. visual-only 베이스라인 대비 tri-modal이 더 낫다는 점이 오프라인과 온라인 양쪽에서 확인됐다</li>
+<li><strong>모달리티</strong>: 시각은 SeqCLIP(CLIP 스타일 프레임 인코더), 음성은 <strong>wav2vec 2.0</strong>, timed-text는 <strong>text-embedding-3-large</strong>로 인코딩한다.<ul>
+<li>shot마다 셋을 concat해 <strong>2,304-d unit-normed</strong> 벡터를 만든다.</li>
+</ul>
+</li>
+<li><strong>인코더</strong>: BERT 스타일 3-layer / 8-head transformer다.<ul>
+<li><strong>Masked Shot Modeling</strong>(20% shot 마스킹)과 <strong>cosine distance loss</strong>로 self-supervised 사전학습을 한다.</li>
+<li>프리뷰 표현은 contextualized shot embedding을 <strong>mean-pool</strong>해서 얻는다.</li>
+</ul>
+</li>
+<li><strong>학습 코퍼스</strong>: Netflix 쇼 카탈로그에서 뽑은 대규모 shot corpus를 쓴다. 구체적인 규모는 공개하지 않았다.</li>
+<li><strong>적용 지면</strong>: 모든 디바이스 플랫폼의 비디오 프리뷰 개인화에 적용한다. 프리뷰 길이는 30~90초이고, TV UI 서피스에서 이득이 가장 컸다.</li>
+<li><strong>온라인 A/B 결과</strong>: streaming 메트릭이 상대적으로 <strong>+0.193%</strong> 올랐다(p&lt;0.02) <span class="badge ok">확인</span> §5.2.<ul>
+<li>오프라인 IPS 지표는 <strong>0.380%</strong> 올랐다.</li>
+<li>visual-only 베이스라인 대비 tri-modal이 더 낫다는 점이 오프라인과 온라인 양쪽에서 확인됐다.</li>
+</ul>
+</li>
 </ul>
 <h3 id="popularity-based-winner--오프라인-프록시-태스크">Popularity-Based Winner — 오프라인 프록시 태스크</h3>
-<p>MediaFM 체크포인트 릴리스를 gating하려고 새 오프라인 프록시를 배치했다 <span class="badge ok">확인</span> §5.4.</p>
+<p>Netflix는 MediaFM 체크포인트 릴리스를 거르기(gating) 위해 새 오프라인 프록시 태스크를 도입했다 <span class="badge ok">확인</span> §5.4. <strong>모든 새 MediaFM 체크포인트를 이 프록시가 gating하고</strong>, 후보 공간을 줄인 뒤에만 A/B로 넘어간다.</p>
 <ul>
-<li><strong>정의</strong>: &quot;만약 unpersonalized·uniform serving policy로 노출했다면 어떤 에셋이 이겼을까&quot;를 <strong>에셋 콘텐츠 임베딩만 입력</strong>으로 예측한다 (linear probe binary classification이다)</li>
-<li><strong>왜 유효한가</strong>: end-to-end integration이나 A/B test 없이도 임베딩 quality의 순위를 매길 수 있다. 온라인 outcome과의 상관관계도 관찰됐다. 프로브 정확도 순위와 오프라인 IPS 순위, 온라인 A/B 결과 순위가 세 시그널 모두에서 일치했다</li>
-<li><strong>정량치</strong>: MediaFM 프로브 정확도는 pick-at-random 대비 <strong>+25.90 percentage points</strong>다. SeqCLIP 단독은 <strong>+18.75 pp</strong>다. 트리모달의 uplift가 shot-level 프록시에서도 재현됐다</li>
-<li><strong>의미</strong>: <strong>모든 새 MediaFM 체크포인트를 이 프록시가 gating한다.</strong> 후보 공간을 pruning한 뒤에만 A/B로 넘어간다. Netflix가 오랜 문제(&quot;오프라인 지표가 A/B를 예측 못 함&quot;)를 임베딩 quality 하나만 보는 단일 태스크로 부분적으로 우회한 사례다</li>
+<li><strong>정의</strong>: &quot;만약 unpersonalized·uniform serving policy로 노출했다면 어떤 에셋이 이겼을까&quot;를 <strong>에셋 콘텐츠 임베딩만 입력</strong>으로 예측한다. linear probe(고정된 임베딩 위에 선형 분류기만 학습하는 방법) 방식의 이진 분류다.</li>
+<li><strong>왜 유효한가</strong>: end-to-end integration이나 A/B test 없이도 임베딩 품질의 순위를 매길 수 있다. 온라인 outcome과의 상관관계도 관찰됐다.<ul>
+<li>프로브 정확도 순위, 오프라인 IPS 순위, 온라인 A/B 결과 순위가 세 시그널 모두에서 일치했다.</li>
+</ul>
+</li>
+<li><strong>정량치</strong>: MediaFM 프로브 정확도는 pick-at-random 대비 <strong>+25.90 percentage points</strong> 높다. SeqCLIP 단독은 <strong>+18.75 pp</strong> 높다. tri-modal의 uplift가 shot-level 프록시에서도 재현됐다.</li>
+<li><strong>의미</strong>: &quot;오프라인 지표가 A/B를 예측 못 함&quot;이라는 Netflix의 오랜 문제를, 임베딩 품질 하나만 보는 단일 태스크로 부분적으로 우회한 사례다.</li>
 </ul>
 <h3 id="netflix-embedding-store--인프라-레이어">Netflix Embedding Store — 인프라 레이어</h3>
-<p>플랫폼 레이어는 다음과 같다 <span class="badge ok">확인</span> §4.3:</p>
+<p>플랫폼 레이어는 사전 계산과 캐싱의 세 단계로 이뤄진다 <span class="badge ok">확인</span> §4.3. 이 3단 캐싱이 저지연 서빙과 값싼 스크리닝을 동시에 가능하게 만들었다.</p>
 <ul>
-<li><strong>콘텐츠 임베딩</strong> — 에셋이 카탈로그에 유입되는 순간에 미리 계산한다 (ingestion time)</li>
-<li><strong>Item-tower projection</strong> — 에셋마다 캐시해 둔다</li>
-<li><strong>일일 materialization</strong> — 프로필별 상위 ~500 타이틀 선택을 미리 계산한다</li>
+<li><strong>콘텐츠 임베딩</strong>: 에셋이 카탈로그에 유입되는 순간(ingestion time)에 미리 계산한다 <span class="badge ok">확인</span> §4.3.</li>
+<li><strong>Item-tower projection</strong>: 에셋마다 캐시해 둔다 <span class="badge ok">확인</span> §4.3.</li>
+<li><strong>일일 materialization</strong>: 프로필별 상위 ~500 타이틀 선택을 미리 계산한다 <span class="badge ok">확인</span> §4.3.</li>
 </ul>
-<p>이 3단 캐싱이 저지연 서빙과 값싼 스크리닝을 동시에 가능하게 만들었다. FM 시대에 이미 회원 임베딩의 배치 생산이 프로덕션에 들어가 있었는데(위 retrieval 절), MediaFM은 <strong>아이템 쪽 임베딩 파이프라인</strong>을 같은 방식으로 확립했다. 두 흐름이 서로 대응한다.</p>
-<p>2026-08-28 <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그</a>가 이 저장소를 <strong>Netflix Embedding Store</strong>라는 이름으로 명명하고 두 속성을 명시했다. <span class="badge ok">확인</span></p>
+<p>FM 시대에 이미 회원 임베딩의 배치 생산이 프로덕션에 들어가 있었고(<a href="#%ED%9B%84%EB%B3%B4-%EC%83%9D%EC%84%B1-retrieval">후보 생성</a> 절), MediaFM은 <strong>아이템 쪽 임베딩 파이프라인</strong>을 같은 방식으로 확립했다. 두 흐름이 서로 대응한다.</p>
+<p>2026-08-28 <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그</a>는 이 저장소에 <strong>Netflix Embedding Store</strong>라는 이름을 붙이고, 두 속성을 명시했다 <span class="badge ok">확인</span>.</p>
 <ul>
-<li><strong>Training-serving skew 없음</strong> — 학습 시점과 온라인 추론 시점에 정확히 같은 임베딩을 서빙한다. Embedding Store가 유일한 source of truth이므로 학습·서빙 파이프라인이 다른 값을 볼 여지가 없다</li>
-<li><strong>Foundation-model 업데이트와 personalization-model 배포의 decouple</strong> — 새 임베딩(또는 기존 임베딩의 새 버전)이 나오면 register → 카탈로그 전체 backfill → 자체 검증까지 마친 뒤 config 한 줄로 downstream이 스위치할 수 있다. downstream 모델의 학습·서빙 코드 변경 없이 임베딩 세대 전환이 이뤄진다<blockquote>
+<li><p><strong>Training-serving skew가 없다</strong> <span class="badge ok">확인</span> MAPS 블로그.</p>
+<ul>
+<li>학습 시점과 온라인 추론 시점에 정확히 같은 임베딩을 서빙한다.</li>
+<li>Embedding Store가 유일한 source of truth이므로, 학습 파이프라인과 서빙 파이프라인이 다른 값을 볼 여지가 없다.</li>
+</ul>
+</li>
+<li><p><strong>Foundation model 업데이트와 personalization model 배포가 분리돼 있다(decouple)</strong> <span class="badge ok">확인</span> MAPS 블로그.</p>
+<ul>
+<li>새 임베딩이나 기존 임베딩의 새 버전이 나오면 register, 카탈로그 전체 backfill, 자체 검증까지 마친다. 그 뒤 config 한 줄로 downstream이 스위치할 수 있다.</li>
+<li>downstream 모델의 학습·서빙 코드를 바꾸지 않고 임베딩 세대를 전환한다.</li>
+</ul>
+<blockquote>
 <p>&quot;Its key property is that it decouples foundation-model updates from personalization-model deployments. A new embedding, or a new version of an existing one, can be registered, backfilled across the catalog, and validated entirely on its own, without touching the training or serving code of any model that consumes it.&quot;
 — <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS 블로그</a>, 2026-08-28</p>
 </blockquote>
 </li>
 </ul>
-<p>블로그는 다음 단계로 image·text·video를 하나의 <strong>shared semantic space</strong>로 통합해 cross-modal retrieval과 통합 asset 랭킹을 열겠다고 명시했다 <span class="badge ok">확인</span>. 회원 쪽 FM과 아이템 쪽 MediaFM이 같은 저장소에서 흐르는 그림이 앞으로도 유지될 것을 뜻한다.</p>
+<p>블로그는 다음 단계로 image·text·video를 하나의 <strong>shared semantic space</strong>로 통합해, cross-modal retrieval과 통합 asset 랭킹을 열겠다고 명시했다 <span class="badge ok">확인</span>. 회원 쪽 FM과 아이템 쪽 MediaFM이 같은 저장소에서 흐르는 그림이 앞으로도 유지될 것을 뜻한다.</p>
 <h3 id="의미--아트워크프리뷰가-개인화-스택의-별개-축이-됐다">의미 — 아트워크·프리뷰가 개인화 스택의 별개 축이 됐다</h3>
-<p>지금까지 이 정본은 아트워크 개인화를 &quot;재순위·다양성&quot;에서 한 줄로만 언급했다 (2017 밴딧 이후 큰 갱신이 없었기 때문이다). 2026-08 MediaFM 논문이 이 축을 <strong>별도의 프로덕션 시스템</strong>으로 확립했다:</p>
+<p>2026-08 MediaFM 논문이 아트워크 개인화를 <strong>별도의 프로덕션 시스템</strong>으로 확립했다. 그전까지 이 정본은 이 축을 &quot;재순위·다양성&quot;에서 한 줄로만 언급했다. 2017 밴딧 이후 큰 갱신이 없었기 때문이다. 달라진 점은 네 가지다.</p>
 <ol>
-<li><strong>캔버스별 모델에서 단일 모델로</strong> 아키텍처를 통합했다 (5→1)</li>
-<li><strong>시각 전용에서 tri-modal로</strong> modality를 확장했다 (audio와 timed-text가 uplift에 기여한다는 점을 정량적으로 검증했다)</li>
-<li><strong>콜드스타트를 처리하는 위치가 랭커 안이 아니라 pretrained 임베딩으로 옮겨갔다</strong> (day-zero CLIP 임베딩이다)</li>
-<li><strong>오프라인 gating이 A/B의 전제조건</strong>으로 프로덕션 프로세스에 편입됐다 (popularity-based winner다)</li>
+<li><strong>캔버스별 모델에서 단일 모델로</strong> 아키텍처를 통합했다 (5→1).</li>
+<li><strong>시각 전용에서 tri-modal로</strong> 모달리티를 넓혔다. audio와 timed-text가 uplift에 기여한다는 점을 정량적으로 검증했다.</li>
+<li><strong>콜드스타트를 처리하는 위치가 랭커 안에서 pretrained 임베딩으로 옮겨 갔다</strong> (day-zero CLIP 임베딩).</li>
+<li><strong>오프라인 gating이 A/B의 전제조건</strong>으로 프로덕션 프로세스에 편입됐다 (popularity-based winner).</li>
 </ol>
 <p>이것은 Netflix가 &quot;FM으로 회원 표현을 중앙화&quot;하는 흐름에 <strong>아이템 쪽에서 대응한 것</strong>이라고 볼 수 있다. 회원 쪽은 FM(2025)이고 아이템 쪽은 MediaFM(2026)이다. 두 임베딩이 결합돼 랭커와 retrieval, 아트워크, 프리뷰의 공통 하부구조가 되는 방향으로 가고 있다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="콜드스타트">콜드스타트</h2>
+<p>신규 타이틀은 출시일을 미리 아는 편성 카탈로그이므로, &quot;인덱스 커버리지&quot; 문제가 아니라 <strong>탐색과 프로모션</strong> 문제다. FM은 신규 타이틀 임베딩을 메타데이터로 초기화한다 <span class="badge ok">확인</span> FM 블로그 2025.</p>
 <ul>
-<li><strong>신규 타이틀</strong>: 출시일을 미리 아는 편성 카탈로그이므로 &quot;인덱스 커버리지&quot; 문제가 아니라 <strong>탐색과 프로모션</strong> 문제다. 빌보드 incrementality 밴딧이 P(play|노출)−P(play|비노출)을 최대화한다(어차피 볼 타이틀에 지면을 낭비하지 않는다) <span class="badge ok">확인</span> <a href="https://www.slideshare.net/JayaKawale/a-multiarmed-bandit-framework-for-recommendations-at-netflix" target="_blank" rel="noopener">Kawale &amp; Amat 2018 슬라이드</a> (전면 배포 여부는 확인하지 못했다). FM에서는 신규 타이틀 임베딩을 메타데이터의 가중 결합으로 초기화하고, entity age 기반 어텐션으로 ID 임베딩과 메타데이터 임베딩을 섞는다 <span class="badge ok">확인</span> FM 블로그 2025. 신규 아이템을 ID로만 다루는 X와는 정반대다</li>
-<li><strong>신규 콘텐츠 타입</strong>: 라이브 이벤트 콜드스타트를 다룬 사례 연구가 있고, 글로벌 실험에서 라이브 참여가 +20% 늘었다 <span class="badge ok">확인</span> <a href="https://dl.acm.org/doi/10.1145/3705328.3748112" target="_blank" rel="noopener">RecSys 2025</a></li>
-<li><strong>신규 회원</strong>: 가입할 때 타이틀 픽커 설문을 받는다(2015 논문부터 현재 헬프 문서까지 확인했다. 선택사항이고, 건너뛰면 &quot;다양하고 인기 있는&quot; 셋을 준다) <span class="badge ok">확인</span> TMIS 2015 §5.5 + <a href="https://help.netflix.com/en/node/100639" target="_blank" rel="noopener">help.netflix.com</a></li>
+<li><strong>신규 타이틀(빌보드)</strong>: incrementality 밴딧이 P(play|노출)−P(play|비노출)을 최대화한다. 어차피 볼 타이틀에는 지면을 낭비하지 않는다는 뜻이다 <span class="badge ok">확인</span> <a href="https://www.slideshare.net/JayaKawale/a-multiarmed-bandit-framework-for-recommendations-at-netflix" target="_blank" rel="noopener">Kawale &amp; Amat 2018 슬라이드</a>. 전면 배포 여부는 확인하지 못했다.</li>
+<li><strong>신규 타이틀(FM)</strong>: 신규 타이틀 임베딩을 메타데이터의 가중 결합으로 초기화하고, entity age 기반 어텐션으로 ID 임베딩과 메타데이터 임베딩을 섞는다 <span class="badge ok">확인</span> FM 블로그 2025. 신규 아이템을 ID로만 다루는 X와는 정반대다.</li>
+<li><strong>신규 콘텐츠 타입</strong>: 라이브 이벤트 콜드스타트를 다룬 사례 연구가 있고, 글로벌 실험에서 라이브 참여가 +20% 늘었다 <span class="badge ok">확인</span> <a href="https://dl.acm.org/doi/10.1145/3705328.3748112" target="_blank" rel="noopener">RecSys 2025</a>.</li>
+<li><strong>신규 회원</strong>: 가입할 때 타이틀 픽커 설문을 받는다. 설문은 선택사항이고, 건너뛰면 &quot;다양하고 인기 있는&quot; 셋을 준다 <span class="badge ok">확인</span> TMIS 2015 §5.5와 <a href="https://help.netflix.com/en/node/100639" target="_blank" rel="noopener">help.netflix.com</a>.<ul>
+<li>설문을 받는다는 사실은 2015 논문부터 현재 헬프 문서까지 확인했다.</li>
+</ul>
+</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="피드백-신호">피드백 신호</h2>
+<p>암묵 신호가 지배적이다. Netflix는 무엇을 봤는지, 어떻게 봤는지(디바이스·시각·요일·강도), 어디서 발견했는지, 그리고 <strong>노출됐으나 재생하지 않은 것</strong>까지 로깅한다 <span class="badge ok">확인</span> TMIS 2015.</p>
 <ul>
-<li>암묵 신호가 지배적이다. 무엇을 봤는지, 어떻게 봤는지(디바이스·시각·요일·강도), 어디서 발견했는지, 그리고 <strong>노출됐으나 재생하지 않은 것</strong>까지 로깅한다 <span class="badge ok">확인</span> TMIS 2015</li>
-<li>명시 신호는 이렇다. 2017년에 thumbs up(&quot;비슷한 것 더&quot;)과 down(&quot;그만 추천&quot;)으로 전환했고, 별점 대비 평점 활동이 200% 늘었다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs" target="_blank" rel="noopener">About Netflix 2017</a> · 2022년에는 Two Thumbs Up(&quot;정말 좋았음&quot;, 더 구체적으로 반영)을 추가했다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/two-thumbs-up-even-better-recommendations" target="_blank" rel="noopener">About Netflix 2022</a></li>
-<li>% Match는 &quot;시청 습관·행동 분석만으로&quot; 산출되는 <strong>표시용</strong> 점수다 <span class="badge ok">확인</span> 2017 발표. 명시 평점을 소비하는 곳이 랭킹이 아니라 UI일 수 있다 (→ <a href="survey-signals.html">survey-signals.md</a>)</li>
-<li>클릭베이트를 막는 장치도 있다. 아트워크 라벨에서 &quot;재생 유도했지만 저품질 참여&quot;를 배제한다 <span class="badge ok">확인</span> 2017</li>
-<li>인구통계(연령·성별)를 쓰지 않는다고 명시한다 <span class="badge ok">확인</span> help.netflix.com</li>
-<li>세션 의도는 FM-Intent가 다룬다. 다음 의도와 아이템을 동시에 예측하며, 프로덕션에 들어가 있다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/fm-intent-predicting-user-session-intent-with-hierarchical-multi-task-learning-94c75e18f4b8" target="_blank" rel="noopener">블로그 2025</a></li>
+<li>명시 신호는 2017년에 별점에서 thumbs up과 down으로 바뀌었다. up은 &quot;비슷한 것 더&quot;, down은 &quot;그만 추천&quot;이라는 뜻이다. 별점 대비 평점 활동이 200% 늘었다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs" target="_blank" rel="noopener">About Netflix 2017</a>.</li>
+<li>2022년에는 Two Thumbs Up(&quot;정말 좋았음&quot;)을 추가했고, 이 평가는 더 구체적으로 반영된다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/two-thumbs-up-even-better-recommendations" target="_blank" rel="noopener">About Netflix 2022</a>.</li>
+<li>% Match는 &quot;시청 습관·행동 분석만으로&quot; 산출되는 <strong>표시용</strong> 점수다 <span class="badge ok">확인</span> 2017 발표. 명시 평점을 소비하는 곳이 랭킹이 아니라 UI일 수 있다 (→ <a href="survey-signals.html">survey-signals.md</a>).</li>
+<li>클릭베이트를 막는 장치도 있다. 아트워크 라벨에서 &quot;재생 유도했지만 저품질 참여&quot;를 배제한다 <span class="badge ok">확인</span> 2017.</li>
+<li>인구통계(연령·성별)는 쓰지 않는다고 명시한다 <span class="badge ok">확인</span> help.netflix.com.</li>
+<li>세션 의도는 FM-Intent가 다룬다. 다음 의도와 아이템을 동시에 예측하며, 프로덕션에 들어가 있다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/fm-intent-predicting-user-session-intent-with-hierarchical-multi-task-learning-94c75e18f4b8" target="_blank" rel="noopener">블로그 2025</a>.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="학습-주기평가">학습 주기·평가</h2>
+<p>FM은 <strong>월 단위로 처음부터 재학습하고 일 단위로 파인튜닝한다.</strong> 빅테크 추천 모델 중에서 가장 구체적으로 공개된 주기다 <span class="badge ok">확인</span> 통합 블로그 2025-11.</p>
 <ul>
-<li>FM은 <strong>월 단위로 처음부터 재학습하고 일 단위로 파인튜닝한다.</strong> 빅테크 추천 모델 중에서 가장 구체적으로 공개된 주기다 <span class="badge ok">확인</span> 통합 블로그 2025-11</li>
-<li>고전 세대는 오프라인 실험 프로토콜의 예시로 &quot;이틀 전까지의 데이터&quot;를 언급한다 <span class="badge ok">확인</span> TMIS 2015 (<strong>프로덕션 학습 주기에 대한 진술은 아니다.</strong> 주기 자체는 공개되지 않았다) · 3계층(offline/nearline/online) 구조를 갖는다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/system-architectures-for-personalization-and-recommendation-e081aa94b5d8" target="_blank" rel="noopener">2013 블로그</a></li>
-<li>평가는 2단계다. interleaving(team-draft 방식, 시청시간 점유율로 판정하며, A/B 대비 &quot;100× 적은 인원으로 95% power&quot;)으로 후보를 줄인 뒤, 2-6개월 동안 셀당 ~200만 명 규모의 A/B로 넘어간다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55" target="_blank" rel="noopener">2017 블로그</a> + TMIS 2015</li>
-<li>오프라인 지표의 한계를 정직하게 인정한다. &quot;A/B 결과를 원하는 만큼 예측하지 못한다&quot;(2015)에서 &quot;오프라인 개선이 온라인 flat/음수&quot;(2024)로 이어지는데, 10년째 같은 고백이다 <span class="badge ok">확인</span></li>
+<li>고전 세대 자료는 오프라인 실험 프로토콜의 예시로 &quot;이틀 전까지의 데이터&quot;를 언급한다 <span class="badge ok">확인</span> TMIS 2015.<ul>
+<li><strong>프로덕션 학습 주기에 대한 진술은 아니다.</strong> 주기 자체는 공개되지 않았다.</li>
+<li>고전 세대 시스템은 3계층(offline/nearline/online) 구조를 갖는다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/system-architectures-for-personalization-and-recommendation-e081aa94b5d8" target="_blank" rel="noopener">2013 블로그</a>.</li>
+</ul>
+</li>
+<li>평가는 2단계다. interleaving으로 후보를 줄인 뒤, 2-6개월 동안 셀당 ~200만 명 규모의 A/B로 넘어간다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55" target="_blank" rel="noopener">2017 블로그</a>와 TMIS 2015.<ul>
+<li>interleaving은 두 랭커의 결과를 한 목록에 섞어 보여 주고, 어느 쪽 결과가 더 선택받는지 보는 실험이다.</li>
+<li>Netflix는 team-draft 방식으로 섞고 시청시간 점유율로 판정한다. A/B 대비 &quot;100× 적은 인원으로 95% power&quot;를 낸다.</li>
+</ul>
+</li>
+<li>오프라인 지표의 한계를 정직하게 인정한다. 2015년에는 &quot;A/B 결과를 원하는 만큼 예측하지 못한다&quot;고 했고, 2024년에는 &quot;오프라인 개선이 온라인 flat/음수&quot;라고 했다. 10년째 같은 고백이다 <span class="badge ok">확인</span>.</li>
 </ul>
 <h3 id="counterfactual-observability-프레임워크-2026-09-recsys-2026">Counterfactual observability 프레임워크 (2026-09, RecSys 2026)</h3>
-<p><span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a>, 2026-09-19, RecSys 2026 accepted. 저자 4인 전원 Netflix Los Gatos.</p>
-<p>Netflix가 &quot;몇 년에 걸쳐 여러 recommender 위에 구축·배포&quot;한 counterfactual measurement 프레임워크의 첫 학술 진술이다. <strong>오프라인 gating</strong>(MediaFM의 popularity-based winner)이 배포 전 선발이라면, 이 프레임워크는 <strong>배포 후 관측(observability)</strong> 축이다 — 위치가 다르다.</p>
+<p>Netflix는 배포된 추천 시스템을 counterfactual measurement로 관측하는 프레임워크를 논문으로 공개했다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a>, 2026-09-19, RecSys 2026 accepted. counterfactual measurement는 특정 콘텐츠나 모델 결정이 없었다면 어땠을지를 추정하는 측정이다. Netflix가 &quot;몇 년에 걸쳐 여러 recommender 위에 구축·배포&quot;한 프레임워크이고, 이 논문이 그 첫 학술 진술이다. 저자 4인은 전원 Netflix Los Gatos 소속이다.</p>
+<p><strong>오프라인 gating</strong>(MediaFM의 popularity-based winner)이 배포 전 선발이라면, 이 프레임워크는 <strong>배포 후 관측</strong>(observability) 축이다. 둘은 놓인 위치가 다르다.</p>
 <ul>
-<li><p><strong>관측성을 counterfactual measurement 문제로 재정의</strong>한다: <em>&quot;estimating what the recommender would have done, and what engagement would have followed, in the absence of a specific content item or model decision&quot;</em>. 청중은 두 층 — content creator(콘텐츠 창작자)와 model developer(모델 개발자).</p>
+<li><p><strong>관측성을 counterfactual measurement 문제로 재정의한다</strong> <span class="badge ok">확인</span> 논문.</p>
+<ul>
+<li>논문의 정의: <em>&quot;estimating what the recommender would have done, and what engagement would have followed, in the absence of a specific content item or model decision&quot;</em></li>
+<li>청중은 두 층이다. 하나는 콘텐츠 창작자(content creator)이고, 다른 하나는 모델 개발자(model developer)다.</li>
+</ul>
 </li>
-<li><p><strong>측정 축이 세 개다</strong>(§3.1) — bias reduction(SNIPS/self-normalized IPS), relativity(정책 vs 정책, 아이템 vs 아이템 position-adjusted 비교), incrementality(counterfactual leave-one-out). 세 축이 하나의 measurement foundation 위에서 두 청중을 동시에 지원한다는 것이 저자들이 강조하는 통합점이다.</p>
+<li><p><strong>측정 축은 세 개다</strong>(§3.1) <span class="badge ok">확인</span> 논문.</p>
+<ul>
+<li>bias reduction은 SNIPS(self-normalized IPS)로 한다.</li>
+<li>relativity는 정책 대 정책 비교와, 아이템 대 아이템의 position-adjusted 비교로 잰다.</li>
+<li>incrementality는 counterfactual leave-one-out으로 잰다.</li>
+<li>세 축이 하나의 measurement foundation 위에서 두 청중을 동시에 지원한다는 것이 저자들이 강조하는 통합점이다.</li>
+</ul>
 </li>
-<li><p><strong>Cascading recommender에 대한 확장이 있다</strong>(§3.3). Upstream model developer용 metric은 target action을 set으로 두고 Jaccard 등 set-similarity로 match function을 재정의한다. Content creator용 metric은 아이템 i의 전체 pipeline 기여도를 두 값으로 분해한다:</p>
+<li><p><strong>cascading recommender로 확장했다</strong>(§3.3) <span class="badge ok">확인</span> 논문. cascading recommender는 여러 단계를 거쳐 후보를 좁혀 가는 추천이다.</p>
+<ul>
+<li><p>upstream model developer용 metric은 target action을 set으로 두고, Jaccard 등 set-similarity로 match function을 재정의한다.</p>
+</li>
+<li><p>content creator용 metric은 아이템 i의 전체 pipeline 기여도를 두 값으로 분해한다:</p>
 <p>Incrementality(i) = Irreplaceability(i) · Universality(i)</p>
-<p>Irreplaceability는 i가 후보 pool에 있을 때의 조건부 causal lift(self-normalized Hájek IPS estimator), Universality는 i가 eligible한 확률이다.</p>
+<p>Irreplaceability는 i가 후보 pool에 있을 때의 조건부 causal lift(self-normalized Hájek IPS estimator)이고, Universality는 i가 eligible한 확률이다.</p>
 </li>
-<li><p><strong>Row Curators A/B alignment R²=0.8212</strong> <span class="badge ok">확인</span> §4.2. Netflix 홈페이지의 Row Curator(콘텐츠 큐레이터가 만드는 title collection row)에 대한 오프라인 incrementality 측정을 실제 A/B(해당 row 시리즈를 recommender에서 제거하고 user engagement 손실을 측정) ground truth와 비교. 11개 A/B에서 R² = 0.8212. 프로덕션 detail — propensity를 [0.0001, 0.9999]로 clip, row당 최소 100 observation 요구, 서로 다른 길이의 홈페이지에 걸쳐 aggregate.</p>
+</ul>
+</li>
+<li><p><strong>Row Curators A/B alignment R²=0.8212</strong>: 오프라인 incrementality 측정을 실제 A/B ground truth와 비교한 값이다 <span class="badge ok">확인</span> §4.2.</p>
+<ul>
+<li>Row Curator는 Netflix 홈페이지에서 콘텐츠 큐레이터가 만드는 title collection row다.</li>
+<li>ground truth A/B는 해당 row 시리즈를 recommender에서 제거하고 user engagement 손실을 측정했다.</li>
+<li>11개 A/B에서 R² = 0.8212였다.</li>
+<li>프로덕션 세부도 밝혔다. propensity를 [0.0001, 0.9999]로 clip하고, row당 최소 100 observation을 요구하며, 서로 다른 길이의 홈페이지에 걸쳐 aggregate한다.</li>
+</ul>
 <blockquote>
 <p>&quot;Across 11 A/B tests, the R² between our proposed row-incrementality measurement and the A/B-test ground truth is 0.8212, providing strong validation of our approach.&quot;
 — <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">arXiv 2609.22747</a>, 2026-09-19</p>
 </blockquote>
 </li>
-<li><p><strong>Label misattribution 자동 감지 케이스</strong> <span class="badge ok">확인</span> §4.3. Incrementality 시계열 모니터링이 특정 콘텐츠 A의 성능 dip를 유사 콘텐츠는 안정된 상황에서 감지 → root cause가 모델의 positive label misattribution으로 밝혀졌다. Raw engagement로는 놓칠 발견을 이 프레임워크가 잡아냈다는 사례.</p>
+<li><p><strong>label misattribution을 자동으로 감지한 사례가 있다</strong> <span class="badge ok">확인</span> §4.3.</p>
+<ul>
+<li>incrementality 시계열 모니터링이, 유사 콘텐츠는 안정적인데 특정 콘텐츠 A만 성능이 dip한 상황을 감지했다.</li>
+<li>root cause는 모델의 positive label misattribution으로 밝혀졌다.</li>
+<li>raw engagement로는 놓칠 발견을 이 프레임워크가 잡아냈다는 사례다.</li>
+</ul>
 </li>
-<li><p><strong>Exploration이 전제조건이다</strong> <span class="badge ok">확인</span> §3.1. 프레임워크는 contextual bandit·RL setup 위에 얹혀 있고 logged propensity가 있어야 한다. Netflix는 이 조건이 자체 recommender 대부분에 이미 충족돼 있다고 서술하지만, <strong>exploration 없이 서빙되는 라인(예: pure Foundation Model shadow 배포)에는 그대로 얹을 수 없다</strong>는 제약이 함께 붙는다 <span class="badge est">추정</span>(논문이 이 제약을 명시적으로 다루지는 않는다).</p>
+<li><p><strong>exploration이 전제조건이다</strong> <span class="badge ok">확인</span> §3.1. 프레임워크는 contextual bandit·RL setup 위에서 동작하고, logged propensity가 있어야 한다.</p>
+<ul>
+<li>Netflix는 이 조건이 자체 recommender 대부분에 이미 충족돼 있다고 서술한다.</li>
+<li>다만 <strong>exploration 없이 서빙되는 라인(예: pure Foundation Model shadow 배포)에는 그대로 적용할 수 없다</strong>는 제약이 함께 붙는다 <span class="badge est">추정</span>(논문이 이 제약을 명시적으로 다루지는 않는다).</li>
+</ul>
 </li>
-<li><p><strong>공개하지 않은 것</strong> <span class="badge obs">관찰</span> 논문 정독. (a) 프레임워크가 배포된 recommender의 이름(Row Curators만 명시). (b) core online metric 절대값. (c) FM·GenRec·GenPage·MediaFM/MAPS 세대 라인과의 관계 — 이 프레임워크가 GenRec의 batch-compute A/B 결과 검증에 쓰였는지가 후속 확인 대상. (d) 11개 A/B의 개별 결과(R² 하나로만 aggregate). (e) exploration 없는 recommender에 대한 대응책.</p>
+<li><p><strong>논문이 공개하지 않은 것</strong> <span class="badge obs">관찰</span> 논문 정독.</p>
+<ul>
+<li>프레임워크가 배포된 recommender의 이름. Row Curators만 명시했다.</li>
+<li>core online metric 절대값</li>
+<li>FM·GenRec·GenPage·MediaFM/MAPS 세대 라인과의 관계. 이 프레임워크가 GenRec의 batch-compute A/B 결과 검증에 쓰였는지가 후속 확인 대상이다.</li>
+<li>11개 A/B의 개별 결과. R² 하나로만 aggregate했다.</li>
+<li>exploration 없는 recommender에 대한 대응책</li>
+</ul>
 </li>
 </ul>
-<p><strong>저장소 안에서의 위치.</strong> Netflix는 이 저장소가 추적하는 서비스 중 오프라인/온라인 alignment의 한계를 지속적으로 공개해 온 유일한 회사다(&quot;A/B 결과를 원하는 만큼 예측하지 못한다&quot;, 2015 → &quot;오프라인 개선이 온라인 flat/음수&quot;, 2024 → 이번 counterfactual measurement 프레임워크, 2026). 그동안의 진술이 문제 인정 쪽이었다면 이번 자료는 그 문제의 한 축(&quot;프로덕션 관측성&quot;)에 대한 자체 방법론이다. 저장소 코퍼스 안에서 recommender 측정 방법론을 별도 논문으로 공개한 회사·연도 조합의 첫 진술이며, <a href="#popularity-based-winner--%EC%98%A4%ED%94%84%EB%9D%BC%EC%9D%B8-%ED%94%84%EB%A1%9D%EC%8B%9C-%ED%83%9C%EC%8A%A4%ED%81%AC">MediaFM의 popularity-based winner</a>와는 목적(gating vs monitoring)과 시점(배포 전 vs 후)이 다르므로 두 축이 상보적이다.</p>
+<p>이 저장소가 추적하는 서비스 중 오프라인/온라인 alignment의 한계를 꾸준히 공개해 온 회사는 Netflix뿐이다. &quot;A/B 결과를 원하는 만큼 예측하지 못한다&quot;(2015)와 &quot;오프라인 개선이 온라인 flat/음수&quot;(2024)에 이어, 이번 counterfactual measurement 프레임워크(2026)가 나왔다. 그동안의 진술이 문제 인정 쪽이었다면, 이번 자료는 그 문제의 한 축인 &quot;프로덕션 관측성&quot;에 대한 자체 방법론이다. 저장소 코퍼스 안에서 recommender 측정 방법론을 별도 논문으로 공개한 회사·연도 조합의 첫 진술이다. <a href="#popularity-based-winner--%EC%98%A4%ED%94%84%EB%9D%BC%EC%9D%B8-%ED%94%84%EB%A1%9D%EC%8B%9C-%ED%83%9C%EC%8A%A4%ED%81%AC">MediaFM의 popularity-based winner</a>와는 목적(gating vs monitoring)이 다르고 시점도 배포 전과 배포 후로 다르므로, 두 축이 상보적이다.</p>
 <h3 id="추천의-가치-측정--선택-모델--소규모-nudge-ab-검증-ijio-논문-ec-26">추천의 가치 측정 — 선택 모델 + 소규모 nudge A/B 검증 (IJIO 논문, EC &#39;26)</h3>
-<p><span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2511.07280" target="_blank" rel="noopener">The Value of Personalized Recommendations: Evidence from Netflix (arXiv 2511.07280)</a>, v1 2025-11-10 · v5 2026-06-08, 논문. 요약 블로그는 <a href="https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96" target="_blank" rel="noopener">Measuring the Impact of Personalized Recommendations</a>(블로그, 게시일 미확인: RSS 날짜는 2026-10-14 일괄 재게시 값이다). 저자 6인이 Netflix다.</p>
+<p>이 논문은 개인화 추천의 가치를, 개인화를 끄는 대규모 실험 없이 선택 모델로 추정하고 소규모 nudge A/B로 검증한다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2511.07280" target="_blank" rel="noopener">The Value of Personalized Recommendations: Evidence from Netflix (arXiv 2511.07280)</a>, v1 2025-11-10 · v5 2026-06-08, 논문. 요약 블로그는 <a href="https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96" target="_blank" rel="noopener">Measuring the Impact of Personalized Recommendations</a>다. 블로그 게시일은 확인하지 못했고, RSS 날짜 2026-10-14는 일괄 재게시 값이다. 저자 6인이 Netflix 소속이다.</p>
 <ul>
 <li><p>추천 개인화를 끄는 대규모 실험 대신, 일 단위 시청 선택을 low-rank 선택 모델로 추정하고 추천된 타이틀에 &quot;추천 효과&quot; 항을 더한다. 식별은 알고리즘 exploration 같은 자연 변동에서 나온다 <span class="badge ok">확인</span>(블로그).</p>
 </li>
-<li><p>검증은 특정 카테고리의 노출을 살짝 올리거나 내리는 무작위 A/B로 diversion ratio(한 타이틀 묶음이 덜 보일 때 시청이 어디로 옮겨 가는지)를 재고 모델 예측과 비교했다. 상관 0.86, R² 0.73이다 <span class="badge ok">확인</span>(블로그).</p>
+<li><p>검증에는 특정 카테고리의 노출을 살짝 올리거나 내리는 무작위 A/B를 썼다. 이 A/B로 diversion ratio를 재고 모델 예측과 비교한 결과, 상관은 0.86, R²는 0.73이다 <span class="badge ok">확인</span>(블로그).</p>
+<ul>
+<li>diversion ratio는 한 타이틀 묶음이 덜 보일 때 시청이 어디로 옮겨 가는지를 나타낸다.</li>
+</ul>
 </li>
 <li><p>반사실 비교에서 현재 추천 대비 engagement는 무작위 −16%, 인기순 −12%, matrix factorization −4%다. 인기순과 MF는 시청 집중도를 높였다 <span class="badge ok">확인</span>(블로그, 초록).</p>
 </li>
-<li><p>추천으로 생긴 시청 차이 중 기계적 노출(exposure)은 약 7%이고, 대부분은 selection(원래 볼 사람에게 보여 줌)과 targeting(추천이 결정을 바꾸는 사람에게 보여 줌)이며, targeting 효과가 exposure의 약 7배다. targeting 효과는 중간 인기 타이틀에서 가장 크다 <span class="badge ok">확인</span>(블로그).</p>
+<li><p>추천으로 생긴 시청 차이 중 기계적 노출(exposure)은 약 7%이고, 대부분은 selection과 targeting에서 나온다 <span class="badge ok">확인</span>(블로그).</p>
+<ul>
+<li>selection은 원래 볼 사람에게 보여 주는 효과이고, targeting은 추천이 결정을 바꾸는 사람에게 보여 주는 효과다.</li>
+<li>targeting 효과는 exposure의 약 7배이고, 중간 인기 타이틀에서 가장 크다.</li>
+</ul>
 <blockquote>
 <p>&quot;Relative to the current system, random recommendations reduce engagement by 16%, popularity-based recommendations reduce engagement by 12%, and matrix factorization reduces engagement by 4%.&quot;
 — <a href="https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96" target="_blank" rel="noopener">Measuring the Impact of Personalized Recommendations</a> (블로그)</p>
 </blockquote>
 </li>
-<li><p>위 counterfactual observability 프레임워크가 &quot;개별 아이템·모델 결정&quot;의 증분을 재는 운영 도구라면, 이 논문은 &quot;추천 시스템 전체&quot;의 가치를 재는 경제학 측정이다 <span class="badge est">추정</span> — 두 자료의 측정 단위가 다르다는 점이 근거다. 비교 대상인 &quot;현재 시스템&quot;이 FM 세대인지 그 이전인지는 밝히지 않았다 <span class="badge ok">확인</span>(부재).</p>
+<li><p>위 <a href="#counterfactual-observability-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC-2026-09-recsys-2026">counterfactual observability 프레임워크</a>가 &quot;개별 아이템·모델 결정&quot;의 증분을 재는 운영 도구라면, 이 논문은 &quot;추천 시스템 전체&quot;의 가치를 재는 경제학 측정이다 <span class="badge est">추정</span>.</p>
+<ul>
+<li>근거는 두 자료의 측정 단위가 다르다는 점이다.</li>
+<li>비교 대상인 &quot;현재 시스템&quot;이 FM 세대인지 그 이전인지는 밝히지 않았다 <span class="badge ok">확인</span>(부재).</li>
+</ul>
 </li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="광고">광고</h2>
+<p>Netflix 광고에서 공개된 것은 이벤트 파이프라인(frequency capping, Flink/Druid)과 타겟팅 상품뿐이다. 타겟팅 상품은 17개 카테고리와 100+ 관심사로 이뤄진다. <strong>광고 랭킹 모델의 엔지니어링을 다룬 공개물은 2026-08 현재 없다</strong> <span class="badge ok">확인</span>(부재를 확인했다). Meta처럼 오가닉 계보와 광고 계보를 나누어 서술하는 것 자체가 불가능한 상태다.</p>
 <ul>
-<li>2022-11 Microsoft 파트너십에서 2024-01 인하우스 결정을 거쳐, 2025년에 Ads Suite가 12개국 전체에서 라이브됐다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/netflix-upfront-2025-the-center-of-attention" target="_blank" rel="noopener">Upfront 2025</a> + <a href="https://netflixtechblog.com/behind-the-scenes-building-a-robust-ads-event-processing-pipeline-e4e86caf9249" target="_blank" rel="noopener">파이프라인 블로그</a></li>
-<li>공개된 것은 이벤트 파이프라인(frequency capping, Flink/Druid)과 타겟팅 상품(17개 카테고리, 100+ 관심사)뿐이다. <strong>광고 랭킹 모델의 엔지니어링을 다룬 공개물은 2026-08 현재 없다</strong> <span class="badge ok">확인</span> (부재를 확인했다). Meta처럼 오가닉 계보와 광고 계보를 나누어 서술하는 것 자체가 불가능한 상태다</li>
+<li>광고 사업은 2022-11 Microsoft 파트너십에서 출발해 2024-01 인하우스 결정을 거쳤고, 2025년에는 Ads Suite가 12개국 전체에서 라이브됐다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/netflix-upfront-2025-the-center-of-attention" target="_blank" rel="noopener">Upfront 2025</a>와 <a href="https://netflixtechblog.com/behind-the-scenes-building-a-robust-ads-event-processing-pipeline-e4e86caf9249" target="_blank" rel="noopener">파이프라인 블로그</a>.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="열린-질문">열린 질문</h2>
 <ul>
-<li>GenRec와 GenPage를 전면 롤아웃했는가. 2026-08 현재 A/B 단계라는 진술까지만 나와 있다. <span class="badge obs">관찰</span> 2026-08-09 재확인: netflixtechblog에 GenRec 후속 글이 없다(단 인덱스가 JS 렌더링이라 검색 결과를 기준으로 삼았다)</li>
-<li>GenRec를 실시간 서빙 지면에도 적용했는가. 공개된 A/B는 batch-compute 지면에 한정된다. 실시간 후보 규모에서 prefill 1패스 비용이 성립하는지에 대한 진술이 없다</li>
-<li>GenRec의 후보 집합은 어디서 오는가. 채점 대상 candidate set을 누가 만드는지(FM 임베딩 retrieval인지, 기존 소스별 후보인지) 글이 밝히지 않는다</li>
-<li>Calibrated Recommendations를 프로덕션에 배포했는가</li>
-<li>프로덕션 FM의 파라미터 수는 얼마인가</li>
-<li>행 간 중복 허용 규칙의 1차 출처는 무엇인가</li>
-<li>광고 랭킹 모델은 어떤 구조인가 (공개물이 없다)</li>
-<li>&quot;Hydra&quot;라는 통합 시스템명이 실재하는가. 2차 출처만 있고 1차 출처는 확인하지 못했다</li>
-<li>semantic ID를 쓰는가. 1차 출처가 없다 (PRS 2025의 semantic tokenization 발표는 Spotify 것인데, 흔히 혼동한다)</li>
+<li>GenRec와 GenPage를 전면 롤아웃했는가. 2026-08 현재 A/B 단계라는 진술까지만 나와 있다. <span class="badge obs">관찰</span> 2026-08-09 재확인: netflixtechblog에 GenRec 후속 글이 없다. 단, 인덱스가 JS 렌더링이라 검색 결과를 기준으로 삼았다.</li>
+<li>GenRec를 실시간 서빙 지면에도 적용했는가. 공개된 A/B는 batch-compute 지면에 한정된다. 실시간 후보 규모에서 prefill 1패스 비용이 성립하는지에 대한 진술이 없다.</li>
+<li>GenRec의 후보 집합은 어디서 오는가. 채점 대상 candidate set을 누가 만드는지(FM 임베딩 retrieval인지, 기존 소스별 후보인지) 글이 밝히지 않는다.</li>
+<li>Calibrated Recommendations를 프로덕션에 배포했는가.</li>
+<li>프로덕션 FM의 파라미터 수는 얼마인가.</li>
+<li>행 간 중복 허용 규칙의 1차 출처는 무엇인가.</li>
+<li>광고 랭킹 모델은 어떤 구조인가. 공개물이 없다.</li>
+<li>&quot;Hydra&quot;라는 통합 시스템명이 실재하는가. 2차 출처만 있고 1차 출처는 확인하지 못했다.</li>
+<li>semantic ID를 쓰는가. 1차 출처가 없다. PRS 2025의 semantic tokenization 발표는 Spotify 것인데, 흔히 혼동한다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="출처">출처</h2>
@@ -426,16 +710,23 @@
 <li><a href="https://netflixtechblog.com/behind-the-streams-real-time-recommendations-for-live-events-e027cb313f8f" target="_blank" rel="noopener">라이브 실시간 추천 전달</a> — 2025, 블로그</li>
 <li><a href="https://netflixtechblog.com/behind-the-scenes-building-a-robust-ads-event-processing-pipeline-e4e86caf9249" target="_blank" rel="noopener">Ads 파이프라인</a> — 2025, 블로그</li>
 <li><a href="https://about.netflix.com/en/news/netflix-upfront-2025-the-center-of-attention" target="_blank" rel="noopener">Upfront 2025 (Ads Suite)</a> — 2025, 발표</li>
-<li><a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">새 TV 경험 + 대화형 검색 베타</a> — 2025, 발표</li>
+<li><a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">새 TV 경험과 대화형 검색 베타</a> — 2025, 발표</li>
 <li><a href="https://arxiv.org/abs/2605.23312" target="_blank" rel="noopener">1B 스케일링 연구</a> — 2026, 논문 (shadow 단계)</li>
 <li><a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec</a> — 2026, 블로그</li>
 <li><a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">GenPage (RecSys)</a> — 2026, 논문</li>
 <li><a href="https://arxiv.org/abs/2601.02764" target="_blank" rel="noopener">Artwork LLM Post-training</a> — 2026, 논문 (연구 단계)</li>
-<li><a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a> — 2026-07-17, 블로그. GenRec의 서빙 층(vLLM + Triton + Java control plane, MSS, constrained decoding scaling)을 다룬다</li>
+<li><a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a> — 2026-07-17, 블로그. GenRec의 서빙 층을 다룬다. vLLM, Triton, Java control plane, MSS, constrained decoding scaling이 나온다</li>
 <li><a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a> — 2026-08-10, 논문. GenRec 블로그의 학술판이다. 손실 수식, Phase 1/2 기여 분해, 컨텍스트 5000→1700 예시, +0.006% 코어 지표, GRPO preliminary, 팀 구조 등 블로그가 밝히지 않은 정량치를 담았다</li>
-<li><a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS: Netflix&#39;s Multimodal Asset Personalization at Scale</a> — 2026-08-28, 블로그. 위 arXiv 2608.18322와 같은 시스템에 <strong>MAPS</strong>라는 이름을 부여한다. 정량치는 논문 쪽에 있고, 블로그가 새로 더하는 것은 (a) 시스템 이름과 세 프로덕트(CLIP 아트워크·query-aware 아트워크·MediaFM 비디오 프리뷰) 묶음, (b) 2025 TV 홈스크린 개편 홀드백 실측, (c) V1·V2 단독 flat vs V3 유의 ablation, (d) <strong>Netflix Embedding Store</strong>의 이름과 두 속성(training-serving skew 없음 + FM 업데이트와 personalization 배포 decouple), (e) 다음 단계로 image·text·video 공통 semantic space 확장 계획이다</li>
-<li><a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">Multimedia Asset Personalization via Multimodal Embeddings at Netflix (arXiv 2608.18322)</a> — 2026-08-18, 논문. 아트워크 CLIP two-tower와 MediaFM tri-modal(SeqCLIP + wav2vec 2.0 + text-embedding-3-large)의 프로덕션 배포, +0.127%/+0.193% A/B lift, popularity-based winner 프록시로 체크포인트를 gating하는 방식을 다룬다</li>
-<li><a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a> — 2026-09-19, 논문(RecSys 2026 accepted). Counterfactual measurement 기반 observability 프레임워크. 세 축(bias reduction/relativity/incrementality), single-stage + cascading 지원, Row Curators A/B alignment R²=0.8212, label misattribution 자동 감지 케이스</li>
+<li><a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS: Netflix&#39;s Multimodal Asset Personalization at Scale</a> — 2026-08-28, 블로그. 위 arXiv 2608.18322와 같은 시스템에 <strong>MAPS</strong>라는 이름을 부여한다. 정량치는 논문 쪽에 있고, 블로그가 새로 더하는 것은 다음 다섯 가지다<ul>
+<li>시스템 이름과 세 프로덕트(CLIP 아트워크·query-aware 아트워크·MediaFM 비디오 프리뷰) 묶음</li>
+<li>2025 TV 홈스크린 개편 홀드백 실측</li>
+<li>V1·V2 단독 flat vs V3 유의 ablation</li>
+<li><strong>Netflix Embedding Store</strong>의 이름과 두 속성(training-serving skew 없음, FM 업데이트와 personalization 배포 decouple)</li>
+<li>다음 단계로 image·text·video 공통 semantic space 확장 계획</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">Multimedia Asset Personalization via Multimodal Embeddings at Netflix (arXiv 2608.18322)</a> — 2026-08-18, 논문. 아트워크 CLIP two-tower와 MediaFM tri-modal(SeqCLIP, wav2vec 2.0, text-embedding-3-large)의 프로덕션 배포, +0.127%/+0.193% A/B lift, popularity-based winner 프록시로 체크포인트를 gating하는 방식을 다룬다</li>
+<li><a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a> — 2026-09-19, 논문(RecSys 2026 accepted). Counterfactual measurement 기반 observability 프레임워크다. 세 축(bias reduction/relativity/incrementality), single-stage와 cascading 지원, Row Curators A/B alignment R²=0.8212, label misattribution 자동 감지 케이스를 다룬다</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 

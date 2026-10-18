@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-08-19 — feed-research</title>
-<meta name="description" content="한 줄: X가 4세대 이후 세 번째로 내놓은 후속 공개(b089ce6, 2026-08-17)에서 다음 세 가지를 확인했다. (1) 광고 브랜드 안전 판정에 V2 경로를 나란히 추가해서 Grok 라벨 6종을 _V2 버전으로 옮기고, V1 라벨 가운데…">
+<meta name="description" content="한 줄: X가 광고 브랜드 안전 판정에 V2 경로를 나란히 추가하고, 성인 컨텐츠 판정이 엇갈리면 Grok 4.5에게 다시 묻게 했다. 심판이 반대하면 hard 판정은 soft로 낮아진다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-08-19.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-08-19 — feed-research">
-<meta property="og:description" content="한 줄: X가 4세대 이후 세 번째로 내놓은 후속 공개(b089ce6, 2026-08-17)에서 다음 세 가지를 확인했다. (1) 광고 브랜드 안전 판정에 V2 경로를 나란히 추가해서 Grok 라벨 6종을 _V2 버전으로 옮기고, V1 라벨 가운데…">
+<meta property="og:description" content="한 줄: X가 광고 브랜드 안전 판정에 V2 경로를 나란히 추가하고, 성인 컨텐츠 판정이 엇갈리면 Grok 4.5에게 다시 묻게 했다. 심판이 반대하면 hard 판정은 soft로 낮아진다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-08-19.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,24 +42,35 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>수요일</li>
-<li><span class="meta-k">읽는 시간</span>38분</li>
+<li><span class="meta-k">읽는 시간</span>40분</li>
 </ul>
 <div class="doc-intro">
-<ul class="chips"><li class="chip">읽은 자료 <b>2</b>건 (X 4세대+2 공개 1건 + arXiv triage 30건 중 통과 1건 [SDF/Google Discover])</li><li class="chip">정본 반영 <b>1</b>개 파일 (x.md 4개 절 갱신)</li><li class="chip">레이더 갱신 <b>1</b>건 (Google Discover SDF 신규 등록)</li><li class="chip">Meta 엔지니어링 블로그 <b>0</b>건(마지막 관련 글 2026-08-05, canon에 이미 반영)</li><li class="chip">Netflix 테크 블로그 <b>0</b>건(마지막 2026-08-07</li><li class="chip">알고리즘 무관)</li></ul>
-<div class="lead"><span class="lb">한 줄 요약</span>X가 4세대 이후 세 번째로 내놓은 후속 공개(<a href="https://github.com/xai-org/x-algorithm/commit/b089ce6">b089ce6</a>, 2026-08-17)에서 다음 세 가지를 확인했다. (1) <strong>광고 브랜드 안전 판정에 V2 경로를 나란히 추가</strong>해서 Grok 라벨 6종을 <code>_V2</code> 버전으로 옮기고, V1 라벨 가운데 <code>PROMPT_OWNED_RULES</code>(botmaker rule id 7개)에 속하는 것을 강제로 제거하는 <code>compute_verdict_v2</code>를 새로 만들었다. (2) <strong>성인 컨텐츠 판정이 서로 엇갈릴 때 Grok 4.5를 심판으로 호출하는 cross-validation 태스크</strong>를 추가해서, safemodel(자체 비전 모델)이 positive라고 판정했지만 PtOS 정책이 hard 위반을 잡아내지 못하거나 그 반대인 경우에 Grok 4.5가 다시 판단해서 hard에서 soft로 강등할 수 있게 만들었다. (3) <strong><code>phoenix-rankall</code>의 인덱싱 게이트 두 개(<code>build1FavIndex</code>·<code>buildMMEmbMetadataDump</code>)에서 <code>favoriteCount &gt;= 1</code> 조건을 제거</strong>해서, 이제 후보 전체가 &quot;1fav&quot; 인덱스와 멀티모달 임베딩 메타데이터 덤프로 흘러가고 fav 없이 도착한 경우는 <code>1fav_uec_count_race</code> 카운터로 관측만 하도록 바꾸었다. 커밋 규모는 파일 34개에 +751/−162로 4세대+1(2026-08-14)보다 작지만, <strong>광고 브랜드 안전과 성인 컨텐츠 판정이 하나의 커밋에서 각각 다른 방향으로 정교화되었다</strong>는 점이 특징이다. V2 마이그레이션은 라벨 스키마를 정정하는 작업이고, cross-validation은 판정 계층을 확장하는 작업이다.</div>
+<ul class="chips"><li class="chip">읽은 자료 <b>2</b>건: X 커밋 1건(4세대+2), arXiv triage 30건 중 통과 1건(SDF)</li><li class="chip">정본 반영 <b>1</b>개 파일(x.md 4개 절 갱신)</li><li class="chip">레이더 갱신 <b>1</b>건(Google Discover SDF 신규 등록)</li><li class="chip">Meta 엔지니어링 블로그 <b>0</b>건(마지막 관련 글은 2026-08-05, 정본에 이미 반영)</li><li class="chip">Netflix 테크 블로그 <b>0</b>건(마지막 글은 2026-08-07이고 알고리즘과 무관)</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 광고 브랜드 안전 판정에 V2 경로를 나란히 추가하고, 성인 컨텐츠 판정이 엇갈리면 Grok 4.5에게 다시 묻게 했다. 심판이 반대하면 hard 판정은 soft로 낮아진다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">3</span></summary><ol><li><a href="#1-x-알고리즘-4세대2-후속-공개--광고-브랜드-안전-v2--grok-45-성인-컨텐츠-심판--phoenix-retrieval-인덱싱-게이트-제거"><span class="num">1</span>X 알고리즘 4세대+2 후속 공개 — 광고 브랜드 안전 V2 + Grok 4.5 성인 컨텐츠 심판 + Phoenix retrieval 인덱싱 게이트 제거</a></li><li><a href="#2-arxiv-triage--sdf-google-discover가-2년-동안-프로덕션에서-운영한-staleness-필터"><span class="num">2</span>arXiv triage — SDF (Google Discover가 2년 동안 프로덕션에서 운영한 staleness 필터)</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">3</span></summary><ol><li><a href="#1-광고-안전-판정에-v2-경로를-성인-판정에-grok-45-심판을-더했다--x"><span class="num">1</span>광고 안전 판정에 V2 경로를, 성인 판정에 Grok 4.5 심판을 더했다 — X</a></li><li><a href="#2-낡은-콘텐츠를-두-종류로-나눠-거르는-필터가-2년간-운영됐다--레이더google-discover"><span class="num">2</span>낡은 콘텐츠를 두 종류로 나눠 거르는 필터가 2년간 운영됐다 — 레이더(Google Discover)</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-x-알고리즘-4세대2-후속-공개--광고-브랜드-안전-v2--grok-45-성인-컨텐츠-심판--phoenix-retrieval-인덱싱-게이트-제거"><span class="num">1</span>X 알고리즘 4세대+2 후속 공개 — 광고 브랜드 안전 V2 + Grok 4.5 성인 컨텐츠 심판 + Phoenix retrieval 인덱싱 게이트 제거</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/b089ce6" target="_blank" rel="noopener">xai-org/x-algorithm @ b089ce6 — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-17 20:20 UTC, 공개 소스코드. 파일 34개, +751/−162. 4세대+1(2026-08-14)보다 규모는 작지만, <strong>광고 안전과 성인 컨텐츠 심판, retrieval 인덱싱</strong>이라는 서로 다른 세 축을 하나의 커밋에 함께 담았다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
-<p>4세대(2026-08-13, 47c1bcd)의 초대형 공개가 파라미터와 안전 파이프라인, labeling 서브레포 15개를 통째로 열었고, 바로 다음 날 나온 4세대+1(2026-08-14, c65aa17)이 가중치 해석 규칙과 브라질 선거 필터, Thompson sampling, Phoenix bool 3종, BDSM enforcement note 생성기 부분 공개까지 다섯 방향으로 확장했다 (상세한 내용은 <a href="daily-2026-08-16.html">daily/2026-08-16.md</a>에 정리해 두었다). 그 흐름에서 사흘 뒤에 나온 이 커밋(2026-08-17)은 규모가 훨씬 작은 대신 <strong>광고와 성인 컨텐츠 판정 계층</strong>에 초점을 명확하게 맞추고 있다. X가 4세대의 공개 리듬을 &quot;대형 공개 → 후속 하루짜리 정리 → 며칠 뒤 계층별 정교화&quot;로 잡아가고 있다고 볼 근거가 하나 더 늘었다 <span class="badge obs">관찰</span> 2026-08-19.</p>
-<p>특히 세 방향이 canon에 영향을 준다.</p>
-<p>첫째, <strong>광고 브랜드 안전 판정에 V2 로직이 나란히 추가되었다.</strong> 4세대 초까지 canon은 <code>home-mixer/models/brand_safety.rs</code>에 있는 <code>compute_verdict</code>가 <code>MEDIUM_RISK_LABELS</code>(14개)와 <code>LOW_RISK_LABELS</code>(3개)를 순서대로 검사해서 광고를 붙일지 판단한다고 반영해 왔다. 오늘 커밋은 그 함수를 지우지 않은 채 옆에 <code>compute_verdict_v2</code>를 새로 만들고, 라벨 세트를 <code>_V2</code> 버전으로 확장했으며, 특정 V1 라벨을 강제로 걸러내는 <code>strip_v1_grok_written</code> 헬퍼를 도입했다. 이것은 라벨 스키마 마이그레이션을 실제 프로덕션에서 어떻게 다루는지 보여주는 구체적인 사례이고, canon 주의 목록에 있는 &quot;죽은 파일&quot; 판별법과도 이어진다. V1과 V2가 둘 다 살아 있고, <code>worst_verdict</code>가 두 결과를 결합하는지 여부에 따라 광고 인접성 판정이 달라진다.</p>
-<p>둘째, <strong>성인 컨텐츠 판정에 판정 불일치를 대비하는 심판(judge) 계층이 추가되었다.</strong> 4세대에서 처음 공개된 grox의 안전 파이프라인은 <code>TaskSafetyPtosSafemodelSexNudity</code>(자체 비전 모델을 사용하는 sex/nudity 판정)와 PtOS(정책을 기준으로 삼는 위반 카테고리 판정)를 병렬로 실행하고, 두 결과가 다를 때는 로그만 남겼다. 오늘 커밋은 이 로직을 두 파일로 분리했다. safemodel은 판정만 담당하고(<code>_compare_outcome</code>을 제거했다), 새로 만든 파일 <code>task_safety_ptos_adult_content_cross_validation.py</code>가 <strong>safemodel과 PtOS의 판정이 서로 어긋날 때 Grok 4.5 심판을 호출</strong>해서 다시 판단을 받는다. 심판이 &quot;hard가 아니다&quot;라고 답하면 최종 결정은 <code>AdultContentSexualSoft</code>로 강등되고, safemodel이 남긴 positive 표시도 지워진다. 즉 판정 계층이 (a) safemodel, (b) PtOS, (c) Grok 4.5 심판이라는 세 층으로 확장되었다.</p>
-<p>셋째, <strong>Phoenix retrieval의 인덱싱 게이트가 사실상 제거되었다.</strong> <code>phoenix-rankall-strato</code>에 있는 <code>build1FavIndex</code>는 이름 그대로 &quot;1개 이상 favorite을 받은 포스트를 index에 넣는&quot; 함수였고, <code>buildMMEmbMetadataDump</code>(멀티모달 임베딩 메타데이터를 Kafka로 덤프하는 함수)도 같은 <code>favoriteCount &gt;= 1</code> 게이트를 통과해야 실행되었다. 오늘 커밋은 두 게이트를 모두 제거했다. 그래서 이제 <strong>모든 후보가 &quot;1fav&quot; 인덱스와 멀티모달 임베딩 덤프로 흘러들어간다.</strong> 다만 &quot;1fav&quot;라는 이름은 그대로 남았고, fav가 0인 상태로 도달한 경우는 <code>1fav_uec_count_race</code>라는 새 카운터로 계측만 한다. 이 변경은 canon이 3세대부터 4세대까지 &quot;인덱스는 인기도 신호를 담는다&quot;고 반영해온 이해와 정면으로 어긋난다. retrieval 후보 풀 자체가 사실상 인덱싱된 포스트 전체 집합으로 커진다는 뜻이다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">광고 브랜드 안전 V2 (Grok 라벨 마이그레이션)</span></p></div>
-<p>새 함수와 세 라벨 세트 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/home-mixer/models/brand_safety.rs" target="_blank" rel="noopener"><code>home-mixer/models/brand_safety.rs</code></a>:</p>
+<p>오늘 함께 본 다른 변화는 다음과 같다.</p>
+<ul>
+<li>X는 같은 커밋에서 favorite이 1개 이상인 후보만 retrieval 인덱스에 넣던 조건을 없앴다.</li>
+<li>Google 저자들이 Discover 피드에서 2년간 운영한 staleness 필터(SDF)를 논문으로 공개했다. 사용자의 staleness 신고가 54.9% 줄었다고 밝혔다.</li>
+</ul>
+<h2 id="1-광고-안전-판정에-v2-경로를-성인-판정에-grok-45-심판을-더했다--x"><span class="num">1</span>광고 안전 판정에 V2 경로를, 성인 판정에 Grok 4.5 심판을 더했다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/b089ce6" target="_blank" rel="noopener">xai-org/x-algorithm @ b089ce6 — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-17 20:20 UTC, 공개 소스코드. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+2다. 파일 34개, +751/−162다. 4세대+1(2026-08-14)보다 규모는 작지만, 광고 안전과 성인 컨텐츠 심판, retrieval 인덱싱이라는 서로 다른 세 축을 한 커밋에 함께 담았다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X 추천 알고리즘 공개 소스의 4세대(2026-08-13, 47c1bcd)는 초대형 공개로, 파라미터와 안전 파이프라인, labeling 서브레포 15개를 전부 열었다. 바로 다음 날 나온 4세대+1(2026-08-14, c65aa17)은 다섯 방향으로 공개 범위를 넓혔고, 자세한 내용은 <a href="daily-2026-08-16.html">daily/2026-08-16.md</a>에 정리해 두었다. 그 다섯 방향은 가중치 해석 규칙, 브라질 선거 필터, Thompson sampling, Phoenix(X For You의 랭킹·retrieval 모델) bool 3종, BDSM enforcement note 생성기 부분 공개다. 이번 커밋은 그 사흘 뒤(2026-08-17)에 나왔고, 규모가 훨씬 작은 대신 광고와 성인 컨텐츠 판정 계층에 초점을 분명히 맞췄다.</p></div>
+<p>특히 이번 커밋의 세 방향이 정본에 영향을 준다. 광고 브랜드 안전 판정에 생긴 V2 경로(카드 A), 성인 컨텐츠 판정에 더해진 심판 계층(카드 B), Phoenix retrieval 인덱싱 게이트의 제거(카드 C)다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 광고 브랜드 안전 판정에 V1을 그대로 둔 채 V2 경로가 생겼다</span></p></div>
+<p>광고 브랜드 안전 판정(포스트 옆에 광고를 붙여도 되는지 가리는 판정)에 V2 로직이 나란히 추가됐다. 4세대 초까지 정본은 <code>compute_verdict</code>가 <code>MEDIUM_RISK_LABELS</code>(14개)와 <code>LOW_RISK_LABELS</code>(3개)를 순서대로 검사해 광고를 붙일지 판단한다고 적어 왔다. 이 함수는 home-mixer(For You 피드를 조립하는 서비스)의 <code>home-mixer/models/brand_safety.rs</code>에 있다. 이번 커밋은 그 함수를 지우지 않은 채 옆에 <code>compute_verdict_v2</code>를 새로 만들었다. Grok 라벨 6종을 <code>_V2</code> 버전으로 옮겼고, 라벨 세트도 <code>_V2</code> 버전으로 넓혔다. 특정 V1 라벨을 강제로 걸러 내는 <code>strip_v1_grok_written</code> 헬퍼도 도입했다.</p>
+<ul>
+<li><p>V2 판정에 쓰는 새 함수와 세 라벨 세트가 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/home-mixer/models/brand_safety.rs" target="_blank" rel="noopener"><code>home-mixer/models/brand_safety.rs</code></a>.</p>
+<ul>
+<li><p>V1과 비교하면 medium risk 라벨은 14개에서 16개로 늘었고, low risk 라벨은 3개 그대로 남았다.</p>
+</li>
+<li><p><code>GROK_NSFA</code>는 <code>GROK_NSFA_V2</code>로 이름이 바뀌었고, <code>GROK_NSFA_EXPANDED_V2</code>가 새로 생겼다(medium 쪽에 하나가 늘었다).</p>
+</li>
+<li><p><code>GROK_NSFA_LIMITED</code>는 <code>GROK_NSFA_LIMITED_V2</code>로 이름이 바뀌었다(low 쪽에서 하나가 옮겨졌다).</p>
+</li>
+<li><p>라벨 세트 정의:</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) const MEDIUM_RISK_LABELS_V2: &amp;[SafetyLabelType] = &amp;[
     SafetyLabelType::NSFW_HIGH_PRECISION,
     SafetyLabelType::NSFW_HIGH_RECALL,
@@ -85,8 +96,22 @@ pub(crate) const LOW_RISK_LABELS_V2: &amp;[SafetyLabelType] = &amp;[
     SafetyLabelType::NSFA_HIGH_RECALL,
 ];
 </code></pre></figure>
-<p>즉 V2는 V1과 비교하면 (a) <code>GROK_NSFA</code>를 <code>GROK_NSFA_V2</code>로 이름을 바꾸고 <code>GROK_NSFA_EXPANDED_V2</code>를 새로 만들었으며(medium 쪽에 하나가 늘었다), (b) <code>GROK_NSFA_LIMITED</code>를 <code>GROK_NSFA_LIMITED_V2</code>로 이름을 바꾸었다(low 쪽에서 하나가 옮겨졌다). 그 결과 V1과 비교해서 medium risk 라벨은 14개에서 16개로 늘었고, low risk 라벨은 3개 그대로 남았다.</p>
-<p>핵심 로직인 <code>strip_v1_grok_written</code>은 다음과 같다 <span class="badge ok">확인</span>:</p>
+</li>
+</ul>
+</li>
+<li><p>V2 판정은 V1 프롬프트가 이중으로 기록(dual write)한 라벨을 먼저 입력에서 지우고, 나머지 라벨만으로 판정한다 <span class="badge ok">확인</span>(같은 파일).</p>
+<ul>
+<li><p>지우는 조건은 둘이다.</p>
+<ul>
+<li>라벨이 <code>NSFA_HIGH_PRECISION</code>이거나 <code>NSFA_LIMITED_INVENTORY</code>다.</li>
+<li>그 라벨의 botmaker(X의 규칙 엔진) rule id가 <code>PROMPT_OWNED_RULES = [1400, 1410, 1420, 1500, 1510, 1610, 1700]</code>의 7개 가운데 하나다.</li>
+</ul>
+</li>
+<li><p>두 조건을 모두 만족하면 V1 프롬프트가 dual-write한 라벨로 보고 입력 라벨 집합에서 제거한다.</p>
+</li>
+<li><p>이 처리는 V2 로직이 V1 프롬프트가 만든 이중 기록을 무시하고 V2 라벨만으로 판단하게 만드는 마이그레이션 장치다.</p>
+</li>
+<li><p>이 일을 맡는 핵심 로직은 <code>strip_v1_grok_written</code>이다:</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn strip_v1_grok_written(labels: &amp;HashMap&lt;SafetyLabelType, SafetyLabel&gt;)
     -&gt; Cow&lt;&#39;_, HashMap&lt;SafetyLabelType, SafetyLabel&gt;&gt;
 {
@@ -111,8 +136,18 @@ pub(crate) const LOW_RISK_LABELS_V2: &amp;[SafetyLabelType] = &amp;[
     )
 }
 </code></pre></figure>
-<p>즉 V2로 판정할 때 (a) 라벨이 <code>NSFA_HIGH_PRECISION</code>이거나 <code>NSFA_LIMITED_INVENTORY</code>이고 (b) 그 라벨의 botmaker rule id가 <code>PROMPT_OWNED_RULES = [1400, 1410, 1420, 1500, 1510, 1610, 1700]</code>의 7개 가운데 하나이면, V1 프롬프트가 dual-write한 라벨로 판단해서 <strong>입력 라벨 집합에서 제거</strong>한 다음 나머지 라벨만으로 판정한다. 이 처리는 <strong>V1 프롬프트가 만든 이중 기록(dual write)을 V2 로직이 무시하고 V2 라벨만으로 판단하게 만드는 마이그레이션 장치</strong>에 해당한다.</p>
-<p><code>compute_verdict_v2</code>의 판정 순서는 다음과 같다 <span class="badge ok">확인</span>:</p>
+</li>
+</ul>
+</li>
+<li><p>V2 판정 함수의 판정 순서는 V1과 같다. 달라진 점은 참조하는 라벨 이름과 앞에 들어간 전처리, 두 가지다 <span class="badge ok">확인</span>(같은 파일).</p>
+<ul>
+<li><p>순서는 medium 캐스케이드 → Grok 채점 여부 → PTOS(정책을 기준으로 삼는 위반 카테고리 판정) 심사 → low → 그 외에는 safe다.</p>
+</li>
+<li><p>참조하는 라벨 이름이 <code>GROK_SFA</code>에서 <code>GROK_SFA_V2</code>로, <code>GROK_NSFA_LIMITED</code>에서 <code>GROK_NSFA_LIMITED_V2</code>로 바뀌었다.</p>
+</li>
+<li><p>V1의 이중 기록을 제거하는 전처리가 맨 앞에 들어갔다.</p>
+</li>
+<li><p><code>compute_verdict_v2</code>의 판정 순서를 보여 주는 코드:</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn compute_verdict_v2(labels: ..., tweet_id: u64) -&gt; BrandSafetyVerdict {
     let labels = strip_v1_grok_written(labels);
     if MEDIUM_RISK_LABELS_V2.iter().any(|l| labels.contains_key(l)) {
@@ -132,8 +167,16 @@ pub(crate) const LOW_RISK_LABELS_V2: &amp;[SafetyLabelType] = &amp;[
     BrandSafetyVerdict::Safe
 }
 </code></pre></figure>
-<p>판정 순서 자체는 V1과 동일하다 (medium 캐스케이드 → Grok 채점 여부 → PTOS 심사 → low → 그 외에는 safe). 달라진 점은 두 가지다. (a) 참조하는 라벨 이름이 <code>GROK_SFA</code>에서 <code>GROK_SFA_V2</code>로, <code>GROK_NSFA_LIMITED</code>에서 <code>GROK_NSFA_LIMITED_V2</code>로 바뀌었다. (b) V1의 이중 기록을 제거하는 전처리가 앞에 들어갔다.</p>
-<p><strong>핵심 검증 테스트 <span class="badge ok">확인</span></strong> — 같은 파일에 있는 <code>v2_mirrors_v1_across_tier_matrix</code>는 다음과 같다:</p>
+</li>
+</ul>
+</li>
+<li><p>X는 V1과 V2가 같은 판정을 내려야 한다는 점을 테스트로 명시한다 <span class="badge ok">확인</span>(같은 파일).</p>
+<ul>
+<li><p>같은 파일의 <code>v2_mirrors_v1_across_tier_matrix</code>가 6가지 라벨 조합 × 두 tweet_id 시점(PTOS_CUTOFF 전과 후)에서 두 판정이 같은지 assert한다.</p>
+</li>
+<li><p>마이그레이션이 진행되는 동안 두 판정이 어긋나지 않아야 광고 인접성이 바뀌지 않기 때문에, 이 테스트가 안전장치 역할을 한다.</p>
+</li>
+<li><p>테스트 코드:</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[test]
 fn v2_mirrors_v1_across_tier_matrix() {
     fn to_v2(v1_set: &amp;[SafetyLabelType]) -&gt; Vec&lt;SafetyLabelType&gt; { /* V1 → V2 라벨 이름 변환 */ }
@@ -154,27 +197,82 @@ fn v2_mirrors_v1_across_tier_matrix() {
     }
 }
 </code></pre></figure>
-<p>즉 X는 <strong>V1과 V2가 같은 판정을 내려야 한다는 점을 6가지 라벨 조합 × 두 tweet_id 시점(PTOS_CUTOFF 전과 후)에서 명시적으로 assert한다</strong>. 마이그레이션이 진행되는 동안 두 판정이 어긋나지 않아야 광고 인접성이 바뀌지 않기 때문에, 이 테스트가 안전장치 역할을 한다.</p>
-<div class="blk why"><p><span class="lbl">의미 (라벨 스키마 마이그레이션의 관찰 가능성)</span></p></div>
-<p>canon은 3세대부터 4세대까지 광고 브랜드 안전을 &quot;손으로 짠 규칙 캐스케이드&quot;로 반영해 왔는데, 오늘 확인한 내용은 <strong>Grok의 안전 라벨 자체가 버전으로 관리되고 있고, 그 마이그레이션이 코드 안에서 dual-write를 감지하는 로직으로 구현되어 있다</strong>는 것이다. 이 내용은 canon 주의 목록에 있는 &quot;죽은 파일&quot; 판별법과도 이어진다. V1과 V2가 둘 다 export되기 때문에, 어느 쪽이 실제로 호출되는지는 상위 하이드레이터(<code>ads_brand_safety_vf_hydrator.rs</code>)에서 확인해야 한다. <span class="badge ok">확인</span> 오늘 커밋은 그 하이드레이터도 함께 수정했는데(+13/−7), 상위 호출 경로가 V1에서 V2로 전환되는 중이라는 신호로 볼 수 있다.</p>
-<p>특히 <code>PROMPT_OWNED_RULES = [1400, 1410, 1420, 1500, 1510, 1610, 1700]</code>의 rule id 7개는 이름부터 <strong>botmaker 프롬프트가 소유한다</strong>고 표시되어 있지만, 4세대에서 공개된 <a href="https://github.com/xai-org/x-algorithm/tree/b089ce6/botmaker-rules" target="_blank" rel="noopener"><code>botmaker-rules/</code></a>의 어느 규칙과 정확히 대응하는지는 공개되지 않았다. rule id를 규칙 파일에 연결하는 매핑 문서가 없기 때문이다. 이 매핑을 canon의 심층 분석 필요 목록에 추가한다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">성인 컨텐츠 판정 cross-validation (Grok 4.5 심판)</span></p></div>
-<p>새로 추가된 파일 <code>task_safety_ptos_adult_content_cross_validation.py</code>(162줄) <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py</code></a>:</p>
-<p>핵심 흐름은 다음 4단계로 이루어진다.</p>
-<ol>
-<li><strong>판정 비교</strong> — 새 enum <code>CompareOutcome</code>이 <code>BOTH_POSITIVE</code>·<code>BOTH_NEGATIVE</code>·<code>SAFEMODEL_ONLY_POSITIVE</code>·<code>PTOS_ONLY_POSITIVE</code> 4가지를 구분한다. <code>is_disagreement</code>는 SAFEMODEL_ONLY이거나 PTOS_ONLY일 때 true가 된다. 이 로직은 4세대에서 <code>safemodel_sex_nudity.py</code> 안에 있었는데, 오늘 커밋이 그것을 떼어내 새 파일로 옮겼다.</li>
-<li><strong>게이트</strong> — (a) <code>is_deluxe = ctx.payload.task_type == SAFETY_PTOS_DELUXE</code>이므로 deluxe 플로우에서만 동작하고, 일반 플로우는 예전처럼 로그만 남긴다. (b) 이미 NSFW로 플래그된 포스트이면 건너뛰는데, <code>_post_is_already_flagged_nsfw</code>가 <code>StratoSafetyPostAnnotationsResultDirectMh</code>를 조회해서 확인한다.</li>
-<li><strong>Grok 4.5 심판 호출</strong> — 새 클래스 <code>SafetyPtosAdultContentCrossValidationJudge</code>가 <code>ModelName.EAPI_GROK_4_5_X_ALGO</code> 모델을 호출한다. 이때 <code>adult_content_policy_prompt()</code>를 system 메시지로 넣고, <code>PostRenderer.render(post, include_reply_to=True)</code>와 <code>UserRenderer.render(post.user)</code>를 user 메시지로 넣은 다음, <code>&lt;json&gt;...&lt;/json&gt;</code> 형식의 응답을 파싱해서 <code>SafetyPolicy</code> 오브젝트를 얻는다. 이 호출에는 <code>_EAPI_4_5_X_ALGO_BREAKER_CONFIG</code>라는 별도의 서킷브레이커가 붙어 있으며, 실패율 50%, 창 600초, 회복 600초, half-open 5회로 설정되어 있다.</li>
-<li><strong>재판단 적용</strong> — 심판이 <code>AdultContentSexualHard</code>라고 답하면 원래 판정을 그대로 유지한다. 그 밖의 경우, 즉 심판이 &quot;hard가 아니다&quot;라고 답하면 (a) 모든 AdultContent 위반의 <code>safetyPolicy.policyType</code>을 <code>AdultContentSexualSoft</code>로 강등하고 (b) 강등된 위반에 <code>reason = &quot;Grok 4.5 Cross Validation disagreed&quot;</code>를 표기하며 (c) <code>safemodel_sex_nudity.positive</code>를 false로 지운다. 즉 원래 판정 이유가 무엇이었든 <strong>최종 감사 로그에는 &quot;Grok 4.5 심판이 반대해서 강등되었다&quot;는 사실이 명시적인 텍스트로 기록된다</strong>.</li>
-</ol>
-<p><strong>연결된 safemodel 변경</strong> — 같은 커밋에서 <code>task_safety_ptos_safemodel_sex_nudity.py</code>도 함께 정리되었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py</code></a>:</p>
-<ul>
-<li><code>_compare_outcome</code>과 비교 로그, CompareOutcome enum 정의를 제거했다 (cross_validation 파일로 옮겼다).</li>
-<li>deluxe 플로우에서 이미 NSFW로 플래그된 포스트이면 판정 자체를 건너뛰는 사전 게이트를 추가했다.</li>
-<li>판정이 끝나는 시점에 <code>safemodel_sex_nudity.scored = True</code>를 명시적으로 설정한다 (cross_validation이 이 플래그를 보고 실행 여부를 판단한다).</li>
+</li>
 </ul>
-<p>즉 두 파일은 서로 의존한다. safemodel이 먼저 실행되면서 <code>scored=True</code>를 남기면, cross_validation이 그 플래그를 보고 실행되어 판정 결과를 비교하고, 필요하면 Grok 4.5에 재판단을 요청한다.</p>
-<p><strong>Grok 4.5 심판의 프롬프트 세부 <span class="badge ok">확인</span></strong> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py:597-608</code></a>:</p>
+</li>
+<li><p>이 변경은 라벨 스키마 마이그레이션을 실제 프로덕션에서 어떻게 다루는지 보여 주는 구체적인 사례이고, 정본 주의 목록의 &quot;죽은 파일&quot; 판별법과도 이어진다.</p>
+<ul>
+<li>V1과 V2가 둘 다 살아 있고, <code>worst_verdict</code>가 두 결과를 결합하는지 여부에 따라 광고 인접성 판정이 달라진다.</li>
+</ul>
+</li>
+<li><p>Grok의 안전 라벨 자체가 버전으로 관리되고, 그 마이그레이션은 코드 안에서 dual-write를 감지하는 로직으로 구현되어 있다.</p>
+<ul>
+<li>정본은 3세대부터 4세대까지 광고 브랜드 안전을 &quot;손으로 짠 규칙 캐스케이드&quot;로 반영해 왔다.</li>
+<li>이 내용도 &quot;죽은 파일&quot; 판별법과 이어진다. V1과 V2가 둘 다 export되기 때문에, 어느 쪽이 실제로 호출되는지는 상위 하이드레이터(<code>ads_brand_safety_vf_hydrator.rs</code>)에서 확인해야 한다. <span class="badge ok">확인</span> 이번 커밋은 그 하이드레이터도 함께 수정했는데(+13/−7), 상위 호출 경로가 V1에서 V2로 전환되는 중이라는 신호로 볼 수 있다.</li>
+</ul>
+</li>
+<li><p>botmaker 프롬프트가 소유한다고 표시된 rule id 7개가 실제로 어느 규칙인지는 공개되지 않았다.</p>
+<ul>
+<li><code>PROMPT_OWNED_RULES = [1400, 1410, 1420, 1500, 1510, 1610, 1700]</code>은 이름부터 botmaker 프롬프트가 소유한다고 표시되어 있다.</li>
+<li>하지만 4세대에서 공개된 <a href="https://github.com/xai-org/x-algorithm/tree/b089ce6/botmaker-rules" target="_blank" rel="noopener"><code>botmaker-rules/</code></a>의 어느 규칙과 정확히 대응하는지는 공개되지 않았다. rule id를 규칙 파일에 연결하는 매핑 문서가 없기 때문이다.</li>
+<li>이 매핑을 정본의 심층 분석 필요 목록에 추가한다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 성인 컨텐츠 판정이 엇갈리면 Grok 4.5 심판이 다시 판단하고, hard를 soft로 낮출 수 있다</span></p></div>
+<p>성인 컨텐츠 판정에, 판정이 서로 엇갈릴 때를 대비하는 심판(judge) 계층이 추가됐다. 4세대에서 처음 공개된 grox(Grok 기반 nearline 주석 파이프라인)의 안전 파이프라인은 두 판정을 병렬로 실행하고, 두 결과가 다를 때는 로그만 남겼다. 하나는 <code>TaskSafetyPtosSafemodelSexNudity</code>(자체 비전 모델을 사용하는 sex/nudity 판정)이고, 다른 하나는 PtOS(정책을 기준으로 삼는 위반 카테고리 판정)다.</p>
+<p>이번 커밋은 이 로직을 두 파일로 나눴다. safemodel은 판정만 맡는다(<code>_compare_outcome</code>을 제거했다). 새 파일 <code>task_safety_ptos_adult_content_cross_validation.py</code>는 safemodel과 PtOS의 판정이 어긋날 때 Grok 4.5 심판을 불러 다시 판단을 받는다. 어긋나는 경우는 safemodel이 positive로 판정했는데 PtOS 정책이 hard 위반을 잡아내지 못한 경우와 그 반대인 경우다. 심판이 &quot;hard가 아니다&quot;라고 답하면 최종 결정은 <code>AdultContentSexualSoft</code>로 강등되고, safemodel이 남긴 positive 표시도 지워진다. 판정 계층은 safemodel, PtOS, Grok 4.5 심판의 세 층으로 늘었다.</p>
+<ul>
+<li>교차 검증은 새 파일 <code>task_safety_ptos_adult_content_cross_validation.py</code>(162줄)가 네 단계로 처리한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py</code></a>.</li>
+</ul>
+<ol>
+<li>먼저 두 판정을 비교해 불일치를 찾는다 <span class="badge ok">확인</span>(같은 파일).<ul>
+<li>새 enum <code>CompareOutcome</code>이 <code>BOTH_POSITIVE</code>·<code>BOTH_NEGATIVE</code>·<code>SAFEMODEL_ONLY_POSITIVE</code>·<code>PTOS_ONLY_POSITIVE</code> 4가지를 구분한다.</li>
+<li><code>is_disagreement</code>는 SAFEMODEL_ONLY이거나 PTOS_ONLY일 때 true가 된다.</li>
+<li>이 로직은 4세대에서 <code>safemodel_sex_nudity.py</code> 안에 있었는데, 이번 커밋이 떼어 내 새 파일로 옮겼다.</li>
+</ul>
+</li>
+<li>deluxe 플로우에서만 동작하고, 이미 NSFW로 플래그된 포스트는 건너뛴다 <span class="badge ok">확인</span>(같은 파일).<ul>
+<li><code>is_deluxe = ctx.payload.task_type == SAFETY_PTOS_DELUXE</code>이므로 deluxe 플로우에서만 동작한다. 일반 플로우는 예전처럼 로그만 남긴다.</li>
+<li>플래그 여부는 <code>_post_is_already_flagged_nsfw</code>가 <code>StratoSafetyPostAnnotationsResultDirectMh</code>를 조회해서 확인한다.</li>
+</ul>
+</li>
+<li>불일치가 있으면 Grok 4.5 심판을 호출한다 <span class="badge ok">확인</span>(같은 파일).<ul>
+<li>새 클래스 <code>SafetyPtosAdultContentCrossValidationJudge</code>가 <code>ModelName.EAPI_GROK_4_5_X_ALGO</code> 모델을 호출한다.</li>
+<li>system 메시지에는 <code>adult_content_policy_prompt()</code>를 넣는다.</li>
+<li>user 메시지에는 <code>PostRenderer.render(post, include_reply_to=True)</code>와 <code>UserRenderer.render(post.user)</code>를 넣는다.</li>
+<li><code>&lt;json&gt;...&lt;/json&gt;</code> 형식의 응답을 파싱해서 <code>SafetyPolicy</code> 오브젝트를 얻는다.</li>
+<li>이 호출에는 <code>_EAPI_4_5_X_ALGO_BREAKER_CONFIG</code>라는 별도의 서킷브레이커가 붙어 있다. 실패율 50%, 창 600초, 회복 600초, half-open 5회로 설정되어 있다.</li>
+</ul>
+</li>
+<li>심판이 &quot;hard가 아니다&quot;라고 답하면 판정을 soft로 낮춘다 <span class="badge ok">확인</span>(같은 파일).<ul>
+<li>심판이 <code>AdultContentSexualHard</code>라고 답하면 원래 판정을 그대로 유지한다.</li>
+<li>그 밖의 경우에는 다음 세 가지를 한다.<ul>
+<li>모든 AdultContent 위반의 <code>safetyPolicy.policyType</code>을 <code>AdultContentSexualSoft</code>로 강등한다.</li>
+<li>강등된 위반에 <code>reason = &quot;Grok 4.5 Cross Validation disagreed&quot;</code>를 표기한다.</li>
+<li><code>safemodel_sex_nudity.positive</code>를 false로 지운다.</li>
+</ul>
+</li>
+<li>원래 판정 이유가 무엇이었든, 최종 감사 로그에는 &quot;Grok 4.5 심판이 반대해서 강등되었다&quot;는 사실이 명시적인 텍스트로 기록된다.</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><p>같은 커밋에서 <code>task_safety_ptos_safemodel_sex_nudity.py</code>도 함께 정리됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py</code></a>.</p>
+<ul>
+<li><code>_compare_outcome</code>과 비교 로그, CompareOutcome enum 정의를 지웠다. cross_validation 파일로 옮긴 것이다.</li>
+<li>deluxe 플로우에서 이미 NSFW로 플래그된 포스트이면 판정 자체를 건너뛰는 사전 게이트를 추가했다.</li>
+<li>판정이 끝나는 시점에 <code>safemodel_sex_nudity.scored = True</code>를 명시적으로 설정한다. cross_validation은 이 플래그를 보고 실행 여부를 판단한다.</li>
+<li>즉 두 파일은 서로 의존한다. safemodel이 먼저 실행되면서 <code>scored=True</code>를 남기면, cross_validation이 그 플래그를 보고 실행된다. 이어서 판정 결과를 비교하고, 필요하면 Grok 4.5에 재판단을 요청한다.</li>
+</ul>
+</li>
+<li><p>Grok 4.5 심판 호출은 시스템 프롬프트에서 사고 과정을 감추라는 제약을 벗겨 낸다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py:597-608</code></a>.</p>
+<ul>
+<li><p><code>_strip_thinking_restrictions()</code>가 시스템 프롬프트를 감싼다.</p>
+</li>
+<li><p>원래 프롬프트에는 &quot;이런 답변은 사고 과정을 노출하지 마라&quot;에 해당하는 제약이 있다. 심판 맥락에서는 그 제약을 벗겨 내 사고 과정을 볼 수 있게 만든다.</p>
+</li>
+<li><p>프롬프트를 구성하는 코드:</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">convo.messages.append(Message(
     role=Role.SYSTEM,
     content=[_strip_thinking_restrictions(adult_content_policy_prompt())],
@@ -189,18 +287,53 @@ user_msg.content.append(
     f&quot;\n\nProvide the requested JSON object for the specific safety policy type.{THINKING_CONTROL_START}&quot;
 )
 </code></pre></figure>
-<p>여기에서 관찰한 내용은 세 가지다.</p>
-<ul>
-<li><code>_strip_thinking_restrictions()</code>가 시스템 프롬프트를 감싼다. 원래 프롬프트가 &quot;이런 답변은 사고 과정을 노출하지 마라&quot;에 해당하는 제약을 담고 있는데, 심판 맥락에서는 그 제약을 벗겨내서 사고 과정을 볼 수 있게 만든다.</li>
-<li><code>include_reply_to=True</code>로 두어서, 답글인 경우에는 부모 포스트도 컨텍스트에 함께 넣는다. 그 답글이 어떤 포스트에 대한 반응인지가 성인 컨텐츠 판정에 영향을 준다는 뜻이다.</li>
-<li>응답은 <code>re.compile(r&quot;(.*)&lt;json&gt;(.*)&lt;/json&gt;&quot;, re.DOTALL)</code>로 파싱한다. 응답이 자유 텍스트와 <code>&lt;json&gt;...&lt;/json&gt;</code> 태그 안의 JSON으로 나뉘어 나오는 형식이며, 심판이 사고 과정을 자유 텍스트로 남기고 최종 판정만 JSON으로 반환하는 방식이다.</li>
+</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미 (판정 계층의 확장 방향)</span></p></div>
-<p>canon은 지금까지 &quot;판정은 단일 (safemodel 또는 PtOS 또는 Grok) → visibility rules → 필터/광고 인접성&quot; 구조로 반영해 왔는데, 오늘 확인한 내용은 <strong>판정 자체를 여러 모델의 앙상블로 재구성하는 방향</strong>을 보여준다. 세 층이 서로 다른 모델(safemodel은 자체 비전 모델, PtOS는 정책 판정 모델, Grok 4.5는 LLM 심판)로 구성되고, 판정이 어긋나는 상황을 이용해서 최종 판정을 자동으로 조정한다는 점이 특징이며, 4세대의 &quot;labeling 파이프라인 완전 공개&quot;와 방향이 같다. 앞으로 지켜볼 점은 두 가지다. 이 심판 계층이 다른 카테고리(폭력·혐오·스팸)로도 확장되는지, 그리고 Grok 4.5를 사용하는 비용(추론 코스트)을 어느 정도까지 감당할 수 있는지를 확인해야 한다.</p>
-<p>특히 <strong>판정이 강등되는 방향(hard → soft)만 있고 격상되는 방향은 없다</strong>는 점도 중요한 관찰이다. 즉 이 심판 계층은 <strong>과도한 게이팅을 완화하는 방향으로만 작동</strong>하도록 설계되었다. 원래 판정이 놓친 hard 케이스를 심판이 잡아내서 격상하는 로직은 이 커밋에 들어 있지 않다. 이 설계는 성인 컨텐츠 게이팅의 정책 방향이 false positive를 줄이는 쪽이지 false negative를 줄이는 쪽이 아니라는 사실을 코드에서 확인할 수 있게 해 준다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">Phoenix retrieval 인덱싱 게이트 제거</span></p></div>
-<p><code>phoenixRankAllCandidateProcessor.strato</code>에서 두 함수가 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato" target="_blank" rel="noopener"><code>phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato</code></a>:</p>
-<p><strong>변경 전:</strong></p>
+</li>
+<li><p>답글이면 부모 포스트도 컨텍스트에 함께 넣는다 <span class="badge ok">확인</span>(같은 파일).</p>
+<ul>
+<li><code>include_reply_to=True</code>로 둔 결과다.</li>
+<li>그 답글이 어떤 포스트에 대한 반응인지가 성인 컨텐츠 판정에 영향을 준다는 뜻이다.</li>
+</ul>
+</li>
+<li><p>심판은 사고 과정을 자유 텍스트로 남기고, 최종 판정만 JSON으로 반환한다 <span class="badge ok">확인</span>(같은 파일).</p>
+<ul>
+<li>응답은 <code>re.compile(r&quot;(.*)&lt;json&gt;(.*)&lt;/json&gt;&quot;, re.DOTALL)</code>로 파싱한다.</li>
+<li>응답이 자유 텍스트와 <code>&lt;json&gt;...&lt;/json&gt;</code> 태그 안의 JSON으로 나뉘어 나오는 형식이다.</li>
+</ul>
+</li>
+<li><p>이번 변경은 판정 자체를 여러 모델의 앙상블로 재구성하는 방향을 보여 준다.</p>
+<ul>
+<li>정본은 지금까지 판정 구조를 &quot;판정은 단일 (safemodel 또는 PtOS 또는 Grok) → visibility rules → 필터/광고 인접성&quot;으로 반영해 왔다.</li>
+<li>세 층은 서로 다른 모델로 이루어진다. safemodel은 자체 비전 모델, PtOS는 정책 판정 모델, Grok 4.5는 LLM 심판이다.</li>
+<li>판정이 어긋나는 상황을 이용해 최종 판정을 자동으로 조정한다는 점이 특징이다. 4세대의 &quot;labeling 파이프라인 완전 공개&quot;와 방향이 같다.</li>
+</ul>
+</li>
+<li><p>판정이 강등되는 방향(hard → soft)만 있고 격상되는 방향은 없다는 점도 중요한 관찰이다.</p>
+<ul>
+<li>원래 판정이 놓친 hard 케이스를 심판이 잡아내 격상하는 로직은 이 커밋에 들어 있지 않다.</li>
+<li>즉 이 심판 계층은 과도한 게이팅을 완화하는 방향으로만 작동하도록 설계됐다.</li>
+<li>이 설계는 성인 컨텐츠 게이팅의 정책 방향이 false positive를 줄이는 쪽이지 false negative를 줄이는 쪽이 아니라는 사실을 코드에서 확인할 수 있게 해 준다.</li>
+</ul>
+</li>
+<li><p>앞으로 지켜볼 점은 두 가지다.</p>
+<ul>
+<li>이 심판 계층이 다른 카테고리(폭력·혐오·스팸)로도 확장되는지 확인해야 한다.</li>
+<li>Grok 4.5를 사용하는 비용(추론 코스트)을 어느 정도까지 감당할 수 있는지 확인해야 한다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. favorite 1개 이상이던 인덱싱 조건이 사라져 모든 후보가 인덱스로 간다</span></p></div>
+<p>Phoenix retrieval의 인덱싱 게이트가 사실상 제거됐다. <code>phoenix-rankall-strato</code>(어떤 인덱스에 포스트가 속하는지 결정하는 이벤트 층)의 <code>build1FavIndex</code>는 이름 그대로 &quot;1개 이상 favorite을 받은 포스트를 index에 넣는&quot; 함수였다. <code>buildMMEmbMetadataDump</code>(멀티모달 임베딩 메타데이터를 Kafka로 덤프하는 함수)도 같은 <code>favoriteCount &gt;= 1</code> 게이트를 통과해야 실행됐다.</p>
+<p>이번 커밋은 두 게이트를 모두 없앴다. 그래서 이제 모든 후보가 &quot;1fav&quot; 인덱스와 멀티모달 임베딩 덤프로 흘러 들어간다. 다만 &quot;1fav&quot;라는 이름은 그대로 남았고, fav가 0인 상태로 도달한 경우는 <code>1fav_uec_count_race</code>라는 새 카운터로 계측만 한다.</p>
+<ul>
+<li><p>인덱싱 이벤트를 만드는 <code>phoenixRankAllCandidateProcessor.strato</code>에서 두 함수가 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato" target="_blank" rel="noopener"><code>phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato</code></a>.</p>
+</li>
+<li><p>1fav 인덱스를 만드는 <code>build1FavIndex</code>는 이제 fav 카운트와 상관없이 매번 인덱싱 이벤트를 발행하고, fav가 0인 경우만 카운터로 계측한다 <span class="badge ok">확인</span>(같은 파일).</p>
+<ul>
+<li><p>계측에 쓰는 카운터는 <code>1fav_uec_count_race</code>다.</p>
+</li>
+<li><p>변경 전:</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">def build1FavIndex(candidate: PhoenixRankAllCandidate, stats: Stats.StatsReceiver): Unit = {
   candidate.engagementCount match {
     case Some(ec) =&gt;
@@ -213,7 +346,8 @@ user_msg.content.append(
   }
 }
 </code></pre></figure>
-<p><strong>변경 후:</strong></p>
+</li>
+<li><p>변경 후:</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">def build1FavIndex(candidate: PhoenixRankAllCandidate, stats: Stats.StatsReceiver): Unit = {
   if (candidate.engagementCount.flatMap { ec =&gt; ec.favoriteCount }.getOrElse(0) == 0) {
     stats.counter(&quot;1fav_uec_count_race&quot;).incr(1)
@@ -223,83 +357,180 @@ user_msg.content.append(
   stats.counter(&quot;1fav_indexing_event_created&quot;).incr(1)
 }
 </code></pre></figure>
-<p>즉 (a) fav 카운트와 상관없이 매번 인덱싱 이벤트를 발행하고, (b) fav가 0인 경우만 <code>1fav_uec_count_race</code> 카운터로 계측한다. 카운터 이름에 들어간 &quot;race&quot;는 uec(user engagement counts) 저장소와 후보가 도착하는 시점이 어긋나서 fav가 아직 반영되지 않았을 가능성을 가리키는 것으로 보인다 <span class="badge est">추정</span>.</p>
-<p>같은 함수 안에 있던 <code>buildMMEmbMetadataDump</code>(멀티모달 임베딩 v3·v5_1·v6_dev 세 버전을 조회해서 Kafka로 덤프하는 부분)도 똑같이 <code>favoriteCount &gt;= 1</code> 게이트를 제거했기 때문에, 이제 모든 후보에 대해 실행된다 <span class="badge ok">확인</span>:</p>
-<ul>
-<li>변경 전: <code>if(ec.favoriteCount.getOrElse(0) &gt;= 1) { ... 멀티모달 임베딩 fetch + Kafka 덤프 ... }</code></li>
-<li>변경 후: 게이트를 제거해서 모든 후보에 대해 멀티모달 임베딩 3개 버전을 조회하고 Kafka로 덤프한다.</li>
-</ul>
-<div class="blk why"><p><span class="lbl">의미 (retrieval 인덱스 커버리지 확대)</span></p></div>
-<p>canon이 3세대부터 4세대까지 관찰해온 &quot;phoenix-rankall이 인기 신호로 인덱스를 갱신한다&quot;는 이해는 이제 정확하지 않다. 오늘 이후로 <strong>&quot;1fav&quot;라는 인덱스 이름은 하위 호환을 위해 남겨 둔 라벨일 뿐</strong>이고, 실제 인덱스는 유입되는 후보 전체를 담는다. 이 관찰은 canon 주의 목록에 &quot;인덱스 이름이 필터 조건을 뜻하지는 않는다&quot;를 추가할 만한 근거가 된다.</p>
-<p>멀티모달 임베딩 덤프의 게이트를 제거한 것은 특히 눈여겨볼 만한데, v3·v5_1·v6_dev 세 임베딩을 인기 없는 포스트에까지 전부 조회해서 Kafka로 덤프한다는 것은 <strong>retrieval 시그널을 마련하기 위한 인벤토리 준비 비용을 크게 늘리는 선택</strong>이다. 이는 canon이 서술해온 &quot;인기도가 있어야 후보로 진입 가능&quot;과 반대되는 방향이며, Phoenix retrieval이 롱테일 포스트에도 임베딩 기반 매칭을 시도할 수 있도록 인프라를 확장하는 작업으로 보인다 <span class="badge est">추정</span>.</p>
-<p>앞으로 지켜볼 점은 두 가지다. (a) <code>1fav_uec_count_race</code> 카운터의 실제 관측치가 어느 정도 비율로 나오는지, (b) 인덱스 커버리지 확대가 어떤 param 게이트(예를 들어 Phoenix retrieval의 top-k나 SID window)와 짝을 이루어 활성화되는지가 앞으로 나올 커밋에서 드러날 지표이다.</p>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> — 4개 절 갱신:</p></div>
-<ul>
-<li>&quot;한 줄 요약&quot; 절: 4세대+2 후속 공개(brand safety V2 + Grok 4.5 cross validation + 인덱싱 게이트 제거) 요약을 추가했다.</li>
-<li>&quot;공개 소스 4세대&quot; 세대 테이블: <strong>4세대+2</strong> 행을 새로 만들었다 (커밋 <a href="https://github.com/xai-org/x-algorithm/commit/b089ce6" target="_blank" rel="noopener">b089ce6</a>, +751/−162, 파일 34개).</li>
-<li>&quot;광고&quot; 절: brand safety V2 라벨 세트(medium 16 + low 3)와 <code>strip_v1_grok_written</code> 마이그레이션 헬퍼, <code>v2_mirrors_v1_across_tier_matrix</code> 테스트를 추가했다.</li>
-<li><strong>&quot;Grox → PtOS Adult Content Cross-Validation (4세대+2 신규)&quot;</strong> 절을 새로 만들어서 4단계 흐름과 심판 프롬프트 세부, 강등 방향의 특징을 정리했다.</li>
-<li>&quot;Phoenix 학습·인덱스&quot; 절: <code>phoenix-rankall-strato</code>의 인덱싱 게이트 제거 관찰을 추가했다 (<code>1fav_uec_count_race</code> 카운터 신설, 멀티모달 임베딩 덤프 게이트 제거).</li>
-<li>열린 질문 절: &quot;4세대+2 공개로 해소된 것 (2026-08-19)&quot; 하위 절을 새로 만들고, <code>PROMPT_OWNED_RULES</code>와 botmaker rule의 매핑을 심층 분석 필요 목록에 추가했다.</li>
-<li>출처: 4건을 추가했다 (b089ce6 커밋, brand_safety.rs, adult_content_cross_validation.py, phoenixRankAllCandidateProcessor.strato).</li>
-</ul>
-<div class="blk why"><p><span class="lbl">의미 (공개 리듬과 계층별 정교화 방향)</span></p></div>
-<p>4세대(2026-08-13) → 4세대+1(2026-08-14) → 4세대+2(2026-08-17)로 이어지는 사흘 간격의 세 번째 공개를 통해 <strong>X의 공개 리듬이 자리를 잡은 것으로 보인다.</strong> 특히 각 공개의 성격이 서로 다르다는 점이 중요하다.</p>
-<ul>
-<li><strong>4세대</strong>: 파라미터와 labeling 파이프라인을 통째로 공개했다 (구조를 여는 대형 공개).</li>
-<li><strong>4세대+1</strong>: 가중치 해석과 규제 대응, A/B 연결, 모델 입력 확장을 담았다 (다섯 방향 확장).</li>
-<li><strong>4세대+2</strong>: 광고 브랜드 안전 V2 마이그레이션과 Grok 4.5 심판 계층, retrieval 인덱스 게이트 제거를 담았다 (판정 계층 정교화).</li>
-</ul>
-<p>canon이 이 흐름에서 얻을 수 있는 것은 두 가지다. (a) X의 커밋 로그를 매일 추적하는 작업의 가치가 계속 커진다. 커밋마다 서로 다른 축을 건드리기 때문이다. (b) X의 open-source 관행이 특정 방향(규제 대응, 안전 판정 계층, retrieval 커버리지)으로 이동한다는 초기 신호가 세 번의 공개에 걸쳐 쌓이고 있다.</p>
-<p><strong>심층 분석 필요 항목</strong> (오늘 처리하지 않음):</p>
-<ul>
-<li>V1에서 V2로 가는 라벨 마이그레이션이 완료되는 시점. V1 함수를 삭제하는 커밋이 나오는지, 아니면 dual-write를 영구히 유지하는지 확인해야 한다.</li>
-<li><code>PROMPT_OWNED_RULES</code>의 botmaker rule id 7개(1400/1410/1420/1500/1510/1610/1700)가 <a href="https://github.com/xai-org/x-algorithm/tree/b089ce6/botmaker-rules" target="_blank" rel="noopener"><code>botmaker-rules/</code></a>의 실제 규칙 파일 가운데 무엇과 대응하는지 확인해야 한다.</li>
-<li>Grok 4.5 심판 계층이 다른 카테고리(폭력·혐오·스팸)로 확장되는지 확인해야 한다.</li>
-<li><code>1fav_uec_count_race</code> 카운터의 실제 관측 비율. 외부에서 직접 관측할 수는 없지만, 후속 커밋에서 임계값을 조정하는 것을 보고 간접적으로 관찰할 수 있다.</li>
-<li>멀티모달 임베딩 v3/v5_1/v6_dev 세 버전을 소비하는 쪽이 어디인지 확인해야 한다. 홈 랭킹이 아니라는 사실은 canon에 이미 반영했지만, 어디로 가는지는 아직 확인하지 못했다.</li>
-</ul>
-<h2 id="2-arxiv-triage--sdf-google-discover가-2년-동안-프로덕션에서-운영한-staleness-필터"><span class="num">2</span>arXiv triage — SDF (Google Discover가 2년 동안 프로덕션에서 운영한 staleness 필터)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.15780" target="_blank" rel="noopener">Decomposing Staleness in Recommender Systems: A Dual-Filter Framework for Supersession and Decay — arXiv:2608.15780</a> — 2026-08-16 제출, 논문, 저자 6명 전원이 Google LLC 소속이다 (<a href="https://arxiv.org/html/2608.15780v1" target="_blank" rel="noopener">HTML 판</a>에서 저자 affiliation 표기를 확인했다: 이메일 도메인이 모두 <code>@google.com</code>이다). CIKM Applied Research Track 2026에 accepted되었다 (DOI <a href="https://doi.org/10.1145/3799682.3840082" target="_blank" rel="noopener">10.1145/3799682.3840082</a>).</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span></p></div>
-<p>Google Discover는 Android 홈스크린과 Google 앱에서 제공되는 개인화 피드 지면이며, DAU는 수억 명, MAU는 수십억 명 규모이다 <span class="badge ok">확인</span> (논문 abstract). canon은 지금까지 Google Discover를 추적 서비스로 등록하지 않았는데, Google이 Discover의 알고리즘과 랭킹, retrieval 계층을 통째로 공개한 적이 없었기 때문이다. 이 논문은 그 지면의 <strong>staleness 필터</strong>만 다루므로 전면적인 아키텍처 공개가 아니라 단일 컴포넌트 공개에 그치지만, 프로덕션에 2년 동안 배포했고 유저 피드백 지표가 54.9% 개선되었다는 실제 A/B 결과 진술이 있어서 레이더 수용 기준(플랫폼 기업 저자, 프로덕션 배포, 대규모 스케일)을 충족한다.</p>
-<p>이 논문이 정의한 문제는 <strong>콘텐츠 피드에서 &quot;이 후보가 낡았다&quot;고 판정하는 서로 다른 두 메커니즘을 분리하고, 각각을 독립된 모델로 예측</strong>하는 것이다.</p>
-<ul>
-<li><strong>Supersession (초월/대체)</strong> — 새 아이템이 도착해서 이전 아이템의 정보 가치가 무효화되는 경우이다. 예를 들어 스포츠 선수의 팀 이적 소식이 발표되면 그 이전의 이적 협상 기사들이 자동으로 낡는다. 판정 근거는 시간 자체가 아니라 <strong>후속 아이템이 존재하는지 여부</strong>이다.</li>
-<li><strong>Relevance decay (관련성 감쇠)</strong> — 후속 아이템이 없어도 아이템 자체의 정보 가치가 시간에 따라 자연히 줄어드는 경우이다. 예를 들어 &quot;오늘 밤 유성우&quot; 안내는 그날 저녁에는 유용하지만 다음날부터는 쓸모가 없다. 판정 근거는 시간에 따른 곡선이다.</li>
-</ul>
-<p>기존의 관행(age cutoff, engagement heuristic)은 이 두 메커니즘을 구분하지 못한다. 그래서 (a) age cutoff는 관련성 감쇠를 크게 과대평가하거나 과소평가하고, (b) engagement heuristic은 lagging signal이기 때문에 낡은 컨텐츠가 이미 노출된 뒤에야 반응한다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">아키텍처와 프로덕션 결과</span></p></div>
-<p>SDF를 구성하는 두 필터는 다음과 같다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/html/2608.15780v1" target="_blank" rel="noopener">arXiv 2608.15780v1</a>, 3절 Methodology:</p>
-<ol>
-<li><strong>Relational Staleness Filter (supersession)</strong> — pairwise classification framework를 사용한다. 후보 아이템 <code>d_t</code>와 그 뒤에 도착한 topic-related 아이템 <code>d&#39;</code>의 쌍을 놓고, 학습된 함수 <code>f(d_t, d&#39;)</code>가 &quot;d&#39;가 d_t를 낡게 만드는가&quot;를 이진으로 판정한다. 이 판정 결과들의 disjunction (∃ d&#39; &gt; t: f(d_t, d&#39;) = 1)이 supersession indicator가 된다. 훈련 데이터는 규모 때문에 수동 어노테이션이 불가능하므로 LLM 파이프라인으로 합성해서 만들고, 지식 증류(knowledge distillation)를 거친 학생 모델을 서빙에 배포한다.</li>
-<li><strong>Predicted Traffic Ratio (PTR) Filter (relevance decay)</strong> — 아이템의 멀티모달 콘텐츠(텍스트·이미지·비디오)를 입력으로 받아서 미래의 여러 horizon에서 traffic ratio(정규화된 방문 트래픽)를 예측하는 multi-horizon 회귀 모델이다. 학습 라벨로는 아이템의 <strong>lifetime visit traffic</strong>, 즉 수명 전체에 걸친 방문량을 사용한다. 서빙 시점의 traffic ratio가 임계값보다 낮으면 decay indicator가 1이 된다.</li>
-<li><strong>Composition</strong> — 두 필터를 disjunction(OR)으로 결합해서 upstream(ranking 이전의 후보 프루닝 단계)에 배치한다. 즉 supersession과 decay 가운데 하나라도 판정되면 후보에서 제거한다. ranking으로 넘어가는 후보 수가 줄어들기 때문에 downstream serving cost도 함께 감소한다.</li>
-</ol>
-<p><strong>A/B 결과 <span class="badge ok">확인</span></strong> — 4.2절 Online A/B Testing:</p>
-<ul>
-<li>2년 동안 프로덕션에 배포한(initial → 확장 → 안정화) 결과 <strong>user-filed staleness reports가 54.9% 감소했다</strong> (in-product user feedback 기준이며, pre-deployment baseline과 비교한 값이다).<ul>
-<li>supersession filter 단독 기여: 64.0% 감소</li>
-<li>decay filter 단독 기여: 34.4% 감소</li>
+</li>
 </ul>
 </li>
-<li>engagement neutral 제약 아래에서 튜닝했다. &quot;trivially aggressive cuts would reduce staleness further but shrink candidate set and degrade user engagement, which we explicitly rule out.&quot; 즉 무리하게 공격적으로 잘라내면 staleness 지표는 더 좋아지지만 engagement를 떨어뜨리기 때문에 그런 방식은 배제했다는 뜻이다.</li>
-<li>각 필터가 개별적으로도 statistically significant negative &quot;engagement lift&quot;를 낸다는 진술이 있다. 즉 후보를 프루닝했는데도 engagement가 개선되었다는 뜻인데, 구체적인 % 수치는 abstract에 나와 있지 않다.</li>
-<li>online staleness는 A/B arm의 통제군과 처리군에서 매주 샘플링해서 4주 연속으로 관찰했다 (view delta 크기로 가중치를 준다).</li>
+<li><p>카운터 이름의 &quot;race&quot;는 uec(user engagement counts) 저장소와 후보가 도착하는 시점이 어긋나서 fav가 아직 반영되지 않았을 가능성을 가리키는 것으로 보인다 <span class="badge est">추정</span>.</p>
+</li>
+<li><p>같은 함수 안에 있던 <code>buildMMEmbMetadataDump</code>도 똑같이 <code>favoriteCount &gt;= 1</code> 게이트를 제거했기 때문에, 이제 모든 후보에 대해 실행된다 <span class="badge ok">확인</span>(같은 파일).</p>
+<ul>
+<li>이 부분은 멀티모달 임베딩 v3·v5_1·v6_dev 세 버전을 조회해서 Kafka로 덤프한다.</li>
+<li>변경 전에는 <code>if(ec.favoriteCount.getOrElse(0) &gt;= 1) { ... 멀티모달 임베딩 fetch + Kafka 덤프 ... }</code>였다.</li>
+<li>변경 후에는 게이트가 없어서 모든 후보에 대해 멀티모달 임베딩 3개 버전을 조회하고 Kafka로 덤프한다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미 (canon 관점)</span></p></div>
-<p>이 논문은 canon의 세 방향에 영향을 줄 가능성이 있다.</p>
+</li>
+<li><p>이 변경은 정본이 3세대부터 4세대까지 &quot;인덱스는 인기도 신호를 담는다&quot;고 반영해 온 이해와 정면으로 어긋난다.</p>
+<ul>
+<li>retrieval 후보 풀 자체가 사실상 인덱싱된 포스트 전체 집합으로 커진다는 뜻이다.</li>
+<li>정본이 3세대부터 4세대까지 관찰해 온 &quot;phoenix-rankall이 인기 신호로 인덱스를 갱신한다&quot;는 이해는 이제 정확하지 않다.</li>
+<li>오늘 이후로 &quot;1fav&quot;라는 인덱스 이름은 하위 호환을 위해 남겨 둔 라벨일 뿐이고, 실제 인덱스는 유입되는 후보 전체를 담는다.</li>
+<li>이 관찰은 정본 주의 목록에 &quot;인덱스 이름이 필터 조건을 뜻하지는 않는다&quot;를 추가할 만한 근거가 된다.</li>
+</ul>
+</li>
+<li><p>멀티모달 임베딩 덤프의 게이트를 없앤 것은 특히 눈여겨볼 만하다.</p>
+<ul>
+<li>v3·v5_1·v6_dev 세 임베딩을 인기 없는 포스트까지 전부 조회해서 Kafka로 덤프하는 것은 retrieval 시그널을 마련하기 위한 인벤토리 준비 비용을 크게 늘리는 선택이다.</li>
+<li>이는 정본이 서술해 온 &quot;인기도가 있어야 후보로 진입 가능&quot;과 반대되는 방향이며, Phoenix retrieval이 롱테일 포스트에도 임베딩 기반 매칭을 시도할 수 있도록 인프라를 확장하는 작업으로 보인다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+<li><p>앞으로 나올 커밋에서 드러날 지표는 두 가지다.</p>
+<ul>
+<li><code>1fav_uec_count_race</code> 카운터의 실제 관측치가 어느 정도 비율로 나오는지 본다.</li>
+<li>인덱스 커버리지 확대가 어떤 param 게이트와 짝을 이루어 활성화되는지 본다. 예를 들면 Phoenix retrieval의 top-k나 SID(semantic ID, 아이템을 계층 코드로 표현한 토큰 열) window다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 4개 절을 갱신했다.</p></div>
+<ul>
+<li>&quot;한 줄 요약&quot; 절에 4세대+2 후속 공개(brand safety V2, Grok 4.5 cross validation, 인덱싱 게이트 제거) 요약을 추가했다.</li>
+<li>&quot;공개 소스 4세대&quot; 세대 테이블에 4세대+2 행을 새로 만들었다(커밋 <a href="https://github.com/xai-org/x-algorithm/commit/b089ce6" target="_blank" rel="noopener">b089ce6</a>, +751/−162, 파일 34개).</li>
+<li>&quot;광고&quot; 절에 brand safety V2 라벨 세트(medium 16개와 low 3개), <code>strip_v1_grok_written</code> 마이그레이션 헬퍼, <code>v2_mirrors_v1_across_tier_matrix</code> 테스트를 추가했다.</li>
+<li>&quot;Grox → PtOS Adult Content Cross-Validation (4세대+2 신규)&quot; 절을 새로 만들어 4단계 흐름과 심판 프롬프트 세부, 강등 방향의 특징을 정리했다.</li>
+<li>&quot;Phoenix 학습·인덱스&quot; 절에 <code>phoenix-rankall-strato</code>의 인덱싱 게이트 제거 관찰을 추가했다. <code>1fav_uec_count_race</code> 카운터 신설과 멀티모달 임베딩 덤프 게이트 제거가 그 내용이다.</li>
+<li>열린 질문 절에 &quot;4세대+2 공개로 해소된 것 (2026-08-19)&quot; 하위 절을 새로 만들고, <code>PROMPT_OWNED_RULES</code>와 botmaker rule의 매핑을 심층 분석 필요 목록에 추가했다.</li>
+<li>출처 절에 4건을 추가했다. b089ce6 커밋, brand_safety.rs, adult_content_cross_validation.py, phoenixRankAllCandidateProcessor.strato다.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대(2026-08-13) → 4세대+1(2026-08-14) → 4세대+2(2026-08-17)로 이어지는 사흘 간격의 세 번째 공개를 통해 X의 공개 리듬이 자리를 잡은 것으로 보인다. 특히 각 공개의 성격이 서로 다르다는 점이 중요하다. 광고 브랜드 안전과 성인 컨텐츠 판정이 한 커밋에서 각각 다른 방향으로 정교화됐다는 점도 이번 공개의 특징이다.</p></div>
+<ul>
+<li>4세대는 파라미터와 labeling 파이프라인을 전부 공개했다. 구조를 여는 대형 공개다.</li>
+<li>4세대+1은 가중치 해석과 규제 대응, A/B 연결, 모델 입력 확장을 담았다. 다섯 방향으로 넓힌 공개다.</li>
+<li>4세대+2는 광고 브랜드 안전 V2 마이그레이션과 Grok 4.5 심판 계층, retrieval 인덱스 게이트 제거를 담았다. 판정 계층을 정교화한 공개다.<ul>
+<li>V2 마이그레이션은 라벨 스키마를 정정하는 작업이고, cross-validation은 판정 계층을 확장하는 작업이다.</li>
+</ul>
+</li>
+<li>X가 4세대의 공개 리듬을 &quot;대형 공개 → 후속 하루짜리 정리 → 며칠 뒤 계층별 정교화&quot;로 잡아 가고 있다고 볼 근거가 하나 더 늘었다 <span class="badge obs">관찰</span> 2026-08-19.</li>
+<li>정본이 이 흐름에서 얻을 수 있는 것은 두 가지다.<ul>
+<li>X의 커밋 로그를 매일 추적하는 작업의 가치가 계속 커진다. 커밋마다 서로 다른 축을 건드리기 때문이다.</li>
+<li>X의 open-source 관행이 특정 방향(규제 대응, 안전 판정 계층, retrieval 커버리지)으로 이동한다는 초기 신호가 세 번의 공개에 걸쳐 쌓이고 있다.</li>
+</ul>
+</li>
+</ul>
+<p>심층 분석이 필요하지만 오늘 처리하지 않은 항목은 다섯 가지다.</p>
+<ul>
+<li>V1에서 V2로 가는 라벨 마이그레이션이 완료되는 시점을 본다. V1 함수를 삭제하는 커밋이 나오는지, 아니면 dual-write를 영구히 유지하는지 확인해야 한다.</li>
+<li><code>PROMPT_OWNED_RULES</code>의 botmaker rule id 7개(1400/1410/1420/1500/1510/1610/1700)가 <a href="https://github.com/xai-org/x-algorithm/tree/b089ce6/botmaker-rules" target="_blank" rel="noopener"><code>botmaker-rules/</code></a>의 실제 규칙 파일 가운데 무엇과 대응하는지 확인해야 한다.</li>
+<li>Grok 4.5 심판 계층이 다른 카테고리(폭력·혐오·스팸)로 확장되는지 확인해야 한다.</li>
+<li><code>1fav_uec_count_race</code> 카운터의 실제 관측 비율을 본다. 외부에서 직접 관측할 수는 없지만, 후속 커밋에서 임계값을 조정하는 것을 보고 간접적으로 관찰할 수 있다.</li>
+<li>멀티모달 임베딩 v3/v5_1/v6_dev 세 버전을 소비하는 쪽이 어디인지 확인해야 한다. 홈 랭킹이 아니라는 사실은 정본에 이미 반영했지만, 어디로 가는지는 아직 확인하지 못했다.</li>
+</ul>
+<h2 id="2-낡은-콘텐츠를-두-종류로-나눠-거르는-필터가-2년간-운영됐다--레이더google-discover"><span class="num">2</span>낡은 콘텐츠를 두 종류로 나눠 거르는 필터가 2년간 운영됐다 — 레이더(Google Discover)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.15780" target="_blank" rel="noopener">Decomposing Staleness in Recommender Systems: A Dual-Filter Framework for Supersession and Decay — arXiv:2608.15780</a> — 2026-08-16 제출, 논문. 저자 6명 전원이 Google LLC 소속이다. <a href="https://arxiv.org/html/2608.15780v1" target="_blank" rel="noopener">HTML 판</a>에서 저자 affiliation 표기를 확인했고, 이메일 도메인이 모두 <code>@google.com</code>이다. CIKM Applied Research Track 2026에 accepted됐고, DOI는 <a href="https://doi.org/10.1145/3799682.3840082" target="_blank" rel="noopener">10.1145/3799682.3840082</a>다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> Google Discover는 Android 홈스크린과 Google 앱에서 제공되는 개인화 피드 지면이며, DAU는 수억 명, MAU는 수십억 명 규모다 <span class="badge ok">확인</span>(논문 abstract). 정본은 지금까지 Google Discover를 추적 서비스로 등록하지 않았는데, Google이 Discover의 알고리즘과 랭킹, retrieval 계층을 전부 공개한 적이 없었기 때문이다. 이번 논문은 그 지면의 staleness 필터(낡은 후보를 거르는 필터)만 다루므로 전면적인 아키텍처 공개가 아니라 단일 컴포넌트 공개에 그친다. 그래도 프로덕션에 2년 동안 배포했고 유저 피드백 지표가 54.9% 개선되었다는 실제 A/B 결과 진술이 있어서, 레이더 수용 기준(플랫폼 기업 저자, 프로덕션 배포, 대규모 스케일)을 충족한다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 논문은 &#39;낡음&#39;을 두 메커니즘으로 나누고, 각각을 독립된 모델로 예측한다</span></p></div>
+<p>이 논문이 정의한 문제는 콘텐츠 피드에서 &quot;이 후보가 낡았다&quot;고 판정하는 서로 다른 두 메커니즘을 분리하고, 각각을 독립된 모델로 예측하는 것이다.</p>
+<ul>
+<li>Supersession(초월/대체)은 새 아이템이 도착해서 이전 아이템의 정보 가치가 무효화되는 경우다.<ul>
+<li>예를 들어 스포츠 선수의 팀 이적 소식이 발표되면 그 이전의 이적 협상 기사들이 자동으로 낡는다.</li>
+<li>판정 근거는 시간 자체가 아니라 후속 아이템이 존재하는지 여부다.</li>
+</ul>
+</li>
+<li>Relevance decay(관련성 감쇠)는 후속 아이템이 없어도 아이템 자체의 정보 가치가 시간에 따라 자연히 줄어드는 경우다.<ul>
+<li>예를 들어 &quot;오늘 밤 유성우&quot; 안내는 그날 저녁에는 유용하지만 다음날부터는 쓸모가 없다.</li>
+<li>판정 근거는 시간에 따른 곡선이다.</li>
+</ul>
+</li>
+<li>기존의 관행(age cutoff, engagement heuristic)은 이 두 메커니즘을 구분하지 못한다. 그래서 두 가지 문제가 생긴다.<ul>
+<li>age cutoff는 관련성 감쇠를 크게 과대평가하거나 과소평가한다.</li>
+<li>engagement heuristic은 lagging signal이기 때문에 낡은 컨텐츠가 이미 노출된 뒤에야 반응한다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 두 필터를 OR로 묶어 랭킹 전 단계에서 후보를 지운다</span></p></div>
+<ul>
+<li>SDF는 두 필터로 이루어진다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/html/2608.15780v1" target="_blank" rel="noopener">arXiv 2608.15780v1</a>, 3절 Methodology.</li>
+</ul>
 <ol>
-<li><strong>X의 stale post 처리와 비교하는 축.</strong> 4세대+1에서 관찰한 X의 <code>IS_STALE_POST14D</code> bool feature(<a href="daily-2026-08-16.html">daily/2026-08-16.md</a>)는 &quot;14일이 지나면 engagement count를 0으로 stamp하고 bool을 셋한다&quot;는 규칙 기반 처리다. 반면 SDF는 (a) supersession을 학습 모델로 예측하고 (b) decay를 lifetime traffic 회귀로 예측하는, 완전히 학습에 기반한 접근이다. 두 접근은 canon의 관점에서 <strong>staleness에 대한 서로 다른 두 정의</strong>를 반영한다. X는 노출 감소가 count zero로 이어지는 자기강화 루프를 완화하려고 랭커에게 명시적인 라벨을 주는 쪽이고, Google Discover는 <strong>candidate pool에서 아예 제거</strong>하는 쪽, 즉 retrieval 이전에 프루닝하는 쪽이다. 두 처리가 놓인 위치가 근본적으로 다르다.</li>
-<li><strong>피드 지면의 staleness를 topic으로 승격할 후보.</strong> 현재 canon의 topic 목록에는 staleness가 없다. Netflix Foundation Model이나 Meta ConnectionMind가 stale item을 어떻게 처리하는지는 아직 확인하지 못했다. 두 번째 회사에서 비슷한 진술이 나오면 <code>topics/</code>에 절을 새로 만드는 것을 검토한다.</li>
-<li><strong>Google Discover를 추적 서비스로 등록할 것인가?</strong> 지금은 등록하지 않는다. 이 논문은 단일 컴포넌트인 staleness 필터만 공개했고, retrieval과 ranking, 다양성을 비롯한 나머지 알고리즘 스택은 여전히 공개되지 않았다. 그 상태에서 정본 파일을 만드는 것은 canon의 &quot;서비스 정본은 압축된 결론&quot;이라는 원칙과 맞지 않는다. 레이더에 올려 두었다가 두 번째 컴포넌트가 공개되면 다시 검토한다.</li>
+<li>Relational Staleness Filter는 supersession을 판정하며, pairwise classification framework를 사용한다 <span class="badge ok">확인</span>(같은 절).<ul>
+<li>후보 아이템 <code>d_t</code>와 그 뒤에 도착한 topic-related 아이템 <code>d&#39;</code>의 쌍을 놓고, 학습된 함수 <code>f(d_t, d&#39;)</code>가 &quot;d&#39;가 d_t를 낡게 만드는가&quot;를 이진으로 판정한다.</li>
+<li>이 판정 결과들의 disjunction (∃ d&#39; &gt; t: f(d_t, d&#39;) = 1)이 supersession indicator가 된다.</li>
+<li>훈련 데이터는 규모 때문에 수동 어노테이션이 불가능하므로 LLM 파이프라인으로 합성해서 만든다.</li>
+<li>서빙에는 지식 증류(knowledge distillation)를 거친 학생 모델을 배포한다.</li>
+</ul>
+</li>
+<li>Predicted Traffic Ratio (PTR) Filter는 relevance decay를 판정하는 multi-horizon 회귀 모델이다 <span class="badge ok">확인</span>(같은 절).<ul>
+<li>아이템의 멀티모달 콘텐츠(텍스트·이미지·비디오)를 입력으로 받아서 미래의 여러 horizon에서 traffic ratio(정규화된 방문 트래픽)를 예측한다.</li>
+<li>학습 라벨로는 아이템의 lifetime visit traffic, 즉 수명 전체에 걸친 방문량을 사용한다.</li>
+<li>서빙 시점의 traffic ratio가 임계값보다 낮으면 decay indicator가 1이 된다.</li>
+</ul>
+</li>
+<li>두 필터는 disjunction(OR)으로 결합되어 upstream(ranking 이전의 후보 프루닝 단계)에 배치된다 <span class="badge ok">확인</span>(같은 절).<ul>
+<li>supersession과 decay 가운데 하나라도 판정되면 후보에서 제거한다.</li>
+<li>ranking으로 넘어가는 후보 수가 줄어들기 때문에 downstream serving cost도 함께 감소한다.</li>
+</ul>
+</li>
 </ol>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> — &quot;이번 달 신규&quot; 절에 <strong>SDF (Google Discover — 2년 프로덕션 staleness 필터, supersession + decay 이중 학습)</strong> 항목을 새로 넣었다. 상태는 &quot;관찰&quot;로 적었다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. 2년 운영 뒤 사용자가 직접 낸 staleness 신고가 54.9% 줄었다</span></p></div>
+<ul>
+<li><p>2년 동안 프로덕션에 배포한(initial → 확장 → 안정화) 결과 user-filed staleness reports가 54.9% 감소했다 <span class="badge ok">확인</span> — 4.2절 Online A/B Testing.</p>
+<ul>
+<li>in-product user feedback 기준이며, pre-deployment baseline과 비교한 값이다.</li>
+<li>supersession filter의 단독 기여는 64.0% 감소다.</li>
+<li>decay filter의 단독 기여는 34.4% 감소다.</li>
+</ul>
+</li>
+<li><p>engagement neutral 제약 아래에서 튜닝했다 <span class="badge ok">확인</span>(같은 절).</p>
+<ul>
+<li>무리하게 공격적으로 잘라 내면 staleness 지표는 더 좋아지지만 engagement를 떨어뜨리기 때문에 그런 방식은 배제했다는 뜻이다.</li>
+</ul>
+<blockquote>
+<p>&quot;trivially aggressive cuts would reduce staleness further but shrink candidate set and degrade user engagement, which we explicitly rule out.&quot;
+— 같은 논문</p>
+</blockquote>
+</li>
+<li><p>각 필터가 개별적으로도 statistically significant negative &quot;engagement lift&quot;를 낸다는 진술이 있다 <span class="badge ok">확인</span>(같은 절).</p>
+<ul>
+<li>후보를 프루닝했는데도 engagement가 개선되었다는 뜻이다.</li>
+<li>구체적인 % 수치는 abstract에 나와 있지 않다.</li>
+</ul>
+</li>
+<li><p>online staleness는 A/B arm의 통제군과 처리군에서 매주 샘플링해서 4주 연속으로 관찰했다(view delta 크기로 가중치를 준다) <span class="badge ok">확인</span>(같은 절).</p>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot; 절에 SDF 항목(Google Discover — 2년 프로덕션 staleness 필터, supersession + decay 이중 학습)을 새로 넣었다. 상태는 &quot;관찰&quot;로 적었다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이 논문은 정본의 세 방향에 영향을 줄 가능성이 있다.</p></div>
+<ol>
+<li>X의 stale post 처리와 비교하는 축이 된다.<ul>
+<li>4세대+1(2026-08-14)에서 관찰한 X의 <code>IS_STALE_POST14D</code> bool feature(<a href="daily-2026-08-16.html">daily/2026-08-16.md</a>)는 &quot;14일이 지나면 engagement count를 0으로 stamp하고 bool을 셋한다&quot;는 규칙 기반 처리다.</li>
+<li>반면 SDF는 supersession을 학습 모델로 예측하고 decay를 lifetime traffic 회귀로 예측하는, 완전히 학습에 기반한 접근이다.</li>
+<li>두 접근은 정본의 관점에서 staleness에 대한 서로 다른 두 정의를 반영한다.</li>
+<li>X는 노출 감소가 count zero로 이어지는 자기강화 루프를 완화하려고 랭커에게 명시적인 라벨을 주는 쪽이다. Google Discover는 candidate pool에서 아예 제거하는 쪽, 즉 retrieval 이전에 프루닝하는 쪽이다.</li>
+<li>두 처리가 놓인 위치가 근본적으로 다르다.</li>
+</ul>
+</li>
+<li>피드 지면의 staleness를 topic으로 승격할 후보가 된다.<ul>
+<li>현재 정본의 topic 목록에는 staleness가 없다.</li>
+<li>Netflix Foundation Model이나 Meta ConnectionMind가 stale item을 어떻게 처리하는지는 아직 확인하지 못했다.</li>
+<li>두 번째 회사에서 비슷한 진술이 나오면 <code>topics/</code>에 절을 새로 만드는 것을 검토한다.</li>
+</ul>
+</li>
+<li>Google Discover는 지금은 추적 서비스로 등록하지 않는다.<ul>
+<li>이 논문은 단일 컴포넌트인 staleness 필터만 공개했고, retrieval과 ranking, 다양성을 비롯한 나머지 알고리즘 스택은 여전히 공개되지 않았다.</li>
+<li>그 상태에서 정본 파일을 만드는 것은 이 저장소의 &quot;서비스 정본은 압축된 결론&quot;이라는 원칙과 맞지 않는다.</li>
+<li>레이더에 올려 두었다가 두 번째 컴포넌트가 공개되면 다시 검토한다.</li>
+</ul>
+</li>
+</ol>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li><strong>X 4세대+3 후속</strong> — 사흘 간격의 공개 리듬(8-13 → 8-14 → 8-17)이 유지된다면, 다음 커밋에서 나올 만한 후보는 (a) 브라질 필터의 계정 리스트 갱신 diff, (b) V1에서 V2로 가는 라벨 마이그레이션의 다음 단계(V1 함수 제거 또는 다른 라벨 세트 추가), (c) Grok 4.5 심판 계층을 다른 카테고리로 확장하는 변경, (d) <code>phoenix-rankall</code>의 인덱스 커버리지 확대와 짝을 이루는 param 게이트이다.</li>
-<li><strong>SDF 후속 진술 관찰</strong> — Google Discover가 다른 컴포넌트(retrieval, ranking, 다양성)를 CIKM/WWW 2027 사이클에 공개하는지 확인한다. Discover를 추적 서비스로 승격할지는 두 번째 컴포넌트가 공개된 다음에 판단한다.</li>
-<li><strong>Kuaishou/Alibaba/ByteDance 라인 지속 관찰</strong> — 이번 달에 프로덕션 논문을 꾸준히 내고 있는 세 회사이다. 8월 나머지 기간의 arXiv triage에서도 통과하는 자료를 계속 관찰한다.</li>
+<li>X의 다음 커밋(4세대+3)을 본다 — 사흘 간격의 공개 리듬(8-13 → 8-14 → 8-17)이 유지된다면, 다음 커밋에서 나올 만한 후보는 다음 네 가지다.<ul>
+<li>브라질 필터의 계정 리스트 갱신 diff</li>
+<li>V1에서 V2로 가는 라벨 마이그레이션의 다음 단계(V1 함수 제거 또는 다른 라벨 세트 추가)</li>
+<li>Grok 4.5 심판 계층을 다른 카테고리로 확장하는 변경</li>
+<li><code>phoenix-rankall</code>의 인덱스 커버리지 확대와 짝을 이루는 param 게이트</li>
+</ul>
+</li>
+<li>SDF의 후속 진술을 본다 — Google Discover가 다른 컴포넌트(retrieval, ranking, 다양성)를 CIKM/WWW 2027 사이클에 공개하는지 확인한다. Discover를 추적 서비스로 승격할지는 두 번째 컴포넌트가 공개된 다음에 판단한다.</li>
+<li>Kuaishou·Alibaba·ByteDance 라인을 계속 본다 — 이번 달에 프로덕션 논문을 꾸준히 내고 있는 세 회사다. 8월 나머지 기간의 arXiv triage에서도 통과하는 자료를 계속 관찰한다.</li>
 </ul></div>
 
 </div>

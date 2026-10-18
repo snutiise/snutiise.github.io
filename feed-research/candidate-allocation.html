@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>후보 배분 — 소스가 여럿일 때 무엇을 몇 개 넣는가 — feed-research</title>
-<meta name="description" content="후보 생성 소스가 10개, 30개씩 있을 때 &quot;각 소스에서 몇 개를 가져와 최종 리스트에 어떻게 섞을 것인가&quot;를 정하는 레이어다. 세 가지 방식이 있고, X는 세대가 바뀌면서 방식을 바꿨다.">
+<meta name="description" content="후보 배분은 후보 생성 소스가 10개, 30개씩 있을 때 &quot;각 소스에서 몇 개를 가져와 최종 리스트에 어떻게 섞을 것인가&quot;를 정하는 레이어다. 방식은 세 가지이고, X는 세대가 바뀌면서 방식을 바꿨다. 2025 Scala 세대는 상한과 위브, 우선순위 병합을 썼다 [확인](세대별…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/candidate-allocation.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="후보 배분 — 소스가 여럿일 때 무엇을 몇 개 넣는가 — feed-research">
-<meta property="og:description" content="후보 생성 소스가 10개, 30개씩 있을 때 &quot;각 소스에서 몇 개를 가져와 최종 리스트에 어떻게 섞을 것인가&quot;를 정하는 레이어다. 세 가지 방식이 있고, X는 세대가 바뀌면서 방식을 바꿨다.">
+<meta property="og:description" content="후보 배분은 후보 생성 소스가 10개, 30개씩 있을 때 &quot;각 소스에서 몇 개를 가져와 최종 리스트에 어떻게 섞을 것인가&quot;를 정하는 레이어다. 방식은 세 가지이고, X는 세대가 바뀌면서 방식을 바꿨다. 2025 Scala 세대는 상한과 위브, 우선순위 병합을 썼다 [확인](세대별…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/candidate-allocation.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -45,86 +45,181 @@
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">19</span></summary><ol><li><a href="#x는-인네트워크아웃오브네트워크를-5050으로-섞는다는-틀렸다">&quot;X는 인네트워크:아웃오브네트워크를 50:50으로 섞는다&quot;는 틀렸다</a></li><li><a href="#세대별-배분-구조--x">세대별 배분 구조</a><ol><li><a href="#2026-rust-배분기-없음-소스별-상한만">2026 Rust: 배분기 없음, 소스별 상한만</a></li><li><a href="#2025-scala-상한--인터리브--우선순위-위브">2025 Scala: 상한 + 인터리브 + 우선순위 위브</a></li><li><a href="#소스가-아니라-슬롯으로-배분하는-경우">소스가 아니라 &quot;슬롯&quot;으로 배분하는 경우</a></li></ol></li><li><a href="#케이스-meta--숫자는-있는데-배분기가-없다">케이스: Meta</a><ol><li><a href="#pass-0-후보-수--지면별">pass 0 후보 수</a></li><li><a href="#두-숫자의-성격이-다르다--이것이-진짜-구조적인-차이다">두 숫자의 성격이 다르다</a></li><li><a href="#meta-쪽-배분-장치--딱-한-지면에서만-기계적으로-보인다">Meta 쪽 배분 장치</a></li></ol></li><li><a href="#케이스-netflix--배분-단위가-소스가-아니라-행이다">케이스: Netflix</a></li><li><a href="#광고-대-오가닉--개수-슬롯이냐-픽셀-거리냐">광고 대 오가닉</a></li><li><a href="#이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#아직-확인하지-못한-것">아직 확인하지 못한 것</a></li><li><a href="#출처">출처</a><ol><li><a href="#공개-소스코드">공개 소스코드</a></li><li><a href="#meta-transparency-center-후보-수의-1차-출처">Meta Transparency Center (후보 수의 1차 출처)</a></li><li><a href="#meta-블로그특허">Meta 블로그·특허</a></li><li><a href="#netflix">Netflix</a></li></ol></li></ol></details></nav>
 <div class="prose">
-<p>후보 생성 소스가 10개, 30개씩 있을 때 &quot;각 소스에서 몇 개를 가져와 최종 리스트에 어떻게 섞을 것인가&quot;를 정하는 레이어다. 세 가지 방식이 있고, <strong>X는 세대가 바뀌면서 방식을 바꿨다.</strong></p>
+<p>후보 배분은 후보 생성 소스가 10개, 30개씩 있을 때 &quot;각 소스에서 몇 개를 가져와 최종 리스트에 어떻게 섞을 것인가&quot;를 정하는 레이어다. 방식은 세 가지이고, <strong>X는 세대가 바뀌면서 방식을 바꿨다.</strong> 2025 Scala 세대는 상한과 위브, 우선순위 병합을 썼다 <span class="badge ok">확인</span>(<a href="#%EC%84%B8%EB%8C%80%EB%B3%84-%EB%B0%B0%EB%B6%84-%EA%B5%AC%EC%A1%B0--x">세대별 배분 구조</a>). 2026 Rust 세대는 배분기 없이 점수 배수를 쓴다 <span class="badge ok">확인</span>(<a href="#2026-rust-%EB%B0%B0%EB%B6%84%EA%B8%B0-%EC%97%86%EC%9D%8C-%EC%86%8C%EC%8A%A4%EB%B3%84-%EC%83%81%ED%95%9C%EB%A7%8C">2026 Rust</a>, <a href="#x%EB%8A%94-%EC%9D%B8%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC%EC%95%84%EC%9B%83%EC%98%A4%EB%B8%8C%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC%EB%A5%BC-5050%EC%9C%BC%EB%A1%9C-%EC%84%9E%EB%8A%94%EB%8B%A4%EB%8A%94-%ED%8B%80%EB%A0%B8%EB%8B%A4">50:50 절</a>).</p>
 <ol>
-<li><strong>비율 배분 (ratio)</strong> — &quot;이 소스에서 30%&quot; 식으로 슬롯을 나눈다. 결과 구성이 보장된다.</li>
-<li><strong>상한 배분 (cap)</strong> — 소스마다 최대 N개만 가져오고, 이후엔 점수로만 경쟁시킨다. 구성이 보장되지 않는다.</li>
-<li><strong>인터리브 (round-robin / weave)</strong> — 소스를 번갈아 하나씩 뽑는다. 상한과 조합해서 쓴다.</li>
+<li><strong>비율 배분 (ratio)</strong>: &quot;이 소스에서 30%&quot; 식으로 슬롯을 나눈다. 결과 구성이 보장된다.</li>
+<li><strong>상한 배분 (cap)</strong>: 소스마다 최대 N개만 가져오고, 그 뒤로는 점수로만 경쟁시킨다. 구성은 보장되지 않는다.</li>
+<li><strong>인터리브 (round-robin / weave)</strong>: 소스를 번갈아 하나씩 뽑는다. 상한과 조합해서 쓴다.</li>
 </ol>
-<p><strong>X와 Meta는 이 레이어에 대해 정확히 반대 방향으로 공개했다.</strong> X는 배분기 코드가 전부 공개되어 있는데 상한 <em>값</em>은 전부 레포 밖에 있고, Meta는 단계별 후보 <em>수</em>를 지면마다 숫자로 밝히는데 그 숫자를 만드는 배분기는 어디에도 공개하지 않았다. 이 비대칭 자체가 아래 내용 전체에 걸쳐 반복되는 주제다.</p>
-<h2 id="x는-인네트워크아웃오브네트워크를-5050으로-섞는다는-틀렸다">&quot;X는 인네트워크:아웃오브네트워크를 50:50으로 섞는다&quot;는 틀렸다</h2>
-<p>가장 널리 퍼진 오해다. 근거는 2023년 공식 블로그의 *&quot;the For You timeline consists of 50% In-Network Tweets and 50% Out-of-Network Tweets <strong>on average</strong>, though this may vary from user to user&quot;*와 README의 <em>&quot;~50% of Tweets come from this candidate source&quot;</em>(검색 인덱스 행)인데, <strong>둘 다 관측된 결과 비율(&quot;on average&quot;)이지 코드에 있는 쿼터가 아니다.</strong> <span class="badge ok">확인</span> — Twitter 블로그 2023-03-31(아카이브 대조 2026-08-09) + twitter/the-algorithm <code>README.md:41</code></p>
-<p>2026 세대 코드에는 in-network / out-of-network 비율을 강제하는 코드가 <strong>없다.</strong></p>
+<p><strong>X와 Meta는 이 레이어를 정확히 반대 방향으로 공개했다.</strong></p>
 <ul>
-<li>소스 11개가 병렬로 돌고 결과를 그냥 이어 붙인다. <span class="badge ok">확인</span> — <code>home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs</code></li>
-<li>최종 선택은 점수 기준 top-K 하나뿐이다. <span class="badge ok">확인</span> — <code>home-mixer/selectors/top_k_score_selector.rs</code></li>
-<li>OON 비중을 조절하는 수단은 <strong>쿼터가 아니라 점수 배수</strong>다. in-network가 아닌 후보에만 <code>effective_oon</code>을 곱한다. <span class="badge ok">확인</span> — <code>home-mixer/scorers/ranking_scorer.rs:220-239,272-275</code></li>
+<li>X는 배분기 코드를 전부 공개했지만, 상한 <em>값</em>은 전부 레포 밖에 있다.</li>
+<li>Meta는 단계별 후보 <em>수</em>를 지면마다 숫자로 밝히지만, 그 숫자를 만드는 배분기는 어디에도 공개하지 않았다.</li>
 </ul>
+<p>이 비대칭은 노트 전체에서 되풀이되는 주제다.</p>
+<h2 id="x는-인네트워크아웃오브네트워크를-5050으로-섞는다는-틀렸다">&quot;X는 인네트워크:아웃오브네트워크를 50:50으로 섞는다&quot;는 틀렸다</h2>
+<p>X가 인네트워크(팔로우한 계정의 글)와 아웃오브네트워크를 반씩 섞는다는 말은 가장 널리 퍼진 오해다. 이 말의 근거로 쓰이는 두 문장은 <strong>둘 다 관측된 결과 비율(&quot;on average&quot;)이지 코드에 있는 쿼터가 아니다.</strong> <span class="badge ok">확인</span> — Twitter 블로그 2023-03-31(아카이브 대조 2026-08-09), twitter/the-algorithm <code>README.md:41</code></p>
+<ul>
+<li><p>2023년 공식 블로그는 이 비율이 평균이고 유저마다 다를 수 있다고 썼다 <span class="badge ok">확인</span> — Twitter 블로그.</p>
+<blockquote>
+<p>&quot;the For You timeline consists of 50% In-Network Tweets and 50% Out-of-Network Tweets <strong>on average</strong>, though this may vary from user to user&quot;</p>
+</blockquote>
+</li>
+<li><p>README는 검색 인덱스 행에서 트윗의 약 절반이 이 후보 소스에서 온다고 쓴다 <span class="badge ok">확인</span> — 같은 README.</p>
+<blockquote>
+<p>&quot;~50% of Tweets come from this candidate source&quot;</p>
+</blockquote>
+</li>
+</ul>
+<p>2026 세대 코드에는 인네트워크와 OON(out-of-network, 팔로우하지 않는 계정의 글)의 비율을 강제하는 코드가 <strong>없다.</strong></p>
+<ul>
+<li>home-mixer(For You 피드를 조립하는 서비스)에서는 소스 11개가 병렬로 돌고, 그 결과를 그냥 이어 붙인다 <span class="badge ok">확인</span> — <code>home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs</code></li>
+<li>최종 선택은 점수 기준 top-K 하나뿐이다 <span class="badge ok">확인</span> — <code>home-mixer/selectors/top_k_score_selector.rs</code></li>
+<li>OON 비중을 조절하는 수단은 <strong>쿼터가 아니라 점수 배수</strong>다 <span class="badge ok">확인</span> — <code>home-mixer/scorers/ranking_scorer.rs:220-239,272-275</code><ul>
+<li><p>in-network가 아닌 후보에만 <code>effective_oon</code>을 곱한다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let final_score = match c.in_network {
     Some(false) =&gt; after_diversity * effective_oon,
     _ =&gt; after_diversity,
 };
 </code></pre></figure>
-<p>배수 값은 세 갈래로 갈린다: 토픽 요청이면 <code>TopicOonWeightFactor</code>, 신규 유저(계정 나이 &lt; <code>NewUserAgeThresholdSecs</code> <strong>그리고</strong> 팔로잉 수 ≥ <code>NEW_USER_MIN_FOLLOWING</code>)면 <code>NEW_USER_OON_WEIGHT_FACTOR</code>, 나머지는 <code>OonWeightFactor</code>. <strong>세 값 모두 레포에 없다.</strong> <span class="badge ok">확인</span> — <code>ranking_scorer.rs:220-239</code></p>
-<p>→ 즉 <strong>&quot;OON을 얼마나 넣을지&quot;는 배분 문제가 아니라 랭킹 문제로 옮겨갔다.</strong> 결과 비율은 배수와 후보 풀에 따라 요청마다 달라진다.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>배수 값은 세 갈래로 갈리고, <strong>세 값 모두 레포에 없다.</strong> <span class="badge ok">확인</span> — <code>ranking_scorer.rs:220-239</code></p>
+<ul>
+<li>토픽 요청이면 <code>TopicOonWeightFactor</code>를 쓴다.</li>
+<li>신규 유저면 <code>NEW_USER_OON_WEIGHT_FACTOR</code>를 쓴다. 신규 유저는 계정 나이가 <code>NewUserAgeThresholdSecs</code>보다 작고 <strong>동시에</strong> 팔로잉 수가 <code>NEW_USER_MIN_FOLLOWING</code> 이상인 유저다.</li>
+<li>나머지는 <code>OonWeightFactor</code>를 쓴다.</li>
+</ul>
+<p>즉 <strong>&quot;OON을 얼마나 넣을지&quot;는 배분 문제가 아니라 랭킹 문제로 옮겨 갔다.</strong> 결과 비율은 배수와 후보 풀에 따라 요청마다 달라진다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="세대별-배분-구조--x">세대별 배분 구조 — X</h2>
+<p>X의 배분 구조는 세대마다 다르다. 2025 Scala 세대는 상한과 인터리브, 파이프라인 순서에 따른 우선순위 병합을 함께 썼다 <span class="badge ok">확인</span>(<a href="#2025-scala-%EC%83%81%ED%95%9C--%EC%9D%B8%ED%84%B0%EB%A6%AC%EB%B8%8C--%EC%9A%B0%EC%84%A0%EC%88%9C%EC%9C%84-%EC%9C%84%EB%B8%8C">2025 Scala</a>). 2026 Rust 세대에는 배분기가 없고, 소스마다 상한이 있으며 전역 선택은 점수 순 하나뿐이다 <span class="badge ok">확인</span>(<a href="#2026-rust-%EB%B0%B0%EB%B6%84%EA%B8%B0-%EC%97%86%EC%9D%8C-%EC%86%8C%EC%8A%A4%EB%B3%84-%EC%83%81%ED%95%9C%EB%A7%8C">2026 Rust</a>). 두 세대 모두 캐시된 후보가 충분하면 비싼 소스를 돌리지 않는다 <span class="badge ok">확인</span>(<a href="#2026-rust-%EB%B0%B0%EB%B6%84%EA%B8%B0-%EC%97%86%EC%9D%8C-%EC%86%8C%EC%8A%A4%EB%B3%84-%EC%83%81%ED%95%9C%EB%A7%8C">2026 Rust</a>, <a href="#home-mixer-%EB%A0%88%EC%9D%B4%EC%96%B4">home-mixer 레이어</a>).</p>
 <h3 id="2026-rust-배분기-없음-소스별-상한만">2026 Rust: 배분기 없음, 소스별 상한만</h3>
-<p>소스 11개(<code>home-mixer/sources/</code>) <span class="badge ok">확인</span>:</p>
-<p><code>thunder_source</code> / <code>phoenix_source</code> / <code>phoenix_moe_source</code> / <code>phoenix_topics_source</code> / <code>tweet_mixer_source</code> / <code>cached_posts_source</code> / <code>scored_posts_source</code> / <code>ads_source</code> / <code>who_to_follow_source</code> / <code>prompts_source</code> / <code>push_to_home_source</code></p>
-<p>각 소스가 자기 상한을 FeatureSwitch에서 읽는다: <code>ThunderMaxResults</code>, <code>PhoenixMaxResults</code>, <code>TweetMixerMaxResults</code>. <strong>값은 전부 레포 밖에 있다.</strong> <span class="badge ok">확인</span> — <code>thunder_source.rs:38</code>, <code>phoenix_source.rs:89</code>, <code>tweet_mixer_source.rs:61</code></p>
-<p>전역 선택은 <code>TopKScoreSelector</code> 하나뿐이고, 점수 내림차순으로 <code>TOP_K_CANDIDATES_TO_SELECT</code>개를 고른다. 이 상수도 <code>params</code> 모듈에 있고 <strong><code>params</code> 모듈은 공개되지 않았다.</strong> <span class="badge ok">확인</span> — <code>top_k_score_selector.rs:13</code></p>
-<p><strong>캐시 게이트가 사실상 배분기 역할을 한다.</strong> 캐시된 포스트가 임계치 이상이면 모든 소스와 Phoenix 자체가 조용히 꺼진다 <span class="badge ok">확인</span>. 즉 &quot;새 후보를 얼마나 가져올지&quot;의 1차 결정은 소스별 상한이 아니라 캐시 상태다.</p>
-<h3 id="2025-scala-상한--인터리브--우선순위-위브">2025 Scala: 상한 + 인터리브 + 우선순위 위브</h3>
-<p>훨씬 복잡하다. 두 레이어로 나뉜다.</p>
-<p><strong>(a) tweet-mixer는 OON 후보 생성을 전담한다. Home 요청에는 candidate pipeline이 34개 배선되어 있다.</strong> <span class="badge ok">확인</span> — <code>HomeRecommendedTweetsRecommendationPipelineConfig.scala:271-332</code> (엔트리 <code>:274-331</code>)</p>
-<p>배분 순서 <span class="badge ok">확인</span> <code>:362-412</code>:</p>
-<ol>
-<li><p>저신호 유저면 <strong>여기서 끝난다.</strong> 작성자당 1개로 dedup한 뒤(<code>DropDuplicateCandidates(duplicationKey = _.features.getOrElse(AuthorIdFeature, None))</code> <code>:364</code>) <code>InsertAppendRatioResults</code>로 <strong>명시적 비율 배분</strong>을 하고 <code>DropAllCandidates()</code> <code>:380</code>로 이후 selector를 전부 막는다. 블록 전체가 <code>AllowLowSignalUserGate.evaluate</code>로 게이트된다 <code>:382</code>. 비율의 default 값은 다음과 같다: <strong>Grok 토픽 0.7 / SimClusters interested-in 0.15 / 인기 지역 0.15 / 나머지 전부 0.01</strong> <span class="badge ok">확인</span> <code>TweetMixerGlobalParams.scala:225,233,241,249</code> (나머지에는 <code>filterNot</code>으로 일괄 적용한다 <code>:372-378</code>. default 값이고 프로덕션 값은 아니다)</p>
-</li>
-<li><p>아니면 블렌더가 <code>BlendingParam</code>으로 선택돼 실행된다. Home 파이프라인에 <strong>배선된 것은 3개</strong>이고 그중 하나가 뽑힌다 <span class="badge ok">확인</span> <code>:399,401,402</code>:</p>
+<p>2026 세대에는 소스 사이의 몫을 나누는 배분기가 없다. 소스마다 상한이 있고 전역 선택은 점수 순 하나뿐이며, 사실상 배분기 역할은 캐시 게이트가 한다 <span class="badge ok">확인</span>.</p>
 <ul>
-<li><code>exclusiveRoundRobinSelector</code> — <code>(소스, 시그널)</code> 버킷으로 위브한다.</li>
-<li><code>signalPrioritySelector</code> — 버킷 기준에 <code>USSFeatures.getPriority</code>를 추가한다.</li>
-<li><code>weightedSignalPrioritySelector</code> — 가중치를 적용한 위브다. <strong><code>new Random(0)</code>으로 시드를 고정한다</strong> <span class="badge ok">확인</span> <code>TweetMixerFunctionalComponents.scala:289</code></li>
+<li>소스는 11개다 <span class="badge ok">확인</span> — <code>home-mixer/sources/</code><ul>
+<li><code>thunder_source</code> / <code>phoenix_source</code> / <code>phoenix_moe_source</code> / <code>phoenix_topics_source</code> / <code>tweet_mixer_source</code> / <code>cached_posts_source</code> / <code>scored_posts_source</code> / <code>ads_source</code> / <code>who_to_follow_source</code> / <code>prompts_source</code> / <code>push_to_home_source</code></li>
 </ul>
-<p>주의: <code>TweetMixerFunctionalComponents.scala</code>에 정의된 selector는 훨씬 많고(<code>roundRobinSelector</code> <code>:210</code>, <code>inclusiveRoundRobinSelector</code> <code>:237</code> 등), <code>BlendingEnum</code>은 값이 6개다 <span class="badge ok">확인</span> <code>TweetMixerGlobalParams.scala:23-30</code>. &quot;블렌더는 3종&quot;이 아니라 &quot;이 지면이 3개를 배선했다&quot;가 맞다.</p>
 </li>
-<li><p><code>DropMaxResults(LightRankerMaxResultsParam)</code> <code>:404</code> — default 값은 500이다 <span class="badge ok">확인</span> <code>HomeRecommendedTweetsParam.scala:9-15</code></p>
+<li>각 소스는 자기 상한을 FeatureSwitch(런타임 설정)에서 읽고, <strong>값은 전부 레포 밖에 있다</strong> <span class="badge ok">확인</span> — <code>thunder_source.rs:38</code>, <code>phoenix_source.rs:89</code>, <code>tweet_mixer_source.rs:61</code><ul>
+<li>상한 이름은 <code>ThunderMaxResults</code>, <code>PhoenixMaxResults</code>, <code>TweetMixerMaxResults</code>다.</li>
+</ul>
 </li>
-<li><p><strong>그 다음에</strong> u2i(user→post) 파이프라인 <strong>7개</strong> <code>:385-393</code>를 <code>inclusiveRoundRobinSelector</code>로 덧붙인다 <code>:405-406</code></p>
+<li>전역 선택은 점수 내림차순으로 상위 K개를 고르는 단계 하나뿐이다 <span class="badge ok">확인</span> — <code>top_k_score_selector.rs:13</code><ul>
+<li>선택기는 <code>TopKScoreSelector</code>이고, <code>TOP_K_CANDIDATES_TO_SELECT</code>개를 고른다.</li>
+<li>이 상수도 <code>params</code> 모듈에 있고, <strong><code>params</code> 모듈은 공개되지 않았다.</strong></li>
+</ul>
 </li>
-<li><p><code>DropRequestedMaxResults</code> <code>:408-411</code>는 <code>min(requestedMaxResults, serverMaxResults)</code>를 적용한다. 파라미터 이름은 <code>DefaultRequestedMaxResultsParam</code>(300)과 <code>ServerMaxResultsParam</code>(500)이다 <span class="badge ok">확인</span> <code>HomeRecommendedTweetsParam.scala:18-24,27-33</code></p>
+<li><strong>캐시 게이트가 사실상 배분기 역할을 한다.</strong> 캐시된 포스트가 임계치 이상이면 모든 소스와 Phoenix(X For You의 랭킹 모델) 자체가 조용히 꺼진다 <span class="badge ok">확인</span>.<ul>
+<li>즉 &quot;새 후보를 얼마나 가져올지&quot;의 1차 결정은 소스별 상한이 아니라 캐시 상태다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2025-scala-상한--인터리브--우선순위-위브">2025 Scala: 상한 + 인터리브 + 우선순위 위브</h3>
+<p>2025 세대는 훨씬 복잡하고, 배분이 두 레이어에서 일어난다. OON 후보를 만드는 tweet-mixer는 저신호 유저에게만 비율 배분을 쓰고, 나머지 유저에게는 블렌더와 상한을 쓴다 <span class="badge ok">확인</span>(<a href="#tweet-mixer-%EB%A0%88%EC%9D%B4%EC%96%B4">tweet-mixer 레이어</a>). 피드를 조립하는 home-mixer는 파이프라인 순서를 우선순위로 쓴다 <span class="badge ok">확인</span>(<a href="#home-mixer-%EB%A0%88%EC%9D%B4%EC%96%B4">home-mixer 레이어</a>).</p>
+<h4 id="tweet-mixer-레이어">tweet-mixer 레이어</h4>
+<p>tweet-mixer는 OON 후보 생성을 전담한다. Home 요청에는 candidate pipeline이 34개 연결되어 있다 <span class="badge ok">확인</span> — <code>HomeRecommendedTweetsRecommendationPipelineConfig.scala:271-332</code> (엔트리 <code>:274-331</code>)</p>
+<p>배분은 다섯 단계로 진행된다 <span class="badge ok">확인</span> <code>:362-412</code>.</p>
+<ol>
+<li>저신호 유저(팔로우 그래프가 작은 유저)면 <strong>여기서 끝난다.</strong> 작성자당 1개로 dedup하고, <strong>명시적 비율 배분</strong>을 한 뒤, 이후 selector를 전부 막는다 <span class="badge ok">확인</span>.<ul>
+<li>dedup은 <code>DropDuplicateCandidates(duplicationKey = _.features.getOrElse(AuthorIdFeature, None))</code>가 한다 <code>:364</code>.</li>
+<li>비율 배분은 <code>InsertAppendRatioResults</code>가 한다.</li>
+<li>이후 selector를 막는 것은 <code>DropAllCandidates()</code>다 <code>:380</code>.</li>
+<li>블록 전체는 <code>AllowLowSignalUserGate.evaluate</code>로 게이트된다 <code>:382</code>.</li>
+<li>비율의 default 값은 Grok 토픽 0.7, SimClusters interested-in 0.15, 인기 지역 0.15, 나머지 전부 0.01이다 <span class="badge ok">확인</span> <code>TweetMixerGlobalParams.scala:225,233,241,249</code>.</li>
+<li>&#39;나머지&#39;에는 <code>filterNot</code>으로 일괄 적용한다 <code>:372-378</code>. 이 값들은 default 값이고 프로덕션 값은 아니다.</li>
+</ul>
+</li>
+<li>저신호 유저가 아니면 블렌더 하나를 골라 실행한다. Home 파이프라인에 <strong>연결된 블렌더는 3개</strong>이고, <code>BlendingParam</code>이 그중 하나를 고른다 <span class="badge ok">확인</span> <code>:399,401,402</code>.<ul>
+<li><code>exclusiveRoundRobinSelector</code>는 <code>(소스, 시그널)</code> 버킷으로 위브한다.</li>
+<li><code>signalPrioritySelector</code>는 버킷 기준에 <code>USSFeatures.getPriority</code>를 추가한다.</li>
+<li><code>weightedSignalPrioritySelector</code>는 가중치를 적용해 위브한다. <strong><code>new Random(0)</code>으로 시드를 고정한다</strong> <span class="badge ok">확인</span> <code>TweetMixerFunctionalComponents.scala:289</code>.</li>
+<li>다만 블렌더가 이것뿐인 것은 아니다. <code>TweetMixerFunctionalComponents.scala</code>에는 selector가 훨씬 많이 정의돼 있고, <code>BlendingEnum</code>은 값이 6개다 <span class="badge ok">확인</span> <code>TweetMixerGlobalParams.scala:23-30</code>.<ul>
+<li>정의된 selector에는 <code>roundRobinSelector</code> <code>:210</code>, <code>inclusiveRoundRobinSelector</code> <code>:237</code> 등이 있다.</li>
+<li>&quot;블렌더는 3종&quot;이 아니라 &quot;이 지면이 3개를 배선했다&quot;가 맞다.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>라이트랭커 상한으로 결과를 자른다. default 값은 500이다 <span class="badge ok">확인</span> <code>HomeRecommendedTweetsParam.scala:9-15</code>.<ul>
+<li>자르는 단계는 <code>DropMaxResults(LightRankerMaxResultsParam)</code>이다 <code>:404</code>.</li>
+</ul>
+</li>
+<li><strong>그다음에</strong> u2i(user→post) 파이프라인 <strong>7개</strong>를 라운드로빈으로 덧붙인다 <span class="badge ok">확인</span>.<ul>
+<li>파이프라인은 <code>:385-393</code>에 있고, 덧붙이는 selector는 <code>inclusiveRoundRobinSelector</code>다 <code>:405-406</code>.</li>
+</ul>
+</li>
+<li>마지막으로 요청 수와 서버 상한 가운데 작은 값으로 자른다 <span class="badge ok">확인</span> <code>:408-411</code>.<ul>
+<li>이 단계는 <code>DropRequestedMaxResults</code>이고, <code>min(requestedMaxResults, serverMaxResults)</code>를 적용한다.</li>
+<li>두 값의 파라미터 이름은 <code>DefaultRequestedMaxResultsParam</code>(300)과 <code>ServerMaxResultsParam</code>(500)이다 <span class="badge ok">확인</span> <code>HomeRecommendedTweetsParam.scala:18-24,27-33</code>.</li>
+</ul>
 </li>
 </ol>
-<p><strong>4번은 특혜처럼 보이지만 특혜가 아니다.</strong> &quot;상한을 자른 뒤에 붙으니 슬롯 경쟁을 면제받는다&quot;고 읽기 쉬운데, 두 가지가 그 결론을 뒤집는다 <span class="badge ok">확인</span>:</p>
+<p><strong>4번은 특혜처럼 보이지만 특혜가 아니다.</strong> &quot;상한을 자른 뒤에 붙으니 슬롯 경쟁을 면제받는다&quot;고 읽기 쉽지만, 두 가지 사실이 그 결론을 뒤집는다 <span class="badge ok">확인</span>.</p>
 <ul>
-<li><code>DropMaxResults</code>는 <code>result</code>만 자르고 <code>remainingCandidates</code>는 그대로 둔다 <span class="badge ok">확인</span> <code>DropMaxResults.scala:36-38</code>. 그래서 뒤에 붙는 u2i 후보는 <strong>리스트의 맨 뒤</strong>에 놓인다.</li>
-<li>그리고 <strong>home-mixer가 실제로 요청하는 수는 400</strong>이다 <span class="badge ok">확인</span> <code>ScoredTweetsParam.scala:176</code>(default 400) → <code>ScoredTweetsTweetMixerCandidatePipelineConfig.scala:77</code> → <code>HomeRecommendedTweetsProductPipelineConfig.scala:73</code>. 라이트랭커 상한 500보다 작다.</li>
+<li>3단계의 절단은 결과 리스트만 자르고, 남은 후보는 버리지 않는다 <span class="badge ok">확인</span> <code>DropMaxResults.scala:36-38</code>. 그래서 뒤에 붙는 u2i 후보는 <strong>리스트의 맨 뒤</strong>에 놓인다.<ul>
+<li>코드로는 <code>DropMaxResults</code>가 <code>result</code>만 자르고 <code>remainingCandidates</code>는 그대로 둔다.</li>
 </ul>
-<p>→ 즉 5번의 최종 절단선(400)이 3번의 상한(500)보다 앞에 있으므로, <strong>비-u2i 블렌드만으로 400개가 채워지면 뒤에 붙은 u2i는 한 개도 안 남는다.</strong> u2i는 500 슬롯을 놓고 경쟁하지 않는 대신 <strong>400에서 가장 먼저 잘리는 쪽</strong>이다. 순서상 뒤에 붙는 것은 우대가 아니라 후순위다.</p>
-<p><strong>저신호 유저 판정에 코드/주석 불일치가 있다.</strong> 게이트 주석은 &quot;&lt; 25 users&quot;라고 쓰는데 코드는 <code>SmallFollowGraphSize = 5</code>다. <strong>tweet-mixer와 home-mixer 양쪽에 똑같이 복제돼 있다.</strong> <span class="badge ok">확인</span> — tweet-mixer <code>SignalUtils.scala:17,20</code> vs <code>AllowLowSignalUserGate.scala:12</code>·<code>DenyLowSignalUserGate.scala:12</code>, home-mixer <code>util/SignalUtil.scala:18</code> vs <code>scored_tweets/gate/DenyLowSignalUserGate.scala:13</code></p>
-<p>주석을 인용하면 임계값이 5배 틀린다. 그리고 이 임계값은 &quot;명시적 비율 배분으로 내려갈지&quot;를 가르는 스위치라서, 5냐 25냐가 영향받는 유저 규모를 크게 바꾼다.</p>
-<p><strong>(b) home-mixer에는 candidate pipeline이 9개 있고, 그 순서 자체가 배분 규칙이다.</strong> <span class="badge ok">확인</span> — <code>ScoredTweetsRecommendationPipelineConfig.scala:446,451-459</code></p>
+</li>
+<li><strong>home-mixer가 실제로 요청하는 수는 400</strong>이다 <span class="badge ok">확인</span>. 라이트랭커 상한 500보다 작다.<ul>
+<li>근거 경로는 <code>ScoredTweetsParam.scala:176</code>(default 400) → <code>ScoredTweetsTweetMixerCandidatePipelineConfig.scala:77</code> → <code>HomeRecommendedTweetsProductPipelineConfig.scala:73</code>이다.</li>
+</ul>
+</li>
+</ul>
+<p>즉 5단계의 최종 절단선(400)이 3단계의 상한(500)보다 앞에 있으므로, <strong>비-u2i 블렌드만으로 400개가 채워지면 뒤에 붙은 u2i는 한 개도 안 남는다.</strong> u2i는 500 슬롯을 놓고 경쟁하지 않는 대신 <strong>400에서 가장 먼저 잘리는 쪽</strong>이다. 순서상 뒤에 붙는 것은 우대가 아니라 후순위다.</p>
+<p><strong>저신호 유저 판정에는 코드와 주석이 어긋나는 곳이 있다.</strong> 게이트 주석은 &quot;&lt; 25 users&quot;라고 쓰지만, 코드는 <code>SmallFollowGraphSize = 5</code>다. <strong>이 불일치는 tweet-mixer와 home-mixer 양쪽에 똑같이 복제돼 있다.</strong> <span class="badge ok">확인</span></p>
+<ul>
+<li>tweet-mixer: <code>SignalUtils.scala:17,20</code> vs <code>AllowLowSignalUserGate.scala:12</code>·<code>DenyLowSignalUserGate.scala:12</code></li>
+<li>home-mixer: <code>util/SignalUtil.scala:18</code> vs <code>scored_tweets/gate/DenyLowSignalUserGate.scala:13</code></li>
+</ul>
+<p>주석을 인용하면 임계값이 5배 틀린다. 이 임계값은 &quot;명시적 비율 배분으로 내려갈지&quot;를 가르는 스위치이므로, 5냐 25냐에 따라 영향받는 유저 규모가 크게 달라진다.</p>
+<h4 id="home-mixer-레이어">home-mixer 레이어</h4>
+<p>home-mixer에는 candidate pipeline이 9개 있고, 그 순서 자체가 배분 규칙이다 <span class="badge ok">확인</span>. 목록과 순서는 <code>ScoredTweetsRecommendationPipelineConfig.scala:446,451-459</code>에 있다.</p>
 <pre tabindex="0"><code>Static → CachedScoredTweets → EarlybirdInNetwork → DirectUteg → TweetMixer
        → ContentExploration → Lists → Backfill → Communities
 </code></pre>
-<p>바로 위에 붙은 주석은 다음과 같다: <code>&quot;Order matters. Duplicated candidates take the first occurrence in the pipelines when merger&quot;</code>. 병합은 <code>DropDuplicateCandidates(AllPipelines, IdAndClassDuplicationKey, PickFirstCandidateMerger)</code>가 처리한다 <span class="badge ok">확인</span> <code>:462-469</code>.</p>
-<p>→ <strong>비율도 상한도 아니고, 중복 시 앞선 파이프라인이 이긴다는 우선순위다.</strong> 같은 포스트가 인네트워크와 tweet-mixer 양쪽에서 오면 인네트워크 것으로 기록된다.</p>
-<p>캐시 상태가 여기서도 게이트다: <code>MinCachedTweetsParam</code>(default 30 <code>:272</code>) 미만일 때만 Frs / TweetMixer / Uteg 파이프라인이 돈다. <span class="badge ok">확인</span> — <code>ScoredTweetsParam.scala:269-275</code>, <code>ScoredTweetsTweetMixerCandidatePipelineConfig.scala:51</code></p>
-<p><strong>fail-open이 기본이지만 예외가 하나 있다.</strong> tweet-mixer는 <code>candidatePipelines.map { … FailOpenPolicy.Always }</code>로 전부 기계적으로 fail-open이다 <span class="badge ok">확인</span> <code>HomeRecommendedTweetsRecommendationPipelineConfig.scala:334-337</code>. 그런데 home-mixer는 <strong>손으로 나열해서 9개 중 8개만</strong> 등록했다. <code>scoredTweetsContentExplorationCandidatePipelineConfig</code>가 목록에 없다 <span class="badge ok">확인</span> <code>ScoredTweetsRecommendationPipelineConfig.scala:456</code> vs <code>:492-502</code>.</p>
-<p>빠진 것은 <code>defaultFailOpenPolicy = FailOpenPolicy(Set(ClosedGate))</code>를 따르게 된다 <span class="badge ok">확인</span> <code>product-mixer/core/.../RecommendationPipelineConfig.scala:113</code> → <strong>ContentExploration이 죽으면 요청 전체가 실패한다.</strong> 나머지 8개가 죽으면 그 몫이 조용히 사라지고 나머지로 채워지는 것과 대비된다.</p>
-<p>이것이 의도인지 누락인지는 코드에 단서가 없다 <span class="badge est">추정</span> — 8개를 손으로 적고 하나를 빠뜨리기 쉬운 형태이고, 탐색 파이프라인만 fail-closed로 둘 이유를 찾기 어렵다.</p>
-<h3 id="소스가-아니라-슬롯으로-배분하는-경우">소스가 아니라 &quot;슬롯&quot;으로 배분하는 경우</h3>
-<p>전부 점수 경쟁으로 보내지 않고 위치를 고정하는 장치도 있다.</p>
+<p>코드는 이 목록 바로 위에 이런 주석을 달았다: <code>&quot;Order matters. Duplicated candidates take the first occurrence in the pipelines when merger&quot;</code>. 병합은 <code>DropDuplicateCandidates(AllPipelines, IdAndClassDuplicationKey, PickFirstCandidateMerger)</code>가 처리한다 <span class="badge ok">확인</span> <code>:462-469</code>.</p>
+<p>즉 <strong>이 규칙은 비율도 상한도 아니고, 중복되면 앞선 파이프라인이 이기는 우선순위다.</strong> 같은 포스트가 인네트워크와 tweet-mixer 양쪽에서 오면 인네트워크 것으로 기록된다.</p>
+<p>여기서도 캐시 상태가 게이트다.</p>
 <ul>
-<li>커뮤니티당 후보는 <strong>1개</strong>이고, 커뮤니티 후보 총합은 <strong>3개</strong>다. <code>MaxCandidatesPerCommunity = 1</code>, <code>MaxCommunityCandidates = 3</code> <span class="badge ok">확인</span> <code>KeepTopKCandidatesPerCommunity.scala:14-15,30,32</code></li>
-<li>콘텐츠 탐색 후보와 DeepRetrieval 후보를 특정 위치로 끌어올린다. <code>ContentExplorationBoostPosParam</code>과 <code>DeepRetrievalBoostPosParam</code>을 쓰고, 각각 <code>getNumCandidatesToBoost = 1</code>이다 <span class="badge ok">확인</span> <code>ScoreAveragingPositionSelector.scala:121,137,193</code></li>
+<li>Frs, TweetMixer, Uteg 파이프라인은 <code>MinCachedTweetsParam</code>(default 30 <code>:272</code>) 미만일 때만 돈다 <span class="badge ok">확인</span> — <code>ScoredTweetsParam.scala:269-275</code><ul>
+<li>추가 근거는 <code>ScoredTweetsTweetMixerCandidatePipelineConfig.scala:51</code>이다.</li>
 </ul>
-<p>이건 <strong>랭킹 부스트가 아니라 위치 예약</strong>이다. 점수를 올리는 것이 아니라 자리를 미리 배정한다.</p>
+</li>
+</ul>
+<p><strong>fail-open(파이프라인 하나가 실패해도 응답은 나가게 하는 정책)이 기본이지만, 예외가 하나 있다.</strong></p>
+<ul>
+<li>tweet-mixer는 모든 파이프라인에 fail-open을 기계적으로 적용한다 <span class="badge ok">확인</span> <code>HomeRecommendedTweetsRecommendationPipelineConfig.scala:334-337</code>.<ul>
+<li>적용 코드는 <code>candidatePipelines.map { … FailOpenPolicy.Always }</code>다.</li>
+</ul>
+</li>
+<li>home-mixer는 fail-open 대상을 <strong>손으로 나열해서 9개 중 8개만</strong> 등록했다. <code>scoredTweetsContentExplorationCandidatePipelineConfig</code>가 목록에 없다 <span class="badge ok">확인</span> <code>ScoredTweetsRecommendationPipelineConfig.scala:456</code> vs <code>:492-502</code>.</li>
+<li>목록에서 빠진 파이프라인은 기본 정책을 따른다 <span class="badge ok">확인</span> <code>product-mixer/core/.../RecommendationPipelineConfig.scala:113</code>. 따라서 <strong>ContentExploration이 죽으면 요청 전체가 실패한다.</strong><ul>
+<li>기본 정책은 <code>defaultFailOpenPolicy = FailOpenPolicy(Set(ClosedGate))</code>다.</li>
+<li>이는 나머지 8개가 죽으면 그 몫이 조용히 사라지고 나머지로 채워지는 것과 대비된다.</li>
+</ul>
+</li>
+</ul>
+<p>이것이 의도인지 누락인지는 코드에 단서가 없지만, 8개를 손으로 적다가 하나를 빠뜨리기 쉬운 형태이고 탐색 파이프라인만 fail-closed로 둘 이유도 찾기 어렵다 <span class="badge est">추정</span>.</p>
+<h3 id="소스가-아니라-슬롯으로-배분하는-경우">소스가 아니라 &quot;슬롯&quot;으로 배분하는 경우</h3>
+<p>후보를 전부 점수 경쟁에 맡기지 않고 위치를 고정하는 장치도 있다. 이 장치는 <strong>랭킹 부스트가 아니라 위치 예약</strong>이다. 점수를 올리는 것이 아니라 자리를 미리 배정한다.</p>
+<ul>
+<li>커뮤니티당 후보는 <strong>1개</strong>이고, 커뮤니티 후보 총합은 <strong>3개</strong>다 <span class="badge ok">확인</span> <code>KeepTopKCandidatesPerCommunity.scala:14-15,30,32</code><ul>
+<li>상수는 <code>MaxCandidatesPerCommunity = 1</code>, <code>MaxCommunityCandidates = 3</code>이다.</li>
+</ul>
+</li>
+<li>콘텐츠 탐색 후보와 DeepRetrieval(유저 탑과 아이템 탑을 따로 학습해 내적으로 채점하는 후보 소스) 후보를 특정 위치로 끌어올린다 <span class="badge ok">확인</span> <code>ScoreAveragingPositionSelector.scala:121,137,193</code><ul>
+<li>파라미터는 <code>ContentExplorationBoostPosParam</code>과 <code>DeepRetrievalBoostPosParam</code>이고, 각각 <code>getNumCandidatesToBoost = 1</code>이다.</li>
+</ul>
+</li>
+</ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="케이스-meta--숫자는-있는데-배분기가-없다">케이스: Meta — 숫자는 있는데 배분기가 없다</h2>
+<p>Meta는 X와 반대 방향으로 공개했다. 지면마다 단계별 후보 수는 숫자로 밝히지만 그 숫자를 만드는 배분기는 공개하지 않았고, 배분 장치가 기계적으로 보이는 곳은 Instagram 한 지면뿐이다 <span class="badge est">추정</span>(<a href="#meta-%EC%AA%BD-%EB%B0%B0%EB%B6%84-%EC%9E%A5%EC%B9%98--%EB%94%B1-%ED%95%9C-%EC%A7%80%EB%A9%B4%EC%97%90%EC%84%9C%EB%A7%8C-%EA%B8%B0%EA%B3%84%EC%A0%81%EC%9C%BC%EB%A1%9C-%EB%B3%B4%EC%9D%B8%EB%8B%A4">Meta 쪽 배분 장치</a>).</p>
 <h3 id="pass-0-후보-수--지면별">pass 0 후보 수 — 지면별</h3>
+<p>Meta는 AI system card(Meta가 지면마다 발행하는 랭킹 설명 문서)에 지면별 후보 수를 적는다. pass 0(경량 모델로 후보를 줄이는 단계)의 후보 수는 지면마다 달라서, <strong>&quot;Meta의 pass 0은 500&quot;이라고 한 줄로 쓰면 아홉 줄 중 한 줄만 맞다.</strong></p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col><col class="w8"><col class="w6"></colgroup>
 <thead>
 <tr>
@@ -189,91 +284,182 @@
 <td>—</td>
 </tr>
 </tbody></table></div>
-<p><span class="badge ok">확인</span> 각 수치는 AI system card 본문 그대로다 (2023~, <a href="https://transparency.meta.com/features/explaining-ranking/" target="_blank" rel="noopener">인덱스</a>). 원문 인용과 지면 맥락은 → <a href="facebook.html">facebook.md</a> · <a href="instagram.html">instagram.md</a> · <a href="threads.html">threads.md</a></p>
+<p>각 수치는 AI system card 본문 그대로다 <span class="badge ok">확인</span> <a href="https://transparency.meta.com/features/explaining-ranking/" target="_blank" rel="noopener">인덱스</a> (2023~). 원문 인용과 지면 맥락은 <a href="facebook.html">facebook.md</a>, <a href="instagram.html">instagram.md</a>, <a href="threads.html">threads.md</a>에 있다.</p>
 <ul>
-<li><strong>같은 이름의 지면인데 숫자가 다르다.</strong> FB Feed는 500→500으로 단조 감소가 없고 IG Feed는 700→500이다. Meta 문서가 지면마다 다른 퍼널 형태를 서술한다.</li>
-<li><strong>비연결(Recommendations) 카드는 FB·IG 양쪽 다 수치가 없다.</strong> 그런데 같은 시스템을 설명하는 2023 블로그는 *&quot;narrow <strong>billions</strong> of pieces of content down to <strong>thousands</strong> and then to <strong>a few hundred</strong>&quot;*이라고 쓴다 <span class="badge ok">확인</span> <a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">ai.meta.com, 2023</a>. <strong>Meta 자체 문서 두 개가 다른 해상도로 서술한다.</strong></li>
-<li>Threads 카드는 단계별 수치를 하나도 제시하지 않는다. <span class="badge obs">관찰</span> 2026-08-09 (ig-threads-feed 카드 본문 1건)</li>
-<li>→ <strong>&quot;Meta의 pass 0은 500&quot;이라고 한 줄로 쓰면 아홉 줄 중 한 줄만 맞다.</strong></li>
+<li><p><strong>같은 이름의 지면인데 숫자가 다르다.</strong> FB Feed는 500→500으로 줄지 않고, IG Feed는 700→500으로 준다. Meta 문서는 지면마다 다른 퍼널 형태를 서술한다.</p>
+</li>
+<li><p><strong>비연결(Recommendations) 카드는 FB·IG 양쪽 다 수치가 없다.</strong> 그런데 같은 시스템을 설명하는 2023 블로그는 수십억 개를 수천 개로, 다시 수백 개로 줄인다고 쓴다 <span class="badge ok">확인</span> <a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">ai.meta.com, 2023</a>. <strong>Meta 자체 문서 두 개가 다른 해상도로 서술한다.</strong></p>
+<blockquote>
+<p>&quot;narrow <strong>billions</strong> of pieces of content down to <strong>thousands</strong> and then to <strong>a few hundred</strong>&quot;</p>
+</blockquote>
+</li>
+<li><p>Threads 카드는 단계별 수치를 하나도 제시하지 않는다. <span class="badge obs">관찰</span> 2026-08-09 (ig-threads-feed 카드 본문 1건)</p>
+</li>
 </ul>
 <h3 id="두-숫자의-성격이-다르다--이것이-진짜-구조적인-차이다">두 숫자의 성격이 다르다 — 이것이 진짜 구조적인 차이다</h3>
+<p>X와 Meta의 후보 수는 나온 곳부터 다르다. X의 숫자는 소스코드에서, Meta의 숫자는 system card에서 나온다 <span class="badge obs">관찰</span>. 실무에서 Meta 숫자는 상대 비교(Explore 15:1 vs Feed 1.4:1)에는 쓸 수 있지만 재현에는 못 쓴다. X 숫자는 그 반대다.</p>
 <ul>
-<li><strong>X의 숫자는 소스코드에서 나온다.</strong> <code>LightRankerMaxResultsParam</code> 500, <code>DefaultRequestedMaxResultsParam</code> 300, <code>ServerMaxResultsParam</code> 500, home-mixer 실제 요청값 400, <code>MinCachedTweetsParam</code> 30. 정확하고, 파일·줄 번호를 적을 수 있고, <strong>서로 어긋나는 것까지 보인다</strong>(위의 500 상한 뒤 400 절단선). <span class="badge ok">확인</span></li>
-<li><strong>Meta의 숫자는 system card에서 나온다.</strong> 전부 <em>&quot;approximately&quot;</em> / <em>&quot;about&quot;</em> / *&quot;up to&quot;*가 붙은 반올림 값이고, 절단 순서도, 누가 어디서 자르는지도 밝히지 않는다. <span class="badge obs">관찰</span> 2026-08-09 (검사한 코퍼스: 위 표의 시스템 카드 9종 본문)</li>
-<li>→ <span class="badge est">추정</span> <strong>공개물의 목적이 다르다.</strong> X 레포는 시스템을 읽을 수 있게 만들려던 것이라 **로직은 100%, 값은 0%**로 남았고, system card는 DSA 설명 의무 대응 문서라 **값은 반올림해서 주고 로직은 0%**다. 근거: 두 공개물의 정밀도 패턴이 정확히 반대 방향이다.</li>
-<li><strong>실무 함의:</strong> Meta 숫자는 상대 비교(Explore 15:1 vs Feed 1.4:1)에는 쓸 수 있지만 재현에는 못 쓴다. X 숫자는 그 반대다.</li>
+<li><strong>X의 숫자는 소스코드에서 나온다.</strong> 정확하고, 파일과 줄 번호를 적을 수 있고, <strong>서로 어긋나는 것까지 보인다</strong>(위에서 본 500 상한 뒤의 400 절단선). <span class="badge ok">확인</span><ul>
+<li>예: <code>LightRankerMaxResultsParam</code> 500, <code>DefaultRequestedMaxResultsParam</code> 300, <code>ServerMaxResultsParam</code> 500, home-mixer 실제 요청값 400, <code>MinCachedTweetsParam</code> 30</li>
+</ul>
+</li>
+<li><strong>Meta의 숫자는 system card에서 나온다.</strong> 전부 &quot;approximately&quot;, &quot;about&quot;, &quot;up to&quot;가 붙은 반올림 값이고, 절단 순서도, 누가 어디서 자르는지도 밝히지 않는다. <span class="badge obs">관찰</span> 2026-08-09 (검사한 코퍼스: 위 표의 시스템 카드 9종 본문)</li>
+<li><strong>공개물의 목적이 다르다</strong> <span class="badge est">추정</span>. X 레포는 시스템을 읽을 수 있게 만들려던 것이라 로직은 100%, 값은 0%로 남았고, system card는 DSA(EU 디지털서비스법) 설명 의무에 대응하는 문서라 값은 반올림해서 주고 로직은 0%다 <span class="badge est">추정</span>. 근거는 두 공개물의 정밀도 패턴이 정확히 반대 방향이라는 점이다.</li>
 </ul>
 <h3 id="meta-쪽-배분-장치--딱-한-지면에서만-기계적으로-보인다">Meta 쪽 배분 장치 — 딱 한 지면에서만 기계적으로 보인다</h3>
-<p>Instagram의 2020년 retrieval DSL과 2023년 Explore 글이 유일하다. 쿼리 전문은 → <a href="instagram.html">instagram.md</a>.</p>
+<p>Meta에서 배분 장치가 기계적으로 드러나는 자료는 Instagram의 2020년 retrieval DSL과 2023년 Explore 글뿐이다. 두 자료에는 소스별 가중치, 계정당 상한, seed 계정 기준 라운드로빈, 병합 우선순위가 나온다 <span class="badge ok">확인</span>. 쿼리 전문은 <a href="instagram.html">instagram.md</a>에 있다.</p>
 <ul>
-<li>소스 타입 4종(heuristics / ML / real-time / pre-generated)을 *&quot;mix them with <strong>tunable weights</strong>&quot;*라고 서술한다 <span class="badge ok">확인</span> <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>, 2023. <strong>소스별 가중치가 튜닝 파라미터로 존재한다고 명시한 진술이다.</strong> 값은 공개하지 않았다.</li>
-<li><code>max_media_per_account=10</code> — <strong>계정당 상한이다.</strong> X의 소스별 <code>*MaxResults</code>와 같은 유형(상한 배분)인데, 키가 소스가 아니라 <strong>작성자</strong>다. <span class="badge ok">확인</span> 2020</li>
-<li><code>diversify_by(seed_id, method=round_robin)</code> — <strong>retrieval 단계의 라운드로빈이다.</strong> X의 <code>exclusiveRoundRobinSelector</code>(소스×시그널 버킷 위브)와 같은 유형이고, 키만 seed 계정으로 다르다. <span class="badge ok">확인</span> 2020</li>
-<li>seed 소스의 병합 우선순위는 다음과 같다 <span class="badge ok">확인</span> 2020: <em>&quot;The final merge order is as follows: H &gt;&gt; R &gt; F.&quot;</em> (H = Home Feed 유래, R = Explore/Reels 등 다른 추천 지면 유래, F = graph exploration 백업)</li>
+<li><p>Explore 글은 소스 타입 4종(heuristics, ML, real-time, pre-generated)을 조정 가능한 가중치로 섞는다고 쓴다 <span class="badge ok">확인</span> <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>, 2023.</p>
+<ul>
+<li>원문은 이렇다: <em>&quot;mix them with <strong>tunable weights</strong>&quot;</em>.</li>
+<li><strong>소스별 가중치가 튜닝 파라미터로 존재한다고 명시한 진술이다.</strong> 값은 공개하지 않았다.</li>
 </ul>
-<p>→ <strong>마지막 항목은 X와 거의 같은 방식이다.</strong> X home-mixer는 파이프라인 9개를 순서대로 배선하고 <code>&quot;Order matters. Duplicated candidates take the first occurrence in the pipelines when merger&quot;</code> 주석을 달았다. Instagram은 같은 규칙을 <code>H &gt;&gt; R &gt; F</code>라는 한 문장으로 공개했다. <strong>비율도 상한도 아닌 &quot;중복 시 앞선 소스가 이긴다&quot;는 우선순위 배분이 양쪽에 다 있다.</strong> <span class="badge est">추정</span> 구현까지 같은지는 확인할 수 없다. Instagram 쪽은 코드가 공개되지 않았다.</p>
-<p>저신호·신규 유저 처리도 대응된다. X는 저신호 유저에게만 명시적 비율 배분으로 내려가고(위 2025 tweet-mixer), Instagram은 이력이 희소한 유저에게 one-hop/two-hop 그래프 확장으로 seed를 만든 뒤 *&quot;the overall distribution is not skewed away from Home-based sources&quot;*를 <strong>학습 제약으로 적용한다</strong> <span class="badge ok">확인</span> 2020. <strong>양쪽 다 점수 경쟁이 의미 없을 때만 명시적 분포 제약으로 내려간다.</strong></p>
-<p>Facebook 쪽에는 이런 장치가 없다. <strong>Facebook Feed retrieval의 소스별 후보 수 분해는 no primary source found.</strong> <span class="badge est">추정</span> — 검사한 코퍼스는 Transparency Center 시스템 카드 15종, engineering.fb.com·ai.meta.com·about.fb.com 본문, 실적발표 전사본(2026-08-09 열람)이다. 연결 콘텐츠는 코퍼스가 이미 친구 그래프로 제한돼 배분 문제 자체가 크지 않기 때문으로 보인다 <span class="badge est">추정</span>.</p>
+</li>
+<li><p>retrieval DSL에는 <strong>계정당 상한</strong>이 있다. X의 소스별 상한과 같은 유형(상한 배분)이지만, 키가 소스가 아니라 <strong>작성자</strong>다 <span class="badge ok">확인</span> 2020.</p>
+<ul>
+<li>Instagram 쪽 파라미터는 <code>max_media_per_account=10</code>이고, X 쪽은 <code>*MaxResults</code> 계열이다.</li>
+</ul>
+</li>
+<li><p>retrieval 단계에는 <strong>라운드로빈</strong>도 있다. X의 소스×시그널 버킷 위브와 같은 유형이고, 키만 seed 계정으로 다르다 <span class="badge ok">확인</span> 2020.</p>
+<ul>
+<li>Instagram 쪽은 <code>diversify_by(seed_id, method=round_robin)</code>, X 쪽은 <code>exclusiveRoundRobinSelector</code>다.</li>
+</ul>
+</li>
+<li><p>seed 소스에는 병합 우선순위가 있다 <span class="badge ok">확인</span> 2020.</p>
+<blockquote>
+<p>&quot;The final merge order is as follows: H &gt;&gt; R &gt; F.&quot;</p>
+</blockquote>
+<ul>
+<li>H는 Home Feed 유래, R은 Explore/Reels 등 다른 추천 지면 유래, F는 graph exploration 백업이다.</li>
+</ul>
+</li>
+</ul>
+<p><strong>병합 우선순위는 X와 거의 같은 방식이다.</strong> X home-mixer는 파이프라인 9개를 순서대로 연결하고 <code>&quot;Order matters. Duplicated candidates take the first occurrence in the pipelines when merger&quot;</code> 주석을 달았다. Instagram은 같은 규칙을 <code>H &gt;&gt; R &gt; F</code>라는 한 문장으로 공개했다. <strong>비율도 상한도 아닌 &quot;중복 시 앞선 소스가 이긴다&quot;는 우선순위 배분이 양쪽에 다 있다.</strong> <span class="badge est">추정</span> 구현까지 같은지는 확인할 수 없다. Instagram 쪽은 코드가 공개되지 않았다.</p>
+<p>저신호·신규 유저 처리도 서로 대응한다. <strong>양쪽 다 점수 경쟁이 의미 없을 때만 명시적 분포 제약으로 내려간다.</strong></p>
+<ul>
+<li><p>X는 저신호 유저에게만 명시적 비율 배분으로 내려간다 <span class="badge ok">확인</span>(<a href="#tweet-mixer-%EB%A0%88%EC%9D%B4%EC%96%B4">2025 tweet-mixer</a>).</p>
+</li>
+<li><p>Instagram은 이력이 희소한 유저에게 one-hop/two-hop 그래프 확장으로 seed를 만들고, 분포가 Home 기반 소스에서 벗어나지 않게 하는 조건을 <strong>학습 제약으로 적용한다</strong> <span class="badge ok">확인</span> 2020.</p>
+<blockquote>
+<p>&quot;the overall distribution is not skewed away from Home-based sources&quot;</p>
+</blockquote>
+</li>
+</ul>
+<p>Facebook 쪽에는 이런 장치가 없다.</p>
+<ul>
+<li><strong>Facebook Feed retrieval의 소스별 후보 수 분해는 1차 출처를 찾지 못했다(no primary source found).</strong> <span class="badge est">추정</span><ul>
+<li>검사한 코퍼스는 Transparency Center 시스템 카드 15종, engineering.fb.com·ai.meta.com·about.fb.com 본문, 실적발표 전사본(2026-08-09 열람)이다.</li>
+</ul>
+</li>
+<li>그 이유는 연결 콘텐츠의 코퍼스가 이미 친구 그래프로 제한돼 배분 문제 자체가 크지 않기 때문으로 보인다 <span class="badge est">추정</span>.</li>
+</ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="케이스-netflix--배분-단위가-소스가-아니라-행이다">케이스: Netflix — 배분 단위가 소스가 아니라 행이다</h2>
-<p>Netflix를 넣으면 이 노트의 전제 하나가 조건부가 된다: <strong>&quot;소스가 여럿일 때 몇 개씩 섞는가&quot;라는 문제 설정 자체가 코퍼스가 클 때만 성립한다.</strong></p>
-<p><strong>아이템 레벨 배분 레이어가 없다.</strong> 편성 카탈로그가 수천~수만 타이틀이라 PVR이 *&quot;카탈로그 전체(또는 장르 필터된 부분집합)를 회원별로 정렬&quot;*한다 <span class="badge ok">확인</span> <a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">TMIS 2015</a>. 전 아이템을 채점할 수 있으면 소스별 상한(X의 <code>*MaxResults</code>)도, 퍼널 수치(Meta의 pass 0)도 필요 없다. X의 500/400 같은 숫자가 등장할 자리가 없다.</p>
-<p><strong>대신 같은 문제가 한 층 위, 곧 행 배분에서 다시 나타난다.</strong> 회원당 후보 행은 수만 개이고(&quot;tens of thousands&quot;), 지면은 약 40행에 행마다 최대 75타이틀이다 <span class="badge ok">확인</span> TMIS 2015. &quot;어떤 소스에서 몇 개&quot;가 &quot;어떤 행(장르/BYW/Trending/CW)을 몇 개, 어떤 순서로&quot;가 된다. 그리고 2015년에 이미 <strong>비율 배분(템플릿)을 폐기하고 ML 기반 선택으로 전환했다</strong>: <em>&quot;BYW 행이 0개인 홈도, 절반이 BYW인 홈도&quot;</em> 허용한다 <span class="badge ok">확인</span>. X가 2026에 한 전환(쿼터 제거 → 점수 경쟁)을 행 단위에서 10년 먼저 한 셈이다 <span class="badge est">추정</span>. 문제 구조가 같다는 뜻이지 계보 관계가 있다는 것은 아니다.</p>
-<p><strong>행 종류별 랭커가 X의 후보 소스에 대응한다.</strong> PVR·Top-N·Trending·Continue Watching·sims가 각자 다른 알고리즘으로 행 내용을 채우고 <span class="badge ok">확인</span> TMIS 2015, 페이지 알고리즘이 이들을 조립한다. X home-mixer가 candidate pipeline 9개를 병합하는 것과 같은 자리다. 차이는 병합 규칙에 있다: X는 &quot;중복 시 앞선 파이프라인 승리&quot;라는 우선순위를 쓰고, Netflix는 행 선택이라는 최적화를 쓴다.</p>
-<p><strong>GenPage(2026)는 이 레이어 전체를 단일 모델로 통합한다.</strong> 행 선택과 행 내 정렬을 트랜스포머 하나의 autoregressive 생성으로 대체하고, 엔드투엔드 지연은 −20%다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">arXiv 2606.31031</a> (실험 단계). SilverTorch가 인덱스를 모델 텐서로 통합한 것과 같은 방향이다: <strong>배분 로직이 명시적 규칙에서 학습된 분포로 이동한다.</strong></p>
-<p><strong>광고</strong>: 랭킹 모델 공개물이 없어 오가닉/광고 배분 규칙도 알 수 없다 <span class="badge ok">확인</span>(부재) → <a href="netflix.html">netflix.md</a>.</p>
+<p>Netflix를 넣으면 이 노트의 전제 하나가 조건부가 된다. <strong>&quot;소스가 여럿일 때 몇 개씩 섞는가&quot;라는 문제 설정 자체가 코퍼스가 클 때만 성립한다.</strong> Netflix에는 아이템 단위 배분이 없고, 배분 단위는 행이다 <span class="badge ok">확인</span>.</p>
+<p><strong>아이템 레벨 배분 레이어가 없다.</strong> 편성 카탈로그가 수천~수만 타이틀이라, PVR(장르 행을 채우는 랭커)이 &quot;카탈로그 전체(또는 장르 필터된 부분집합)를 회원별로 정렬&quot;한다 <span class="badge ok">확인</span> <a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">TMIS 2015</a>.</p>
+<ul>
+<li>전 아이템을 채점할 수 있으면 소스별 상한(X의 <code>*MaxResults</code>)도, 퍼널 수치(Meta의 pass 0)도 필요 없다.</li>
+<li>X의 500/400 같은 숫자가 등장할 자리가 없다.</li>
+</ul>
+<p><strong>대신 같은 문제가 한 층 위, 곧 행 배분에서 다시 나타난다.</strong> 회원당 후보 행은 수만 개이고(&quot;tens of thousands&quot;), 지면은 약 40행에 행마다 최대 75타이틀이다 <span class="badge ok">확인</span> TMIS 2015. &quot;어떤 소스에서 몇 개&quot;라는 질문이 &quot;어떤 행(장르/BYW/Trending/CW)을 몇 개, 어떤 순서로&quot;라는 질문으로 바뀐다. BYW는 Because You Watched 행이고, CW는 Continue Watching 행이다.</p>
+<p>Netflix는 2015년에 이미 <strong>비율 배분(템플릿)을 폐기하고 ML 기반 선택으로 전환했다</strong> <span class="badge ok">확인</span>. ML 기반 선택은 &quot;BYW 행이 0개인 홈도, 절반이 BYW인 홈도&quot; 허용한다 <span class="badge ok">확인</span>. X가 2026에 한 전환(쿼터 제거 → 점수 경쟁)을 행 단위에서 10년 먼저 한 셈이다 <span class="badge est">추정</span>. 문제 구조가 같다는 뜻이지, 계보 관계가 있다는 뜻은 아니다.</p>
+<p><strong>행 종류별 랭커가 X의 후보 소스에 대응한다.</strong> PVR·Top-N·Trending·Continue Watching·sims가 각자 다른 알고리즘으로 행 내용을 채우고 <span class="badge ok">확인</span> TMIS 2015, 페이지 알고리즘이 이들을 조립한다. X home-mixer가 candidate pipeline 9개를 병합하는 것과 같은 자리다. 차이는 병합 규칙에 있다. X는 &quot;중복 시 앞선 파이프라인 승리&quot;라는 우선순위를 쓰고, Netflix는 행 선택이라는 최적화를 쓴다.</p>
+<p><strong>GenPage(2026)는 이 레이어 전체를 단일 모델로 통합한다.</strong> 행 선택과 행 내 정렬을 트랜스포머 하나의 autoregressive 생성으로 대체하고, 엔드투엔드 지연은 −20%다 <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">arXiv 2606.31031</a> (실험 단계). Meta의 SilverTorch가 인덱스를 모델 텐서로 통합한 것과 같은 방향이다. <strong>배분 로직이 명시적 규칙에서 학습된 분포로 옮겨 간다.</strong></p>
+<p>광고 쪽은 랭킹 모델 공개물이 없어서 오가닉과 광고의 배분 규칙도 알 수 없다 <span class="badge ok">확인</span>(부재). 관련 서술은 <a href="netflix.html">netflix.md</a>에 있다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="광고-대-오가닉--개수-슬롯이냐-픽셀-거리냐">광고 대 오가닉 — 개수 슬롯이냐 픽셀 거리냐</h2>
-<p>배분 레이어에서 두 회사의 차이가 가장 뚜렷하게 드러나는 부분이다.</p>
+<p>배분 레이어에서 두 회사의 차이가 가장 뚜렷하게 드러나는 곳은 광고와 오가닉의 배분이다. X는 오가닉 랭킹이 끝난 뒤 개수 기준으로 광고를 끼워 넣고, Meta 특허는 광고와 오가닉을 공통 단위로 환산해 하나의 랭킹에 넣는다 <span class="badge ok">확인</span>.</p>
 <p><strong>X는 오가닉 랭킹이 끝난 뒤 개수 기준으로 광고를 끼워 넣는다.</strong> <span class="badge ok">확인</span> 2026 소스코드 <a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a></p>
 <ul>
-<li>광고를 붙이려면 오가닉 포스트가 최소 5개 있어야 한다 (<code>ads/util.rs:10</code>)</li>
-<li>기본 간격은 <code>{requested: 3, min: 2}</code>이다 (<code>ads/util.rs:12-17</code>)</li>
-<li>안전 갭의 절반까지만 넣는다: <code>max_from_safe = safe_count / 2</code> (<code>ads/partition_organic_blender.rs:35</code>)</li>
-<li><code>BlenderSelector</code>가 프레임워크 정렬을 <strong>의도적으로 무력화</strong>(<code>score()</code>가 상수 <code>0.0</code>)한 뒤 프롬프트와 팔로우 추천, 광고를 지정된 위치에 삽입한다 (<code>blender_selector.rs:25-114</code>)</li>
+<li>광고를 붙이려면 오가닉 포스트가 최소 5개 있어야 한다 <span class="badge ok">확인</span> <code>ads/util.rs:10</code></li>
+<li>기본 간격은 <code>{requested: 3, min: 2}</code>이다 <span class="badge ok">확인</span> <code>ads/util.rs:12-17</code></li>
+<li>안전 갭의 절반까지만 넣는다 <span class="badge ok">확인</span> <code>ads/partition_organic_blender.rs:35</code><ul>
+<li>계산식은 <code>max_from_safe = safe_count / 2</code>다.</li>
 </ul>
-<p>→ <strong>광고가 랭킹 경쟁에 참여하지 않는다.</strong> 정렬이 끝난 리스트에 개수 규칙으로 삽입된다.</p>
+</li>
+<li>블렌더 selector는 프레임워크 정렬을 <strong>의도적으로 무력화</strong>한 뒤, 프롬프트와 팔로우 추천, 광고를 지정된 위치에 삽입한다 <span class="badge ok">확인</span> <code>blender_selector.rs:25-114</code><ul>
+<li>selector는 <code>BlenderSelector</code>이고, 무력화 방법은 <code>score()</code>를 상수 <code>0.0</code>으로 두는 것이다.</li>
+</ul>
+</li>
+</ul>
+<p>즉 <strong>광고는 랭킹 경쟁에 참여하지 않는다.</strong> 정렬이 끝난 리스트에 개수 규칙으로 삽입된다.</p>
 <p><strong>Meta는 광고와 오가닉을 공통 단위로 환산해 하나의 랭킹에 넣는다.</strong> <span class="badge ok">확인</span> <a href="https://patents.google.com/patent/US10345993B2/en" target="_blank" rel="noopener">US 10,345,993 B2</a> &quot;Selecting content items for presentation in a feed based on heights associated with the content items&quot;, 출원 2015 / 등록 2019, 특허</p>
 <ul>
-<li><em>&quot;Scores associated with organic news feed stories and scores associated with advertisements are <strong>converted into a common unit of measurement</strong>, and advertisements and organic news feed stories are <strong>together ranked in a single ranking</strong>.&quot;</em></li>
-<li>간격 제약이 <strong>개수 기준과 픽셀 높이 기준 둘 다로</strong> 표현된다: <em>&quot;at least a threshold number of organic news feed stories are presented between advertisements&quot;</em> 또는 <em>&quot;a combination of heights of the organic feed stories exceeds a <strong>gap distance threshold</strong>&quot;</em></li>
-<li>position discount가 <strong>위에 놓인 후보들의 예측 높이 합</strong>에 의존한다</li>
-<li><strong>높이 예측 자체가 ML 모델이다.</strong> 콘텐츠 타입과 언어, 댓글 수에 클라이언트 화면 크기와 OS, 해상도, 앱 버전을 더해 *&quot;the likely height of the content item when presented&quot;*를 예측한다.</li>
+<li><p>특허는 오가닉 점수와 광고 점수를 공통 측정 단위로 바꾼 뒤, 광고와 오가닉 스토리를 한 랭킹에서 함께 순위 매긴다고 쓴다 <span class="badge ok">확인</span> 특허.</p>
+<blockquote>
+<p>&quot;Scores associated with organic news feed stories and scores associated with advertisements are <strong>converted into a common unit of measurement</strong>, and advertisements and organic news feed stories are <strong>together ranked in a single ranking</strong>.&quot;</p>
+</blockquote>
+</li>
+<li><p>간격 제약이 <strong>개수 기준과 픽셀 높이 기준 둘 다로</strong> 표현된다 <span class="badge ok">확인</span> 특허.</p>
+<ul>
+<li>개수 기준: &quot;at least a threshold number of organic news feed stories are presented between advertisements&quot;</li>
+<li>또는 높이 기준: &quot;a combination of heights of the organic feed stories exceeds a <strong>gap distance threshold</strong>&quot;</li>
 </ul>
-<p>→ <strong>인터리빙이 슬롯 인덱스가 아니라 기하 제약이다.</strong> &quot;3개마다 하나&quot;가 아니라 &quot;직전 광고로부터 픽셀 거리 X 이상&quot;이므로, <strong>같은 유저라도 화면 크기와 콘텐츠 타입 구성에 따라 실제 광고 개수가 달라진다.</strong> <span class="badge est">추정</span> — 특허가 결과 비중을 말하지는 않는다. 고정 슬롯 비율(ad load N%)로 모델링하면 틀린다는 뜻이다.</p>
-<p class="warn"><strong>⚠ 주의 두 가지.</strong> (1) 이 특허는 출원 2015이고 <strong>현재 프로덕션이라는 근거가 아니다.</strong> 다만 Meta 광고 인터리빙에 남아 있는 유일한 기계적 1차 출처다. (2) 널리 퍼져 있는 <code>Total Value = Bid × Estimated Action Rate × Ad Quality</code>는 <strong>Meta 1차 출처를 찾지 못했으므로 수식으로 인용하면 안 된다.</strong> ad load 수치도 인터리빙 규칙도 마찬가지다. <span class="badge est">추정</span> — 검사한 코퍼스는 Marketing API 입찰·게재 문서, Transparency Center 광고 페이지, about.fb.com 본문(2026-08-09 열람)이다. 상세는 → <a href="facebook.html">facebook.md</a></p>
-<p>Threads는 2025 Q3에 광고를 글로벌 롤아웃했지만 <strong>인터리빙 규칙은 공개하지 않았고, 픽셀 높이 특허를 적용하는지도 알 수 없다.</strong> <span class="badge est">추정</span>(같은 코퍼스, 2026-08-09) → <a href="threads.html">threads.md</a></p>
+</li>
+<li><p>position discount(위치에 따라 예측되는 상호작용 감소)가 <strong>위에 놓인 후보들의 예측 높이 합</strong>에 의존한다 <span class="badge ok">확인</span> 특허.</p>
+</li>
+<li><p><strong>높이 예측 자체가 ML 모델이다.</strong> 콘텐츠 타입과 언어, 댓글 수에 클라이언트 화면 크기와 OS, 해상도, 앱 버전을 더해 콘텐츠가 표시될 때의 높이를 예측한다 <span class="badge ok">확인</span> 특허.</p>
+<blockquote>
+<p>&quot;the likely height of the content item when presented&quot;</p>
+</blockquote>
+</li>
+</ul>
+<p>즉 <strong>인터리빙은 슬롯 인덱스가 아니라 기하 제약이다.</strong> &quot;3개마다 하나&quot;가 아니라 &quot;직전 광고로부터 픽셀 거리 X 이상&quot;이므로, <strong>같은 유저라도 화면 크기와 콘텐츠 타입 구성에 따라 실제 광고 개수가 달라진다</strong> <span class="badge est">추정</span>. 고정 슬롯 비율(ad load N%)로 모델링하면 틀린다는 뜻이다 <span class="badge est">추정</span>. 다만 특허가 결과 비중을 말하지는 않는다.</p>
+<p class="warn"><strong>⚠ 주의할 점이 두 가지 있다.</strong></p>
+<ol>
+<li>이 특허는 2015년에 출원됐고, <strong>현재 프로덕션이라는 근거가 아니다.</strong> 다만 Meta 광고 인터리빙에 관해 남아 있는 유일한 기계적 1차 출처다.</li>
+<li>널리 퍼져 있는 <code>Total Value = Bid × Estimated Action Rate × Ad Quality</code>는 <strong>Meta 1차 출처를 찾지 못했으므로 수식으로 인용하면 안 된다.</strong> ad load 수치도, 인터리빙 규칙도 마찬가지다 <span class="badge est">추정</span>.<ul>
+<li>검사한 코퍼스는 Marketing API 입찰·게재 문서, Transparency Center 광고 페이지, about.fb.com 본문(2026-08-09 열람)이다. 상세는 <a href="facebook.html">facebook.md</a>에 있다.</li>
+</ul>
+</li>
+</ol>
+<p>Threads는 2025 Q3에 광고를 글로벌 롤아웃했지만, <strong>인터리빙 규칙은 공개하지 않았고 픽셀 높이 특허를 적용하는지도 알 수 없다.</strong> <span class="badge est">추정</span>(같은 코퍼스, 2026-08-09). 관련 서술은 <a href="threads.html">threads.md</a>에 있다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</h2>
+<p>배분을 읽을 때는 공개된 비율보다 코드의 실제 경로를 봐야 한다. 실제 소스 구성은 캐시 상태, fail-open 정책, 절단선의 순서에 따라 달라진다. 배분이 필요한지와 그 단위는 코퍼스 크기와 지면 구조를 따라간다.</p>
 <ul>
-<li><strong>공개된 &quot;비율&quot;은 대개 관측 결과지 코드에 있는 쿼터가 아니다.</strong> 소스를 열어 배분기를 직접 찾아야 한다. X는 결국 배분기를 없애고 점수 배수로 옮겼다.</li>
+<li><strong>배분은 실제로 어디서 정해지는가?</strong><ul>
+<li><strong>공개된 &quot;비율&quot;은 대개 관측 결과이지, 코드에 있는 쿼터가 아니다.</strong> 소스를 열어 배분기를 직접 찾아야 한다. X는 결국 배분기를 없애고 점수 배수로 옮겨 갔다.</li>
 <li><strong>캐시가 최대의 배분기다.</strong> X는 두 세대 모두 &quot;캐시된 후보가 충분하면 비싼 소스를 안 돈다&quot;가 1차 분기다. 즉 실제 소스 구성은 유저의 요청 빈도에 따라 달라진다.</li>
-<li><strong>fail-open이 기본이면 배분은 보장이 아니라 경향이다.</strong> X는 거의 모든 candidate pipeline이 fail-open이라 소스 하나가 죽어도 응답은 나가고, 그 몫은 조용히 다른 소스로 대체된다. 단 <strong>정책을 손으로 나열하면 빠뜨린 하나가 fail-closed가 된다.</strong> X home-mixer의 ContentExploration이 그 경우다. 기계적 일괄 적용(tweet-mixer)과 수기 나열(home-mixer)의 차이가 그대로 장애 반경 차이가 된다.</li>
-<li><strong>상한이 여러 겹이면 &quot;나중에 붙는다&quot;는 우대가 아니라 후순위다.</strong> X 2025 tweet-mixer의 u2i 후보는 라이트랭커 상한(500) 절단 뒤에 붙어 경쟁을 면제받는 것처럼 보이지만, 그 뒤의 최종 절단선이 400이라 앞이 다 차면 먼저 사라진다. <strong>절단선을 하나만 보고 결론내면 방향이 반대로 나온다.</strong></li>
-<li><strong>신규·저신호 유저에게만 비율 배분을 쓴다.</strong> 시그널이 없어 점수 경쟁이 의미 없을 때만 명시적 쿼터로 내려간다. <strong>X(저신호 유저 명시 비율)와 Instagram(희소 유저 seed 확장 + Home 분포 제약) 양쪽에서 같은 패턴이 관찰된다.</strong></li>
-<li><strong>&quot;후보 수&quot;라는 숫자는 출처 종류를 먼저 봐야 한다.</strong> 소스코드에서 나온 수는 정확하고 재현에 쓸 수 있으며 서로 어긋나는 것까지 보인다. 규제 대응 문서에서 나온 수는 반올림돼 있고 상대 비교에만 쓸 수 있다. <strong>정밀도는 시스템의 성질이 아니라 공개물의 목적이 정한다.</strong></li>
-<li><strong>광고 인터리빙을 슬롯 비율로 모델링하면 안 될 수 있다.</strong> X는 개수 기준(간격 3, 최소 5개 오가닉)이라 슬롯 모델이 맞지만, Meta 특허는 <strong>픽셀 높이라는 공통 단위 + gap distance 제약</strong>이라 화면 크기에 따라 결과가 달라진다. 같은 &quot;N개마다 광고 하나&quot;라는 요약이 한쪽에서는 맞고 한쪽에서는 틀린다.</li>
-<li><strong>배분 레이어의 존재 자체가 코퍼스 크기의 함수다.</strong> 카탈로그가 전 아이템 채점 가능한 크기(Netflix 수천~수만)면 아이템 레벨 배분이 사라지고, 문제는 한 층 위(행 구성)로 이동한다. &quot;이 서비스의 후보 배분은?&quot;이라고 묻기 전에 &quot;배분이 필요한 규모인가&quot;부터 물어야 한다.</li>
+<li><strong>신규·저신호 유저에게만 비율 배분을 쓴다.</strong> 시그널이 없어 점수 경쟁이 의미 없을 때만 명시적 쿼터로 내려간다. X는 저신호 유저에게 명시적 비율을 쓰고, Instagram은 희소 유저에게 seed 확장과 Home 분포 제약을 쓴다. <strong>양쪽에서 같은 패턴이 관찰된다.</strong></li>
+</ul>
+</li>
+<li><strong>상한과 장애 정책은 배분을 어떻게 바꾸는가?</strong><ul>
+<li><strong>fail-open이 기본이면 배분은 보장이 아니라 경향이다.</strong> X는 거의 모든 candidate pipeline이 fail-open이라 소스 하나가 죽어도 응답은 나가고, 그 몫은 조용히 다른 소스로 대체된다. 다만 <strong>정책을 손으로 나열하면 빠뜨린 하나가 fail-closed가 된다.</strong> X home-mixer의 ContentExploration이 그 경우다. 기계적 일괄 적용(tweet-mixer)과 수기 나열(home-mixer)의 차이가 그대로 장애 반경의 차이가 된다.</li>
+<li><strong>상한이 여러 겹이면 &quot;나중에 붙는다&quot;는 우대가 아니라 후순위다.</strong> X 2025 tweet-mixer의 u2i 후보는 라이트랭커 상한(500) 절단 뒤에 붙어 경쟁을 면제받는 것처럼 보인다. 하지만 그 뒤의 최종 절단선이 400이라, 앞이 다 차면 먼저 사라진다. <strong>절단선을 하나만 보고 결론을 내면 방향이 반대로 나온다.</strong></li>
+</ul>
+</li>
+<li><strong>배분에 관한 숫자와 모델은 어떻게 읽어야 하는가?</strong><ul>
+<li><strong>&quot;후보 수&quot;라는 숫자는 출처 종류를 먼저 봐야 한다.</strong> 소스코드에서 나온 수는 정확하고, 재현에 쓸 수 있으며, 서로 어긋나는 것까지 보인다. 규제 대응 문서에서 나온 수는 반올림돼 있고 상대 비교에만 쓸 수 있다. <strong>정밀도는 시스템의 성질이 아니라 공개물의 목적이 정한다.</strong></li>
+<li><strong>광고 인터리빙을 슬롯 비율로 모델링하면 안 될 수 있다.</strong> X는 개수 기준(간격 3, 최소 5개 오가닉)이라 슬롯 모델이 맞다. Meta 특허는 <strong>픽셀 높이라는 공통 단위와 gap distance 제약</strong>이라 화면 크기에 따라 결과가 달라진다. 같은 &quot;N개마다 광고 하나&quot;라는 요약이 한쪽에서는 맞고 한쪽에서는 틀린다.</li>
+</ul>
+</li>
+<li><strong>배분이 필요한지와 그 단위는 무엇이 정하는가?</strong><ul>
+<li><strong>배분 레이어의 존재 자체가 코퍼스 크기의 함수다.</strong> 카탈로그가 전 아이템을 채점할 수 있는 크기(Netflix 수천~수만)면 아이템 레벨 배분이 사라지고, 문제는 한 층 위(행 구성)로 옮겨 간다. &quot;이 서비스의 후보 배분은?&quot;이라고 묻기 전에 &quot;배분이 필요한 규모인가&quot;부터 물어야 한다.</li>
 <li><strong>배분 단위는 지면 구조를 따라간다.</strong> 단일 스트림은 아이템을 배분하고, 2차원 페이지는 행을 배분한다. Netflix의 행 종류(장르/BYW/Trending)가 X의 후보 소스와 같은 역할을 한다. 다만 병합 규칙만 우선순위(X)와 최적화(Netflix)로 다르다.</li>
+</ul>
+</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="누가-이걸-쓰는가">누가 이걸 쓰는가</h2>
+<p>X는 배분 로직이 전부 레포 안에 있고, 값은 전부 레포 밖에 있다 <span class="badge ok">확인</span>. Facebook과 Instagram은 여러 지면의 후보 수를 밝히고, Threads는 하나도 밝히지 않는다 <span class="badge obs">관찰</span>. Netflix는 아이템이 아니라 행을 배분한다 <span class="badge ok">확인</span>.</p>
 <ul>
-<li><strong>X</strong> — 2025 Scala 세대는 상한과 위브, 우선순위 병합을 쓰고, 2026 Rust 세대는 배분기 없이 점수 배수를 쓴다. 값은 전부 레포 밖에 있고, 로직은 전부 레포 안에 있다. → <a href="x.html">x.md</a> <span class="badge ok">확인</span></li>
-<li><strong>Facebook</strong> — pass 0은 약 500(Feed) / 1,000→200(Video) / 10–100(Reels)이고, 비연결 카드에는 수치가 없다. <strong>소스별 분해는 1차 출처가 없다.</strong> 광고 쪽 근거는 픽셀 높이를 공통 단위로 쓰는 특허다. → <a href="facebook.html">facebook.md</a> <span class="badge ok">확인</span></li>
-<li><strong>Instagram</strong> — Feed는 700→500이고, Explore는 1,500→100(15:1)이며, Reels Chaining은 약 100이다. <strong>Meta에서 배분 장치가 기계적으로 보이는 유일한 지면이다</strong>(tunable weights, <code>max_media_per_account</code>, seed 라운드로빈, <code>H &gt;&gt; R &gt; F</code>). → <a href="instagram.html">instagram.md</a> <span class="badge ok">확인</span></li>
-<li><strong>Threads</strong> — <strong>단계별 후보 수가 하나도 없다.</strong> 인벤토리 정의에 팔로우는 <em>all</em>, 공개 콘텐츠는 <em>a portion</em>이라는 비대칭만 명시한다. → <a href="threads.html">threads.md</a> <span class="badge obs">관찰</span> 2026-08-09 (ig-threads-feed 카드 본문 1건)</li>
-<li><strong>Netflix</strong> — 아이템 레벨 배분이 없고(전 카탈로그를 채점한다), 배분 단위는 행이다. 행 후보 수만 개를 약 40행으로 줄인다. 2015년에 템플릿(비율 배분)을 폐지했다. → <a href="netflix.html">netflix.md</a> <span class="badge ok">확인</span></li>
+<li><strong>X</strong> — 2025 Scala 세대는 상한과 위브, 우선순위 병합을 쓰고, 2026 Rust 세대는 배분기 없이 점수 배수를 쓴다. 값은 전부 레포 밖에 있고, 로직은 전부 레포 안에 있다 <span class="badge ok">확인</span> — <a href="x.html">x.md</a></li>
+<li><strong>Facebook</strong> — pass 0은 약 500(Feed), 1,000→200(Video), 10–100(Reels)이고, 비연결 카드에는 수치가 없다. <strong>소스별 분해는 1차 출처가 없다.</strong> 광고 쪽 근거는 픽셀 높이를 공통 단위로 쓰는 특허다 <span class="badge ok">확인</span> — <a href="facebook.html">facebook.md</a></li>
+<li><strong>Instagram</strong> — Feed는 700→500이고, Explore는 1,500→100(15:1)이며, Reels Chaining은 약 100이다. <strong>Meta에서 배분 장치가 기계적으로 보이는 유일한 지면이다</strong>(tunable weights, <code>max_media_per_account</code>, seed 라운드로빈, <code>H &gt;&gt; R &gt; F</code>). <span class="badge ok">확인</span> — <a href="instagram.html">instagram.md</a></li>
+<li><strong>Threads</strong> — <strong>단계별 후보 수가 하나도 없다.</strong> 카드는 인벤토리 정의에서 팔로우는 <em>all</em>, 공개 콘텐츠는 <em>a portion</em>이라는 비대칭만 명시한다 <span class="badge obs">관찰</span> 2026-08-09 (ig-threads-feed 카드 본문 1건), <a href="threads.html">threads.md</a></li>
+<li><strong>Netflix</strong> — 아이템 레벨 배분이 없고(전 카탈로그를 채점한다), 배분 단위는 행이다. 행 후보 수만 개를 약 40행으로 줄인다. 2015년에 템플릿(비율 배분)을 폐지했다 <span class="badge ok">확인</span> — <a href="netflix.html">netflix.md</a></li>
 <li><strong>그 외 서비스</strong> — 아직 조사하지 않았다. <strong>열린 질문으로 남아 있다.</strong></li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="아직-확인하지-못한-것">아직 확인하지 못한 것</h2>
+<p>Meta 쪽은 연결·비연결 결과의 병합 규칙, Explore 가중치의 튜닝 방법, 높이 특허의 현재 운용 여부, Threads의 단계별 수치를 아직 확인하지 못했다. Netflix 쪽은 지금의 행 선택 알고리즘을 확인하지 못했다.</p>
 <ul>
-<li><strong>Meta가 연결(500) 결과와 비연결(수백) 결과를 어떤 규칙으로 인터리브하는가.</strong> 두 시스템이 별개라고만 밝히고 병합 규칙은 설명하지 않는다 → <a href="facebook.html">facebook.md</a> 열린 질문 4.</li>
-<li><strong>Instagram Explore의 소스별 tunable weight를 무엇으로 튜닝하는가.</strong> *&quot;tunable&quot;*이라고만 하고 목적 함수와 최적화 방법은 공개하지 않았다.</li>
+<li><strong>Meta가 연결(500) 결과와 비연결(수백) 결과를 어떤 규칙으로 인터리브하는가.</strong> 두 시스템이 별개라고만 밝히고 병합 규칙은 설명하지 않는다. 참고: <a href="facebook.html">facebook.md</a> 열린 질문 4.</li>
+<li><strong>Instagram Explore의 소스별 tunable weight를 무엇으로 튜닝하는가.</strong> &quot;tunable&quot;이라고만 하고 목적 함수와 최적화 방법은 공개하지 않았다.</li>
 <li><strong>Meta 픽셀 높이 특허(2015 출원)가 2026년에도 운용되는가.</strong> 특허 외에는 1차 근거가 없다.</li>
 <li><strong>Threads의 후보 생성 방식과 단계별 수치.</strong> system card가 숫자를 하나도 주지 않는다.</li>
-<li><strong>Netflix 행 선택 알고리즘은 지금 어떤 형태인가.</strong> 2015 논문(row-level 채점+greedy 류 서술) 이후 GenPage(2026 실험)까지 사이 10년의 1차 출처가 없다.</li>
+<li><strong>Netflix 행 선택 알고리즘은 지금 어떤 형태인가.</strong> 2015 논문은 row-level 채점과 greedy 류로 서술한다. 그 뒤 GenPage(2026 실험)까지 10년 사이의 1차 출처가 없다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="출처">출처</h2>
@@ -290,7 +476,7 @@
 <h3 id="meta-블로그특허">Meta 블로그·특허</h3>
 <ul>
 <li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> — 2020, 블로그. retrieval DSL, <code>max_media_per_account</code>, <code>H &gt;&gt; R &gt; F</code>.</li>
-<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023, 블로그. 소스 타입 4종 + tunable weights.</li>
+<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023, 블로그. 소스 타입 4종과 tunable weights.</li>
 <li><a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">The AI behind unconnected content recommendations</a> — 2023, 블로그. billions → thousands → a few hundred.</li>
 <li><a href="https://patents.google.com/patent/US10345993B2/en" target="_blank" rel="noopener">US 10,345,993 B2 — Selecting content items for presentation in a feed based on heights</a> — 등록 2019(출원 2015), 특허. <strong>광고와 오가닉을 통합한 랭킹, 그리고 gap distance에 관한 유일한 기계적 출처다.</strong></li>
 </ul>

@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-08-28 — feed-research</title>
-<meta name="description" content="한 줄: X 4세대+9번째 공개(45b48ba, 2026-08-26, +873/−525, 파일 36)에는 Phoenix 체크포인트 스택의 저장·복원 양방향 RSS 상한 재정리 (신규 ThrottledD2HArrayHandler가 D2H와 write를 배치로 끊어…">
+<meta name="description" content="한 줄: X가 추천 모델 Phoenix의 체크포인트를 저장할 때도 호스트 메모리 사용량에 상한을 둘 수 있게 했다. 복원 쪽에는 한 배치씩만 호스트 메모리에 올리는 방식이 추가됐다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-08-28.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-08-28 — feed-research">
-<meta property="og:description" content="한 줄: X 4세대+9번째 공개(45b48ba, 2026-08-26, +873/−525, 파일 36)에는 Phoenix 체크포인트 스택의 저장·복원 양방향 RSS 상한 재정리 (신규 ThrottledD2HArrayHandler가 D2H와 write를 배치로 끊어…">
+<meta property="og:description" content="한 줄: X가 추천 모델 Phoenix의 체크포인트를 저장할 때도 호스트 메모리 사용량에 상한을 둘 수 있게 했다. 복원 쪽에는 한 배치씩만 호스트 메모리에 올리는 방식이 추가됐다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-08-28.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,185 +42,406 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>금요일</li>
-<li><span class="meta-k">읽는 시간</span>39분</li>
+<li><span class="meta-k">읽는 시간</span>43분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>5</b>건</li><li class="chip">정본 반영 <b>6</b>개 파일</li><li class="chip">레이더 <b>3</b>건</li></ul>
-<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+9번째 공개(<a href="https://github.com/xai-org/x-algorithm/commit/45b48ba">45b48ba</a>, 2026-08-26, +873/−525, 파일 36)에는 <strong>Phoenix 체크포인트 스택의 저장·복원 양방향 RSS 상한 재정리</strong> (신규 <code>ThrottledD2HArrayHandler</code>가 D2H와 write를 배치로 끊어 pinned-host 메모리를 <code>save_concurrent_gb</code>로 제한하고, 신규 <code>load_checkpoint_streamed</code>가 tensor 단위로 stage→copy→evict를 반복하며 window를 옮긴다. auto-window는 max_leaf와 total/16 중 큰 값을 쓰되 32GB를 넘지 않는다) + <strong>trainer_recsys valid_step 게이팅 정합화</strong> (embedding grad-norm이 실패해도 이전에는 dense params가 갱신되던 순서 버그를 dense·async·async_no_deferred 세 갈래 모두 <code>keep_step = valid_step &amp; emb_valid_step</code>으로 통일했고, <code>grad_norm_keep_threshold</code> assert도 제거했다) + <strong>grox reply_spam LM 프롬프트의 팔로워 카운트·bio 주입 옵션과 Manhattan write monotone-only 게이트</strong> (새 스코어가 기존보다 크면 쓰기를 건너뛴다. 답글 랭킹 스코어가 시간이 지나며 올라가는 것을 막아 label 진동을 없앤다) + <strong>VF <code>TesHydrator</code>의 media fallback cache 전면 제거</strong> (292줄 삭제, 1M-entry LRU와 serve-stale/shadow 모드 env 플래그 두 개가 사라졌다. VF 재작성이 안정화되면서 이 안전망이 불필요해졌다는 뜻이다) + <strong>dark_traffic canary opt-out 배선</strong> (<code>workload.ends_with(&quot;-canary&quot;)</code>면 mirror하지 않고, workload가 없으면 fail-closed로 처리한다) + <strong>광고 conversion 헤드 3개 추가</strong> (proto ActionName 191 <code>ADS_PIXEL_FIRE</code>, 192 <code>ADS_LONG_DWELL_AND_PIXEL_FIRE</code>, 193 <code>P_LONG_DWELL_AND_PIXEL_FIRE</code>로, 광고주가 심어 둔 픽셀의 발화를 랭커가 직접 예측한다) + <strong>retrieval 유저 타워의 <code>use_history_segment_ids</code> 플래그</strong> (히스토리 토큰에 별도 segment id를 부여해 pallas varlen attention의 세그먼트 마스크를 정합화한다) + <strong><code>PredictNextActionsRequest.conv_asset_ids</code></strong> (impression time / author id / asset id 3개 배열을 신설했고, 광고 창작물의 재사용 인식과 attribution에 쓴다)이 함께 들어갔다. Meta와 Netflix는 신규 자료가 없다. arXiv cs.IR 30건을 triage해서 3건이 통과했다. <strong>AMBER</strong>(Meta, &quot;Event Tokenization&quot;으로 산업 규모 LLM 추천을 다루며 Facebook surface에서 하루 수십억 이벤트를 인코딩한다), <strong>TransRetrieval</strong>(Alibaba Alimama의 디스플레이 광고 retrieval로, 4개 도메인 프로덕션 A/B에서 동일 지연 조건에 revenue +2.53%), <strong>SWIM</strong>(Kuaishou 메인 피드 재순위 evaluator로, 5% 트래픽 7일 A/B에서 app stay time +0.351%와 7일 리텐션 +0.048%) 세 건이다.</div>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 추천 모델 Phoenix의 체크포인트를 저장할 때도 호스트 메모리 사용량에 상한을 둘 수 있게 했다. 복원 쪽에는 한 배치씩만 호스트 메모리에 올리는 방식이 추가됐다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">14</span></summary><ol><li><a href="#1-x-4세대9-공개-체크포인트-저장복원-스택-정리--trainer_recsys-valid_step-통일--grox-reply_spam-lm-프롬프트-확장--vf-media-cache-제거--pixel_fire-광고-헤드-3종"><span class="num">1</span>X 4세대+9 공개: 체크포인트 저장·복원 스택 정리 + trainer_recsys valid_step 통일 + grox reply_spam LM 프롬프트 확장 + VF media cache 제거 + PIXEL_FIRE 광고 헤드 3종</a><ol><li><a href="#1-a-phoenix-체크포인트-저장복원-스택-재정리">1-A. Phoenix 체크포인트 저장·복원 스택 재정리</a></li><li><a href="#1-b-trainer_recsys의-valid_step-게이팅-통일">1-B. trainer_recsys의 valid_step 게이팅 통일</a></li><li><a href="#1-c-grox-reply_spam-lm-프롬프트에-팔로워-카운트bio-주입-옵션--manhattan-write-monotone-only">1-C. grox reply_spam LM 프롬프트에 팔로워 카운트/bio 주입 옵션 + Manhattan write monotone-only</a></li><li><a href="#1-d-vf-teshydrator의-media-fallback-cache-전면-제거">1-D. VF TesHydrator의 media fallback cache 전면 제거</a></li><li><a href="#1-e-dark-traffic-canary-opt-out">1-E. Dark traffic canary opt-out</a></li><li><a href="#1-f-광고-conversion-헤드-3종-신설--conv_asset_ids-배선">1-F. 광고 conversion 헤드 3종 신설 + conv_asset_ids 배선</a></li><li><a href="#1-g-retrieval-유저-타워에-use_history_segment_ids-플래그">1-G. Retrieval 유저 타워에 use_history_segment_ids 플래그</a></li><li><a href="#정본-반영-정리">정본 반영 정리</a></li></ol></li><li><a href="#2-amber-meta-ai-event-tokenization으로-이벤트를-단일-llm-토큰으로-압축-레이더"><span class="num">2</span>AMBER: Meta AI, &quot;Event Tokenization&quot;으로 이벤트를 단일 LLM 토큰으로 압축 (레이더)</a></li><li><a href="#3-transretrieval-alibaba-alimama-transformer-scaling-law를-광고-retrieval에-적용-레이더"><span class="num">3</span>TransRetrieval: Alibaba Alimama, Transformer scaling law를 광고 retrieval에 적용 (레이더)</a></li><li><a href="#4-swim-kuaishou-메인-피드-재순위-evaluator-레이더"><span class="num">4</span>SWIM: Kuaishou 메인 피드 재순위 evaluator (레이더)</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">14</span></summary><ol><li><a href="#1-phoenix-체크포인트-저장에도-호스트-메모리-상한이-생겼다--x"><span class="num">1</span>Phoenix 체크포인트 저장에도 호스트 메모리 상한이 생겼다 — X</a><ol><li><a href="#1-a-phoenix-체크포인트의-저장과-복원-양쪽에-호스트-메모리-상한이-도입됐다">1-A. Phoenix 체크포인트의 저장과 복원 양쪽에 호스트 메모리 상한이 도입됐다</a></li><li><a href="#1-b-dense와-임베딩-중-한쪽만-grad-norm-검사에-실패해도-양쪽-갱신을-모두-건너뛴다">1-B. dense와 임베딩 중 한쪽만 grad-norm 검사에 실패해도 양쪽 갱신을 모두 건너뛴다</a></li><li><a href="#1-c-답글-스팸-판정-프롬프트에-팔로워-수와-bio를-넣을-수-있게-됐고-manhattan에-쓰는-답글-랭킹-스코어는-내려가기만-한다">1-C. 답글 스팸 판정 프롬프트에 팔로워 수와 bio를 넣을 수 있게 됐고, Manhattan에 쓰는 답글 랭킹 스코어는 내려가기만 한다</a></li><li><a href="#1-d-vf가-tes-조회-실패에-대비해-두던-media-fallback-cache를-전부-지웠다">1-D. VF가 TES 조회 실패에 대비해 두던 media fallback cache를 전부 지웠다</a></li><li><a href="#1-e-canary-워크로드는-이제-dark-traffic-미러링에-들어가지-않는다">1-E. canary 워크로드는 이제 dark traffic 미러링에 들어가지 않는다</a></li><li><a href="#1-f-광고-픽셀-발화를-다루는-conversion-헤드-3종과-광고-소재-노출-이력-필드가-생겼다">1-F. 광고 픽셀 발화를 다루는 conversion 헤드 3종과 광고 소재 노출 이력 필드가 생겼다</a></li><li><a href="#1-g-retrieval-유저-타워가-히스토리-토큰에-전용-segment-id를-줄-수-있게-됐다">1-G. retrieval 유저 타워가 히스토리 토큰에 전용 segment id를 줄 수 있게 됐다</a></li><li><a href="#정본-반영-정리">정본 반영 정리</a></li></ol></li><li><a href="#2-상호작용-이벤트-하나를-토큰-하나로-압축하는-amber가-facebook에서-서빙된다--레이더meta"><span class="num">2</span>상호작용 이벤트 하나를 토큰 하나로 압축하는 AMBER가 Facebook에서 서빙된다 — 레이더(Meta)</a></li><li><a href="#3-transretrieval이-광고-retrieval을-transformer로-키우고-revenue를-올렸다--레이더alibaba"><span class="num">3</span>TransRetrieval이 광고 retrieval을 Transformer로 키우고 revenue를 올렸다 — 레이더(Alibaba)</a></li><li><a href="#4-재순위-리스트를-세션-단위로-채점하는-swim이-kuaishou-메인-피드에-배포됐다--레이더kuaishou"><span class="num">4</span>재순위 리스트를 세션 단위로 채점하는 SWIM이 Kuaishou 메인 피드에 배포됐다 — 레이더(Kuaishou)</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-x-4세대9-공개-체크포인트-저장복원-스택-정리--trainer_recsys-valid_step-통일--grox-reply_spam-lm-프롬프트-확장--vf-media-cache-제거--pixel_fire-광고-헤드-3종"><span class="num">1</span>X 4세대+9 공개: 체크포인트 저장·복원 스택 정리 + trainer_recsys valid_step 통일 + grox reply_spam LM 프롬프트 확장 + VF media cache 제거 + PIXEL_FIRE 광고 헤드 3종</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/45b48ba6baa47adc706b1d02de770ba39e0d017a" target="_blank" rel="noopener">xai-org/x-algorithm@45b48ba</a>: 2026-08-26T20:04:12Z 커밋이다(파일 36, +873/−525). 커밋 메시지는 세대 시리즈의 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이라, 실제 내용은 파일 diff로만 읽어 낼 수 있다. 규모로 보면 4세대+7(+1,286)과 +6(+3,105)에 비해 중간이지만, 건드린 서브시스템의 폭은 넓다(Phoenix 학습·서빙·VF·광고 proto·grox·home-mixer 6곳).</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>는 2026-08-13 헤드라인 공개(47c1bcd, +363,246/−11,640) 이후 격일이나 매일 후속 커밋이 붙고 있고, 이 문서 기준으로 오늘이 열 번째 후속(4세대+9)이다. 직전의 4세대+8(0d3cdd8)이 <strong>AES <code>generic_actions</code> 패스스루</strong>, <strong>VMRanker 대폭 단순화</strong>, <strong>Following 파이프라인 블록 관계 확장</strong>, <strong>Brazil 계정 갱신</strong>, <strong>Phoenix <code>copy_port</code> 하드닝</strong>으로 여섯 서브시스템을 나란히 건드린 넓은 공개였다면, 이번 4세대+9는 (a) 어제 4세대+8이 정리하기 시작한 <strong>Phoenix 서빙·학습 인프라 성숙</strong>을 저장 측까지 확장하고, (b) 어제 다루지 않은 <strong>랭커 학습 정합성</strong>, <strong>LLM 판정 프롬프트</strong>, <strong>VF 안정성</strong>을 오늘 차례로 정리하는 성격이다. 어제와 오늘 두 공개가 짝을 이룬다.</p></div>
-<p>이 절은 서브시스템별로 나눠서 설명한다. 여섯 갈래의 변경이 서로 독립적이라 하나의 흐름으로 엮이지 않기 때문이다.</p>
-<h3 id="1-a-phoenix-체크포인트-저장복원-스택-재정리">1-A. Phoenix 체크포인트 저장·복원 스택 재정리</h3>
-<p><code>phoenix/xrex/utils/checkpointing.py</code>(+215/−6)와 <code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py</code>(+311/−88)이 저장·복원 양방향에서 RSS(resident set size, 호스트 메모리 실 점유량) 상한을 명시적으로 도입했다. <a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">4세대+7 (2026-08-24)의 restore-side 하드닝</a>에 이어지는 변경이다. 그때는 <strong>복원</strong>에만 <code>concurrent_gb</code> throttle과 node-lock을 적용했는데, 이번에는 <strong>저장</strong>에도 같은 원리를 적용했고 복원에는 <strong>streamed</strong> 변형이 하나 더 붙었다.</p>
-<p><strong>저장 측에 <code>ThrottledD2HArrayHandler</code>를 신설했다</strong> <span class="badge ok">확인</span>. 위치는 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/phoenix/xrex/utils/checkpointing.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/checkpointing.py:88-181</code></a>이다.</p>
+<p>오늘 함께 본 다른 변화는 다음과 같다.</p>
 <ul>
-<li>Orbax의 <code>ocp.type_handlers.ArrayHandler</code>를 상속해서 <code>serialize(values, infos, args)</code>를 오버라이드한다. 텐서 리스트를 순회하면서 각 tensor의 <code>addressable_nbytes</code>(현재 프로세스가 담당하는 shard의 실 바이트)를 누적하다가 <code>concurrent_bytes</code> 한도를 넘으면 배치를 flush한다. 배치마다 super().serialize()를 호출하고 <code>future.result()</code>로 D2H와 write가 끝나기를 기다린 뒤에 다음 배치로 넘어간다. 즉 텐서를 한 번에 모두 stage해서 pinned-host 메모리를 한꺼번에 소모하는 대신, <strong>한 배치의 D2H와 저장이 끝나야 다음 배치를 stage</strong>한다.</li>
-<li>압축 여부에 따라 <code>ThrottledD2HArrayHandler</code>(compressed)와 <code>ThrottledNoCompressionArrayHandler</code>(non-compressed)로 다중 상속을 나눈다. 크기는 <code>save_checkpoint(..., save_concurrent_gb=&lt;N&gt;)</code> 인자로 지정한다. 지정하지 않으면 이전과 동일한 stock Orbax handler(전량 stage)를 그대로 쓰므로 하위 호환이 유지된다.</li>
-<li>노드 레벨의 flock도 있다. <code>XAI_SAVE_NODE_SERIALIZE=1</code> env가 켜지면 <code>/dev/shm/xai_save_node_lock</code>(없으면 <code>/tmp/...</code>)에 <code>fcntl.LOCK_EX</code>를 걸어 같은 노드의 여러 프로세스가 동시에 저장하지 못하게 막는다. restore 측과 동일한 패턴이다(<code>XAI_RESTORE_NODE_SERIALIZE</code>).</li>
-<li>로그에는 배치별 leaves count와 GiB를 남기고, max_leaf가 예산을 넘으면 명시적으로 경고한다(&quot;that leaf still D2Hs in one shot&quot;). 스로틀 크기가 텐서보다 작을 때 튜닝할 여지가 있다는 것을 사용자에게 알리는 장치다.</li>
-<li><strong>의미:</strong> Muon+GB300 세대에서 여러 워커가 동시에 checkpoint를 저장할 때 <code>wait_until_finished</code> 바깥의 D2H 스테이지가 host OOM을 일으키는 현상이 관찰됐을 것이다 <span class="badge est">추정</span>. restore 측에 4세대+7을 도입한 논리와 완전히 대칭이다. 4세대+6이 flagship Muon 학습을 export에 정식으로 포함한 뒤, 큰 모델을 저장하기에는 오래된 stock Orbax 설정(&quot;write-limiter default 96GB, D2H 전량&quot;)이 실제로 부족하다는 것을 측정으로 확인한 결과라고 해석할 수 있다.</li>
+<li>X는 같은 커밋에서 dense 파라미터와 임베딩 중 한쪽이라도 grad-norm 검사에 실패하면 양쪽 모두 갱신하지 않게 했다.</li>
+<li>X의 답글 스팸 흐름은 Manhattan에 쓰는 답글 랭킹 스코어를 기존보다 높은 값으로는 덮어쓰지 않게 됐다.</li>
+<li>Meta와 Netflix는 신규 자료가 없다. arXiv에서는 AMBER, TransRetrieval, SWIM 3건이 레이더를 통과했다.</li>
+</ul>
+<h2 id="1-phoenix-체크포인트-저장에도-호스트-메모리-상한이-생겼다--x"><span class="num">1</span>Phoenix 체크포인트 저장에도 호스트 메모리 상한이 생겼다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/45b48ba6baa47adc706b1d02de770ba39e0d017a" target="_blank" rel="noopener">xai-org/x-algorithm@45b48ba</a> — GitHub 커밋, 2026-08-26T20:04:12Z(파일 36, +873/−525), 공개 소스코드. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+9다.</p></div>
+<ul>
+<li>커밋 메시지는 세대 시리즈의 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이다. 그래서 실제 내용은 파일 diff로만 읽어 낼 수 있다.</li>
+<li>규모로 보면 4세대+7(+1,286)과 +6(+3,105)에 비해 중간이다.</li>
+<li>다만 건드린 서브시스템의 폭은 넓다(Phoenix 학습·서빙·VF·광고 proto·grox·home-mixer 6곳).<ul>
+<li>Phoenix는 X For You의 랭킹 모델인 트랜스포머로, 후보마다 참여 확률을 예측한다. 팔로우하지 않는 계정의 후보를 찾는 Phoenix retrieval도 있다.</li>
+<li>VF(visibility-filtering)는 포스트마다 이 뷰어에게 보여도 되는지 판정하는 서비스다.</li>
+<li>grox는 Grok 기반 nearline 주석 파이프라인이다.</li>
+<li>home-mixer는 For You와 Following 피드 요청을 받는 서비스다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>에는 2026-08-13 헤드라인 공개(47c1bcd, +363,246/−11,640) 뒤로 격일이나 매일 후속 커밋이 붙고 있다. 직전 커밋인 4세대+8(0d3cdd8)은 아래 변경으로 여섯 서브시스템을 나란히 건드린 넓은 공개였다.</p></div>
+<ul>
+<li>AES(abuse-enforcement-service) <code>generic_actions</code> 패스스루</li>
+<li>VMRanker(슬레이트 재정렬 서비스) 대폭 단순화</li>
+<li>Following 파이프라인 블록 관계 확장</li>
+<li>Brazil 계정 갱신</li>
+<li>Phoenix <code>copy_port</code> 하드닝</li>
+</ul>
+<p>어제와 오늘 두 공개는 짝을 이룬다. 이번 4세대+9 커밋(<a href="https://github.com/xai-org/x-algorithm/commit/45b48ba" target="_blank" rel="noopener">45b48ba</a>, 2026-08-26, +873/−525, 파일 36)은 두 가지 성격을 띤다.</p>
+<ul>
+<li>어제 4세대+8이 정리하기 시작한 Phoenix 서빙·학습 인프라 성숙을 저장 측까지 확장한다.</li>
+<li>어제 다루지 않은 랭커 학습 정합성, LLM 판정 프롬프트, VF 안정성을 오늘 차례로 정리한다.</li>
+</ul>
+<p>이번 커밋의 여섯 갈래 변경은 서로 독립적이라 하나의 흐름으로 엮이지 않는다.</p>
+<h3 id="1-a-phoenix-체크포인트의-저장과-복원-양쪽에-호스트-메모리-상한이-도입됐다">1-A. Phoenix 체크포인트의 저장과 복원 양쪽에 호스트 메모리 상한이 도입됐다</h3>
+<p>Phoenix 체크포인트를 저장하는 코드와 복원하는 코드가 모두 RSS(resident set size, 호스트 메모리 실 점유량) 상한을 명시적으로 도입했다. 이 변경은 <a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">4세대+7 (2026-08-24)의 restore-side 하드닝</a>에 이어진다. 그때는 복원에만 <code>concurrent_gb</code> throttle과 node-lock을 적용했다. 이번 4세대+9에서는 저장에도 같은 원리를 적용했고, 복원에는 streamed 변형이 하나 더 붙었다.</p>
+<ul>
+<li>바뀐 파일은 저장 쪽 <code>phoenix/xrex/utils/checkpointing.py</code>(+215/−6)와 복원 쪽 <code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py</code>(+311/−88)다.</li>
+<li>저장 쪽에는 텐서를 배치로 끊어 D2H(디바이스에서 호스트로의 복사)와 write를 하는 handler가 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/phoenix/xrex/utils/checkpointing.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/checkpointing.py:88-181</code></a>.<ul>
+<li>이름은 <code>ThrottledD2HArrayHandler</code>다. Orbax의 <code>ocp.type_handlers.ArrayHandler</code>를 상속해서 <code>serialize(values, infos, args)</code>를 오버라이드한다.</li>
+<li>텐서 리스트를 순회하면서 각 tensor의 <code>addressable_nbytes</code>(현재 프로세스가 담당하는 shard의 실 바이트)를 누적하다가, <code>concurrent_bytes</code> 한도를 넘으면 배치를 flush한다.</li>
+<li>배치마다 super().serialize()를 호출하고, <code>future.result()</code>로 D2H와 write가 끝나기를 기다린 뒤에 다음 배치로 넘어간다.</li>
+<li>즉 텐서를 한 번에 모두 stage해서 pinned-host 메모리를 한꺼번에 소모하는 대신, 한 배치의 D2H와 저장이 끝나야 다음 배치를 stage한다.</li>
+</ul>
+</li>
+<li>스로틀 크기는 저장 함수의 인자로 지정한다. 지정하지 않으면 이전과 동일한 stock Orbax handler(전량 stage)를 그대로 쓰므로 하위 호환이 유지된다 <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li>지정하는 형태는 <code>save_checkpoint(..., save_concurrent_gb=&lt;N&gt;)</code>이다.</li>
+<li>압축 여부에 따라 <code>ThrottledD2HArrayHandler</code>(compressed)와 <code>ThrottledNoCompressionArrayHandler</code>(non-compressed)로 다중 상속을 나눈다.</li>
+</ul>
+</li>
+<li>노드 레벨의 flock도 있다. env를 켜면 같은 노드의 여러 프로세스가 동시에 저장하지 못하게 막고, 이는 restore 측과 동일한 패턴이다 <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li><code>XAI_SAVE_NODE_SERIALIZE=1</code> env가 켜지면 <code>/dev/shm/xai_save_node_lock</code>(없으면 <code>/tmp/...</code>)에 <code>fcntl.LOCK_EX</code>를 건다.</li>
+<li>restore 측의 env는 <code>XAI_RESTORE_NODE_SERIALIZE</code>다.</li>
+</ul>
+</li>
+<li>로그에는 배치별 leaves count와 GiB를 남기고, max_leaf가 예산을 넘으면 명시적으로 경고한다(&quot;that leaf still D2Hs in one shot&quot;) <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li>스로틀 크기가 텐서보다 작을 때 튜닝할 여지가 있다는 것을 사용자에게 알리는 장치다.</li>
+</ul>
+</li>
 </ul>
 <blockquote>
 <p>&quot;save node-serialize ACTIVE (flock per batch) lock=%s pid=%d num_batches=%d&quot;
 — <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/phoenix/xrex/utils/checkpointing.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/checkpointing.py</code></a>, 2026-08-26</p>
 </blockquote>
-<p><strong>복원 측에 <code>load_checkpoint_streamed</code>를 신설했다</strong> <span class="badge ok">확인</span>. 위치는 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py:365-528</code></a>이다.</p>
+<div class="blk why"><p><span class="lbl">의미</span> Muon+GB300 세대에서 여러 워커가 동시에 checkpoint를 저장할 때 <code>wait_until_finished</code> 바깥의 D2H 스테이지가 host OOM을 일으키는 현상이 관찰됐을 것이다 <span class="badge est">추정</span>. 이 변경은 4세대+7이 restore 측에 하드닝을 도입한 논리와 완전히 대칭이다. 4세대+6이 flagship Muon 학습을 export에 정식으로 포함한 뒤, 큰 모델을 저장하기에는 오래된 stock Orbax 설정(&quot;write-limiter default 96GB, D2H 전량&quot;)이 실제로 부족하다는 것을 측정으로 확인한 결과라고 해석할 수 있다.</p></div>
 <ul>
-<li>기존 <code>load_checkpoint</code>는 처음에 <code>host_state</code>(모든 텐서의 pinned-host 사본)를 만들어 놓고 배치별로 read into shards 하는 방식이었다. streamed 버전은 <strong><code>device_state</code>를 유지하고, 배치마다 그 배치의 텐서만 pinned-host로 stage → 파일 read → device로 device_put → device_state 갱신 → 배치 pinned-host 해제</strong>한다. 즉 어느 시점에서든 pinned-host 사용량의 상한은 현재 배치의 크기와 같다.</li>
-<li><strong>auto-window</strong>: <code>window_gb=None</code>(기본값)이면 <code>_auto_window_bytes</code> = min(max(max_leaf, total/16), 32GB)로 정해진다. 즉 window는 항상 max_leaf보다 크고, 전체를 최소 16개 배치로 나누되 32GB를 넘지 않는다. 사용자가 값을 따로 정하지 않아도 합리적인 window가 자동으로 선택된다.</li>
-<li><strong>on_replaced 콜백</strong>: 배치가 완료되어 device_state의 참조가 새 array로 교체되면 old와 new의 페어 리스트를 콜백에 넘긴다. 호출자는 old array를 즉시 delete하거나 다른 자료구조에서 링크를 교체하는 데 이 목록을 쓴다. 콜백을 지정하지 않으면 전체 목록을 반환한다.</li>
-<li><strong><code>copy_aliased_arrays</code></strong>: jax tree에서 같은 array 객체를 두 번 참조하는 aliased 케이스에서, 두 번째 참조부터는 <code>may_alias=False</code> device_put으로 실제 사본을 만든다. streamed load가 배치 단위로 새 array를 교체할 때 aliased 참조가 원본을 놓치지 않도록 미리 처리해 두는 헬퍼다.</li>
-<li><code>plan.sort(key=lambda item: item[3], reverse=True)</code>로 큰 텐서부터 처리해서 window packing 효율을 확보한다(max_leaf 이상인 텐서는 어차피 그 텐서 하나로 배치가 차므로 앞쪽에 모아 둔다).</li>
+<li>복원 쪽에는 한 번에 한 배치의 텐서만 pinned-host 메모리에 올리는 streamed 로더가 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py:365-528</code></a>.<ul>
+<li>이름은 <code>load_checkpoint_streamed</code>다.</li>
+<li>기존 <code>load_checkpoint</code>는 처음에 <code>host_state</code>(모든 텐서의 pinned-host 사본)를 만들어 놓고, 배치별로 read into shards 하는 방식이었다.</li>
+<li>streamed 버전은 <code>device_state</code>를 유지한다. 배치마다 그 배치의 텐서만 pinned-host로 stage → 파일 read → device로 device_put → device_state 갱신 → 배치 pinned-host 해제를 거친다.</li>
+<li>즉 어느 시점에서든 pinned-host 사용량의 상한은 현재 배치의 크기와 같다.</li>
 </ul>
-<p><strong><code>load_checkpoint</code> 자체도 리팩터링됐다.</strong> 헬퍼 함수 5개(<code>_build_read_plan</code>, <code>_pack_read_batches</code>, <code>_convert_domains</code>, <code>_open_tensor</code>, <code>_drain_read_futures</code>)를 추출해 인라인 로직을 정리했고(streamed 버전이 이 헬퍼들을 재사용한다), 예외 로깅은 rank_logger로 통일했다. 별도의 <code>logger = logging.getLogger(&quot;checkpointing&quot;)</code> 인스턴스는 제거되고 rank_logger 단일 채널로 수렴했다.</p>
-<p><strong><code>Trainer.warm_start_staging_spec</code></strong> 훅이 새로 생겼다(<code>phoenix/xrex/train/trainer.py:1160-1165</code>). checkpoint에서 params만 복원하고 opt_state는 재초기화하려는 경우에 <strong>pinned-host에도 opt_state 사본을 만들지 않는다</strong>. 이전에는 restore용 staging sharding으로 device_put할 때 전체 state 구조가 pinned-host로 올라갔는데, 이제는 <code>warm_purge(self.state)</code>로 opt_state를 미리 잘라내고 pinned-host에 stage한 뒤 로드된 부분만 다시 device_put하며 원래 opt_state 필드는 그대로 유지한다. <code>RecsysTrainer.warm_start_staging_spec</code>은 서브클래스에서 이를 오버라이드해 <code>keep_emb_opt_state=True</code> 옵션을 지원한다. <strong>의미:</strong> warm start restore가 훨씬 가벼워졌다. flagship Muon 학습이 pretrained params에서 출발하고 optimizer는 새로 시작하는 흐름이 표준으로 자리 잡았다는 방증이다 <span class="badge est">추정</span>.</p>
-<p>**<code>admission.reset_estimates</code>와 <code>request_metrics.reset_admission_estimates</code>**가 추가됐다. Phoenix 서빙의 admission controller가 유지하는 service_time과 pipeline_time EWMA를 zero로 리셋할 수 있고, 대응하는 Prometheus gauge도 0으로 내려간다. 회귀 테스트도 두 개 붙었다(<code>reset_estimates_clears_s_and_p</code>, <code>reset_admission_estimates_clears_gauges_and_p</code>). 왜 필요한지는 diff에 단서가 없지만, <strong>hot-swap이나 트래픽 프로파일이 급변한 뒤에 EWMA를 즉시 초기화</strong>하려는 용도로 보인다 <span class="badge est">추정</span>. 4세대+6의 <code>_glibc_malloc_trim()</code> swap 후처리와 방향이 같다.</p>
-<p><strong><code>copy_port_client</code>의 로깅도 정리됐다.</strong> dense weights load와 emb_table load의 완료 로그에 총 바이트, 경과 시간, GB/s를 함께 적는다(divide-by-zero 가드도 들어 있다). &quot;downloading dense weights prefix=... futures=...&quot; 시작 로그는 삭제됐는데, 완료 로그가 이제 요약 정보를 담고 있어서 시작 로그가 필요 없어졌기 때문이다.</p>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">../services/x.md</a>: 이 절 제목을 &quot;Phoenix 체크포인트 스택 저장/복원 이중 하드닝 — 4세대+7 (복원) → 4세대+9 (저장·streamed 복원·warm-start staging)&quot;으로 확장하고, 저장 측과 streamed 변형, warm_start_staging_spec, admission reset 네 가지를 추가했다.</p></div>
-<h3 id="1-b-trainer_recsys의-valid_step-게이팅-통일">1-B. trainer_recsys의 valid_step 게이팅 통일</h3>
-<p><code>phoenix/xrex/train/trainer_recsys.py</code>(+29/−19)의 두 학습 루프(dense sync와 async_no_deferred)에서 param update 조건이 통일됐다 <span class="badge ok">확인</span>. 위치는 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_recsys.py:1331-1400</code></a>이다.</p>
-<p><strong>이전 순서:</strong></p>
+</li>
+<li>사용자가 window 값을 따로 정하지 않아도 합리적인 window가 자동으로 선택된다 <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li><code>window_gb=None</code>(기본값)이면 <code>_auto_window_bytes</code> = min(max(max_leaf, total/16), 32GB)로 정해진다.</li>
+<li>즉 window는 항상 max_leaf보다 크고, 전체를 최소 16개 배치로 나누되 32GB를 넘지 않는다.</li>
+</ul>
+</li>
+<li>배치가 완료되어 device_state의 참조가 새 array로 교체되면, old와 new의 페어 리스트를 on_replaced 콜백에 넘긴다 <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li>호출자는 old array를 즉시 delete하거나 다른 자료구조에서 링크를 교체하는 데 이 목록을 쓴다.</li>
+<li>콜백을 지정하지 않으면 전체 목록을 반환한다.</li>
+</ul>
+</li>
+<li>같은 array 객체를 두 번 참조하는 aliased 케이스를 미리 처리하는 헬퍼가 있다 <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li>헬퍼는 <code>copy_aliased_arrays</code>다. jax tree에서 두 번째 참조부터는 <code>may_alias=False</code> device_put으로 실제 사본을 만든다.</li>
+<li>streamed load가 배치 단위로 새 array를 교체할 때 aliased 참조가 원본을 놓치지 않도록 미리 처리해 두는 것이다.</li>
+</ul>
+</li>
+<li>큰 텐서부터 처리해서 window packing 효율을 확보한다 <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li>정렬 코드는 <code>plan.sort(key=lambda item: item[3], reverse=True)</code>다.</li>
+<li>max_leaf 이상인 텐서는 어차피 그 텐서 하나로 배치가 차므로 앞쪽에 모아 둔다.</li>
+</ul>
+</li>
+<li>warm start용 staging 훅이 새로 생겼다. checkpoint에서 params만 복원하고 opt_state는 재초기화하려는 경우에 pinned-host에도 opt_state 사본을 만들지 않는다.<ul>
+<li>훅은 <code>Trainer.warm_start_staging_spec</code>이다(<code>phoenix/xrex/train/trainer.py:1160-1165</code>).</li>
+<li>이전에는 restore용 staging sharding으로 device_put할 때 전체 state 구조가 pinned-host로 올라갔다.</li>
+<li>이제는 <code>warm_purge(self.state)</code>로 opt_state를 미리 잘라내고 pinned-host에 stage한 뒤, 로드된 부분만 다시 device_put한다. 원래 opt_state 필드는 그대로 유지한다.</li>
+<li><code>RecsysTrainer.warm_start_staging_spec</code>은 서브클래스에서 이를 오버라이드해 <code>keep_emb_opt_state=True</code> 옵션을 지원한다.</li>
+<li><strong>의미:</strong> warm start restore가 훨씬 가벼워졌다. flagship Muon 학습이 pretrained params에서 출발하고 optimizer는 새로 시작하는 흐름이 표준으로 자리 잡았다는 방증이다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
+<ul>
+<li>기존 체크포인트 로더도 헬퍼 함수 5개를 추출해 인라인 로직을 정리했다. streamed 버전이 이 헬퍼들을 재사용한다.<ul>
+<li>대상은 <code>load_checkpoint</code>다.</li>
+<li>헬퍼는 <code>_build_read_plan</code>, <code>_pack_read_batches</code>, <code>_convert_domains</code>, <code>_open_tensor</code>, <code>_drain_read_futures</code>다.</li>
+<li>예외 로깅은 rank_logger로 통일했다. 별도의 <code>logger = logging.getLogger(&quot;checkpointing&quot;)</code> 인스턴스는 제거되고 rank_logger 단일 채널로 수렴했다.</li>
+</ul>
+</li>
+<li>Phoenix 서빙의 admission controller가 유지하는 service_time과 pipeline_time EWMA를 zero로 리셋할 수 있게 됐다. 대응하는 Prometheus gauge도 0으로 내려간다.<ul>
+<li>추가된 것은 <code>admission.reset_estimates</code>와 <code>request_metrics.reset_admission_estimates</code>다.</li>
+<li>회귀 테스트도 두 개 붙었다(<code>reset_estimates_clears_s_and_p</code>, <code>reset_admission_estimates_clears_gauges_and_p</code>).</li>
+<li>왜 필요한지는 diff에 단서가 없지만, hot-swap이나 트래픽 프로파일이 급변한 뒤에 EWMA를 즉시 초기화하려는 용도로 보인다 <span class="badge est">추정</span>. 4세대+6의 <code>_glibc_malloc_trim()</code> swap 후처리와 방향이 같다.</li>
+</ul>
+</li>
+<li>가중치 로드 완료 로그에 총 바이트, 경과 시간, GB/s를 함께 적는다(divide-by-zero 가드도 들어 있다).<ul>
+<li>대상은 <code>copy_port_client</code>의 dense weights load와 emb_table load 완료 로그다.</li>
+<li>&quot;downloading dense weights prefix=... futures=...&quot; 시작 로그는 삭제됐다. 완료 로그가 이제 요약 정보를 담고 있어서 시작 로그가 필요 없어졌기 때문이다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26">services/x.md</a>에서 이 절 제목을 &quot;Phoenix 체크포인트 스택 저장/복원 이중 하드닝 — 4세대+7 (복원) → 4세대+9 (저장·streamed 복원·warm-start staging)&quot;으로 확장했다. 그리고 저장 측과 streamed 변형, warm_start_staging_spec, admission reset 네 가지를 추가했다.</p></div>
+<h3 id="1-b-dense와-임베딩-중-한쪽만-grad-norm-검사에-실패해도-양쪽-갱신을-모두-건너뛴다">1-B. dense와 임베딩 중 한쪽만 grad-norm 검사에 실패해도 양쪽 갱신을 모두 건너뛴다</h3>
+<p>Phoenix 학습 코드(trainer_recsys)에서 dense와 embedding 어느 한쪽이라도 grad-norm 검사가 실패하면, 이제 양쪽 다 원본으로 유지된다. 이전에는 dense가 통과하고 emb만 실패하면 dense params는 새 값으로 갱신되고 emb만 롤백되는 비대칭 상태가 몇 스텝 동안 이어질 수 있었다. 이제는 파라미터와 embedding table이 lock-step으로 움직인다.</p>
+<ul>
+<li>두 학습 루프(dense sync와 async_no_deferred)에서 param update 조건이 통일됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_recsys.py:1331-1400</code></a>.<ul>
+<li>파일 변경은 <code>phoenix/xrex/train/trainer_recsys.py</code>(+29/−19)다.</li>
+</ul>
+</li>
+</ul>
+<p>이전에는 다음 순서로 갱신했다.</p>
 <ol>
-<li><code>valid_step = is_valid_step(gradients)</code>로 dense grad-norm을 검사한다</li>
+<li><code>valid_step = is_valid_step(gradients)</code>로 dense grad-norm을 검사한다.</li>
 <li>dense params를 업데이트한다: <code>jnp.where(valid_step, updated, original)</code></li>
-<li><code>segment_sum</code> 이후 <code>is_valid_step(emb_gradients)</code>로 emb grad-norm을 검사한다</li>
+<li><code>segment_sum</code> 이후 <code>is_valid_step(emb_gradients)</code>로 emb grad-norm을 검사한다.</li>
 <li>emb table을 업데이트한다: <code>sparse_update(..., valid_step=emb_valid_step)</code></li>
-<li>metric에 <code>valid_step = valid_step &amp; emb_valid_step</code>을 기록한다</li>
+<li>metric에 <code>valid_step = valid_step &amp; emb_valid_step</code>을 기록한다.</li>
 </ol>
-<p><strong>변경 후:</strong></p>
+<p>변경 후에는 이 순서로 갱신한다.</p>
 <ol>
-<li>dense grad-norm을 검사해 <code>valid_step</code>을 얻는다</li>
-<li><strong>먼저</strong> segment_sum과 emb grad-norm 검사를 수행해 <code>emb_valid_step</code>을 얻는다</li>
-<li><code>keep_step = valid_step &amp; emb_valid_step</code>을 계산한다</li>
+<li>dense grad-norm을 검사해 <code>valid_step</code>을 얻는다.</li>
+<li>먼저 segment_sum과 emb grad-norm 검사를 수행해 <code>emb_valid_step</code>을 얻는다.</li>
+<li><code>keep_step = valid_step &amp; emb_valid_step</code>을 계산한다.</li>
 <li>dense params를 업데이트한다: <code>jnp.where(keep_step, updated, original)</code></li>
 <li>emb table을 업데이트한다: <code>sparse_update(..., valid_step=keep_step)</code></li>
-<li>metric에 <code>valid_step = keep_step</code>을 기록한다</li>
+<li>metric에 <code>valid_step = keep_step</code>을 기록한다.</li>
 </ol>
-<p>즉 dense와 embedding 어느 한쪽이라도 grad-norm 검사가 실패하면 <strong>양쪽 다</strong> 원본으로 유지된다. 이전에는 dense가 통과하고 emb만 실패하면 dense params는 새 값으로 갱신되고 emb만 롤백되는 비대칭 상태가 몇 스텝 동안 이어질 수 있었다. 이제는 파라미터와 embedding table이 lock-step으로 움직인다.</p>
-<p>async 경로(<code>update_async_deferred</code>)도 같은 방식으로 통일됐다. <code>pending=jnp.asarray(True)</code>가 <code>pending=keep_step</code>으로 바뀌면서, 비동기 emb gradient update가 이번 스텝의 게이트 결과를 반영해 다음 스텝에 실제로 반영될지가 결정된다. 그리고 <code>_create_async_emb_executables</code>에 있던 <code>assert self.grad_norm_keep_threshold is None</code>이 <strong>제거</strong>됐다. 이전에는 async deferred 경로가 grad-norm 게이팅과 호환되지 않는다고 전제했는데, 이제는 async에서도 그 threshold를 실제로 사용한다.</p>
+<ul>
+<li>async 경로(<code>update_async_deferred</code>)도 같은 방식으로 통일됐다.<ul>
+<li><code>pending=jnp.asarray(True)</code>가 <code>pending=keep_step</code>으로 바뀌었다. 그러면서 비동기 emb gradient update가 이번 스텝의 게이트 결과를 반영해, 다음 스텝에 실제로 반영될지가 결정된다.</li>
+</ul>
+</li>
+<li>async 경로에서도 grad-norm threshold를 실제로 사용한다. 이전에는 async deferred 경로가 grad-norm 게이팅과 호환되지 않는다고 전제했다.<ul>
+<li>이 threshold는 <code>grad_norm_keep_threshold</code>다. <code>_create_async_emb_executables</code>에 있던 <code>assert self.grad_norm_keep_threshold is None</code>이 제거됐다.</li>
+</ul>
+</li>
+</ul>
 <div class="blk why"><p><span class="lbl">의미</span> Muon+GB300 세대에서 dense grad와 embedding grad가 서로 다른 스케일로 튀는 현상이 관찰됐을 것이다 <span class="badge est">추정</span>. lock-step 게이팅으로 이 divergence가 남기는 영향을 처음부터 차단했다. 재현 가능한 학습을 위한 정합성 조정이다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">../services/x.md</a> Phoenix 학습·인덱스 절에 valid_step 통일 subsection을 추가했다.</p></div>
-<h3 id="1-c-grox-reply_spam-lm-프롬프트에-팔로워-카운트bio-주입-옵션--manhattan-write-monotone-only">1-C. grox reply_spam LM 프롬프트에 팔로워 카운트/bio 주입 옵션 + Manhattan write monotone-only</h3>
-<p>변경은 두 갈래다. LM 판정 컨텍스트가 확장됐고, Manhattan write에 monotone-only 게이트가 붙었다. 답글 스팸과 랭킹 판정의 신뢰도, 그리고 서빙 안정성을 함께 건드린다.</p>
-<p><strong>LM 컨텍스트 확장</strong> <span class="badge ok">확인</span>. 해당 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/grox/core/lm/post.py" target="_blank" rel="noopener"><code>grox/core/lm/post.py</code></a> (+18/−6)와 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/grox/core/lm/thread.py" target="_blank" rel="noopener"><code>grox/core/lm/thread.py</code></a> (+25/−4)다.</p>
-<p>이전에는 <code>PostRenderer.render()</code>가 유저 메타데이터를 <code>Metadata: &lt;name&gt; @&lt;handle&gt;</code> 한 줄로 뽑았는데, 이제는 셋으로 분리한다:</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">services/x.md</a>의 Phoenix 학습·인덱스 절에 valid_step 통일 소절을 추가했다.</p></div>
+<h3 id="1-c-답글-스팸-판정-프롬프트에-팔로워-수와-bio를-넣을-수-있게-됐고-manhattan에-쓰는-답글-랭킹-스코어는-내려가기만-한다">1-C. 답글 스팸 판정 프롬프트에 팔로워 수와 bio를 넣을 수 있게 됐고, Manhattan에 쓰는 답글 랭킹 스코어는 내려가기만 한다</h3>
+<p>grox의 답글 스팸(reply_spam) 흐름에서 변경은 두 갈래다. LM 판정 컨텍스트가 확장됐고, Manhattan write에 monotone-only 게이트가 붙었다. 두 변경은 답글 스팸과 랭킹 판정의 신뢰도, 그리고 서빙 안정성을 함께 건드린다.</p>
+<ul>
+<li>LM 판정에 넣는 유저 메타데이터가 확장됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/grox/core/lm/post.py" target="_blank" rel="noopener"><code>grox/core/lm/post.py</code></a> (+18/−6).<ul>
+<li><p>함께 바뀐 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/grox/core/lm/thread.py" target="_blank" rel="noopener"><code>grox/core/lm/thread.py</code></a> (+25/−4)다.</p>
+</li>
+<li><p>이전에는 <code>PostRenderer.render()</code>가 유저 메타데이터를 <code>Metadata: &lt;name&gt; @&lt;handle&gt;</code> 한 줄로 뽑았는데, 이제는 셋으로 분리한다.</p>
 <pre tabindex="0"><code>User Handle: @&lt;handle&gt;
 [User Follower Count: &lt;N&gt;]     # include_follower_count=True일 때
 User Name: &quot;&lt;name&gt;&quot;
 [User Bio: &quot;&lt;bio&gt;&quot;]              # include_bio=True일 때
 </code></pre>
-<p><code>ThreadRenderer._render_thread</code>에는 <code>include_follower_count</code> 인자가 새로 생겼다. <strong>스레드의 모든 포스트에는 팔로워 카운트가 들어가고, bio는 오직 post 0(원본, 스레드 root)에만 들어간다</strong>. 답글 대상(마지막 post, 곧 reply-under-eval)에도 팔로워 카운트가 들어간다. 그리고 메시지 앞에 <code># Reply Author Info</code> 헤더가 추가되어, LLM에게 &quot;이 정보는 evaluate하려는 reply 작성자에 관한 것&quot;이라는 컨텍스트 힌트를 명시적으로 준다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> 팔로워 카운트는 원래 답글 스팸과 저품질 판정에 강한 신호였을 것이다. grox reply_spam 파이프라인은 이미 <a href="x.html#grox-llm-%EC%A3%BC%EC%84%9D--3%EC%84%B8%EB%8C%80-%EA%B7%B8%EB%8C%80%EB%A1%9C--2026-08-14-%EC%9E%84%EA%B3%84-%EC%83%81%ED%96%A5"><code>task_filter.py</code>의 follower 임계</a>로 대량 스팸을 걸러내는 데 이 신호를 쓰고 있었고, 이제는 LM 판정 자체에서도 이 수치를 직접 참조한다. bio는 스팸과 봇을 탐지하는 데 강한 근거가 되므로(bio에 &quot;링크 in 프로필&quot; 같은 스팸 힌트가 있거나, 정치·상업 조직 소속과 관심사가 드러난다), 원 post 저자의 profile을 함께 노출하면 판정 신뢰도가 올라간다. 다만 답글 스레드의 나머지 참여자 bio는 넣지 않아 컨텍스트가 지나치게 길어지는 것을 막고, 원 post와 reply-under-eval 두 저자의 profile만 확장한다.</p></div>
-<p><strong>Manhattan write monotone-only</strong> <span class="badge ok">확인</span>. 위치는 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/grox/flows/reply_spam/task_write.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_write.py:113-138</code></a>이고 +22줄이다.</p>
-<p><code>_publish_to_reply_ranking_manhattan</code>은 <code>ReplyRankingScoreStratoLoader.fetch_reply_ranking_score(post.id)</code>로 기존 스코어를 먼저 조회한다. 새 스코어가 기존보다 <strong>크면</strong> 쓰기를 건너뛰면서 <code>Metrics.counter(&quot;task.write_reply_ranking_manhattan.skipped.count&quot;, reason=&quot;higher_than_existing&quot;)</code>를 증가시키고, 낮으면 그대로 쓴다. 즉 이 채널로 나가는 답글 랭킹 스코어는 <strong>시간이 지나면 낮아지기만 하고 올라가지는 않는다</strong>.</p>
-<div class="blk why"><p><span class="lbl">의미</span> 답글의 첫 판정이 낮게 나오면 그 답글은 계속 낮은 스코어를 유지한다. 새 판정이 관대해져도 서빙 스코어는 갱신되지 않는다. 반대로 첫 판정이 높게(관대하게) 나온 답글은 이후 판정이 엄격해지면 낮아진다. 이는 <strong>답글 스팸 판정의 monotone 안전 방향</strong>, 곧 한번 스팸으로 잡히면 계속 스팸으로 취급하고 정상에서 스팸으로 가는 재분류만 허용하는 방향과 맞아떨어진다. 답글 랭킹 스코어가 시간축에서 진동하는 것을 없애서, UI와 A/B에서 같은 답글의 랭킹이 오르내리지 않도록 만든다. <span class="badge est">추정</span> 답글 스팸과 랭킹 관측에서 label flapping이 실제로 관측됐을 것이다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#grox-llm-%EC%A3%BC%EC%84%9D--3%EC%84%B8%EB%8C%80-%EA%B7%B8%EB%8C%80%EB%A1%9C--2026-08-14-%EC%9E%84%EA%B3%84-%EC%83%81%ED%96%A5">../services/x.md</a> reply_spam 절에 LM 컨텍스트 확장과 Manhattan monotone write 두 subsection을 추가했다.</p></div>
-<h3 id="1-d-vf-teshydrator의-media-fallback-cache-전면-제거">1-D. VF <code>TesHydrator</code>의 media fallback cache 전면 제거</h3>
-<p><code>visibility-filtering/hydration/tes_hydrator.rs</code>(+4/−292)에서 <strong>1M-entry LRU 기반 fallback cache가 통째로 삭제</strong>됐다. 관련 config env 두 개(<code>VF_MEDIA_FALLBACK_CACHE_SERVE_STALE_ENABLED</code>, <code>VF_MEDIA_FALLBACK_CACHE_POPULATE_ENABLED</code>)도 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/visibility-filtering/config.rs" target="_blank" rel="noopener"><code>visibility-filtering/config.rs</code></a> (0+/20−)에서 제거됐다. <code>server_deps.rs</code>의 배선(9줄)과 <code>hydration/mod.rs</code>의 인자(2줄), <code>HydrationPipeline::new</code>의 <code>media_fallback_cache_mode</code> 파라미터도 함께 삭제됐다.</p>
-<p>이전 로직은 다음과 같았다.</p>
-<ul>
-<li>TES(Tweet Entity Service, X 내부의 트윗 메타데이터 서비스)에서 media entity를 조회하는데, TES가 실패해서 media feature가 나오지 않으면 이전에 성공한 조회 결과를 캐시에 유지해 두었다가 이후 조회가 실패할 때 <strong>stale하지만 유효한</strong> media feature로 대체했다(<code>FallbackCacheMode::ServeStale</code>). 캐시를 채우기만 하고 서빙에는 쓰지 않는 모드도 있었다(<code>FallbackCacheMode::Shadow</code>).</li>
-<li>캐시 크기는 1,000,000이었고(<code>CACHE_CAPACITY = 1_000_000</code>), 축출 방식은 LRU였다. 삭제된 292줄 중 상당 부분은 <code>MediaFailingAfterFirstClient</code> mock을 이용한 회귀 테스트 두 개(<code>media_stale_recovery_respects_cache_mode</code>, <code>no_media_tweets_cache_default_entries_that_serve_stale</code>)였다.</li>
+</li>
+<li><p><code>ThreadRenderer._render_thread</code>에는 <code>include_follower_count</code> 인자가 새로 생겼다.</p>
+</li>
+<li><p>스레드의 모든 포스트에는 팔로워 카운트가 들어가고, bio는 오직 post 0(원본, 스레드 root)에만 들어간다.</p>
+</li>
+<li><p>답글 대상인 마지막 post(reply-under-eval)에도 팔로워 카운트가 들어간다.</p>
+</li>
+<li><p>메시지 앞에 <code># Reply Author Info</code> 헤더가 추가되어, LLM에게 &quot;이 정보는 evaluate하려는 reply 작성자에 관한 것&quot;이라는 컨텍스트 힌트를 명시적으로 준다.</p>
+</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> 이 fallback cache는 VF 재작성 초기(4세대 헤드라인) 이후 안정화 기간의 안전망이었다 <span class="badge est">추정</span>. TES 인프라를 재작성하는 도중에 실패가 발생하면 candidate가 media feature 없이 fail-close 필터링에 걸리는데, 그 파괴적인 결과를 완화하는 장치였다. 지금 제거된다는 것은 (a) VF 재작성이 4세대+7 <code>reference_compare</code> 하니스로 정합성을 감사할 수 있게 됐고, (b) TES media path의 실패율이 낮아져 fallback cache의 marginal utility가 줄었으며, (c) <a href="x.html#4%EC%84%B8%EB%8C%808-2026-08-25--aes-generic_actions-%ED%8C%A8%EC%8A%A4%EC%8A%A4%EB%A3%A8-%EB%B0%B0%EC%84%A0">4세대+8의 VMRanker 대폭 단순화</a>와 방향이 같은 &quot;안정화된 뒤에 안전망을 걷어내는&quot; 흐름이라는 뜻이다. 다만 다른 hydrator(gizmoduck 등)의 fallback cache는 그대로 유지되어 <code>fallback_cache_mode</code> env도 계속 남아 있다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#%EC%95%88%EC%A0%84%EC%84%B1--visibility-filtering--labeling-%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%ED%86%B5%EC%A7%B8-%EA%B3%B5%EA%B0%9C">../services/x.md</a> VF 절에 media fallback cache 제거 subsection을 추가했다.</p></div>
-<h3 id="1-e-dark-traffic-canary-opt-out">1-E. Dark traffic canary opt-out</h3>
-<p><code>visibility-filtering/dark_traffic_setup.rs</code>(+40/−17)의 <code>should_enable(ordinal, max_ordinal)</code> 함수가 <code>should_mirror(workload, ordinal, max_ordinal)</code>로 확장됐다 <span class="badge ok">확인</span>. 다음 규칙이 추가됐다.</p>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 팔로워 카운트는 원래 답글 스팸과 저품질 판정에 강한 신호였을 것이다. grox reply_spam 파이프라인은 이미 <a href="x.html#grox-llm-%EC%A3%BC%EC%84%9D--3%EC%84%B8%EB%8C%80-%EA%B7%B8%EB%8C%80%EB%A1%9C--2026-08-14-%EC%9E%84%EA%B3%84-%EC%83%81%ED%96%A5"><code>task_filter.py</code>의 follower 임계</a>로 대량 스팸을 걸러내는 데 이 신호를 쓰고 있었다. 이제는 LM 판정 자체에서도 이 수치를 직접 참조한다.</p></div>
+<p>bio는 스팸과 봇을 탐지하는 데 강한 근거가 된다(bio에 &quot;링크 in 프로필&quot; 같은 스팸 힌트가 있거나, 정치·상업 조직 소속과 관심사가 드러난다). 그래서 원 post 저자의 profile을 함께 노출하면 판정 신뢰도가 올라간다. 다만 답글 스레드의 나머지 참여자 bio는 넣지 않아 컨텍스트가 지나치게 길어지는 것을 막고, 원 post와 reply-under-eval 두 저자의 profile만 확장한다.</p>
 <ul>
-<li><code>workload=None</code>(env <code>WORKLOAD_NAME</code> 미설정)이면 <strong>fail-closed</strong>로 처리해 mirror하지 않는다.</li>
-<li><code>workload.ends_with(&quot;-canary&quot;)</code>이면 mirror하지 않는다. 즉 canary 워크로드는 절대 dark traffic 미러링에 들어가지 않는다.</li>
+<li>Manhattan에 답글 랭킹 스코어를 쓸 때, 새 스코어가 기존보다 크면 쓰기를 건너뛴다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/grox/flows/reply_spam/task_write.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_write.py:113-138</code></a>.<ul>
+<li>변경은 +22줄이다.</li>
+<li><code>_publish_to_reply_ranking_manhattan</code>은 <code>ReplyRankingScoreStratoLoader.fetch_reply_ranking_score(post.id)</code>로 기존 스코어를 먼저 조회한다.</li>
+<li>새 스코어가 기존보다 크면 쓰기를 건너뛰면서 <code>Metrics.counter(&quot;task.write_reply_ranking_manhattan.skipped.count&quot;, reason=&quot;higher_than_existing&quot;)</code>를 증가시키고, 낮으면 그대로 쓴다.</li>
+<li>즉 이 채널로 나가는 답글 랭킹 스코어는 시간이 지나면 낮아지기만 하고 올라가지는 않는다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 답글의 첫 판정이 낮게 나오면 그 답글은 계속 낮은 스코어를 유지한다. 새 판정이 관대해져도 서빙 스코어는 갱신되지 않는다. 반대로 첫 판정이 높게(관대하게) 나온 답글은 이후 판정이 엄격해지면 낮아진다. 이는 답글 스팸 판정의 monotone 안전 방향, 곧 한번 스팸으로 잡히면 계속 스팸으로 취급하고 정상에서 스팸으로 가는 재분류만 허용하는 방향과 맞아떨어진다. 답글 랭킹 스코어가 시간축에서 진동하는 것을 없애서, UI와 A/B에서 같은 답글의 랭킹이 오르내리지 않도록 만든다. <span class="badge est">추정</span> 답글 스팸과 랭킹 관측에서 label flapping이 실제로 관측됐을 것이다.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#grox-llm-%EC%A3%BC%EC%84%9D--3%EC%84%B8%EB%8C%80-%EA%B7%B8%EB%8C%80%EB%A1%9C--2026-08-14-%EC%9E%84%EA%B3%84-%EC%83%81%ED%96%A5">services/x.md</a>의 reply_spam 절에 LM 컨텍스트 확장과 Manhattan monotone write 두 소절을 추가했다.</p></div>
+<h3 id="1-d-vf가-tes-조회-실패에-대비해-두던-media-fallback-cache를-전부-지웠다">1-D. VF가 TES 조회 실패에 대비해 두던 media fallback cache를 전부 지웠다</h3>
+<p>VF가 TES(Tweet Entity Service, X 내부의 트윗 메타데이터 서비스)에서 media entity를 조회할 때 쓰던 1M-entry LRU 기반 fallback cache가 전부 삭제됐다. 관련 env 플래그 두 개와 연결 코드도 함께 사라졌다.</p>
+<ul>
+<li>캐시가 있던 곳은 <code>TesHydrator</code>이고, 파일은 <code>visibility-filtering/hydration/tes_hydrator.rs</code>(+4/−292)다.</li>
+<li>관련 config env 두 개도 <a href="https://github.com/xai-org/x-algorithm/blob/45b48ba/visibility-filtering/config.rs" target="_blank" rel="noopener"><code>visibility-filtering/config.rs</code></a> (0+/20−)에서 제거됐다.<ul>
+<li><code>VF_MEDIA_FALLBACK_CACHE_SERVE_STALE_ENABLED</code>, <code>VF_MEDIA_FALLBACK_CACHE_POPULATE_ENABLED</code></li>
+</ul>
+</li>
+<li>캐시를 연결하던 코드와 인자도 함께 삭제됐다.<ul>
+<li><code>server_deps.rs</code>의 연결 코드(9줄)</li>
+<li><code>hydration/mod.rs</code>의 인자(2줄)</li>
+<li><code>HydrationPipeline::new</code>의 <code>media_fallback_cache_mode</code> 파라미터</li>
+</ul>
+</li>
+</ul>
+<p>삭제 전의 로직은 다음과 같았다.</p>
+<ul>
+<li>TES에서 media entity를 조회하는데, TES가 실패해서 media feature가 나오지 않으면 이전에 성공한 조회 결과를 캐시에 유지해 두었다. 그리고 이후 조회가 실패할 때 stale하지만 유효한 media feature로 대체했다(<code>FallbackCacheMode::ServeStale</code>).</li>
+<li>캐시를 채우기만 하고 서빙에는 쓰지 않는 모드도 있었다(<code>FallbackCacheMode::Shadow</code>).</li>
+<li>캐시 크기는 1,000,000이었고(<code>CACHE_CAPACITY = 1_000_000</code>), 축출 방식은 LRU였다.</li>
+<li>삭제된 292줄 중 상당 부분은 <code>MediaFailingAfterFirstClient</code> mock을 이용한 회귀 테스트 두 개였다.<ul>
+<li><code>media_stale_recovery_respects_cache_mode</code>, <code>no_media_tweets_cache_default_entries_that_serve_stale</code></li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> 이 fallback cache는 VF 재작성 초기(4세대 헤드라인) 이후 안정화 기간의 안전망이었다 <span class="badge est">추정</span>. TES 인프라를 재작성하는 도중에 실패가 발생하면 candidate가 media feature 없이 fail-close 필터링에 걸리는데, 그 파괴적인 결과를 완화하는 장치였다. 지금 제거된다는 것은 다음 세 가지를 뜻한다.</p></div>
+<ul>
+<li>VF 재작성이 4세대+7 <code>reference_compare</code> 하니스로 정합성을 감사할 수 있게 됐다.</li>
+<li>TES media path의 실패율이 낮아져 fallback cache의 marginal utility가 줄었다.</li>
+<li><a href="x.html#4%EC%84%B8%EB%8C%808-2026-08-25--aes-generic_actions-%ED%8C%A8%EC%8A%A4%EC%8A%A4%EB%A3%A8-%EB%B0%B0%EC%84%A0">4세대+8의 VMRanker 대폭 단순화</a>와 방향이 같은 &quot;안정화된 뒤에 안전망을 걷어내는&quot; 흐름이다.</li>
+</ul>
+<p>다만 다른 hydrator(gizmoduck 등)의 fallback cache는 그대로 유지되어 <code>fallback_cache_mode</code> env도 계속 남아 있다.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#%EC%95%88%EC%A0%84%EC%84%B1--visibility-filtering--labeling-%ED%8C%8C%EC%9D%B4%ED%94%84%EB%9D%BC%EC%9D%B8-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%ED%86%B5%EC%A7%B8-%EA%B3%B5%EA%B0%9C">services/x.md</a>의 VF 절에 media fallback cache 제거 소절을 추가했다.</p></div>
+<h3 id="1-e-canary-워크로드는-이제-dark-traffic-미러링에-들어가지-않는다">1-E. canary 워크로드는 이제 dark traffic 미러링에 들어가지 않는다</h3>
+<p>VF의 dark traffic 미러링에서 canary 워크로드가 빠진다. 워크로드 이름이 설정되지 않았을 때도 미러링하지 않는다.</p>
+<ul>
+<li>미러링 여부를 정하는 함수가 워크로드도 받도록 확장됐다 <span class="badge ok">확인</span>.<ul>
+<li>대상은 <code>visibility-filtering/dark_traffic_setup.rs</code>(+40/−17)의 <code>should_enable(ordinal, max_ordinal)</code> 함수다. 이 함수가 <code>should_mirror(workload, ordinal, max_ordinal)</code>로 확장됐다.</li>
+<li>추가된 규칙: <code>workload=None</code>(env <code>WORKLOAD_NAME</code> 미설정)이면 fail-closed로 처리해 mirror하지 않는다.</li>
+<li>추가된 규칙: <code>workload.ends_with(&quot;-canary&quot;)</code>이면 mirror하지 않는다. 즉 canary 워크로드는 절대 dark traffic 미러링에 들어가지 않는다.</li>
 <li>그 외에는 기존과 같이 <code>ordinal &lt; max_ordinal</code>로 판단한다.</li>
 </ul>
-<p>테스트도 두 개 새로 생겼다(<code>canary_never_mirrors</code>, <code>missing_workload_name_fails_closed</code>). 로그 메시지도 <code>&quot;disabled (ordinal &gt;= max)&quot;</code>에서 <code>&quot;disabled (not a mirror host)&quot;</code>로 일반화됐다.</p>
-<div class="blk why"><p><span class="lbl">의미</span> 4세대+4에서 <a href="x.html#4%EC%84%B8%EB%8C%806-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-23">dark_traffic이 shadow에서 staging으로 이관</a>됐고, 이번 변경으로 canary 워크로드가 실수로 미러링에 들어가 canary 이슈가 shadow verdict를 오염시키는 사고를 막는다. 프로덕션과 canary 두 워크로드가 같은 이름 prefix를 쓰는 관행이 있는 것으로 보이므로 <span class="badge est">추정</span>, 접미사 매칭만으로도 충분하다.</p></div>
-<h3 id="1-f-광고-conversion-헤드-3종-신설--conv_asset_ids-배선">1-F. 광고 conversion 헤드 3종 신설 + <code>conv_asset_ids</code> 배선</h3>
-<p><code>phoenix/python/common/xai-proto/proto/recsys.proto</code> (+12)에서 바뀐 내용이다 <span class="badge ok">확인</span>.</p>
-<p>새로 생긴 ActionName은 3종이다.</p>
-<ul>
-<li><strong>191 <code>ADS_PIXEL_FIRE</code></strong>: 광고주가 자기 사이트에 심어 둔 전환 픽셀이 발화하는 웹 컨버전 이벤트다.</li>
-<li><strong>192 <code>ADS_LONG_DWELL_AND_PIXEL_FIRE</code></strong>: 픽셀 발화와 long dwell(랜딩 페이지에 오래 머무르는 것)을 AND로 결합한 이벤트다. <code>LONG_DWELL_AFTER_CLICK</code>(158)과 <code>ADS_PIXEL_FIRE</code>(191)의 AND에 해당한다.</li>
-<li><strong>193 <code>P_LONG_DWELL_AND_PIXEL_FIRE</code></strong>: 접두사 <code>P_</code>는 &quot;primary&quot; 또는 &quot;predicted&quot;를 뜻하는 것으로 보인다 <span class="badge est">추정</span>. <a href="x.html#%EA%B4%91%EA%B3%A0-conversion-%EC%95%A1%EC%85%98-%EB%8C%80%ED%8F%AD-%ED%99%95%EC%9E%A5--4%EC%84%B8%EB%8C%806-2026-08-21-28e414f">4세대+6의 광고 conversion 20개 확장</a>에서 관찰된 명명 관행에 비추면, primary conversion 라벨의 predicted target을 가리킨다.</li>
+</li>
+<li>테스트도 두 개 새로 생겼다(<code>canary_never_mirrors</code>, <code>missing_workload_name_fails_closed</code>).</li>
+<li>로그 메시지도 <code>&quot;disabled (ordinal &gt;= max)&quot;</code>에서 <code>&quot;disabled (not a mirror host)&quot;</code>로 일반화됐다.</li>
 </ul>
-<p>같은 커밋에서 proto 측 <code>SlateContext</code>에 <code>reconCosMilli = 13</code> 필드가 배선됐다. home-mixer의 <a href="x.html#4%EC%84%B8%EB%8C%805-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-22"><code>SlateContext</code></a>에도 이 문서에서 볼 수 있듯 어제 4세대+8까지는 <code>recon_cos_milli</code>가 있었는데, 이번에는 <code>recon_count_above: Option&lt;u32&gt;</code>와 <code>recon_gap_above: Option&lt;u32&gt;</code> 두 개가 추가되어 slate context 재구성 계산이 세분화됐다. 이 두 필드는 아직 proto에 반영되지 않았고(proto에는 <code>reconCosMilli</code>만 있다), home-mixer의 로컬 배선이 proto로 옮겨지기를 기다리는 상태다.</p>
-<p>**<code>PredictNextActionsRequest.conv_asset_ids</code>**도 신설됐다. 새 message <code>ConvAssetIds</code>가 <code>repeated int64 impressed_time_ms / author_id / asset_id</code> 3배열 구조를 갖는다. 유저에게 이전에 노출된 conversion asset(광고 크리에이티브)의 이력을 Phoenix 서빙에 전달하는 통로다. 용도는 <strong>광고 창작물 attribution</strong>으로 보이는데, 같은 asset이 여러 광고주에게 재사용되거나 유저가 같은 asset을 여러 번 봤을 때 컨버전 예측에 이 이력을 참조하려는 것이다 <span class="badge est">추정</span>.</p>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대+4에서 <a href="x.html#4%EC%84%B8%EB%8C%806-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-23">dark_traffic이 shadow에서 staging으로 이관</a>됐다. 이번 변경은 canary 워크로드가 실수로 미러링에 들어가 canary 이슈가 shadow verdict를 오염시키는 사고를 막는다. 프로덕션과 canary 두 워크로드가 같은 이름 prefix를 쓰는 관행이 있는 것으로 보이므로 <span class="badge est">추정</span>, 접미사 매칭만으로도 충분하다.</p></div>
+<h3 id="1-f-광고-픽셀-발화를-다루는-conversion-헤드-3종과-광고-소재-노출-이력-필드가-생겼다">1-F. 광고 픽셀 발화를 다루는 conversion 헤드 3종과 광고 소재 노출 이력 필드가 생겼다</h3>
+<p>Phoenix의 proto에 광고주 픽셀 발화와 관련된 ActionName 3종이 새로 생겼다. 서빙 요청에는 유저에게 앞서 노출된 광고 소재의 이력을 실어 보낼 필드가 추가됐다.</p>
+<ul>
+<li>새 ActionName 3종이 proto에 추가됐다 <span class="badge ok">확인</span>. 바뀐 파일은 <code>phoenix/python/common/xai-proto/proto/recsys.proto</code>(+12)다.<ul>
+<li>191 <code>ADS_PIXEL_FIRE</code>: 광고주가 자기 사이트에 심어 둔 전환 픽셀이 발화하는 웹 컨버전 이벤트다.</li>
+<li>192 <code>ADS_LONG_DWELL_AND_PIXEL_FIRE</code>: 픽셀 발화와 long dwell(랜딩 페이지에 오래 머무르는 것)을 AND로 결합한 이벤트다. <code>LONG_DWELL_AFTER_CLICK</code>(158)과 <code>ADS_PIXEL_FIRE</code>(191)의 AND에 해당한다.</li>
+<li>193 <code>P_LONG_DWELL_AND_PIXEL_FIRE</code>: 접두사 <code>P_</code>는 &quot;primary&quot; 또는 &quot;predicted&quot;를 뜻하는 것으로 보인다 <span class="badge est">추정</span>. <a href="x.html#%EA%B4%91%EA%B3%A0-conversion-%EC%95%A1%EC%85%98-%EB%8C%80%ED%8F%AD-%ED%99%95%EC%9E%A5--4%EC%84%B8%EB%8C%806-2026-08-21-28e414f">4세대+6의 광고 conversion 20개 확장</a>에서 관찰된 명명 관행에 비추면, primary conversion 라벨의 predicted target을 가리킨다.</li>
+</ul>
+</li>
+<li>같은 커밋에서 proto 측 <code>SlateContext</code>에 <code>reconCosMilli = 13</code> 필드가 들어갔다 <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li>이 문서에서 볼 수 있듯 home-mixer의 <a href="x.html#4%EC%84%B8%EB%8C%805-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-22"><code>SlateContext</code></a>에도 어제 4세대+8까지는 <code>recon_cos_milli</code>가 있었다.</li>
+<li>home-mixer 쪽에는 이번에 <code>recon_count_above: Option&lt;u32&gt;</code>와 <code>recon_gap_above: Option&lt;u32&gt;</code> 두 개가 추가되어, slate context 재구성 계산이 세분화됐다.</li>
+<li>이 두 필드는 아직 proto에 반영되지 않았다(proto에는 <code>reconCosMilli</code>만 있다). home-mixer의 로컬 연결이 proto로 옮겨지기를 기다리는 상태다.</li>
+</ul>
+</li>
+<li>유저에게 이전에 노출된 conversion asset(광고 크리에이티브)의 이력을 Phoenix 서빙에 전달하는 통로도 신설됐다 <span class="badge ok">확인</span> — 같은 파일.<ul>
+<li>필드 이름은 <code>conv_asset_ids</code>이고, 전체 경로는 <code>PredictNextActionsRequest.conv_asset_ids</code>다.</li>
+<li>새 message <code>ConvAssetIds</code>가 <code>repeated int64 impressed_time_ms / author_id / asset_id</code> 3배열 구조를 갖는다.</li>
+<li>용도는 광고 창작물 attribution으로 보이는데, 같은 asset이 여러 광고주에게 재사용되거나 유저가 같은 asset을 여러 번 봤을 때 컨버전 예측에 이 이력을 참조하려는 것이다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+</ul>
 <div class="blk why"><p><span class="lbl">의미</span> <a href="x.html#%EA%B4%91%EA%B3%A0-conversion-%EC%95%A1%EC%85%98-%EB%8C%80%ED%8F%AD-%ED%99%95%EC%9E%A5--4%EC%84%B8%EB%8C%806-2026-08-21-28e414f">4세대+6이 광고 conversion 예측 헤드를 20개 대폭 확장한 것</a>에 이어지는 변경이다. 이번에는 픽셀 발화와 long dwell을 합성한 3종을 추가하고, asset 이력을 서빙 요청에 실을 통로를 만들었다. 광고 랭커 학습 스택이 conversion prediction 방향으로 계속 확장되는 흐름이 이어진다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#%EA%B4%91%EA%B3%A0-conversion-%EC%95%A1%EC%85%98-%EB%8C%80%ED%8F%AD-%ED%99%95%EC%9E%A5--4%EC%84%B8%EB%8C%806-2026-08-21-28e414f">../services/x.md</a> 광고 conversion 절에 4세대+9의 3종 신설과 <code>conv_asset_ids</code> 배선 subsection을 추가했다.</p></div>
-<h3 id="1-g-retrieval-유저-타워에-use_history_segment_ids-플래그">1-G. Retrieval 유저 타워에 <code>use_history_segment_ids</code> 플래그</h3>
-<p><code>phoenix/xrex/models/recsys_two_tower_model.py</code> (+12/−1)에서 user tower의 attention segment id를 zeros 대신 히스토리 토큰 전용의 <code>HISTORY_SEGMENT_ID</code>(<code>xrex.pallas.ranker_attention_utils</code>에서 가져온다)로 부여할 수 있게 됐다 <span class="badge ok">확인</span>. <code>RecsysTwoTowerModelConfig.use_history_segment_ids: bool = False</code> config 플래그로 켜고 끄며, 기본값은 off다.</p>
-<p>새 함수 <code>user_tower_segment_ids(batch, seq_len, use_history_segment_ids)</code>는 플래그가 켜지면 shape (B, T) 전체를 <code>HISTORY_SEGMENT_ID</code>로 채우고(즉 유저 히스토리 토큰이 하나의 segment로 묶인다), 꺼져 있으면 이전과 같이 zeros로 채운다. <code>xrecsys_two_tower.py</code> config에도 관련 기본값을 넣었다. <strong>의미:</strong> pallas flash-attention의 varlen 커널이 segment mask로 attention scope를 자를 때, 유저 히스토리 시퀀스 안에서 세그먼트 경계를 명시할 수 있도록 준비한 것이다. 이전에는 전체가 zeros 하나여서 한 세그먼트로 묶였고 세그먼트 mask 자체가 의미가 없었지만, 이제는 다른 segment id를 가진 특수 토큰(예: user_features 토큰)과 히스토리 토큰이 서로 attention을 주고받지 않도록 격리할 수 있다. varlen packing의 정확도가 올라간다.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html#%EA%B4%91%EA%B3%A0-conversion-%EC%95%A1%EC%85%98-%EB%8C%80%ED%8F%AD-%ED%99%95%EC%9E%A5--4%EC%84%B8%EB%8C%806-2026-08-21-28e414f">services/x.md</a>의 광고 conversion 절에 4세대+9의 3종 신설과 <code>conv_asset_ids</code> 연결을 다룬 소절을 추가했다.</p></div>
+<h3 id="1-g-retrieval-유저-타워가-히스토리-토큰에-전용-segment-id를-줄-수-있게-됐다">1-G. retrieval 유저 타워가 히스토리 토큰에 전용 segment id를 줄 수 있게 됐다</h3>
+<p>Phoenix의 two-tower retrieval 모델(유저와 아이템을 각각 따로 임베딩하는 모델)에서, 유저 타워의 히스토리 토큰에 전용 segment id를 붙일 수 있게 됐다. 이 동작은 config 플래그로 켜고 끄며, 기본값은 off다.</p>
+<ul>
+<li>user tower의 attention segment id를 zeros 대신 히스토리 토큰 전용의 <code>HISTORY_SEGMENT_ID</code>로 부여할 수 있게 됐다 <span class="badge ok">확인</span>.<ul>
+<li>파일은 <code>phoenix/xrex/models/recsys_two_tower_model.py</code>(+12/−1)다.</li>
+<li><code>HISTORY_SEGMENT_ID</code>는 <code>xrex.pallas.ranker_attention_utils</code>에서 가져온다.</li>
+<li>플래그 이름은 <code>use_history_segment_ids</code>이고, 정의는 <code>RecsysTwoTowerModelConfig.use_history_segment_ids: bool = False</code>다. 기본값은 off다.</li>
+</ul>
+</li>
+<li>새 함수 <code>user_tower_segment_ids(batch, seq_len, use_history_segment_ids)</code>는 플래그가 켜지면 shape (B, T) 전체를 <code>HISTORY_SEGMENT_ID</code>로 채운다. 꺼져 있으면 이전과 같이 zeros로 채운다.<ul>
+<li>켜면 유저 히스토리 토큰이 하나의 segment로 묶인다.</li>
+</ul>
+</li>
+<li><code>xrecsys_two_tower.py</code> config에도 관련 기본값을 넣었다.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">의미</span> pallas flash-attention의 varlen 커널이 segment mask로 attention scope를 자를 때, 유저 히스토리 시퀀스 안에서 세그먼트 경계를 명시할 수 있도록 준비한 것이다. 이전에는 전체가 zeros 하나여서 한 세그먼트로 묶였고, 세그먼트 mask 자체가 의미가 없었다. 이제는 다른 segment id를 가진 특수 토큰(예: user_features 토큰)과 히스토리 토큰이 서로 attention을 주고받지 않도록 격리할 수 있다. varlen packing의 정확도가 올라간다.</p></div>
 <h3 id="정본-반영-정리">정본 반영 정리</h3>
 <ul>
-<li><a href="x.html">../services/x.md</a>: 위 서브섹션 각각에 subsection을 추가하거나 확장했다(구체적인 위치는 각 절 끝의 &quot;정본 반영&quot;에 적어 두었다).</li>
-<li><a href="x.html#%EB%AF%B8%ED%95%B4%EC%86%8C%EC%8B%AC%EC%B8%B5-%EB%B6%84%EC%84%9D-%ED%95%84%EC%9A%94-4%EC%84%B8%EB%8C%80-%EA%B3%B5%EA%B0%9C-%EC%9D%B4%ED%9B%84">../services/x.md</a>: 4세대+9의 열린 질문 항목을 추가했다.</li>
+<li><a href="x.html">services/x.md</a>: 위 소절 각각에 해당하는 x.md 절에 소절을 추가하거나 확장했다. 구체적인 위치는 각 소절 끝의 &quot;정본 반영&quot;에 적어 두었다.</li>
+<li><a href="x.html#%EB%AF%B8%ED%95%B4%EC%86%8C%EC%8B%AC%EC%B8%B5-%EB%B6%84%EC%84%9D-%ED%95%84%EC%9A%94-4%EC%84%B8%EB%8C%80-%EA%B3%B5%EA%B0%9C-%EC%9D%B4%ED%9B%84">services/x.md</a>: 4세대+9의 열린 질문 항목을 추가했다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> 어제 4세대+8이 <strong>관계 필터, enforcement, retrieval 인덱스</strong>를 나란히 손봤다면, 오늘 4세대+9는 (a) **학습 인프라(체크포인트와 gradient 게이팅)**를 저장 측까지 확장하고 (b) <strong>LLM 판정 프롬프트와 서빙 안정성</strong>을 뒤이어 정리하는 성격이다. 4세대+7 이후 매일 커밋이 붙는 흐름 안에서 오늘 공개는 <strong>규모(중형)와 subsystem 폭(6곳)이 균형을 이루는</strong> 표준적인 유지보수형 릴리스다. 눈에 띄는 정책 방향 변경은 없다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 4세대+7(2026-08-24) 이후 매일 커밋이 붙는 흐름 안에서, 오늘 공개는 중형 규모와 6곳의 서브시스템 폭이 균형을 이루는 표준적인 유지보수형 릴리스다. 눈에 띄는 정책 방향 변경은 없다. 어제 4세대+8이 관계 필터, enforcement, retrieval 인덱스를 나란히 손봤다면, 오늘 4세대+9는 학습 인프라(체크포인트와 gradient 게이팅)를 저장 측까지 확장하고 LLM 판정 프롬프트와 서빙 안정성을 뒤이어 정리하는 성격이다.</p></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="2-amber-meta-ai-event-tokenization으로-이벤트를-단일-llm-토큰으로-압축-레이더"><span class="num">2</span>AMBER: Meta AI, &quot;Event Tokenization&quot;으로 이벤트를 단일 LLM 토큰으로 압축 (레이더)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.25546" target="_blank" rel="noopener">AMBER: An Event is Worth One Token — arXiv 2608.25546</a>: 2026-08-26 제출이고, 저자 15명이 전원 &quot;AI at Meta&quot;로 표기돼 있다(<a href="https://arxiv.org/html/2608.25546v1" target="_blank" rel="noopener">HTML v1</a>에서 확인했다). 소속 표기는 <code>∗Core contributors, †Correspondence, AI at Meta</code>다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> LLM 기반 추천은 &quot;유저 상호작용 시퀀스&quot;를 토큰으로 재표현해 autoregressive 예측을 수행한다. 그런데 종전 방식(text, semantic ID, categorical feature 몇 개)은 각 position에 담기는 정보가 얕아서 query context가 약해지고, 이것이 다음 position의 context로 다시 들어가면서 성능 저하가 시퀀스 길이에 따라 누적되는 문제가 있었다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h2 id="2-상호작용-이벤트-하나를-토큰-하나로-압축하는-amber가-facebook에서-서빙된다--레이더meta"><span class="num">2</span>상호작용 이벤트 하나를 토큰 하나로 압축하는 AMBER가 Facebook에서 서빙된다 — 레이더(Meta)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.25546" target="_blank" rel="noopener">AMBER: An Event is Worth One Token — arXiv 2608.25546</a> — arXiv, 2026-08-26 제출, 논문. 저자 15명이 전원 &quot;AI at Meta&quot;로 표기돼 있고, 이는 <a href="https://arxiv.org/html/2608.25546v1" target="_blank" rel="noopener">HTML v1</a>에서 확인했다. 소속 표기는 <code>∗Core contributors, †Correspondence, AI at Meta</code>다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> LLM 기반 추천은 &quot;유저 상호작용 시퀀스&quot;를 토큰으로 재표현해 autoregressive 예측을 수행한다. 그런데 종전 방식(text, semantic ID, categorical feature 몇 개)은 각 position에 담기는 정보가 얕았다. 그래서 query context가 약해지고, 이것이 다음 position의 context로 다시 들어가면서 성능 저하가 시퀀스 길이에 따라 누적되는 문제가 있었다. 이번 논문(AMBER)은 상호작용 이벤트 하나를 Event Token 하나로 압축하는 Event Tokenization을 내놓았다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">AMBER는 이벤트 하나를 Event Token 하나로 압축하고, Facebook에서 하루 수십억 이벤트를 인코딩한다</span></p></div>
 <ul>
-<li><strong>Event Tokenization</strong>은 상호작용 이벤트 하나의 &quot;temporal snapshot&quot;(유저, 아이템, 컨텍스트, outcome 신호 전부)을 하나의 compact <strong>Event Token</strong>으로 압축한다 <span class="badge ok">확인</span></li>
-<li>이 Event Token이 LLM의 새로운 입력 유형으로 자리 잡았다. 산업 규모의 오프라인 랭킹·retrieval 벤치마크에서 &quot;compute-quality Pareto frontier&quot;를 개선했다 <span class="badge ok">확인</span></li>
-<li>Event Token은 non-LLM 랭커에도 feature로 이식할 수 있고(transferability), 통계적으로 유의한 개선을 보였다 <span class="badge ok">확인</span></li>
-<li><strong>Facebook surface에서 하루 수십억 이벤트의 인코딩을 서빙한다</strong> <span class="badge ok">확인</span> HTML에 <code>&quot;supporting online encoding for billions of events per day&quot;</code>라고 적혀 있다</li>
+<li>Event Tokenization은 상호작용 이벤트 하나의 &quot;temporal snapshot&quot;(유저, 아이템, 컨텍스트, outcome 신호 전부)을 하나의 compact Event Token으로 압축한다 <span class="badge ok">확인</span>.</li>
+<li>이 Event Token이 LLM의 새로운 입력 유형으로 자리 잡았다. 산업 규모의 오프라인 랭킹·retrieval 벤치마크에서 &quot;compute-quality Pareto frontier&quot;를 개선했다 <span class="badge ok">확인</span>.</li>
+<li>Event Token은 non-LLM 랭커에도 feature로 이식할 수 있고(transferability), 통계적으로 유의한 개선을 보였다 <span class="badge ok">확인</span>.</li>
+<li>Facebook surface에서 하루 수십억 이벤트의 인코딩을 서빙한다 <span class="badge ok">확인</span>. HTML에 <code>&quot;supporting online encoding for billions of events per day&quot;</code>라고 적혀 있다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">왜 주목</span> LLM-native 랭킹 스레드에 <strong>네 번째 프로덕션 진술</strong>이 추가된다. Netflix GenRec(scoring), Meta ConnectionMind(graph reasoning), Taobao MetaStrategy(offline policy compiler)에 이어 Meta AMBER는 <strong>input tokenization</strong> 각도에서 접근한다. 서빙 경로에 LLM을 두는 대신 offline이나 nearline 인코더로 접근하면서도 이후 사용처는 넓게 열어 두는 방향인데, Facebook surface에서 online encoding으로 서빙되고 non-LLM 랭커에도 이식된다는 점이 특이하다. Meta의 <a href="facebook.html">ConnectionMind</a>(그래프 경로 추론기)와 함께 보면, <strong>Meta 안에서도 LLM 기반 recsys 접근이 최소 두 축으로 갈라졌다</strong>는 신호다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">../radar.md</a> 이번 달 신규 절에 AMBER 엔트리를 추가했다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> GenRec 스레드가 <strong>채점 함수(Netflix) → 그래프 경로 추론기(Meta) → 오프라인 정책 컴파일러(Alibaba) → 입력 인코더(Meta)</strong> 네 갈래로 나뉘면서, 서빙 위치와 역할과 계산 예산이 서로 다른 방향으로 다양해졌다. &quot;LLM을 어디에 배치하는가&quot;라는 아키텍처 스펙트럼이 넓어지는 흐름을 확인할 수 있다. 다만 온라인 A/B 수치는 abstract에도 HTML에도 명시돼 있지 않다. Facebook 프로덕션 배포는 확인되지만 랭킹 metric의 lift는 공개되지 않았다.</p></div>
-<p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="3-transretrieval-alibaba-alimama-transformer-scaling-law를-광고-retrieval에-적용-레이더"><span class="num">3</span>TransRetrieval: Alibaba Alimama, Transformer scaling law를 광고 retrieval에 적용 (레이더)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.25528" target="_blank" rel="noopener">TransRetrieval: Scaling Up Transformer-Based Retrieval for Industrial Recommendation — arXiv 2608.25528</a>: 2026-08-26 제출이다. 저자 10명 가운데 Alibaba(Taobao &amp; Tmall Group Beijing) 소속이 6명(Yunfei Liu, Bin Liu, Ziru Xu, Han Zhu, Jian Xu, Bo Zheng으로, Alimama 광고 라인의 시니어 저자들이다)이고, Renmin University 소속이 4명(Zhifei Zheng, Qiren Zhu, Hanbing Liu, Qi Qi)이다. affiliation은 <a href="https://arxiv.org/html/2608.25528v1" target="_blank" rel="noopener">HTML v1</a>에서 확인했다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 추천 시스템의 retrieval에 LLM 스케일링 법칙을 적용하려는 시도는 여러 회사에서 있었지만(HSTU, Wukong, LLaTTE), feature heterogeneity 때문에 Transformer layer를 단순하게 쌓기만 하면 diminishing return이 나타난다. 서로 다른 field가 서로 다른 스케일의 token norm을 만들기 때문에, attention이 norm이 큰 feature에 지배되어 signal이 고르게 섞이지 않는다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<div class="blk why"><p><span class="lbl">왜 주목</span> LLM-native 랭킹 스레드에 네 번째 프로덕션 진술이 추가된다. 앞선 세 진술은 다음과 같다.</p></div>
 <ul>
-<li><strong>Weighted average aggregation</strong>은 heterogeneous field들의 token-norm divergence를 억제해 Transformer를 스케일링할 수 있게 만드는 aggregator다 <span class="badge ok">확인</span></li>
-<li><strong>Target token compression</strong>으로 candidate 하나당 계산량을 85% 절감한다 <span class="badge ok">확인</span></li>
-<li><strong>Position-style domain embedding</strong>은 cross-domain 데이터를 최소한의 오버헤드로 통합한다 <span class="badge ok">확인</span></li>
-<li><strong>Alibaba 디스플레이 광고 플랫폼에서 한 달간 프로덕션 A/B를 진행했다</strong> <span class="badge ok">확인</span>:</li>
+<li>Netflix GenRec: scoring</li>
+<li>Meta ConnectionMind: graph reasoning</li>
+<li>Taobao MetaStrategy: offline policy compiler</li>
+</ul>
+<p>Meta AMBER는 이들에 이어 input tokenization 각도에서 접근한다. 서빙 경로에 LLM을 두는 대신 offline이나 nearline 인코더로 접근하면서도, 이후 사용처는 넓게 열어 두는 방향이다. Facebook surface에서 online encoding으로 서빙되고 non-LLM 랭커에도 이식된다는 점이 특이하다. Meta의 <a href="facebook.html">ConnectionMind</a>(그래프 경로 추론기)와 함께 보면, Meta 안에서도 LLM 기반 recsys 접근이 최소 두 축으로 갈라졌다는 신호다.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 이번 달 신규 절에 AMBER 엔트리를 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> &quot;LLM을 어디에 배치하는가&quot;라는 아키텍처 스펙트럼이 넓어지는 흐름을 확인할 수 있다. GenRec 스레드가 Netflix의 채점 함수, Meta의 그래프 경로 추론기, Alibaba의 오프라인 정책 컴파일러, Meta의 입력 인코더 네 갈래로 나뉘면서, 서빙 위치와 역할과 계산 예산이 서로 다른 방향으로 다양해졌다. 다만 온라인 A/B 수치는 abstract에도 HTML에도 명시돼 있지 않고, Facebook 프로덕션 배포는 확인되지만 랭킹 metric의 lift는 공개되지 않았다.</p></div>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="3-transretrieval이-광고-retrieval을-transformer로-키우고-revenue를-올렸다--레이더alibaba"><span class="num">3</span>TransRetrieval이 광고 retrieval을 Transformer로 키우고 revenue를 올렸다 — 레이더(Alibaba)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.25528" target="_blank" rel="noopener">TransRetrieval: Scaling Up Transformer-Based Retrieval for Industrial Recommendation — arXiv 2608.25528</a> — arXiv, 2026-08-26 제출, 논문. 저자 10명 가운데 Alibaba(Taobao &amp; Tmall Group Beijing) 소속이 6명이고, Renmin University 소속이 4명이다. affiliation은 <a href="https://arxiv.org/html/2608.25528v1" target="_blank" rel="noopener">HTML v1</a>에서 확인했다.</p></div>
+<ul>
+<li>Alibaba 저자는 Yunfei Liu, Bin Liu, Ziru Xu, Han Zhu, Jian Xu, Bo Zheng이고, Alimama 광고 라인의 시니어 저자들이다.</li>
+<li>Renmin University 저자는 Zhifei Zheng, Qiren Zhu, Hanbing Liu, Qi Qi다.</li>
+</ul>
+<div class="blk ctx"><p><span class="lbl">배경</span> 추천 시스템의 retrieval에 LLM 스케일링 법칙을 적용하려는 시도는 여러 회사에서 있었다(HSTU, Wukong, LLaTTE). 하지만 feature heterogeneity 때문에 Transformer layer를 단순하게 쌓기만 하면 diminishing return이 나타난다. 서로 다른 field가 서로 다른 스케일의 token norm을 만들기 때문에, attention이 norm이 큰 feature에 지배되어 signal이 고르게 섞이지 않는다. 이번 논문(TransRetrieval)은 heterogeneous field들의 token-norm divergence를 억제해 Transformer를 스케일링할 수 있게 만드는 aggregator를 내놓았다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">광고 retrieval을 Transformer로 키우고도 같은 지연 조건에서 revenue를 올렸다</span></p></div>
+<ul>
+<li>Weighted average aggregation은 heterogeneous field들의 token-norm divergence를 억제해 Transformer를 스케일링할 수 있게 만드는 aggregator다 <span class="badge ok">확인</span>.</li>
+<li>Target token compression으로 candidate 하나당 계산량을 85% 절감한다 <span class="badge ok">확인</span>.</li>
+<li>Position-style domain embedding은 cross-domain 데이터를 최소한의 오버헤드로 통합한다 <span class="badge ok">확인</span>.</li>
+<li>Alibaba 디스플레이 광고 플랫폼에서 한 달간 프로덕션 A/B를 진행했다 <span class="badge ok">확인</span>.</li>
 </ul>
 <blockquote>
 <p>&quot;lifts platform revenue by 2.53% under the same end-to-end latency constraint as the production baseline&quot;
 — <a href="https://arxiv.org/html/2608.25528v1" target="_blank" rel="noopener">TransRetrieval HTML</a>, 2026-08-26</p>
 </blockquote>
 <ul>
-<li>정확한 수치는 다음과 같다. revenue +2.53% (95% CI [2.22%, 2.70%], p&lt;0.0001), RPM +1.28% (CI [1.14%, 1.56%], p&lt;0.0001)이고, 4 도메인 분산은 Domain A +1.72%, B +2.51%, C +5.39%, D +0.87%다. P99 지연은 ~40ms로 유지된다 <span class="badge ok">확인</span>.</li>
+<li>정확한 수치는 아래와 같고, P99 지연은 ~40ms로 유지된다 <span class="badge ok">확인</span>.<ul>
+<li>revenue +2.53% (95% CI [2.22%, 2.70%], p&lt;0.0001)</li>
+<li>RPM +1.28% (CI [1.14%, 1.56%], p&lt;0.0001)</li>
+<li>4 도메인 분산: Domain A +1.72%, B +2.51%, C +5.39%, D +0.87%</li>
 </ul>
-<div class="blk why"><p><span class="lbl">왜 주목</span> <a href="radar.html#%EC%B6%94%EC%B2%9C-%EB%AA%A8%EB%8D%B8-%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81-%EB%B2%95%EC%B9%99--%ED%9A%8C%EC%82%AC%EB%B3%84-%EB%8F%85%EB%A6%BD-%ED%99%95%EC%9D%B8%EC%9D%B4-%EC%8C%93%EC%9D%B4%EB%8A%94-%EC%A4%91">스케일링 법칙 스레드</a>에 Alibaba와 Alimama의 첫 진술이 추가된다. 이전에는 Meta HSTU·Wukong·LLaTTE와 Netflix FM으로 회사가 2개였는데, 이제 세 번째 회사(Alibaba 광고 라인)가 들어왔다. 특히 <strong>retrieval 스택에 스케일링을 적용했다</strong>는 진술이라는 점이 특이한데, 대부분의 회사는 rank 스택에서 시작했기 때문이다. LLaTTE(&quot;semantic feature 없으면 스케일링 안 됨&quot;)와 HSTU(&quot;scaling만으로 됨&quot;)의 논쟁에 대해 TransRetrieval은 &quot;field heterogeneity를 명시적으로 다루면 scaling 가능&quot;이라는 세 번째 답을 내놓는다. 그리고 revenue +2.53%가 <strong>동일한 지연</strong> 조건에서 나왔다는 점에서 강한 프로덕션 진술이다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">../radar.md</a> 이번 달 신규 절에 TransRetrieval 엔트리를 추가했다.</p></div>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">왜 주목</span> <a href="radar.html#%EC%B6%94%EC%B2%9C-%EB%AA%A8%EB%8D%B8-%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81-%EB%B2%95%EC%B9%99--%ED%9A%8C%EC%82%AC%EB%B3%84-%EB%8F%85%EB%A6%BD-%ED%99%95%EC%9D%B8%EC%9D%B4-%EC%8C%93%EC%9D%B4%EB%8A%94-%EC%A4%91">스케일링 법칙 스레드</a>에 Alibaba와 Alimama의 첫 진술이 추가된다. 이전에는 Meta HSTU·Wukong·LLaTTE와 Netflix FM으로 회사가 2개였는데, 이제 세 번째 회사인 Alibaba 광고 라인이 들어왔다. 특히 retrieval 스택에 스케일링을 적용했다는 진술이라는 점이 특이하다. 대부분의 회사는 rank 스택에서 시작했기 때문이다.</p></div>
+<p>LLaTTE의 &quot;semantic feature 없으면 스케일링 안 됨&quot;과 HSTU의 &quot;scaling만으로 됨&quot; 사이에는 논쟁이 있다. 이 논쟁에 TransRetrieval은 &quot;field heterogeneity를 명시적으로 다루면 scaling 가능&quot;이라는 세 번째 답을 내놓는다. 그리고 revenue +2.53%가 동일한 지연 조건에서 나왔다는 점에서 강한 프로덕션 진술이다.</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 이번 달 신규 절에 TransRetrieval 엔트리를 추가했다.</p></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
-<h2 id="4-swim-kuaishou-메인-피드-재순위-evaluator-레이더"><span class="num">4</span>SWIM: Kuaishou 메인 피드 재순위 evaluator (레이더)</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.25104" target="_blank" rel="noopener">SWIM: Step-Wise Integrated Measure for Session-supervised List Evaluation in Generative Re-ranking — arXiv 2608.25104</a>: 2026-08-25 제출이다. 저자는 9명으로, Kuaishou Technology(Beijing) 6명(Chenghao Zhang, Chao Feng, Xunyong Yang, Xiang Li, Yongqi Liu, Kaiqiao Zhan)에 USTC 2명(Yuanhao Pu, Defu Lian)과 Kun Gai(Unaffiliated)가 함께한다. affiliation은 <a href="https://arxiv.org/html/2608.25104v1" target="_blank" rel="noopener">HTML v1</a>에서 확인했다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 오늘날의 산업 추천 시스템은 재순위(re-ranking) 단계에서 Generator-Evaluator (G-E) 아키텍처를 널리 채택하고 있다. Generator가 후보 리스트를 여러 개 만들면 Evaluator가 그 리스트들을 채점해 가장 좋은 리스트를 고르는 구조다. Kuaishou 같은 short-video 앱에서는 유저가 한 세션 안에서 여러 번 요청을 던지며 상호작용을 이어 가는데, 종전 Evaluator는 리스트 하나에 대한 단일 요청 metric(예: expected watch time)만 최적화해서 세션 전체의 관점을 놓친다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<h2 id="4-재순위-리스트를-세션-단위로-채점하는-swim이-kuaishou-메인-피드에-배포됐다--레이더kuaishou"><span class="num">4</span>재순위 리스트를 세션 단위로 채점하는 SWIM이 Kuaishou 메인 피드에 배포됐다 — 레이더(Kuaishou)</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.25104" target="_blank" rel="noopener">SWIM: Step-Wise Integrated Measure for Session-supervised List Evaluation in Generative Re-ranking — arXiv 2608.25104</a> — arXiv, 2026-08-25 제출, 논문. 저자는 9명이고, affiliation은 <a href="https://arxiv.org/html/2608.25104v1" target="_blank" rel="noopener">HTML v1</a>에서 확인했다.</p></div>
 <ul>
-<li><strong>SWIM</strong>은 유저 행동을 finite-horizon prefix session-level survival process로 모델링한다 <span class="badge ok">확인</span></li>
-<li>현재 리스트가 세션 목표에 얼마나 기여하는지를 (a) recursive survival distribution과 (b) reached-position conditional rewards로 factorize한다 <span class="badge ok">확인</span></li>
-<li><strong>Kuaishou 메인 피드의 재순위에 프로덕션 배포됐다</strong> <span class="badge ok">확인</span>:</li>
+<li>Kuaishou Technology(Beijing) 6명: Chenghao Zhang, Chao Feng, Xunyong Yang, Xiang Li, Yongqi Liu, Kaiqiao Zhan</li>
+<li>USTC 2명: Yuanhao Pu, Defu Lian</li>
+<li>Kun Gai(Unaffiliated)</li>
+</ul>
+<div class="blk ctx"><p><span class="lbl">배경</span> 오늘날의 산업 추천 시스템은 재순위(re-ranking) 단계에서 Generator-Evaluator (G-E) 아키텍처를 널리 채택하고 있다. Generator가 후보 리스트를 여러 개 만들면, Evaluator가 그 리스트들을 채점해 가장 좋은 리스트를 고르는 구조다. Kuaishou 같은 short-video 앱에서는 유저가 한 세션 안에서 여러 번 요청을 던지며 상호작용을 이어 간다. 그런데 종전 Evaluator는 리스트 하나에 대한 단일 요청 metric(예: expected watch time)만 최적화해서 세션 전체의 관점을 놓친다. 이번 논문의 SWIM은 현재 리스트가 세션 목표에 얼마나 기여하는지로 리스트를 채점하는 Evaluator다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">SWIM은 세션 단위 survival process로 리스트를 채점하고, Kuaishou 메인 피드에 배포됐다</span></p></div>
+<ul>
+<li>SWIM은 유저 행동을 finite-horizon prefix session-level survival process로 모델링한다 <span class="badge ok">확인</span>.</li>
+<li>현재 리스트가 세션 목표에 얼마나 기여하는지를 recursive survival distribution과 reached-position conditional rewards로 factorize한다 <span class="badge ok">확인</span>.</li>
+<li>Kuaishou 메인 피드의 재순위에 프로덕션 배포됐다 <span class="badge ok">확인</span>.</li>
 </ul>
 <blockquote>
 <p>&quot;Kuaishou short-video application (&gt;400M DAU, &gt;2 hours average daily engagement) ... 7 days, 5% traffic allocation&quot;
 — <a href="https://arxiv.org/html/2608.25104v1" target="_blank" rel="noopener">SWIM HTML</a>, 2026-08-25</p>
 </blockquote>
 <ul>
-<li><strong>정확한 수치:</strong> App stay time +0.351% (95% CI [0.27%, 0.42%]), 7-day retention +0.048% (CI [0.01%, 0.09%])다 <span class="badge ok">확인</span></li>
+<li>정확한 수치는 아래와 같다 <span class="badge ok">확인</span>.<ul>
+<li>App stay time +0.351% (95% CI [0.27%, 0.42%])</li>
+<li>7-day retention +0.048% (CI [0.01%, 0.09%])</li>
+</ul>
+</li>
 <li>배포 방식은 이전 evaluator인 CAVE를 SWIM으로 교체하는 것이고, upstream의 retrieval과 generator는 그대로 유지한다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">왜 주목</span> Kuaishou가 이번 달에만 내놓은 <strong>네 번째 프로덕션 추천 논문</strong>이다(HD-Rec, PushDualGen, DrEM에 이어진다). 이번에는 <strong>G-E 아키텍처의 evaluator 자체</strong>를 세션 단위 survival process로 재설계했는데, SID·CoT 논쟁이나 pxtr noise 논쟁과는 다른 축이다. Kuaishou 인프라 팀이 재순위 evaluator 문헌을 스택 전체에 걸쳐 재검토하고 있다는 신호로 보인다 <span class="badge est">추정</span>. 다만 app stay 개선폭이 +0.351%로, 이번 달의 다른 Kuaishou 진술(예: DrEM App Stay Time +0.116%)에 비하면 큰 편이다. evaluator 수준의 개입이 downstream metric에 미치는 여지를 명시적으로 크게 잡은 셈이다.</p></div>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">../radar.md</a> 이번 달 신규 절에 SWIM 엔트리를 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">왜 주목</span> SWIM은 Kuaishou가 이번 달에만 내놓은 네 번째 프로덕션 추천 논문이다. 앞선 셋은 HD-Rec, PushDualGen, DrEM이다. 이번에는 G-E 아키텍처의 evaluator 자체를 세션 단위 survival process로 재설계했다. 이는 SID(semantic ID)·CoT 논쟁이나 pxtr noise 논쟁과는 다른 축이다. Kuaishou 인프라 팀이 재순위 evaluator 문헌을 스택 전체에 걸쳐 재검토하고 있다는 신호로 보인다 <span class="badge est">추정</span>. 다만 app stay 개선폭이 +0.351%로, 이번 달의 다른 Kuaishou 진술(예: DrEM App Stay Time +0.116%)에 비하면 큰 편이다. evaluator 수준의 개입이 downstream metric에 미치는 여지를 명시적으로 크게 잡은 셈이다.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 이번 달 신규 절에 SWIM 엔트리를 추가했다.</p></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="레이더">레이더</h2>
-<p><code>radar.md</code>의 이번 달 신규 절에 AMBER(Meta), TransRetrieval(Alibaba Alimama), SWIM(Kuaishou) 3건을 추가했다. 관찰 스레드로는 (a) LLM-native 랭킹의 확산에 Meta AMBER 유형(입력 인코더)의 각도가 더해졌고, (b) 추천 모델 스케일링 법칙에 Alibaba 광고 라인의 첫 진술이 추가됐다(세 번째 회사다).</p>
+<p>arXiv cs.IR 30건을 triage해서 3건이 통과했고, 관찰 스레드 두 곳에 새 근거가 붙었다.</p>
+<ul>
+<li><code>radar.md</code>의 이번 달 신규 절에 AMBER(Meta), TransRetrieval(Alibaba Alimama), SWIM(Kuaishou) 3건을 추가했다.</li>
+<li>LLM-native 랭킹의 확산 스레드에 Meta AMBER 유형(입력 인코더)의 각도가 더해졌다.</li>
+<li>추천 모델 스케일링 법칙 스레드에 Alibaba 광고 라인의 첫 진술이 추가됐다. 세 번째 회사다.</li>
+</ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li><strong>4세대+9의 열린 질문:</strong> ThrottledD2HArrayHandler의 프로덕션 <code>save_concurrent_gb</code> 튜닝 값과 저장 시간 증가폭은 얼마인지, <code>load_checkpoint_streamed</code>가 어떤 조건에서 <code>load_checkpoint</code>(v1)를 대체하는지(기본 restore는 아직 v1을 유지한다), warm_start_staging_spec이 처음 활성화되는 config는 무엇인지(flagship에 이미 반영됐는지), Manhattan reply_ranking의 monotone-only write가 실제 label flap 관측을 뒤집는 데이터가 있는지, VF media fallback cache를 제거한 뒤 TES 실패 시 media feature가 실제로 fail-close되는 비율은 얼마인지, <code>ADS_PIXEL_FIRE</code>와 <code>ADS_LONG_DWELL_AND_PIXEL_FIRE</code>의 학습·서빙 배선은 어떻게 되는지(아직 recsys_model.py에는 등장하지 않는다), <code>conv_asset_ids</code>의 실제 소비자는 누구인지, <code>use_history_segment_ids</code>가 언제 프로덕션으로 승격되는지를 확인해야 한다.</li>
-<li><strong>AMBER의 A/B 수치</strong>: abstract에도 HTML에도 online lift가 명시돼 있지 않다. 후속 블로그나 논문 개정판에서 나오는지 지켜본다.</li>
-<li><strong>TransRetrieval과 Alimama 광고</strong>를 뒤이어 다른 회사가 재현하는지 본다. 세 번째 회사의 retrieval 스택 스케일링 진술이 나오면 <a href="embedding-retrieval.html"><code>topics/embedding-retrieval.md</code></a> 절로 승격할지 검토한다.</li>
+<li>4세대+9에서 남은 열린 질문을 확인한다.<ul>
+<li>ThrottledD2HArrayHandler의 프로덕션 <code>save_concurrent_gb</code> 튜닝 값과 저장 시간 증가폭은 얼마인가.</li>
+<li><code>load_checkpoint_streamed</code>가 어떤 조건에서 <code>load_checkpoint</code>(v1)를 대체하는가. 기본 restore는 아직 v1을 유지한다.</li>
+<li>warm_start_staging_spec이 처음 활성화되는 config는 무엇이고, flagship에 이미 반영됐는가.</li>
+<li>Manhattan reply_ranking의 monotone-only write가 실제 label flap 관측을 뒤집는 데이터가 있는가.</li>
+<li>VF media fallback cache를 제거한 뒤 TES 실패 시 media feature가 실제로 fail-close되는 비율은 얼마인가.</li>
+<li><code>ADS_PIXEL_FIRE</code>와 <code>ADS_LONG_DWELL_AND_PIXEL_FIRE</code>의 학습·서빙 연결은 어떻게 되는가. 아직 recsys_model.py에는 등장하지 않는다.</li>
+<li><code>conv_asset_ids</code>의 실제 소비자는 누구인가.</li>
+<li><code>use_history_segment_ids</code>는 언제 프로덕션으로 승격되는가.</li>
+</ul>
+</li>
+<li>AMBER의 A/B 수치가 후속 블로그나 논문 개정판에서 나오는지 지켜본다 — abstract에도 HTML에도 online lift가 명시돼 있지 않다.</li>
+<li>TransRetrieval과 Alimama 광고를 뒤이어 다른 회사가 재현하는지 본다 — 세 번째 회사의 retrieval 스택 스케일링 진술이 나오면 <a href="embedding-retrieval.html"><code>topics/embedding-retrieval.md</code></a> 절로 승격할지 검토한다.</li>
 </ul></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 

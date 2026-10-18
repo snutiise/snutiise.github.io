@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-26 — feed-research</title>
-<meta name="description" content="한 줄: X VF 하이드레이션 스택이 하루 만에 다시 뒤집혔다 — 어제(4세대+28)까지 유지되던 predicate 별 hydrator 함수 계층이 통째로 삭제되고, Hydrator enum(7→17 variant)·NodeSpec 데이터…">
+<meta name="description" content="한 줄: X가 노출 판정 서비스(VF)의 데이터 조회 단계를 하루 만에 다시 썼다. 데이터 종류마다 두던 조회 함수를 지우고 데이터 테이블과 스케줄러로 옮겼다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-26.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-26 — feed-research">
-<meta property="og:description" content="한 줄: X VF 하이드레이션 스택이 하루 만에 다시 뒤집혔다 — 어제(4세대+28)까지 유지되던 predicate 별 hydrator 함수 계층이 통째로 삭제되고, Hydrator enum(7→17 variant)·NodeSpec 데이터…">
+<meta property="og:description" content="한 줄: X가 노출 판정 서비스(VF)의 데이터 조회 단계를 하루 만에 다시 썼다. 데이터 종류마다 두던 조회 함수를 지우고 데이터 테이블과 스케줄러로 옮겼다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-26.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,21 +42,42 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>토요일</li>
-<li><span class="meta-k">읽는 시간</span>27분</li>
+<li><span class="meta-k">읽는 시간</span>31분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
-<div class="lead"><span class="lb">한 줄 요약</span>X VF 하이드레이션 스택이 하루 만에 다시 뒤집혔다 — 어제(4세대+28)까지 유지되던 predicate 별 hydrator 함수 계층이 통째로 삭제되고, <code>Hydrator</code> enum(7→17 variant)·<code>NodeSpec</code> 데이터 테이블·<code>HydrationPlan</code>·<code>execute.rs</code>(FuturesUnordered 스케줄러) 3계층의 데이터 기반 실행 파이프라인으로 이관됐다.</div>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 노출 판정 서비스(VF)의 데이터 조회 단계를 하루 만에 다시 썼다. 데이터 종류마다 두던 조회 함수를 지우고 데이터 테이블과 스케줄러로 옮겼다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-x-4세대29--vf-hydration-데이터-기반-재작성--about-this-account-클라이언트-신설--rulesgolden_corpus-15개-파일-분할--region-카탈로그-배선--x"><span class="num">1</span>X 4세대+29 — VF hydration 데이터 기반 재작성 + About This Account 클라이언트 신설 + rules/golden_corpus 15개 파일 분할 + Region 카탈로그 배선 — X</a></li><li><a href="#2-onetrans-v2--산업-recommender의-retrievalpre-rankfine-rank-캐스케이드를-단일-transformer로-통합-gmv-974throughput-32--레이더"><span class="num">2</span>OneTrans-V2 — 산업 recommender의 retrieval·pre-rank·fine-rank 캐스케이드를 단일 Transformer로 통합, GMV +9.74%·throughput 3.2× — 레이더</a></li><li><a href="#산업-블로그-훑기-결과--오늘토요일-대상-아님">산업 블로그 훑기 결과 — 오늘(토요일) 대상 아님</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-vf가-판정용-데이터-조회를-데이터-테이블과-스케줄러로-다시-썼다--x"><span class="num">1</span>VF가 판정용 데이터 조회를 데이터 테이블과 스케줄러로 다시 썼다 — X</a></li><li><a href="#2-onetrans-v2가-추천-캐스케이드-세-단계를-transformer-하나로-합쳤다--레이더"><span class="num">2</span>OneTrans-V2가 추천 캐스케이드 세 단계를 Transformer 하나로 합쳤다 — 레이더</a></li><li><a href="#산업-블로그는-오늘토요일-훑는-대상이-아니다">산업 블로그는 오늘(토요일) 훑는 대상이 아니다</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-x-4세대29--vf-hydration-데이터-기반-재작성--about-this-account-클라이언트-신설--rulesgolden_corpus-15개-파일-분할--region-카탈로그-배선--x"><span class="num">1</span>X 4세대+29 — VF hydration 데이터 기반 재작성 + About This Account 클라이언트 신설 + rules/golden_corpus 15개 파일 분할 + Region 카탈로그 배선 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/bf7db1becb6590152fba79b8c3bf0555752f7b14" target="_blank" rel="noopener">xai-org/x-algorithm@bf7db1b</a> — 2026-09-25 UTC 01:56, 87 files, +7,780/−5,759.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 어제(4세대+28)까지 X는 visibility-filtering(VF, 후보의 노출 가능성을 판정하는 서비스)의 하이드레이션(hydration — 판정에 필요한 원본 데이터를 backend service에서 배치로 조회해 채우는 단계)을 <strong>rule/predicate가 자기가 필요한 hydrator 집합을 <code>const fn hydrators()</code>로 선언 → <code>RuleEngine::hydrators_for(safety_level)</code>가 active rule set으로 조사 → <code>Hydrators</code> bitset union → 각 hydrator variant마다 별도 함수/파일</strong>로 실행하는 구조로 갖고 있었다. 어제 열린 <code>conversation_control_hydrator.rs</code>(310줄)가 그 관행의 정점이었다.</p></div>
-<p>오늘 커밋은 그 관행을 뿌리째 갈아엎었다. hydrator 함수 파일들(<code>conversation_control_hydrator.rs</code>·<code>exclusive_content_hydrator.rs</code>·<code>socialgraph_hydrator.rs</code>)이 통째로 삭제되고, <code>hydration/mod.rs</code>도 787줄이 잘려나가 169줄만 남았다. 자리에 <strong><code>plan.rs</code>(471줄 신규)·<code>execute.rs</code>(1,280줄 신규)·<code>sources.rs</code>(445줄 신규)</strong> 3파일이 들어갔다. 하이드레이션이 이제 데이터 테이블과 스케줄러로 표현된다.</p>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<p>오늘 함께 본 다른 변화는 다음과 같다.</p>
 <ul>
-<li><p><strong><code>Hydrator</code> enum이 7 → 17 variant로 확장</strong> <span class="badge ok">확인</span> — 어제 목록에 없던 10개가 이번에 배선됐다. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs:44-62</code></a>. variant 목록:</p>
+<li>같은 X 커밋에서 VF가 뷰어의 국가를 About This Account 데이터에서 직접 조회하게 됐다.</li>
+<li>같은 커밋에서 규칙 골든 테스트가 정책 카테고리별 15개 파일로 나뉘고, 국가 코드를 9개 지역으로 묶는 카탈로그가 생겼다.</li>
+<li>OneTrans-V2는 추천 캐스케이드 세 단계를 Transformer 하나로 합쳐 프로덕션 A/B에서 GMV +9.74%, 처리량 3.2×를 보고했다.</li>
+</ul>
+<h2 id="1-vf가-판정용-데이터-조회를-데이터-테이블과-스케줄러로-다시-썼다--x"><span class="num">1</span>VF가 판정용 데이터 조회를 데이터 테이블과 스케줄러로 다시 썼다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/bf7db1becb6590152fba79b8c3bf0555752f7b14" target="_blank" rel="noopener">xai-org/x-algorithm@bf7db1b</a> — xai-org/x-algorithm 공개 저장소, 2026-09-25 UTC 01:56, 커밋. 바뀐 파일은 87개이고, 줄 수는 +7,780/−5,759다. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+29다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> visibility-filtering(VF)은 후보의 노출 가능성을 판정하는 서비스다. 하이드레이션(hydration)은 판정에 필요한 원본 데이터를 backend service에서 배치로 조회해 채우는 단계이고, 데이터 종류마다 조회를 맡는 단위를 hydrator라고 부른다. 2026-09-24 커밋(4세대+28)까지 VF는 규칙이 자기에게 필요한 hydrator를 스스로 선언하고, hydrator variant마다 따로 둔 함수로 이 단계를 실행했다. 이번 커밋은 그 함수 계층을 뿌리째 걷어 내고, 하이드레이션을 데이터 테이블과 스케줄러로 표현하도록 다시 썼다.</p></div>
+<ul>
+<li>어제(4세대+28)까지의 구조는 다음 순서로 돌았다.<ul>
+<li>rule/predicate가 자기에게 필요한 hydrator 집합을 <code>const fn hydrators()</code>로 선언한다.</li>
+<li><code>RuleEngine::hydrators_for(safety_level)</code>가 active rule set을 조사한다.</li>
+<li>그 결과를 <code>Hydrators</code> bitset으로 union한다.</li>
+<li>hydrator variant마다 별도 함수/파일로 실행한다.</li>
+</ul>
+</li>
+<li>어제 열린 <code>conversation_control_hydrator.rs</code>(310줄)가 이 방식의 정점이었다.</li>
+<li>이번 커밋에서 hydrator 함수 파일들(<code>conversation_control_hydrator.rs</code>·<code>exclusive_content_hydrator.rs</code>·<code>socialgraph_hydrator.rs</code>)은 파일 전체가 삭제됐다. <code>hydration/mod.rs</code>도 787줄이 잘려 169줄만 남았다.</li>
+<li>그 자리에 <code>plan.rs</code>(471줄 신규)·<code>execute.rs</code>(1,280줄 신규)·<code>sources.rs</code>(445줄 신규) 3파일이 들어갔다.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. hydrator 종류가 늘었고, 각 종류는 함수 대신 표의 한 행으로 등록된다</span></p></div>
+<ul>
+<li><p>hydrator의 종류가 7 → 17 variant로 늘었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs:44-62</code></a>.</p>
+<ul>
+<li><p>종류를 나열한 enum은 <code>Hydrator</code>이고, 어제 목록에 없던 10개가 이번에 연결됐다.</p>
+</li>
+<li><p>아래 코드 블록이 variant 목록이다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub enum Hydrator {
     PureCore, Tweet, ConversationControl,          // TES 계열
     TweetSafetyLabels,                              // safety_label
@@ -69,90 +90,250 @@
     ViewerCountry,                                  // about_this_account (신규 클라이언트)
 }
 </code></pre></figure>
-<p>각 variant마다 별도 함수가 있는 게 아니라 하나의 <code>NodeSpec { source, part, key, label }</code> 테이블에 등록된다. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:32-45</code></a>.</p>
 </li>
-<li><p><strong><code>NodeSpec</code>이 각 hydrator를 4-축 데이터로 표현</strong> <span class="badge ok">확인</span> — <code>Source</code>(어느 backend에 호출), <code>Part</code>(백엔드 안에서 무엇 — 컬럼·필드셋·edge query), <code>KeyOrigin</code>(입력 키가 어디서 오는지 — 요청 tweet id, viewer id, PureCore가 채워준 author id 등), <code>label</code>(client·method 문자열 쌍, 메트릭용). 예를 들어 <code>Hydrator::AuthorSafety</code>는 <code>NodeSpec { source: GizmoduckAuthor, part: Fields([SAFETY]), key: PureCoreAuthor, label: (&quot;gizmoduck&quot;, &quot;get_users&quot;) }</code>이다. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:82-192</code></a>.</p>
+</ul>
 </li>
-<li><p><strong><code>HydrationPlan</code>이 요청된 hydrator 집합을 RPC 그룹으로 자동 병합</strong> <span class="badge ok">확인</span> — <code>HydrationPlan::new(level, hydrators)</code>가 요청된 hydrator를 <code>(source, input)</code> 쌍으로 그룹핑해서 같은 backend·같은 입력 dependency를 갖는 hydrator들이 <strong>한 번의 RPC</strong>로 묶이도록 계획한다. 같은 source여도 dependency(예: pure_core가 필요한 것 vs 요청에 이미 있는 것)가 다르면 다른 그룹이 된다. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:274-305</code></a>.</p>
-<p>예를 들어 <code>Hydrator::AuthorSafety</code>(SAFETY 필드)와 <code>Hydrator::AuthorLabels</code>(LABELS 필드)는 둘 다 <code>GizmoduckAuthor</code> source에 <code>PureCoreAuthor</code> 입력을 요구하므로 한 그룹이 되고, <code>Group::fields()</code>가 두 필드 집합을 합집합으로 만들어 <code>gizmoduck.get_users(fields=[SAFETY|LABELS])</code> 한 번으로 처리된다. <code>Follows·Blocks·Mutes·MuteRetweets</code>도 모두 <code>Flock</code>+<code>PureCoreAuthor</code>+forward이므로 한 번의 <code>socialgraph/batch_check_relationships</code> 호출로 묶인다. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:316-353</code></a>.</p>
+<li><p>각 variant마다 별도 함수가 있는 것이 아니라, 하나의 테이블에 한 행으로 등록된다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:32-45</code></a>.</p>
+<ul>
+<li>테이블의 행 형식은 <code>NodeSpec { source, part, key, label }</code>이다.</li>
+</ul>
 </li>
-<li><p><strong>plan이 SafetyLevel별로 결정되고 골든 테스트에 pin된다</strong> <span class="badge ok">확인</span> — <code>RuleEngine::plan(level)</code>이 각 SafetyLevel마다 만드는 계획을 5-safety-level 골든 문자열로 잠근다. <code>filter_all</code>은 1 call, <code>timeline_home</code>은 7 calls, <code>timeline_home_recommendations</code>도 7 calls, <code>timeline_home_hydration</code>은 10 calls, <code>immersive_expanded_recommendations</code>는 7 calls로 고정. 각 계획이 어느 client·method를 어느 input에 대해 어느 hydrator 노드로 실행하는지, viewer가 필요해서 logged-out에서 스킵되는지까지 문자열에 박혀 있다. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:422-460</code></a>.</p>
+<li><p>테이블의 한 행(<code>NodeSpec</code>)은 hydrator 하나를 4개 축의 데이터로 표현한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:82-192</code></a>.</p>
+<ul>
+<li><code>Source</code>는 어느 backend를 호출하는지다.</li>
+<li><code>Part</code>는 백엔드 안에서 무엇을 가져오는지다. 컬럼, 필드셋, edge query가 여기에 해당한다.</li>
+<li><code>KeyOrigin</code>은 입력 키가 어디서 오는지다. 요청 tweet id, viewer id, PureCore(트윗 코어 메타)가 채워 준 author id 등이 있다.</li>
+<li><code>label</code>은 메트릭용 client·method 문자열 쌍이다.</li>
+<li>예를 들어 <code>Hydrator::AuthorSafety</code>는 <code>NodeSpec { source: GizmoduckAuthor, part: Fields([SAFETY]), key: PureCoreAuthor, label: (&quot;gizmoduck&quot;, &quot;get_users&quot;) }</code>이다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 같은 백엔드에 같은 입력으로 가는 조회는 RPC 한 번으로 자동 병합된다</span></p></div>
+<ul>
+<li>요청된 hydrator 가운데 backend와 입력 dependency가 같은 것들은 한 번의 RPC로 묶이도록 계획된다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:274-305</code></a>.<ul>
+<li>계획은 <code>HydrationPlan</code>이 세운다. <code>HydrationPlan::new(level, hydrators)</code>가 요청된 hydrator를 <code>(source, input)</code> 쌍으로 그룹핑한다.</li>
+<li>같은 source여도 dependency가 다르면 다른 그룹이 된다. pure_core가 필요한 것과 요청에 이미 있는 것이 그런 경우다.</li>
+</ul>
+</li>
+<li>예를 들어 gizmoduck(X의 유저 정보 서비스)에서 가져오는 작성자의 SAFETY 필드와 LABELS 필드는 호출 한 번으로 함께 조회된다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:316-353</code></a>.<ul>
+<li><code>Hydrator::AuthorSafety</code>(SAFETY 필드)와 <code>Hydrator::AuthorLabels</code>(LABELS 필드)는 둘 다 <code>GizmoduckAuthor</code> source에 <code>PureCoreAuthor</code> 입력을 요구하므로 한 그룹이 된다.</li>
+<li><code>Group::fields()</code>가 두 필드 집합의 합집합을 만들어, <code>gizmoduck.get_users(fields=[SAFETY|LABELS])</code> 한 번으로 처리한다.</li>
+<li><code>Follows·Blocks·Mutes·MuteRetweets</code>도 모두 <code>Flock</code> source, <code>PureCoreAuthor</code> 입력, forward 방향이 같으므로 한 번의 <code>socialgraph/batch_check_relationships</code> 호출로 묶인다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. 지면별 조회 계획이 골든 테스트로 고정된다</span></p></div>
+<ul>
+<li><p>조회 계획은 SafetyLevel(지면별 정책 묶음)마다 정해지고, 골든 테스트가 그 계획을 문자열로 고정한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:422-460</code></a>.</p>
+<ul>
+<li><code>RuleEngine::plan(level)</code>이 SafetyLevel마다 만드는 계획을 5-safety-level 골든 문자열로 잠근다.</li>
+<li>SafetyLevel별 호출 수가 다음처럼 고정돼 있다.<ul>
+<li><code>filter_all</code>: 1 call</li>
+<li><code>timeline_home</code>: 7 calls</li>
+<li><code>timeline_home_recommendations</code>: 7 calls</li>
+<li><code>timeline_home_hydration</code>: 10 calls</li>
+<li><code>immersive_expanded_recommendations</code>: 7 calls</li>
+</ul>
+</li>
+<li>문자열에는 계획마다 어느 client·method를 어느 input에 대해 어느 hydrator 노드로 실행하는지가 적혀 있다. viewer가 필요해서 logged-out에서 건너뛰는지까지 들어 있다.</li>
+</ul>
 <blockquote>
 <p>&quot;filter_all: 1 calls\n tes/get_tweet_core_datas after: - nodes: pure_core\n timeline_home_hydration: 10 calls\n tes/get_tweet_core_datas after: - nodes: pure_core\n tes/get_tweets_for_visibility after: - nodes: tweet\n conversation_control/get_conversation_controls after: - nodes: conversation_control\n safety_labels/get after: - nodes: tweet_safety_labels\n gizmoduck/get_viewer_data after: - nodes: viewer_profile fields: ACCOUNT|EXTENDED_PROFILE|SAFETY (skipped logged out)\n gizmoduck/get_users after: pure_core nodes: author_safety fields: SAFETY|LABELS\n blocked_by/batch_check_blocked_by after: pure_core nodes: blocked_by_author,blocked_by_reply_root blocks-rev[author,reply_root] (skipped logged out)\n exclusive_content/batch_check_super_follows after: tweet nodes: super_follows_exclusive super_follows-fwd[exclusive_author] (skipped logged out)\n conversation_control/batch_check_followed_by+batch_check_super_follows after: conversation_control nodes: root_follows_viewer,super_follows_root follows-rev[root:Community|MyNetwork] super_follows-fwd[root:Subscribers] (skipped logged out)\n conversation_control/tfe_top_country after: conversation_control nodes: viewer_country (skipped logged out)&quot;
 — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/plan.rs:422-451</code></a></p>
 </blockquote>
-<p>즉 <code>timeline_home_hydration</code>은 (1) tes/get_tweet_core_datas와 tes/get_tweets_for_visibility·conversation_control·safety_labels·gizmoduck/get_viewer_data 다섯 개는 요청 tweet id·viewer id만으로 즉시 시작, (2) gizmoduck/get_users(author_safety+labels)와 blocked_by는 pure_core가 채운 author id에 dependent, (3) exclusive_content는 tweet id에 dependent, (4) conversation_control 하위(followed_by+super_follows)와 tfe_top_country는 conversation_control 결과에 dependent 하는 4단계 그래프를 서비스가 자체적으로 인식한다.</p>
-</li>
-<li><p><strong><code>execute.rs</code>가 FuturesUnordered로 dependency graph를 스케줄</strong> <span class="badge ok">확인</span> — 스케줄링 알고리즘은 다음과 같다. <code>ready</code> 큐를 <code>input.is_none()</code>인 그룹(외부 dependency 없음)으로 초기화 → 각 ready 그룹의 RPC를 spawn해서 <code>running</code> FuturesUnordered에 push → 어느 하나가 완료되면 그 결과를 <code>Store</code>에 저장 → <code>waiting_on(group)</code>으로 이 그룹을 기다리던 하위 그룹을 다시 ready로 승격 → 반복. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/execute.rs" target="_blank" rel="noopener"><code>execute.rs:80-100</code></a>.</p>
-</li>
-<li><p><strong><code>about_this_account_client.rs</code> 신규 클라이언트 배선(166줄)</strong> <span class="badge ok">확인</span> — Strato 컬럼 <code>about_this_account/tfe_top_country.User</code>에서 유저의 weighted top country를 조회해 <code>ViewerCountry</code> hydrator에 공급한다. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/clients/about_this_account_client.rs" target="_blank" rel="noopener"><code>visibility-filtering/clients/about_this_account_client.rs:1-42</code></a>. 이 클라이언트 결과가 <code>conversation_control</code> allowed-list 판정의 country 필터에 쓰인다. &quot;About This Account&quot; 자체는 X 앱의 계정 프로필 하단 투명성 UI(계정 생성일·top country·이름 변경 이력을 보여 주는 뷰)이고, 그 데이터 원천을 VF가 직접 소비하게 됐다.</p>
-</li>
-<li><p><strong>rules 계층도 함께 재편</strong> <span class="badge ok">확인</span> — <code>visibility-filtering/rules/tweet_rules.rs</code> −575줄, <code>author_rules.rs</code> −160줄, <code>registry.rs</code> +226/−58, <code>rule_spec.rs</code> +141/−161. 어제 도입된 이원 Verdict 트리(Withheld/Shown) 구조는 유지되고, rule 카탈로그 자체가 데이터로 이관되는 방향이 이어진다. 세부는 추적 필요.</p>
-</li>
-<li><p><strong><code>rules/golden_corpus.rs</code> 1,493줄 단일 파일이 15개 파일로 분할</strong> <span class="badge ok">확인</span> — <code>age_gating.rs</code> 267줄·<code>author_state.rs</code> 119줄·<code>baseline.rs</code> 56줄·<code>builders.rs</code> 63줄·<code>conversation_control.rs</code> 257줄·<code>exclusive_content.rs</code> 61줄·<code>interstitial.rs</code> 334줄·<code>mod.rs</code> 173줄·<code>oon_media.rs</code> 218줄·<code>oon_tweet_label.rs</code> 133줄·<code>oon_user_label.rs</code> 234줄·<code>relationship.rs</code> 122줄·<code>takedown.rs</code> 224줄·<code>tweet_label.rs</code> 195줄·<code>tweet_state.rs</code> 90줄. 정책 카테고리별로 골든 케이스가 갈라졌다. <a href="https://github.com/xai-org/x-algorithm/tree/bf7db1be/visibility-filtering/rules/golden_corpus" target="_blank" rel="noopener"><code>visibility-filtering/rules/golden_corpus/</code></a>.</p>
-</li>
-<li><p><strong><code>models/region.rs</code> 신설(97줄)</strong> <span class="badge ok">확인</span> — ISO country code를 9개 지역(AFR·AUS·CAS·EAS·EUR·NAM·SAM·SAS·SEA)으로 매핑한다. 예를 들어 AFR은 AO·BF·BI·BJ·BW·CD 등 57개국, EUR은 AD·AL·AT 등 51개국, SEA는 BN·ID·KH·LA·MM·MY·PH·SG·TH·TL·VN 11개국. <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/models/region.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/region.rs:1-97</code></a>. 4세대+12(2026-09-01)의 NSFW 게이팅 16개국 목록이 국가 단위였다면, 이제 지역 단위의 rule도 표현 가능해진다.</p>
-</li>
-<li><p><strong>Phoenix proto에 34줄 신규 필드</strong> <span class="badge ok">확인</span> — <code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code>와 <code>phoenix/python/common/xai-proto/proto/recsys.proto</code> 양쪽에 동일한 34줄 추가(+58줄이 lib.rs에 붙음). 어떤 필드가 추가됐는지는 이번 배치에서 추적하지 않는다(후속 커밋에서 소비처가 나오면 그때 정본에 반영). Phoenix <code>transformer.py</code> +42/−5, <code>recsys_model.py</code> +5/−1.</p>
-</li>
-<li><p><strong>grox key-frame 파이프라인 정비</strong> <span class="badge ok">확인</span> — 새 파일 <code>frame_sampler.py</code>(124줄)와 <code>embedding_ranked_key_frames.py</code>(193줄)가 추가되고, <code>key_frames.py</code>가 −53/+14로 재편, <code>media_loader.py</code> +62/−34, <code>convo.py</code> +112/−61. 어제(4세대+28)까지 열렸던 32×32 grayscale scene-cut·shot midframe 파이프라인이 embedding 기반 랭킹으로 확장되는 것으로 보이지만 세부는 추적하지 않는다.</p>
-</li>
-<li><p><strong><code>home-mixer/filters/brazil_2026_election_filter.rs</code> +22/−2</strong> <span class="badge ok">확인</span> — 브라질 2026 선거 관련 계정 목록 하드코딩 필터(2026-08-14 커밋에서 신설)가 소량 업데이트됐다. 규제 근거는 브라질 선거법원(TSE) Electoral Resolution No. 23.610 Art. 28 §1º-A로 코드 주석에 명시되어 있다. 팔로잉 예외는 유지된다.</p>
-</li>
-<li><p><strong><code>under-the-hood/jetfuel/</code> — 관측 UI 신설(약 600줄)</strong> <span class="badge ok">확인</span> — <code>routes/index.tsx</code>·<code>report.tsx</code>·<code>download.tsx</code>·<code>_lib/{load,mock,report,ui}</code> 8파일이 추가됐다. 계정 단위 라벨 투명성 툴(4세대에서 파일럿으로 언급)의 프론트엔드 코드가 오픈된 것으로 보인다. 랭킹·retrieval 메커니즘과는 직결되지 않으므로 정본 반영은 하지 않는다.</p>
+<ul>
+<li>즉, 서비스는 <code>timeline_home_hydration</code>의 조회를 4단계 그래프로 스스로 인식한다.<ol>
+<li>다섯 개 조회는 요청 tweet id와 viewer id만으로 바로 시작한다. tes/get_tweet_core_datas와 tes/get_tweets_for_visibility·conversation_control·safety_labels·gizmoduck/get_viewer_data가 여기에 해당한다.</li>
+<li>gizmoduck/get_users(author_safety와 labels)와 blocked_by는 pure_core가 채운 author id에 의존한다.</li>
+<li>exclusive_content는 tweet id에 의존한다.</li>
+<li>conversation_control 하위 조회(followed_by와 super_follows)와 tfe_top_country는 conversation_control 결과에 의존한다. conversation control은 누가 답글을 달 수 있는지 정하는 X의 대화 설정이다.</li>
+</ol>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html"><code>services/x.md</code></a> — 4세대+29 절 신설, <code>## 출처</code>의 커밋 리스트에 <code>bf7db1b</code>(2026-09-25) 추가.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> VF hydration의 <strong>1일 반감기 리팩터링</strong>이 다시 확인된다. 2026-09-24 커밋(4세대+28)이 어제까지 유지되던 pattern(&quot;<code>RuleEngine::hydrators_for(safety_level)</code>로 active rule이 필요한 hydrator만 실행&quot;)을 도입했고, 그것을 오늘 커밋(4세대+29)이 데이터 테이블+FuturesUnordered 스케줄러로 <strong>다시</strong> 재작성했다. <code>conversation_control_hydrator.rs</code>(어제 신설, 310줄)의 수명은 24시간이다.</p></div>
-<p>이번 재작성의 실질적 의미는 세 가지다.</p>
-<p>첫째, <strong>hydration의 인터페이스가 함수에서 데이터로 이관됐다.</strong> 어제 구조는 rule마다 <code>hydrators()</code> 리스트를 선언하는 방식이었지만, 실행 자체는 여전히 함수 계층(hydrator variant마다 <code>.rs</code> 파일)이었다. 오늘은 실행도 데이터가 됐다 — <code>NodeSpec</code> 테이블 하나만 갖고 있으면 어느 hydrator 조합이 요청되든 스케줄러가 자동으로 RPC 그룹을 계획한다. rule을 추가할 때 hydrator 함수를 새로 쓸 필요가 없고 테이블에 한 줄을 더하면 된다.</p>
-<p>둘째, <strong>RPC 그룹 병합이 자동화됐다.</strong> 어제까지는 gizmoduck의 SAFETY 조회와 LABELS 조회가 서로 다른 hydrator 함수를 통과했다면, 오늘은 <code>Group::fields()</code>가 같은 source·같은 입력을 갖는 hydrator들의 필드 집합을 자동으로 합집합으로 만들어 한 번의 RPC로 묶는다. 이건 마이크로 최적화가 아니라 hydration 예산이 gizmoduck·socialgraph 같은 fan-out 서비스에 몰리는 X 구조에서 P99에 직접 영향을 준다.</p>
-<p>셋째, <strong><code>ViewerCountry</code> hydrator 배선으로 conversation-control country allowed-list가 hydration 예산에 정식 편입됐다.</strong> 이전 세대에서는 country 정보가 요청 컨텍스트에 실려 오는 것이었지만, 이제 <code>about_this_account/tfe_top_country.User</code> Strato 컬럼을 hydration이 직접 조회해서 채운다. About This Account 투명성 UI의 백엔드가 VF 판정 경로에 붙었다는 의미이며, 규제 대응(예: 국가별 콘텐츠 제한) 축이 hydration 계층에 정식으로 들어왔다.</p>
-<p><code>golden_corpus</code>가 15개 파일로 분할된 것은 (a) 정책 카테고리별로 코퍼스 오너십을 분리하고 (b) 어제 열린 이원 Verdict 트리에서 카테고리별 verdict 매트릭스를 독립적으로 잠글 수 있게 하는 준비 작업으로 읽힌다.</p>
-<h2 id="2-onetrans-v2--산업-recommender의-retrievalpre-rankfine-rank-캐스케이드를-단일-transformer로-통합-gmv-974throughput-32--레이더"><span class="num">2</span>OneTrans-V2 — 산업 recommender의 retrieval·pre-rank·fine-rank 캐스케이드를 단일 Transformer로 통합, GMV +9.74%·throughput 3.2× — 레이더</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.28589" target="_blank" rel="noopener">arXiv 2609.28589</a> — 2026-09-23 v1, &quot;OneTrans-V2: Unifying Retrieval, Pre-rank, and Fine-rank with One Transformer in Industrial Recommender&quot;. 저자 15인(Hannan Cao·Jun Guo·Haolei Pei 등), 소속은 arXiv 메타데이터에서 명시적으로 확인되지 않는다. HTML 판이 발행되지 않아 이메일 도메인이나 affiliation footnote를 직접 확인할 수 없고, Semantic Scholar API도 저자 affiliation을 반환하지 않는다(2026-09-26 확인). &quot;OneTrans&quot;라는 이름과 &quot;GMV&quot; 지표, MoE 백본 규모로 보아 e-commerce 플랫폼의 프로덕션 팀 자료로 판단 <span class="badge est">추정</span>.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 산업 추천 시스템은 대부분 (a) 후보 생성(retrieval)·(b) coarse ranking(pre-rank)·(c) fine ranking(fine-rank)의 3단 캐스케이드로 서빙되지만, 세 단계가 서로 다른 모델로 학습·서빙되기 때문에 유저 시퀀스 인코딩이 반복되고 단계 간 최적화가 격리되며 엔지니어링 중복이 발생한다. OneTrans(v1)는 model-level unification을 시도한 이전 자료로, 이번 V2는 그 위에 세 가지를 얹었다는 진술이다: (1) MoE 백본 확장, (2) DCGR(Decision-Conditioned Generative Retrieval)로 목표별 retrieval 채널을 하나의 generative 프로세스로 통합, (3) SNT(Sequence-Native Training)로 유저 lifelong 시퀀스 인코딩을 노출마다 amortize.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">D. 실행기는 그룹 하나가 끝날 때마다 그 결과를 기다리던 그룹을 이어서 실행한다</span></p></div>
 <ul>
-<li><p><strong>캐스케이드 3단계 모두를 하나의 Transformer로 통합</strong> <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2609.28589" target="_blank" rel="noopener">초록</a>. user behavior sequence를 shared context로 한 번만 인코딩하고 stage-specific candidate feature와 computation을 유지한다. Joint training으로 세 stage가 상호 강화되며 in-model knowledge distillation이 fine-rank에서 pre-rank로 흐른다.</p>
+<li>실행 단계는 그룹 사이의 dependency graph를 FuturesUnordered(여러 비동기 작업을 함께 돌리고 끝난 순서대로 결과를 받는 Rust 자료구조)로 스케줄한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/execute.rs" target="_blank" rel="noopener"><code>execute.rs:80-100</code></a>.<ul>
+<li>스케줄러는 <code>execute.rs</code>에 있으며, 다음 순서를 반복한다.<ul>
+<li>먼저 <code>ready</code> 큐를 <code>input.is_none()</code>인 그룹(외부 dependency가 없는 그룹)으로 초기화한다.</li>
+<li>각 ready 그룹의 RPC를 spawn해서 <code>running</code> FuturesUnordered에 넣는다.</li>
+<li>어느 하나가 끝나면 그 결과를 <code>Store</code>에 저장한다.</li>
+<li><code>waiting_on(group)</code>으로 이 그룹을 기다리던 하위 그룹을 다시 ready로 올린다.</li>
+</ul>
 </li>
-<li><p><strong>sparse MoE로 백본 확장, μP-style parameterization으로 스케일링 안정화</strong> <span class="badge ok">확인</span>. capacity를 bounded activated computation으로 늘리는 표준 recipe이지만, 산업 스택에서 μP 스타일 hyperparameter transfer를 명시적으로 채택한 첫 진술.</p>
+</ul>
 </li>
-<li><p><strong>DCGR (Decision-Conditioned Generative Retrieval)</strong> <span class="badge ok">확인</span> — decision prefix(다가올 상호작용의 유형을 서술하는 짧은 토큰)를 먼저 예측한 뒤 그 prefix에 조건화해서 아이템을 생성한다. 별도의 objective별 retrieval 채널을 여러 개 두는 대신 하나의 generative 프로세스로 통합하고 business objective가 decision prefix로 스티어링한다.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">E. 뷰어의 국가를 About This Account 데이터에서 직접 조회한다</span></p></div>
+<ul>
+<li>새 클라이언트가 유저의 weighted top country를 조회해 국가 hydrator에 공급한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/clients/about_this_account_client.rs" target="_blank" rel="noopener"><code>visibility-filtering/clients/about_this_account_client.rs:1-42</code></a>.<ul>
+<li>새 클라이언트는 <code>about_this_account_client.rs</code>(166줄)다.</li>
+<li>조회하는 곳은 Strato(X의 실시간 스토리지와 서비스 조회를 담당하는 레이어) 컬럼 <code>about_this_account/tfe_top_country.User</code>이고, 결과를 받는 hydrator는 <code>ViewerCountry</code>다.</li>
+<li>이 클라이언트 결과는 <code>conversation_control</code> allowed-list 판정의 country 필터에 쓰인다.</li>
+<li>&quot;About This Account&quot; 자체는 X 앱 계정 프로필 하단의 투명성 UI로, 계정 생성일·top country·이름 변경 이력을 보여 준다. 그 데이터 원천을 VF가 직접 소비하게 됐다.</li>
+</ul>
 </li>
-<li><p><strong>SNT (Sequence-Native Training)</strong> <span class="badge ok">확인</span> — 학습을 유저 lifelong behavior sequence 기준으로 조직해서 시퀀스 인코딩을 노출(exposure)마다 amortize. 유저 표현을 request마다 다시 계산하는 대신 세션·노출 축으로 재사용한다.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
+<ul>
+<li>VF의 rules 계층도 함께 재편됐다 <span class="badge ok">확인</span>.<ul>
+<li><code>visibility-filtering/rules/tweet_rules.rs</code> −575줄, <code>author_rules.rs</code> −160줄, <code>registry.rs</code> +226/−58, <code>rule_spec.rs</code> +141/−161이다.</li>
+<li>어제 도입된 이원 Verdict 트리(Withheld/Shown) 구조는 유지되고, rule 카탈로그 자체가 데이터로 옮겨 가는 방향이 이어진다. 세부는 더 추적해야 한다.</li>
+</ul>
 </li>
-<li><p><strong>프로덕션 A/B: GMV +9.74%, 3.2× throughput under same hardware budget</strong> <span class="badge ok">확인</span>.</p>
+<li>규칙의 골든 케이스를 모은 1,493줄짜리 단일 파일이 정책 카테고리별 15개 파일로 나뉘었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/bf7db1be/visibility-filtering/rules/golden_corpus" target="_blank" rel="noopener"><code>visibility-filtering/rules/golden_corpus/</code></a>.<ul>
+<li>원래 파일은 <code>rules/golden_corpus.rs</code>다.</li>
+<li>새 파일과 줄 수는 다음과 같다.<ul>
+<li><code>age_gating.rs</code> 267줄·<code>author_state.rs</code> 119줄·<code>baseline.rs</code> 56줄·<code>builders.rs</code> 63줄·<code>conversation_control.rs</code> 257줄</li>
+<li><code>exclusive_content.rs</code> 61줄·<code>interstitial.rs</code> 334줄·<code>mod.rs</code> 173줄·<code>oon_media.rs</code> 218줄·<code>oon_tweet_label.rs</code> 133줄</li>
+<li><code>oon_user_label.rs</code> 234줄·<code>relationship.rs</code> 122줄·<code>takedown.rs</code> 224줄·<code>tweet_label.rs</code> 195줄·<code>tweet_state.rs</code> 90줄</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>국가 코드를 지역 단위로 묶는 카탈로그가 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/models/region.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/region.rs:1-97</code></a>.<ul>
+<li>새 파일은 <code>models/region.rs</code>(97줄)이고, ISO country code를 9개 지역(AFR·AUS·CAS·EAS·EUR·NAM·SAM·SAS·SEA)으로 매핑한다.</li>
+<li>예를 들어 AFR은 AO·BF·BI·BJ·BW·CD 등 57개국, EUR은 AD·AL·AT 등 51개국, SEA는 BN·ID·KH·LA·MM·MY·PH·SG·TH·TL·VN 11개국이다.</li>
+<li>4세대+12(2026-09-01)의 NSFW 게이팅 16개국 목록이 국가 단위였다면, 이제 지역 단위의 rule도 표현할 수 있게 된다.</li>
+</ul>
+</li>
+<li>Phoenix(X의 Grok 기반 Transformer 랭커)의 proto에 34줄짜리 새 필드가 추가됐다 <span class="badge ok">확인</span>.<ul>
+<li><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code>와 <code>phoenix/python/common/xai-proto/proto/recsys.proto</code> 양쪽에 같은 34줄이 추가됐고, lib.rs에는 +58줄이 붙었다.</li>
+<li>어떤 필드가 추가됐는지는 이번 배치에서 추적하지 않는다. 후속 커밋에서 소비처가 나오면 그때 정본에 반영한다.</li>
+<li>Phoenix <code>transformer.py</code>는 +42/−5, <code>recsys_model.py</code>는 +5/−1이다.</li>
+</ul>
+</li>
+<li>grox(Grok 기반 nearline 분류기)의 key-frame 파이프라인이 정비됐다 <span class="badge ok">확인</span>.<ul>
+<li>새 파일 <code>frame_sampler.py</code>(124줄)와 <code>embedding_ranked_key_frames.py</code>(193줄)가 추가됐다.</li>
+<li><code>key_frames.py</code>는 −53/+14로 재편됐고, <code>media_loader.py</code>는 +62/−34, <code>convo.py</code>는 +112/−61이다.</li>
+<li>2026-09-24 커밋(4세대+28)까지 열렸던 32×32 grayscale scene-cut·shot midframe 파이프라인이 embedding 기반 랭킹으로 확장되는 것으로 보이지만, 세부는 추적하지 않는다.</li>
+</ul>
+</li>
+<li>home-mixer(For You 피드를 조립하는 서비스)에서 브라질 2026 선거 관련 계정 목록을 하드코딩한 필터가 소량 업데이트됐다 <span class="badge ok">확인</span>.<ul>
+<li>파일은 <code>home-mixer/filters/brazil_2026_election_filter.rs</code>(+22/−2)이고, 필터는 2026-08-14 커밋에서 신설됐다.</li>
+<li>코드 주석은 규제 근거로 브라질 선거법원(TSE) Electoral Resolution No. 23.610 Art. 28 §1º-A를 명시한다.</li>
+<li>팔로잉 예외는 유지된다.</li>
+</ul>
+</li>
+<li>관측 UI 코드(약 600줄)가 새로 추가됐다 <span class="badge ok">확인</span>.<ul>
+<li>위치는 <code>under-the-hood/jetfuel/</code>이고, <code>routes/index.tsx</code>·<code>report.tsx</code>·<code>download.tsx</code>·<code>_lib/{load,mock,report,ui}</code> 8파일이 추가됐다.</li>
+<li>계정 단위 라벨 투명성 툴(4세대에서 파일럿으로 언급)의 프론트엔드 코드가 오픈된 것으로 보인다.</li>
+<li>랭킹·retrieval 메커니즘과는 직결되지 않으므로 정본 반영은 하지 않는다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html"><code>services/x.md</code></a>에 4세대+29 절을 새로 만들고, <code>## 출처</code>의 커밋 리스트에 <code>bf7db1b</code>(2026-09-25)를 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> VF 하이드레이션 구조를 하루 만에 갈아엎는 1일 반감기 리팩터링이 다시 확인된다. 2026-09-24 커밋(4세대+28)은 어제까지 유지되던 pattern(&quot;<code>RuleEngine::hydrators_for(safety_level)</code>로 active rule이 필요한 hydrator만 실행&quot;)을 도입했다. 오늘 커밋(4세대+29)은 그것을 데이터 테이블과 FuturesUnordered 스케줄러로 다시 썼다. <code>conversation_control_hydrator.rs</code>(어제 신설, 310줄)의 수명은 24시간이다.</p></div>
+<p>이번 재작성의 실질적 의미는 세 가지다.</p>
+<ul>
+<li>첫째, hydration의 인터페이스가 함수에서 데이터로 옮겨 갔다.<ul>
+<li>어제 구조는 rule마다 <code>hydrators()</code> 리스트를 선언하는 방식이었지만, 실행 자체는 여전히 함수 계층(hydrator variant마다 <code>.rs</code> 파일)이었다.</li>
+<li>오늘은 실행도 데이터가 됐다. <code>NodeSpec</code> 테이블 하나만 있으면, 어느 hydrator 조합이 요청되든 스케줄러가 RPC 그룹을 자동으로 계획한다.</li>
+<li>rule을 추가할 때 hydrator 함수를 새로 쓸 필요가 없고, 테이블에 한 줄을 더하면 된다.</li>
+</ul>
+</li>
+<li>둘째, RPC 그룹 병합이 자동화됐다.<ul>
+<li>어제까지는 gizmoduck의 SAFETY 조회와 LABELS 조회가 서로 다른 hydrator 함수를 거쳤다. 오늘은 <code>Group::fields()</code>가 같은 source·같은 입력을 갖는 hydrator들의 필드 집합을 자동으로 합쳐 한 번의 RPC로 묶는다.</li>
+<li>이것은 마이크로 최적화가 아니다. hydration 예산이 gizmoduck·socialgraph 같은 fan-out 서비스에 몰리는 X 구조에서 P99에 직접 영향을 준다.</li>
+</ul>
+</li>
+<li>셋째, <code>ViewerCountry</code> hydrator를 연결해 conversation-control country allowed-list가 hydration 예산에 정식으로 들어왔다.<ul>
+<li>이전 세대에서는 country 정보가 요청 컨텍스트에 실려 왔지만, 이제는 hydration이 <code>about_this_account/tfe_top_country.User</code> Strato 컬럼을 직접 조회해서 채운다.</li>
+<li>About This Account 투명성 UI의 백엔드가 VF 판정 경로에 붙었다는 의미다. 규제 대응(예: 국가별 콘텐츠 제한) 축이 hydration 계층에 정식으로 들어왔다.</li>
+</ul>
+</li>
+</ul>
+<p><code>golden_corpus</code>를 15개 파일로 나눈 것은 두 가지를 위한 준비 작업으로 읽힌다. 하나는 정책 카테고리별로 코퍼스 오너십을 나누는 것이고, 다른 하나는 어제 열린 이원 Verdict 트리에서 카테고리별 verdict 매트릭스를 독립적으로 잠글 수 있게 하는 것이다.</p>
+<h2 id="2-onetrans-v2가-추천-캐스케이드-세-단계를-transformer-하나로-합쳤다--레이더"><span class="num">2</span>OneTrans-V2가 추천 캐스케이드 세 단계를 Transformer 하나로 합쳤다 — 레이더</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.28589" target="_blank" rel="noopener">arXiv 2609.28589</a> — arXiv, 2026-09-23 v1, 논문. 제목은 &quot;OneTrans-V2: Unifying Retrieval, Pre-rank, and Fine-rank with One Transformer in Industrial Recommender&quot;다. 저자는 15인(Hannan Cao·Jun Guo·Haolei Pei 등)이고, 소속은 arXiv 메타데이터에서 명시적으로 확인되지 않는다. HTML 판이 발행되지 않아 이메일 도메인이나 affiliation footnote를 직접 확인할 수 없고, Semantic Scholar API도 저자 affiliation을 반환하지 않는다(2026-09-26 확인). &quot;OneTrans&quot;라는 이름과 &quot;GMV&quot; 지표, MoE(입력마다 일부 전문가 층만 계산하는 mixture-of-experts 구조) 백본 규모로 보아 e-commerce 플랫폼의 프로덕션 팀 자료로 판단한다 <span class="badge est">추정</span>.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 산업 추천 시스템은 대부분 후보 생성(retrieval), coarse ranking(pre-rank), fine ranking(fine-rank)의 3단 캐스케이드로 서빙된다. 그런데 세 단계가 서로 다른 모델로 학습·서빙되기 때문에 유저 시퀀스 인코딩이 반복되고, 단계 간 최적화가 격리되며, 엔지니어링 중복이 생긴다. OneTrans(v1)는 model-level unification을 시도한 이전 자료다. 이번 V2는 그 위에 세 가지를 더했다고 진술한다.</p></div>
+<ol>
+<li>MoE 백본을 확장했다.</li>
+<li>DCGR(Decision-Conditioned Generative Retrieval)로 목표별 retrieval 채널을 하나의 generative 프로세스로 합쳤다.</li>
+<li>SNT(Sequence-Native Training)로 유저 lifelong 시퀀스 인코딩을 노출마다 amortize했다.</li>
+</ol>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 세 단계를 Transformer 하나로 합치고, 그 위에 세 가지 장치를 더했다</span></p></div>
+<ul>
+<li>캐스케이드 3단계를 모두 하나의 Transformer로 통합했다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2609.28589" target="_blank" rel="noopener">초록</a>.<ul>
+<li>user behavior sequence를 shared context로 한 번만 인코딩하고, stage-specific candidate feature와 computation은 유지한다.</li>
+<li>Joint training으로 세 stage가 서로 강화되며, in-model knowledge distillation이 fine-rank에서 pre-rank로 흐른다.</li>
+</ul>
+</li>
+<li>백본을 sparse MoE로 확장하고, μP-style parameterization으로 스케일링을 안정화했다 <span class="badge ok">확인</span>.<ul>
+<li>활성화되는 연산량은 묶어 둔 채 capacity를 늘리는 표준 recipe다.</li>
+<li>다만 산업 스택에서 μP(모델 폭을 바꿔도 하이퍼파라미터를 그대로 옮겨 쓰게 하는 파라미터화) 스타일 hyperparameter transfer를 명시적으로 채택한 첫 진술이다.</li>
+</ul>
+</li>
+<li>DCGR(Decision-Conditioned Generative Retrieval)은 다가올 상호작용의 유형을 먼저 예측하고, 그 예측에 조건화해서 아이템을 생성한다 <span class="badge ok">확인</span>.<ul>
+<li>먼저 예측하는 것은 decision prefix, 즉 다가올 상호작용의 유형을 서술하는 짧은 토큰이다.</li>
+<li>objective별 retrieval 채널을 여러 개 따로 두는 대신 하나의 generative 프로세스로 통합하고, business objective가 decision prefix로 방향을 잡는다.</li>
+</ul>
+</li>
+<li>SNT(Sequence-Native Training)는 학습을 유저의 lifelong behavior sequence 기준으로 조직해서, 시퀀스 인코딩을 노출(exposure)마다 amortize한다 <span class="badge ok">확인</span>.<ul>
+<li>유저 표현을 request마다 다시 계산하는 대신 세션·노출 축으로 재사용한다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 프로덕션 A/B에서 GMV와 처리량이 함께 올랐다고 밝혔다</span></p></div>
+<ul>
+<li><p>프로덕션 A/B에서 GMV는 +9.74% 올랐고, 같은 하드웨어 예산에서 throughput은 기존 캐스케이드의 3.2×였다 <span class="badge ok">확인</span>.</p>
 <blockquote>
 <p>&quot;Deployed across all three stages of a large-scale industrial recommendation system, OneTrans-V2 improves gross merchandise value (GMV) by 9.74% and, with a co-designed serving stack, delivers 3.2× the throughput of the cascade it replaces under the same hardware budget.&quot;
 — <a href="https://arxiv.org/abs/2609.28589" target="_blank" rel="noopener">arXiv 2609.28589 abstract</a></p>
 </blockquote>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html"><code>radar.md</code></a>의 &quot;이번 달 신규&quot;에 OneTrans-V2 편입.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> 캐스케이드 3단계를 하나의 Transformer로 통합했다는 산업 진술 자체가 흔치 않다. 저장소 코퍼스에서 stage 간 통합을 다룬 최근 프로덕션 진술은 <a href="radar.html#unique-baidu--beihang--cityu--%EC%82%B0%EC%97%85-mobile-feed%EC%9D%98-unified-retrieval--ranking--single-layer-flat-quantization-recsys-2026-accepted">UNIQUE (Baidu, RecSys 2026)</a>와 <a href="radar.html#unirec-kuaishou--%EC%BA%90%EC%8A%A4%EC%BC%80%EC%9D%B4%EB%93%9C-pre-ranking--ranking-fusion%EC%9D%84-two-stage-joint-learning%EC%9C%BC%EB%A1%9C-%EC%A0%95%EB%A0%AC-app-usage-duration-0616">UniRec (Kuaishou)</a> 두 편이었고 각각 (a) generative retrieval + target-aware ranking을 early-fusion single architecture로 묶는 각도(UNIQUE)와 (b) pre-rank·rank 두 stage fusion agent를 joint learning으로 정렬하는 각도(UniRec)였다. OneTrans-V2는 여기에 <strong>3-stage 전체를 하나의 Transformer로 통합했다</strong>는 세 번째 각도를 더한다. 게다가 A/B 수치가 GMV +9.74%·throughput 3.2×로 다른 두 편(UniRec: app usage duration +0.616%, UNIQUE: A/B 수치 abstract 미공개)보다 훨씬 크다.</p></div>
-<p>다만 어느 회사의 어느 지면인지가 확인되지 않는다. HTML 판이 없고 Semantic Scholar도 affiliation을 반환하지 않아 이번 배치에서는 판단 유예. GMV 지표를 쓰는 e-commerce 플랫폼(Taobao·JD·Meituan·Pinduoduo·Shopee 등)이 가장 유력한 후보 <span class="badge est">추정</span>. 후속 v2나 학회 accepted 통지에서 affiliation이 확인되면 정본 반영을 재검토한다.</p>
-<p><strong>탈락(관찰 대상 아님).</strong> 이번 arXiv triage 30건 중 나머지 28건은 다음 사유로 통과되지 못했다:</p>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html"><code>radar.md</code></a>의 &quot;이번 달 신규&quot;에 OneTrans-V2를 넣었다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 캐스케이드 3단계를 하나의 Transformer로 통합했다는 산업 진술 자체가 흔치 않다. 저장소 코퍼스에서 stage 간 통합을 다룬 최근 프로덕션 진술은 두 편이었고, OneTrans-V2는 여기에 3-stage 전체를 하나의 Transformer로 통합했다는 세 번째 각도를 더한다. 다만 어느 회사의 어느 지면인지는 확인되지 않는다.</p></div>
 <ul>
-<li><strong>AgentX (2609.30001, Meituan)</strong> — abstract에서 &quot;560 of 636 completed model-changing experiments recorded AUC above their business baselines&quot;와 &quot;10-15% acquisition efficiency, 15-20% target-segment advertising spend, 0.3-0.8% watch time&quot;의 프로덕션 A/B를 주장하지만, 이 자료는 <strong>model research framework</strong>(연구 agent 아키텍처)에 대한 자료이지 랭킹·retrieval 메커니즘 자체의 새 각도가 아니다. Meituan은 canon 추적 대상 서비스가 아니고, 이 저장소가 묻는 &quot;실제 서비스가 무엇을 하는가&quot;보다 &quot;실제 서비스를 만드는 팀이 어떻게 연구하는가&quot;에 가까운 자료라서 스레드가 다르다.</li>
-<li><strong>X-Rec (2609.29180)</strong> — flow matching으로 continuous item embedding space에서 recommendation distribution을 학습한다는 학술 GR 자료. 프로덕션 배포 진술이 abstract에 없어 탈락.</li>
-<li><strong>From Interests to Semantic IDs (2609.29983)</strong> / <strong>Learning Better Reasoning for GR with SIDs (2609.29973)</strong> — 같은 저자군(Mengdan Zhu·Yufan Zhao 등)의 두 편, SID 기반 GR의 reasoning trace 학습 개선. 학술 방법론이며 프로덕션 A/B 없음.</li>
-<li><strong>ScalarLens (2609.29182)</strong> — Criteo dataset을 쓴 numerical embedding 방법론. 학술 벤치마크만.</li>
-<li><strong>Fair Feed Ranking for Participatory Budgeting (2609.29819)</strong> — Consul Democracy 플랫폼(참여 예산 편성 도구)의 제안 노출 순서를 다루는 자료. 저장소 관측 대상 밖.</li>
-<li><strong>Cross-Country Code-Mixing for GR (2609.28972)</strong> — cross-country e-commerce GR. 학술 방법론.</li>
-<li><strong>SEEK (2609.29803)</strong> — industrial search 평가 프레임워크. 검색 평가 툴이며 랭킹 메커니즘 자체가 아님.</li>
-<li><strong>Decoupled Learning and Selection in Slate Rec (2609.29453)</strong> — DP guarantee의 slate recommendation. 학술 이론.</li>
-<li>나머지 20건은 RAG·LLM eval·문서 검색·QA·비디오 검색 벤치마크·quantum GitHub·knowledge graph 등 이 저장소의 도메인(피드·랭킹·retrieval) 밖.</li>
+<li>앞선 두 편은 각각 다른 각도였다.<ul>
+<li><a href="radar.html#unique-baidu--beihang--cityu--%EC%82%B0%EC%97%85-mobile-feed%EC%9D%98-unified-retrieval--ranking--single-layer-flat-quantization-recsys-2026-accepted">UNIQUE (Baidu, RecSys 2026)</a>는 generative retrieval과 target-aware ranking을 early-fusion single architecture로 묶는 각도였다.</li>
+<li><a href="radar.html#unirec-kuaishou--%EC%BA%90%EC%8A%A4%EC%BC%80%EC%9D%B4%EB%93%9C-pre-ranking--ranking-fusion%EC%9D%84-two-stage-joint-learning%EC%9C%BC%EB%A1%9C-%EC%A0%95%EB%A0%AC-app-usage-duration-0616">UniRec (Kuaishou)</a>는 pre-rank·rank 두 stage fusion agent를 joint learning으로 정렬하는 각도였다.</li>
 </ul>
-<h2 id="산업-블로그-훑기-결과--오늘토요일-대상-아님">산업 블로그 훑기 결과 — 오늘(토요일) 대상 아님</h2>
-<p>배치 규칙상 월요일에만 훑는다. Meta·Netflix 블로그 최신 글은 어제 확인한 상태에서 변화 없다(engineering.fb.com 최신은 2026-09-23 Private Processing to Meta AI Glasses·보안 주제·건너뜀; netflixtechblog.com 최신은 2026-09-18 Class Path·JVM 인프라·건너뜀).</p>
+</li>
+<li>게다가 A/B 수치가 GMV +9.74%·throughput 3.2×로 다른 두 편보다 훨씬 크다.<ul>
+<li>UniRec은 app usage duration +0.616%였고, UNIQUE는 A/B 수치를 abstract에 공개하지 않았다.</li>
+</ul>
+</li>
+<li>HTML 판이 없고 Semantic Scholar도 affiliation을 반환하지 않아, 이번 배치에서는 판단을 유예한다.</li>
+<li>GMV 지표를 쓰는 e-commerce 플랫폼(Taobao·JD·Meituan·Pinduoduo·Shopee 등)이 가장 유력한 후보다 <span class="badge est">추정</span>.</li>
+<li>후속 v2나 학회 accepted 통지에서 affiliation이 확인되면 정본 반영을 재검토한다.</li>
+</ul>
+<p><strong>나머지 arXiv 자료는 관찰 대상에서 뺐다.</strong> 이번 arXiv triage 30건 중 나머지 28건은 다음 사유로 통과되지 못했다.</p>
+<ul>
+<li>AgentX(2609.30001, Meituan): model research framework, 즉 연구 agent 아키텍처에 대한 자료이지 랭킹·retrieval 메커니즘 자체의 새 각도가 아니다.<ul>
+<li>abstract는 &quot;560 of 636 completed model-changing experiments recorded AUC above their business baselines&quot;와 &quot;10-15% acquisition efficiency, 15-20% target-segment advertising spend, 0.3-0.8% watch time&quot;의 프로덕션 A/B를 주장한다.</li>
+<li>Meituan은 이 저장소가 정본(canon)으로 추적하는 서비스가 아니다.</li>
+<li>이 저장소가 묻는 &quot;실제 서비스가 무엇을 하는가&quot;보다 &quot;실제 서비스를 만드는 팀이 어떻게 연구하는가&quot;에 가까운 자료라서 스레드가 다르다.</li>
+</ul>
+</li>
+<li>X-Rec(2609.29180): flow matching으로 continuous item embedding space에서 recommendation distribution을 학습한다는 학술 GR(generative retrieval) 자료다. abstract에 프로덕션 배포 진술이 없어 탈락했다.</li>
+<li>From Interests to Semantic IDs(2609.29983)와 Learning Better Reasoning for GR with SIDs(2609.29973): 같은 저자군(Mengdan Zhu·Yufan Zhao 등)의 두 편이다. SID(semantic ID, 아이템을 계층 코드로 표현한 것) 기반 GR의 reasoning trace 학습을 개선하는 학술 방법론이며, 프로덕션 A/B가 없다.</li>
+<li>ScalarLens(2609.29182): Criteo dataset을 쓴 numerical embedding 방법론이다. 학술 벤치마크만 있다.</li>
+<li>Fair Feed Ranking for Participatory Budgeting(2609.29819): Consul Democracy 플랫폼(참여 예산 편성 도구)의 제안 노출 순서를 다룬다. 저장소 관측 대상 밖이다.</li>
+<li>Cross-Country Code-Mixing for GR(2609.28972): cross-country e-commerce GR을 다룬 학술 방법론이다.</li>
+<li>SEEK(2609.29803): industrial search 평가 프레임워크다. 검색 평가 툴이며 랭킹 메커니즘 자체가 아니다.</li>
+<li>Decoupled Learning and Selection in Slate Rec(2609.29453): DP guarantee를 둔 slate(한 화면에 함께 보여 주는 아이템 묶음) recommendation을 다룬 학술 이론이다.</li>
+<li>나머지 20건은 RAG·LLM eval·문서 검색·QA·비디오 검색 벤치마크·quantum GitHub·knowledge graph 등 이 저장소의 도메인(피드·랭킹·retrieval) 밖이다.</li>
+</ul>
+<h2 id="산업-블로그는-오늘토요일-훑는-대상이-아니다">산업 블로그는 오늘(토요일) 훑는 대상이 아니다</h2>
+<p>배치 규칙상 산업 블로그는 월요일에만 훑는다. Meta·Netflix 블로그의 최신 글은 어제 확인한 상태에서 변화가 없다.</p>
+<ul>
+<li>engineering.fb.com의 최신 글은 2026-09-23 Private Processing to Meta AI Glasses다. 보안 주제의 글이며 건너뛰었다.</li>
+<li>netflixtechblog.com의 최신 글은 2026-09-18 Class Path다. JVM 인프라 주제의 글이며 건너뛰었다.</li>
+</ul>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li><strong><code>golden_corpus</code>가 15개 파일로 분할된 후 각 파일의 verdict 매트릭스가 어떻게 잠기는가</strong> — 특히 <code>interstitial.rs</code>(334줄, 가장 큰 파일)와 <code>age_gating.rs</code>(267줄)의 case 목록. Interstitial과 age-gating은 이번 세대에서 verdict 트리의 새 슬롯이므로, 잠긴 verdict 매트릭스가 정책 축의 실체다.</li>
-<li><strong><code>Hydrator</code> enum이 다시 확장되는가</strong> — 오늘 17 variant로 커졌다. 다음 커밋에서 새 예측 축(예: LLM-based content classification hydrator)이 붙는지 관측.</li>
-<li><strong>Phoenix proto에 오늘 추가된 34줄이 어느 필드인가</strong> — <code>recsys.proto</code> diff를 다음 배치에서 확인해 소비처가 나오면 정본에 반영.</li>
-<li><strong>OneTrans-V2 저자 소속</strong> — 학회 accepted 통지나 v2에서 affiliation이 확인되면 관측 서비스 목록을 재검토.</li>
-<li><strong>Meta VDD Model-Based Retrieval + EvoPilot 심층 분석</strong> — radar에 &quot;관찰(심층 분석 필요)&quot;로 남아 있음. 다음 배치에서 원문 정독 후보.</li>
+<li>15개 파일로 나뉜 규칙 골든 코퍼스에서 파일마다 verdict 매트릭스가 어떻게 잠기는지 본다 — 잠긴 verdict 매트릭스가 정책 축의 실체다.<ul>
+<li>Interstitial(경고 화면 뒤에 콘텐츠를 표시하는 처리)과 age-gating이 이번 세대에서 verdict 트리의 새 슬롯이기 때문이다.</li>
+<li>특히 <code>golden_corpus</code>의 <code>interstitial.rs</code>(334줄, 가장 큰 파일)와 <code>age_gating.rs</code>(267줄)의 case 목록을 본다.</li>
+</ul>
+</li>
+<li><code>Hydrator</code> enum이 다시 커지는지 본다 — 오늘 17 variant로 커졌다. 다음 커밋에서 새 예측 축(예: LLM-based content classification hydrator)이 붙는지 관측한다.</li>
+<li>Phoenix proto에 오늘 추가된 34줄이 어느 필드인지 확인한다 — 다음 배치에서 <code>recsys.proto</code> diff를 확인하고, 소비처가 나오면 정본에 반영한다.</li>
+<li>OneTrans-V2 저자 소속을 확인한다 — 학회 accepted 통지나 v2에서 affiliation이 확인되면 관측 서비스 목록을 재검토한다.</li>
+<li>Meta VDD Model-Based Retrieval과 EvoPilot을 심층 분석한다 — radar에 &quot;관찰(심층 분석 필요)&quot;로 남아 있다. 다음 배치에서 원문을 정독할 후보다.</li>
 </ul></div>
 
 </div>

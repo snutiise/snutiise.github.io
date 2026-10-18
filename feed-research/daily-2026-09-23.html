@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>일일 리포트 2026-09-23 — feed-research</title>
-<meta name="description" content="한 줄: X 4세대+26 커밋(3aa0fa33)에서 VMRanker가 DPP wrapper에서 value-model input carrier로 확장되고 retrieval candidate attribution Kafka 스트림이 신설되고 VF rule engine이 이원…">
+<meta name="description" content="한 줄: X가 재순위 서비스 VMRanker에 값 모델 입력을 보내거나 값 모델 점수를 계산하게 하는 모드를 붙였다. 새 모드를 켜는 파라미터는 둘 다 기본 false다.">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-09-23.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="일일 리포트 2026-09-23 — feed-research">
-<meta property="og:description" content="한 줄: X 4세대+26 커밋(3aa0fa33)에서 VMRanker가 DPP wrapper에서 value-model input carrier로 확장되고 retrieval candidate attribution Kafka 스트림이 신설되고 VF rule engine이 이원…">
+<meta property="og:description" content="한 줄: X가 재순위 서비스 VMRanker에 값 모델 입력을 보내거나 값 모델 점수를 계산하게 하는 모드를 붙였다. 새 모드를 켜는 파라미터는 둘 다 기본 false다.">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-09-23.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -42,113 +42,317 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>수요일</li>
-<li><span class="meta-k">읽는 시간</span>36분</li>
+<li><span class="meta-k">읽는 시간</span>41분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul>
-<div class="lead"><span class="lb">한 줄 요약</span>X 4세대+26 커밋(3aa0fa33)에서 VMRanker가 DPP wrapper에서 value-model input carrier로 확장되고 retrieval candidate attribution Kafka 스트림이 신설되고 VF rule engine이 이원 <code>Verdict</code> 트리로 재작성됐다 · Netflix가 recommender system의 observability를 counterfactual 측정 문제로 재정의하는 RecSys 2026 논문 공개(Row Curators 배포 실측 R²=0.82).</div>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 재순위 서비스 VMRanker에 값 모델 입력을 보내거나 값 모델 점수를 계산하게 하는 모드를 붙였다. 새 모드를 켜는 파라미터는 둘 다 기본 false다.</div>
 </div>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-x-4세대26-커밋--vmranker-value-model-확장-retrieval-attribution-kafka-vf-verdict-트리-재작성--x"><span class="num">1</span>X 4세대+26 커밋 — VMRanker value-model 확장, retrieval attribution Kafka, VF Verdict 트리 재작성 — X</a></li><li><a href="#2-netflix-beyond-raw-engagement--recommender-system-observability를-counterfactual-측정-문제로-재정의recsys-2026--netflix"><span class="num">2</span>Netflix &quot;Beyond Raw Engagement&quot; — recommender system observability를 counterfactual 측정 문제로 재정의(RecSys 2026) — Netflix</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">4</span></summary><ol><li><a href="#1-재순위-서비스-vmranker가-값-모델-계산까지-맡을-준비를-마쳤다--x"><span class="num">1</span>재순위 서비스 VMRanker가 값 모델 계산까지 맡을 준비를 마쳤다 — X</a></li><li><a href="#2-추천-시스템-관측을-반사실-측정-문제로-다루는-recsys-2026-논문--netflix"><span class="num">2</span>추천 시스템 관측을 반사실 측정 문제로 다루는 RecSys 2026 논문 — Netflix</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
 <div class="prose">
-<h2 id="1-x-4세대26-커밋--vmranker-value-model-확장-retrieval-attribution-kafka-vf-verdict-트리-재작성--x"><span class="num">1</span>X 4세대+26 커밋 — VMRanker value-model 확장, retrieval attribution Kafka, VF Verdict 트리 재작성 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/3aa0fa33" target="_blank" rel="noopener">xai-org/x-algorithm @ 3aa0fa33</a> — GitHub, 2026-09-22 커밋(+5,588/−2,601, 파일 72), 커밋 메시지는 관행대로 <code>Open-source X Recommendation Algorithm</code> 한 줄.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> X는 2026-08-13 4세대 공개 이후 매일~격일 주기로 프로덕션 코드를 오픈소스 저장소에 미러링해 왔다. 이번 커밋은 4세대 이후 스물여섯 번째로, 세 가지 방향이 함께 성숙한다. 첫째, 홈믹서의 후처리 랭커인 <strong>VMRanker</strong>(지금까지 <a href="https://en.wikipedia.org/wiki/Determinantal_point_process" target="_blank" rel="noopener">DPP</a> 재순위기 역할만 하던 gRPC 서비스)의 역할이 &quot;값 모델(value model, 후보의 최종 유효 가치를 내는 모델) 자체를 컴퓨트하는 서비스&quot;로 확장될 준비가 끝났다. 둘째, retrieval 소스별 후보 기여도를 오프라인에서 분석할 수 있는 attribution 파이프라인이 홈믹서에 신설됐다 — 후보마다 자신이 어느 retrieval 소스에서 어느 클러스터로 어느 rank에 들어왔는지를 벡터로 기록하고, 요청의 5%를 Kafka에 selected/non-selected와 함께 발행한다. 셋째, visibility-filtering(VF) rule engine이 flat <code>VfAction</code>(Allow/Drop/Interstitial 3-variant)에서 이원 <code>Verdict</code> 트리(<code>Withheld{Drop|Tombstone}</code> | <code>Shown{media?, engagement?}</code>)로 완전히 재작성됐고, rule이 함수에서 데이터(predicate list + audience + action)로 옮겨갔다. 상세 분석 결과는 아래 새로 알게 된 것에 정리한다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<p>오늘 함께 본 다른 변화는 다음과 같다.</p>
 <ul>
-<li><p><strong>VMRanker에 새 세 모드가 붙었다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a>와 신규 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/vm_ranker_request.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker_request.rs</code></a>(+74). 두 새 파라미터 <code>VMRankerSendValueModelInputs</code>와 <code>VMRankerComputeValueModel</code>(둘 다 기본 false)로 세 모드가 갈린다 — <code>dpp_only</code>(기존 동작), <code>send_inputs</code>(viewer 컨텍스트와 후보 정책 플래그를 실어 보내 shadow evaluation), <code>compute_value_model</code>(실제로 새 value model 스코어를 컴퓨트). VMRanker 요청 페이로드에는 신규 domain type <code>FsRecipientInputs</code> 12필드(<code>user_id</code>, <code>country_code</code>, <code>language_code</code>, <code>client_app_id</code>, <code>client_version</code>, <code>user_roles</code>, <code>datacenter</code>, <code>has_phone_number</code>, <code>resurrection_time_ms</code>, <code>product</code>, <code>now_ms</code>, <code>fs_overrides</code>)와 후보별 8필드 + <code>PhoenixScores</code> 26필드가 실린다. <code>Experiment6</code>라는 6번째 클러스터가 새로 등록됐다.</p>
+<li>X는 같은 커밋에서 후보마다 어느 retrieval 소스에서 왔는지 기록하고, 요청의 5%를 Kafka로 발행하는 경로를 새로 만들었다.</li>
+<li>X의 노출 판정 엔진(VF)은 판정 결과를 숨김과 표시 두 갈래의 트리로 나타내도록 다시 쓰였다.</li>
+<li>Netflix는 추천 시스템 관측을 반사실 측정 문제로 다루는 RecSys 2026 논문을 냈다. Row Curators 검증에서 A/B와의 R²는 0.82였다.</li>
+</ul>
+<h2 id="1-재순위-서비스-vmranker가-값-모델-계산까지-맡을-준비를-마쳤다--x"><span class="num">1</span>재순위 서비스 VMRanker가 값 모델 계산까지 맡을 준비를 마쳤다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/3aa0fa33" target="_blank" rel="noopener">xai-org/x-algorithm @ 3aa0fa33</a> — GitHub, 2026-09-22 커밋(+5,588/−2,601, 파일 72), 코드. 커밋 메시지는 관행대로 <code>Open-source X Recommendation Algorithm</code> 한 줄이다. 이 노트들은 X 추천 코드의 네 번째 공개본(4세대 공개) 뒤에 나온 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+26이다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X는 2026-08-13 4세대 공개 이후 매일~격일 주기로 프로덕션 코드를 오픈소스 저장소에 미러링해 왔다. 홈믹서(home-mixer, X For You 피드를 조립하는 서비스)는 여러 retrieval 소스에서 후보를 모아 Phoenix가 예측한 참여 확률로 점수를 매기고, VMRanker로 피드에 낼 후보의 순서를 다시 정한다. Phoenix는 X의 Grok 기반 추천 트랜스포머다. 이번 커밋은 VMRanker의 역할 확장 준비, 후보별 retrieval 출처 기록, 노출 판정 규칙 엔진의 재작성이라는 세 방향을 함께 담았다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. VMRanker에 값 모델 입력을 보내거나 값 모델을 계산하게 하는 모드가 생겼다</span></p></div>
+<p>VMRanker는 홈믹서의 후처리 랭커로, 지금까지 <a href="https://en.wikipedia.org/wiki/Determinantal_point_process" target="_blank" rel="noopener">DPP</a>(서로 비슷한 후보가 함께 뽑히지 않도록 고르는 확률 모델) 재순위기 역할만 하던 gRPC 서비스다. 이번 커밋으로 그 역할이 &quot;값 모델(value model, 후보의 최종 유효 가치를 내는 모델) 자체를 컴퓨트하는 서비스&quot;로 확장될 준비가 끝났다.</p>
+<ul>
+<li>VMRanker 호출이 세 모드로 나뉘었다. 기존처럼 DPP 재순위만 하는 모드, 값 모델 입력을 실어 보내 그림자 평가를 하는 모드, 새 값 모델 점수를 실제로 계산하는 모드다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a>, 신규 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/vm_ranker_request.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker_request.rs</code></a>(+74).<ul>
+<li>모드는 두 새 파라미터 <code>VMRankerSendValueModelInputs</code>와 <code>VMRankerComputeValueModel</code>로 갈린다. 둘 다 기본 false다.</li>
+<li><code>dpp_only</code>는 기존 동작이다.</li>
+<li><code>send_inputs</code>는 viewer 컨텍스트와 후보 정책 플래그를 실어 보내 shadow evaluation을 한다.</li>
+<li><code>compute_value_model</code>은 실제로 새 value model 스코어를 컴퓨트한다.</li>
+<li>VMRanker 요청 페이로드에는 신규 domain type <code>FsRecipientInputs</code>의 12필드가 실린다.<ul>
+<li><code>user_id</code>, <code>country_code</code>, <code>language_code</code>, <code>client_app_id</code>, <code>client_version</code>, <code>user_roles</code>, <code>datacenter</code>, <code>has_phone_number</code>, <code>resurrection_time_ms</code>, <code>product</code>, <code>now_ms</code>, <code>fs_overrides</code></li>
+</ul>
 </li>
-<li><p><strong>후보에 정책 결정 태그 두 개가 붙기 시작했다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>(+85/−20). <code>AuthorColdStart::apply_with_decisions()</code>가 새로 생기고 <code>ColdStartOutcome { scores, author_policy_zeroed: Vec&lt;bool&gt;, lift: Option&lt;ColdStartLift&gt; }</code>을 리턴한다. <code>author_policy_zeroed[i]</code>는 MoE ranking policy에서 이 후보가 zero-score로 마스킹됐는지, <code>lift</code>는 어느 후보를 어느 rank로 lift했는지를 담는다. <code>RankingScorer</code>가 이 두 필드를 <code>PostCandidate</code>에 채우면 downstream(VMRanker와 새 Kafka 파이프라인)이 볼 수 있다.</p>
+<li>후보별 8필드와 <code>PhoenixScores</code> 26필드도 함께 실린다.</li>
+<li><code>Experiment6</code>라는 6번째 클러스터가 새로 등록됐다.</li>
+</ul>
 </li>
-<li><p><strong>Retrieval candidates Kafka 신설</strong> <span class="badge ok">확인</span> — 신규 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/side_effects/retrieval_candidates_kafka_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/retrieval_candidates_kafka_side_effect.rs</code></a>(+209). 두 새 파라미터 <code>RetrievalCandidatesKafkaSamplePercent</code>(기본 5.0)와 <code>RetrievalCandidatesKafkaMaxCandidates</code>(기본 200)로 게이팅된다. 각 요청당 하나의 <code>RetrievalCandidateBatch</code> 프로토(<code>request_id</code>, <code>viewer_id</code>, <code>request_time_ms</code>, <code>sample_rate</code>, <code>ranker_cluster</code>, <code>experiment_buckets</code>, 후보 리스트)가 <code>RETRIEVAL_CANDIDATES_TOPIC</code>로 발행된다. <code>is_prod()</code> 안에서만 켜지고 in-network-only 요청과 캐시된 요청은 제외.</p>
+<li>작성자 콜드스타트 처리가 내린 정책 결정 두 가지가 후보에 태그로 붙기 시작했다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>(+85/−20).<ul>
+<li><code>AuthorColdStart::apply_with_decisions()</code>가 새로 생겼고, <code>ColdStartOutcome { scores, author_policy_zeroed: Vec&lt;bool&gt;, lift: Option&lt;ColdStartLift&gt; }</code>을 리턴한다.</li>
+<li><code>author_policy_zeroed[i]</code>는 MoE ranking policy에서 이 후보가 zero-score로 마스킹됐는지를 담는다. MoE(mixture of experts)는 여러 전문가 하위 모델 가운데 일부를 골라 쓰는 모델 구조다.</li>
+<li><code>lift</code>는 어느 후보를 어느 rank로 lift했는지를 담는다.</li>
+<li><code>RankingScorer</code>가 이 두 필드를 <code>PostCandidate</code>에 채우면 downstream(VMRanker와 새 Kafka 파이프라인)이 볼 수 있다.</li>
+</ul>
 </li>
-<li><p><strong>후보가 자기 출처를 기억한다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>에 <code>PostCandidate::retrieval_sources: Vec&lt;RetrievalSource&gt;</code> 필드 신설. <code>RetrievalSource</code>는 <code>{served_type, cluster: Option&lt;PhoenixRetrievalCluster&gt;, score: Option&lt;f32&gt;, position: Option&lt;u32&gt;}</code>. Phoenix/MoE/Topics 세 retrieval RPC 소스가 신규 헬퍼 <code>candidates_from_retrieval_response()</code>로 후보 생성을 이관하며 served_type별 score 내림차순 rank(1-based)를 붙인다. Simclusters 소스도 <code>RetrievalSource::from_served_type(ForYouSimclusters)</code>를 붙인다. 여러 소스에서 나온 중복 후보는 dedup 필터(<a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/filters/drop_duplicates_filter.rs" target="_blank" rel="noopener"><code>filters/drop_duplicates_filter.rs</code></a>)가 <code>retrieval_sources</code> 벡터를 병합해 하나의 후보에 여러 소스 기록을 남긴다. 대응 aggregate 메트릭도 함께 배선 — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/side_effects/scored_stats_side_effect.rs" target="_blank" rel="noopener"><code>side_effects/scored_stats_side_effect.rs</code></a>의 <code>record_retrieval_source_contribution</code>이 <code>Phoenix.RetrievalContribution.Selected</code>(source·mode=credited/inclusive), <code>PhoenixTopK</code>(k ∈ {10, 100, 200, 500, 1000}), <code>SelectedTotal</code> 세 계열을 발행.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 후보마다 어느 retrieval 소스에서 왔는지 기록하고, 요청 일부를 Kafka로 내보낸다</span></p></div>
+<p>retrieval 소스별 후보 기여도를 오프라인에서 분석할 수 있는 attribution 파이프라인이 홈믹서에 신설됐다. 후보마다 자신이 어느 retrieval 소스에서 어느 클러스터로 어느 rank에 들어왔는지를 벡터로 기록하고, 요청의 5%를 Kafka에 selected/non-selected와 함께 발행한다.</p>
+<ul>
+<li>샘플링한 요청의 retrieval 후보 목록을 Kafka 토픽으로 발행하는 side effect가 새로 생겼다 <span class="badge ok">확인</span> — 신규 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/side_effects/retrieval_candidates_kafka_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/retrieval_candidates_kafka_side_effect.rs</code></a>(+209).<ul>
+<li>두 새 파라미터 <code>RetrievalCandidatesKafkaSamplePercent</code>(기본 5.0)와 <code>RetrievalCandidatesKafkaMaxCandidates</code>(기본 200)로 게이팅된다.</li>
+<li>요청마다 <code>RetrievalCandidateBatch</code> 프로토 하나가 <code>RETRIEVAL_CANDIDATES_TOPIC</code>로 발행된다. 프로토에는 <code>request_id</code>, <code>viewer_id</code>, <code>request_time_ms</code>, <code>sample_rate</code>, <code>ranker_cluster</code>, <code>experiment_buckets</code>와 후보 리스트가 담긴다.</li>
+<li><code>is_prod()</code> 안에서만 켜지고, in-network-only 요청과 캐시된 요청은 제외된다.</li>
+</ul>
 </li>
-<li><p><strong>VF rule engine이 flat action에서 이원 verdict 트리로 재작성됐다</strong> <span class="badge ok">확인</span> — 신규 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/verdict.rs</code></a>(+62)와 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>visibility-filtering/treatment.rs</code></a>(+446). 새 정의:</p>
+<li>후보가 자기를 가져온 retrieval 소스의 기록을 갖게 됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>.<ul>
+<li>새 필드는 <code>PostCandidate::retrieval_sources: Vec&lt;RetrievalSource&gt;</code>이다. <code>RetrievalSource</code>는 <code>{served_type, cluster: Option&lt;PhoenixRetrievalCluster&gt;, score: Option&lt;f32&gt;, position: Option&lt;u32&gt;}</code>다.</li>
+<li>Phoenix/MoE/Topics 세 retrieval RPC 소스는 후보 생성을 신규 헬퍼 <code>candidates_from_retrieval_response()</code>로 이관하면서, served_type별 score 내림차순 rank(1-based)를 붙인다.</li>
+<li>Simclusters 소스도 <code>RetrievalSource::from_served_type(ForYouSimclusters)</code>를 붙인다.</li>
+<li>여러 소스에서 나온 중복 후보는 dedup 필터(<a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/filters/drop_duplicates_filter.rs" target="_blank" rel="noopener"><code>filters/drop_duplicates_filter.rs</code></a>)가 <code>retrieval_sources</code> 벡터를 병합해, 하나의 후보에 여러 소스 기록을 남긴다.</li>
+<li>대응하는 aggregate 메트릭도 함께 연결됐다. <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/side_effects/scored_stats_side_effect.rs" target="_blank" rel="noopener"><code>side_effects/scored_stats_side_effect.rs</code></a>의 <code>record_retrieval_source_contribution</code>이 다음 세 계열을 발행한다.<ul>
+<li><code>Phoenix.RetrievalContribution.Selected</code>(source·mode=credited/inclusive)</li>
+<li><code>PhoenixTopK</code>(k ∈ {10, 100, 200, 500, 1000})</li>
+<li><code>SelectedTotal</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. 노출 판정 엔진(VF)의 판정 결과가 숨김과 표시 두 갈래의 트리로 바뀌었다</span></p></div>
+<p>visibility-filtering(VF)은 포스트마다 이 뷰어에게 보여도 되는지를 판정하는 서비스다. 이번 커밋에서 VF rule engine이 완전히 재작성됐다. 판정은 평면 액션 하나에서 이원 판정 트리로 바뀌었고, rule은 함수에서 데이터(predicate 목록, audience, action)로 옮겨 갔다.</p>
+<ul>
+<li>판정 결과가 숨김과 표시 두 갈래의 트리가 됐다. 숨김에는 드롭과 tombstone(포스트 자리에 안내 문구만 남기는 처리)이 있다 <span class="badge ok">확인</span> — 신규 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/verdict.rs</code></a>(+62), <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>visibility-filtering/treatment.rs</code></a>(+446).<ul>
+<li><p>이전 판정은 flat <code>VfAction</code>(Allow/Drop/Interstitial 3-variant)이었다. 새 판정은 이원 <code>Verdict</code> 트리(<code>Withheld{Drop|Tombstone}</code> | <code>Shown{media?, engagement?}</code>)다.</p>
+</li>
+<li><p>새 정의는 다음과 같다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub enum Verdict {
     Withheld(Decided&lt;Withholding&gt;),
     Shown { media: Option&lt;Decided&lt;MediaInterstitial&gt;&gt;, engagement: Option&lt;Decided&lt;LimitedEngagement&gt;&gt; },
 }
 pub enum Withholding { Drop(FilteredReason), Tombstone(TombstoneReason) }
 </code></pre></figure>
-<p><code>Withheld</code>는 terminal(정책·규제 드롭 또는 tombstone), <code>Shown</code>은 non-terminal이라 media interstitial과 limited engagement 두 restriction이 동시에 겹칠 수 있다. 결정마다 <code>by: &amp;&#39;static str</code>이 rule 이름을 개별로 기록한다. <code>TombstoneReason::LocalRegulations</code>와 <code>LimitedEngagementReason::ConversationControl</code> enum 슬롯은 wire는 있지만 아직 어떤 rule도 발동하지 않아 <code>#[expect(dead_code)]</code>로 마킹돼 있다 — 지역 규제 대체 렌더링과 대화 통제 정책이 이 슬롯으로 들어올 준비다.</p>
 </li>
-<li><p><strong>Rule이 함수에서 데이터로</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/rules/rule_spec.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/rule_spec.rs</code></a>(+240/−69). 이전 <code>RuleSpec::{Tweet, Author, Custom}</code> enum이 <code>RuleClause { rule_name, when: &amp;[Condition], applies_to: Audience, action: ActionSpec }</code> struct로 대체됐다. Predicate는 4계열로 카탈로그화(<code>TweetPredicate</code> 11종·<code>AuthorPredicate</code> 8종·<code>ViewerPredicate</code> 5종·<code>RelationshipPredicate</code> 5종). Audience는 3종(<code>Everyone</code> / <code>ExceptAuthor</code> / <code>ExceptAuthorAndFollowers</code>), ActionSpec은 4-variant(<code>Drop</code> / <code>Tombstone</code> / <code>Interstitial{legacy, media}</code> / <code>LimitedEngagement</code>). 신규 helper <code>tweet_timestamp_ms(tweet_id)</code>가 Snowflake epoch(<code>1288834974657 ms</code>, shift 22-bit)에서 tweet 생성 시각을 뽑는다. Policy 조립은 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>rules/registry.rs</code></a>에서 이뤄지며, <code>TimelineHome</code> 30개·<code>TimelineHomeRecommendations</code> 56개 rule 순서가 회귀 테스트 <code>wired_rule_order_matches_pre_migration_sequence</code>로 잠긴다.</p>
+<li><p><code>Withheld</code>는 terminal(정책·규제 드롭 또는 tombstone)이다.</p>
 </li>
-<li><p><strong>NSFW interstitial이 트윗 생성 시점으로 갈린다</strong> <span class="badge ok">확인</span> — 신규 rule <code>NsfwHighPrecisionAdultInterstitialRule</code>이 <code>CreatedAfter(1705536000000)</code>(2024-01-18 UTC) predicate로 갈라진다. 그 이후 생성 트윗은 <code>InterstitialReason::Nudity(true)</code>, 그 이전은 기존 <code>InterstitialReason::Sensitive(true)</code>로 blur된다. <span class="badge est">추정</span> — <code>NSFW_HIGH_PRECISION</code> 라벨의 semantics가 2024-01-18에 정책적으로 바뀌었고, 이전 라벨을 재해석하지 않고 시점 기준으로 분리 처리한 것으로 읽힌다.</p>
+<li><p><code>Shown</code>은 non-terminal이라 media interstitial과 limited engagement 두 restriction이 동시에 겹칠 수 있다.</p>
 </li>
-<li><p><strong>VF 신규 SafetyLevel <code>TimelineHomeHydration</code></strong> <span class="badge ok">확인</span> — 4-variant 중 4번째로 신설. hydration 단계에서 author-state와 socialgraph rule을 뺀 tweet-only rule 6개만(<code>TWEET_LABEL_DROPS</code> / <code>EXCLUSIVE_TWEET_DROP</code> / <code>TAKEDOWN_DROPS</code> / <code>SENSITIVE_VIEWER_DROPS</code> / <code>NSFW_MEDIA_INTERSTITIALS</code> / <code>NSFW_AUTHOR_INTERSTITIAL</code>) 돈다. Thrift <code>TIMELINE_HOME_HYDRATION</code> enum(값 4)이 이제 인식된다 — 4세대+25(2026-09-18)에서 이 값은 <code>unimplemented</code>로 스텁이었다.</p>
+<li><p>결정마다 <code>by: &amp;&#39;static str</code>이 rule 이름을 개별로 기록한다.</p>
 </li>
-<li><p><strong>Phoenix xrex serving의 bloom filter와 topic filter가 model_runner로 통합됐다</strong> <span class="badge ok">확인</span> — 삭제: <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/inference/serving_filters_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/serving_filters_runner.py</code></a>(−543)와 <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/models/recsys_two_tower_serving_filters.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_two_tower_serving_filters.py</code></a>(−173). 통합: <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/xrex/inference/model_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/model_runner.py</code></a>(+328)의 <code>RetrievalModelRunner</code>가 두 필터를 흡수. Topic filter는 6개 옵션(0=기본, 1~5는 A/B 대체)의 parquet(<code>1fav_topic_option_{0..5}_1day.parquet</code>)를 로드해 요청별로 하나 선택. Bloom filter는 bucket별 pinned host 메모리에 mask 버퍼를 할당하고 Rust(<code>RetrieveRequestBatch::build_eligible_mask_into_shards()</code>)가 채운다. 둘 중 하나라도 켜지면 live post-embeddings hotswap이 비활성화되고 drained finalize 경로로 폴백(pinned mask가 all_post_ids에 강하게 coupling돼 있어 stale mismatch를 피하기 위함 <span class="badge est">추정</span>).</p>
+<li><p><code>TombstoneReason::LocalRegulations</code>와 <code>LimitedEngagementReason::ConversationControl</code> enum 슬롯은 wire는 있지만, 아직 어떤 rule도 발동하지 않아 <code>#[expect(dead_code)]</code>로 마킹돼 있다. 지역 규제 대체 렌더링과 대화 통제 정책이 이 슬롯으로 들어올 준비다.</p>
 </li>
-<li><p><strong>Int8 post table quantization 배선</strong> <span class="badge ok">확인</span> — 신규 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/xrex/inference/int8_post_table.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/int8_post_table.py</code></a>(+11)에 <code>quantize_post_table()</code> 함수가 per-post absolute-max 스케일링으로 bf16 → int8 변환(scale은 float32). <code>RetrievalModelRunner.enable_int8_post_table</code> 플래그가 켜지면 post embedding 객체가 바뀔 때마다(<code>cache[0] is not x</code> identity check) 재양자화하고 캐시. <code>RecsysTwoTowerModel.forward()</code>가 <code>post_scales</code> 인자를 새로 받아 int8 → bf16 변환 후 matmul을 수행. 새 sharding pspec <code>((&quot;stage&quot;, &quot;expert&quot;, &quot;replica&quot;, &quot;data&quot;), (&quot;seq&quot;, &quot;model&quot;))</code>로 post embedding 첫 축이 4-axis sharding까지 확장(pipeline·data 병렬 축 추가).</p>
+</ul>
 </li>
-<li><p><strong>Phoenix engine copy_port 대규모 리팩터</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a>(+879/−93). 서빙 노드가 트레이너/피어에서 embedding 테이블·dense weight를 병렬 다운로드하는 클라이언트. 배치-per-배치 방식이 사라지고 <code>tokio::task::JoinSet</code> 기반 streaming continuation으로 대체돼 slow-tail transfer가 다음 배치를 막지 않는다. 두 새 env var — <code>COPY_PORT_TRAINER_CONNS_PER_SOURCE</code>(트레이너 하나에 병렬 커넥션 개수, 1~16 clamp)와 <code>XAI_RECSYS_RDMA=1</code>(RDMA 모드에서는 커넥션 다중화 비활성). 신규 <code>spawn_striped_trainer_downloads()</code>가 트레이너 하나의 소유 파일 리스트를 커넥션 수로 균등 분할해 파이프라이닝. Checkpoint hot-swap 지연 축소용 최적화 <span class="badge est">추정</span>.</p>
+<li>rule은 이제 함수가 아니라 데이터로 적는다. rule 하나가 이름, 조건 목록, 적용 대상, 액션으로 이뤄진다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/rules/rule_spec.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/rule_spec.rs</code></a>(+240/−69).<ul>
+<li>이전 <code>RuleSpec::{Tweet, Author, Custom}</code> enum이 <code>RuleClause { rule_name, when: &amp;[Condition], applies_to: Audience, action: ActionSpec }</code> struct로 대체됐다.</li>
+<li>Predicate는 4계열로 카탈로그화됐다. <code>TweetPredicate</code> 11종, <code>AuthorPredicate</code> 8종, <code>ViewerPredicate</code> 5종, <code>RelationshipPredicate</code> 5종이다.</li>
+<li>Audience는 3종이다: <code>Everyone</code> / <code>ExceptAuthor</code> / <code>ExceptAuthorAndFollowers</code>.</li>
+<li>ActionSpec은 4-variant다: <code>Drop</code> / <code>Tombstone</code> / <code>Interstitial{legacy, media}</code> / <code>LimitedEngagement</code>.</li>
+<li>신규 helper <code>tweet_timestamp_ms(tweet_id)</code>가 Snowflake epoch(<code>1288834974657 ms</code>, shift 22-bit)에서 tweet 생성 시각을 뽑는다.</li>
+<li>Policy 조립은 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>rules/registry.rs</code></a>에서 이뤄진다. <code>TimelineHome</code> 30개, <code>TimelineHomeRecommendations</code> 56개 rule의 순서는 회귀 테스트 <code>wired_rule_order_matches_pre_migration_sequence</code>로 잠긴다.</li>
+</ul>
 </li>
-<li><p><strong>홈믹서 하드코딩 상수 두 개가 파라미터로 승격</strong> <span class="badge ok">확인</span> — <code>NEW_USER_OON_WEIGHT_FACTOR</code> 상수가 <code>NewUserOonWeightFactor</code>(FS <code>rust_home_mixer_new_user_oon_weight_factor</code>, 기본 <code>0.00001</code>)로 이동. <code>ANN_MAX_POST_CANDIDATE_AGE_HOURS</code> 상수가 <code>SimclustersMaxCandidateAgeHours</code>(FS <code>rust_home_mixer_simclusters_max_candidate_age_hours</code>, 기본 48)로 이동. Simclusters cache key가 <code>signal_id → (signal_id, max_candidate_age_hours)</code>로 확장돼 age가 다른 실험이 서로 다른 cache entry를 갖는다.</p>
+<li>NSFW interstitial(콘텐츠 위에 씌우는 경고 화면)이 트윗 생성 시점에 따라 다른 사유로 걸린다 <span class="badge ok">확인</span>.<ul>
+<li>신규 rule <code>NsfwHighPrecisionAdultInterstitialRule</code>이 <code>CreatedAfter(1705536000000)</code>(2024-01-18 UTC) predicate로 갈라진다.</li>
+<li>그 이후 생성 트윗은 <code>InterstitialReason::Nudity(true)</code>로, 그 이전 트윗은 기존 <code>InterstitialReason::Sensitive(true)</code>로 blur된다.</li>
+<li><code>NSFW_HIGH_PRECISION</code> 라벨의 semantics가 2024-01-18에 정책적으로 바뀌었고, 이전 라벨을 재해석하지 않고 시점 기준으로 분리 처리한 것으로 읽힌다 <span class="badge est">추정</span>.</li>
+</ul>
 </li>
-<li><p><strong>Phoenix MoE 소스에 kill-switch decider 신설</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/sources/phoenix_moe_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/phoenix_moe_source.rs</code></a>(+66/−19). 새 decider <code>disable_home_mixer_phoenix_moe_source</code>가 켜지면 MoE 소스가 즉시 disable된다. FS는 rollout에 시간이 걸리지만 decider는 seconds 단위 propagate. <code>PhoenixMoeColdStartMaxResults</code>(기본 0)도 신설돼 4세대+25에서 non-MoE 소스에 도입된 cold-start 슬라이스 상한이 MoE에도 노출된다.</p>
+<li>hydration 단계에서 쓰는 SafetyLevel이 새로 생겼다. 이 레벨에서는 트윗만 보는 rule 6개만 돈다 <span class="badge ok">확인</span>.<ul>
+<li>SafetyLevel은 VF가 적용할 rule 목록(policy)을 정하는 단위다. 새 레벨 <code>TimelineHomeHydration</code>은 4-variant 중 4번째로 신설됐다.</li>
+<li>hydration 단계에서는 author-state와 socialgraph rule을 뺀 tweet-only rule만 돈다.<ul>
+<li><code>TWEET_LABEL_DROPS</code> / <code>EXCLUSIVE_TWEET_DROP</code> / <code>TAKEDOWN_DROPS</code> / <code>SENSITIVE_VIEWER_DROPS</code> / <code>NSFW_MEDIA_INTERSTITIALS</code> / <code>NSFW_AUTHOR_INTERSTITIAL</code></li>
+</ul>
 </li>
-<li><p><strong>Grox <code>SimpleReplyScorer</code> — quoted post 폴백 + 3단 JSON 복구</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/grox/flows/reply_spam/classifier_simple_reply_scorer.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/classifier_simple_reply_scorer.py</code></a>(+103/−3). 인용 트윗(quoted_post)이 있는 리플라이는 simple 경로를 건너뛰고 full <code>ReplyScorer</code> 경로로 위임(카운터 <code>task.spam_comment_detection.full_scorer.count</code>). LLM output JSON 파서가 3단계로 방어 — (1) <code>re.search(r&quot;\{.*\}&quot;, output, re.DOTALL)</code> 추출, (2) 실패 시 <code>json_repair.repair_json()</code>, (3) 여전히 실패면 <code>r&#39;&quot;score&quot;:\s*([\d.]+)&#39;</code> regex로 숫자만 뽑아 낸다. 파싱 실패는 <code>task.reply_ranker.invalid.count{reason=invalid_format|invalid_score_format|score_out_of_range}</code> 3계열로 세어진다. 새 히스토그램 <code>ranked_replies_scores</code>가 4-bucket(0.0, 1.0, 2.0, 3.0)으로 score 분포 관측.</p>
+<li>Thrift <code>TIMELINE_HOME_HYDRATION</code> enum(값 4)이 이제 인식된다. 2026-09-18 커밋(4세대+25)에서 이 값은 <code>unimplemented</code>로 스텁이었다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">D. Phoenix retrieval 서빙의 필터 두 개가 모델 러너로 합쳐지고, int8 양자화 옵션이 생겼다</span></p></div>
+<ul>
+<li>Phoenix xrex 서빙 코드에서 별도 파일에 있던 bloom filter와 topic filter가 model_runner 하나로 통합됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/xrex/inference/model_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/model_runner.py</code></a>(+328).<ul>
+<li>두 필터를 흡수한 것은 <code>RetrievalModelRunner</code>다.</li>
+<li>삭제된 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/inference/serving_filters_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/serving_filters_runner.py</code></a>(−543)와 <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/models/recsys_two_tower_serving_filters.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_two_tower_serving_filters.py</code></a>(−173)다.</li>
+<li>Topic filter는 6개 옵션의 parquet(<code>1fav_topic_option_{0..5}_1day.parquet</code>)를 로드해 요청별로 하나를 고른다. 옵션 0이 기본이고, 1~5는 A/B 대체다.</li>
+<li>Bloom filter는 bucket별 pinned host 메모리에 mask 버퍼를 할당하고, Rust(<code>RetrieveRequestBatch::build_eligible_mask_into_shards()</code>)가 이를 채운다.</li>
+<li>둘 중 하나라도 켜지면 live post-embeddings hotswap이 비활성화되고, drained finalize 경로로 폴백한다.</li>
+<li>이 폴백은 pinned mask가 all_post_ids에 강하게 coupling돼 있어 stale mismatch를 피하기 위한 것이다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+<li>포스트 임베딩 테이블을 int8로 양자화해 쓰는 옵션이 생겼다 <span class="badge ok">확인</span> — 신규 <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/xrex/inference/int8_post_table.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/int8_post_table.py</code></a>(+11).<ul>
+<li><code>quantize_post_table()</code> 함수가 per-post absolute-max 스케일링으로 bf16 → int8 변환을 한다. scale은 float32다.</li>
+<li><code>RetrievalModelRunner.enable_int8_post_table</code> 플래그가 켜지면, post embedding 객체가 바뀔 때마다(<code>cache[0] is not x</code> identity check) 재양자화하고 캐시한다.</li>
+<li><code>RecsysTwoTowerModel.forward()</code>가 <code>post_scales</code> 인자를 새로 받아, int8 → bf16 변환 후 matmul을 수행한다.</li>
+<li>새 sharding pspec <code>((&quot;stage&quot;, &quot;expert&quot;, &quot;replica&quot;, &quot;data&quot;), (&quot;seq&quot;, &quot;model&quot;))</code>로 post embedding 첫 축이 4-axis sharding까지 확장됐다. pipeline·data 병렬 축이 추가된 것이다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
+<ul>
+<li>Phoenix 서빙 엔진의 copy_port 클라이언트가 크게 리팩터돼, 느린 전송 하나가 다음 배치를 막지 않게 됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a>(+879/−93).<ul>
+<li>copy_port 클라이언트는 서빙 노드가 트레이너/피어에서 embedding 테이블·dense weight를 병렬 다운로드하는 클라이언트다.</li>
+<li>배치-per-배치 방식이 사라지고 <code>tokio::task::JoinSet</code> 기반 streaming continuation으로 대체돼, slow-tail transfer가 다음 배치를 막지 않는다.</li>
+<li>새 env var는 두 개다. <code>COPY_PORT_TRAINER_CONNS_PER_SOURCE</code>는 트레이너 하나에 여는 병렬 커넥션 개수다(1~16 clamp). <code>XAI_RECSYS_RDMA=1</code>은 RDMA 모드이고, 이 모드에서는 커넥션 다중화가 비활성된다.</li>
+<li>신규 <code>spawn_striped_trainer_downloads()</code>가 트레이너 하나의 소유 파일 리스트를 커넥션 수로 균등 분할해 파이프라이닝한다.</li>
+<li>Checkpoint hot-swap 지연을 줄이기 위한 최적화다 <span class="badge est">추정</span>.</li>
+</ul>
+</li>
+<li>홈믹서에 하드코딩돼 있던 상수 두 개가 FS(FeatureSwitch, 런타임에 값을 바꿀 수 있는 설정 스위치) 파라미터로 옮겨졌다 <span class="badge ok">확인</span>.<ul>
+<li><code>NEW_USER_OON_WEIGHT_FACTOR</code> 상수는 <code>NewUserOonWeightFactor</code>(FS <code>rust_home_mixer_new_user_oon_weight_factor</code>, 기본 <code>0.00001</code>)로 이동했다.</li>
+<li><code>ANN_MAX_POST_CANDIDATE_AGE_HOURS</code> 상수는 <code>SimclustersMaxCandidateAgeHours</code>(FS <code>rust_home_mixer_simclusters_max_candidate_age_hours</code>, 기본 48)로 이동했다.</li>
+<li>Simclusters cache key가 <code>signal_id → (signal_id, max_candidate_age_hours)</code>로 확장돼, age가 다른 실험이 서로 다른 cache entry를 갖는다.</li>
+</ul>
+</li>
+<li>Phoenix MoE 후보 소스를 즉시 끌 수 있는 kill-switch decider가 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/sources/phoenix_moe_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/phoenix_moe_source.rs</code></a>(+66/−19).<ul>
+<li>새 decider <code>disable_home_mixer_phoenix_moe_source</code>가 켜지면 MoE 소스가 즉시 disable된다.</li>
+<li>FS는 rollout에 시간이 걸리지만, decider는 seconds 단위로 propagate된다.</li>
+<li><code>PhoenixMoeColdStartMaxResults</code>(기본 0)도 신설돼, 2026-09-18 커밋(4세대+25)에서 non-MoE 소스에 도입된 cold-start 슬라이스 상한이 MoE에도 노출된다.</li>
+</ul>
+</li>
+<li>Grox(X의 LLM 주석 파이프라인)의 간이 답글 점수기가 인용 트윗이 있는 답글을 full 점수기로 넘기고, LLM 출력 JSON을 3단계로 복구한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/grox/flows/reply_spam/classifier_simple_reply_scorer.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/classifier_simple_reply_scorer.py</code></a>(+103/−3).<ul>
+<li>간이 점수기는 <code>SimpleReplyScorer</code>다. 인용 트윗(quoted_post)이 있는 리플라이는 simple 경로를 건너뛰고 full <code>ReplyScorer</code> 경로로 위임된다(카운터 <code>task.spam_comment_detection.full_scorer.count</code>).</li>
+<li>LLM output JSON 파서는 다음 3단계로 방어한다.<ol>
+<li><code>re.search(r&quot;\{.*\}&quot;, output, re.DOTALL)</code>로 추출한다.</li>
+<li>실패하면 <code>json_repair.repair_json()</code>을 쓴다.</li>
+<li>여전히 실패하면 <code>r&#39;&quot;score&quot;:\s*([\d.]+)&#39;</code> regex로 숫자만 뽑아 낸다.</li>
+</ol>
+</li>
+<li>파싱 실패는 <code>task.reply_ranker.invalid.count{reason=invalid_format|invalid_score_format|score_out_of_range}</code> 3계열로 세어진다.</li>
+<li>새 히스토그램 <code>ranked_replies_scores</code>가 4-bucket(0.0, 1.0, 2.0, 3.0)으로 score 분포를 관측한다.</li>
+</ul>
 </li>
 </ul>
 <blockquote>
 <p>&quot;The framework treats recommender-system observability as a counterfactual measurement problem: estimating what the recommender would have done, and what engagement would have followed, in the absence of a specific content item or model decision.&quot;
 — <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement (arXiv 2609.22747)</a>, 2026-09-19 (Netflix 자료에서 인용, 이 자료 아래 절 참조)</p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> <code>공개 소스 4세대</code> 표 — <code>4세대+26</code> 행 추가(3aa0fa33 커밋 요약). 열린 질문의 세 축(VMRanker의 value model 실체, retrieval attribution의 downstream 활용, VF Tombstone/LimitedEngagement 슬롯이 언제 채워지는지)은 후속 커밋 관찰 대상.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> VMRanker의 확장(값 모델 컴퓨트 준비 완료), retrieval attribution 파이프라인(후보 origin이 후보 자체에 기록 + 5% Kafka + aggregate metric), VF verdict 트리 재작성(여러 restriction 겹침 표현 + Tombstone/LimitedEngagement 슬롯 개방)이 한 커밋에 함께 온다. 세 축 모두 &quot;인프라 배선은 완성됐지만 게이팅 파라미터 기본은 off/기존 동작 유지&quot;라는 4세대의 반복되는 패턴을 따른다. Phoenix xrex serving 층에서도 별도 파일이었던 bloom filter·topic filter가 model_runner로 통합되고 int8 post table quantization까지 함께 온 것은 retrieval serving의 대규모 스케일 대응 축이다. 앞으로 관찰할 지점은 <code>VMRankerComputeValueModel=true</code>가 실험으로 켜지는 시점, retrieval attribution Kafka가 어느 오프라인 잡을 먹이는지, Tombstone/LimitedEngagement 슬롯이 어느 rule에서 처음 채워지는지 세 개다.</p></div>
-<h2 id="2-netflix-beyond-raw-engagement--recommender-system-observability를-counterfactual-측정-문제로-재정의recsys-2026--netflix"><span class="num">2</span>Netflix &quot;Beyond Raw Engagement&quot; — recommender system observability를 counterfactual 측정 문제로 재정의(RecSys 2026) — Netflix</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a> — arXiv 2026-09-19 v1 제출, RecSys 2026(2026-10-02 Minneapolis) accepted. 저자 4인 전원 Netflix Los Gatos — Chaoran Guo·Ding Tong·Ting-Po Lee(전 Netflix)·Scarlet Chen. <a href="https://arxiv.org/html/2609.22747v1" target="_blank" rel="noopener">HTML 판</a>에서 이메일 도메인 <code>@netflix.com</code> 3인 확인.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 대규모 recommender system은 조회수·클릭 같은 raw engagement 신호만으로는 콘텐츠 품질(content quality), 모델 동작(model behavior), 노출 편향(presentation bias), 청중 도달(audience reach)이 뒤섞여 어떤 원인이 어떤 결과를 냈는지 귀속하기 어렵다. 예를 들어 좋은 콘텐츠가 새 모델이 잘못 배치해서 CTR이 낮게 나오는 상황에서 raw CTR만 보면 콘텐츠가 저평가된다. Netflix는 이 문제를 &quot;recommender-system observability를 counterfactual measurement problem으로 재정의&quot; — 특정 콘텐츠 아이템이 없었다면 또는 특정 모델 결정이 없었다면 어떤 추천이 나오고 어떤 engagement가 뒤따랐을지를 추정하는 방식 — 로 접근하는 프레임워크를 몇 년에 걸쳐 여러 recommender 위에 구축·배포해 왔다고 밝힌다. 이번 논문은 그 프레임워크의 방법론(bias reduction / relativity / incrementality 세 축)과 프로덕션 검증 사례(Row Curators A/B alignment R²=0.82, label misattribution 자동 감지) 하나를 공개한 것이다. Counterfactual 측정 자체는 새 개념이 아니지만, &quot;content creator와 model developer 두 청중을 단일 측정 기반으로 지원한다&quot;는 관점과 cascading recommender에 대한 확장이 이 자료의 각도다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 <code>공개 소스 4세대</code> 표에 <code>4세대+26</code> 행을 추가해 3aa0fa33 커밋을 요약했다. 열린 질문의 세 축은 VMRanker의 value model 실체, retrieval attribution의 downstream 활용, VF Tombstone/LimitedEngagement 슬롯이 언제 채워지는지이고, 모두 후속 커밋에서 지켜볼 대상이다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> VMRanker 확장, retrieval attribution 파이프라인, VF verdict 트리 재작성이 한 커밋에 함께 왔고, 세 축 모두 &quot;인프라 배선은 완성됐지만 게이팅 파라미터 기본은 off/기존 동작 유지&quot;라는 4세대의 반복되는 패턴을 따른다.</p></div>
 <ul>
-<li><p><strong>세 축의 측정 프레임워크</strong> <span class="badge ok">확인</span> §3.1. Netflix가 자체 recommender에 배포한 measurement의 축은 세 개다.</p>
+<li>VMRanker는 값 모델을 컴퓨트할 준비를 마쳤다.</li>
+<li>retrieval attribution 파이프라인은 후보 origin을 후보 자체에 기록하고, 5% Kafka 샘플과 aggregate metric을 함께 낸다.</li>
+<li>VF verdict 트리 재작성은 여러 restriction의 겹침을 표현하고, Tombstone/LimitedEngagement 슬롯을 열었다.</li>
+<li>Phoenix xrex serving 층에서도 별도 파일이었던 bloom filter·topic filter가 model_runner로 통합되고, int8 post table quantization까지 함께 왔다. 이것은 retrieval serving의 대규모 스케일 대응 축이다.</li>
+<li>앞으로 관찰할 지점은 세 개다. <code>VMRankerComputeValueModel=true</code>가 실험으로 켜지는 시점, retrieval attribution Kafka가 어느 오프라인 잡의 입력이 되는지, Tombstone/LimitedEngagement 슬롯이 어느 rule에서 처음 채워지는지다.</li>
+</ul>
+<h2 id="2-추천-시스템-관측을-반사실-측정-문제로-다루는-recsys-2026-논문--netflix"><span class="num">2</span>추천 시스템 관측을 반사실 측정 문제로 다루는 RecSys 2026 논문 — Netflix</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a> — arXiv, 2026-09-19 v1 제출, 논문. RecSys 2026(2026-10-02 Minneapolis)에 accepted됐다. 저자 4인의 소속은 전원 Netflix Los Gatos다: Chaoran Guo·Ding Tong·Ting-Po Lee(전 Netflix)·Scarlet Chen. <a href="https://arxiv.org/html/2609.22747v1" target="_blank" rel="noopener">HTML 판</a>에서 이메일 도메인 <code>@netflix.com</code> 3인을 확인했다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 대규모 recommender system에서 조회수·클릭 같은 raw engagement 신호만 보면 여러 요인이 뒤섞인다. 섞이는 것은 콘텐츠 품질, 모델 동작, 노출 편향, 청중 도달(각각 content quality, model behavior, presentation bias, audience reach)이다. 그래서 어떤 원인이 어떤 결과를 냈는지 귀속하기 어렵다. 예를 들어 새 모델이 좋은 콘텐츠를 잘못 배치해 CTR이 낮게 나오면, raw CTR만 보는 한 그 콘텐츠가 저평가된다. Netflix는 이 문제를 &quot;recommender-system observability를 counterfactual measurement problem으로 재정의&quot;하는 방식으로 접근하는 프레임워크를, 몇 년에 걸쳐 여러 recommender 위에 구축·배포해 왔다고 밝힌다. 이 방식은 특정 콘텐츠 아이템이나 특정 모델 결정이 없었다면 어떤 추천이 나오고 어떤 engagement가 뒤따랐을지를 추정한다. Counterfactual 측정 자체는 새 개념이 아니다. 이 자료의 각도는 &quot;content creator와 model developer 두 청중을 단일 측정 기반으로 지원한다&quot;는 관점과, cascading recommender(upstream 단계가 후보 pool을 먼저 거르는 다단계 추천)로의 확장이다. 이번 논문은 bias reduction / relativity / incrementality 세 축의 방법론과, 프로덕션 검증 사례 하나(Row Curators A/B alignment R²=0.82, label misattribution 자동 감지)를 공개했다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 측정은 세 축으로 이뤄지고, exploration으로 남긴 노출 확률 로그를 전제로 한다</span></p></div>
 <ul>
-<li><strong>Bias reduction</strong> — inverse propensity score(IPS)의 self-normalized 변형(SNIPS)으로 노출 propensity를 보정. 정책 $\pi_e$ vs 로그 정책 $\pi_0$의 alignment를 match function $m$으로 가늠하고, exact matching이 unbiased의 특수 케이스라고 명시.</li>
-<li><strong>Relativity</strong> — 정책 vs 정책 비교(SNIPS 차이)와 아이템 vs 아이템 비교(position-adjusted SNIPS)로 알고리즘 성능과 콘텐츠 성능을 분리. Position bias 완화를 위해 콘텐츠 $c_i$의 각 position lift를 랜덤 콘텐츠와 비교한 뒤 position weight로 aggregate.</li>
-<li><strong>Incrementality</strong> — &quot;이 아이템을 제거하면 얼마의 가치를 잃는가&quot;를 counterfactual로 물어 콘텐츠의 실제 기여도를 재는 것. Netflix는 이 축을 single-stage와 cascading 두 케이스로 나눠 방법을 제시한다.</li>
+<li>Netflix가 자체 recommender에 배포한 measurement의 축은 세 개다 <span class="badge ok">확인</span> §3.1.<ul>
+<li>Bias reduction은 노출 propensity를 SNIPS로 보정한다. SNIPS는 inverse propensity score(IPS, 관측값을 노출 확률의 역수로 가중하는 추정)의 self-normalized 변형이다. 정책 $\pi_e$와 로그 정책 $\pi_0$의 alignment는 match function $m$으로 가늠하고, exact matching이 unbiased의 특수 케이스라고 명시한다.</li>
+<li>Relativity는 알고리즘 성능과 콘텐츠 성능을 분리한다. 정책 대 정책 비교에는 SNIPS 차이를, 아이템 대 아이템 비교에는 position-adjusted SNIPS를 쓴다. Position bias를 완화하려고 콘텐츠 $c_i$의 각 position lift를 랜덤 콘텐츠와 비교한 뒤 position weight로 aggregate한다.</li>
+<li>Incrementality는 &quot;이 아이템을 제거하면 얼마의 가치를 잃는가&quot;를 counterfactual로 물어 콘텐츠의 실제 기여도를 잰다. Netflix는 이 축의 방법을 single-stage와 cascading 두 케이스로 나눠 제시한다.</li>
 </ul>
 </li>
-<li><p><strong>Leave-One-Out 측정으로 single-stage incrementality</strong> <span class="badge ok">확인</span> §3.2. Exploration 정책 위에 특정 아이템이 제거된 counterfactual을 시뮬레이션한 &quot;Leave-One-Out policy&quot;를 얹고, 두 정책의 SNIPS 차이를 position별로 aggregate. match function은 두 조건 중 하나에서 1 — (i) explored arm이 Exploration 정책의 top pick이고 제거 대상이 아니거나, (ii) explored arm이 second-best이고 top이 제거 대상. 분산 축소용으로 logged probability를 10th percentile에서 하한 clip.</p>
+<li>이 프레임워크는 Exploration &amp; Exploitation 모듈을 전제조건으로 한다 <span class="badge ok">확인</span> §3.1.<ul>
+<li>프레임워크는 contextual bandit·RL setup 위에서 동작한다. arm $a_j$가 정책 $\pi$에 따라 확률 $\pi(a_j|x_j)$로 선택되고, 그 확률이 logging된다.</li>
+<li>즉 exploration을 하지 않고 logged propensity가 없는 recommender에는 이 프레임워크를 그대로 적용할 수 없다.</li>
+<li>Netflix는 이 조건이 대부분의 자체 recommender에 이미 충족돼 있다고 서술한다.</li>
+</ul>
 </li>
-<li><p><strong>Cascading recommender의 청중별 방법</strong> <span class="badge ok">확인</span> §3.3. 캐스케이드에서는 후보 pool이 upstream에서 걸러지므로 낮은 engagement가 upstream filtering 탓일 수 있다. 청중별로 답이 다르다.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. single-stage에서는 아이템을 뺀 반사실 정책과 비교해 증분 기여도를 재고, 캐스케이드에서는 청중마다 방법이 다르다</span></p></div>
 <ul>
-<li><p><strong>Upstream model developer</strong> — &quot;이 아이템을 후보 pool에 넣는 것이 좋았나&quot;를 Leave-One-Out으로 재사용하되, target action이 single top pick이 아니라 set이 되므로 match $m$을 Jaccard 같은 set similarity로 재정의. 여러 아이템에서 lift가 크면 upstream이 downstream에 실제로 값을 더한다는 뜻이고, 반대면 pool이 downstream 관점에서 교환 가능하다는 뜻.</p>
+<li>single-stage incrementality는 Leave-One-Out 측정으로 잰다 <span class="badge ok">확인</span> §3.2.<ul>
+<li>Exploration 정책 위에 특정 아이템이 제거된 counterfactual을 시뮬레이션한 &quot;Leave-One-Out policy&quot;를 두고, 두 정책의 SNIPS 차이를 position별로 aggregate한다.</li>
+<li>match function은 다음 두 조건 중 하나에서 1이다.<ul>
+<li>explored arm이 Exploration 정책의 top pick이고 제거 대상이 아닐 때</li>
+<li>explored arm이 second-best이고 top이 제거 대상일 때</li>
+</ul>
 </li>
-<li><p><strong>Content creator·platform observability</strong> — 각 아이템의 전체 pipeline 기여도를 두 값으로 분해:</p>
+<li>분산을 줄이려고 logged probability를 10th percentile에서 하한 clip한다.</li>
+</ul>
+</li>
+<li>cascading recommender에서는 청중에 따라 방법이 다르다 <span class="badge ok">확인</span> §3.3.<ul>
+<li><p>캐스케이드에서는 후보 pool이 upstream에서 걸러지므로, 낮은 engagement가 upstream filtering 탓일 수 있다.</p>
+</li>
+<li><p>upstream model developer에게는 &quot;이 아이템을 후보 pool에 넣는 것이 좋았나&quot;를 묻고, Leave-One-Out을 재사용한다. 다만 target action이 single top pick이 아니라 set이 되므로, match $m$을 Jaccard 같은 set similarity로 재정의한다.</p>
+<ul>
+<li>여러 아이템에서 lift가 크면 upstream이 downstream에 실제로 값을 더한다는 뜻이다.</li>
+<li>반대면 pool이 downstream 관점에서 교환 가능하다는 뜻이다.</li>
+</ul>
+</li>
+<li><p>content creator와 platform observability를 위해서는 각 아이템의 전체 pipeline 기여도를 두 값으로 분해한다.</p>
 <p>Incrementality(i) = Irreplaceability(i) · Universality(i)</p>
-<p>Irreplaceability는 i가 후보 pool에 있을 때의 조건부 causal lift(self-normalized Hájek IPS로 추정), Universality는 i가 eligible한 확률.</p>
+<ul>
+<li>Irreplaceability는 i가 후보 pool에 있을 때의 조건부 causal lift이고, self-normalized Hájek IPS로 추정한다.</li>
+<li>Universality는 i가 eligible한 확률이다.</li>
+</ul>
 </li>
 </ul>
 </li>
-<li><p><strong>Row Curators A/B alignment R²=0.82</strong> <span class="badge ok">확인</span> §4.2. Netflix 홈페이지의 &quot;Row Curator&quot;(콘텐츠 큐레이터가 만드는 title 컬렉션 row)의 오프라인 incrementality 측정을 실제 A/B(해당 row 시리즈를 recommender에서 제거하고 user engagement 손실 측정) ground truth와 비교. 11개 A/B에서 R²=0.8212 alignment. Netflix는 self-normalized Hájek estimator를 선택한 이유로 heterogeneous propensity 환경에서의 견고성을 든다. 프로덕션 detail — propensity를 [0.0001, 0.9999]로 clip, row당 최소 100 observation 요구, 서로 다른 길이의 홈페이지에 걸쳐 aggregate.</p>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. Row Curators의 오프라인 측정과 실제 A/B의 alignment가 R²=0.82였고, 라벨 오귀속을 자동으로 감지한 사례가 있다</span></p></div>
+<ul>
+<li><p>Row Curators의 오프라인 incrementality 측정과 실제 A/B의 alignment는 R²=0.82였다 <span class="badge ok">확인</span> §4.2.</p>
+<ul>
+<li>Netflix 홈페이지의 &quot;Row Curator&quot;는 콘텐츠 큐레이터가 만드는 title 컬렉션 row다.</li>
+<li>이 row의 오프라인 incrementality 측정을 실제 A/B ground truth와 비교했다. A/B는 해당 row 시리즈를 recommender에서 제거하고 user engagement 손실을 측정한 것이다.</li>
+<li>11개 A/B에서 alignment는 R²=0.8212였다.</li>
+<li>Netflix는 self-normalized Hájek estimator를 선택한 이유로 heterogeneous propensity 환경에서의 견고성을 든다.</li>
+<li>프로덕션 세부 사항은 세 가지다.<ul>
+<li>propensity를 [0.0001, 0.9999]로 clip한다.</li>
+<li>row당 최소 100 observation을 요구한다.</li>
+<li>서로 다른 길이의 홈페이지에 걸쳐 aggregate한다.</li>
+</ul>
+</li>
+</ul>
 <blockquote>
 <p>&quot;For the Irreplaceability estimate, we tried different estimators and eventually selected the self-normalized Hájek estimator for robust observability signal under such heterogeneous propensities. In practice, we clip the propensities to [0.0001, 0.9999] to further reduce variance, require at least 100 observations for each row, and aggregate across homepages of varying lengths. Across 11 A/B tests, the R² between our proposed row-incrementality measurement and the A/B-test ground truth is 0.8212, providing strong validation of our approach.&quot;
 — <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">arXiv 2609.22747</a>, 2026-09-19</p>
 </blockquote>
 </li>
-<li><p><strong>Model developer observability 케이스 스터디 — 라벨 misattribution 자동 감지</strong> <span class="badge ok">확인</span> §4.3. Incrementality 시계열 모니터링이 특정 콘텐츠 A의 성능 dip를 다른 유사 콘텐츠는 안정된 상황에서 감지해 냈고, 원인을 추적한 결과 &quot;모델의 positive label misattribution&quot;이었다. 저자는 이 프레임워크가 raw engagement로는 놓칠 발견을 하고, model developer가 root cause로 빨리 접근하게 만든다고 정리.</p>
-</li>
-<li><p><strong>Exploration &amp; Exploitation 모듈이 전제조건이다</strong> <span class="badge ok">확인</span> §3.1. 프레임워크는 contextual bandit·RL setup 위에 얹혀 있다 — arm $a_j$가 정책 $\pi$에 따라 확률 $\pi(a_j|x_j)$로 선택되고 그 확률이 logging된다. 즉 <strong>exploration을 하지 않고 logged propensity가 없는 recommender에는 이 프레임워크를 그대로 얹을 수 없다</strong>. Netflix는 이 조건이 대부분의 자체 recommender에 이미 충족돼 있다고 서술.</p>
-</li>
-<li><p><strong>명시하지 않은 것</strong> <span class="badge obs">관찰</span> 논문 정독. (a) 어느 recommender에 각각 배포됐는지 이름 명시가 없다(홈페이지 row 큐레이션이 명확한 유일한 사례). (b) core online metric 절대값이 공개되지 않는다. (c) FM·GenRec·GenPage 같은 세대 라인과의 관계가 명시되지 않는다 — 이 프레임워크가 GenRec의 A/B alignment에 쓰였는지, 자체 라인인지 불분명. (d) Row Curators A/B 11개의 개별 결과가 논문 본문에는 제시되지 않고 R² 하나로만 aggregate. (e) 프레임워크가 아직 커버하지 않는 recommender(exploration 없는 경우 등)의 대응책이 언급되지 않는다.</p>
-</li>
-</ul>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="netflix.html">services/netflix.md</a> — <code>학습 주기·평가</code> 절 아래에 새 하위 절 &quot;Counterfactual observability 프레임워크 (2026-09, RecSys 2026)&quot; 신설. 기존 진술 &quot;오프라인 지표가 A/B를 예측 못 함(10년째 같은 고백)&quot;과 <a href="netflix.html#popularity-based-winner--%EC%98%A4%ED%94%84%EB%9D%BC%EC%9D%B8-%ED%94%84%EB%A1%9D%EC%8B%9C-%ED%83%9C%EC%8A%A4%ED%81%AC">MediaFM</a>의 popularity-based winner 프록시가 gate 역할을 하는 방식이 있었고, 이번 자료는 그 옆에 <strong>&quot;운영 중 관측(observability)&quot; 축을 counterfactual measurement 기반으로 별도로 세운다</strong>는 진술로 붙는다. Row Curators A/B alignment R²=0.82와 label misattribution 자동 감지 사례를 그 절에 담고, MediaFM 프록시가 &quot;체크포인트 gating(선발전)&quot;이라면 이 프레임워크는 &quot;프로덕션 monitoring(경기 중 관측)&quot;이라는 위치 차이를 명시한다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> Netflix는 그동안 오프라인 평가와 A/B의 alignment를 정직하게 낮게 인정해 왔다(&quot;A/B 결과를 원하는 만큼 예측하지 못한다&quot;, 2015). 이번 자료는 그 문제의 한 축인 &quot;프로덕션 관측성&quot;에 대해 counterfactual measurement 기반의 자체 프레임워크를 제시한다. Row Curators A/B alignment R²=0.82는 이 프레임워크의 오프라인 추정치가 실제 A/B 결과의 82%를 설명한다는 강한 결과다(random baseline이 0에 가까울 것을 감안). 저장소 정본에서는 이 프레임워크가 (a) MediaFM의 popularity-based winner(체크포인트 gating용 오프라인 프록시)와 나란히 서지만 자리가 다르고 — winner는 배포 전 선발, 이 프레임워크는 배포 후 관측 —, (b) GenRec 논문의 A/B 결과 검증에 이 프레임워크가 쓰였는지가 후속 확인 대상, (c) exploration 기반 logged propensity가 전제이므로 non-exploring recommender(예: pure Foundation Model shadow 배포)에는 그대로 얹을 수 없다는 제약이 함께 붙는다. Netflix가 recommender 측정 방법론을 별도 논문으로 공개한 것은 이 저장소 코퍼스 안에서 counterfactual measurement 라인의 첫 회사 진술이다(위치와 목적이 <a href="netflix.html#%EC%95%84%ED%8A%B8%EC%9B%8C%ED%81%AC%EB%B9%84%EB%94%94%EC%98%A4-%ED%94%84%EB%A6%AC%EB%B7%B0-%EA%B0%9C%EC%9D%B8%ED%99%94--maps-multimodal-asset-personalization-at-scale-2026-08-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98">MAPS</a>의 offline gating과는 별개).</p></div>
-<h2 id="레이더">레이더</h2>
-<p>오늘 arXiv cs.IR 신규 30건 triage(파싱된 <code>&lt;entry&gt;</code> 개수 30, 2026-09-18~09-21). 통과 3건 — 그중 1건은 Netflix 자료로 위 자료 2에서 상세 다뤘고 서비스 정본에 직접 반영했으므로 레이더에는 편입하지 않는다. 나머지 2건(<a href="radar.html">radar.md</a>에 편입):</p>
+<li><p>model developer 관측 사례에서는 라벨 misattribution이 자동으로 감지됐다 <span class="badge ok">확인</span> §4.3.</p>
 <ul>
-<li><strong>UNIQUE (Baidu + Beihang + CityU) — 산업 mobile feed의 unified retrieval + ranking + single-layer flat quantization, RecSys 2026 accepted</strong> <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2609.23718" target="_blank" rel="noopener">arXiv 2609.23718</a>, 2026-09-20 v1. 저자 소속을 <a href="https://arxiv.org/html/2609.23718v1" target="_blank" rel="noopener">HTML 판</a>에서 확인(Baidu Inc.·Beihang University·Hong Kong Institute of AI for Science). 후보 retrieval의 hierarchical quantization instability와 retrieval-ranking stage 간 정보 손실을 두 축의 문제로 지적하고, generative code-based retrieval과 target-aware ranking을 early-fusion single architecture로 통합해 end-to-end 학습·효율적 후보 생성을 함께 노린다는 주장. Baidu는 canon 서비스 아니지만 대규모 산업 mobile feed(Baidu App)를 운영. 논문이 프로덕션 배포·A/B 수치를 abstract 수준에서 명시하는지는 정독 필요 — radar에 심층 분석 대기로 편입.</li>
-<li><strong>MuSeR (Kuaishou) — deployed MGS 위에서 10^4~10^5 규모 유저 이력을 hierarchical temporal compression으로 압축하는 multi-interest 시퀀스 retrieval</strong> <span class="badge ok">확인</span> <a href="https://arxiv.org/abs/2609.23677" target="_blank" rel="noopener">arXiv 2609.23677</a>, 2026-09-20 v1. HTML 판에서 저자 소속이 Kuaishou 도메인으로 확인. 최근 액션은 full resolution로 유지, 오래된 세그먼트는 점진 pooling으로 압축해 fixed serving budget 안에서 lifelong history를 담는다는 접근. Kuaishou는 이미 radar의 <a href="radar.html#swim-kuaishou-%EB%A9%94%EC%9D%B8-%ED%94%BC%EB%93%9C--generator-evaluator-%EC%9E%AC%EC%88%9C%EC%9C%84%EC%9D%98-evaluator%EB%A5%BC-%EC%84%B8%EC%85%98-survival-process%EB%A1%9C-%EC%9E%AC%EC%84%A4%EA%B3%84">SWIM</a>·<a href="radar.html#unirec-kuaishou--%EC%BA%90%EC%8A%A4%EC%BC%80%EC%9D%B4%EB%93%9C-pre-ranking--ranking-fusion%EC%9D%84-two-stage-joint-learning%EC%9C%BC%EB%A1%9C-%EC%A0%95%EB%A0%AC-app-usage-duration-0616">UniRec</a>·<a href="radar.html#drem-kuaishou-%EB%8B%A8%ED%8E%B8-%EB%B9%84%EB%94%94%EC%98%A4--pxtr-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9D%B4%EC%A4%91-%EB%B3%B4%EC%A0%95-ensemble-ranking">DrEM</a> 등 다수 스레드가 있고, MuSeR는 <a href="radar.html#chroniclerec-tencent-pcg--weixin-moments-ads-pcvr%EC%97%90-ultra-long-%EC%9C%A0%EC%A0%80-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4%EB%A5%BC-target-independent-chronicle-token%EC%9C%BC%EB%A1%9C-%EC%82%AC%EC%A0%84-%EC%95%95%EC%B6%95-gmv-161-95-ci-0678-2547">Tencent PCG의 ChronicleRec</a>와 자리가 인접(둘 다 ultra-long behavior sequence 사전 압축) — radar의 lifelong user modeling 각도에 데이터 포인트를 하나 더한다.</li>
+<li>Incrementality 시계열 모니터링이, 다른 유사 콘텐츠는 안정된 상황에서 특정 콘텐츠 A의 성능 dip를 감지해 냈다.</li>
+<li>원인을 추적한 결과는 &quot;모델의 positive label misattribution&quot;이었다.</li>
+<li>저자는 이 프레임워크가 raw engagement로는 놓칠 발견을 하고, model developer가 root cause에 빨리 접근하게 만든다고 정리한다.</li>
 </ul>
-<p><strong>탈락(관찰 대상 아님).</strong> 나머지 27건은 요건 삼각(플랫폼 기업 저자 + 프로덕션 A/B 진술 + 메커니즘·스케일 신규성)을 만족하지 않았다. 목록: Ascent(clinical MCP), UK-PRBENCH(법률 case law retrieval), Semantic ID reproducibility study, Baidu·Google AI search auditing(외부 audit), Graded-Relevance e-commerce multimodal, publication bias biomedical causal search, UniK universal knowledge, Q-TIE temporal IR, YouTube Music LLM rationale(음악 도메인), UNDRR disaster schema extraction, Redundancy Reduction Sequential Recommendation(academic), PSD LLM agent memory, Answer-Oriented Context AI search, candidate-job matching bi-encoder eval, Brand Visibility AI Search, MM-ContextFold multimodal RAG, EU research policy, Inherit4Rec(Kuaishou 파라미터 상속 — mechanism-novel하지만 프로덕션 A/B 미언급으로 이번 batch에서는 탈락), Static-vs-Agentic RAG Taiwan history, Attributable RAG citations, R-GEAN medication change(EHR), Per-Query Gating LLM rerankers, Dense-Sparse Fusion BEIR SciFact, DOA-SORT multi-object tracking(비-IR), GEO score cross-engine, AdaMerge visual doc retrieval, semantic candidate-job matching hybrid retrieval.</p>
-<p>산업 블로그 훑기는 오늘(수요일) 대상 아님(월요일에만).</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">D. 논문이 밝히지 않은 것이 다섯 가지 있다</span></p></div>
+<ul>
+<li>논문은 다음 다섯 가지를 명시하지 않는다 <span class="badge obs">관찰</span> 논문 정독.<ul>
+<li>프레임워크가 각각 어느 recommender에 배포됐는지 이름을 밝히지 않는다. 홈페이지 row 큐레이션이 명확한 유일한 사례다.</li>
+<li>core online metric의 절대값이 공개되지 않는다.</li>
+<li>FM·GenRec·GenPage 같은 세대 라인과의 관계가 명시되지 않는다. 이 프레임워크가 GenRec의 A/B alignment에 쓰였는지, 자체 라인인지 불분명하다.<ul>
+<li>FM은 회원 표현을 중앙화한 Netflix의 Foundation Model이다. GenRec은 LLM 랭커이고, GenPage는 페이지 전체를 트랜스포머 하나로 생성하는 모델이다.</li>
+</ul>
+</li>
+<li>Row Curators A/B 11개의 개별 결과가 논문 본문에는 제시되지 않고, R² 하나로만 aggregate돼 있다.</li>
+<li>프레임워크가 아직 커버하지 않는 recommender(exploration 없는 경우 등)의 대응책이 언급되지 않는다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="netflix.html">services/netflix.md</a>의 <code>학습 주기·평가</code> 절 아래에 새 하위 절 &quot;Counterfactual observability 프레임워크 (2026-09, RecSys 2026)&quot;를 만들었다. 정본에는 기존 진술 &quot;오프라인 지표가 A/B를 예측 못 함(10년째 같은 고백)&quot;과, <a href="netflix.html#popularity-based-winner--%EC%98%A4%ED%94%84%EB%9D%BC%EC%9D%B8-%ED%94%84%EB%A1%9D%EC%8B%9C-%ED%83%9C%EC%8A%A4%ED%81%AC">MediaFM</a>(Netflix의 비디오 프리뷰용 foundation model)의 popularity-based winner 프록시가 gate 역할을 하는 방식이 있었다. 이번 자료는 그 옆에 &quot;운영 중 관측(observability)&quot; 축을 counterfactual measurement 기반으로 별도로 세운다는 진술로 들어갔다. 그 절에는 Row Curators A/B alignment R²=0.82와 label misattribution 자동 감지 사례를 담았다. 또 MediaFM 프록시가 &quot;체크포인트 gating(선발전)&quot;이라면 이 프레임워크는 &quot;프로덕션 monitoring(경기 중 관측)&quot;이라는 위치 차이를 명시했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이번 자료는 오프라인 평가와 A/B의 alignment 문제 가운데 한 축인 &quot;프로덕션 관측성&quot;에 대해, counterfactual measurement 기반의 자체 프레임워크를 제시한다. Netflix는 그동안 이 alignment가 낮다는 것을 정직하게 인정해 왔다(&quot;A/B 결과를 원하는 만큼 예측하지 못한다&quot;, 2015). Row Curators A/B alignment R²=0.82는 이 프레임워크의 오프라인 추정치가 실제 A/B 결과의 82%를 설명한다는 강한 결과다(random baseline이 0에 가까울 것을 감안).</p></div>
+<ul>
+<li>저장소 정본에서 이 프레임워크는 MediaFM의 popularity-based winner(체크포인트 gating용 오프라인 프록시)와 나란히 서지만 자리가 다르다. winner는 배포 전 선발이고, 이 프레임워크는 배포 후 관측이다.</li>
+<li>GenRec 논문의 A/B 결과 검증에 이 프레임워크가 쓰였는지가 후속 확인 대상이다.</li>
+<li>exploration 기반 logged propensity가 전제이므로, non-exploring recommender(예: pure Foundation Model shadow 배포)에는 그대로 적용할 수 없다는 제약이 함께 붙는다.</li>
+<li>Netflix가 recommender 측정 방법론을 별도 논문으로 공개한 것은, 이 저장소 코퍼스 안에서 counterfactual measurement 라인의 첫 회사 진술이다. 위치와 목적은 <a href="netflix.html#%EC%95%84%ED%8A%B8%EC%9B%8C%ED%81%AC%EB%B9%84%EB%94%94%EC%98%A4-%ED%94%84%EB%A6%AC%EB%B7%B0-%EA%B0%9C%EC%9D%B8%ED%99%94--maps-multimodal-asset-personalization-at-scale-2026-08-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98">MAPS</a>(Netflix의 아트워크·비디오 프리뷰 개인화 시스템)의 offline gating과는 별개다.</li>
+</ul>
+<h2 id="레이더">레이더</h2>
+<p>오늘 arXiv cs.IR 신규 30건을 triage해 3건을 통과시켰고, 그중 2건을 <a href="radar.html">radar.md</a>에 편입했다. 통과한 나머지 1건은 Netflix 자료로, 위 2절에서 자세히 다뤘고 서비스 정본에 직접 반영했으므로 레이더에는 편입하지 않는다. 파싱된 <code>&lt;entry&gt;</code> 개수는 30, 대상 기간은 2026-09-18~09-21이다.</p>
+<ul>
+<li>UNIQUE는 산업 mobile feed에서 retrieval과 ranking을 통합하고 single-layer flat quantization을 쓰는 Baidu·Beihang·CityU 논문이다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2609.23718" target="_blank" rel="noopener">arXiv 2609.23718</a>, 2026-09-20 v1.<ul>
+<li>RecSys 2026에 accepted됐다.</li>
+<li>저자 소속은 <a href="https://arxiv.org/html/2609.23718v1" target="_blank" rel="noopener">HTML 판</a>에서 확인했다: Baidu Inc.·Beihang University·Hong Kong Institute of AI for Science.</li>
+<li>논문은 후보 retrieval의 hierarchical quantization instability와 retrieval-ranking stage 간 정보 손실을 두 축의 문제로 지적한다.</li>
+<li>그리고 generative code-based retrieval과 target-aware ranking을 early-fusion single architecture로 통합해, end-to-end 학습과 효율적 후보 생성을 함께 노린다고 주장한다.</li>
+<li>Baidu는 canon 서비스(이 저장소가 정본 문서를 두고 추적하는 서비스)는 아니지만, 대규모 산업 mobile feed인 Baidu App을 운영한다.</li>
+<li>논문이 프로덕션 배포와 A/B 수치를 abstract 수준에서 명시하는지는 정독이 필요하다. radar에는 심층 분석 대기로 편입했다.</li>
+</ul>
+</li>
+<li>MuSeR는 deployed MGS 위에서 10^4~10^5 규모 유저 이력을 hierarchical temporal compression으로 압축하는 Kuaishou의 multi-interest 시퀀스 retrieval이다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2609.23677" target="_blank" rel="noopener">arXiv 2609.23677</a>, 2026-09-20 v1.<ul>
+<li>HTML 판에서 저자 소속이 Kuaishou 도메인임을 확인했다.</li>
+<li>최근 액션은 full resolution으로 유지하고, 오래된 세그먼트는 점진 pooling으로 압축해 fixed serving budget 안에서 lifelong history를 담는다는 접근이다.</li>
+<li>Kuaishou는 이미 radar에 <a href="radar.html#swim-kuaishou-%EB%A9%94%EC%9D%B8-%ED%94%BC%EB%93%9C--generator-evaluator-%EC%9E%AC%EC%88%9C%EC%9C%84%EC%9D%98-evaluator%EB%A5%BC-%EC%84%B8%EC%85%98-survival-process%EB%A1%9C-%EC%9E%AC%EC%84%A4%EA%B3%84">SWIM</a>·<a href="radar.html#unirec-kuaishou--%EC%BA%90%EC%8A%A4%EC%BC%80%EC%9D%B4%EB%93%9C-pre-ranking--ranking-fusion%EC%9D%84-two-stage-joint-learning%EC%9C%BC%EB%A1%9C-%EC%A0%95%EB%A0%AC-app-usage-duration-0616">UniRec</a>·<a href="radar.html#drem-kuaishou-%EB%8B%A8%ED%8E%B8-%EB%B9%84%EB%94%94%EC%98%A4--pxtr-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9D%B4%EC%A4%91-%EB%B3%B4%EC%A0%95-ensemble-ranking">DrEM</a> 등 다수 스레드가 있다.</li>
+<li>MuSeR는 <a href="radar.html#chroniclerec-tencent-pcg--weixin-moments-ads-pcvr%EC%97%90-ultra-long-%EC%9C%A0%EC%A0%80-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4%EB%A5%BC-target-independent-chronicle-token%EC%9C%BC%EB%A1%9C-%EC%82%AC%EC%A0%84-%EC%95%95%EC%B6%95-gmv-161-95-ci-0678-2547">Tencent PCG의 ChronicleRec</a>와 자리가 인접하고, 둘 다 ultra-long behavior sequence를 사전 압축한다. MuSeR는 radar의 lifelong user modeling 각도에 데이터 포인트를 하나 더한다.</li>
+</ul>
+</li>
+</ul>
+<p>나머지 27건은 탈락했고 관찰 대상이 아니다. 요건 삼각, 즉 플랫폼 기업 저자, 프로덕션 A/B 진술, 메커니즘·스케일 신규성을 만족하지 않았다. 탈락 목록은 Ascent(clinical MCP), UK-PRBENCH(법률 case law retrieval), Semantic ID reproducibility study, Baidu·Google AI search auditing(외부 audit), Graded-Relevance e-commerce multimodal, publication bias biomedical causal search, UniK universal knowledge, Q-TIE temporal IR, YouTube Music LLM rationale(음악 도메인), UNDRR disaster schema extraction, Redundancy Reduction Sequential Recommendation(academic), PSD LLM agent memory, Answer-Oriented Context AI search, candidate-job matching bi-encoder eval, Brand Visibility AI Search, MM-ContextFold multimodal RAG, EU research policy, Inherit4Rec(Kuaishou 파라미터 상속, mechanism-novel하지만 프로덕션 A/B 미언급으로 이번 batch에서는 탈락), Static-vs-Agentic RAG Taiwan history, Attributable RAG citations, R-GEAN medication change(EHR), Per-Query Gating LLM rerankers, Dense-Sparse Fusion BEIR SciFact, DOA-SORT multi-object tracking(비-IR), GEO score cross-engine, AdaMerge visual doc retrieval, semantic candidate-job matching hybrid retrieval이다.</p>
+<p>산업 블로그 훑기는 월요일에만 한다. 수요일인 오늘은 대상이 아니었다.</p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li><strong>X 3aa0fa33에서 열린 세 축의 후속 배선</strong> — (a) <code>VMRankerComputeValueModel=true</code>가 실험으로 켜지는 시점(현재 기본 false), (b) retrieval attribution Kafka(<code>RETRIEVAL_CANDIDATES_TOPIC</code>) 5% 샘플이 어느 오프라인 잡을 먹이는지, (c) VF <code>TombstoneReason::LocalRegulations</code> / <code>LimitedEngagementReason::ConversationControl</code> 슬롯이 어느 rule에서 처음 채워지는지 세 개.</li>
-<li><strong>Netflix Counterfactual Observability의 확장 범위</strong> — 프레임워크가 GenRec의 A/B 결과 검증에 쓰였는지, 다른 지면(FM·GenPage·MediaFM·MAPS) 자료에서 이 프레임워크의 measurement가 인용되는지 관측. RecSys 2026(2026-10-02) 발표 시점에 후속 진술 여부.</li>
-<li><strong>UNIQUE 원문 정독 판단</strong> — Baidu App feed 배포 진술과 A/B 수치가 abstract 밖 본문에 있는지, 있다면 <code>topics/generative-retrieval.md</code> 같은 SID·early-fusion 스레드로 승격 후보인지. RecSys 2026 발표 시점에 함께 재확인.</li>
+<li>X 3aa0fa33 커밋이 연 세 축이 후속 커밋에서 어떻게 연결되는지 본다. 볼 지점은 세 개다.<ul>
+<li><code>VMRankerComputeValueModel=true</code>가 실험으로 켜지는 시점(현재 기본 false)</li>
+<li>retrieval attribution Kafka(<code>RETRIEVAL_CANDIDATES_TOPIC</code>)의 5% 샘플이 어느 오프라인 잡의 입력이 되는지</li>
+<li>VF <code>TombstoneReason::LocalRegulations</code> / <code>LimitedEngagementReason::ConversationControl</code> 슬롯이 어느 rule에서 처음 채워지는지</li>
+</ul>
+</li>
+<li>Netflix counterfactual observability 프레임워크가 어디까지 쓰이는지 본다 — 프레임워크가 GenRec의 A/B 결과 검증에 쓰였는지, 다른 지면(FM·GenPage·MediaFM·MAPS) 자료에서 이 프레임워크의 measurement가 인용되는지 관측한다. RecSys 2026(2026-10-02) 발표 시점에 후속 진술이 나오는지도 본다.</li>
+<li>UNIQUE 원문을 정독할지 판단한다 — Baidu App feed 배포 진술과 A/B 수치가 abstract 밖 본문에 있는지 본다. 있다면 <code>topics/generative-retrieval.md</code> 같은 SID(semantic ID, 아이템을 계층 코드로 표현한 토큰 열)·early-fusion 스레드로 승격할 후보인지 가린다. RecSys 2026 발표 시점에 함께 재확인한다.</li>
 </ul></div>
 
 </div>
