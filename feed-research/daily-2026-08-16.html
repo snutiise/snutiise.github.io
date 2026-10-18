@@ -42,7 +42,7 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>일요일</li>
-<li><span class="meta-k">읽는 시간</span>40분</li>
+<li><span class="meta-k">읽는 시간</span>41분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건(X 4세대+1 커밋 1개, Meta/Netflix 블로그 신규 0건, arXiv triage 30건 중 통과 1건 [DrEM])</li><li class="chip">정본 반영 <b>1</b>개 파일(x.md 9개 절 갱신, 출처 6건 추가)</li><li class="chip">다이어그램 갱신 <b>1</b>건(x-pipeline.svg 필터 17→18)</li><li class="chip">레이더 갱신 <b>1</b>건(DrEM 소속 확정, A/B 수치 반영)</li></ul>
@@ -111,8 +111,9 @@
 </li>
 <li><p>관할권 필터를 코드에서 그대로 관찰할 수 있는 첫 사례가 나왔다. DSA와 GDPR, NetzDG 같은 규제 대응은 지금까지 대부분 규제 제출 문서(EU 투명성 리포트)를 통해서만 확인할 수 있었다.</p>
 </li>
-<li><p>필터 이름은 <code>Brazil2026ElectionFilter</code>다. 이 필터는 브라질 선거법원(TSE)이 조치한 계정 665개를 코드 상수에 하드코딩하고, 각 ID 옆 주석에 계정 이름을 남긴다.</p>
+<li><p>필터 이름은 <code>Brazil2026ElectionFilter</code>다. 이 필터는 브라질 선거법원(TSE)에 신고된 계정 665개를 코드 상수에 하드코딩하고, 각 ID 옆 주석에 계정 이름을 남긴다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/filters/brazil_2026_election_filter.rs#L9-L20" target="_blank" rel="noopener"><code>brazil_2026_election_filter.rs:9-20</code></a>.</p>
 <ul>
+<li>상수 위 주석은 &quot;User ids reported to the Electoral Court for the Brazil 2026 election&quot;이고, 근거 데이터로 TSE 후보자 데이터셋(<code>candidatos-2026</code>)을 링크한다.</li>
 <li>상수의 타입은 <code>FxHashSet&lt;u64&gt;</code>이고, 주석은 <code>@username</code> 꼴이다.</li>
 <li>뷰어가 그 계정을 팔로우하고 있으면 예외로 처리한다(정치적 성향과 무관하게 대칭적으로 적용된다).</li>
 </ul>
@@ -177,7 +178,7 @@ impl Brazil2026ElectionFilter {
 <li>TSE 리스트에는 올라 있지만 X에서 계정이 삭제된 인물까지 주석으로 따로 남겨 둘 만큼 세밀하게 문서화했다.</li>
 </ul>
 </li>
-<li><p>이 관행이 유지된다면, 각국의 선거 주기마다 비슷한 필터를 코드에서 확인할 수 있게 된다. X가 4세대 README에서 강조한 다음 문구가 규제 대응에도 적용된다는 신호이기도 하다: &quot;a benefit of open-source is that you can see that changes like this exist, and exactly how they work&quot;.</p>
+<li><p>이 관행이 유지된다면, 각국의 선거 주기마다 비슷한 필터를 코드에서 확인할 수 있게 된다. X가 2026-08-14 커밋(4세대+1)의 README에서 강조한 다음 문구가 규제 대응에도 적용된다는 신호이기도 하다: &quot;a benefit of open-source is that you can see that changes like this exist, and exactly how they work&quot;.</p>
 </li>
 <li><p>앞으로 지켜볼 것은 다음 3가지다.</p>
 <ol>
@@ -366,7 +367,8 @@ if is_stale {
 <ul>
 <li>grox(Grok 기반 주석 파이프라인)가 답글 스팸 판정과 답글 랭킹 채점에 쓰는 팔로워 수 임계를 15,000에서 30,000으로 두 배 올렸다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py:17, 185</code></a>.<ul>
 <li>바뀐 상수는 <code>TaskSpamFilter.FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION</code>과 <code>TaskReplyRankingFilter.FOLLOWER_COUNT_THRESHOLD_FOR_REPLY_RANKING</code>이다.</li>
-<li>팔로워가 30k 미만인 계정의 답글에만 grok으로 스팸 여부와 답글 랭킹을 채점한다는 뜻이므로, 임계를 올려서 grok 리소스를 쓰는 답글의 범위를 두 배로 넓힌 것이다. 리소스 배분을 조정한 변경이다.</li>
+<li>스레드 root와 답글 대상이 모두 팔로워 30k 이하인 답글은 스팸 판정을, 하나라도 30k를 넘는 답글은 답글 랭킹 채점을 받는다(<a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py:77-92, 214-225</code></a>).</li>
+<li>그래서 이번 상향으로 스팸 판정 대상은 넓어지고 답글 랭킹 채점 대상은 좁아졌다. 두 작업 사이에 grok 리소스 배분을 조정한 변경이다.</li>
 </ul>
 </li>
 <li>phoenix-rankall에 2주 시간창의 영상 SID(아이템을 계층 코드로 나타낸 semantic ID) window인 <code>video_14day</code>가 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/config/mod.rs:177-180</code></a>.<ul>
@@ -415,14 +417,18 @@ if is_stale {
 <h2 id="2-노이즈에-강한-앙상블-랭킹-논문-drem의-소속이-kuaishou로-확정됐다--kuaishou"><span class="num">2</span>노이즈에 강한 앙상블 랭킹 논문 DrEM의 소속이 Kuaishou로 확정됐다 — Kuaishou</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2608.12778" target="_blank" rel="noopener">DrEM: Dual-Side Robust Ensemble Ranking from Noisy User Preference Predictions in Video Recommendation — arXiv:2608.12778</a> — arXiv, 2026-08-13 제출, 논문. 저자는 8명이다(Canwei Huang, Tiantian He, Xiaoxiao Xu, Jun Zhang, Ziran Deng, Weike Pan, Chunjie Chen, Kaiqiao Zhan).</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> 어제 <a href="radar.html#drem-kuaishou-%EB%8B%A8%ED%8E%B8-%EB%B9%84%EB%94%94%EC%98%A4--pxtr-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9D%B4%EC%A4%91-%EB%B3%B4%EC%A0%95-ensemble-ranking">radar.md</a>에 이 논문을 소속 미확정 상태로 등록하면서, <span class="badge est">추정</span> 등급으로 Kuaishou 계열일 통계적 가능성만 적어 두었다. 오늘 arXiv HTML 판을 열어 저자 소속 표기를 확인한 결과, Kuaishou 이메일 도메인을 쓰는 저자가 5명 확인돼 이 회사의 프로덕션 논문임이 확정됐다. 이번 논문은 앙상블 랭킹 단계에서 상위 모델 예측의 노이즈를 라벨과 입력 양쪽에서 함께 보정하는 방법을 다룬다.</p></div>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. DrEM은 Kuaishou가 이번 달에 낸 세 번째 프로덕션 논문이다</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. DrEM은 Kuaishou가 이번 달에 낸 두 번째 프로덕션 논문이다</span></p></div>
 <ul>
 <li>HTML 판을 확인한 결과, 이 논문은 Kuaishou Technology Beijing과 Shenzhen University의 협업으로 확정됐다.<ul>
 <li>Kaiqiao Zhan, Xiaoxiao Xu, Tiantian He, Jun Zhang, Chunjie Chen이 Kuaishou 이메일 도메인을 쓴다.</li>
 <li>Weike Pan, Canwei Huang, Ziran Deng은 Shenzhen University 소속이다.</li>
 </ul>
 </li>
-<li>Kuaishou는 이번 달에 이미 프로덕션 논문 두 편을 냈다(HD-Rec 2026-08-11 <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">radar.md</a>, PushDualGen 2026-08-12). 이번 논문이 세 편째다.</li>
+<li>Kuaishou 연구진은 이번 달에 이미 논문 두 편을 냈다(HD-Rec 2026-08-11 <a href="radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id">radar.md</a>, PushDualGen 2026-08-12). 이번 논문이 세 편째다.</li>
+<li>그중 프로덕션 배포를 밝힌 것은 PushDualGen이고, HD-Rec은 공개 벤치마크 결과만 낸 논문이다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2608.06997" target="_blank" rel="noopener">arXiv 2608.06997</a>.<ul>
+<li>HD-Rec 초록의 실험은 &quot;three public cross-domain recommendation benchmarks&quot;뿐이고, 배포나 A/B 진술이 없다.</li>
+</ul>
+</li>
 <li>세 편이 모두 다른 알고리즘 계열이라는 점이 특징이다. 각각 SID cross-domain, SID와 CoT를 결합한 푸시, ensemble ranking의 노이즈 강건성을 다룬다.<ul>
 <li>회사 차원에서 여러 팀과 여러 연구 라인이 동시에 프로덕션 SOTA 논문을 낼 만한 자원을 갖췄다는 사실이 확인된 셈이다.</li>
 </ul>
@@ -515,7 +521,7 @@ if is_stale {
 </li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html#drem-kuaishou-%EB%8B%A8%ED%8E%B8-%EB%B9%84%EB%94%94%EC%98%A4--pxtr-%EB%85%B8%EC%9D%B4%EC%A6%88-%EC%9D%B4%EC%A4%91-%EB%B3%B4%EC%A0%95-ensemble-ranking">radar.md DrEM 절</a>에서 소속을 확정해 등급을 <span class="badge est">추정</span>에서 <span class="badge ok">확인</span>으로 갱신했다. A/B 실험 설정(트래픽 5.1%, 7일)과 지표 8개의 실측값을 추가하고, 이론적 관찰인 sparse &gt; dense도 적었다. Kuaishou 서비스는 정본 추적 대상이 아니기 때문에, services 폴더의 정본에는 아직 반영하지 않았다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> 이 논문은 Kuaishou가 이번 달에 낸 프로덕션 논문 세 편 가운데 정본과 가장 밀접하다. 다른 서비스들도 같은 노이즈 문제를 겪는다. X의 26개 헤드 가중합, Meta의 다목적 랭킹, Netflix의 멀티태스크 FM(추천 foundation model)은 모두 상위 pxtr가 하위 스코어러의 입력이자 라벨이 되는 구조를 갖는다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이 논문은 Kuaishou가 이번 달에 낸 논문 세 편 가운데 정본과 가장 밀접하다. 다른 서비스들도 같은 노이즈 문제를 겪는다. X의 26개 헤드 가중합, Meta의 다목적 랭킹, Netflix의 멀티태스크 FM(추천 foundation model)은 모두 상위 pxtr가 하위 스코어러의 입력이자 라벨이 되는 구조를 갖는다.</p></div>
 <p>다만 DrEM이 다루는 특정 문제인 앙상블 랭킹 단계의 pxtr 노이즈가 X와 Meta, Netflix에서 별도 컴포넌트로 존재하는지, 아니면 다른 방식으로 완화되고 있는지는 문헌으로 확인되지 않는다. 두 번째 회사에서 비슷한 진술이 나온다면 <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a>에 절을 새로 만들 후보가 된다.</p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>

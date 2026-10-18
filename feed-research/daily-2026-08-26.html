@@ -57,12 +57,12 @@
 <li>Spotify 실험에서는 추론 트레이스가 offline 추천 성능을 최대 19%까지 떨어뜨렸다.</li>
 </ul>
 <h2 id="1-노출-판정-재작성을-프로덕션-트래픽으로-검증하는-장치가-완성됐다--x"><span class="num">1</span>노출 판정 재작성을 프로덕션 트래픽으로 검증하는 장치가 완성됐다 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/d011592a1c8c4bfb23781ff15577a68dc08bdde1" target="_blank" rel="noopener">xai-org/x-algorithm@d011592</a> — xai-org 공개 저장소, 2026-08-24T18:51:34Z 커밋, 코드. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+7이다. 변경 규모는 파일 19, +1,428/−121이다. 커밋 메시지는 이 시리즈의 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이라, 내용은 파일 diff로만 판독했다. 8월 25일 월요일 자정 배치가 08-24 18:51 UTC 커밋을 놓쳤고 24일 daily도 &quot;신규 없음&quot;으로 판정해서, 26일 배치가 뒤늦게 따라잡는다.</p></div>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/d011592a1c8c4bfb23781ff15577a68dc08bdde1" target="_blank" rel="noopener">xai-org/x-algorithm@d011592</a> — xai-org 공개 저장소, 2026-08-24T18:51:34Z 커밋, 코드. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+7이다. 변경 규모는 파일 19, +1,418/−117이다. 커밋 메시지는 이 시리즈의 관행대로 <code>&quot;Open-source X Recommendation Algorithm&quot;</code> 한 줄뿐이라, 내용은 파일 diff로만 판독했다. 8월 25일(화) 01:00 KST 배치가 08-24 18:51 UTC 커밋을 놓쳤고 24일 daily도 &quot;신규 없음&quot;으로 판정해서, 26일 배치가 뒤늦게 따라잡는다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> X For You 타임라인의 <a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 오픈소스 릴리스</a>에는 2026-08-13 최초 공개(47c1bcd, +363,246/−11,640) 뒤로 매일 또는 격일로 후속 커밋이 붙고 있다. 이번 커밋(4세대+7, d011592)이 손댄 곳은 크게 세 갈래다.</p></div>
 <ul>
 <li>VF(visibility-filtering)는 포스트마다 이 뷰어에게 보여도 되는지를 판정하는 안전 필터 스택이다. 4세대 최초 공개에서 전부 공개됐다.</li>
 <li>home-mixer(For You 피드를 조립하는 서비스)의 브랜드 안전 판정은 광고 인접성 게이팅을 맡는다.</li>
-<li>PTOS(Policy-to-Safety, 정책 기반 위반 카테고리 판정) 파이프라인은 Grok LLM으로 policy-to-safety를 재분류한다. 이 파이프라인은 grox(Grok 기반 nearline 분류기)에 있다.</li>
+<li>PTOS(정책 기반 위반 카테고리 판정) 파이프라인은 Grok LLM으로 위반 카테고리를 재분류한다. 이 파이프라인은 grox(Grok 기반 nearline 분류기)에 있다.</li>
 </ul>
 <p>세 갈래는 서로 다른 방향으로 성숙하고 있는데, 이번 커밋에서 나란히 진화했다. 이번 커밋에는 Phoenix(X For You의 랭킹 모델)의 체크포인트 로더 변경과 grox의 작은 변경 3건도 함께 들어 있다.</p>
 <h3 id="1-1-staging-vf가-요청마다-레퍼런스-vf와-판정을-대조하고-다를-때만-기록한다">1-1. staging VF가 요청마다 레퍼런스 VF와 판정을 대조하고, 다를 때만 기록한다</h3>
@@ -73,7 +73,7 @@
 <li>VF 검증 스택이 3단으로 완성됐다 <span class="badge ok">확인</span>. dark_traffic이 트래픽만 흘려보내는 단계, dark_traffic 타깃을 staging으로 바꿔 프로덕션 트래픽으로 staging을 검증하는 단계, reference_compare가 staging 안에서 verdict를 대조하는 단계로 이어진다.<ul>
 <li>1단, <strong>4세대+4</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/aad7179" target="_blank" rel="noopener">aad7179</a>, 2026-08-19): <code>dark_traffic_setup.rs</code>(109줄 신규)가 프로덕션 트래픽 요청을 <code>xai-vf-shadow.prod.visibility</code>로 병렬 미러링한다. 이 단계에서는 트래픽 자원만 소비한다.</li>
 <li>2단, <strong>4세대+6</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/28e414f" target="_blank" rel="noopener">28e414f</a>, 2026-08-21): dark_traffic 타깃의 이름이 <code>xai-vf-service.staging.visibility:grpc</code>로 바뀌었다. shadow prod가 아니라 staging 배포를 프로덕션 트래픽으로 검증하겠다는 뜻이다.</li>
-<li>3단, <strong>4세대+7</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/d011592" target="_blank" rel="noopener">d011592</a>, 2026-08-24): <code>reference_compare.rs</code>(812줄 신규)가 staging 배포 안에서 요청마다 Strato(X의 실시간 스토리지와 서비스 조회 레이어) 기반 레퍼런스 VF를 병렬로 호출한다. verdict를 엄격하게 비교한 다음, 결과가 다른 경우만 JSON 라인으로 로깅한다.</li>
+<li>3단, <strong>4세대+7</strong> (<a href="https://github.com/xai-org/x-algorithm/commit/d011592" target="_blank" rel="noopener">d011592</a>, 2026-08-24): <code>reference_compare.rs</code>(812줄 신규)가 staging 배포 안에서 요청마다 Strato(X 코드가 데이터를 조회하거나 저장할 때 거치는 내부 시스템) 기반 레퍼런스 VF를 병렬로 호출한다. verdict를 엄격하게 비교한 다음, 결과가 다른 경우만 JSON 라인으로 로깅한다.</li>
 <li>새 파일의 전체 경로는 <code>visibility-filtering/reference_compare.rs</code>(812줄)이고, 레퍼런스 쪽 클라이언트는 <code>StratoVfClient</code>다.</li>
 <li>정책을 바꿀 때 위험이 큰 fail-closed 안전 서브레포를 프로덕션 트래픽 규모로 회귀 감사할 수 있게 됐고, VF 변경을 적용할 때의 위험이 크게 줄었다.</li>
 </ul>
@@ -90,7 +90,7 @@
 <li>비교 함수는 <code>is_exact_match(&amp;VfAction, &amp;Option&lt;FilteredReason&gt;)</code>다.</li>
 </ul>
 </li>
-<li><code>StratoVfClient</code>가 레퍼런스 VF의 정체다 <span class="badge est">추정</span>. Strato는 X의 실시간 스토리지와 서비스 조회를 담당하는 레이어다. <code>StratoVfClient</code>가 감싸는 실제 VF 스택이 1·2세대 Scala VF의 잔재인지, 별도의 참조 구현인지는 코드에 명시되어 있지 않다.<ul>
+<li><code>StratoVfClient</code>가 레퍼런스 VF의 정체다 <span class="badge est">추정</span>. <code>StratoVfClient</code>가 감싸는 실제 VF 스택이 1·2세대 Scala VF의 잔재인지, 별도의 참조 구현인지는 코드에 명시되어 있지 않다.<ul>
 <li><code>client_id = &quot;visibility-filtering-service.{APP_ENV}&quot;</code> 형식으로 자신을 식별하는 것을 보면, 별도의 인스턴스가 돌고 있다고 보인다 <span class="badge est">추정</span>.</li>
 </ul>
 </li>
@@ -151,7 +151,7 @@
 </blockquote>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 세 절에 반영했다.</p></div>
 <ol>
-<li><a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 표에 +7 행을 추가했다</a>. 파일 목록과 +1,428/−121 규모, 핵심 8건을 요약했다.</li>
+<li><a href="x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4">4세대 표에 +7 행을 추가했다</a>. 파일 목록과 +1,418/−117 규모, 핵심 8건을 요약했다.</li>
 <li><a href="x.html#%ED%95%9C-%EC%A4%84-%EC%9A%94%EC%95%BD">한 줄 요약 문단을 확장했다</a>. 4세대+7 커밋에 대한 서술을 추가했다.</li>
 <li><a href="x.html#4%EC%84%B8%EB%8C%807-2026-08-24--vf-%EB%A0%88%ED%8D%BC%EB%9F%B0%EC%8A%A4-%EB%B9%84%EA%B5%90-%ED%95%98%EB%8B%88%EC%8A%A4-reference_comparers-%EB%B0%B0%EC%84%A0">안전성 절에 새 소절 &quot;4세대+7 (2026-08-24) — VF 레퍼런스 비교 하니스 (<code>reference_compare.rs</code>) 배선&quot;을 추가했다</a>. 동작과 게이팅, 의미를 상세히 적었다.</li>
 </ol>
@@ -252,7 +252,7 @@
 <ul>
 <li>Grok 4.5는 4세대+2에서 성인 컨텐츠 심판으로 들어왔다가 4세대+6에서 완전히 제거됐다. 이번 커밋에서는 다른 엔드포인트를 통해 심판 자리에만 돌아왔다.<ul>
 <li>4세대+2 (2026-08-17): <code>EAPI_GROK_4_5_INTERNAL</code>이 성인 컨텐츠 심판으로 도입됐다(<code>SafetyPtosAdultContentCrossValidationJudge</code>).</li>
-<li>4세대+4 (2026-08-19): Grok 4.6 internal을 10% dial로 도입했다(shadow).</li>
+<li>4세대+4 (2026-08-19): Grok 4.6 internal을 10% dial로 도입했다(호출의 10%를 실제로 4.6이 판정한다).</li>
 <li>4세대+5 (2026-08-20): 4.6 dial을 10%에서 30%로 올렸다.</li>
 <li>4세대+6 (2026-08-21): 4.6 dial을 30%에서 100%로 올리면서 4.5 internal을 코드에서 완전히 제거했다. breaker와 sampler, dial 상수를 모두 삭제했다.</li>
 <li>4세대+7 (2026-08-24): <code>EAPI_GROK_4_5_X_ALGO</code>를 심판 전용으로 재도입했다. primary가 아니라 judge로만 쓴다.</li>
@@ -373,12 +373,14 @@ class _NodeBatchLock:
 <ul>
 <li>grox reply_spam의 follower 임계가 80k에서 100k로 올라갔다.<ul>
 <li><code>TaskSpamFilter</code>와 <code>TaskReplyRankingFilter</code> 둘 다 해당된다.</li>
-<li>11일 동안 5단계(15k → 30k → 60k → 80k → 100k)에 걸쳐 계속 완화됐다. 이 흐름 자체가 신호로, grox reply spam의 검사 대상이 계속 좁아지고 있다는 뜻이다.</li>
+<li>08-13부터 11일 동안 다섯 번(15k → 30k → 40k → 60k → 80k → 100k) 올랐다.</li>
+<li>올릴 때마다 grox 스팸 판정 대상은 넓어지고 답글 랭킹 채점 대상은 좁아졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d011592/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py:77-92, 214-225</code></a>.</li>
 </ul>
 </li>
-<li>grox reply_spam 파이프라인의 오프라인 결과를 온라인 서빙 stack이 소비할 수 있도록 write-back 채널이 갖춰졌다.<ul>
-<li><code>grox/flows/reply_spam/strato_loader.py</code>(49줄 신규)의 <code>ReplyRankingScoreStratoLoader</code>가 reply ranking 점수를 Strato에 <code>put</code>한다.</li>
-<li>score가 1.0 이하이면 지역 캐시인 Atla와 Pdxa에 병렬로 팬아웃하면서 Kafka v2로도 emit한다.</li>
+<li>grox reply_spam이 답글 랭킹 점수를 Strato에 되쓸 때 지역 캐시 두 곳에도 쓰게 됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d011592/grox/flows/reply_spam/strato_loader.py" target="_blank" rel="noopener"><code>strato_loader.py</code></a> (+17/−0).<ul>
+<li><code>grox/flows/reply_spam/strato_loader.py</code>의 <code>ReplyRankingScoreStratoLoader</code>는 4세대 공개 때부터 있던 파일이다(<a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/grox/flows/reply_spam/strato_loader.py" target="_blank" rel="noopener">47c1bcd</a>, 32줄).</li>
+<li>그때부터 reply ranking 점수를 Strato에 <code>put</code>하고 Kafka v2로 emit했다.</li>
+<li>이번 커밋은 <code>put</code> 뒤에, score가 1.0 이하이면 지역 캐시인 Atla와 Pdxa에도 병렬로 쓰는 단계를 추가했다.</li>
 <li>스코어가 1.0을 넘으면 캐시 fanout을 건너뛰는데, 신뢰도가 낮은 판정은 정본에만 남기고 서빙 캐시가 오염되는 것을 막으려는 조치로 보인다 <span class="badge est">추정</span>.</li>
 </ul>
 </li>
@@ -392,7 +394,7 @@ class _NodeBatchLock:
 <ul>
 <li>세 축의 구체적인 내용은 각각 reference_compare, HighRisk와 DDG, 3개 카테고리와 4.5 X_ALGO 재도입이다.</li>
 <li>4세대의 전체 이야기는 코드를 공개하고, 검증 인프라를 연결하고, experiment를 트래킹하고, 다운스트림에 노출하는 성숙 곡선을 그린다. VF와 브랜드 안전, PTOS 세 서브시스템이 이 순서로 나란히 성숙하고 있다는 사실 자체가, X가 4세대 오픈소스 릴리스를 검증 가능한 상태로 만드는 데 조직의 자원을 여전히 투입하고 있다는 방증이다.</li>
-<li>4세대+3부터 매일 커밋이 이어지던 흐름이 4세대+7(08-24)에도 계속됐다.</li>
+<li>4세대+6(08-21) 뒤 사흘 동안 커밋이 없다가 4세대+7(08-24)이 나왔다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="2-시청-시간-분포-예측-hegm이-15개월-프로덕션-ab에서-지표를-올렸다--레이더vk"><span class="num">2</span>시청 시간 분포 예측 HEGM이 1.5개월 프로덕션 A/B에서 지표를 올렸다 — 레이더(VK)</h2>
@@ -506,7 +508,7 @@ class _NodeBatchLock:
 — <a href="https://arxiv.org/abs/2608.23392" target="_blank" rel="noopener">Densing Law abstract</a>, 2026-08-24</p>
 </blockquote>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot;에 <code>### User Behavioral Densing Law (Ant/Alipay) — 3번째 회사의 스케일링 법칙 확인</code> 절을 추가했다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> 스케일링 법칙 스레드에 세 번째 회사가 다른 축으로 합류했다. 이번 논문은 tokenization capacity 스케일링을 다룬다. 데이터 규모가 커질 때 얼마나 큰 tokenization 어휘와 구조가 필요한지를 정리한 법칙이다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 스케일링 법칙 스레드에 Meta·Netflix·ByteDance에 이어 Ant가 다른 축으로 합류했다. 이번 논문은 tokenization capacity 스케일링을 다룬다. 데이터 규모가 커질 때 얼마나 큰 tokenization 어휘와 구조가 필요한지를 정리한 법칙이다.</p></div>
 <ul>
 <li>앞서 진술한 회사들은 다른 축을 다뤘다. Meta의 <a href="radar.html#%EC%B6%94%EC%B2%9C-%EB%AA%A8%EB%8D%B8-%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81-%EB%B2%95%EC%B9%99--%ED%9A%8C%EC%82%AC%EB%B3%84-%EB%8F%85%EB%A6%BD-%ED%99%95%EC%9D%B8%EC%9D%B4-%EC%8C%93%EC%9D%B4%EB%8A%94-%EC%A4%91">HSTU·Wukong·GEM</a>과 Netflix Foundation Model은 파라미터와 데이터의 스케일링 법칙을 진술했고, ByteDance 광고의 <a href="radar.html#tm20k-bytedance-%EA%B4%91%EA%B3%A0--20k-%EC%8B%9C%ED%80%80%EC%8A%A4-%EB%9E%AD%ED%82%B9%EC%9D%84-teacherstudent-kd%EB%A1%9C-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-%EB%B0%B0%ED%8F%AC">TM20K</a>는 시퀀스 스케일링을 KD(knowledge distillation)로 풀어냈다.<ul>
 <li>HSTU는 Meta 유기(organic) 피드 쪽의 시퀀스 모델 계보다.</li>
@@ -598,7 +600,7 @@ class _NodeBatchLock:
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
-<li>X 4세대+8, 즉 다음 커밋을 확인한다 — 4세대 원본이 올라온 08-13부터 지금까지 12일 연속으로 커밋이 이어지고 있다. 지켜볼 점은 다음 다섯 가지다.<ul>
+<li>X 4세대+8, 즉 다음 커밋을 확인한다 — 4세대 원본이 올라온 08-13부터 08-24까지 12일 가운데 8일에 커밋이 올라왔다(08-15·16·22·23은 없다). 지켜볼 점은 다음 다섯 가지다.<ul>
 <li>VF reference_compare가 로깅에서 대시보드와 알람으로 승격되는 시점</li>
 <li>BrandSafetyVerdict::HighRisk가 광고 avoid 외에 랭커 감쇠나 유기 노출 차단 같은 후속 조치를 트리거하는지 여부</li>
 <li>PTOS 심판이 스팸과 혐오 발화 카테고리로 확장되는지 여부</li>

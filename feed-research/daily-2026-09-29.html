@@ -60,7 +60,7 @@
 <p>이 관행에는 병목이 두 가지 있다.</p>
 <ul>
 <li>첫째, 태스크별로 잘라도 시퀀스가 여전히 길다. Content-interest summarization 하나만 봐도 유저당 평균 수백 건, tail에서는 수천 건의 행동 아이템을 읽어야 한다. 이를 프롬프트 텍스트로 직렬화하면 수만 토큰이 된다. LLM으로 프로파일링한다면 context window에 넣기 벅찬 규모다.</li>
-<li>둘째, 프로파일은 자주 갱신해야 한다. Tencent의 규모는 주간 10억 유저, 시간당 aggregate 100K QPM(Query Per Minute)이다. 이 규모에서는 GPU 예산이 고정된 이상 태스크별 모델의 처리량이 하한선을 만든다.</li>
+<li>둘째, 프로파일은 자주 갱신해야 한다. Tencent의 규모는 10억 유저 프로파일의 주간 재계산이고, 이에 필요한 처리량은 aggregate 약 100K QPM(Query Per Minute)이다. 이 규모에서는 GPU 예산이 고정된 이상 태스크별 모델의 처리량이 하한선을 만든다.</li>
 </ul>
 <p>여기서 자연스러운 대안이 압축이다. 시퀀스를 짧은 토큰으로 압축해 LLM에 넣거나, 태스크별로 잘라 넣는 대신 하나의 압축 표현을 여러 태스크가 공유하게 하면 예산 문제를 완화할 수 있다. 그런데 압축 자체가 새로운 문제를 만든다. 저자들은 hallucination 유형 네 가지를 진술한다.</p>
 <ul>
@@ -93,7 +93,7 @@
 <li>Understanding: 압축된 표현을 입력으로 받는 decoder가 원본 시퀀스를 재구성하도록 학습한다. 압축과 decoder를 모두 업데이트한다.</li>
 <li>Post-training: 42 태스크 유형의 layered-difficulty 데이터로 복합 이해를 학습한다. 여기에는 4개 profiling task가 포함된다.</li>
 <li>Co-training: 압축과 생성(태스크별 응답)을 동시에 목표로 한다. Reconstruction 단계에는 sequence-length curriculum(짧은 시퀀스 → 긴 시퀀스)을 넣어 수렴을 안정화한다.</li>
-<li>Hallucination-aware RL: 압축과 projector를 freeze한 상태에서 decoder만 DAPO(direct advantage policy optimization)로 업데이트한다. Reward는 네 hallucination 유형별 판정을 harm 가중치로 합산한다.</li>
+<li>Hallucination-aware RL: 압축과 projector를 freeze한 상태에서 decoder만 DAPO(Decoupled Clip and Dynamic sAmpling Policy Optimization, <a href="https://arxiv.org/abs/2503.14476" target="_blank" rel="noopener">arXiv 2503.14476</a>)로 업데이트한다. Reward는 네 hallucination 유형별 판정을 harm 가중치로 합산한다.</li>
 </ol>
 </li>
 </ul>

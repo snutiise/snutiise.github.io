@@ -57,7 +57,7 @@
 <li>Meta 저자들이 Facebook Marketplace 후보 생성 단계의 카테고리 상한을 유저마다 다르게 거는 PCap 논문을 냈다.</li>
 </ul>
 <h2 id="1-광고-구매액-loss를-학습에-연결하고-체류-시간-head를-이진-분류로-바꿨다--x"><span class="num">1</span>광고 구매액 loss를 학습에 연결하고, 체류 시간 head를 이진 분류로 바꿨다 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/fad2f71" target="_blank" rel="noopener">xai-org/x-algorithm@fad2f71</a> — GitHub 커밋, 2026-09-16 03:11Z, 소스코드. 바뀐 파일은 26개(+552/−233)다. 이 노트들은 4세대 공개 뒤 매일 이어지는 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+22다.</p></div>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/fad2f71" target="_blank" rel="noopener">xai-org/x-algorithm@fad2f71</a> — GitHub 커밋, 2026-09-16 01:11Z, 소스코드. 바뀐 파일은 26개(+552/−233)다. 이 노트들은 4세대 공개 뒤 매일 이어지는 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+22다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> Phoenix(X For You 피드의 랭킹 트랜스포머)는 행동마다 출력 head를 두고, 체류 시간이나 구매액 같은 연속값은 continuous head로 예측한다. 4세대+21(2d4a03c)에서는 광고 구매액 continuous head의 wire만 열렸다. 이 head는 <code>ADS_WEB_CT_PURCHASE_VALUE</code>이고, 요청 필드는 <code>PurchaseValueBaseline</code>이다. 이번 커밋은 세 가지 옵트인 연결(purchase value, <code>binary</code> loss, click_dwell feature)을 함께 넣었고, 그중 이 head를 <strong>학습 loss까지 잇는 것</strong>이 가장 눈에 띄는 변경이다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 광고 구매액 loss가 학습 그래프에 연결됐지만, 기본 가중은 0이다</span></p></div>
 <ul>
@@ -93,9 +93,10 @@
 </ul>
 </li>
 <li>continuous head 출력을 푸는 함수가 binary head의 raw logit도 함께 돌려주도록 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a>.<ul>
-<li><code>decode_continuous</code>의 반환 시그니처가 3-tuple로 바뀌었다. 이전에는 <code>jax.Array</code> 하나만 반환했고, 이제는 <code>(activated: jax.Array, head_logits_by_index: dict[int, jax.Array])</code>를 반환한다.</li>
+<li><code>decode_continuous</code>의 반환형이 <code>jax.Array</code> 하나에서 <code>(activated: jax.Array, head_logits_by_index: dict[int, jax.Array])</code> 2-tuple로 바뀌었다(2283-2285줄).</li>
+<li>이를 부르는 모델 <code>__call__</code>의 반환이 2-tuple에서 <code>(logits, continuous_predictions, head_logits_by_index)</code> 3-tuple로 바뀌었다.</li>
 <li>binary loss는 sigmoid 이전의 raw logit이 있어야 수치적으로 안정되게 계산할 수 있다. 그래서 binary head마다 raw logit tensor를 함께 보낸다.</li>
-<li>서빙 경로도 3-tuple로 바뀌지만, 서빙은 dict를 쓰지 않는다.</li>
+<li>서빙 경로도 <code>__call__</code>의 3-tuple을 받지만, dict는 <code>_head_logits</code>로 받아 버린다.</li>
 </ul>
 </li>
 <li>서빙 때 sigmoid head의 예측값은 원단위로 되돌리지만, binary head는 예외다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a>.<ul>
@@ -120,13 +121,13 @@
 </ul>
 </li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">E. grox(Grok 기반 nearline 분류기)의 답글 스팸 분류기가 스레드 팔로워 150k를 넘으면 전용 파인튜닝 모델을 쓰고, task 자격 임계는 100k → 180k로 올랐다</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">E. grox(Grok 기반 nearline 분류기)의 답글 스팸 분류기가 스레드 팔로워 150k를 넘으면 전용 파인튜닝 모델을 쓰고, task 자격 임계는 150k → 180k로 올랐다</span></p></div>
 <ul>
 <li>답글 스팸 분류기가 스레드 팔로워 수에 따라 판정 모델을 <code>oai-gemma4-26b-reply-spam</code>과 기본 모델로 나누고, task_filter 임계도 올렸다 <span class="badge ok">확인</span> — 세 파일에 걸친 변경이다.<ul>
 <li>근거 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/grox/flows/reply_spam/constants.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/constants.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/grox/flows/reply_spam/classifier_simple_reply_scorer.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/classifier_simple_reply_scorer.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py</code></a>다.</li>
 <li>상수 <code>GEMMA_REPLY_SPAM = &quot;oai-gemma4-26b-reply-spam&quot;</code>이 새로 생겼다. 이 모델은 전용 파인튜닝 변종으로 추정된다. <code>GEMMA_REPLY_SPAM_MIN_FOLLOWERS = 150_000</code>은 모델 라우팅에, <code>GROK_GEMMA_FOLLOWER_SPLIT = 180_000</code>은 task 자격에 쓴다.</li>
 <li>판정 모델은 <code>SimpleReplyScorer._sampler(post)</code>가 고른다. <code>max(post.ancestors[0].user.follower_count, post.ancestors[-1].user.follower_count) &gt; 150_000</code>이면 <code>oai_gemma4_reply_spam</code>을, 그 이하면 기본 <code>oai_gemma4</code>를 쓴다.</li>
-<li>task filter 두 곳의 팔로워 임계가 <code>150000 → GROK_GEMMA_FOLLOWER_SPLIT</code>(180000)로 바뀌었다. 4세대+7의 100k에서 180k로 다시 올린 것이다.<ul>
+<li>task filter 두 곳의 팔로워 임계가 <code>150000 → GROK_GEMMA_FOLLOWER_SPLIT</code>(180000)로 바뀌었다. 4세대+17(49815da)의 150k에서 180k로 다시 올린 것이다.<ul>
 <li>바뀐 상수는 <code>TaskSpamFilter.FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION</code>과 <code>TaskReplyRankingFilter.FOLLOWER_COUNT_THRESHOLD_FOR_REPLY_RANKING</code>이다.</li>
 </ul>
 </li>
@@ -162,8 +163,8 @@
 <li>테스트 두 개가 정상 케이스와 legacy(빈 문자열) 케이스를 모두 통과시킨다.</li>
 </ul>
 </li>
-<li>VF(visibility-filtering, 포스트마다 이 뷰어에게 보여도 되는지 판정하는 서비스) 서브레포에서는 6개 enum이 손으로 짠 <code>as_str()</code> 구현에서 <code>strum::IntoStaticStr</code> 매크로로 통일됐다.<ul>
-<li>대상 enum은 <code>RequestOutcome</code>·<code>SourceOutcome</code>·<code>CacheTier</code>·<code>CacheResult</code>·<code>ManhattanResult</code>·<code>BatchStage</code>·<code>ConnEvent</code>·<code>HydratorOutcome</code>·<code>SafetyLevel</code>·<code>LabelSource</code>·<code>FallbackReason</code>·<code>FailureKind</code>다.</li>
+<li>VF(visibility-filtering, 포스트마다 이 뷰어에게 보여도 되는지 판정하는 서비스) 서브레포에서는 13개 enum이 손으로 짠 <code>as_str()</code> 구현에서 <code>strum::IntoStaticStr</code> 매크로로 통일됐다. 5개 파일에 걸친 변경이다.<ul>
+<li>대상 enum은 <code>RequestOutcome</code>·<code>SourceOutcome</code>·<code>CacheTier</code>·<code>CacheResult</code>·<code>ManhattanResult</code>·<code>BatchStage</code>·<code>ConnEvent</code>·<code>HydratorOutcome</code>·<code>SafetyLevel</code>·<code>LabelSource</code>·<code>FallbackReason</code>·<code>FailureKind</code>·<code>WarmKeyResult</code>다.</li>
 <li>관측 라벨 문자열은 snake_case 그대로 유지되므로 순수 리팩터이고, -180줄이다.</li>
 <li>관측 지표에서 관측할 수 있는 변화는 없고, 이 리팩터의 상세는 여기서 다루지 않는다.</li>
 </ul>
@@ -232,7 +233,7 @@
 </li>
 <li>VMRanker에 붙은 DSCP=InferenceCritical은 4세대+8에서 이 경로가 얇게 정리됐던 것과 짝을 이룬다. <strong>VMRanker가 홈 랭킹의 tail latency에 크리티컬</strong>하다는 배포 결정이 서 있다는 방증이다.</li>
 <li><code>EnableAdsBrandSafetyVerdictV2</code>의 <code>true → false</code> 롤백은 4세대+2에서 신설된 뒤 4세대+7에서 HighRisk 승격까지 갔던 확장 방향이 실측 지표에서 문제를 냈거나 재검토 단계에 있음을 시사한다.</li>
-<li>grox 답글 스팸의 이원 모델 라우팅을 4세대+21의 coordinated_spam 임계 완화(10k → 30k)와 짝으로 읽으면, 전체 스팸 파이프라인이 <strong>높은 팔로워 대역과 낮은 팔로워 대역을 각기 다른 모델·기준으로 처리한다</strong>는 방향으로 세분화되는 중이다.</li>
+<li>grox 답글 스팸의 이원 모델 라우팅을 4세대+21의 coordinated_spam 임계 상향(10k → 30k)과 짝으로 읽으면, 전체 스팸 파이프라인이 <strong>높은 팔로워 대역과 낮은 팔로워 대역을 각기 다른 모델·기준으로 처리한다</strong>는 방향으로 세분화되는 중이다.</li>
 <li>자기 인용(self-QT) 마커는 리치 확대를 노린 자기 부스팅 패턴을 grox 판정기가 의미 수준에서 인식하도록 프롬프트 층에서 힌트를 준다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>

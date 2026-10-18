@@ -243,7 +243,7 @@ static IMMERSIVE_EXPANDED_RECOMMENDATIONS_POLICY: Policy = Policy::new(&amp;[...
 <li><p>부수적으로 filter 코드가 줄었다 <span class="badge ok">확인</span>.</p>
 <ul>
 <li><code>filter.rs</code>는 −94줄 감량됐다.</li>
-<li>Verdict 트리(4세대+28 도입)가 안착하면서, filter가 더는 rule 실행 흐름을 직접 조절할 필요가 없어졌다.</li>
+<li>Verdict 트리(4세대+26, 2026-09-22 도입)가 안착하면서, filter가 더는 rule 실행 흐름을 직접 조절할 필요가 없어졌다.</li>
 </ul>
 </li>
 </ul>
@@ -323,7 +323,7 @@ impl ValueTarget {
 <ul>
 <li>즉 Cold 채널의 후보는 MoE retrieval 후보(served_type <code>ForYouPhoenixRetrievalMoe</code>)와 동일한 arm-gating 규칙을 따른다.</li>
 <li>신규 테스트 <code>cold_retrieval_is_gated_like_moe</code>가 이를 검증한다. Holdout·Control에서는 Cold 후보 점수가 0, Treatment에서는 5.0로 잔존한다.</li>
-<li>Cold 채널은 4세대+28(2026-09-24, 44d37eb)에서 Phoenix retrieval에 <code>HOME_HOT</code> 옆에 신설된 <code>HOME_COLD=14</code> 채널이다.</li>
+<li>Cold 채널은 4세대+28(2026-09-24, 44d37eb)에서 Phoenix retrieval에 <code>HOME_HOT=14</code>와 함께 신설된 <code>HOME_COLD=13</code> 채널이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/data/retrieval_dataset.py" target="_blank" rel="noopener"><code>retrieval_dataset.py:280-281</code></a>.</li>
 <li>이 채널은 <code>1fav_1day.parquet</code> 소스를 fav&lt;8 &amp; views&lt;500 마스크로 분리하고 있었다.</li>
 </ul>
 </li>
@@ -368,7 +368,7 @@ impl ValueTarget {
 <li>정지의 취소가 &quot;지속 상태&quot;로 취급된다.<ul>
 <li>hold는 만료 시각(<code>expires_at</code>)을 갖는 시간 창이다. 그동안 특정 대상에 대한 자동화 조치를 막으며, 대상은 계정 또는 라벨이다.</li>
 <li>즉 사람 검토자의 이의제기 승인이 &quot;1회성 취소&quot;가 아니라 &quot;이후 시간 T까지의 재적용 금지&quot;라는 정책 항목이 된다.</li>
-<li>4세대+13(2026-09-01)에서 정책 파일 리팩터가 있었고, 4세대+28에서 verdict 이원 트리가 정리됐다. overturn-hold는 그 위에 놓이는 enforcement 상태 관리 계층이다.</li>
+<li>4세대+13(2026-09-01)에서 정책 파일 리팩터가 있었고, 4세대+26(2026-09-22)에서 verdict 이원 트리가 도입됐다. overturn-hold는 그 위에 놓이는 enforcement 상태 관리 계층이다.</li>
 <li>dedup retention이 두 상태(hold_overturned·hold_lookup_failed)를 별도로 취급하는 것도 사후 감사(audit) 필요성을 함의한다.</li>
 </ul>
 </li>
@@ -424,7 +424,7 @@ impl ValueTarget {
 <li>watch-time 모델은 FLOPs와 파라미터를 약 10% 줄이면서 이걸 달성했다.</li>
 </ol>
 </li>
-<li>Kuaishou 사업의 3대 지표(신규 유저 확보·광고 매출·시청 시간)를 각각 두 자릿수 백분율·정수 백분율·소수점 백분율로 개선했다는 진술 구조는 자동화 리서치 프레임워크의 성과 프로파일로 상당히 크다.</li>
+<li>사업 지표 셋(신규 유저 확보·광고 지출·시청 시간)을 각각 +10-15%·+15-20%·+0.3-0.8% 개선했다는 진술 구조는 자동화 리서치 프레임워크의 성과 프로파일로 상당히 크다.</li>
 </ul>
 </li>
 </ul>
@@ -440,7 +440,7 @@ impl ValueTarget {
 <div class="blk why"><p><span class="lbl">의미</span> 리서치 자동화 각도는 저장소가 이번 달에 관찰한 사례로 두 번째다. 다만 이 자료의 새로움은 랭킹·retrieval 메커니즘 축이 아니라 조직 축이라, 저장소의 주 관심(피드 파이프라인 자체)과는 거리가 있다. 심층 분석 후보로 남긴다.</p></div>
 <ul>
 <li>첫 번째 사례는 <a href="radar.html#meta-vdd-model-based-retrieval--evopilot--seed-video--pivot-query--user-context-mbr-%EC%98%A8%EB%9D%BC%EC%9D%B8-%EB%94%B0%EB%9D%BC%EC%9E%A1%EA%B8%B0-37%EC%9D%BC-%EC%BA%A0%ED%8E%98%EC%9D%B8-gsrr-066-relative">Meta VDD MBR + EvoPilot</a>의 &quot;37일 human-gated autoresearch 캠페인이 evaluator output-depth 3000/600 결함을 잡아 offline +3.20pp 회복&quot;이었다(2026-09-22).</li>
-<li>Meta가 검색 retrieval 개선을 자동화한 각도라면, Kuaishou AgentX-Model은 전 recommendation 모델 리서치 루프 그 자체를 자동화한 각도다.</li>
+<li>Meta가 검색 retrieval 개선을 자동화한 각도라면, AgentX-Model(Kuaishou 추정)은 전 recommendation 모델 리서치 루프 그 자체를 자동화한 각도다.</li>
 <li>두 회사가 자동화 리서치 프레임워크를 명시적으로 이름 붙여 공개한 일이 이번 달에 이어졌다는 점에서 관찰 스레드로 붙는다.</li>
 </ul>
 <h2 id="레이더">레이더</h2>

@@ -57,7 +57,7 @@
 <ul>
 <li>A. home-mixer(X의 피드 요청을 받아 후보를 모으고 순위를 매기는 서비스)의 랭킹 스코어링에서, 4세대 초기에 들어온 실험 스코어링 모드 하나가 폐기됐다.<ul>
 <li><code>home-mixer/scorers/value_model_gate.rs</code> 파일 하나가 전부 사라지면서(−537) <code>home-mixer/scorers/ranking_scorer.rs</code>가 −465줄로 크게 정리됐다.</li>
-<li><code>home-mixer/params/param.rs</code>는 −110줄로 관련 파라미터 17개를 잃었다.</li>
+<li><code>home-mixer/params/param.rs</code>는 −110줄로 관련 파라미터 18개를 잃었다.</li>
 </ul>
 </li>
 <li>B. Phoenix(X For You의 랭킹과 후보 검색 모델 스택) retrieval에, dataset_type 태그로 구별되는 cold-start 슬라이스가 정식으로 연결됐다.</li>
@@ -65,7 +65,7 @@
 <li>Phoenix serving/train 라인에서 <code>recsys_bundle_export.py</code>가 +559/−107로 크게 개편됐다.</li>
 </ul>
 </li>
-<li>D. VF(visibility-filtering, 포스트마다 이 뷰어에게 보여도 되는지 판정하는 서비스)에는 어제까지 스텁이던 <code>evaluate_tweets</code> gRPC의 서버 구현이 생겼다. TES(Tweet Entity Service, X 내부의 트윗 메타데이터 서비스)가 넘겨 주던 visibility 필드를 대체하는 하이드레이터도 등장했다. 이 하이드레이터는 Strato(X 내부 데이터를 컬럼 단위로 조회하는 서비스) 컬럼에서 필드를 가져온다.<ul>
+<li>D. VF(visibility-filtering, 포스트마다 이 뷰어에게 보여도 되는지 판정하는 서비스)에는 어제까지 스텁이던 <code>evaluate_tweets</code> gRPC의 서버 구현이 생겼다. TES(Tweet Entity Service, X 내부의 트윗 메타데이터 서비스)가 넘겨 주던 visibility 필드를 대체하는 하이드레이터도 등장했다. 이 하이드레이터는 Strato(코드가 데이터를 조회하거나 저장할 때 거치는 X 내부 시스템) 컬럼에서 필드를 가져온다.<ul>
 <li>추가 쪽에서는 두 개의 새 파일 <code>visibility-filtering/evaluate_tweets.rs</code>(+258)와 <code>visibility-filtering/hydration/tes_composite.rs</code>(+607)가 등장했다.</li>
 </ul>
 </li>
@@ -127,7 +127,7 @@
 <li><p>파라미터 미러에서도 관련 파라미터가 대칭으로 삭제됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (+8/−110).</p>
 <ul>
 <li>이 파일은 프로덕션 설정값을 주기적으로 옮겨 오는 미러다. 이번 mirror sync 시각은 <code>2026-09-17T20:46:44Z → 2026-09-18T16:21:20Z</code>로 바뀌었다.</li>
-<li>삭제된 param은 17개다.</li>
+<li>삭제된 param은 18개다.</li>
 </ul>
 </li>
 </ul>
@@ -505,7 +505,7 @@ pub enum EvaluationStatus {
 <li>Hydration이 성공한 tweet은 <code>Evaluated</code>다.</li>
 <li>author가 hydration에서 나오지 않은 tweet은 <code>UnresolvedAuthor</code>이고, 이때 verdict는 <code>Verdict::unresolved_author()</code>다.</li>
 <li>hydration 자체가 실패해서 필드가 부족한 상태로 rule에 걸린 tweet은 <code>Failed</code>다.</li>
-<li><code>HydrationOutput</code>에도 새 필드 <code>failed_ids: HashSet&lt;TweetId&gt;</code>가 추가돼 두 번째 경우를 구별한다.</li>
+<li><code>HydrationOutput</code>에도 새 필드 <code>failed_ids: HashSet&lt;TweetId&gt;</code>가 추가돼 세 번째 경우(<code>Failed</code>)를 구별한다.</li>
 </ul>
 </li>
 <li><p>클라이언트 쪽 <code>EvaluationResult { Evaluated(Box&lt;Action&gt;), NotEvaluated, Failed }</code>(4세대+23 도입)와 축 이름이 나란히 나오고, 서버와 클라이언트의 축이 다음처럼 맞물린다 <span class="badge est">추정</span>.</p>
@@ -577,7 +577,7 @@ const OPERATION: &amp;str = &quot;fetch&quot;;
 <p>VF는 지금까지 TES의 광역 tweet 필드를 그대로 참조해 왔다. 이제 그 관행에서 벗어나, visibility 규칙에 필요한 최소 필드 집합만 별도 Strato 컬럼으로 조회하는 방향이다. 세 축이 함께 정착했다.</p>
 <ul>
 <li><a href="https://github.com/xai-org/x-algorithm/commit/7ba7768" target="_blank" rel="noopener">4세대+13</a>에서 VF rules가 tweet/author 2분류로 재구조화됐다.</li>
-<li><a href="https://github.com/xai-org/x-algorithm/commit/42266f3" target="_blank" rel="noopener">4세대+23</a>은 자체 twemcache 서브트리 2,900줄을 전부 지우고 회사 공용 <code>xai_cache</code>로 옮기면서, evaluate_tweets 클라이언트 인터페이스를 스텁으로 열었다.</li>
+<li><a href="https://github.com/xai-org/x-algorithm/commit/42266f3" target="_blank" rel="noopener">4세대+23</a>은 자체 twemcache 서브트리 3,234줄을 전부 지우고 회사 공용 <code>xai_cache</code>로 옮기면서, evaluate_tweets 클라이언트 인터페이스를 스텁으로 열었다.</li>
 <li>오늘 서버 구현과 TES 분리가 완성된다.</li>
 </ul>
 <p>즉 4세대에서 VF는 rules → dependencies → serving interface 순서로 세 층이 차례로 재편됐다.</p>

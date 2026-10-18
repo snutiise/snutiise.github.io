@@ -41,7 +41,7 @@
 <h1 id="netflix">Netflix</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-10-16">2026-10-16</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc toc-long"><summary>목차<span class="toc-n">13</span></summary><ol><li><a href="#한-줄-요약">한 줄 요약</a></li><li><a href="#세대-구분--이것을-먼저-알아야-자료가-헷갈리지-않는다">세대 구분</a></li><li><a href="#피드-지면">피드 지면</a></li><li><a href="#후보-생성-retrieval">후보 생성 (retrieval)</a></li><li><a href="#랭킹">랭킹</a><ol><li><a href="#foundation-model-2025-프로덕션">Foundation Model (2025, 프로덕션)</a></li><li><a href="#genrec-2026-대규모-ab">GenRec (2026, 대규모 A/B)</a></li><li><a href="#genrec의-서빙-층--별도-블로그로-공개-2026-07">GenRec의 서빙 층</a></li><li><a href="#genrec-arxiv-논문--블로그가-안-밝힌-정량치-2026-08-10">GenRec arXiv 논문</a></li><li><a href="#목적함수--가중합이-아니라-retention-계열">목적함수</a></li><li><a href="#고전-세대-랭커-참고용-2015">고전 세대 랭커 (참고용, 2015)</a></li></ol></li><li><a href="#재순위다양성필터">재순위·다양성·필터</a></li><li><a href="#아트워크비디오-프리뷰-개인화--maps-multimodal-asset-personalization-at-scale-2026-08-프로덕션">아트워크·비디오 프리뷰 개인화</a><ol><li><a href="#clip-기반-통합-two-tower--5개-캔버스-타입-단일-모델">CLIP 기반 통합 two-tower</a></li><li><a href="#mediafm--자체-tri-modal-foundation-model-비디오-프리뷰용">MediaFM</a></li><li><a href="#popularity-based-winner--오프라인-프록시-태스크">Popularity-Based Winner</a></li><li><a href="#netflix-embedding-store--인프라-레이어">Netflix Embedding Store</a></li><li><a href="#의미--아트워크프리뷰가-개인화-스택의-별개-축이-됐다">의미</a></li></ol></li><li><a href="#콜드스타트">콜드스타트</a></li><li><a href="#피드백-신호">피드백 신호</a></li><li><a href="#학습-주기평가">학습 주기·평가</a><ol><li><a href="#counterfactual-observability-프레임워크-2026-09-recsys-2026">Counterfactual observability 프레임워크 (2026-09, RecSys 2026)</a></li><li><a href="#추천의-가치-측정--선택-모델--소규모-nudge-ab-검증-ijio-논문-ec-26">추천의 가치 측정</a></li></ol></li><li><a href="#광고">광고</a></li><li><a href="#열린-질문">열린 질문</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
@@ -170,11 +170,11 @@
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="후보-생성-retrieval">후보 생성 (retrieval)</h2>
-<p><strong>retrieval 레이어가 사실상 없다.</strong> PVR은 &quot;카탈로그 전체(또는 장르 필터된 부분집합)를 회원별로 정렬&quot;한다 <span class="badge ok">확인</span> TMIS 2015. 코퍼스가 수천~수만 규모라서 카탈로그 전체를 채점할 수 있고, X의 500/400 같은 소스별 상한이 등장할 이유가 없다. 배분 문제는 아이템 선별이 아니라 <strong>행 선택</strong>으로 옮겨 간다(→ <a href="candidate-allocation.html">candidate-allocation.md</a>).</p>
+<p><strong>TMIS 2015 기준으로 retrieval 레이어가 사실상 없다.</strong> PVR은 &quot;카탈로그 전체(또는 장르 필터된 부분집합)를 회원별로 정렬&quot;한다 <span class="badge ok">확인</span> TMIS 2015. 코퍼스가 수천~수만 규모라서 카탈로그 전체를 채점할 수 있고, X의 500/400 같은 소스별 상한이 등장할 이유가 없다. 배분 문제는 아이템 선별이 아니라 <strong>행 선택</strong>으로 옮겨 간다(→ <a href="candidate-allocation.html">candidate-allocation.md</a>).</p>
 <ul>
 <li>행 후보는 회원당 수만 개(&quot;tens of thousands of rows&quot;)에 이르고, 행 선택 알고리즘이 관련성과 다양성을 기준으로 골라 정렬한다 <span class="badge ok">확인</span> TMIS 2015.</li>
 <li>2015년부터 템플릿을 없애, &quot;BYW 행이 하나도 없는 홈도, 절반이 BYW인 홈도&quot; 허용한다 <span class="badge ok">확인</span> TMIS 2015.</li>
-<li>FM 시대에는 임베딩 스토어에 회원 임베딩과 타이틀 임베딩을 일 단위로 배치 생산한다. 이 임베딩은 검색용이 아니라 다운스트림 모델의 피처이고, 후보 소스로도 함께 쓴다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">FM 통합 블로그 2025</a>.</li>
+<li>FM 시대에는 임베딩 스토어에 회원 임베딩과 타이틀 임베딩을 일 단위로 배치 생산한다. 이 임베딩은 검색용이 아니라 다운스트림 모델의 피처이고, 후보 소스로도 함께 쓴다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">FM 통합 블로그 2025</a>. 블로그는 후보 생성에 ANN을 쓰는지 밝히지 않는다 <span class="badge obs">관찰</span> 2026-10-19 (블로그 본문 1건).</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="랭킹">랭킹</h2>
@@ -547,7 +547,7 @@
 <ul>
 <li>명시 신호는 2017년에 별점에서 thumbs up과 down으로 바뀌었다. up은 &quot;비슷한 것 더&quot;, down은 &quot;그만 추천&quot;이라는 뜻이다. 별점 대비 평점 활동이 200% 늘었다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs" target="_blank" rel="noopener">About Netflix 2017</a>.</li>
 <li>2022년에는 Two Thumbs Up(&quot;정말 좋았음&quot;)을 추가했고, 이 평가는 더 구체적으로 반영된다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/two-thumbs-up-even-better-recommendations" target="_blank" rel="noopener">About Netflix 2022</a>.</li>
-<li>% Match는 &quot;시청 습관·행동 분석만으로&quot; 산출되는 <strong>표시용</strong> 점수다 <span class="badge ok">확인</span> 2017 발표. 명시 평점을 소비하는 곳이 랭킹이 아니라 UI일 수 있다 (→ <a href="survey-signals.html">survey-signals.md</a>).</li>
+<li>% Match는 &quot;시청 습관·행동 분석만으로&quot; 산출되는 <strong>표시용</strong> 점수다 <span class="badge ok">확인</span> 2017 발표. 같은 발표는 thumbs가 취향을 더 배워 추천을 개선하는 데 쓰인다고 쓴다 <span class="badge ok">확인</span>. 명시 평점이 UI의 % Match에 들어간다는 진술은 없다 (→ <a href="survey-signals.html">survey-signals.md</a>).</li>
 <li>클릭베이트를 막는 장치도 있다. 아트워크 라벨에서 &quot;재생 유도했지만 저품질 참여&quot;를 배제한다 <span class="badge ok">확인</span> 2017.</li>
 <li>인구통계(연령·성별)는 쓰지 않는다고 명시한다 <span class="badge ok">확인</span> help.netflix.com.</li>
 <li>세션 의도는 FM-Intent가 다룬다. 다음 의도와 아이템을 동시에 예측하며, 프로덕션에 들어가 있다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/fm-intent-predicting-user-session-intent-with-hierarchical-multi-task-learning-94c75e18f4b8" target="_blank" rel="noopener">블로그 2025</a>.</li>

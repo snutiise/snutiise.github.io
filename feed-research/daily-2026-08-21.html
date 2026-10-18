@@ -53,7 +53,7 @@
 <p>오늘 함께 본 다른 변화는 다음과 같다.</p>
 <ul>
 <li>같은 X 커밋에서 Phoenix가 검색 랭킹으로 확장됐고, Phoenix proto에 reward 헤드와 link-open 확률 5분위 헤드가 생겼다.</li>
-<li>같은 커밋에는 Following 전용 필터, Grok 4.6 shadow 실험, 노출 판정 shadow 미러링, 플래그 4개의 train-default ON 승격도 있다.</li>
+<li>같은 커밋에는 Following 전용 필터, Grok 4.6에 실트래픽 10%를 보내는 dial, 노출 판정 shadow 미러링, 플래그 4개의 train-default ON 승격도 있다.</li>
 <li>Netflix는 아트워크를 CLIP two-tower로, 비디오 프리뷰를 자체 tri-modal 모델 MediaFM으로 개인화한 프로덕션 결과를 논문으로 냈다.</li>
 </ul>
 <h2 id="1-phoenix의-학습-optimizer가-adam에서-muon으로-바뀌었다--x"><span class="num">1</span>Phoenix의 학습 optimizer가 Adam에서 Muon으로 바뀌었다 — X</h2>
@@ -67,7 +67,7 @@
 </ul>
 </li>
 </ul>
-<p>하루를 건너뛰고 8/19에 나온 이번 커밋은 규모(파일 79, +3.3k lines)와 성격 양쪽에서 후속 소규모 정리를 넘어선 대형 확장이다. 커밋 규모는 79 파일 +3,303/−651로 4세대+3의 6배가 넘는다. 성격 면에서는 학습 파이프라인 대개편, retrieval 지면 확장, 안전 인프라 shadow 구성이 들어 있다.</p>
+<p>4세대+3 다음 날(8/19)에 나온 이번 커밋은 규모(파일 79, +3.3k lines)와 성격 양쪽에서 후속 소규모 정리를 넘어선 대형 확장이다. 커밋 규모는 79 파일 +3,303/−651이다. 4세대+3(파일 14개, +208/−70)과 비교하면 파일 수는 5.6배, 변경 줄 수는 약 14배다. 성격 면에서는 학습 파이프라인 대개편, retrieval 지면 확장, 안전 인프라 shadow 구성이 들어 있다.</p>
 <p>Muon optimizer는 Keller Jordan 등이 2024년에 제안한 dense-parameter optimizer다. 기존 momentum-adam 계열과 달리 Newton-Schulz iteration으로 gradient momentum을 근사 직교화(orthogonalization)한다. Kimi K2와 Moonshot 등의 대규모 LLM 학습에서 채택된 사례가 있다. 임베딩과 norm, logits 등에는 여전히 Adam을 쓰는 하이브리드 구성이 표준이다. 이 저장소가 반영해 온 프로덕션 recsys 학습 파이프라인 가운데 Muon 채택을 코드로 확인한 <strong>첫 사례</strong>라는 점이 오늘 자료에서 가장 중요한 신호다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
 <h3 id="1-phoenix의-dense-parameter-optimizer가-adam에서-muon으로-바뀌었다">(1) Phoenix의 dense-parameter optimizer가 Adam에서 Muon으로 바뀌었다</h3>
@@ -279,7 +279,8 @@ P_OPEN_LINK_P90 = 253;
 <li>TES(Tweet Entity Service)는 X 내부의 트윗 메타데이터 조회 서비스다.</li>
 </ul>
 </li>
-<li>grox PTOS에 Grok 4.6 internal 10% dial을 넣어, 아동 안전 cross-validation과 deluxe 4.3 카테고리 재분류에서 4.5를 4.6으로 바꾸는 shadow 실험을 시작했다.<ul>
+<li>grox PTOS에 Grok 4.6 internal 10% dial을 넣어, 아동 안전 cross-validation과 deluxe 4.3 카테고리 재분류에서 호출의 10%를 4.5 대신 4.6으로 보내기 시작했다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/grox/flows/ptos/classifier.py#L276-L300" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py:276-300</code></a>.<ul>
+<li>4.6의 응답도 4.5와 똑같이 <code>self._parse_policy(raw)</code>로 파싱해 판정에 쓴다. 결과를 버리는 shadow가 아니라 실트래픽을 나누는 점진 롤아웃이다(L281-290, L477-482).</li>
 <li>grox는 Grok 기반 nearline 주석 파이프라인이다. PTOS는 grox 안전 파이프라인에서 정책 기반으로 위반 카테고리를 판정하는 계층이다.</li>
 <li>dial은 grox PTOS <code>classifier.py</code>의 <code>_GROK_4_6_INTERNAL_DIAL = 0.1</code>이다.</li>
 <li><code>prior_nsfw.py</code>(34줄 신규)로 Manhattan lookup 캐시를 분리했다.</li>
@@ -300,7 +301,7 @@ P_OPEN_LINK_P90 = 253;
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>를 다음과 같이 고쳤다.</p></div>
 <ul>
 <li>세대 테이블에 4세대+4 (aad7179, 2026-08-19) 행을 추가했다.</li>
-<li>한 줄 요약에는 Muon, xrecsys_search, RewardOutputs, link-open 5분위, Following filter, Grok 4.6 dial, dark_traffic, train-default 승격까지 7개 항목을 담았다.</li>
+<li>한 줄 요약에는 Muon, xrecsys_search, RewardOutputs, link-open 5분위, Following filter, Grok 4.6 dial, dark_traffic, train-default 승격까지 8개 항목을 담았다.</li>
 <li>&quot;Phoenix 학습·인덱스&quot; 절을 대폭 확장해서 소절 3개를 새로 만들었다. 소절은 &quot;4세대+4 Phoenix dense-parameter optimizer가 Adam → Muon 전환&quot;, &quot;Phoenix가 검색 랭킹으로 확장&quot;, &quot;Phoenix proto에 reward head + link-open 5분위 헤드 신설&quot;이다.</li>
 <li>bool feature 표 아래에는 train-default ON 승격 항목을 추가했다.</li>
 <li>필터 절에는 &quot;4세대+4 신규 — Following 파이프라인 전용 muted-keyword filter + quoted-text hydrator&quot; 소절을 추가했다.</li>
@@ -309,7 +310,7 @@ P_OPEN_LINK_P90 = 253;
 <li>열린 질문 절에는 &quot;4세대+4 공개로 해소된 것&quot; 서브섹션을 신설해서, 해소 8개와 심층 분석이 필요한 6개를 정리했다.</li>
 <li>출처 절에는 aad7179 관련 파일 링크 10개를 추가했다.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> 5일 연속 이어진 후속 커밋의 성격이 오늘 크게 바뀌었다. 8/14부터 8/18까지(4세대+1부터 +3까지)는 brand safety 문구 조정과 filter 신설, hydrator 분기, 흐름 통합처럼 &quot;매일 소규모 정교화&quot;에 해당했다. 4세대+4는 다음 세 축에서 실질적으로 확장됐다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 8/17부터 사흘 연속 이어진 후속 커밋의 성격이 오늘 크게 바뀌었다. 8/14부터 8/18까지(4세대+1부터 +3까지)는 brand safety 문구 조정과 filter 신설, hydrator 분기, 흐름 통합처럼 &quot;매일 소규모 정교화&quot;에 해당했다. 4세대+4는 다음 세 축에서 실질적으로 확장됐다.</p></div>
 <ul>
 <li>학습 파이프라인을 대개편했다(Muon).</li>
 <li>retrieval 지면을 확장했다(검색).</li>

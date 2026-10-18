@@ -41,7 +41,7 @@
 <h1 id="시퀀스-트랜스포머-랭킹-in-context-candidate-scoring">시퀀스 트랜스포머 랭킹 (in-context candidate scoring)</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-10-14">2026-10-14</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc toc-long"><summary>목차<span class="toc-n">13</span></summary><ol><li><a href="#왜-이-구조인가">왜 이 구조인가</a></li><li><a href="#핵심-설계-요소">핵심 설계 요소</a><ol><li><a href="#1-시퀀스-레이아웃">1. 시퀀스 레이아웃</a></li><li><a href="#2-어텐션-마스크--설계에서-가장-중요한-부분">2. 어텐션 마스크</a></li><li><a href="#3-파라미터가-어디에-있는가">3. 파라미터가 어디에 있는가</a></li><li><a href="#4-콘텐츠는-들어가지-않는다">4. 콘텐츠는 들어가지 않는다</a></li></ol></li><li><a href="#hand-engineered-feature-제거-주장의-실제-범위">&quot;hand-engineered feature 제거&quot; 주장의 실제 범위</a></li><li><a href="#meta--트랜스포머-계보가-하나가-아니라-둘이다">Meta</a></li><li><a href="#계보-a-organic--hstu--ultra-hstu">계보 A (organic)</a><ol><li><a href="#1-피처-전체를-하나의-시계열로-합친다">1. 피처 전체를 하나의 시계열로 합친다</a></li><li><a href="#2-numerical-feature를-버리는-근거를-밝힌다">2. numerical feature를 버리는 근거를 밝힌다</a></li><li><a href="#3-retrieval과-ranking이-같은-시퀀스-위의-다른-태스크가-된다">3. retrieval과 ranking이 같은 시퀀스 위의 다른 태스크가 된다</a></li><li><a href="#4-softmax를-버리고-그-이유-두-가지를-밝힌다">4. softmax를 버리고, 그 이유 두 가지를 밝힌다</a></li><li><a href="#5-상대-위치-bias가-위치와-시간을-모두-담는다">5. 상대 위치 bias가 위치와 시간을 모두 담는다</a></li><li><a href="#6-m-falcon-x의-후보-블록-마스크와-같은-문제를-다르게-푼다">6. M-FALCON: X의 후보 블록 마스크와 같은 문제를 다르게 푼다</a></li><li><a href="#hstu의-성과-수치와-배포-지면">HSTU의 성과 수치와 배포 지면</a></li><li><a href="#ultra-hstu-2026">ULTRA-HSTU (2026)</a></li></ol></li><li><a href="#계보-b-ads--dhen--wukong--interformer--gem-서빙은-marm">계보 B (ads)</a><ol><li><a href="#llatte-시퀀스-모델을-랭커-밖으로-빼낸다">LLaTTE: 시퀀스 모델을 랭커 밖으로 빼낸다</a></li><li><a href="#gem-훈련-인프라">GEM 훈련 인프라</a></li><li><a href="#gem-2026-세대">GEM 2026 세대</a></li><li><a href="#marm은-gem을-서빙한다고-말하지-않는다">MARM은 GEM을 서빙한다고 말하지 않는다</a></li></ol></li><li><a href="#두-계보가-서로를-인용하지-않는다--실측">두 계보가 서로를 인용하지 않는다</a></li><li><a href="#dv365--시퀀스를-늘리는-대신-미리-압축한다-instagram">DV365</a></li><li><a href="#통합-모델-주장을-읽는-법">&quot;통합 모델&quot; 주장을 읽는 법</a></li><li><a href="#x-vs-meta--이-주제에서의-대조">X vs Meta</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#아직-확인하지-못한-것">아직 확인하지 못한 것</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
@@ -348,7 +348,7 @@ c3    [  1    1   1   0   0   1 ]
 </li>
 <li>확장 효율 쪽에서는 2D FSDP, Expert Parallelism (dense), Fully Sharded 2D Model Parallelism (sparse), SM-free collectives로 통신 오버헤드를 줄인다. <span class="badge ok">확인</span>(GEM Training 블로그)</li>
 <li><strong>DHEN은 대체되지 않고 흡수됐다.</strong> <span class="badge ok">확인</span>(GEM Training 블로그) 블로그 본문에서 &quot;Deep Hierarchical Ensemble Network experts&quot;가 GEM의 expert 모듈로 남아 있다.<ul>
-<li>계보 표의 &quot;GEM = Wukong·InterFormer 통합&quot;은 유효하고, DHEN도 그 안에 있다.</li>
+<li>2025-11 세대 기준으로 계보 표의 &quot;GEM = Wukong·InterFormer 통합&quot;은 유효하고, DHEN도 그 안에 있다. 2026-10 세대의 백본 교체는 <a href="#gem-2026-%EC%84%B8%EB%8C%80">아래 절</a>에 있다.</li>
 </ul>
 </li>
 </ul>
@@ -460,7 +460,7 @@ c3    [  1    1   1   0   0   1 ]
 <li>DV365는 오프라인에서 압축해 피처로 만든다.</li>
 <li>LLaTTE는 비동기 upstream user model로 분리한다.</li>
 </ul>
-<p>DV365와 LLaTTE는 &quot;무거운 계산을 랭커 밖으로 뺀다&quot;는 같은 형태이고, ULTRA-HSTU는 그 접근을 명시적으로 비판한다. <strong>세 방향이 동시에 프로덕션에 있다.</strong> <span class="badge est">추정</span></p>
+<p>DV365와 LLaTTE는 &quot;무거운 계산을 랭커 밖으로 뺀다&quot;는 같은 형태이고, ULTRA-HSTU는 cross-attention에 기대는 최근 접근을 일반론으로 비판할 뿐 두 모델을 지목하지는 않는다. <strong>세 방향이 동시에 프로덕션에 있다.</strong> <span class="badge est">추정</span></p>
 <p>X에는 이런 구분 자체가 없다. Phoenix 공개 설정의 이력 길이는 훨씬 짧고, 이력을 압축하는 장치도 코드에 없다. <span class="badge ok">확인</span> xai-org/x-algorithm, 2026</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="통합-모델-주장을-읽는-법">&quot;통합 모델&quot; 주장을 읽는 법</h2>
@@ -534,7 +534,10 @@ c3    [  1    1   1   0   0   1 ]
 </ul>
 </li>
 <li><strong>Meta (organic)</strong>: HSTU(ICML 2024)에서 ULTRA-HSTU(2026)로 이어지고, ULTRA-HSTU는 &quot;serving billions of users daily&quot;라고 쓴다. <strong>⚠ 논문이 지면을 익명화</strong>해서 어느 앱인지 확정할 수 없다. <span class="badge ok">확인</span>(존재) / <span class="badge est">추정</span>(지면) 자세한 내용은 <a href="facebook.html">facebook.md</a>에 있다.</li>
-<li><strong>Meta (ads)</strong>: DHEN → Wukong → InterFormer → GEM으로 이어지고, 시퀀스 파트는 LLaTTE, 서빙은 MARM이다. Facebook Feed·Reels 광고에 배포되었다고 명시되어 있다. 2026-10 블로그 기준 GEM 백본은 Kunlun이고, Facebook·Instagram·Reels를 한 모델로 다룬다. <span class="badge ok">확인</span></li>
+<li><strong>Meta (ads)</strong>: DHEN → Wukong → InterFormer → GEM으로 이어지고, 시퀀스 파트는 LLaTTE다. Facebook Feed·Reels 광고에 배포되었다고 명시되어 있다. 2026-10 블로그 기준 GEM 백본은 Kunlun이고, Facebook·Instagram·Reels를 한 모델로 다룬다. <span class="badge ok">확인</span><ul>
+<li>MARM이 이 계보의 서빙을 맡는다는 1차 출처는 없다 <span class="badge est">추정</span>(<a href="#marm%EC%9D%80-gem%EC%9D%84-%EC%84%9C%EB%B9%99%ED%95%9C%EB%8B%A4%EA%B3%A0-%EB%A7%90%ED%95%98%EC%A7%80-%EC%95%8A%EB%8A%94%EB%8B%A4">MARM 절</a>).</li>
+</ul>
+</li>
 <li><strong>Instagram</strong>: DV365가 Instagram·Threads의 <strong>product model 15개</strong>에 upstream으로 공급된다. 시퀀스 모델을 랭커 밖으로 뺀 형태다. <span class="badge ok">확인</span> 자세한 내용은 <a href="instagram.html">instagram.md</a>에 있다.</li>
 <li><strong>Threads</strong>: 자체 시퀀스 모델에 대한 진술이 없다. DV365의 <strong>소비처</strong>로만 언급된다. <span class="badge ok">확인</span> 자세한 내용은 <a href="threads.html">threads.md</a>에 있다.</li>
 <li><strong>그 외 서비스</strong>: 아직 조사하지 않았다. Pinterest TransAct와 Kuaishou 쪽이 같은 계열에 속할 가능성이 높지만, 이 저장소에서 아직 1차 출처로 확인하지 않았다. <strong>열린 질문이다.</strong></li>

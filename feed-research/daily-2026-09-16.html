@@ -42,7 +42,7 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>수요일</li>
-<li><span class="meta-k">읽는 시간</span>27분</li>
+<li><span class="meta-k">읽는 시간</span>28분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
@@ -58,9 +58,9 @@
 <li>continuous head는 연속값을 회귀로 예측하는 출력 헤드다.</li>
 </ul>
 </li>
-<li>H100 학습·서빙 커널이 GB300과 같은 CUTe DSL 계열로 옮겨졌다.</li>
+<li>H100 two-tower 학습 config의 attention 커널이 GB300과 같은 CUTe DSL 계열로 옮겨졌다.</li>
 <li>Kafka OTel export 간격이 30→120초로 완화됐다.</li>
-<li>coordinated spam 필터의 팔로워 임계가 10k→30k로 처음 완화됐다.</li>
+<li>coordinated spam 필터의 root 팔로워 임계가 10k→30k로 올랐다.</li>
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 응답의 다양성을 3단계로 나눠 기록하는 관측이 새로 생겼다</span></p></div>
 <ul>
@@ -171,7 +171,7 @@ ClientTweetShare, ClientTweetClickSendViaDirectMessage, ClientTweetShareViaCopyL
 ClientTweetBookmark, ClientTweetFollowAuthor
 </code></pre>
 <ul>
-<li>즉 리포트·뮤트·블록·<code>not_dwelled</code> 같은 부정 신호와 dwell·quality view 같은 노출성 신호는 의도적으로 제외됐다.</li>
+<li>즉 리포트·뮤트·블록·<code>not_dwelled</code> 같은 부정 신호와 dwell 같은 노출성 신호는 의도적으로 제외됐다. 영상 quality view 두 개는 목록에 들어 있다.</li>
 </ul>
 </li>
 <li><p>이 세트는 X 공개 코드의 다른 어느 곳에도 나온 적이 없는 새 상수 집합이다. &quot;적극적 참여로 관계가 형성된 작성자&quot;의 정의를 처음으로 코드에 고정한다.</p>
@@ -280,9 +280,12 @@ _GB300_OVERRIDES = {&quot;bs_per_device&quot;: 960, &quot;ep&quot;: 64, &quot;at
 </li>
 </ul>
 </li>
-<li><p><code>cutedsl_ranker_varlen_attn</code>은 NVIDIA CUTLASS/CUTe DSL 기반 variable-length attention 커널이다. 이 커널은 4세대+6(28e414f, 2026-08-21)에서 <code>_GB300_OVERRIDES</code>에 처음 등장했다. 4세대+15(9b0dc31, 2026-09-04)에서는 SM80·SM90 forward·backward가 모두 오픈소스로 공개됐다(<code>phoenix/xrex/cutedsl/ranker_fa4/</code>).</p>
+<li><p><code>cutedsl_ranker_varlen_attn</code>은 NVIDIA CUTLASS/CUTe DSL 기반 variable-length attention 커널이다. 이 커널은 4세대 공개(47c1bcd, 2026-08-13)부터 <code>_GB300_OVERRIDES</code>에 있었다(<a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:340</code></a>). 4세대+17(49815da, 2026-09-08)에서는 SM80·SM90 forward·backward가 모두 오픈소스로 공개됐다(<code>phoenix/xrex/cutedsl/ranker_fa4/</code>).</p>
 </li>
-<li><p>SM80은 H100(및 A100), SM90은 GB300에 각각 대응하므로, 이번 전환은 H100 배포도 같은 커널을 쓰도록 통일한 후속이다. 이제 GB300과 H100 두 GPU 세대의 학습 코드 경로는 attention 층의 시맨틱까지 같아졌다.</p>
+<li><p>SM80 커널은 A100(compute capability 8.0)용이고 SM90 커널은 H100(9.0)용이며, GB300(10.3)은 arch 100 경로를 탄다 <span class="badge ok">확인</span> — <a href="https://developer.nvidia.com/cuda-gpus" target="_blank" rel="noopener">NVIDIA compute capability 표</a>, <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/xrex/cutedsl/ranker_attention_fa4.py" target="_blank" rel="noopener"><code>ranker_attention_fa4.py</code>의 <code>cutedsl_arch</code></a>.</p>
+<ul>
+<li>따라서 이번 전환으로 H100 학습은 SM90 커널을 쓴다. 두 GPU 세대가 같은 <code>attn_impl</code> 이름을 쓰지만, 실제로 도는 커널은 세대마다 다르다.</li>
+</ul>
 </li>
 <li><p>seqpack(여러 유저 시퀀스를 한 배치 행에 이어 붙이는 패킹) 학습 config가 H100에서만 <code>pallas_ranker_varlen_attn</code>을 강제하는 제약이 이번 커밋으로 풀리는지는 확인하지 못했다. 이 제약은 4세대+11(bc8e5f0)에서 관측됐다.</p>
 <ul>
@@ -300,9 +303,9 @@ _GB300_OVERRIDES = {&quot;bs_per_device&quot;: 960, &quot;ep&quot;: 64, &quot;at
 <li>OTel 지표를 4배 덜 자주 내보내는 것은 학습 잡의 관측 tail 분해능을 내주고 collector 부담을 줄이는 트레이드오프다.</li>
 <li>이번 완화는 지표 host cost가 실제로 부담이 됐다는 방증이다 <span class="badge est">추정</span>.</li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">G. coordinated spam 필터가 팔로워 임계를 10k에서 30k로 처음 완화했다</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">G. coordinated spam 필터가 root 팔로워 임계를 10k에서 30k로 올렸다</span></p></div>
 <ul>
-<li><p>Grox(Grok 기반 nearline 주석 파이프라인)의 coordinated spam 필터 팔로워 임계가 10k → 30k로 처음 완화됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py</code></a> (+1/−1)</p>
+<li><p>Grox(Grok 기반 nearline 주석 파이프라인)의 coordinated spam 필터 팔로워 임계가 10k → 30k로 올랐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py</code></a> (+1/−1)</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">class TaskCoordinatedSpamFilter(TaskFilterWithPost):
 -    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 10000
 +    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 30000
@@ -310,17 +313,19 @@ _GB300_OVERRIDES = {&quot;bs_per_device&quot;: 960, &quot;ep&quot;: 64, &quot;at
 </li>
 <li><p>Grox reply-spam 파이프라인에는 팔로워 임계가 두 개 따로 있다.</p>
 <ul>
-<li><code>TaskSpamFilter</code>·<code>TaskReplyRankingFilter</code>: 4세대 공개 이후 15k → 30k(4세대+1) → 60k(4세대+3) → 80k(4세대+6) → <strong>100k</strong>(4세대+7)로 다섯 단계 상향됐다. 이 임계는 팔로워 수가 임계 이하인 계정의 답글만 스팸 분류에 넣는다는 뜻이므로, 상향은 분류 범위 확대(더 큰 계정까지 검사)를 뜻한다.</li>
-<li><code>TaskCoordinatedSpamFilter</code>: 지금까지 15k(원래) → 10k(어느 시점의 하향)였고, 이번에 10k → <strong>30k</strong>로 처음 완화됐다. coordinated spam은 여러 계정이 짝지어 같은 스팸 패턴을 반복 게시하는 유형이다.</li>
+<li><code>TaskSpamFilter</code>·<code>TaskReplyRankingFilter</code>: 4세대 공개 이후 15k → 30k(4세대+1) → 40k(4세대+2) → 60k(4세대+3) → 80k(4세대+6) → 100k(4세대+7) → 120k(4세대+8) → <strong>150k</strong>(4세대+17)로 일곱 번 올랐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py</code></a>의 커밋별 값.</li>
+<li>스팸 분류는 root와 답글 대상 계정의 팔로워가 모두 임계 이하인 대화만 넣는다(77-93줄). 그래서 상향은 분류 범위 확대(더 큰 계정의 대화까지 검사)를 뜻한다.</li>
+<li><code>TaskCoordinatedSpamFilter</code>: 4세대 공개 때 1k였고, 5k(4세대+15)와 10k(4세대+17)를 거쳐 이번에 <strong>30k</strong>로 세 번째 올랐다 <span class="badge ok">확인</span> — 같은 파일의 커밋별 값. coordinated spam은 여러 계정이 짝지어 같은 스팸 패턴을 반복 게시하는 유형이다.</li>
+<li>이 필터는 root 작성자의 팔로워가 임계 미만이면 건너뛴다(157-161줄, 사유 <code>low_blast_radius</code>). 그래서 상향은 작은 계정 아래의 대화를 판정에서 빼는 쪽이다.</li>
 </ul>
 </li>
-<li><p>두 필터의 임계 곡선이 정반대 방향으로 움직이는 점이 특이하다. 일반 spam 분류는 오탐을 감수하고 큰 계정까지 넓히고, coordinated spam 분류는 큰 계정을 제외한다(작은 계정에 집중하고 오탐은 줄이는 쪽).</p>
+<li><p>두 임계는 모두 오르고 있고, 두 필터의 판정 범위도 모두 큰 계정의 대화 쪽으로 옮겨 간다 <span class="badge ok">확인</span> — 같은 파일. 일반 spam 분류는 더 큰 계정의 대화까지 넓히고, coordinated spam 분류는 작은 계정 아래의 대화를 뺀다.</p>
 </li>
-<li><p>coordinated spam은 조직화된 소규모 계정 클러스터가 전형이라, 30k 이상 팔로워 계정은 이 파이프라인에서 판정 가치가 낮다는 판단으로 읽힌다 <span class="badge est">추정</span>.</p>
+<li><p>coordinated spam 판정의 비용을 노출이 큰 대화에 집중하려는 조정으로 읽힌다 <span class="badge est">추정</span>. 근거는 건너뛰는 사유 이름이 <code>low_blast_radius</code>라는 점이다.</p>
 </li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">../services/x.md</a>의 4세대 공개 표에 <code>4세대+21</code> 행을 추가하고, 상세 절 <code>### 4세대+21 (2026-09-15, 2d4a03c) — …</code>을 새로 만들었다. 광고 절, 피드백 신호 절, Phoenix 랭킹 절에도 새 continuous head와 슬레이트 관측 지표를 코드에 연결된 범위까지만 짧게 반영했다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> 슬레이트 다양성 관측과 광고 구매 금액 예측이라는 두 축이 나란히 열렸다. 두 축 모두 이번 커밋에서는 feature-switch 게이트 뒤에 연결만 됐다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 슬레이트 다양성 관측과 광고 구매 금액 예측이라는 두 축이 나란히 열렸다. 구매 금액 축은 이번 커밋에서 연결만 됐고, 다양성 관측은 기본으로 요청의 5%에서 이미 돈다(위 A).</p></div>
 <ol>
 <li>관측 범위가 슬레이트 다양성까지 넓어졌다. 지금까지 X 공개 코드의 스코어링 관측은 후보별 점수와 head별 확률까지였고, 슬레이트 층의 휴리스틱(DPP, author-decay, OON multiplier)이 후보 집합을 얼마나 바꾸는지는 계량되지 않았다.<ul>
 <li>이번 커밋의 <code>pre_heuristic</code>/<code>top10</code>/<code>final</code> 세 stage 병렬 관측은 휴리스틱 층의 실제 영향 폭을 잴 수 있는 첫 연결이다.</li>
@@ -365,7 +370,7 @@ _GB300_OVERRIDES = {&quot;bs_per_device&quot;: 960, &quot;ep&quot;: 64, &quot;at
 <li><code>phoenix/runners.py</code>의 positive engagement head 인덱스와 대조한다.</li>
 </ul>
 </li>
-<li>coordinated_spam 임계 30k의 다음 값을 본다 — 일반 spam 임계 곡선과 계속 반대 방향으로 가는지, 이번이 튜닝 노이즈였는지 가릴 수 있다.</li>
+<li>coordinated_spam 임계 30k의 다음 값을 본다 — 일반 spam 임계처럼 계속 오르는지, 이번이 튜닝 노이즈였는지 가릴 수 있다.</li>
 </ul>
 <p>조회 실패: arXiv cs.IR API — HTTP 429 (rate limit exceeded), 재시도 6회 후 포기.</p></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>

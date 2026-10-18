@@ -42,7 +42,7 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>목요일</li>
-<li><span class="meta-k">읽는 시간</span>51분</li>
+<li><span class="meta-k">읽는 시간</span>52분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
@@ -58,7 +58,7 @@
 <li>랭킹 스코어러가 참여 헤드 가중치를 서빙 요청마다 결정론적으로 흔드는 새 메커니즘이 생겼다.</li>
 <li>grox(X의 nearline LLM 주석 파이프라인)에 검색 지면 전용 멀티모달 임베딩 스택이 새로 생겼다.</li>
 <li>Phoenix(Grok 기반 Transformer 랭커)의 서빙 proto에 구조화된 콘텐츠 피처 <code>ContentFeatures</code>가 들어갔다.</li>
-<li>PTOS(Policy-based ToS 위반 판정)에 성인 콘텐츠를 영상 앞부분만 다시 훑는 심층 재스캔 플랜이 생겼다.</li>
+<li>PTOS(정책 기반 위반 카테고리 판정)에 성인 콘텐츠를 영상 앞부분만 다시 훑는 심층 재스캔 플랜이 생겼다.</li>
 <li>Phoenix의 FA4(CuTeDSL로 쓴 flash attention 커널)가 forward와 backward 모두, 두 GPU 아키텍처용으로 대규모 공개됐다.</li>
 </ul>
 <h3 id="a-랭킹-가중치를-유저와-헤드마다-정해진-방향으로-흔드는-장치가-생겼다">A. 랭킹 가중치를 유저와 헤드마다 정해진 방향으로 흔드는 장치가 생겼다</h3>
@@ -100,7 +100,7 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
 <li><p>흔드는 대상은 참여 헤드 26개 전부다 <span class="badge ok">확인</span> — 위 두 파일.</p>
 <ul>
 <li>대상 헤드는 <code>favorite</code>·<code>reply</code>·<code>retweet</code>·<code>photo_expand</code>·<code>video_open</code>·<code>click</code>·<code>open_link</code>·<code>profile_click</code>·<code>vqv</code>·<code>share</code>·<code>share_via_dm</code>·<code>share_via_copy_link</code>·<code>dwell</code>·<code>quote</code>·<code>quoted_click</code>·<code>quoted_vqv</code>·<code>dwell_time</code>·<code>click_dwell_time</code>·<code>active_secs_5m_residual_norm</code>·<code>follow_author</code>·<code>post_unexplored</code>·<code>not_interested</code>·<code>block_author</code>·<code>mute_author</code>·<code>report</code>·<code>not_dwelled</code>이다.</li>
-<li>4세대 랭커의 core positive 17헤드, negative 5헤드, continuous 3헤드가 모두 대상이다. 각각 engagement, user feedback, dwell·click_dwell·active_secs에 해당한다.</li>
+<li>4세대 랭커의 core positive 17헤드, negative 5헤드, continuous 3헤드에 <code>post_unexplored</code> 1개를 더한 26개가 모두 대상이다. 앞의 세 묶음은 각각 engagement, user feedback, dwell·click_dwell·active_secs에 해당한다.</li>
 </ul>
 </li>
 <li><p>가중치를 흔든 뒤에는 양수·음수·전체 합계도 함께 다시 계산한다 <span class="badge ok">확인</span>. 그래서 합계를 쓰는 하류 게이팅 로직도 흔들린 값을 그대로 반영한다.</p>
@@ -118,7 +118,7 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
 </li>
 <li><p>흔드는 배율은 σ에 대한 지수 함수다 <span class="badge ok">확인</span>. 계수 배율은 <code>exp(sigma × sign)</code> = <code>exp(±sigma)</code>다.</p>
 <ul>
-<li>σ=0.1이면 가중치가 약 ±10.5%, σ=0.3이면 약 ±35% 방향으로 흔들린다.</li>
+<li>σ=0.1이면 가중치에 ×1.105 또는 ×0.905를 곱하고, σ=0.3이면 ×1.35 또는 ×0.74를 곱한다.</li>
 <li>지수 스케일이므로 곱셈 대칭이 보장된다. σ=0.1의 up과 down은 정확히 곱셈 역수 관계이고, log-space에서 대칭 분포를 만든다.</li>
 </ul>
 </li>
@@ -145,7 +145,7 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
 <p>grox가 기존 두 임베딩 파이프라인 옆에 검색 지면 전용 세 번째 파이프라인을 만들었다. 과거 포스트를 뒤늦게 임베딩하는 backfill 경로와, backfill 대상을 고르는 fav 임계를 처리량에 맞춰 자동으로 조절하는 장치도 함께 들어왔다.</p>
 <ul>
 <li>신규·수정 파일은 17개다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/49815da/grox/flows/mm_emb" target="_blank" rel="noopener"><code>grox/flows/mm_emb/</code></a>.<ul>
-<li>신규 파일 12개, 총 1,026줄이 새로 생겼다. 임베더와 렌더러는 <code>embedder_v8_search.py</code>(113), <code>renderer_v8_search.py</code>(461)다.</li>
+<li>신규 파일 11개, 총 1,026줄이 새로 생겼다. 임베더와 렌더러는 <code>embedder_v8_search.py</code>(113), <code>renderer_v8_search.py</code>(461)다.</li>
 <li>플랜 파일은 <code>plan_post_embedding_v8_search.py</code>(34), <code>plan_post_embedding_v8_search_for_reply.py</code>(37)다. backfill 플랜은 <code>plan_post_embedding_v8_search_backfill.py</code>(43), <code>plan_post_embedding_v8_search_backfill_batch.py</code>(16)다.</li>
 <li>backfill 쪽 파일은 <code>task_backfill_fanout.py</code>(85), <code>task_backfill_gate.py</code>(60), <code>backfill_consumer_dedup.py</code>(49)다. fav 관련 파일은 <code>batched_fav_hydrator.py</code>(65), <code>adaptive_min_fav.py</code>(63)다.</li>
 <li>수정 파일은 <code>generators.py</code>(+82), <code>constants.py</code>(+9), <code>task_multimodal_post_embedding.py</code>(+52)다. <code>task_write_mm_embedding_sink.py</code>(+90), <code>task_rate_limit.py</code>(+15), <code>task_embedding_pub.py</code>(+5)도 고쳤다.</li>
@@ -165,7 +165,7 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
 <li>슬롯은 <code>MultimodalPostEmbeddingState.embeddings[&quot;v8_search&quot;]</code>다.</li>
 </ul>
 </li>
-<li>네 kafka 스트림이 각각 대응하는 Plan과 연결됐다 <span class="badge ok">확인</span>.<ul>
+<li>세 kafka 스트림이 각각 대응하는 Plan과 연결됐다 <span class="badge ok">확인</span>.<ul>
 <li><code>POST_EMBEDDING_V8_SEARCH_STREAM</code>은 <code>grox-multimodal-embedding-requests-with-summary</code> 토픽을 쓴다.</li>
 <li><code>POST_EMBEDDING_V8_SEARCH_FOR_REPLY_STREAM</code>은 <code>content-understanding-...-min-traction-for-grox-multi-modal</code>을 쓴다.</li>
 <li><code>POST_EMBEDDING_BACKFILL_STREAM</code>은 <code>grox-multimodal-embedding-backfill</code>을 쓴다.</li>
@@ -211,7 +211,7 @@ pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&
 <li><code>XaiEmbeddingClientHttp</code> 클라이언트로 <code>embed_openai_async(text=text, images=images)</code>를 호출한다.</li>
 </ul>
 </li>
-<li>저자의 core 정보를 조회해 렌더러에 넘긴다 <span class="badge ok">확인</span>. 조회에는 Strato(X 사내 gRPC 프록시)의 <code>StratoUserCore</code> fetch를 쓴다.<ul>
+<li>저자의 core 정보를 조회해 렌더러에 넘긴다 <span class="badge ok">확인</span>. 조회에는 Strato(코드가 데이터를 조회하거나 저장할 때 거치는 X 내부 시스템)의 <code>StratoUserCore</code> fetch를 쓴다.<ul>
 <li>조회에 실패하면 <code>post_embedding_v8_search.core_user_fetch_error</code> 카운터가 오른다.</li>
 </ul>
 </li>
@@ -329,9 +329,9 @@ message ContentFeatures {
 <li><p>텍스트 길이 <code>weighted_text_len</code>은 단순 문자 수가 아니라 <a href="https://developer.twitter.com/en/docs/counting-characters" target="_blank" rel="noopener">Twitter 자체 텍스트 길이 계산 규칙</a>을 그대로 따른다(URL=23, CJK 2배 등) <span class="badge ok">확인</span>.</p>
 <ul>
 <li>URL은 무조건 23자로 센다. <code>t.co</code> shortener 정책과 같다.</li>
-<li>CJK 문자, punctuation, 이모지 modifier(스킨톤 등)는 2자로 센다.</li>
-<li>ASCII와 기본 라틴 문자는 1자로 센다.</li>
-<li>ZWJ와 skin-tone modifier(<code>0xFE0E</code>·<code>0xFE0F</code>·<code>0x1F3FB..0x1F3FF</code>·<code>0xE0020..0xE007F</code>)는 0자다. base 이모지에 흡수된다.</li>
+<li>CJK 문자와 이모지는 2자로 센다. 1자 범위(<code>SINGLE_WEIGHT_CODEPOINT_RANGES</code>) 밖의 문자는 모두 2자다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/models/content_features.rs" target="_blank" rel="noopener"><code>content_features.rs:72-85</code></a>.</li>
+<li>ASCII와 기본 라틴 문자는 1자로 센다. 구두점은 범위가 가른다: ASCII 구두점과 U+2010–U+201F 같은 일반 구두점은 1자이고, 범위 밖의 구두점은 2자다.</li>
+<li>variation selector(<code>0xFE0E</code>·<code>0xFE0F</code>), skin-tone modifier(<code>0x1F3FB..0x1F3FF</code>), tag 문자(<code>0xE0020..0xE007F</code>)는 0자다. base 이모지에 흡수된다.</li>
 <li>미디어 첨부 URL은 external URL이 아니다. 미디어 attachment가 있으면(attachment_urls=1) 첫 URL을 media URL로 보고 external URL count에서 뺀다.</li>
 </ul>
 </li>
@@ -358,7 +358,7 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <p>4세대+17에서 텍스트 자체의 구조 시그널이 서빙 wire format의 first-class field로 승격됐다.</p>
 <ul>
 <li>이제까지 Phoenix 랭커가 소비하는 콘텐츠 시그널은 두 종류였다. 하나는 임베딩 테이블에서 lookup하는 hashed feature이고, 다른 하나는 <code>has_media</code>·<code>has_video</code>·<code>view_count</code> 같은 산발적인 boolean과 정수다.</li>
-<li>특히 <code>weighted_text_len</code>은 트윗 UI의 400자 상한과 직결되는 값이다. 그래서 랭커가 &quot;이 포스트가 얼마나 꽉 차 있나 / URL만 걸고 지나가는 pass-through인가&quot;를 명시적으로 학습할 수 있게 된다.</li>
+<li>특히 <code>weighted_text_len</code>은 포스트의 280자 상한(가중치 기준)과 직결되는 값이다 <span class="badge ok">확인</span> — <a href="https://docs.x.com/fundamentals/counting-characters" target="_blank" rel="noopener">X 개발자 문서 Counting Characters</a>. 그래서 랭커가 &quot;이 포스트가 얼마나 꽉 차 있나 / URL만 걸고 지나가는 pass-through인가&quot;를 명시적으로 학습할 수 있게 된다.</li>
 </ul>
 <p>다만 이 시그널을 랭킹 헤드에서 어떻게 소비하는지는 이번 커밋에 없다 <span class="badge ok">확인</span>. <code>phoenix/xrex/models/recsys_model.py</code>에 <code>content_features</code>를 읽는 코드가 아직 없기 때문이다 <span class="badge ok">확인</span>. wire에는 실렸지만, 학습에서 소비하는지는 다음 커밋에서 관측할 대상이다.</p>
 <h3 id="d-ptos가-긴-영상의-앞-10초만-잘라-성인-콘텐츠를-다시-판정하는-경로를-얻었다">D. PTOS가 긴 영상의 앞 10초만 잘라 성인 콘텐츠를 다시 판정하는 경로를 얻었다</h3>
@@ -388,7 +388,7 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <li>그런데 회피 유저가 첫 15초 이상을 정상 콘텐츠로 채우고 후반에 성인 콘텐츠를 넣는 패턴을 쓰면, 실시간 판정이 놓칠 수 있다.</li>
 <li>4세대+12에서 도입된 <code>PlanSafetyPtosSpecialVideo</code>는 캡션이나 워터마크 같은 정적 오버레이로 가려진 콘텐츠를 다룬다. 4세대+17의 이 경로는 첫 몇 초를 안전하게 위장하는 시간축 회피를 다룬다.</li>
 <li>이름은 leading-frames지만 실제로는 &quot;앞 10초를 crop해서 재판정&quot;이므로, 성인 콘텐츠가 앞부분에 짧게 나타나는 케이스를 특히 겨냥한 것으로 보인다 <span class="badge est">추정</span>.</li>
-<li>이전 판정에 AdultContent violated policy가 있는데도 <code>isNsfw</code>가 아닌 경우가 있다. 4세대+7의 3개 카테고리 cross-validator(ChildSafety·ViolentMedia·IllegalAndRegulatedBehaviors)에서 Grok 4.5 심판이 강등만 허용하기 때문이다. 그래서 primary가 AdultContent라 해도 NSFW 태그로 굳어지지 않을 수 있다.<ul>
+<li>이전 판정에 AdultContent violated policy가 있는데도 <code>isNsfw</code>가 아닌 경우가 있다. 4세대+2의 성인 콘텐츠 cross-validator에서 Grok 4.5 심판이 강등만 허용하기 때문이다. 그래서 primary가 AdultContent라 해도 NSFW 태그로 굳어지지 않을 수 있다.<ul>
 <li>이 경로는 강등된 판정을 다시 뒤집을 수 있는 두 번째 심판이 된다.</li>
 </ul>
 </li>
@@ -411,7 +411,7 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 <h3 id="e-phoenix-fa4-attention-커널의-forward와-backward가-sm80sm90용으로-모두-공개됐다">E. Phoenix FA4 attention 커널의 forward와 backward가 SM80·SM90용으로 모두 공개됐다</h3>
 <p>Phoenix의 FA4 attention 커널이 forward와 backward 모두, 두 GPU 아키텍처(SM80 Ampere, SM90 Hopper)용으로 공개됐다. backward pass 원본이 공개된 것은 이번이 처음이다.</p>
 <ul>
-<li>6개 파일이 새로 생기고 4개 파일이 수정됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/49815da/phoenix/xrex/cutedsl/ranker_fa4" target="_blank" rel="noopener"><code>phoenix/xrex/cutedsl/ranker_fa4/</code></a>.</li>
+<li>6개 파일이 새로 생기고 5개 파일이 수정됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/49815da/phoenix/xrex/cutedsl/ranker_fa4" target="_blank" rel="noopener"><code>phoenix/xrex/cutedsl/ranker_fa4/</code></a>.</li>
 </ul>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col class="w8"><col class="w8"><col></colgroup>
 <thead>
@@ -490,7 +490,7 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 </tr>
 </tbody></table></div>
 <ul>
-<li>신규 코드는 총 5,080줄이고, 수정 폭도 크다 <span class="badge ok">확인</span>. 이번 커밋에서 개별 라인 수가 가장 큰 갈래다 <span class="badge ok">확인</span>.</li>
+<li>신규 코드는 총 7,080줄이고, 수정 폭도 크다 <span class="badge ok">확인</span>. 이번 커밋에서 개별 라인 수가 가장 큰 갈래다 <span class="badge ok">확인</span>.</li>
 <li>공개된 커널은 Dao-AILab/flash-attention의 원본 코드를 바탕으로 X.AI가 수정한 fork다 <span class="badge ok">확인</span>. 파일 헤더가 출처와 라이선스를 밝힌다.<ul>
 <li><p>헤더 원문을 그대로 옮긴다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python"># Derived from flash-attention (https://github.com/Dao-AILab/flash-attention);
@@ -525,7 +525,7 @@ assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic 
 </ul>
 <p>이번 공개의 의미는 세 가지다.</p>
 <ul>
-<li>오픈소스 쪽에서 보면 backward pass 원본은 이번이 처음 공개됐다. 4세대+15(2026-09-06 daily 참조)에서는 FA4 forward의 varlen 지원 재작성이 공개됐다. Backward는 학습에 필수이므로, 이전에는 X 내부 저장소에만 있었고 오픈소스 미러에서는 forward만 공개된 형태였다. 이제 X 랭커의 학습·서빙 attention 커널이 완전히 오픈소스에 있다.</li>
+<li>오픈소스 쪽에서 보면 backward pass 원본은 이번이 처음 공개됐다. 4세대+15(<a href="daily-2026-09-05.html">2026-09-05 daily</a> 참조)에서는 FA4 forward의 varlen 지원 재작성이 공개됐다. Backward는 학습에 필수이므로, 이전에는 X 내부 저장소에만 있었고 오픈소스 미러에서는 forward만 공개된 형태였다. 이제 X 랭커의 학습·서빙 attention 커널이 완전히 오픈소스에 있다.</li>
 <li>SM90 연결이 확정됐다. 4세대+15에서 <code>SAVE_H100_RECSYS = 32</code> remat 정책(역전파 때 활성값을 저장하지 않고 다시 계산하는 메모리 절약 방식)이 신설됐을 때는 &quot;H100에서도 학습이 돈다는 첫 코드 신호&quot;라고만 관측했다.<ul>
 <li>이번 커밋에는 SM90(H100)용 forward·backward 두 파일이 명시적으로 있으므로, H100 학습은 이제 연결이 완결됐다. <code>SAVE_H100_RECSYS</code> remat 정책이 실제로 무엇을 쓰는지가 코드로 확정됐다.</li>
 <li>4세대+6의 <code>_GB300_OVERRIDES</code>에 대한 SM90/H100 대체 경로도 명확해졌다. GB300은 Grace Blackwell 300, SM100 세대다.</li>

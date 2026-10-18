@@ -58,14 +58,14 @@
 </ul>
 <h2 id="1-홈-피드-cold-start-파라미터-6개가-바뀌고-vf-조회-구조가-다시-쓰였다--x"><span class="num">1</span>홈 피드 cold-start 파라미터 6개가 바뀌고 VF 조회 구조가 다시 쓰였다 — X</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/77d431a" target="_blank" rel="noopener">xai-org/x-algorithm@77d431a</a> — xai-org/x-algorithm 공개 저장소, 2026-09-30 03:53:42Z(UTC), 커밋. 줄 수는 +3,306/−1,489, 바뀐 파일은 69개다. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+32다. 어제 커밋 <a href="https://github.com/xai-org/x-algorithm/commit/a707cc2" target="_blank" rel="noopener">4세대+31 a707cc2</a>의 하루 뒤에 나왔다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> visibility-filtering(VF, X의 트윗 필터 파이프라인)의 hydration 계층은 지난 나흘 사이에 세 번 뒤집혔다. hydration은 판정에 필요한 원본 데이터를 backend 서비스에서 배치로 조회해 채우는 단계다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> visibility-filtering(VF, X의 트윗 필터 파이프라인)의 hydration 계층은 2026-09-25부터 09-29까지 나흘 사이에 세 번 뒤집혔다. hydration은 판정에 필요한 원본 데이터를 backend 서비스에서 배치로 조회해 채우는 단계다.</p></div>
 <ul>
 <li>4세대+29(2026-09-25, bf7db1b)가 <code>Hydrator</code> enum을 7 → 17 variant로 확장하며, 데이터 기반 plan/execute/sources 3-파일을 신설했다.</li>
 <li>4세대+30(2026-09-26, 4c5cfe8)이 그 안의 상태를 <code>store.rs</code>로, 실행을 <code>execute.rs</code>로 분리했다.</li>
 <li>어제 4세대+31(2026-09-29, a707cc2)이 <code>retweet.rs</code>를 별도 모듈로 추출하면서, in-batch 소스와 fetched 소스를 두 번-hydrate 패턴으로 병합했다. 두 번-hydrate 패턴은 요청 배치를 hydrate한 뒤 리트윗 소스만 두 번째 hydrate 호출로 따로 채우는 방식이다.</li>
 </ul>
 <p>이번 커밋(4세대+32)은 이 두 번-hydrate 패턴을 <strong>한 번-hydrate와 in-flight 확장</strong> 패턴으로 단순화했다. in-flight 확장은 조회가 진행되는 도중에 먼저 도착한 결과를 보고 요청 목록을 늘리는 방식이다. 또 Store의 8개 <code>Option&lt;HydrationBatch&gt;</code> 필드를 새 <code>Fetcher&lt;V&gt;</code> trait 어레이로 다시 써서, 같은 hydrator를 다시 불러도 이미 클레임된 키는 재요청하지 않게 했다.</p>
-<p>동시에 두 축이 별도로 진화했다. Phoenix(4세대에서 신설된 학습·서빙 스택)의 <code>xrecsys_two_tower.py</code>가 registry에 정식 카탈로그로 편입됐다. 이와 함께 SID(semantic ID) 기반 candidate tower와 sequence packing이 6개 preset으로 잠겼다. SID는 포스트 임베딩 대신 codebook 여러 층으로 hash한 이산 코드다. sequence packing은 여러 유저 시퀀스를 한 배치 행에 이어 붙이는 방식이다. 광고 conversion 헤드 학습에 쓰던 <code>ads_head_masking</code>은 JAX 학습 그래프에서 numpy 데이터 로더로 옮겨지면서, web conversion과 app(MMP, Mobile Measurement Partner) conversion 두 축을 분리 학습할 수 있게 됐다.</p>
+<p>동시에 두 축이 별도로 진화했다. Phoenix(X For You의 랭킹 모델 스택, 학습 코드는 4세대에서 공개)의 <code>xrecsys_two_tower.py</code>가 registry에 정식 카탈로그로 편입됐다. 이와 함께 SID(semantic ID) 기반 candidate tower와 sequence packing이 6개 preset으로 잠겼다. SID는 포스트 임베딩 대신 codebook 여러 층으로 hash한 이산 코드다. sequence packing은 여러 유저 시퀀스를 한 배치 행에 이어 붙이는 방식이다. 광고 conversion 헤드 학습에 쓰던 <code>ads_head_masking</code>은 JAX 학습 그래프에서 numpy 데이터 로더로 옮겨지면서, web conversion과 app(MMP, Mobile Measurement Partner) conversion 두 축을 분리 학습할 수 있게 됐다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. Phoenix cold-start retrieval이 켜지고 포스트 나이 상한이 2시간으로 줄었다</span></p></div>
 <ul>
 <li>홈믹서(home-mixer, For You 피드 요청을 처리하는 서비스)의 cold-start 파라미터 6개가 크론 미러에서 이동했다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.<ul>
@@ -97,7 +97,7 @@
 <td><code>ColdStartImpressionThreshold</code></td>
 <td>1000</td>
 <td>200</td>
-<td>×0.2(cold-start 대상 유저를 5배 넓힘)</td>
+<td>×0.2(홈 노출 200회 미만 포스트만 대상, 대상 축소)</td>
 </tr>
 <tr>
 <td><code>ColdStartFollowerCap</code></td>
@@ -332,15 +332,15 @@
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>에 <code>### 4세대+32</code> 절을 새로 만들어 위 사실을 요약했고, <code>## 출처</code>에 커밋 sha <code>77d431a</code>를 추가했으며, <code>최종 갱신</code>을 2026-10-01로 갱신했다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> 세 축이 겹친다.</p></div>
 <ol>
-<li><strong>홈믹서 cold-start가 프로덕션 파라미터로 세팅됐다.</strong> 4세대+30에서 신설된 HOME_COLD=14 채널의 코드 경로 추가에 이어, 오늘 파라미터가 잡혔다.<ul>
+<li><strong>홈믹서 cold-start가 프로덕션 파라미터로 세팅됐다.</strong> 4세대+28(44d37eb)에서 HOME_HOT=14와 함께 신설된 HOME_COLD=13 채널에 4세대+30이 코드 경로를 추가한 데 이어, 오늘 파라미터가 잡혔다.<ul>
 <li>Phoenix cold retrieval 채널이 0에서 200 posts로 열렸고, MaxPostAge가 48h에서 2h로 극단화됐다.</li>
 <li>FollowerCap이 1000에서 50k로 사실상 해제되어 author 풀이 폭증했다.</li>
-<li>ImpressionThreshold는 1000에서 200으로 낮아져 cold-start 대상 유저를 5배 넓혔다. Thompson sampling도 켜졌다.</li>
+<li>ImpressionThreshold는 1000에서 200으로 낮아져, 홈 노출이 200회 미만인 포스트만 cold-start 대상이 됐다(대상 축소) <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>author_cold_start.rs:294</code></a>. Thompson sampling도 켜졌다.</li>
 <li>cold-start가 지금까지 tracked author나 신규 유저를 대상으로 한 좁은 exploration이었다면, 이 파라미터 세팅에서는 신선도가 극단적으로 엄격한 2h와 넓게 열린 author 풀의 조합이 작동한다.</li>
 <li>이 튜닝이 A/B에서 유지되는지가 다음 크론 sync에서 관측할 지점이다.</li>
 </ul>
 </li>
-<li><strong>VF hydration의 재확장 능력이 확보됐다.</strong> 4세대+29 → 4세대+30 → 4세대+31의 3일 흐름이 데이터 기반 파이프라인 골격과 <code>retweet.rs</code> 모듈 추출을 완성했다.<ul>
+<li><strong>VF hydration의 재확장 능력이 확보됐다.</strong> 4세대+29(09-25)부터 4세대+31(09-29)까지 나흘의 흐름이 데이터 기반 파이프라인 골격과 <code>retweet.rs</code> 모듈 추출을 완성했다.<ul>
 <li>오늘 그 위에 <code>Fetcher&lt;V&gt;</code> trait이 더해져 claim이 idempotent해졌다.</li>
 <li>이 덕에 pure_cores가 land한 순간 in-flight로 request_tweets를 확장하고 inputless 그룹을 재발사하는 <code>Landing::SourcesJoined</code> 흐름이 성립한다.</li>
 <li><code>retweet.rs</code>의 두 번-hydrate 패턴은 한 번-hydrate와 in-flight 확장으로 단순해졌다.</li>
@@ -351,7 +351,7 @@
 </li>
 <li><strong>Phoenix retrieval two-tower가 카탈로그로 승격됐다.</strong> 지금까지 <code>xrecsys_two_tower.py</code>는 파일로 존재했고 여러 커밋에서 소품 수정이 있었지만, registry 카탈로그 자체는 잠기지 않은 상태였다.<ul>
 <li>소품 수정은 4세대+6에서 <code>qk_norm=True</code>·<code>attn_logit_cap=-1</code>·<code>right_anchored_rope=True</code> 3옵션을 도입한 것과, 4세대+21에서 H100 attn 커널을 <code>pallas_ranker_varlen_attn</code> → <code>cutedsl_ranker_varlen_attn</code>으로 전환한 것이다.</li>
-<li>오늘 6개 preset(H100/GB300 × single/combined, immersive-only, nano)이 <code>MODEL_CFGS</code>에 잠기면서, 프로덕션 데이터 파이프에 연결되도록 이관됐다 <span class="badge est">추정</span>. 근거는 파일 안의 유일한 in-file dataset이 <code>aggregated_kafka</code>이고, preset이 hardware-aware로 잘 정의돼 있다는 점이다.</li>
+<li>오늘 6개 preset(기본, immersive-only와 그 GB300판, combined와 그 GB300판, nano)이 <code>MODEL_CFGS</code>에 잠기면서, 프로덕션 데이터 파이프에 연결되도록 이관됐다 <span class="badge est">추정</span>. 근거는 파일 안의 유일한 in-file dataset이 <code>aggregated_kafka</code>이고, preset이 hardware-aware로 잘 정의돼 있다는 점이다.</li>
 <li>특히 SID-only(포스트 임베딩 대신 6-level codebook hash)·seqpack·H100/GB300 하드웨어 프리셋·Home과 Immersive 두 head 공유가 한 파일에 정리됐다는 점이 눈에 띈다.</li>
 <li>4세대+13에서 관측된 &quot;DPA 광고 제품에도 <code>sid_codes</code> 배선&quot;과 짝을 이루면, SID 어휘 체계가 유기 post·광고 DPA·retrieval two-tower의 세 사용처를 하나로 묶을 잠재가 커진다.</li>
 </ul>

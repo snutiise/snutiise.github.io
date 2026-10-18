@@ -70,7 +70,7 @@
 </li>
 <li>라이브 방송 프레임이 두 안전 파이프라인의 정식 판정 대상이 됐다.<ul>
 <li><code>BroadcastLoader</code>가 grox에 새로 들어와 라이브 broadcast(X의 라이브 비디오, Periscope 후신)의 프레임을 추출한다.</li>
-<li>PTOS(post text-only sensitive classification, X 내부 안전 라벨링 프레임워크 <span class="badge est">추정</span>) adult-content leading-frames와 sex/nudity safemodel, 두 안전 파이프라인이 broadcast 프레임을 정식 payload로 인정한다.</li>
+<li>PTOS(정책 기반 위반 카테고리 판정) adult-content leading-frames와 sex/nudity safemodel, 두 안전 파이프라인이 broadcast 프레임을 정식 payload로 인정한다.</li>
 </ul>
 </li>
 <li>등록된 랭킹 훈련 config 두 개 모두에서 멀티모달 post 임베딩이 학습 입력에서 빠졌다.<ul>
@@ -96,8 +96,8 @@
 <li>새 helper <code>TweetVisibility::to_visibility_reason()</code>이 action과 reason을 조합해 <code>visibility_reason</code> 필드 값을 유도한다.</li>
 </ul>
 </li>
-<li>Strato(레거시 VF 스택 <span class="badge est">추정</span>) 경로에서는 클라이언트가 Strato에서 받은 사유로부터 액션을 계산한다 <span class="badge ok">확인</span>. 규칙은 세 갈래다.<ul>
-<li><p>Strato는 2026-08-30 4세대+8 canon(이 저장소의 정본 노트) 주의 목록에서 언급됐다.</p>
+<li>Strato(코드가 데이터를 조회하거나 저장할 때 거치는 X 내부 시스템) 경로에서는 클라이언트가 Strato에서 받은 사유로부터 액션을 계산한다 <span class="badge ok">확인</span>. 규칙은 세 갈래다.<ul>
+<li><p>Strato의 정의는 <a href="x.html#%EC%9A%A9%EC%96%B4">services/x.md 용어 표</a>에 있다.</p>
 </li>
 <li><p><code>StratoVfClient::get_result</code>가 Strato에서 받은 <code>FilteredReason</code>으로부터 <code>action_from_strato_reason</code>을 거쳐 action을 계산한다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn action_from_strato_reason(reason: &amp;Option&lt;FilteredReason&gt;) -&gt; Action {
@@ -133,7 +133,7 @@
 }
 </code></pre></figure>
 </li>
-<li><p>이전 버전은 <code>FilteredReason</code> variants를 매칭했다. <code>SafetyResult</code>면 <code>action == Drop</code>만 통과했고, 나머지 non-SafetyResult reason(뮤트·차단·null-cast·exclusive 등)은 무조건 drop이었다.</p>
+<li><p>이전 버전은 <code>FilteredReason</code> variants를 매칭했다. <code>SafetyResult</code>면 <code>action == Drop</code>일 때만 걸렀고, 나머지 non-SafetyResult reason(뮤트·차단·null-cast·exclusive 등)은 무조건 drop이었다.</p>
 </li>
 <li><p>새 버전은 판정 축이 명시적이라 훨씬 읽기 좋다.</p>
 </li>
@@ -159,8 +159,8 @@
 <ul>
 <li>이전 정본은 &quot;<code>VFFilter</code>는 fail-closed다. <code>SafetyResult</code> 이외의 모든 <code>FilteredReason</code> 변종이 무조건 drop이다&quot;였다.</li>
 <li>새 판정 함수는 문법이 완전히 달라졌지만 결과는 대부분 동일하다. Strato 경로에서 non-SafetyResult reason은 client 층에서 이미 <code>Drop</code>으로 변환되고, <code>NotEvaluated</code>도 drop이다.</li>
-<li>바뀐 것 하나는 이제 <code>Interstitial</code>이 명시적으로 통과된다는 점이다(이전 코드도 통과시켰다).</li>
-<li><code>Downrank</code>와 <code>Avoid</code>가 명시적으로 통과된다. 이 두 action은 이전엔 <code>SafetyResult.action</code>으로 오면 drop되고, 다른 경로로 오면 통과되는 애매한 상태였다.</li>
+<li>이전 필터도 <code>SafetyResult</code>로 온 판정은 action이 <code>Drop</code>일 때만 걸렀다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/filters/vf_filter.rs" target="_blank" rel="noopener"><code>vf_filter.rs:22-30</code></a>. Allow·Interstitial·Avoid·Downrank·Tombstone·NotEvaluated는 모두 남겼다.</li>
+<li>바뀐 것은 필터 층에서 <code>Tombstone</code>과 <code>NotEvaluated</code>가 이제 걸러진다는 점이다 <span class="badge ok">확인</span> — 아래 인용한 <code>vf_filter.rs:16-21</code>.</li>
 </ul>
 <blockquote>
 <p>&quot;match action { Action::Allow | Action::Interstitial | Action::Avoid | Action::Downrank =&gt; false, Action::Drop(_) | Action::Tombstone | Action::NotEvaluated =&gt; true, }&quot;
@@ -170,7 +170,7 @@
 <ul>
 <li>통일된 액션 값의 타입은 <code>Action</code> enum이다.</li>
 <li>4세대 공개(2026-08-13) 이래 VF의 판정 함수에는 세 경로가 얽혀 있었다. <code>SafetyResult.action</code>을 봐야 하는 경로, <code>FilteredReason</code> variant를 봐야 하는 경로, gRPC action을 매핑해야 하는 경로다.</li>
-<li>4세대+8(2026-08-26, <code>reference_compare.rs</code>)이 도입한 shadow 비교에서 diff의 원인은 대부분 &quot;reason variant matching이 파이프라인마다 조금씩 달라서&quot;였을 가능성이 크고 <span class="badge est">추정</span>, 이번 리팩터는 그 diff를 줄이는 후속 조치로 읽힌다.</li>
+<li>4세대+7(2026-08-24, <a href="https://github.com/xai-org/x-algorithm/commit/d011592" target="_blank" rel="noopener">d011592</a>)이 <code>reference_compare.rs</code>로 도입한 shadow 비교에서 diff의 원인은 대부분 &quot;reason variant matching이 파이프라인마다 조금씩 달라서&quot;였을 가능성이 크고 <span class="badge est">추정</span>, 이번 리팩터는 그 diff를 줄이는 후속 조치로 읽힌다.</li>
 <li>아직 <code>Downrank</code>를 실제로 쓰는 코드는 이 커밋에 등장하지 않는다. Strato가 리턴하는 <code>SafetyResult.action</code>에 <code>Downrank</code>가 들어올 여지는 열렸지만, 실제로 연결되는지는 다음 커밋에서 볼 대상이다.</li>
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 홈 타임라인에 트윗을 감싸지 않는 여섯 번째 광고 포맷이 생겼다</span></p></div>
@@ -280,7 +280,7 @@
 </ul>
 <div class="blk why"><p><span class="lbl">의미 (C)</span> 이번 커밋은 긴 영상의 대표 프레임 한 장을 storyboard 앞에 먼저 붙이는, 세 번째 미디어 표현 형태를 추가했다.</p></div>
 <ul>
-<li>4세대+15(2026-09-06, &quot;grox multimodal 스택 재구조&quot;) 이래 grox가 LLM에 넘기는 미디어 표현은 storyboard와 motion-reveal frames(정적/동적 분리) 두 형태였다.</li>
+<li>4세대+12(2026-09-01, <a href="https://github.com/xai-org/x-algorithm/commit/6384ca7" target="_blank" rel="noopener">6384ca7</a>)에서 motion-reveal frames(정적/동적 분리)가 storyboard(4세대부터)에 더해진 이래, grox가 LLM에 넘기는 미디어 표현은 이 두 형태였다.</li>
 <li>짧은 영상은 이미 storyboard의 프레임 수가 적어서 대표성이 충분하다. 반면 30초+ 긴 영상은 프레임 격자로는 첫인상이 흐려질 수 있으므로, preview thumbnail로 &quot;이게 무엇인가&quot;를 먼저 잡아 준다.</li>
 <li>Deluxe 티어(main post이고 high fav)면 tile 크기가 큰 preview를 쓴다는 점도, LLM 판정 비용을 대표성에 걸어 두는 기존 설계와 일관된다.</li>
 </ul>
@@ -365,9 +365,9 @@
 <li>문구의 <code>on</code>은 &quot;off&quot;의 문법적 elision으로 읽어야 한다(&quot;off in both, and [off] on every registered ranking config&quot;) <span class="badge ok">확인</span>. 그렇지 않으면 표와 모순된다.</li>
 <li>즉 등록된 랭킹 훈련 config 두 개(<code>home_direct_packed</code> 플래그십, <code>xrecsys_seqpack</code> seqpack) 모두에서 multimodal post 임베딩이 학습 입력에서 빠졌다 <span class="badge ok">확인</span>.</li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미 (E)</span> 4세대+17(2026-09-08, 49815da)이 grox 검색 지면 전용 v8-search 멀티모달 임베딩 스택을 신설해, 랭킹 옆에 v5·v8.2와 별개인 벡터 공간을 열었다. 그 하루 뒤인 이번 커밋에서 flagship 랭킹 config의 v5 입력이 꺼졌다.</p></div>
+<div class="blk why"><p><span class="lbl">의미 (E)</span> 4세대+17(2026-09-08, 49815da)이 grox 검색 지면 전용 v8-search 멀티모달 임베딩 스택을 신설해, 랭킹 옆에 v5·v8.2와 별개인 벡터 공간을 열었다. 그 하루 뒤인 이번 커밋에서, v5가 켜져 있던 유일한 랭킹 config의 v5 입력이 꺼졌다.</p></div>
 <ul>
-<li>v5 입력이 꺼진 flagship config는 <code>xrecsys_seqpack</code>이다.</li>
+<li>그 config는 <code>xrecsys_seqpack</code>이고, 4세대 공개 때부터 v5가 켜져 있었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/phoenix/README.md" target="_blank" rel="noopener"><code>phoenix/README.md</code></a> 표.</li>
 <li>두 사건을 조합하면 시나리오가 좁혀진다: v5는 랭킹 입력으로 유의미한 개선을 내지 못했거나 latency/quality tradeoff에서 밀렸고, v8-search로 넘어가는 중간에 학습 config에서 임시로 뗐다 <span class="badge est">추정</span>.</li>
 <li>v8-search를 랭킹 config에 연결하는 코드는 이 커밋에 없다. 검색 지면 임베딩과 랭킹 임베딩이 별도 벡터 공간으로 유지될지, v8-search가 v5를 대체할지는 다음 커밋에서 볼 대상이다.</li>
 </ul>
@@ -394,7 +394,7 @@
 </li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> 랭킹·필터 절 line 392의 VF fail-closed 진술을 갱신했다. 소절도 하나 새로 만들었다(<a href="x.html#"><code>## 파이프라인</code> 아래 &quot;4세대+18&quot; subsection 신설</a>). <code>## 출처</code>에는 75d93d9 sources를 추가했다.</p></div>
-<div class="blk why"><p><span class="lbl">의미 (전체)</span> 이번 커밋에서 코드 품질로 가장 큰 개선은 VF Action 리팩터이고, 제품에서 가장 눈에 띌 변화는 header-image-prompt-ad다. multimodal 임베딩 학습 config 제거는 X 랭킹 모델의 입력 스키마 결정에서 가장 무거운 신호다. 1일 만에 뒤집힌 결정이므로 v8-search 연결의 후속을 지켜봐야 한다.</p></div>
+<div class="blk why"><p><span class="lbl">의미 (전체)</span> 이번 커밋에서 코드 품질로 가장 큰 개선은 VF Action 리팩터이고, 제품에서 가장 눈에 띌 변화는 header-image-prompt-ad다. multimodal 임베딩 학습 config 제거는 X 랭킹 모델의 입력 스키마 결정에서 가장 무거운 신호다. 4세대 공개 때부터 켜져 있던 v5 입력을 v8-search 스택 신설 하루 뒤에 껐으므로, v8-search 연결의 후속을 지켜봐야 한다.</p></div>
 <ul>
 <li>4세대+17이 하루 사이에 다섯 축을 동시에 움직인 대형 커밋이었다면, 4세대+18에는 각 축의 정리·후속·확장이 골고루 실렸다.<ul>
 <li>VF는 판정 축을 통일했다(가장 크고 근본적인 리팩터).</li>
@@ -409,7 +409,7 @@
 <li>&quot;VFFilter는 fail-closed다&quot;라는 정본 진술은 완전히 부정되지 않았고, 표현이 바뀌었다.<ul>
 <li>위치는 <code>services/x.md</code> line 392다.</li>
 <li>판정 축이 <code>FilteredReason</code> 매칭에서 명시적 <code>Action</code> enum으로 옮겨졌다.</li>
-<li>fail-closed 성격은 유지된다(NotEvaluated → drop, Strato 경로에서 non-SafetyResult reason → Drop 변환). 다만 <code>Downrank</code>와 <code>Avoid</code>가 명시적으로 keep 대상이 됐다.</li>
+<li>fail-closed 성격은 유지된다(NotEvaluated → drop, Strato 경로에서 non-SafetyResult reason → Drop 변환). 다만 필터 층에서 <code>Tombstone</code>과 <code>NotEvaluated</code>가 새로 걸러진다.</li>
 <li>정본에 반영했다.</li>
 </ul>
 </li>
@@ -442,7 +442,7 @@
 </ul>
 </li>
 <li>header-image-prompt-ad가 들어가는 광고 블렌더 — 이 광고 포맷이 5종 광고 블렌더(<code>safe_gap</code>·<code>partition_organic</code>·<code>partition_organic_low_risk</code>·<code>time_gap</code>·<code>multi_risk</code>) 가운데 어느 것에 진입하는지, 슬롯 예산 계산에서 프로모트 트윗과 어떻게 함께 산정되는지 다음 커밋에서 관측한다.</li>
-<li>v8-search가 랭킹 config에 붙는 시점 — flagship <code>xrecsys_seqpack</code>에서 v5가 꺼졌으므로, v8-search가 후속 연결의 유력한 후보다. <code>phoenix/xrex/data/retrieval_dataset.py</code>에 <code>grox-multimodal-embedding-v8-search</code> topic 소비자가 붙는지, <code>phoenix/README.md</code> 표에 v8-search가 추가되는지 지켜본다.</li>
+<li>v8-search가 랭킹 config에 붙는 시점 — v5가 켜져 있던 유일한 config <code>xrecsys_seqpack</code>에서 v5가 꺼졌으므로, v8-search가 후속 연결의 유력한 후보다. <code>phoenix/xrex/data/retrieval_dataset.py</code>에 <code>grox-multimodal-embedding-v8-search</code> topic 소비자가 붙는지, <code>phoenix/README.md</code> 표에 v8-search가 추가되는지 지켜본다.</li>
 <li>broadcast의 PTOS 재판정률 — 라이브 broadcast가 정식 payload가 된 첫 커밋이다. <code>task.safety_ptos_adult_content_leading_frames.eligible.count{media=broadcast}</code>와 <code>task.safety_ptos_safemodel_sex_nudity</code>의 broadcast_frame 관련 카운터 대시보드가 어딘가에서 노출되면 실제 재판정 규모를 관측할 수 있다. 직접 관측은 어렵다.</li>
 <li><code>FilteredReason::ViewerBlocksAuthor</code>를 리턴하는 rule — 새 variant지만, 이 커밋에는 어느 rule이 이것을 리턴하게 되는지 보여 주는 코드가 붙지 않았다. <code>visibility-filtering/rules/author_rules.rs</code>의 다음 diff에서 관측한다.</li>
 <li>NUMA isolated CPU 문제가 생긴 실제 host configuration — Phoenix 학습 host가 왜 isolated CPU를 노드 안에 두었는지(RT 워크로드? DPDK? SR-IOV VF driver?), 실제 프로덕션 configuration이 어딘가에서 공개될지 지켜본다.</li>

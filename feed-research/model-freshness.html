@@ -41,7 +41,7 @@
 <h1 id="모델-신선도--얼마나-자주-다시-만드는가-그리고-왜-지면마다-다른가">모델 신선도 — 얼마나 자주 다시 만드는가, 그리고 왜 지면마다 다른가</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-08-09">2026-08-09</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">14</span></summary><ol><li><a href="#관측된-주기--한-표">관측된 주기</a></li><li><a href="#왜-다른가--구조-4가지">왜 다른가</a><ol><li><a href="#1-인덱스는-커버리지-문제이고-랭커는-정확도-문제다">1. 인덱스는 커버리지 문제이고 랭커는 정확도 문제다</a></li><li><a href="#2-출력을-캐싱하는-순간-그-타워의-재학습-주기는-캐시-재구축-비용이-정한다">2. 출력을 캐싱하는 순간 그 타워의 재학습 주기는 캐시 재구축 비용이 정한다</a></li><li><a href="#3-파라미터-종류마다-신선도-예산이-다르다">3. 파라미터 종류마다 신선도 예산이 다르다</a></li><li><a href="#4-그래프는-무엇을-담고-있느냐가-주기를-정한다">4. 그래프는 무엇을 담고 있느냐가 주기를 정한다</a></li></ol></li><li><a href="#x--재학습-주기-대신-시간-감쇠로-신선도를-관리한다">X</a></li><li><a href="#케이스-netflix--가장-구체적으로-공개된-재학습-주기-그리고-신선도-압력이-낮은-이유">케이스: Netflix</a></li><li><a href="#광고--신선도를-측정-가능한-비용으로-다룬-사례가-가장-오래됐다">광고</a></li><li><a href="#신선도가-인프라-지표에서-제품-지표로-승격됐다">신선도가 인프라 지표에서 제품 지표로 승격됐다</a></li><li><a href="#이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#아직-확인하지-못한-것">아직 확인하지 못한 것</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
@@ -121,7 +121,7 @@
 <tr>
 <td>Meta SilverTorch</td>
 <td>전체 모델 스냅샷 publish</td>
-<td><strong>1시간</strong> (이전에는 며칠)</td>
+<td>주기 미공개 (publish 소요 시간이 며칠에서 1시간으로 줄었다)</td>
 <td><span class="badge ok">확인</span></td>
 </tr>
 <tr>
@@ -277,7 +277,8 @@ override val batchIncrement: Duration = Days(7)
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="x--재학습-주기-대신-시간-감쇠로-신선도를-관리한다">X — 재학습 주기 대신 시간 감쇠로 신선도를 관리한다</h2>
 <p>X 공개 코드에는 모델 재학습 주기에 대한 단서가 거의 없다 <span class="badge ok">확인</span>. 대신 신선도가 <strong>감쇠 상수와 TTL</strong>로 표현된다 <span class="badge ok">확인</span>.</p>
-<p>2026 Rust 레포 전체에서 <code>hourly</code> / <code>daily</code> / <code>retrain</code> / <code>continual</code> 문자열이 <strong>0건</strong>이다 <span class="badge ok">확인</span> — GitHub code search, <code>xai-org/x-algorithm</code>, 2026-08-09</p>
+<p>4세대 공개 전인 2026-08-09에는 2026 Rust 레포 전체에서 <code>hourly</code> / <code>daily</code> / <code>retrain</code> / <code>continual</code> 문자열이 <strong>0건</strong>이었다 <span class="badge ok">확인</span> — GitHub code search, <code>xai-org/x-algorithm</code>, 2026-08-09</p>
+<p>HEAD(<code>862a123</code>, 2026-10-17)의 <code>phoenix/</code>에서는 이 문자열이 멀티모달 임베딩 스냅샷 경로와 proto 필드에만 나오고, 랭커 재학습 주기를 말하는 문구는 없다 <span class="badge ok">확인</span> — 2026-10-19 <code>git grep</code>.</p>
 <p>감쇠 상수와 TTL은 아래 표와 같다. 위치는 <code>twitter/the-algorithm</code> @ <code>c54bec0</code> 기준이고, Thunder 행만 <code>xai-org</code>다.</p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col><col><col class="w4"></colgroup>
 <thead>
@@ -331,7 +332,7 @@ override val batchIncrement: Duration = Days(7)
 <td><span class="badge ok">확인</span></td>
 </tr>
 </tbody></table></div>
-<p><strong>같은 시스템 안에서 시간 상수가 12,500배 차이가 난다.</strong> 취향의 반감기는 100일이고 콘텐츠의 반감기는 8시간이다. 자세한 내용은 <a href="embedding-retrieval.html">embedding-retrieval.md</a>에 정리했다.</p>
+<p><strong>같은 시스템 안에서 두 반감기가 300배 차이가 난다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/twitter/the-algorithm/blob/c54bec0/src/scala/com/twitter/simclusters_v2/scalding/InterestedInFromKnownFor.scala" target="_blank" rel="noopener"><code>InterestedInFromKnownFor.scala:291-292</code></a>, <a href="https://github.com/twitter/the-algorithm/blob/c54bec0/src/scala/com/twitter/simclusters_v2/summingbird/common/Configs.scala" target="_blank" rel="noopener"><code>summingbird/common/Configs.scala:38</code></a> (<code>c54bec0</code>). 취향의 반감기는 100일이고 콘텐츠의 반감기는 8시간이므로 100 × 24 ÷ 8 = 300이다. 자세한 내용은 <a href="embedding-retrieval.html">embedding-retrieval.md</a>에 정리했다.</p>
 <p><strong>X와 Meta는 신선도를 다른 층위에서 푼다</strong> <span class="badge est">추정</span>. Meta는 모델 파라미터를 계속 갱신하고, X 공개 코드에서 보이는 방식은 &quot;모델과 커뮤니티는 오래 두고 <strong>입력을 시간 감쇠시킨다</strong>&quot;에 가깝다 <span class="badge est">추정</span>. 다만 X의 랭커 재학습 주기가 공개되지 않았을 뿐일 수 있으므로 <strong>비교로 확정하면 안 된다.</strong> 지금 있는 것은 근거의 부재이지 반증이 아니다.</p>
 <p>Thunder(팔로우한 계정의 최신 포스트를 메모리에 담는 X 2026 코드의 인네트워크 인덱스)의 2일 보존에는 부작용이 하나 따른다. 스레드 루트가 만료되면 그 밑의 답글이 전부 사라진다. <strong>인덱스 보존 기간이 제품 동작을 결정하는 사례다</strong> <span class="badge ok">확인</span> — <a href="x.html">x.md</a></p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
@@ -410,11 +411,11 @@ override val batchIncrement: Duration = Days(7)
 <h2 id="이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</h2>
 <p>갱신 주기는 모델마다 하나로 정해지지 않고, 같은 모델 안에서도 컴포넌트마다 다르다 <span class="badge ok">확인</span>(<a href="#2-%EC%B6%9C%EB%A0%A5%EC%9D%84-%EC%BA%90%EC%8B%B1%ED%95%98%EB%8A%94-%EC%88%9C%EA%B0%84-%EA%B7%B8-%ED%83%80%EC%9B%8C%EC%9D%98-%EC%9E%AC%ED%95%99%EC%8A%B5-%EC%A3%BC%EA%B8%B0%EB%8A%94-%EC%BA%90%EC%8B%9C-%EC%9E%AC%EA%B5%AC%EC%B6%95-%EB%B9%84%EC%9A%A9%EC%9D%B4-%EC%A0%95%ED%95%9C%EB%8B%A4">2번</a>, <a href="#3-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-%EC%A2%85%EB%A5%98%EB%A7%88%EB%8B%A4-%EC%8B%A0%EC%84%A0%EB%8F%84-%EC%98%88%EC%82%B0%EC%9D%B4-%EB%8B%A4%EB%A5%B4%EB%8B%A4">3번</a>). 이 절의 일반화가 주기를 가르는 요인으로 꼽는 것은 캐싱 여부, 파라미터 종류, 그래프가 담은 대상, 아이템이 들어오는 형태다 <span class="badge est">추정</span>(<a href="#2-%EC%B6%9C%EB%A0%A5%EC%9D%84-%EC%BA%90%EC%8B%B1%ED%95%98%EB%8A%94-%EC%88%9C%EA%B0%84-%EA%B7%B8-%ED%83%80%EC%9B%8C%EC%9D%98-%EC%9E%AC%ED%95%99%EC%8A%B5-%EC%A3%BC%EA%B8%B0%EB%8A%94-%EC%BA%90%EC%8B%9C-%EC%9E%AC%EA%B5%AC%EC%B6%95-%EB%B9%84%EC%9A%A9%EC%9D%B4-%EC%A0%95%ED%95%9C%EB%8B%A4">2번</a>, <a href="#3-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-%EC%A2%85%EB%A5%98%EB%A7%88%EB%8B%A4-%EC%8B%A0%EC%84%A0%EB%8F%84-%EC%98%88%EC%82%B0%EC%9D%B4-%EB%8B%A4%EB%A5%B4%EB%8B%A4">3번</a>, <a href="#4-%EA%B7%B8%EB%9E%98%ED%94%84%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%84-%EB%8B%B4%EA%B3%A0-%EC%9E%88%EB%8A%90%EB%83%90%EA%B0%80-%EC%A3%BC%EA%B8%B0%EB%A5%BC-%EC%A0%95%ED%95%9C%EB%8B%A4">4번</a>, <a href="#%EC%BC%80%EC%9D%B4%EC%8A%A4-netflix--%EA%B0%80%EC%9E%A5-%EA%B5%AC%EC%B2%B4%EC%A0%81%EC%9C%BC%EB%A1%9C-%EA%B3%B5%EA%B0%9C%EB%90%9C-%EC%9E%AC%ED%95%99%EC%8A%B5-%EC%A3%BC%EA%B8%B0-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%8B%A0%EC%84%A0%EB%8F%84-%EC%95%95%EB%A0%A5%EC%9D%B4-%EB%82%AE%EC%9D%80-%EC%9D%B4%EC%9C%A0">Netflix 케이스</a>).</p>
 <ul>
-<li><strong>&quot;모델을 얼마나 자주 재학습하나&quot;는 단수형 질문이라서 답이 없다.</strong> 한 지면 안에서 컴포넌트마다 갱신 주기가 다르다. 랭커는 1시간, item tower는 1일, 그래프는 3시간, 캐시는 600초이고, 인덱스는 스트리밍으로 갱신된다. 어느 컴포넌트인지 밝히지 않은 주기 수치는 무의미하다.</li>
+<li><strong>&quot;모델을 얼마나 자주 재학습하나&quot;는 단수형 질문이라서 답이 없다.</strong> 한 지면인 IG Explore에서도 랭커는 1시간, item tower는 1일로 갱신 주기가 다르다. 다른 시스템까지 보면 RankGraph-2 그래프는 3시간, X 캐시는 600초이고, SilverTorch 인덱스는 스트리밍으로 갱신된다. 어느 컴포넌트인지 밝히지 않은 주기 수치는 무의미하다.</li>
 <li><strong>신선도는 학습 주기가 아니라 end-to-end 지연이다.</strong> Meta의 정의는 수집, 학습, 추천에 쓰기까지를 모두 넣는다: <em>&quot;ingested, trained on, and used&quot;</em>. &quot;매시간 학습&quot;이라고 써도 데이터 수집이 3시간 늦으면 신선도는 3시간이다.</li>
 <li><strong>파라미터 종류별로 신선도 예산이 다르다.</strong> item embedding은 지연 0초가 이득이고 dense 층은 수십 분을 견딘다. 전체 모델을 한꺼번에 자주 publish하는 것은 비싼 데다 필요도 없다.</li>
 <li><strong>&quot;전체 재구축 + 증분 갱신&quot; 이중 주기가 반복 패턴이다.</strong> 아래 세 사례가 모두 이 구조를 따른다. 규모가 큰 표현일수록 느린 주기에 배치하고, 최신성은 빠른 주기에 맡긴다.<ul>
-<li>SilverTorch: 스냅샷 1시간, 그 사이는 스트리밍 in-place 갱신</li>
+<li>SilverTorch: 스냅샷 publish(주기 미공개), 그 사이는 스트리밍 in-place 갱신</li>
 <li>Netflix FM: 월 사전학습, 일 파인튜닝</li>
 <li>GenRec: 어댑티드 LLM은 드물게, post-training은 자주</li>
 </ul>
@@ -432,7 +433,7 @@ override val batchIncrement: Duration = Days(7)
 <ul>
 <li><strong>Meta / Facebook</strong>: 신선도 인프라를 가장 상세히 공개했다 <span class="badge ok">확인</span>. 콜드스타트와 retrieval 맥락은 <a href="facebook.html">facebook.md</a>에 있다.<ul>
 <li>@Scale 2025: 3–6시간에서 O(1분)으로</li>
-<li>SilverTorch: index as model, 스냅샷 1시간과 스트리밍 in-place</li>
+<li>SilverTorch: index as model, 스냅샷 publish 소요 1시간과 스트리밍 in-place</li>
 <li>RankGraph-2: 3시간</li>
 <li>GEM: continuous online training과 student adapter</li>
 </ul>
@@ -443,20 +444,20 @@ override val batchIncrement: Duration = Days(7)
 <li>재학습 주기 <span class="badge est">추정</span>: 공개 레포 2세대에 학습 스케줄러가 없고, X 공식 블로그에도 진술이 없다. 미공개 내부 파이프라인까지 없다는 근거는 아니다.</li>
 </ul>
 </li>
-<li><strong>Netflix</strong>: FM은 월 사전학습에 일 파인튜닝을 더한 형태이고, 이것이 가장 구체적인 공개 주기다 <span class="badge ok">확인</span> — <a href="netflix.html">netflix.md</a>. 임베딩 스토어는 일 단위이고, 추천 결과 프리컴퓨트가 기본이다 <span class="badge ok">확인</span> — 같은 문서. 신선도 압력 자체가 낮은 구조다 <span class="badge ok">확인</span> — 같은 문서.</li>
+<li><strong>Netflix</strong>: FM은 월 사전학습에 일 파인튜닝을 더한 형태이고, 이것이 가장 구체적인 공개 주기다 <span class="badge ok">확인</span> — <a href="netflix.html">netflix.md</a>. 임베딩 스토어는 일 단위이고, 추천 결과 프리컴퓨트가 기본이다 <span class="badge ok">확인</span> — 같은 문서. 신선도 압력 자체가 낮은 구조로 보인다 <span class="badge est">추정</span>(<a href="#%EC%BC%80%EC%9D%B4%EC%8A%A4-netflix--%EA%B0%80%EC%9E%A5-%EA%B5%AC%EC%B2%B4%EC%A0%81%EC%9C%BC%EB%A1%9C-%EA%B3%B5%EA%B0%9C%EB%90%9C-%EC%9E%AC%ED%95%99%EC%8A%B5-%EC%A3%BC%EA%B8%B0-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%8B%A0%EC%84%A0%EB%8F%84-%EC%95%95%EB%A0%A5%EC%9D%B4-%EB%82%AE%EC%9D%80-%EC%9D%B4%EC%9C%A0">Netflix 케이스</a>).</li>
 <li><strong>그 외</strong>: 아직 조사하지 않았다. <strong>열린 질문으로 남는다.</strong></li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="아직-확인하지-못한-것">아직 확인하지 못한 것</h2>
 <p>남은 질문은 주로 공개되지 않은 재학습 주기, 수치나 적용 범위가 빠진 공개, 지금도 유효한지 모르는 오래된 근거에 관한 것이다.</p>
 <ul>
-<li><strong>X의 랭커(Phoenix/Navi) 재학습 주기.</strong> 공개 코드에 학습 파이프라인 자체가 없다(<a href="x.html">x.md</a>).</li>
+<li><strong>X의 랭커(Phoenix/Navi) 재학습 주기.</strong> Phoenix 학습 코드는 4세대 공개(<code>47c1bcd</code>)부터 레포에 있지만, 재학습 주기를 말하는 문구는 HEAD(<code>862a123</code>)에도 없다 <span class="badge ok">확인</span>(<a href="x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4">x.md Phoenix 학습 절</a>).</li>
 <li><strong>SilverTorch 스트리밍 갱신의 실제 지연.</strong> 논문은 이 부분을 유보했고(<em>&quot;future work&quot;</em>), 블로그도 수치를 주지 않는다.</li>
 <li><strong>Meta 광고 모델의 시간 단위 staleness 비용.</strong> 1차 출처를 확보하지 못했다. 2014년 논문 본문에 실험이 있으나 PDF라서 이 저장소 규칙상 인용할 수 없다. HTML 판이나 ACM 판을 찾으면 해결된다.</li>
 <li><strong>Facebook Feed 본체(비 Reels)의 랭커 재학습 주기.</strong> system card와 2021년 블로그 어디에도 나오지 않는다.</li>
 <li><strong>@Scale 2025의 &quot;O(1분)&quot;이 어느 지면과 어느 파라미터에 적용되는지.</strong> 발표 요약만 확인했고 세부 범위는 알지 못한다.</li>
 <li><strong>Instagram Explore의 1시간 fine-tune이 2026년에도 유효한지.</strong> 근거가 2023년 글 하나뿐이다.</li>
-<li><strong>X의 SimClusters 7일 주기가 2025년과 2026년에도 실행되는지.</strong> <code>simclusters_v2/</code>는 2023-04 이후 한 바이트도 바뀌지 않았고, 2026 레포에는 SimClusters 참조가 아예 없다(<a href="x.html">x.md</a>). <strong>코드가 남아 있다고 해서 실행되고 있는 것은 아니다.</strong></li>
+<li><strong>X의 simclusters_v2 배치 잡(KnownFor 7일 주기)이 지금도 도는지.</strong> <code>simclusters_v2/</code>는 2023-04 이후 한 바이트도 바뀌지 않았다. 2026 레포에는 3세대까지 SimClusters 참조가 없었고, 4세대(<code>47c1bcd</code>)에서 home-mixer의 SimClusters 후보 소스가 돌아왔다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/sources/simclusters_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/simclusters_source.rs</code></a>. <strong>코드가 남아 있다고 해서 실행되고 있는 것은 아니다.</strong></li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="출처">출처</h2>

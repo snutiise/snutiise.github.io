@@ -41,7 +41,7 @@
 <h1 id="피드-다양성--점수순-정렬을-일부러-망가뜨리는-레이어">피드 다양성 — 점수순 정렬을 일부러 망가뜨리는 레이어</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-10-15">2026-10-15</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">20</span></summary><ol><li><a href="#케이스-x--네-개를-다-쓴다">케이스: X</a><ol><li><a href="#1-작성자-다양성-감쇠-2026">1. 작성자 다양성 감쇠 (2026)</a></li><li><a href="#2-mmr--2025-scala">2. MMR</a></li><li><a href="#3-dpp--2026-별도-서비스">3. DPP</a></li><li><a href="#4-중복-제거--실제로는-여기가-제일-촘촘하다">4. 중복 제거</a></li><li><a href="#5-학습된-슬레이트-디코더--2026-10-학습-코드만-공개">5. 학습된 슬레이트 디코더</a></li></ol></li><li><a href="#케이스-meta--주요-피드에-대해서는-아무것도-공개하지-않았다">케이스: Meta</a><ol><li><a href="#다만-facebook은-다양성을-랭킹-피처로도-쓴다">다만 Facebook은 다양성을 랭킹 피처로도 쓴다</a></li><li><a href="#유일한-예외--instagram-알림의-곱셈-페널티-2025">유일한 예외</a></li><li><a href="#retrieval-단계-다양성--instagram은-여기가-주력일-수-있다">retrieval 단계 다양성</a></li><li><a href="#디벙크--instagram은-같은-계정-3연속을-막는다">디벙크</a></li></ol></li><li><a href="#케이스-netflix--다양성의-단위가-리스트가-아니라-페이지다">케이스: Netflix</a></li><li><a href="#이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#아직-확인-못한-것">아직 확인 못한 것</a></li><li><a href="#출처">출처</a><ol><li><a href="#공개-소스코드">공개 소스코드</a></li><li><a href="#meta-블로그">Meta 블로그</a></li><li><a href="#meta-transparency-center-규제-대응-1차-문서">Meta Transparency Center (규제 대응 1차 문서)</a></li><li><a href="#netflix">Netflix</a></li></ol></li></ol></details></nav>
 <div class="prose">
@@ -57,7 +57,7 @@
 <h2 id="케이스-x--네-개를-다-쓴다">케이스: X — 네 개를 다 쓴다</h2>
 <p>X는 감쇠, MMR, DPP, dedup 네 방식이 모두 공개 소스코드로 읽힌다 <span class="badge ok">확인</span>(<a href="#%EB%88%84%EA%B0%80-%EC%9D%B4%EA%B1%B8-%EC%93%B0%EB%8A%94%EA%B0%80">누가 이걸 쓰는가</a>). 2025 Scala 세대에는 MMR과 카테고리 페널티, dedup 필터 6종이 있고, 2026 세대에는 작성자 감쇠와 DPP, dedup 필터 3종이 있다 <span class="badge ok">확인</span>(누가 이걸 쓰는가 절). 2026-10-14 커밋은 학습된 슬레이트 디코더의 학습 코드를 공개했지만, 서빙 스위치는 기본값이 꺼져 있다 <span class="badge ok">확인</span>(<a href="#5-%ED%95%99%EC%8A%B5%EB%90%9C-%EC%8A%AC%EB%A0%88%EC%9D%B4%ED%8A%B8-%EB%94%94%EC%BD%94%EB%8D%94--2026-10-%ED%95%99%EC%8A%B5-%EC%BD%94%EB%93%9C%EB%A7%8C-%EA%B3%B5%EA%B0%9C">5절</a>).</p>
 <h3 id="1-작성자-다양성-감쇠-2026">1. 작성자 다양성 감쇠 (2026)</h3>
-<p>2026 세대의 작성자 감쇠는 같은 작성자의 포스트 가운데 점수순으로 몇 번째인가에 따라 점수에 배수를 곱하고, 이 배수에는 하한이 있다 <span class="badge ok">확인</span>. 배수를 정하는 함수는 아래와 같다 <span class="badge ok">확인</span> — <code>home-mixer/scorers/ranking_scorer.rs:186-188</code>.</p>
+<p>2026 세대의 작성자 감쇠는 같은 작성자의 포스트 가운데 점수순으로 몇 번째인가에 따라 점수에 배수를 곱하고, 이 배수에는 하한이 있다 <span class="badge ok">확인</span>. 배수를 정하는 함수는 아래와 같다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs:186-188</code></a> (3세대 <code>0bfc279</code>).</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn diversity_multiplier(decay_factor: f64, floor: f64, position: usize) -&gt; f64 {
     (1.0 - floor) * decay_factor.powf(position as f64) + floor
 }
@@ -66,9 +66,9 @@
 <p>설계에서 눈여겨볼 점은 두 가지다.</p>
 <ul>
 <li><strong>하한 <code>floor</code>가 있다.</strong> <code>decay^n</code>만 쓰면 같은 작성자의 10번째 포스트는 점수가 0에 수렴해 사실상 금지된다. floor를 두면 아무리 많아도 원래 점수의 <code>floor</code>배는 남는다. 즉 이 감쇠는 <strong>작성자당 상한이 아니라 페널티</strong>다.</li>
-<li><code>decay_factor</code>와 <code>floor</code>의 값은 FeatureSwitch(런타임 설정)에 있고 <strong>레포에 없다</strong> <span class="badge ok">확인</span> — <code>AuthorDiversityDecay</code>, <code>AuthorDiversityFloor</code>.</li>
+<li><code>decay_factor</code>와 <code>floor</code>의 값은 FeatureSwitch(런타임 설정)에서 읽는다. 3세대(<code>0bfc279</code>)에는 그 값이 레포에 없었고, 4세대(<code>47c1bcd</code>) 미러의 기본값은 <code>AuthorDiversityDecay</code> 0.5, <code>AuthorDiversityFloor</code> 0.25다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</li>
 </ul>
-<p>이 감쇠기는 2025 Scala 세대에 <strong>별도 스코어러 파일로 존재했다가</strong>(<code>author_diversity_scorer.rs</code>) 2026에서 랭킹 스코어러 안으로 흡수됐다 <span class="badge est">추정</span>. 근거는 2026 레포에 <code>author_diversity_scorer.rs</code>가 남아 있지만, <code>scorers/mod.rs</code>에 선언되지 않아 모듈 트리에서 연결이 끊겨 있다는 점이다 <span class="badge ok">확인</span>.</p>
+<p>3세대 첫 공개 커밋 <code>aaa167b</code>(2026-01-20)에서 이 감쇠기는 <code>author_diversity_scorer.rs</code>라는 별도 스코어러였다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aaa167b/home-mixer/scorers/mod.rs" target="_blank" rel="noopener"><code>aaa167b</code> <code>scorers/mod.rs</code></a>. <code>0bfc279</code>(2026-05-15)에서는 감쇠가 랭킹 스코어러 안으로 들어갔고, 이 파일은 남았지만 <code>scorers/mod.rs</code> 선언에서 빠졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/mod.rs" target="_blank" rel="noopener"><code>0bfc279</code> <code>scorers/mod.rs</code></a>. 파일은 4세대 공개 커밋 <code>47c1bcd</code>(2026-08-13)에서 삭제됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/commits/main/home-mixer/scorers/author_diversity_scorer.rs" target="_blank" rel="noopener">파일 커밋 이력</a>.</p>
 <h3 id="2-mmr--2025-scala">2. MMR — 2025 Scala</h3>
 <p>2025 Scala 세대의 MMR은 관련성 점수에 이미 고른 후보들과의 최소 거리를 가중해 더한다 <span class="badge ok">확인</span>. 리스트 앞쪽 구간에는 다양성이 적용되지 않고, 계산 결과는 원래 점수 자리를 덮어쓴다 <span class="badge ok">확인</span>.</p>
 <p>MMR 점수는 아래 식으로 계산한다 <span class="badge ok">확인</span> — <code>DiversityRescoringFeatureHydrator.scala:102</code>.</p>
@@ -99,15 +99,21 @@ score = math.max(relevance - weight * penalty, 0.00001)
 <li>그런데 레포에 벤더링된 프레임워크 코드 <code>product-mixer/core</code>의 <code>RecommendationPipelineConfig.scala</code>는 <code>resultSelectors</code>(<code>:136</code>) → <code>postSelectionFilters</code>(<code>:142</code>)만 정의한다. <strong><code>postSelectionFeatureHydration</code>이라는 훅 자체가 없다.</strong> 즉 실행 위치를 코드로 확인할 수 없다 <span class="badge ok">확인</span>(부재) — <code>grep -r postSelectionFeatureHydration product-mixer/</code> → 0건</li>
 </ul>
 <h3 id="3-dpp--2026-별도-서비스">3. DPP — 2026, 별도 서비스</h3>
-<p>2026 세대의 DPP는 별도 서비스가 계산한다 <span class="badge ok">확인</span>. home-mixer(For You 피드를 내주는 X의 서비스)의 스코어러 <code>VMRanker</code>가 gRPC로 이 서비스를 호출하고, 응답 점수로 <strong>기존 점수를 덮어쓴다</strong> <span class="badge ok">확인</span> — <code>home-mixer/scorers/vm_ranker.rs:47-52</code>.</p>
-<p>DPP 파라미터는 theta와 max_selected_rank 가운데 하나라도 양수일 때만 만들어진다 <span class="badge ok">확인</span> — <code>vm_ranker.rs:112-120</code>.</p>
+<p>2026 세대의 DPP는 별도 서비스가 계산한다 <span class="badge ok">확인</span>. home-mixer(For You 피드를 내주는 X의 서비스)의 스코어러 <code>VMRanker</code>가 gRPC로 이 서비스를 호출하고, 응답 점수로 <strong>기존 점수를 덮어쓴다</strong> <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs:47-52</code></a> (3세대 <code>0bfc279</code>).</p>
+<p>DPP 파라미터는 theta와 max_selected_rank 가운데 하나라도 양수일 때만 만들어진다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>vm_ranker.rs:112-120</code></a>.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let dpp_params = if dpp_theta &gt; 0.0 || dpp_max_selected_rank &gt; 0 {
     Some(DppParams { theta: dpp_theta, max_selected_rank: dpp_max_selected_rank })
 } else { None };
 </code></pre></figure>
 <p><code>theta</code>는 관련성과 다양성 사이의 트레이드오프를 조절하고, <code>max_selected_rank</code>는 DPP를 적용할 상위 구간의 길이로 보인다 <span class="badge est">추정</span>. 근거는 이름과 DPP 관행이고, 코드에는 설명이 없다.</p>
-<p><strong>서비스 본체는 공개되지 않았다.</strong> 레포에 있는 것은 클라이언트와 proto 매핑뿐이라, 실제 커널 행렬을 무엇으로 만드는지는 알 수 없다 <span class="badge ok">확인</span>. 레포 전체에서 확인했고, <code>xai_vm_ranker_proto</code>는 외부 크레이트다.</p>
-<p><strong>호출이 실패하면 DPP 결과가 조용히 사라진다.</strong> gRPC가 실패하면 모든 후보에 <code>Err</code>를 반환하는데, 파이프라인의 <code>update_all</code>은 이 <code>Err</code>를 <strong>로그도 남기지 않고 건너뛴다</strong> <span class="badge ok">확인</span> — <code>candidate-pipeline/scorer.rs</code> (<code>update_all</code> 기본 구현), <code>vm_ranker.rs:33-38</code>.</p>
+<p><strong>DPP 서비스 본체는 4세대 공개(2026-08-13)부터 레포의 <code>vm-ranker/</code>에 있다</strong> <span class="badge ok">확인</span>. 커널 행렬은 후보 점수와 임베딩 코사인 유사도로 만든다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>vm-ranker/dpp.rs:94-133</code></a> (HEAD <code>862a123</code>, 2026-10-17).</p>
+<ul>
+<li>커널 원소는 <code>L_ij = exp(α·q_i) · exp(α·q_j) · cos(e_i, e_j)</code>이고, <code>q_i</code>는 최고 점수로 나눈 후보 점수, <code>α = θ / (2(1 − θ))</code>다 <span class="badge ok">확인</span>(같은 파일).</li>
+<li>선택은 Cholesky 분해를 한 행씩 갱신하는 탐욕 DPP다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>dpp.rs:223</code></a>.</li>
+<li>4세대 공개 커밋에도 같은 커널이 있다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>vm-ranker/dpp.rs:94-124</code></a>.</li>
+<li>3세대(<code>0bfc279</code>)까지는 레포에 클라이언트와 proto 매핑만 있었고, <code>xai_vm_ranker_proto</code>는 외부 크레이트였다 <span class="badge ok">확인</span>.</li>
+</ul>
+<p><strong>호출이 실패하면 DPP 결과가 조용히 사라진다.</strong> gRPC가 실패하면 모든 후보에 <code>Err</code>를 반환하는데, 파이프라인의 <code>update_all</code>은 이 <code>Err</code>를 <strong>로그도 남기지 않고 건너뛴다</strong> <span class="badge ok">확인</span> — <code>candidate-pipeline/scorer.rs</code> (<code>update_all</code> 기본 구현), <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>vm_ranker.rs:33-38</code></a>.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn update_all(&amp;self, candidates: &amp;mut [C], scored: Vec&lt;Result&lt;C, String&gt;&gt;) {
     for (candidate, scored) in candidates.iter_mut().zip(scored) {
         if let Ok(scored) = scored { self.update(candidate, scored); }
@@ -115,7 +121,7 @@ score = math.max(relevance - weight * penalty, 0.00001)
 }
 </code></pre></figure>
 <p>→ <strong>VMRanker에 장애가 생기면 다양성 최적화 없이 순수 점수순 피드가 나간다. 응답에는 아무 표시도 남지 않는다.</strong> 이것은 fail-open 동작이다. 이 상태를 관측하려면 별도 지표가 필요하다.</p>
-<p>VMRanker 전체는 <code>EnableVMRanker</code> FeatureSwitch로 끌 수 있다 <span class="badge ok">확인</span> — <code>vm_ranker.rs:18-20</code>.</p>
+<p>VMRanker 전체는 <code>EnableVMRanker</code> FeatureSwitch로 끌 수 있다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>vm_ranker.rs:18-20</code></a>.</p>
 <p><strong>topic 요청에서는 DPP를 기본으로 건너뛴다(2026-10-14).</strong> 새 스위치 <code>TopicDppEnabled</code>의 기본값이 false다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/mod.rs:85-87</code></a>.</p>
 <h3 id="4-중복-제거--실제로는-여기가-제일-촘촘하다">4. 중복 제거 — 실제로는 여기가 제일 촘촘하다</h3>
 <p>중복 제거는 두 세대 모두 여러 필터로 나뉘어 있다 <span class="badge ok">확인</span>. 2026 세대의 필터는 다음 세 가지다 <span class="badge ok">확인</span> <code>home-mixer/filters/</code>:</p>
@@ -248,7 +254,8 @@ score = math.max(relevance - weight * penalty, 0.00001)
 <blockquote>
 <p><em>&quot;Number of times you have seen posts with the same content type (e.g. video, photo, etc) as the current post <strong>in the past hour</strong>&quot;</em></p>
 </blockquote>
-<p>이 저장소가 기록한 범위에서 X의 다양성은 전부 사후 점수 조작(감쇠·MMR·DPP·dedup)이고, &quot;최근에 같은 유형을 몇 번 봤나&quot; 계열의 랭커 피처는 등장하지 않는다. 다만 <strong>X 랭커의 전체 피처 목록을 살펴보고 확인한 것은 아니라서 <span class="badge est">추정</span>이다.</strong> 확인하면 이 대조가 성립하는지 아닌지가 정해진다(아래 <a href="#%EC%95%84%EC%A7%81-%ED%99%95%EC%9D%B8-%EB%AA%BB%ED%95%9C-%EA%B2%83">&quot;아직 확인 못한 것&quot;</a>).</p>
+<p>이 저장소가 기록한 범위에서 home-mixer 서빙 경로에 있는 X의 다양성은 전부 사후 점수 조작(감쇠·MMR·DPP·dedup)이고, &quot;최근에 같은 유형을 몇 번 봤나&quot; 계열의 랭커 피처는 등장하지 않는다. 다만 <strong>X 랭커의 전체 피처 목록을 살펴보고 확인한 것은 아니라서 <span class="badge est">추정</span>이다.</strong> 확인하면 이 대조가 성립하는지 아닌지가 정해진다(아래 <a href="#%EC%95%84%EC%A7%81-%ED%99%95%EC%9D%B8-%EB%AA%BB%ED%95%9C-%EA%B2%83">&quot;아직 확인 못한 것&quot;</a>).</p>
+<p>다양성 페널티를 학습하는 5절의 디코더는 서빙 스위치 기본값이 꺼져 있어 이 대조에서 뺐다 <span class="badge ok">확인</span>(<a href="#5-%ED%95%99%EC%8A%B5%EB%90%9C-%EC%8A%AC%EB%A0%88%EC%9D%B4%ED%8A%B8-%EB%94%94%EC%BD%94%EB%8D%94--2026-10-%ED%95%99%EC%8A%B5-%EC%BD%94%EB%93%9C%EB%A7%8C-%EA%B3%B5%EA%B0%9C">5절</a>).</p>
 <h3 id="유일한-예외--instagram-알림의-곱셈-페널티-2025">유일한 예외 — Instagram 알림의 곱셈 페널티 (2025)</h3>
 <p>Instagram 알림 랭킹을 다룬 글은 Meta 전체에서 <strong>가장 기계적인 다양성 공개</strong>다. 다만 대상은 <strong>피드가 아니라 알림이다.</strong> 이 프레임워크는 알림 후보의 기본 관련성 점수에, 최근 보낸 알림과의 유사도에 따라 점수를 깎는 배수를 곱한다 <span class="badge ok">확인</span>(아래 본문 인용).</p>
 <pre tabindex="0"><code>Score(c) = R(c) × D(c)
@@ -325,7 +332,7 @@ p_i(c) = max_{h ∈ H} sim_i(c, h)
 <li>&quot;too many&quot;라고 했으므로 임계값이 없다. &quot;try to avoid&quot;라고 했으므로 하드 제약도 아니다.</li>
 <li><strong>&quot;3&quot;이라는 숫자를 Meta 문서에서 찾지 못했다</strong> <span class="badge est">추정</span>(같은 코퍼스).</li>
 <li>같은 문장이 <strong>서로 다른 두 제약</strong>을 말한다. 하나는 같은 작성자의 연속이고, 다른 하나는 <strong>suggested(비연결) 포스트의 연속</strong>이다. 뒤의 것은 Facebook 쪽에 대응 서술이 없다.</li>
-<li>아이러니하게도 <strong>&quot;3&quot;이라는 상수가 실제로 코드에 있는 쪽은 X다</strong> <span class="badge ok">확인</span>. <code>MaxCandidatesPerCommunity = 1</code>과 <code>MaxCommunityCandidates = 3</code>이 그 값이다 <span class="badge ok">확인</span>(4절 표). 작성자 다양성도 X는 함수 형태(<code>(1-floor)·decay^n + floor</code>)까지 읽히고 계수 값만 없다.</li>
+<li>아이러니하게도 <strong>&quot;3&quot;이라는 상수가 실제로 코드에 있는 쪽은 X다</strong> <span class="badge ok">확인</span>. <code>MaxCandidatesPerCommunity = 1</code>과 <code>MaxCommunityCandidates = 3</code>이 그 값이다 <span class="badge ok">확인</span>(4절 표). 작성자 다양성도 X는 함수 형태(<code>(1-floor)·decay^n + floor</code>)까지 읽히고, 계수 값은 4세대(<code>47c1bcd</code>) 미러에 decay 0.5, floor 0.25로 있다 <span class="badge ok">확인</span>(<a href="#1-%EC%9E%91%EC%84%B1%EC%9E%90-%EB%8B%A4%EC%96%91%EC%84%B1-%EA%B0%90%EC%87%A0-2026">1절</a>).</li>
 <li>이 오해는 X의 &quot;인네트워크 50:50&quot;(팔로한 계정과 팔로하지 않은 계정의 포스트를 반씩 섞는다는 이야기)과 같은 형태다 <span class="badge est">추정</span>. <strong>정성적인 문장 하나가 유통 과정에서 구체적인 상수로 굳는 것이다</strong> <span class="badge est">추정</span>. 그 오해를 다룬 절은 <a href="candidate-allocation.html">candidate-allocation.md</a>에 있다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
@@ -400,7 +407,7 @@ p_i(c) = max_{h ∈ H} sim_i(c, h)
 <h2 id="출처">출처</h2>
 <h3 id="공개-소스코드">공개 소스코드</h3>
 <ul>
-<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). <code>home-mixer/scorers/</code>, <code>home-mixer/filters/</code>, <code>candidate-pipeline/</code>. 5절과 DPP 절의 topic 요청 단락은 커밋 <code>17c96bf</code>(2026-10-14) 기준이다. 그 밖의 sha 없는 줄 번호 인용은 작성 시점(2026-08) 기준이다.</li>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). <code>home-mixer/scorers/</code>, <code>home-mixer/filters/</code>, <code>candidate-pipeline/</code>. 5절과 DPP 절의 topic 요청 단락은 커밋 <code>17c96bf</code>(2026-10-14) 기준이다. 1절과 3절의 home-mixer 줄 번호 인용은 <code>0bfc279</code>, 4세대 기본값은 <code>47c1bcd</code>, DPP 커널은 <code>862a123</code> 기준이다. 그 밖의 sha 없는 줄 번호 인용은 작성 시점(2026-08) 기준이다.</li>
 <li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — 2025-09-03 커밋 <code>c54bec0</code>, 공개 소스코드. <code>home-mixer/</code>.</li>
 </ul>
 <h3 id="meta-블로그">Meta 블로그</h3>

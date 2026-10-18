@@ -55,7 +55,7 @@
 <div class="blk ctx"><p><span class="lbl">배경</span> X의 추천 스택은 지난 넉 달 동안 Phoenix(2026년 재구축한 GPU 랭킹 스택)를 중심으로 재편돼 왔다. 그 안에서 &quot;retrieval&quot;은 두 갈래로 나뉘어 있었다.</p></div>
 <ul>
 <li>하나는 <strong>two-tower retrieval</strong>이다. 유저 타워와 아이템 타워의 임베딩 내적으로 ANN 검색을 돌리는 전통적인 OON(out-of-network, 팔로우하지 않은 계정의 포스트) 소스다. 2026-09-30 커밋에서 <code>xrecsys_two_tower.py</code>가 6-preset 카탈로그로 승격됐고, SID 6-level, seqpack, Home/Immersive 두 head 공유가 명시됐다.</li>
-<li>다른 하나는 <strong>generative retrieval</strong>(SID generation)이다. RQ-VAE나 비슷한 양자화로 아이템을 다단계 토큰 시퀀스(semantic ID, 줄여서 SID)로 압축한 다음, Transformer가 유저 히스토리를 조건으로 SID 토큰을 생성하는 방식이다. Pinterest TIGER(2024)·Alibaba PailitaoGR(2025)·Kuaishou OneRec(2025)·Tencent BARGE(2026)·ByteDance GEAR(어제 2026-09-30 arXiv) 같은 라인이 이쪽이다.</li>
+<li>다른 하나는 <strong>generative retrieval</strong>(SID generation)이다. RQ-VAE나 비슷한 양자화로 아이템을 다단계 토큰 시퀀스(semantic ID, 줄여서 SID)로 압축한 다음, Transformer가 유저 히스토리를 조건으로 SID 토큰을 생성하는 방식이다. Google TIGER(NeurIPS 2023, <a href="https://arxiv.org/abs/2305.05065" target="_blank" rel="noopener">arXiv 2305.05065</a>)·Alibaba PailitaoGR(2025)·Kuaishou OneRec(2025)·Tencent BARGE(2026)·ByteDance GEAR(arXiv 2026-09-30 v1, <a href="daily-2026-10-02.html">2026-10-02 daily</a>) 같은 라인이 이쪽이다.</li>
 </ul>
 <p>X는 그동안 SID 토큰을 학습 config의 <code>sid_num_levels</code>로 노출해 왔다. two-tower 모델이 아이템 타워의 입력 피처로 쓰는 형태였다. SID를 생성해 그 자체로 후보를 뽑는 generative retrieval 경로는 공개된 적이 없었다.</p>
 <p>2026-09-04(4세대+15)에는 &quot;Phoenix 서빙 엔진에서 SID retrieval 사이드카가 통째 제거&quot;됐다는 기록이 있다. 당시 사이드카는 Phoenix 요청에서 유저 히스토리의 각 포스트 ID를 SID로 변환해 주는 lookup 역할이었고, 그 역할은 요청에 SID를 미리 실어 넣는 형태로 흡수됐다. 그때까지 X의 &quot;SID retrieval&quot;은 아이템 ID → SID 토큰 lookup이라는 좁은 의미였다.</p>
@@ -90,7 +90,7 @@
 </ul>
 </li>
 <li>이는 레포 안에서 보이는 생산 코드와 그 &quot;generative retrieval&quot; 전용 proto 정의가 분리된 상태라는 뜻이다 <span class="badge est">추정</span>.</li>
-<li><code>SidSource</code>가 켜지는 조건은 네 축의 AND로, 아래가 모두 참이어야 한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/sources/sid_source.rs" target="_blank" rel="noopener"><code>sid_source.rs:50-60</code></a>.<ul>
+<li><code>SidSource</code>가 켜지는 조건은 다섯 조건의 AND로, 아래가 모두 참이어야 한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/sources/sid_source.rs" target="_blank" rel="noopener"><code>sid_source.rs:58-64</code></a>.<ul>
 <li><code>EnableSidSource</code> param이 켜져 있다(기본 <code>false</code>).</li>
 <li>토픽 요청이 아니다.</li>
 <li>in-network only 요청이 아니다.</li>
@@ -227,12 +227,12 @@ sid_num_levels=6,
 </ul>
 </li>
 </ul>
-<p>이 설계는 공개된 generative retrieval 계열과 겹친다. Pinterest TIGER(2024)·Alibaba PailitaoGR(2025)·Kuaishou OneRec(2025)·Tencent BARGE(2026)·ByteDance GEAR(2026-09-30)가 그 계열이다. X판은 다음 점이 다르다.</p>
+<p>이 설계는 공개된 generative retrieval 계열과 겹친다. Google TIGER(NeurIPS 2023)·Alibaba PailitaoGR(2025)·Kuaishou OneRec(2025)·Tencent BARGE(2026)·ByteDance GEAR(2026-09-30)가 그 계열이다. X판은 다음 점이 다르다.</p>
 <ul>
-<li>6-level × 256-codebook이라는 비교적 좁은 공간을 쓴다(TIGER는 4-level × ~2k, OneRec는 3-level × 1024).</li>
-<li>1023토큰 유저 액션 히스토리를 그대로 조건으로 넣는다(TIGER는 유저 히스토리 20~50).</li>
+<li>6-level × 256-codebook이라는 비교적 좁은 공간을 쓴다(TIGER는 3-level × 256에 충돌 구분 토큰 1개, OneRec는 3-level × 1024).</li>
+<li>1023토큰 유저 액션 히스토리를 그대로 조건으로 넣는다(TIGER는 학습 때 유저 히스토리를 최대 20개로 제한).</li>
 <li><code>shared_prefix_depth</code>를 상위 랭킹의 스코어로 넘긴다(TIGER는 생성 확률을 쓰는 쪽이다).</li>
-<li>이미 vocab 설계를 two-tower 모델과 공유해, 두 retrieval이 같은 유저·아이템·작성자 임베딩 공간을 쓴다.</li>
+<li>vocab 설계를 two-tower 모델과 공유한다. 다만 임베딩 테이블은 지금 모델마다 따로 있다(아래 의미 참조).</li>
 </ul>
 <p>two-tower는 벡터 공간 ANN을, SID retrieval은 코드 공간 beam search를 돌린다. 둘은 duplication이 아니라 상보 구조로 선언된 셈이다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. Phoenix에 임베딩 테이블을 행 단위로 나눠 다루는 CUDA 커널 묶음이 생겼다</span></p></div>
@@ -310,7 +310,7 @@ sid_num_levels=6,
 <li>LLM judge 액션 두 개가 15일 만에 번호를 바꿔 다시 나타났다 <span class="badge ok">확인</span>.<ul>
 <li>이번 값은 <code>LLM_JUDGE_RELEVANT_TO_SEARCH=108</code>·<code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH=109</code>다.</li>
 <li>두 action은 4세대+20(2026-09-12)에 107/108로 신설됐다.</li>
-<li>4세대+23(2026-09-17)에 4일 만에 vacate됐다. 그 자리에 <code>CLIENT_TWEET_LIVE_STREAM_REPLY=107</code>이 들어왔고, 108은 <code>RESERVED_108</code> 플레이스홀더로 보존됐다.</li>
+<li>4세대+23(2026-09-17)에 5일 만에 vacate됐다. 그 자리에 <code>CLIENT_TWEET_LIVE_STREAM_REPLY=107</code>이 들어왔고, 108은 <code>RESERVED_108</code> 플레이스홀더로 보존됐다.</li>
 <li>오늘(4세대+34, 15일 만에) 재등장했다. 다만 번호가 바뀌었다: 과거 107/108 → 이번 108/109.</li>
 <li><code>RESERVED_108</code>이 LLM_JUDGE_RELEVANT_TO_SEARCH로 재사용되고, 새 번호 109가 LLM_JUDGE_NOT_RELEVANT_TO_SEARCH로 할당됐다.</li>
 <li>즉 LLM judge 라벨을 action으로 다시 끌어들이려는 결정이 되돌아왔지만, 번호는 새 자리로 간 셈이다. 이것이 재조정 후 안정 상태가 될지, 다시 vacate될지는 다음 커밋 창에서 관측해야 한다 <span class="badge est">추정</span>.</li>

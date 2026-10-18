@@ -62,7 +62,7 @@
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 두 백엔드를 기다리는 시간을 390 ms 상수 하나로 통일하며 크게 늘렸다</span></p></div>
 <ul>
-<li><p>VF의 hydration timeout이 통합 상수 하나로 바뀌었고, Strato(X 사내 gRPC 프록시) 호출의 timeout은 TES 100 ms, Gizmoduck 80 ms에서 390 ms로 올랐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs</code></a></p>
+<li><p>VF의 hydration timeout이 통합 상수 하나로 바뀌었고, Strato(코드가 데이터를 조회하거나 저장할 때 거치는 X 내부 시스템) 호출의 timeout은 TES 100 ms, Gizmoduck 80 ms에서 390 ms로 올랐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs</code></a></p>
 <ul>
 <li><p>같은 변경이 걸친 파일: <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/server_deps.rs" target="_blank" rel="noopener"><code>visibility-filtering/server_deps.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/gizmoduck_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/tes_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/tes_hydrator.rs</code></a></p>
 </li>
@@ -189,7 +189,7 @@ pub(crate) fn author_id_fallback_capacity() -&gt; usize {
 </ul>
 </li>
 </ul>
-<p>A와 B는 사실상 한 프로젝트다. A가 timeout을 3~4배 늘려 하이드레이션이 더 오래 걸리는 것을 허용하는 대신, B는 그래도 실패할 경우의 자동 폴백 경로를 만들었다.</p>
+<p>A와 B는 사실상 한 프로젝트다. A가 timeout을 2.6~4.9배 늘려 하이드레이션이 더 오래 걸리는 것을 허용하는 대신, B는 그래도 실패할 경우의 자동 폴백 경로를 만들었다.</p>
 <p>이 폴백은 4세대+9(2026-08-26)에서 관측한 &quot;TesHydrator media fallback cache 통째 제거&quot;를 뒤집는 방향이 아니다. media fallback은 TES가 반환한 media 정보를 캐싱해 재사용하는 것이었고, 이번 author-id fallback은 TES가 응답을 못 준 tweet에 대해서만 이전 값을 되살려 author-side rules만 부분 판정한다. 즉 결과의 재사용이 아니라 부분 판정의 부활이다.</p>
 <p>이번 변경은 4세대+15(2026-09-04)의 VF hydration 대규모 단순화로 코드가 800+ 줄 순 감소해 얇아진 뒤, 남은 강건성의 빈틈을 좁힌 것으로 읽힌다.</p>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. 저자 라벨을 규칙이 실제로 쓰는 11종만 담는 자료구조로 바꿨다</span></p></div>
@@ -567,7 +567,7 @@ pub(crate) struct ClockCache&lt;V&gt; { /* shards, set_count, next_generation */
 </li>
 </ul>
 </li>
-<li><p>이제 user tower의 attention·RoPE·attention bias는 padding 위치에서 실제 history와 구분되어 계산된다 <span class="badge ok">확인</span>(같은 커밋). 4세대+15(2026-09-04, 902a06f)에서 정본에 반영된 &quot;FA4 attention 커널 가변길이 히스토리 원생 지원&quot;과 같은 방향의 정확성 보완이다.</p>
+<li><p>이제 user tower의 attention·RoPE·attention bias는 padding 위치에서 실제 history와 구분되어 계산된다 <span class="badge ok">확인</span>(같은 커밋). 4세대+15(2026-09-04, 9b0dc31)에서 정본에 반영된 &quot;FA4 attention 커널 가변길이 히스토리 원생 지원&quot;과 같은 방향의 정확성 보완이다.</p>
 </li>
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">H. 광고 삽입 로그에 광고 블렌더 라벨이 붙는다</span></p></div>
@@ -664,7 +664,7 @@ struct UthAccountLabelAggregate {
 </li>
 <li>hydration 메트릭 코드에서 죽은 keyed-result 경로가 제거되고, 저자 라벨 집계 헬퍼가 새로 붙었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/metrics.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/metrics.rs</code></a><ul>
 <li><code>hydration/metrics.rs</code> +21/−154: <code>timed_keyed_rpc</code>와 <code>KeyedResultCounts::from_results</code>·<code>outer_timeout</code>이 제거됐다.</li>
-<li>4세대+15(902a06f, 2026-09-04)의 batch 통일 이후 이 keyed-result 경로는 죽은 코드였다.</li>
+<li>4세대+15(9b0dc31, 2026-09-04)의 batch 통일 이후 이 keyed-result 경로는 죽은 코드였다.</li>
 <li>새 헬퍼는 <code>record_author_labels(mapped, unmapped)</code>다.</li>
 </ul>
 </li>
@@ -700,7 +700,7 @@ struct UthAccountLabelAggregate {
 <li>4세대+4(2026-08-19, <code>dark_traffic_setup.rs</code>)의 shadow deployment 미러링</li>
 <li>4세대+7(2026-08-24, <code>reference_compare.rs</code>)의 verdict 대조 canary</li>
 <li>4세대+13(2026-09-01, 7ba7768)의 rules 재구조화</li>
-<li>4세대+15(2026-09-04, 902a06f)의 hydration 800줄 순 감소 단순화</li>
+<li>4세대+15(2026-09-04, 9b0dc31)의 hydration 800줄 순 감소 단순화</li>
 </ul>
 <p class="warn">⚠ 갱신할 주장은 없다. 이번 diff가 뒤집는 이전 정본 진술은 없고, VF가 fail-closed라는 canon(이 저장소의 정본 문서) 주의 목록 #1은 여전히 유효하다. hydration 실패로 판정하지 못한 tweet은 여전히 건너뛰며, author fallback은 건너뛰던 것을 부분 판정으로 바꿀 뿐이다.</p>
 <h2 id="레이더">레이더</h2>

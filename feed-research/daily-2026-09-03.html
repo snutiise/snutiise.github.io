@@ -62,7 +62,7 @@
 <ul>
 <li>4세대 공개에는 세 가지가 들어 있었다.<ul>
 <li>안전 파이프라인의 4단계 labeling path(Content Understanding → Labeling Rules → Storage → Visibility Filtering)</li>
-<li>VF의 세 SafetyLevel(<code>FilterAll</code>·<code>TimelineHome</code>·<code>TimelineHomeRecommendations</code>)에 걸린 총 54개 규칙. VF(visibility-filtering)는 포스트마다 &#39;이 뷰어에게 보여도 되는가&#39;를 판정하는 서비스다.</li>
+<li>VF의 세 SafetyLevel에 나뉘어 걸린 규칙. 추천 포스트용 <code>TimelineHomeRecommendations</code>에 54개(팔로잉용 <code>TimelineHome</code>의 28개 포함), <code>FilterAll</code>에 1개다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7ba7768/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>registry.rs</code></a> 테스트. VF(visibility-filtering)는 포스트마다 &#39;이 뷰어에게 보여도 되는가&#39;를 판정하는 서비스다.</li>
 <li>Phoenix 랭킹 모델의 학습 코드와 프로덕션 크론 미러 param. 크론 미러는 프로덕션 설정 값을 매일 동기화해 옮겨 오는 파일이다.</li>
 </ul>
 </li>
@@ -169,7 +169,7 @@ pub(super) enum RuleSpec {
 </ul>
 <div class="blk why"><p><span class="lbl">의미</span></p></div>
 <ul>
-<li>이번 커밋의 핵심 신호는 정책이 바뀌지 않았다는 사실을 코드로 어설션했다는 점이다. 4세대+11(2026-08-28)이 90건 골든 코퍼스로 규칙 판정을 고정한 지 사흘 만에, 표현 자체를 재구조화한 커밋이 나왔다. X는 VF 재작성 이후 회귀 방어 자산을 먼저 쌓고, 그 위에서 리팩터를 진행하는 순서를 굳혔다.</li>
+<li>이번 커밋의 핵심 신호는 정책이 바뀌지 않았다는 사실을 코드로 어설션했다는 점이다. 4세대+11(2026-08-28)이 90건 골든 코퍼스로 규칙 판정을 고정한 지 나흘 만에, 표현 자체를 재구조화한 커밋이 나왔다. X는 VF 재작성 이후 회귀 방어 자산을 먼저 쌓고, 그 위에서 리팩터를 진행하는 순서를 굳혔다.</li>
 <li>규칙 목록을 파악하고 감사하기가 크게 쉬워진다. 예전에는 &quot;이 저장소에 어떤 NSFW/드랍 규칙이 있는가&quot;를 확인하려면 파일 9개를 훑어야 했다. 이제는 <code>tweet_rules.rs</code> 하나만 열면 상수 그룹별로 모든 규칙이 한눈에 보인다. 규제 대응이나 투명성 리포트(Under the Hood)에서 원문을 인용하기에도 이 형태가 알맞다.</li>
 <li>추천(recs) 전용 규칙 축이 코드에 명시됐다. <code>RECS_MEDIA_DROPS</code>(DMCA/geo)가 별도 상수로 나왔다. 이는 앞으로 추가될 recs 전용 규칙이 홈 base와 섞이지 않고 이 상수에만 붙는다는 뜻이다.</li>
 </ul>
@@ -365,7 +365,7 @@ encryption_chunk_size_bytes: int = 8 * 1024 * 1024
 </li>
 <li><p>같은 커밋은 행동 이름 enum에 번호 구간 하나를 한꺼번에 예약했다. 광고 conversion 액션이 앞으로 더 확장될 자리를 확보한 것이다 <span class="badge est">추정</span>.</p>
 <ul>
-<li><code>DiscreteActionName</code> enum에 <code>reserved 214 to 252</code>(40자리)가 예약됐다.</li>
+<li><code>DiscreteActionName</code> enum에 <code>reserved 214 to 252</code>(39자리)가 예약됐다.</li>
 </ul>
 </li>
 </ul>
@@ -420,7 +420,7 @@ encryption_chunk_size_bytes: int = 8 * 1024 * 1024
 <li>DPA 광고 제품 SID가 서빙 payload에 실린다는 사실</li>
 </ul>
 </li>
-<li>VF 리팩터는 4세대+11(2026-08-28)의 골든 코퍼스 뒤에 오는 자연스러운 다음 단계다. X는 안전망을 걷어내면서(4세대+7 <code>reference_compare</code>, 4세대+9 media fallback cache 제거) 대신 회귀 방어 자산을 안으로 쌓고, 그 위에서 표현을 얇게 하는 순서를 굳혔다. 이 순서는 이번 사이클의 다른 커밋(dark_traffic, reference_compare, golden corpus, 이번 rules 재구조화)에서도 일관된다.</li>
+<li>VF 리팩터는 4세대+11(2026-08-28)의 골든 코퍼스 뒤에 오는 자연스러운 다음 단계다. X는 안전망을 걷어내면서 대신 회귀 방어 자산을 안으로 쌓고, 그 위에서 표현을 얇게 하는 순서를 굳혔다. 걷어낸 것은 4세대+9의 media fallback cache다. 쌓은 자산에는 4세대+7(<a href="https://github.com/xai-org/x-algorithm/commit/d011592" target="_blank" rel="noopener"><code>d011592</code></a>)에서 812줄로 새로 생긴 비교 하니스 <code>reference_compare.rs</code>가 있다. 이 순서는 이번 사이클의 다른 커밋(dark_traffic, reference_compare, golden corpus, 이번 rules 재구조화)에서도 일관된다.</li>
 <li>SID, StableHLO, 암호화 세 기능이 한 커밋에 몰린 것은 우연이라기보다, 이 커밋이 특정 프로덕션 롤아웃을 위한 사전 연결일 가능성이 크다 <span class="badge est">추정</span>. 셋 모두 연결만 되고 꺼져 있으므로(wired-but-off), 다음 커밋에서 config 게이트가 켜지면 프로덕션이 어느 방향으로 움직이는지 관찰할 수 있다.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
@@ -429,7 +429,7 @@ encryption_chunk_size_bytes: int = 8 * 1024 * 1024
 <div class="blk ctx"><p><span class="lbl">배경</span> TGR은 Tencent Platform and Content Group(PCG) 산하에서 낸 4-in-1 프레임워크다. 랭킹, 생성 retrieval, 슬레이트 생성, reason token 주입의 네 컴포넌트를 한 프레임에 묶고, 뉴스 피드·짧은 영상·긴 영상·음악·웹소설 지면을 대상으로 한다. 이번 논문은 HSTU(Meta의 랭킹 모델 계보)와 OneRec를 한 프레임 안에서 각각 대체 대상으로 명시한 첫 자료다.</p></div>
 <ul>
 <li>저자 13인이 팀 서명(&quot;TGR Team, Lei Cheng, Haonan Hu, Beibei Kong, Yudong Li, Zang Li, Yunsheng Pang, Hongyang Su, Jianchao Tu, Yunlong Wang, Bing Wen, Junzhang Zhu, Shaojie Zhu, Chengxiang Zhuo&quot;) 형식으로 이름을 올렸다.</li>
-<li>대상 지면은 §1 &quot;Our setting&quot;에 &quot;news feeds, short videos, long videos, music, and web novels&quot;로 명시되어 있다. PCG 산하로 좁히면 Tencent News, 후난발 Weishi, Tencent Video, QQ음악, 阅文/QQ阅读 계열을 포괄한다. 다만 논문 본문은 다섯 지면을 Scenario 1~5로 익명화한다.</li>
+<li>대상 지면은 §1 &quot;Our setting&quot;에 &quot;news feeds, short videos, long videos, music, and web novels&quot;로 명시되어 있다. PCG 산하 제품에 대응시키면 Tencent News, Weishi, Tencent Video, QQ음악, 阅文/QQ阅读 계열일 것이다 <span class="badge est">추정</span>. 근거는 지면 종류뿐이고, 논문 본문은 다섯 지면을 Scenario 1~5로 익명화한다.</li>
 </ul>
 <p>이 프레임워크가 중요한 이유는 두 갈래다.</p>
 <ul>

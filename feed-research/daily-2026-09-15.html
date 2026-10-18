@@ -42,7 +42,7 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>화요일</li>
-<li><span class="meta-k">읽는 시간</span>29분</li>
+<li><span class="meta-k">읽는 시간</span>30분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>2</b>건</li><li class="chip">정본 반영 <b>0</b>개 파일</li><li class="chip">레이더 <b>2</b>건</li></ul>
@@ -235,7 +235,8 @@
 <ul>
 <li>Tencent AdLive에서 query 배치와 attention 방향을 바꿔 본 ablation에서는 interleaved-causal 조합이 GAUC(유저별로 계산한 AUC의 평균) 0.8034로 가장 높았다 <span class="badge ok">확인</span>.<ul>
 <li>나머지 조합은 end-causal 0.7890, interleaved-bidirectional 0.7930, end-bidirectional 0.7951이다.</li>
-<li>즉 query 배치는 interleaved가, attention 방향은 causal이 각각 유의미하게 우세하다.</li>
+<li>논문이 드는 비교는 조건부 두 개다. causal encoding에서는 interleaved 배치가 end 배치보다 GAUC가 0.0144 높고, interleaved 배치에서는 causal이 bidirectional보다 0.0104 높다.</li>
+<li>end 배치에서는 bidirectional(0.7951)이 causal(0.7890)보다 높고, 이 비교에 유의성 검정은 제시되지 않았다.</li>
 </ul>
 </li>
 <li>같은 Tencent AdLive에서 구성 요소를 하나씩 뺀 ablation에서는 Chronicle Alignment 단계를 뺄 때 GAUC가 가장 크게 떨어졌다 <span class="badge ok">확인</span>.<ul>
@@ -258,10 +259,10 @@
 <p>&quot;ChronicleRec increases GMV by +1.61%, with a 95% confidence interval of [0.678%, 2.547%] that excludes zero, i.e., a statistically significant improvement.&quot;
 — <a href="https://arxiv.org/html/2609.12375v1" target="_blank" rel="noopener">ChronicleRec</a>, 2026-09-11</p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot; 절에 항목을 추가했다. Tencent PCG는 canon 추적 서비스가 아니어서 services 정본은 만들지 않는다. radar에는 Tencent PCG의 다른 생성형 랭킹 진술로 <a href="radar.html">TGR</a>(<a href="https://arxiv.org/abs/2609.00986" target="_blank" rel="noopener">arXiv 2609.00986</a>, 2026-09-01 v1)이 이미 있다. TGR은 랭킹의 CCFormer, retrieval의 BARGE, slate의 HiGR, reason token의 TGR-Reason을 묶은 4-in-1이었다. ChronicleRec은 랭킹 모델 자체가 아니라 랭킹의 입력으로 들어가는 lifelong user 표현을 다루므로 자리가 다르다.</p></div>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot; 절에 항목을 추가했다. Tencent는 canon 추적 서비스가 아니어서 services 정본은 만들지 않는다. radar에는 Tencent의 다른 생성형 랭킹 진술로 Tencent PCG의 <a href="radar.html">TGR</a>(<a href="https://arxiv.org/abs/2609.00986" target="_blank" rel="noopener">arXiv 2609.00986</a>, 2026-09-01 v1)이 이미 있다. TGR은 랭킹의 CCFormer, retrieval의 BARGE, slate의 HiGR, reason token의 TGR-Reason을 묶은 4-in-1이었다. ChronicleRec은 랭킹 모델 자체가 아니라 랭킹의 입력으로 들어가는 lifelong user 표현을 다루므로 자리가 다르다.</p></div>
 <div class="blk why"><p><span class="lbl">의미</span> ChronicleRec은 lifelong sequence modeling의 세 진영에 새 위치를 잡는다.</p></div>
 <ol>
-<li><strong>target-independent 계열 안에서 order-aware compression을 프로덕션 A/B로 확증했다.</strong> 종래 target-independent 요약은 시퀀스 끝에 붙인 query(end-of-sequence query)와 bidirectional attention이 표준이었다. ChronicleRec은 이를 interleaved와 causal로 바꿔, 시간 순서와 위치 정보를 요약 벡터 안에 남긴다. Tencent AdLive에서 두 변경 축의 GAUC 이득은 각각 +0.01 안팎이고, 그 결과가 프로덕션 GMV +1.61%로 이어졌다.</li>
+<li><strong>target-independent 계열 안에서 order-aware compression을 프로덕션 A/B로 확증했다.</strong> 종래 target-independent 요약은 시퀀스 끝에 붙인 query(end-of-sequence query)와 bidirectional attention이 표준이었다. ChronicleRec은 이를 interleaved와 causal로 바꿔, 시간 순서와 위치 정보를 요약 벡터 안에 남긴다. Tencent AdLive에서 GAUC 이득은 causal 조건의 interleaved 배치가 +0.0144, interleaved 조건의 causal encoding이 +0.0104이고, 그 결과가 프로덕션 GMV +1.61%로 이어졌다.</li>
 <li><strong>ultra-long sequence를 캐시할 수 있다는 점이 온라인 비용 축소에 실제로 효과가 있다.</strong> Chronicle Token은 유저당 한 번만 계산해 캐싱할 수 있어서 후보 스코어링과 결합되지 않는다. Meta의 HSTU·Wukong 계보(스케일링 법칙을 보고한 Meta 추천 모델들)와 Netflix Foundation Model은 시퀀스 인코더 자체를 키운 접근이었다. 반면 ChronicleRec은 랭커 백본을 그대로 두고 lifelong 표현만 캐시로 넣는 각도여서 도입 비용이 낮다.</li>
 <li><strong>distant-history 신호의 독립성 실험 결과는 다른 회사 진술과 비교할 만한 데이터 포인트다.</strong> KuaiRand에서 최근 1,000 이벤트를 완전히 마스킹해도 GAUC가 recent-window baseline을 큰 폭으로 이겼다. 이 관찰은 X Phoenix(X For You의 랭킹 트랜스포머)가 recent action 4,096개를 attention window 상한으로 두는 설계와 대비되는 값이다. Netflix Foundation Model이 lifetime history를 인코딩하는 설계와도 대비된다. &quot;먼 과거만으로도 자립적인 predictive 신호가 있다&quot;는 진술을 통제 실험으로 확인한 사례는 흔치 않다.</li>
 </ol>
@@ -273,7 +274,7 @@
 <p>이번 배치에서 triage한 arXiv cs.IR 23건(신규 12건, cross 6건, replacement 5건) 가운데 두 건이 acceptance 기준을 통과했다.</p>
 <ul>
 <li><strong>PinDCO</strong>는 Pinterest 논문으로, RecSys 2026에 accepted됐고 프로덕션에 launched됐다.</li>
-<li><strong>ChronicleRec</strong>은 Tencent PCG Weixin Moments Ads의 7일 A/B를 보고했다.</li>
+<li><strong>ChronicleRec</strong>은 Tencent Weixin Moments Ads의 7일 A/B를 보고했다.</li>
 </ul>
 <p>두 건 모두 <a href="radar.html">radar.md</a>의 &quot;이번 달 신규&quot; 절에 항목을 추가했다.</p>
 <p>triage에서 언급할 만했지만 반영하지 않은 항목은 다음과 같다.</p>
@@ -306,7 +307,7 @@
 <h2 id="다음에-볼-것">다음에 볼 것</h2>
 <div class="next"><ul>
 <li><strong>PinDCO의 후속 진술</strong> — RecSys 2026 발표 슬라이드에 컴포넌트별 tower의 세부 하이퍼파라미터가 나오는지 본다. 이미지·타이틀·레이아웃 밖의 컴포넌트(예: description·CTA·landing)로 넓혔다는 진술이 있는지도 본다. Successful Session 밖의 유기 impression 영향을 whole-page metric으로 어떻게 측정했는지도 확인한다.</li>
-<li><strong>ChronicleRec의 후속 진술</strong> — Chronicle Token을 Weixin Moments Ads 밖의 Tencent PCG 지면(뉴스·비디오·음악·웹소설)에 이식했다는 진술이 나오는지 본다. TGR의 CCFormer 랭킹 스택과 결합했을 때 GMV에 어떤 조합 효과가 나는지도 본다.</li>
+<li><strong>ChronicleRec의 후속 진술</strong> — Chronicle Token을 Weixin Moments Ads 밖의 다른 Tencent 지면(뉴스·비디오·음악·웹소설 등)에 이식했다는 진술이 나오는지 본다. TGR의 CCFormer 랭킹 스택과 결합했을 때 GMV에 어떤 조합 효과가 나는지도 본다.</li>
 <li><strong>OneLA의 프로덕션 진술</strong> — Kuaishou 오퍼링(OneRec, PushDualGen) 안에서 OneLA가 실제 서빙에 붙었다는 진술이 나오는지 본다. 온라인 지연과 비용 절감의 실측치도 본다.</li>
 <li><strong>MIMA의 구체 uplift 수치</strong> — Alibaba의 어느 지면(Taobao·Tmall·Alimama)에서 어떤 목표를 얼마나 개선했는지가 v2 이후 공개되는지 본다.</li>
 </ul>

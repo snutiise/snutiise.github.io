@@ -186,8 +186,11 @@ pub struct PostCandidate {
 <ul>
 <li>초기화하는 곳은 candidate embedding 슬라이스와 search-query embedding 슬라이스다.</li>
 <li>이전에는 재사용 버퍼에 이전 배치의 값이 남아 있다가, <code>copy_len &lt; embedding_row.len()</code>인 경우(채운 길이가 슬롯 크기보다 작을 때) 잔여 바이트가 유출됐다.</li>
-<li><code>copy_len &gt; 0</code> 조건도 함께 걸었다. <code>copy_from_slice(&amp;src[..0])</code>이 panic을 던지는 엣지 케이스를 막는 방어다.</li>
-<li>4세대+13(2026-09-01)에서 emb_table gRPC 수신 파이프라인을 정리한 흐름의 후속으로, 배치 재사용 경계에서 생기던 잠재적 correctness 이슈를 막은 것이다.</li>
+<li><code>copy_len &gt; 0</code> 조건도 함께 걸어, 복사할 길이가 0이면 복사를 건너뛴다. 커밋은 이유를 적지 않았다.<ul>
+<li>양쪽을 같은 <code>copy_len</code>으로 자르므로 길이 0 복사도 panic하지 않는다 <span class="badge ok">확인</span> — <a href="https://doc.rust-lang.org/std/primitive.slice.html#method.copy_from_slice" target="_blank" rel="noopener">Rust <code>slice::copy_from_slice</code> 문서</a>. 이 함수는 두 슬라이스 길이가 다를 때만 panic한다.</li>
+</ul>
+</li>
+<li>4세대+11(2026-08-28, <a href="https://github.com/xai-org/x-algorithm/commit/bc8e5f0" target="_blank" rel="noopener">bc8e5f0</a>)에서 emb_table gRPC 수신 파이프라인을 정리한 흐름의 후속으로, 배치 재사용 경계에서 생기던 잠재적 correctness 이슈를 막은 것이다.</li>
 </ul>
 <blockquote>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">.par_chunks(chunk_size)
@@ -466,7 +469,7 @@ static TIMELINE_HOME_RECOMMENDATIONS_POLICY: Policy = Policy {
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
 <ul>
-<li>15개 rule slice 이름의 유일성을 검증하는 테스트가 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs</code></a>.<ul>
+<li>15개 slice에 걸린 규칙 이름 전체의 유일성을 검증하는 테스트가 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs</code></a>.<ul>
 <li><code>wired_rule_names_are_unique_and_nonempty</code>는 tweet 축 슬라이스 11개와 author 축 슬라이스 4개, 모두 15개 slice 안의 규칙 이름이 non-empty이고 중복이 없음을 보장한다.</li>
 <li>규칙 이름이 감사·메트릭·golden corpus에서 리터럴로 참조되기 때문에 이 어설션이 중요하다.</li>
 </ul>
@@ -635,12 +638,15 @@ kms_client = xai_kms.KmsClient.from_cluster_env(
 <li>이번 커밋은 write path의 검증(<code>domain</code>/<code>run</code> 강제와 <code>mint_nonce</code> 자동 삽입)과 read path의 두 포맷 지원을 완성한다. 그러나 <code>CheckpointConfig.encrypt = True</code>가 실제 트레이닝 config에서 기본값으로 켜졌는지는 이 diff에 없다. 이는 여전히 관전 포인트다.</li>
 <li>파일 포맷이 문서화됐다. 4096바이트 헤더, <code>XAIENC01</code> magic, wrapped_len/context_len 오프셋이 코드에 남았기 때문에, 미래의 외부 도구(체크포인트 뷰어, 감사 툴)가 이 포맷을 파싱할 수 있다.</li>
 <li><code>xai-dek1:</code> prefix는 키 파생 방식(key derivation scheme)을 나타낸다 <span class="badge est">추정</span>. &quot;derived master&quot;라는 표현은 salt로부터 파생된 마스터 키를 헤더에 담고, 감쌈은 wrapped 필드에 담는 KDF 기반 방식을 시사한다 <span class="badge est">추정</span>. 이는 legacy per-file wrapped key(각 파일마다 KMS-wrapped DEK를 별도 저장)와 대비된다 <span class="badge est">추정</span>. X.AI가 만든 자체 KDF 스펙(&quot;xai-dek1&quot;)의 세부는 코드에 없다. 아마 <code>xai_kms.nfs</code> 모듈에 있다 <span class="badge est">추정</span>.</li>
-<li>KMS-proxy KvStore를 걷어 낸 것은 성능 면에서 의미가 있다. 이전에는 매 IO(ocdbt operation 하나)가 KMS 호출을 필요로 했지만, 이제는 DEK를 한 번 unwrap한 뒤 로컬에서 대칭 복호화한다. checkpoint restore 지연이 tokens/s 규모로 떨어진다. Phoenix가 3만 개 파일로 구성된 체크포인트를 로드할 때 KMS 호출 3만 번이 1번으로 준다.</li>
+<li>KMS-proxy KvStore를 걷어 낸 것은 성능 면에서 의미가 있다. 이전에는 매 IO(ocdbt operation 하나)가 KMS 호출을 필요로 했지만, 이제는 DEK를 한 번 unwrap한 뒤 로컬에서 대칭 복호화한다. KMS 왕복이 IO마다에서 한 번으로 줄어드므로 checkpoint restore 지연도 줄 것이다 <span class="badge est">추정</span>.<ul>
+<li>한 번 unwrap하는 경로는 <code>adopt_tree_dek</code>가 맡는다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py" target="_blank" rel="noopener"><code>dek.py</code></a>.</li>
+</ul>
+</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="5-two-tower-학습의-기본-설정이-logit-상한-대신-qk-norm을-쓰게-됐다--x"><span class="num">5</span>two-tower 학습의 기본 설정이 logit 상한 대신 QK-norm을 쓰게 됐다 — X</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — 공개 소스코드, 2026-09-02. 이 노트들이 붙인 번호로는 4세대+14다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> two-tower는 유저와 아이템을 각각 다른 인코더(타워)로 임베딩해 그 유사도로 후보를 찾는 retrieval 모델 구조다. 4세대+5(2026-08-21, <a href="https://github.com/xai-org/x-algorithm/commit/d0cef2f" target="_blank" rel="noopener">d0cef2f</a>)에서 xrecsys_two_tower에 <code>qk_norm=True</code>·<code>attn_logit_cap=-1</code>·<code>right_anchored_rope=True</code> 세 옵션이 처음 도입됐다. 다만 그때는 옵션 정의만 추가됐고, 실제 조합 base config의 기본값은 <code>qk_norm=False</code>·<code>attn_logit_cap=80.0</code>이었다. 이번 커밋(4세대+14)은 그 기본값을 뒤집어, QK-norm을 실제로 조합 two-tower 학습의 기본으로 만들었다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> two-tower는 유저와 아이템을 각각 다른 인코더(타워)로 임베딩해 그 유사도로 후보를 찾는 retrieval 모델 구조다. 4세대+6(2026-08-21, <a href="https://github.com/xai-org/x-algorithm/commit/28e414f" target="_blank" rel="noopener">28e414f</a>)에서 two-tower의 nano config에 <code>qk_norm=True</code>·<code>attn_logit_cap=-1</code>·<code>right_anchored_rope=True</code> 세 옵션이 처음 도입됐다. 다만 그때 조합 base config의 기본값은 그대로 <code>qk_norm=False</code>·<code>attn_logit_cap=80.0</code>이었다. 이번 커밋(4세대+14)은 그 기본값을 뒤집어, QK-norm을 실제로 조합 two-tower 학습의 기본으로 만들었다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 조합 two-tower의 기본 config가 QK-norm을 켜고 attention logit 상한을 껐다</span></p></div>
 <ul>
 <li><p>조합 two-tower의 base config에서 attention 관련 기본값 두 개가 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a>.</p>
@@ -664,7 +670,7 @@ kms_client = xai_kms.KmsClient.from_cluster_env(
 </li>
 </ul>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 4세대+14 소절에 이 하이퍼파라미터 변경을 짧게 기록했다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> two-tower retrieval의 학습 안정화 방식이 logit clamp에서 QK-norm으로 옮겨졌다. 두 기법은 같지는 않지만 비슷한 목적(soft attention의 dynamic range 제어)에 쓰인다. 4세대+5(2026-08-21)의 옵션 도입에서 이번 4세대+14의 기본값 전환까지 12일이 걸린 것은, 아마 짧은 A/B에서 QK-norm 쪽이 학습 loss나 다운스트림 metric에서 우세를 보였기 때문일 것이다 <span class="badge est">추정</span>.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> two-tower retrieval의 학습 안정화 방식이 logit clamp에서 QK-norm으로 옮겨졌다. 두 기법은 같지는 않지만 비슷한 목적(soft attention의 dynamic range 제어)에 쓰인다. 4세대+6(2026-08-21, 28e414f)의 옵션 도입에서 이번 4세대+14의 기본값 전환까지 12일이 걸린 것은, 아마 짧은 A/B에서 QK-norm 쪽이 학습 loss나 다운스트림 metric에서 우세를 보였기 때문일 것이다 <span class="badge est">추정</span>.</p></div>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="6-신규-논문-30건-가운데-레이더-기준을-통과한-것은-0건이다--arxiv-csir"><span class="num">6</span>신규 논문 30건 가운데 레이더 기준을 통과한 것은 0건이다 — arXiv cs.IR</h2>
 <p>arXiv cs.IR 신규 30건(파싱 성공, 조회 정상) 가운데 radar 수용 기준을 통과한 것은 0건이다. 수용 기준은 플랫폼 기업 저자 또는 프로덕션 배포·A/B 진술, 피드/랭킹 메커니즘의 신규성, 대규모 스케일 결과다. 이날 Meta와 Netflix의 신규 자료는 없었다.</p>
@@ -680,7 +686,7 @@ kms_client = xai_kms.KmsClient.from_cluster_env(
 </li>
 <li><a href="https://arxiv.org/abs/2609.02..." target="_blank" rel="noopener">SPAR</a>는 Generative POI Recommendation 논문이다. POI에 한정된 연구라 원칙적으로 탈락했다(레이더 도메인 제한).</li>
 <li><a href="https://arxiv.org/abs/2609.01571" target="_blank" rel="noopener">GenCAR</a>도 탈락했다. OOD recommendation을 다룬 학술 실험이다.</li>
-<li>그 외 27건도 탈락했다. 확인한 사유는 세 갈래다.<ul>
+<li>나머지도 모두 탈락했다. 확인한 사유는 세 갈래다.<ul>
 <li>benchmark/RAG 방법론(플랫폼 프로덕션 진술 없음)</li>
 <li>도메인 제한(POI·법률·의료·과학)</li>
 <li>저자 소속이 학술 기관 위주</li>

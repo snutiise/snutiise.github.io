@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>추천 파이프라인 안의 LLM — feed-research</title>
-<meta name="description" content="2026-08-13까지 공개된 1차 자료만 놓고 보면, X는 LLM을 심판으로, Meta는 광고 피처 인코더와 Groups Search의 오프라인 심판으로, Netflix는 랭커 그 자체로 넣었다 [추정](프레이밍 검증). X는 콘텐츠 주석 파이프라인 Grox에서 LLM으로…">
+<meta name="description" content="2026-08-13까지 공개된 1차 자료만 놓고 보면, X는 LLM을 심판으로, Meta는 광고 피처 인코더와 Groups Search의 오프라인 심판, 헤비 유저 요청의 그래프 경로 추론기로, Netflix는 랭커 그 자체로 넣었다 [추정](프레이밍 검증). X는 콘텐츠 주석…">
 <link rel="canonical" href="https://snutiise.github.io/feed-research/llm-in-recsys.html">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="feed-research">
 <meta property="og:title" content="추천 파이프라인 안의 LLM — feed-research">
-<meta property="og:description" content="2026-08-13까지 공개된 1차 자료만 놓고 보면, X는 LLM을 심판으로, Meta는 광고 피처 인코더와 Groups Search의 오프라인 심판으로, Netflix는 랭커 그 자체로 넣었다 [추정](프레이밍 검증). X는 콘텐츠 주석 파이프라인 Grox에서 LLM으로…">
+<meta property="og:description" content="2026-08-13까지 공개된 1차 자료만 놓고 보면, X는 LLM을 심판으로, Meta는 광고 피처 인코더와 Groups Search의 오프라인 심판, 헤비 유저 요청의 그래프 경로 추론기로, Netflix는 랭커 그 자체로 넣었다 [추정](프레이밍 검증). X는 콘텐츠 주석…">
 <meta property="og:url" content="https://snutiise.github.io/feed-research/llm-in-recsys.html">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
@@ -41,11 +41,11 @@
 <h1 id="추천-파이프라인-안의-llm">추천 파이프라인 안의 LLM</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-08-13">2026-08-13</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">20</span></summary><ol><li><a href="#케이스-x의-grox-2026">케이스: X의 Grox (2026)</a><ol><li><a href="#무엇을-뽑는가--plan-9개">무엇을 뽑는가</a></li><li><a href="#slop-score--llm이-저품질-콘텐츠를-정수로-매긴다">slop score</a></li><li><a href="#안전-라벨은-fail-closed-답글-품질은-fail-open">안전 라벨은 fail-closed, 답글 품질은 fail-open</a></li><li><a href="#hallucination-가드">hallucination 가드</a></li><li><a href="#안전성-2단계-구조">안전성 2단계 구조</a></li></ol></li><li><a href="#이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</a></li><li><a href="#아직-확인-못한-것--유저-관심사-요약">아직 확인 못한 것</a></li><li><a href="#meta--두-가지가-섞여-있다-llm-표현실재과-llm-비유수사">Meta</a></li><li><a href="#주의할-점--llm-scale--랭커가-llm이다-b의-문제">주의할 점</a></li><li><a href="#자리-1--콘텐츠-주석-광고-엔티티에만-있다">자리 1</a></li><li><a href="#자리-3--llatte의-semantic-feature--a의-결정적-증거">자리 3</a></li><li><a href="#자리-5--meta가-블로그에서-llama를-이름으로-부르는-유일한-곳">자리 5</a></li><li><a href="#자리-6--제품은-있는데-모델을-안-밝힌다">자리 6</a></li><li><a href="#케이스-meta-connectionmind--자리-3llm을-랭커로의-meta-첫-프로덕션-ab-진술-2026-08">케이스: Meta ConnectionMind</a></li><li><a href="#케이스-netflix--자리-3llm을-랭커로의-첫-배포급-1차-진술">케이스: Netflix</a></li><li><a href="#프레이밍-검증--x는-제품-표면-meta는-업스트림이-맞는가">프레이밍 검증</a></li><li><a href="#meta-쪽-아직-확인-못한-것">Meta 쪽 아직 확인 못한 것</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
-<p>2026-08-13까지 공개된 1차 자료만 놓고 보면, X는 LLM을 심판으로, Meta는 광고 피처 인코더와 Groups Search의 오프라인 심판으로, Netflix는 랭커 그 자체로 넣었다 <span class="badge est">추정</span>(<a href="#%ED%94%84%EB%A0%88%EC%9D%B4%EB%B0%8D-%EA%B2%80%EC%A6%9D--x%EB%8A%94-%EC%A0%9C%ED%92%88-%ED%91%9C%EB%A9%B4-meta%EB%8A%94-%EC%97%85%EC%8A%A4%ED%8A%B8%EB%A6%BC%EC%9D%B4-%EB%A7%9E%EB%8A%94%EA%B0%80">프레이밍 검증</a>). X는 콘텐츠 주석 파이프라인 Grox에서 LLM으로 포스트에 품질·안전 라벨을 미리 달아 둔다 <span class="badge ok">확인</span>(<a href="#%EC%BC%80%EC%9D%B4%EC%8A%A4-x%EC%9D%98-grox-2026">Grox 케이스</a>). 그중 안전 라벨은 필터와 광고 인접성(포스트 옆에 광고를 붙여도 되는지) 판정으로 전달된다 <span class="badge ok">확인</span>(<a href="#%EC%9D%B4-%EC%BC%80%EC%9D%B4%EC%8A%A4%EC%97%90%EC%84%9C-%EC%9D%BC%EB%B0%98%ED%99%94%ED%95%A0-%EC%88%98-%EC%9E%88%EB%8A%94-%EA%B2%83">일반화 절</a>). Meta는 미공개 short-form video 지면에서 헤비 유저의 그래프 경로 추론기로도 LLM을 쓴다고 밝혔다 <span class="badge ok">확인</span>(<a href="#%EC%BC%80%EC%9D%B4%EC%8A%A4-meta-connectionmind--%EC%9E%90%EB%A6%AC-3llm%EC%9D%84-%EB%9E%AD%EC%BB%A4%EB%A1%9C%EC%9D%98-meta-%EC%B2%AB-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-ab-%EC%A7%84%EC%88%A0-2026-08">ConnectionMind 케이스</a>). Netflix의 공개된 실험은 추천을 미리 일괄 계산해 두는 지면(배치 연산 지면)에 한정된다 <span class="badge ok">확인</span>(<a href="#%EC%BC%80%EC%9D%B4%EC%8A%A4-netflix--%EC%9E%90%EB%A6%AC-3llm%EC%9D%84-%EB%9E%AD%EC%BB%A4%EB%A1%9C%EC%9D%98-%EC%B2%AB-%EB%B0%B0%ED%8F%AC%EA%B8%89-1%EC%B0%A8-%EC%A7%84%EC%88%A0">Netflix 케이스</a>).</p>
+<p>2026-08-13까지 공개된 1차 자료만 놓고 보면, X는 LLM을 심판으로, Meta는 광고 피처 인코더와 Groups Search의 오프라인 심판, 헤비 유저 요청의 그래프 경로 추론기로, Netflix는 랭커 그 자체로 넣었다 <span class="badge est">추정</span>(<a href="#%ED%94%84%EB%A0%88%EC%9D%B4%EB%B0%8D-%EA%B2%80%EC%A6%9D--x%EB%8A%94-%EC%A0%9C%ED%92%88-%ED%91%9C%EB%A9%B4-meta%EB%8A%94-%EC%97%85%EC%8A%A4%ED%8A%B8%EB%A6%BC%EC%9D%B4-%EB%A7%9E%EB%8A%94%EA%B0%80">프레이밍 검증</a>). X는 콘텐츠 주석 파이프라인 Grox에서 LLM으로 포스트에 품질·안전 라벨을 미리 달아 둔다 <span class="badge ok">확인</span>(<a href="#%EC%BC%80%EC%9D%B4%EC%8A%A4-x%EC%9D%98-grox-2026">Grox 케이스</a>). 그중 안전 라벨은 필터와 광고 인접성(포스트 옆에 광고를 붙여도 되는지) 판정으로 전달된다 <span class="badge ok">확인</span>(<a href="#%EC%9D%B4-%EC%BC%80%EC%9D%B4%EC%8A%A4%EC%97%90%EC%84%9C-%EC%9D%BC%EB%B0%98%ED%99%94%ED%95%A0-%EC%88%98-%EC%9E%88%EB%8A%94-%EA%B2%83">일반화 절</a>). Meta는 미공개 short-form video 지면에서 헤비 유저의 그래프 경로 추론기로도 LLM을 쓴다고 밝혔다 <span class="badge ok">확인</span>(<a href="#%EC%BC%80%EC%9D%B4%EC%8A%A4-meta-connectionmind--%EC%9E%90%EB%A6%AC-3llm%EC%9D%84-%EB%9E%AD%EC%BB%A4%EB%A1%9C%EC%9D%98-meta-%EC%B2%AB-%ED%94%84%EB%A1%9C%EB%8D%95%EC%85%98-ab-%EC%A7%84%EC%88%A0-2026-08">ConnectionMind 케이스</a>). Netflix의 공개된 실험은 추천을 미리 일괄 계산해 두는 지면(배치 연산 지면)에 한정된다 <span class="badge ok">확인</span>(<a href="#%EC%BC%80%EC%9D%B4%EC%8A%A4-netflix--%EC%9E%90%EB%A6%AC-3llm%EC%9D%84-%EB%9E%AD%EC%BB%A4%EB%A1%9C%EC%9D%98-%EC%B2%AB-%EB%B0%B0%ED%8F%AC%EA%B8%89-1%EC%B0%A8-%EC%A7%84%EC%88%A0">Netflix 케이스</a>).</p>
 <p>LLM과 VLM(이미지까지 함께 다루는 언어 모델)이 추천 시스템에 들어가는 자리는 여섯 군데다. 섞어서 말하면 혼동되니 자리별로 나누어 본다.</p>
 <ol>
 <li><strong>콘텐츠 주석 (nearline)</strong>: 아이템 하나를 LLM에 입력해 품질/토픽/안전 라벨을 뽑아 KV 스토어에 적어 둔다. 서빙 때는 조회만 한다.</li>
@@ -114,7 +114,7 @@
 <p>Grox는 X가 LLM으로 포스트에 라벨을 다는 nearline 콘텐츠 주석 파이프라인이다. 코드는 <code>grox/</code>에 있고, Kafka 기반이며, 요청 경로에는 들어가지 않는다. <span class="badge ok">확인</span> xai-org/x-algorithm, 2026 — <code>grox/main.py</code>, <code>grox/data_loaders/kafka_loader.py</code></p>
 <p>Grox는 프로세스 3개로 돌아간다. <code>grox-engine</code>, <code>grox-dispatcher</code>, gRPC 서버가 <code>multiprocessing.Manager</code> 큐로 통신한다. <span class="badge ok">확인</span> — <code>grox/main.py</code>, <code>grox/schedules/context.py:19-28</code></p>
 <h3 id="무엇을-뽑는가--plan-9개">무엇을 뽑는가 — plan 9개</h3>
-<p>Grox의 plan은 9개이고, 그중 4개는 멀티모달 포스트 임베딩을 만든다. <span class="badge ok">확인</span> — <code>grox/plans/plan_master.py</code> 및 각 plan 파일</p>
+<p>3세대(<code>0bfc279</code>) 기준 Grox의 plan은 9개이고, 그중 4개는 멀티모달 포스트 임베딩을 만든다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/0bfc279/grox/plans" target="_blank" rel="noopener"><code>grox/plans/</code></a>의 <code>plan_master.py</code> 및 각 plan 파일. HEAD(<code>862a123</code>, 2026-10-17)에는 <code>@register</code>로 등록된 plan이 21개이고, plan 파일은 <code>grox/flows/</code> 아래로 옮겨졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/862a123/grox/flows" target="_blank" rel="noopener"><code>grox/flows/</code></a>.</p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="표"><table>
 <thead>
 <tr>
@@ -158,7 +158,10 @@
 <h3 id="안전-라벨은-fail-closed-답글-품질은-fail-open">안전 라벨은 fail-closed, 답글 품질은 fail-open</h3>
 <p>같은 서비스 안에서 처리 방식이 정반대다. LLM 결과가 없을 때 안전 라벨은 막는 쪽으로, 답글 품질은 통과시키는 쪽으로 처리한다 <span class="badge ok">확인</span>. 설계 의도가 뚜렷하다.</p>
 <ul>
-<li><strong>브랜드 안전성</strong>: Grok(xAI의 LLM)이 채점하지 않은 포스트는 그냥 <code>MediumRisk</code>로 분류된다. 광고를 붙이지 않는다는 뜻이다. <span class="badge ok">확인</span> — <code>home-mixer/models/brand_safety.rs:47-51</code></li>
+<li><strong>브랜드 안전성</strong>: Grok(xAI의 LLM)이 채점하지 않은 포스트는 그냥 <code>MediumRisk</code>로 분류된다. 3세대(<code>0bfc279</code>)에서는 그 옆에 광고를 붙이지 않는다는 뜻이었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/models/brand_safety.rs" target="_blank" rel="noopener"><code>home-mixer/models/brand_safety.rs:47-51</code></a><ul>
+<li>2026-09-01 커밋(4세대+13)부터 기본 광고 블렌더는 multi-risk이고, MediumRisk 포스트 사이에도 BSR-high 광고를 놓는다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7ba7768/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs</code></a>, <a href="x.html#%EA%B4%91%EA%B3%A0">x.md 광고 절</a>.</li>
+</ul>
+</li>
 <li><strong>답글 랭킹</strong>: 결과가 없으면 점수가 <strong>최댓값 3.0</strong>으로 기본값 처리된다. <span class="badge ok">확인</span> — <code>grox/tasks/task_pub.py:451</code></li>
 </ul>
 <p>특정 snowflake ID 이후의 포스트는 <code>PTOS_REVIEWED</code> 라벨이 없으면 무조건 MediumRisk다. 기준 ID는 <code>2_054_275_414_225_846_272</code>이고, snowflake ID에는 생성 시각이 들어 있다. 즉 <strong>어느 시점부터 LLM 안전 심사를 광고 인접성의 전제 조건으로 명시했다.</strong> <span class="badge ok">확인</span> — <code>home-mixer/models/brand_safety.rs:37,53</code></p>
@@ -177,8 +180,14 @@
 <li>9개 모두 <code>TTLCache(maxsize=10_000, ttl=60)</code>이다.</li>
 </ul>
 </li>
-<li><strong>LLM 출력은 랭커에 직접 들어가지 않고 필터와 광고 레이어로 전달된다.</strong> X에서 Grok 안전 라벨은 필터와 브랜드 안전성 판정으로 간다. 토픽은 유저 쪽 multi-hot 피처로 간다. 랭킹 트랜스포머(Phoenix)는 여전히 ID 임베딩만 입력으로 받는다. <span class="badge ok">확인</span> — <code>home-mixer/models/query.rs:78-79</code>, <code>phoenix/runners.py:130-144</code></li>
-<li><strong>멀티모달 임베딩은 만들었지만 홈 랭킹은 쓰지 않는다.</strong> <code>multimodal</code>은 <code>grox/</code> 밖에서 한 번도 나오지 않는다 <span class="badge ok">확인</span> — repo-wide grep.<ul>
+<li><strong>LLM 출력은 랭커에 직접 들어가지 않고 필터와 광고 레이어로 전달된다.</strong> X에서 Grok 안전 라벨은 필터와 브랜드 안전성 판정으로 간다. 토픽은 유저 쪽 multi-hot 피처로 간다. 3세대(<code>0bfc279</code>) 기준으로 랭킹 트랜스포머(Phoenix)는 ID 임베딩만 입력으로 받았다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/models/query.rs" target="_blank" rel="noopener"><code>home-mixer/models/query.rs:78-79</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/phoenix/runners.py" target="_blank" rel="noopener"><code>phoenix/runners.py:130-144</code></a><ul>
+<li>HEAD(<code>862a123</code>)의 Phoenix README는 랭킹 모델이 포스트의 멀티모달 임베딩에서 만든 semantic ID를 입력 피처로 받는다고 쓴다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/phoenix/README.md" target="_blank" rel="noopener"><code>phoenix/README.md:241-249, 411</code></a>.</li>
+<li>같은 README는 멀티모달 포스트 임베딩 자체의 입력은 등록된 모든 랭킹 config에서 꺼져 있다고 쓴다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/phoenix/README.md" target="_blank" rel="noopener"><code>phoenix/README.md:412, 424-426</code></a>.</li>
+</ul>
+</li>
+<li><strong>3세대(2026-05-15) 기준으로 멀티모달 임베딩은 만들었지만 홈 랭킹은 쓰지 않았다.</strong> 그때는 <code>multimodal</code>이 <code>grox/</code> 밖에서 한 번도 나오지 않았다 <span class="badge ok">확인</span> — repo-wide grep.<ul>
+<li>HEAD(<code>862a123</code>, 2026-10-17)에서는 <code>multimodal</code>이 <code>grox/</code> 밖 28개 파일에 나온다 <span class="badge ok">확인</span> — 2026-10-19 <code>git grep</code>.</li>
+<li>home-mixer는 <code>tweet_multimodal_embeddings</code> 데이터셋을 읽어 For You 영상 캐러셀의 중복 제거에 쓰고, 이 중복 제거는 기본 on이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/home-mixer/clients/post_v8_search_embedding_client.rs" target="_blank" rel="noopener"><code>post_v8_search_embedding_client.rs:14</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/862a123/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1107-1112</code></a>.</li>
 <li>임베딩을 내보내는 싱크의 이름(<code>StratoPostMultimodalEmbeddingMhSearchAi</code>)은 검색을 가리킨다 <span class="badge ok">확인</span> — <code>grox/tasks/task_write_mm_embedding_sink.py:47</code>.</li>
 <li>단 <code>RECSYS_EMBED_V4</code>라는 이름의 변종이 있으므로, 공개되지 않은 recsys 소비자가 내부에 있을 가능성은 높다 <span class="badge est">추정</span>.</li>
 </ul>
@@ -378,14 +387,17 @@
 </ul>
 </li>
 </ul>
-<p>X·Meta와 나란히 놓으면, X는 LLM을 <em>심판</em>(주석·안전)으로, Meta는 <em>피처 인코더</em>(ads)와 <em>오프라인 심판</em>으로, Netflix는 <strong>랭커 그 자체</strong>로 넣었다. 셋 중 Netflix만 서빙 경로의 채점 함수가 LLM이다. 단 공개된 실험은 배치 연산 지면에 한정된다.</p>
+<p>X·Meta와 나란히 놓으면, X는 LLM을 <em>심판</em>(주석·안전)으로, Meta는 <em>피처 인코더</em>(ads)와 <em>오프라인 심판</em>, 2026-08부터는 헤비 유저 요청의 <em>그래프 경로 추론기</em>로, Netflix는 <strong>랭커 그 자체</strong>로 넣었다. 셋 중 Netflix만 서빙 경로의 채점 함수가 LLM이다. 단 공개된 실험은 배치 연산 지면에 한정된다.</p>
 <p><span class="badge est">추정</span> 코퍼스 크기가 이 순서를 설명할 수 있다: 후보가 수천 개면 LLM 추론 비용이 감당되고, X·Meta처럼 수억 코퍼스에 ms 단위 예산이면 자리 1·2(오프라인)부터 들어가는 것이 자연스럽다. 상세는 <a href="netflix.html">netflix.md</a>에 있다.</p>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="프레이밍-검증--x는-제품-표면-meta는-업스트림이-맞는가">프레이밍 검증 — &quot;X는 제품 표면, Meta는 업스트림&quot;이 맞는가</h2>
 <p>이 노트를 시작할 때 세운 가설은 <strong>절반만 맞다.</strong> 여기서 정정해 둔다.</p>
 <ul>
 <li><strong>틀린 절반</strong>: X의 Grok은 유저에게 보이는 제품 표면이 아니다. Grox는 <strong>nearline 파이프라인</strong>이고, 유저는 slop score도 PTOS 판정도 보지 못한다. 오히려 <strong>유저 대면 자연어 표면을 가진 쪽은 Meta다</strong>(Dear Algo, Your Algorithm). 가설이 이 부분을 거꾸로 봤다.</li>
-<li><strong>맞는 절반</strong>: X의 LLM 출력은 <strong>서빙 경로에서 실제로 결정을 내린다</strong>. 필터를 통과시키고 광고 인접성을 게이팅한다(<code>brand_safety.rs</code>). Meta의 공개된 LLM 사용은 Groups Search의 <strong>오프라인 평가</strong>와 HIR의 <strong>오프라인 피처 인코딩</strong>이다. 서빙 경로 진입은 &quot;we plan to&quot;다.</li>
+<li><strong>맞는 절반</strong>: X의 LLM 출력은 <strong>서빙 경로에서 실제로 결정을 내린다</strong>. 필터를 통과시키고 광고 인접성을 게이팅한다(<code>brand_safety.rs</code>). 2026-08 ConnectionMind 전까지 Meta의 공개된 LLM 사용은 Groups Search의 <strong>오프라인 평가</strong>와 HIR의 <strong>오프라인 피처 인코딩</strong>이었고, 서빙 경로 진입은 &quot;we plan to&quot;였다.<ul>
+<li>ConnectionMind는 활동량 상위 5–10% 유저의 요청을 LLM으로 보낸다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2608.10187" target="_blank" rel="noopener">arXiv 2608.10187</a> §6.1.</li>
+</ul>
+</li>
 </ul>
 <p>정확한 문장은 이렇다 <span class="badge est">추정</span>. 등급은 중간이다. 공개 문헌 기준으로는 견고하지만, 미공개 시스템에 대해서는 아무 말도 하지 못한다. <strong>2026-08-13 갱신: ConnectionMind로 두 번째 문장이 뒤집혔다.</strong></p>
 <blockquote>

@@ -42,7 +42,7 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>금요일</li>
-<li><span class="meta-k">읽는 시간</span>35분</li>
+<li><span class="meta-k">읽는 시간</span>36분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
@@ -57,7 +57,7 @@
 <li>Douyin(ByteDance)의 GEAR 논문이 생성형 광고 retrieval을 Douyin Ads 프로덕션에 배포했다고 밝혔다.</li>
 </ul>
 <h2 id="1-액션-제한의-대상-액션과-안내-문구를-vf가-직접-정한다--x"><span class="num">1</span>액션 제한의 대상 액션과 안내 문구를 VF가 직접 정한다 — X</h2>
-<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/b79b947" target="_blank" rel="noopener">xai-org/x-algorithm@b79b947</a> — 공개 소스코드, 2026-10-01 02:13 UTC 커밋. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+33이다. 전체 변경량은 +2,490/−506, 47파일이다. 그중 신규 파일은 5개로, VF 신설 3개(703줄), abuse-enforcement 신설 1개(173줄), phoenix-rankall 신설 1개(84줄)다.</p></div>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/b79b947" target="_blank" rel="noopener">xai-org/x-algorithm@b79b947</a> — 공개 소스코드, 2026-10-01 02:13 UTC 커밋. 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+33이다. 전체 변경량은 +2,490/−506, 47파일이다. 그중 신규 파일은 4개로, VF 신설 3개(829줄, 그중 limited-actions 2개 703줄)와 abuse-enforcement 신설 1개(173줄)다. phoenix-rankall <code>config/mod.rs</code>는 +84줄 수정이다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> visibility-filtering(VF)은 포스트마다 이 뷰어에게 보여도 되는지를 판정하는 서비스다. X의 For You 타임라인은 랭킹을 거친 후보에 두 종류의 가시성 결정을 겹쳐 건다. 하나는 드롭과 tombstone을 내리는 Verdict 트리의 Withheld 축이고, 다른 하나는 Shown 상태에서 media interstitial이나 limited engagement를 추가로 거는 제약 축이다. 두 번째 축의 <code>LimitedEngagement</code>는 뷰어가 그 트윗에 reply·like·retweet 같은 액션을 할 수 없다는 뜻이다. 지금까지 코드가 담아 온 정보는 &quot;사유 하나&quot;였고, 액션 26종 가운데 무엇을 막을지와 UI에 뭐라고 표시할지는 하류인 home-mixer(For You 피드를 조립하는 서비스)나 클라이언트가 자체적으로 매핑하는 몫이었다. 이번 커밋은 그 매핑 전체를 VF 안으로 가져와 정책을 데이터(FeatureSwitches와 stringcenter bundle)로 선언하고, wire로 내보내는 payload 자체를 &quot;액션 × 로컬라이즈된 Prompt&quot; 리스트로 승격한다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 제한 사유마다 막을 액션과 안내 문구를 VF가 데이터로 정한다</span></p></div>
 <p>VF에 limited-actions policy 시스템이 새로 생겼고, 이를 이루는 새 파일 두 개가 703줄이다. 제한 사유는 ConversationControl, ReadonlyViewer, BlockedViewer, RootAuthorBlockedViewer, StaleTweet의 5개다. 코드에서는 이 다섯이 <code>LimitedEngagementReason</code>의 variant다.</p>
@@ -147,7 +147,7 @@ impl LimitedEngagement {
 <li><p>규칙 쪽도 이미 제한이 걸린 트윗에서 새 사유를 만나면 Vec에 덧붙인다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>rules/registry.rs</code></a>.</p>
 <ul>
 <li><code>collect_specs</code>가 <code>ActionSpec::LimitedEngagement(reason)</code>에 매치될 때 이미 engagement가 있으면 <code>limit.value.add(*reason)</code>로 Vec에 append 한다.</li>
-<li>즉 같은 트윗에 BlockedViewer와 ReadonlyViewer가 동시에 걸리면, 두 사유에 걸린 액션 집합의 교집합/합집합을 하류가 아니라 VF가 소지한다.</li>
+<li>즉 같은 트윗에 BlockedViewer와 ReadonlyViewer가 동시에 걸리면, 두 사유에 걸린 액션 집합의 합집합을 하류가 아니라 VF가 만든다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>treatment.rs</code></a>의 <code>limited_engagements</code>.</li>
 </ul>
 </li>
 </ul>
@@ -203,11 +203,11 @@ impl LimitedEngagement {
 </ul>
 </li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">F. phoenix-rankall의 설정이 별도 모듈로 분리되면서 SID 백필 수치가 드러났다</span></p></div>
-<p>phoenix-rankall은 SID 백필과 랭킹 점수를 다루는 Kafka 소비자다. 이전에는 kafka.rs 하나가 topic·그룹·bootstrap·SASL·SSL·wily·SID 설정을 전부 안고 있었다. 이번 커밋에서 그 책임이 신설 <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/config/mod.rs</code></a>로 넘어가면서, kafka.rs에는 <code>KafkaConsumerBuilder</code>를 호출하는 얇은 어댑터만 남는다. 설정 소스는 env var와 CLI 양쪽에서 명시적으로 선언된다(<code>xai-recsys-rankall</code> 바이너리 이름). SID 백필 상수도 눈에 띄는 수치로 드러난다. QPS 상한 800k, batch 5,000, 최소 포스트 나이 180초다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">F. phoenix-rankall의 Kafka 설정이 기존 설정 모듈로 옮겨졌고, 그 모듈의 SID 백필 수치를 확인했다</span></p></div>
+<p>phoenix-rankall은 SID 백필과 랭킹 점수를 다루는 Kafka 소비자다. 이전에는 kafka.rs 하나가 topic·그룹·bootstrap·SASL·SSL·wily·SID 설정을 전부 안고 있었다. 이번 커밋에서 그 책임이 4세대 공개 때부터 있던 <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/config/mod.rs</code></a>로 넘어가면서(+84줄), kafka.rs에는 <code>KafkaConsumerBuilder</code>를 호출하는 얇은 어댑터만 남는다. 설정 소스는 env var와 CLI 양쪽에서 명시적으로 선언된다(<code>xai-recsys-rankall</code> 바이너리 이름). 이 모듈에 이미 있던 SID 백필 상수도 눈에 띈다. QPS 상한 800k, batch 5,000, 최소 포스트 나이 180초다.</p>
 <ul>
-<li>설정을 읽는 CLI 모듈이 kafka.rs에서 분리돼 새 파일이 됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>config/mod.rs:1-98</code></a>.<ul>
-<li><p>phoenix-rankall <code>src/config/mod.rs</code>가 84줄로 새로 생겼다.</p>
+<li>kafka.rs가 들고 있던 Kafka 설정이 기존 CLI 모듈 <code>config/mod.rs</code>로 옮겨졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>config/mod.rs:1-98</code></a>.<ul>
+<li><p>phoenix-rankall <code>src/config/mod.rs</code>는 +84/−0 수정이다. 이 파일은 4세대 공개(47c1bcd) 때부터 있었고, <a href="daily-2026-08-16.html">2026-08-16 daily</a>도 이 파일을 인용한다.</p>
 </li>
 <li><p>바이너리 이름은 <code>xai-recsys-rankall</code>이고, 환경 변수로 값을 받는 CLI 인자가 20여 개다.</p>
 <blockquote>
@@ -284,7 +284,7 @@ pub struct Cli {
 <ul>
 <li>이전에는 rules가 engagement를 한 번만 결정하면, 그다음 ActionSpec::LimitedEngagement 매치는 drop(dead-code 경로)이었다.</li>
 <li>이번 커밋부터는 rules가 여러 번 engagement를 결정하면 <code>limit.value.add(*reason)</code>로 Vec에 축적된다.</li>
-<li>즉 BlockedViewer(19개 액션 제한)와 ReadonlyViewer(14개 액션 제한)가 겹친 뷰어 상황에서, 두 리스트를 모두 payload에 실어 하류가 선택하도록 결정권을 넘긴다.</li>
+<li>즉 BlockedViewer(19개 액션 제한)와 ReadonlyViewer(14개 액션 제한)가 겹치면, VF가 두 사유의 액션 목록을 액션 종류 기준 합집합으로 합쳐 첫 사유와 함께 payload에 싣는다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>treatment.rs:128-148</code></a>과 테스트 <code>a_limit_sends_its_first_reason_and_the_union_of_its_reasons_policies</code>.</li>
 <li>ConversationControl과 StaleTweet, RootAuthorBlockedViewer와 BlockedViewer 같은 조합도 가능해진다.</li>
 </ul>
 </li>
@@ -309,7 +309,7 @@ pub struct Cli {
 </ul>
 </li>
 </ol>
-<p>Brazil 선거법원 라벨을 VF에 등록한 변화는 로직 추가가 아니라 라벨 vocabulary 확장이다. Brazil 2026 election filter(홈믹서 측 handle 하드코딩)는 4세대+1에 신설됐다. 이번 등록은 VF가 Grok 라벨링 서비스에서 <code>brazil_election_legal</code> 라벨을 받으면 drop 경로로 처리한다는 뜻이다. 홈믹서 측 handle 리스트와 VF 측 라벨, 두 축이 함께 작동한다. 직전 커밋에서 Brazil handle 리스트가 2,795개로 늘어난 데 이어 VF 라벨 등록까지 붙으면서, 선거 기간에 두 경로가 공조한다는 선언이 코드로 명시된 셈이다.</p>
+<p>Brazil 선거법원 라벨을 VF에 등록한 변화는 로직 추가가 아니라 라벨 vocabulary 확장이다. Brazil 2026 election filter(홈믹서 측 handle 하드코딩)는 4세대+1에 신설됐다. 이번 등록은 VF가 라벨링 서비스에서 <code>brazil_election_legal</code> 라벨이 붙은 트윗을 받으면, 라벨 출처와 상관없이 drop 경로로 처리한다는 뜻이다. 규칙은 라벨 종류(<code>BRAZIL_ELECTION_LEGAL</code>)와 요청 국가(<code>br</code>)를 보고 작성자 본인은 예외로 둔다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>tweet_rules.rs:570-579</code></a>. 홈믹서 측 handle 리스트와 VF 측 라벨, 두 축이 함께 작동한다. 직전 커밋에서 Brazil handle 리스트가 2,795개로 늘어난 데 이어 VF 라벨 등록까지 붙으면서, 선거 기간에 두 경로가 공조한다는 선언이 코드로 명시된 셈이다.</p>
 <h2 id="2-생성형-광고-retrieval-gear가-douyin-ads-프로덕션에-배포됐다--radar"><span class="num">2</span>생성형 광고 retrieval GEAR가 Douyin Ads 프로덕션에 배포됐다 — radar</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://arxiv.org/abs/2609.39327" target="_blank" rel="noopener">arXiv 2609.39327</a> — arXiv, 2026-09-30 v1, 논문. 제목은 &quot;Generative End-to-end Ad Retrieval at Douyin&quot;이다. 저자 11인 전원이 Douyin(ByteDance) 소속이며, <a href="https://arxiv.org/html/2609.39327v1" target="_blank" rel="noopener">HTML 판</a>에서 소속을 확인했다.</p></div>
 <div class="blk ctx"><p><span class="lbl">배경</span> 생성형 retrieval은 아이템을 ID 임베딩이 아니라 의미 토큰(Semantic ID) 시퀀스로 표현하고, autoregressive 생성으로 검색을 대체하는 패러다임이다. 산업 규모에서는 두 가지 병목이 알려져 있다. 표현 붕괴(representation collapse)는 아이템 tokenizer가 지속적인 분포 변화 아래서 degenerate한 결과로 수렴해 end-to-end 적응이 불안정해지는 문제다. 아이템 충돌(item collision)은 후보 풀이 거대해지면 서로 다른 아이템이 같은 토큰 시퀀스를 공유하게 되어 retrieval 정밀도가 떨어지는 문제다. 두 문제는 서로 결합된다. 충돌을 완화하려고 codebook 용량을 키우면 붕괴가 심화된다. 이번 논문의 GEAR는 두 병목을 함께 다루는 생성형 광고 retrieval이고, Douyin Ads에서 서빙 중이라고 밝힌다.</p></div>
@@ -327,7 +327,7 @@ pub struct Cli {
 — <a href="https://arxiv.org/abs/2609.39327" target="_blank" rel="noopener">arXiv 2609.39327</a>, 2026-09-30</p>
 </blockquote>
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> &quot;이번 달 신규&quot;에 GEAR 포인터를 2~4줄로 추가했다. Douyin(ByteDance)이 추적 서비스 밖이라 서비스 정본에는 반영하지 않는다.</p></div>
-<div class="blk why"><p><span class="lbl">의미</span> GEAR는 Douyin Ads의 광고 지면에 SID 생성 retrieval을 안착시킨 첫 명시적 진술이다. SID 계열 선행인 Kuaishou HD-Rec/PushDualGen, Alibaba PailitaoGR, Spotify GLIDE, Tencent BARGE는 이미 SID 생성 retrieval을 다양한 modality와 지면에 배포한 상태다. 이번 달에 &quot;생성형 retrieval이 industrial-scale에 자리잡는 중&quot;이라는 각도로 나온 진술로는 네 번째이고, 지금까지의 흐름은 다음과 같다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> GEAR는 Douyin Ads의 광고 지면에 SID 생성 retrieval을 안착시킨 첫 명시적 진술이다. SID 계열 선행인 Kuaishou HD-Rec/PushDualGen, Spotify GLIDE, Tencent BARGE는 이미 SID 생성 retrieval을 다양한 modality와 지면에 배포한 상태다. Alibaba PailitaoGR은 Pailitao 온라인 검색 로그로 데이터를 만든 오프라인 실험만 보고했고, 배포나 A/B 진술은 없다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2608.26658" target="_blank" rel="noopener">arXiv 2608.26658</a>. 최근 한 달 사이에 &quot;생성형 retrieval이 industrial-scale에 자리잡는 중&quot;이라는 각도로 나온 진술로는 네 번째이고, 지금까지의 흐름은 다음과 같다.</p></div>
 <ul>
 <li>(a) Snap GRP v0.1(2026-09-29)은 retrieval · ranking · reward를 단일 encoder-decoder로 통합했고, 서빙 latency −69%, A/B view time +0.82%를 냈다.</li>
 <li>(b) Tencent PCG TGR(2026-09-01)은 랭킹·retrieval·slate 생성·reason token을 한 프레임에 묶어 5개 지면에 배포했다.</li>

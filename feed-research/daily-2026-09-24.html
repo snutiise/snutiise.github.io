@@ -180,7 +180,7 @@
 </li>
 <li>TES 하이드레이션 코드의 대량 삭제는 방향 전환의 반작용이다 <span class="badge ok">확인</span>.<ul>
 <li>삭제 규모는 tes_hydrator.rs -333, models/mod.rs -223이다.</li>
-<li>11필드는 어제(3aa0fa33) 정리된 Strato(X 사내 gRPC 프록시) 컬럼 <code>TweetForVisibility</code>로 이관됐다.</li>
+<li>11필드는 2026-09-18 커밋(4세대+25, <a href="https://github.com/xai-org/x-algorithm/commit/8b25829" target="_blank" rel="noopener">8b25829</a>)에서 Strato(코드가 데이터를 조회하거나 저장할 때 거치는 X 내부 시스템) 컬럼 <code>TweetForVisibility</code>로 이관된 것이다.</li>
 <li>그 뒤로 TES는 순수 <code>PureCoreData</code>(author_id·text·source_tweet_id)만 담당한다.</li>
 <li>오늘 커밋에서는 <code>PureCoreHydration</code> 래퍼 struct와 캐시-recovery 로직이 모두 제거됐다.</li>
 <li><code>fetch_pure_core() → fetch_author_ids()</code>로 이름이 바뀌면서 반환 타입이 <code>TweetHydrationBatch&lt;AuthorId&gt;</code>로 단순화됐다.</li>
@@ -200,7 +200,7 @@
 </li>
 <li>key frame 추출은 PTOS(grox의 정책 위반 판정 스택) 안전 파이프라인에 새 태스크로 결합된다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/1b3fec20/grox/flows/ptos/plan_safety_ptos_key_frames.py" target="_blank" rel="noopener"><code>grox/flows/ptos/plan_safety_ptos_key_frames.py</code></a>.<ul>
 <li>신규 파일(52줄)의 DAG는 <code>rate limit → key frames filter → media hydration → adult-only init → policy detection → safemodel sex/nudity → adult content cross-validation → result sink</code>다.</li>
-<li>필터(<a href="https://github.com/xai-org/x-algorithm/blob/1b3fec20/grox/flows/ptos/task_safety_ptos_key_frames_filter.py" target="_blank" rel="noopener"><code>task_safety_ptos_key_frames_filter.py</code></a>:26-83)를 통과하려면 비디오여야 하고 <code>HIGH_FAV_THRESHOLD=512</code> 이상이어야 한다. 그리고 기존 adult label이 있거나, fav가 <code>KEY_FRAMES_UNCONDITIONAL_FAV=512</code> 이상이어야 한다.</li>
+<li>필터(<a href="https://github.com/xai-org/x-algorithm/blob/1b3fec20/grox/flows/ptos/task_safety_ptos_key_frames_filter.py" target="_blank" rel="noopener"><code>task_safety_ptos_key_frames_filter.py</code></a>:26-83)를 통과하려면 비디오여야 하고 <code>HIGH_FAV_THRESHOLD=128</code> 이상이어야 한다. 그리고 기존 adult label이 있거나, fav가 <code>KEY_FRAMES_UNCONDITIONAL_FAV=512</code> 이상이어야 한다.</li>
 <li>rate limit(60초 TTL, 10,000 엔트리 dedupe)으로 중복 처리를 억제한다.</li>
 </ul>
 </li>
@@ -292,7 +292,7 @@
 </ul>
 </li>
 <li>grox key-frame 파이프라인에서 key frame 미디어 경로를 켜는 스위치의 기본값이 바뀌는 시점을 본다 — 지금은 기본 off이므로, 프로덕션에서 켜지는 시점과 fav-count 임계값 조정을 관측한다.<ul>
-<li>스위치는 <code>use_key_frames</code> FS이고, 지금 값은 <code>False</code>다.</li>
+<li>스위치는 <code>use_key_frames</code> config 필드이고, 지금 값은 <code>False</code>다.</li>
 </ul>
 </li>
 </ul></div>

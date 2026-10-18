@@ -53,12 +53,12 @@
 <p>오늘 함께 본 다른 변화는 다음과 같다.</p>
 <ul>
 <li>같은 커밋에서 click-dwell 랭킹 항이 저조 fav 페널티 대신 dwell과 click의 곱으로 재정의됐다(게이트 기본값은 꺼짐).</li>
-<li>4일 전에 생긴 LLM-judge 검색 관련성 액션 두 개가 되돌려졌고, 광고 delayed conversion attribution은 3-tier로 넓어졌다.</li>
+<li>5일 전에 생긴 LLM-judge 검색 관련성 액션 두 개가 되돌려졌고, 광고 delayed conversion attribution은 3-tier로 넓어졌다.</li>
 <li>Meta의 LIGE-GR 논문을 레이더에 심층 분석 필요 항목으로 추가했다.</li>
 </ul>
 <h2 id="1-인기-포스트를-뷰어마다-일부-걷어내는-홀드아웃-필터가-생겼다--x"><span class="num">1</span>인기 포스트를 뷰어마다 일부 걷어내는 홀드아웃 필터가 생겼다 — X</h2>
 <div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/42266f3" target="_blank" rel="noopener">xai-org/x-algorithm@42266f3</a> — 소스코드, 2026-09-17 05:09Z, GitHub 커밋. 64개 파일이 바뀌었다(+2288/−3627). 이 노트들은 4세대 공개 뒤의 X 커밋에 차례로 번호를 붙여 부르며, 이 커밋은 4세대+23이다.</p></div>
-<div class="blk ctx"><p><span class="lbl">배경</span> 파일 수 64개는 4세대+22(파일 26개) 대비 두 배가 넘고, 삭제 3627줄이 추가 2288줄을 크게 웃돈다. VF(visibility-filtering)는 포스트마다 이 뷰어에게 보여도 되는지 판정하는 서비스다. 큰 삭제분은 대부분 이 VF 서브레포의 자체 twemcache 클라이언트 폴더(2900줄 남짓)가 전부 사라진 데서 나왔다. 이번 커밋은 홈믹서(For You와 Following 피드 요청을 받는 서비스)의 랭킹·필터 스택에 세 가지 방향의 변경을 함께 넣었다.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 파일 수 64개는 4세대+22(파일 26개) 대비 두 배가 넘고, 삭제 3627줄이 추가 2288줄을 크게 웃돈다. VF(visibility-filtering)는 포스트마다 이 뷰어에게 보여도 되는지 판정하는 서비스다. 큰 삭제분은 대부분 이 VF 서브레포의 자체 twemcache 클라이언트 폴더(3,234줄)가 전부 사라진 데서 나왔다. 이번 커밋은 홈믹서(For You와 Following 피드 요청을 받는 서비스)의 랭킹·필터 스택에 세 가지 방향의 변경을 함께 넣었다.</p></div>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 인기 포스트를 뷰어마다 일정 비율 걷어내는 필터가 파이프라인 마지막에 생겼다</span></p></div>
 <p>홈믹서 파이프라인 마지막에 완전히 새로운 필터가 연결됐다. 후보를 떨어뜨리는 이 필터의 이름은 <code>FavHoldoutFilter</code>다. 이 필터는 <code>fav_count</code>(포스트의 favorite 누적 수)를 계단식으로 홀드아웃 확률에 매핑한다. 유저·포스트 결정론적 해싱을 통해 인기 있는 포스트를 뷰어별로 일정 비율만 걷어낸다.</p>
 <ul>
@@ -108,12 +108,12 @@ pub(crate) fn holdout_percent(fav_count: Option&lt;i64&gt;) -&gt; u32 {
 </li>
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. click-dwell 랭킹 항이 저조 fav 페널티 대신 dwell과 클릭 확률의 곱을 쓸 수 있게 됐다</span></p></div>
-<p>랭킹 스코어링에서 dwell 예측을 fav 비율로 조정하던 항이 삭제되고, 그 자리에 훨씬 단순한 게이트가 들어섰다. 삭제된 것은 이전에 도입됐던 <code>EnableClickDwellLowFavRatePenalty</code> 로직이다. 이 로직은 4개 튜닝 파라미터를 곱해 <code>(fav/baseline)^alpha</code>로 dwell 예측을 조정하던 항이었다. 새 게이트 <code>EnableCdwellOnImpr</code>가 켜지면 click_dwell_time 예측을 click 확률로 곱한다(<code>dwell × click</code>). 즉 &quot;클릭했을 때의 dwell 초&quot;를 &quot;임프레션 당 기대 dwell 초&quot;로 재정의한다.</p>
+<p>랭킹 스코어링에서 dwell 예측을 fav 비율로 조정하던 항이 삭제되고, 그 자리에 훨씬 단순한 게이트가 들어섰다. 삭제된 것은 이전에 도입됐던 <code>EnableClickDwellLowFavRatePenalty</code> 로직이다. 이 로직은 4개 튜닝 파라미터를 곱해 <code>(fav/baseline)^alpha</code>로 dwell 예측을 조정하던 항이었다. 새 게이트 <code>EnableCdwellOnImpr</code>가 켜지면 click_dwell_time 예측을 click 확률로 곱한다(<code>dwell × click</code>). click_dwell 헤드는 2026-09-16 커밋(4세대+22)부터 이진 분류 확률이므로, 이 곱은 초가 아니라 임프레션 기준의 확률이다.</p>
 <ul>
 <li>랭킹 스코어에서 <code>EnableClickDwellLowFavRatePenalty</code> 계열이 전부 삭제되고 <code>EnableCdwellOnImpr</code>로 대체됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a>(+10/−32).<ul>
 <li><p>param 쪽 변경은 <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>에 있다.</p>
 </li>
-<li><p><code>ScoringWeights</code>가 들고 있던 5개 필드(<code>enable_click_dwell_low_fav_rate_penalty</code>와 baseline/alpha/floor/cap)와 대응 param 5개가 삭제됐다. 이 필드들은 이전에 4세대+13, 7ba7768로 도입된 것으로 추정된다.</p>
+<li><p><code>ScoringWeights</code>가 들고 있던 5개 필드(<code>enable_click_dwell_low_fav_rate_penalty</code>와 baseline/alpha/floor/cap)와 대응 param 5개가 삭제됐다. 이 param들은 4세대 공개(2026-08-13) 때부터 있던 것이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>param.rs:388-412</code></a>.</p>
 </li>
 <li><p>그 자리에 <code>enable_cdwell_on_impr: bool</code> 하나가 들어왔다.</p>
 </li>
@@ -140,7 +140,7 @@ pub(crate) fn holdout_percent(fav_count: Option&lt;i64&gt;) -&gt; u32 {
 </li>
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">D. 신규 저자 부스트에서 Treatment 팔의 MoE 조건이 빠지고, 포스트 나이 상한은 24시간에서 48시간으로 늘었다</span></p></div>
-<p>author cold-start scorer(신규 저자 포스트에 부스트를 거는 스코어러)의 Treatment 팔이 4세대 초기부터 유지해 오던 두 가지 게이트가 함께 완화됐다. Treatment 팔이 요구하던 <code>is_phoenix_moe(candidate)</code> 조건이 제거돼, 이제 Treatment 코퍼스 후보라면 MoE(mixture of experts, 입력마다 일부 전문가 네트워크만 쓰는 구조) 라벨과 무관하게 cold-start 대상이 된다. 또 <code>ColdStartMaxPostAgeSecs</code>가 86400(24시간) → 172800(48시간)으로 두 배가 됐다. Treatment 팔에만 걸리던 이 age 상한은 이제 모든 팔에 적용된다. 회귀 테스트는 3개가 제거되고 하나의 이름이 통합됐다. 테스트 이름도 바뀌었다. <code>treatment_viewer_cold_starts_treatment_moe_only</code>는 <code>treatment_viewer_cold_starts_treatment_authors_only</code>로, <code>treatment_skips_post_older_than_max_post_age</code>는 <code>skips_post_older_than_max_post_age</code>로 바뀌었다.</p>
+<p>author cold-start scorer(신규 저자 포스트에 부스트를 거는 스코어러)의 Treatment 팔에 걸려 있던 두 가지 게이트가 함께 완화됐다. MoE 조건은 2026-09-04 커밋(4세대+16)부터, age 상한은 4세대부터 있던 것이다. Treatment 팔이 요구하던 <code>is_phoenix_moe(candidate)</code> 조건이 제거돼, 이제 Treatment 코퍼스 후보라면 MoE(mixture of experts, 입력마다 일부 전문가 네트워크만 쓰는 구조) 라벨과 무관하게 cold-start 대상이 된다. 또 <code>ColdStartMaxPostAgeSecs</code>가 86400(24시간) → 172800(48시간)으로 두 배가 됐다. Treatment 팔에만 걸리던 이 age 상한은 이제 모든 팔에 적용된다. 회귀 테스트는 3개가 제거되고 하나의 이름이 통합됐다. 테스트 이름도 바뀌었다. <code>treatment_viewer_cold_starts_treatment_moe_only</code>는 <code>treatment_viewer_cold_starts_treatment_authors_only</code>로, <code>treatment_skips_post_older_than_max_post_age</code>는 <code>skips_post_older_than_max_post_age</code>로 바뀌었다.</p>
 <ul>
 <li>Author cold-start scorer의 Treatment 팔에서 두 게이트가 함께 완화됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a>(+7/−50).<ul>
 <li>이전에는 <code>ViewerArm::Treatment</code> 자격이 <code>corpus == Treatment &amp;&amp; is_phoenix_moe(c)</code>였다. 이번에 <code>is_phoenix_moe(c)</code> 조건이 제거돼 <code>corpus == Treatment</code>만 확인한다.</li>
@@ -154,15 +154,15 @@ pub(crate) fn holdout_percent(fav_count: Option&lt;i64&gt;) -&gt; u32 {
 </ul>
 </li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">E. 4일 전에 생긴 LLM-judge 검색 관련성 라벨 두 개가 되돌려지고, 그 자리에 라이브 스트림 답글 신호로 추정되는 액션과 예약 자리가 들어왔다</span></p></div>
-<p>Phoenix(후보마다 참여 확률을 예측하는 X의 랭킹 트랜스포머)의 서빙 프로토 recsys.proto에서는 두 가지 변경이 있다. 하나는 4세대+20(6bb4594, 2026-09-12)에서 신설됐던 검색 관련성 라벨 두 개가 4일 만에 되돌려진 것이다. 두 라벨(<code>LLM_JUDGE_*</code>)은 <code>LLM_JUDGE_RELEVANT_TO_SEARCH=107</code>과 <code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH=108</code>이다. 그 자리는 <code>CLIENT_TWEET_LIVE_STREAM_REPLY=107</code>과 <code>RESERVED_108</code>로 대체됐다. <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code>는 라이브 스트림 답글 신호로 추정되고, <code>RESERVED_108</code>은 예약 자리다. 다른 하나는 광고 delayed conversion attribution의 3-tier 확장이다.</p>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">E. 5일 전에 생긴 LLM-judge 검색 관련성 라벨 두 개가 되돌려지고, 그 자리에 라이브 스트림 답글 신호로 추정되는 액션과 예약 자리가 들어왔다</span></p></div>
+<p>Phoenix(후보마다 참여 확률을 예측하는 X의 랭킹 트랜스포머)의 서빙 프로토 recsys.proto에서는 두 가지 변경이 있다. 하나는 4세대+20(6bb4594, 2026-09-12)에서 신설됐던 검색 관련성 라벨 두 개가 5일 만에 되돌려진 것이다. 두 라벨(<code>LLM_JUDGE_*</code>)은 <code>LLM_JUDGE_RELEVANT_TO_SEARCH=107</code>과 <code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH=108</code>이다. 그 자리는 <code>CLIENT_TWEET_LIVE_STREAM_REPLY=107</code>과 <code>RESERVED_108</code>로 대체됐다. <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code>는 라이브 스트림 답글 신호로 추정되고, <code>RESERVED_108</code>은 예약 자리다. 다른 하나는 광고 delayed conversion attribution의 3-tier 확장이다.</p>
 <ul>
 <li>Phoenix proto에서 검색 관련성 라벨 두 개가 삭제되고, 같은 번호에 새 액션과 예약 자리가 들어왔다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>.<ul>
 <li><p>삭제된 것은 <code>LLM_JUDGE_RELEVANT_TO_SEARCH</code>(107)·<code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH</code>(108)이다. 대체한 것은 <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code>(107)·<code>RESERVED_108</code>(108)이다.</p>
 </li>
 <li><p>근거에는 파이썬 미러 <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>도 포함된다.</p>
 </li>
-<li><p>두 라벨은 4일 전 4세대+20(6bb4594, 2026-09-12)에 신설된 것들인데, 이 커밋에서 되돌려진다.</p>
+<li><p>두 라벨은 5일 전 4세대+20(6bb4594, 2026-09-12)에 신설된 것들인데, 이 커밋에서 되돌려진다.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">// before (4세대+20)
 LLM_JUDGE_RELEVANT_TO_SEARCH = 107;
 LLM_JUDGE_NOT_RELEVANT_TO_SEARCH = 108;
@@ -199,10 +199,10 @@ ADS_CHECKOUT_INITIATED_CONVERSION_DELAYED_TIER_2 = 223;
 </ul>
 </li>
 </ul>
-<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">G. VF가 2900줄 남짓의 자체 twemcache 클라이언트를 지우고 회사 공용 KV 캐시 클라이언트로 옮겼다</span></p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">G. VF가 3,234줄의 자체 twemcache 클라이언트를 지우고 회사 공용 KV 캐시 클라이언트로 옮겼다</span></p></div>
 <p>visibility-filtering 서브레포에서는 큰 재편이 있었다. VF 서브레포가 자체 twemcache 프로토콜/커넥션·링/디스커버리를 유지하는 대신, 회사 공용 KV 캐시 abstraction으로 옮겨 간 것이다. <code>visibility-filtering/twemcache/</code> 아래 11개 파일이 모두 제거됐다. <code>safety_label_source/twemcache.rs</code>는 새 crate <code>xai_cache</code>의 <code>xai_cache::CacheClient</code>(<code>Key</code>·<code>Value</code>·<code>KVCacheError</code> 재수출)에 의존하도록 rebase됐다.</p>
 <ul>
-<li>VF 서브레포의 자체 twemcache 클라이언트가 전부 제거됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/2d4a03c/visibility-filtering/twemcache" target="_blank" rel="noopener"><code>visibility-filtering/twemcache/</code></a> 아래 11개 파일 총 2,900줄 남짓이 삭제됐다.<ul>
+<li>VF 서브레포의 자체 twemcache 클라이언트가 전부 제거됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/tree/2d4a03c/visibility-filtering/twemcache" target="_blank" rel="noopener"><code>visibility-filtering/twemcache/</code></a> 아래 11개 파일 총 3,234줄이 삭제됐다.<ul>
 <li><p>제거된 파일은 <code>accrual.rs</code> 267줄, <code>client.rs</code> 640줄, <code>connection.rs</code> 762줄, <code>discovery.rs</code> 121줄, <code>error.rs</code>, <code>host_pool.rs</code> 359줄이다. 나머지는 <code>host_pool_tests.rs</code> 639줄, <code>key.rs</code> 92줄, <code>metrics.rs</code> 87줄, <code>mod.rs</code> 13줄, <code>ring.rs</code> 239줄이다.</p>
 </li>
 <li><p>대체 코드로는 <code>safety_label_source/twemcache.rs</code>의 상단 import가 다음처럼 바뀌었다.</p>
@@ -214,7 +214,7 @@ use xai_cache::{CacheClient, KVCacheError, Key, Value};
 </li>
 <li><p>fallback 매핑도 재정렬됐다. 이전 매핑은 <code>TwemcacheError::Timeout → FallbackReason::Timeout</code>, <code>Backpressure → Backpressure</code>, <code>Unavailable|Io → Other</code>였다. 새 매핑은 <code>KVCacheError::Timeout(_) → Timeout</code>, <code>Backpressure → Backpressure</code>, <code>_ → Other</code>로 통합됐다.</p>
 </li>
-<li><p>요컨대 VF는 자체 유지하던 twemcache 프로토콜 클라이언트(accrual·discovery·host_pool·ring 포함, 6xx-줄 규모)를 전부 회사 공통 KV 캐시 abstraction으로 옮겼다. 유지보수 표면이 축소되고, 다른 서비스가 쓰는 클라이언트와 동작 특성이 통일된다.</p>
+<li><p>요컨대 VF는 자체 유지하던 twemcache 프로토콜 클라이언트(accrual·discovery·host_pool·ring 포함, <code>client.rs</code>만 640줄)를 전부 회사 공통 KV 캐시 abstraction으로 옮겼다. 유지보수 표면이 축소되고, 다른 서비스가 쓰는 클라이언트와 동작 특성이 통일된다.</p>
 </li>
 </ul>
 </li>
@@ -270,7 +270,7 @@ pub fn decode_action(bytes: &amp;[u8]) -&gt; Result&lt;Action&gt;
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
 <ul>
-<li>Phoenix 서빙 엔진의 6개 파일에 소폭 조정이 있었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>emb_table.rs</code></a>(+15/-3).<ul>
+<li>Phoenix 서빙 엔진의 5개 파일에 소폭 조정이 있었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>emb_table.rs</code></a>(+15/-3).<ul>
 <li>대상 디렉터리는 <code>phoenix/crates/serving/xai-recsys-engine/</code>이다.</li>
 <li>나머지 파일은 <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/grpc_util.rs" target="_blank" rel="noopener"><code>grpc_util.rs</code></a>(+9/-2), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>copy_port_client.rs</code></a>(+4), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/checkpoint_proxy.rs" target="_blank" rel="noopener"><code>checkpoint_proxy.rs</code></a>(+1), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/mem_util.rs" target="_blank" rel="noopener"><code>mem_util.rs</code></a>(+5/-1)다.</li>
 <li>개별 함수의 정확한 의미론 변화는 이번 스캔에서 다루지 않는다. 대부분 emb table 관리와 gRPC 유틸의 소폭 개선으로 보인다 <span class="badge est">추정</span>.</li>
@@ -324,12 +324,12 @@ pub fn decode_action(bytes: &amp;[u8]) -&gt; Result&lt;Action&gt;
 <div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a>의 5개 절을 갱신했다.</p></div>
 <ul>
 <li>필터 21개 절(line 355): 필터 리스트 끝에 <code>FavHoldoutFilter</code>(4세대+23 신규)를 추가했다. <code>InventoryHoldoutFilter</code> 항목의 &quot;홀드아웃 비율 param은 확인이 필요하다&quot;를 삭제했다. 그 자리는 3-tier param(<code>InventoryHoldoutOriginalsPercent</code>·<code>InventoryHoldoutRepliesPercent</code>·<code>InventoryHoldoutRetweetsPercent</code>) 연결을 확정 기술로 대체했다. 새 <code>FavHoldoutFilter</code> 항목도 추가했다.</li>
-<li>Attention 스코어링 항(line 147): click_dwell 항의 계산이 4세대+23에서 재정의됐다는 문장을 추가했다. 바뀐 내용은 <code>EnableClickDwellLowFavRatePenalty</code>(4세대+13 도입) → <code>EnableCdwellOnImpr</code>(dwell × click_score)다.</li>
+<li>Attention 스코어링 항(line 147): click_dwell 항의 계산이 4세대+23에서 재정의됐다는 문장을 추가했다. 바뀐 내용은 <code>EnableClickDwellLowFavRatePenalty</code>(4세대 공개 때부터 있던 param) → <code>EnableCdwellOnImpr</code>(dwell × click_score)다.</li>
 <li>미공개 목록(line 1416, 2535): <code>LLM_JUDGE_RELEVANT_TO_SEARCH</code>·<code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH</code>의 연결처를 묻는 항을 삭제했다. 4세대+20 도입 → 4세대+23 되돌림으로 vacate됐음을 명시했다. <code>InventoryHoldoutFilter</code>의 홀드아웃 비율 param 미공개 줄은 해소되어 삭제했다.</li>
 <li>광고 conversion 액션 절(line 1686 부근): 4세대+23의 tier 2/3 확장 20종 항목을 4세대+9 항목 뒤에 추가했다.</li>
 <li>커밋 시퀀스 절(line 2545): <code>fad2f71</code>(4세대+22) 뒤에 <code>42266f3</code>(2026-09-17, 4세대+23)을 추가하고, &quot;4세대 이후 커밋 23개&quot;를 &quot;4세대 이후 커밋 24개&quot;로 고쳤다.</li>
 </ul>
-<p>또 4세대+22 뒤에 새 절 &#39;4세대+23 (2026-09-17, 42266f3)&#39;을 추가해, 위 여덟 가지 새로 알게 된 것을 요약했다.</p>
+<p>또 4세대+22 뒤에 새 절 &#39;4세대+23 (2026-09-17, 42266f3)&#39;을 추가해, 새로 알게 된 것 열 가지(A–J)를 요약했다.</p>
 <div class="blk why"><p><span class="lbl">의미</span> 세 가지 방향의 변경이 이번 커밋에서 함께 왔다. 인기 포스트 홀드아웃, click_dwell 항의 재정의, cold-start 게이트 완화다. 여기에 Phoenix proto의 변경이 네 번째 층으로 더해진다.</p></div>
 <ul>
 <li>첫째, 홈믹서 랭킹이 인기 있는 포스트에 대한 뷰어별 결정론적 홀드아웃이라는 새 축을 얻었다.<ul>
@@ -351,7 +351,7 @@ pub fn decode_action(bytes: &amp;[u8]) -&gt; Result&lt;Action&gt;
 <li>이 재정의는 Netflix N-tower·YouTube ranker의 관행과 정렬된다. 이들은 오래전부터 dwell 헤드를 conditional 확률(P(dwell|click))로 학습한 뒤, 서빙에서 P(click)과 곱해 unconditional 기댓값을 만든다.</li>
 <li class="warn">⚠ 주장 변경: 어제(2026-09-17) 정본은 &quot;click_dwell_time 헤드의 실효 기여는 이전 대비 ~60배 축소 상태&quot;로 기술했다. 그런데 <code>ContClickDwellTimeWeight</code>가 조정되지 않은 상태에서 이 헤드가 click_score와의 곱으로 재정의될 경우, 실효 스케일은 다시 변한다.<ul>
 <li>정확히는 두 경우로 나뉜다. <code>EnableCdwellOnImpr=false</code>(default)이면 60배 축소가 유지된다.</li>
-<li>켜지면 확률·확률의 곱으로 뜬다. 이는 이전 초 단위 곱(0-60초 × click prob)이 아니라 확률의 곱(0-1 × 0-1)이 된다.</li>
+<li>켜지면 확률·확률의 곱(0-1 × 0-1)이 된다. 이전 항은 click_dwell 값에 fav 비율 배수를 곱했고(게이트가 꺼지면 click_dwell 값 그대로), click 확률을 곱하는 항은 없었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs</code></a> diff.</li>
 <li>Weight 절대치가 유지되면 실효 스케일은 60배 축소가 아니라 훨씬 더 큰 축소로 갈 수 있고, 이 헤드의 랭킹 기여가 사실상 남은 헤드에 흡수되는 방향이 될 수 있다.</li>
 <li>실 배포 여부는 다음 커밋의 <code>EnableCdwellOnImpr</code> mirror 전환과 <code>ContClickDwellTimeWeight</code> 재조정 여부에서 관측될 것이다 <span class="badge est">추정</span>.</li>
 </ul>
@@ -360,13 +360,13 @@ pub fn decode_action(bytes: &amp;[u8]) -&gt; Result&lt;Action&gt;
 </li>
 <li>셋째, cold-start scorer의 Treatment 팔에서 두 게이트가 함께 완화됐다.<ul>
 <li><code>is_phoenix_moe</code> 요구가 사라진 것은, cold-start 대상이 이제 MoE 라벨 없이도 Treatment 실험에서 활성된다는 뜻이다.</li>
-<li>4세대 초기부터 유지돼 온 이 게이트는 Phoenix MoE 헤드가 cold-start 후보에 대해서만 학습에 활용되도록 제한하는 실험 조건이었는데, 실측 결과 이 조건이 필요하지 않았거나 오히려 손실이었다는 판단이 되어야 완화된다 <span class="badge est">추정</span>.</li>
-<li>Max age의 24h → 48h 확장은 신규 저자 부스트 창을 두 배로 넓혔다는 뜻이다. fresh 조건이 완화되면서 뉴 저자의 첫 24시간이 아닌 첫 48시간까지 cold-start 배정이 유효해진다.</li>
-<li>두 완화가 함께 온 것은 cold-start 배정의 투입량 자체를 늘리는 방향의 실험 셋업이다.</li>
+<li>2026-09-04 커밋(4세대+16)에서 생긴 이 게이트는 Phoenix MoE 헤드가 cold-start 후보에 대해서만 학습에 활용되도록 제한하는 실험 조건이었는데, 실측 결과 이 조건이 필요하지 않았거나 오히려 손실이었다는 판단이 되어야 완화된다 <span class="badge est">추정</span>.</li>
+<li>Max age의 24h → 48h 확장은 신규 저자 부스트 창을 두 배로 넓혔다는 뜻이다. 이 상한은 작성자 경력이 아니라 포스트 나이에 걸리므로, 생성 후 48시간 안의 포스트까지 cold-start 대상이 된다.</li>
+<li>Treatment 팔에서는 두 변경이 모두 cold-start 투입량을 늘린다. 반면 상한이 없던 Control·Holdout 팔에는 48시간 상한이 새로 걸려 조건이 오히려 조여졌다 <span class="badge ok">확인</span> — 위 D의 <code>author_cold_start.rs</code> diff.</li>
 </ul>
 </li>
 <li>네 번째 층으로, Phoenix proto의 두 변경이 향후 랭킹 신호의 편성을 알려 준다.<ul>
-<li><code>LLM_JUDGE_*</code> 라벨 두 개가 4일 만에 vacate된 것은, xAI가 검색 관련성 랭킹 학습에 LLM judge 라벨을 별도 축으로 이식하려던 방향을 일단 접었다는 신호다.</li>
+<li><code>LLM_JUDGE_*</code> 라벨 두 개가 5일 만에 vacate된 것은, xAI가 검색 관련성 랭킹 학습에 LLM judge 라벨을 별도 축으로 이식하려던 방향을 일단 접었다는 신호다.</li>
 <li>여기에는 두 가능성이 있다. 판정을 다른 방식으로 흘려 넣었을 수도 있고(예: 기존 <code>CLIENT_TWEET_RELEVANT_TO_SEARCH=105</code> 라벨 채널을 그대로 재사용), 라벨 축 자체를 재정의 대기로 놔뒀을 수도 있다.</li>
 <li>자리에 들어온 <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code>(107)은 라이브 스트림 답글에 대한 클라이언트 시그널로 보이며, 다음 커밋에서 학습 신호 편입 여부를 관측해야 한다.</li>
 <li>Delayed conversion attribution의 3-tier 확장은 이번 커밋에서 가장 견고한 광고 인프라 연결이다.</li>
@@ -392,7 +392,7 @@ pub fn decode_action(bytes: &amp;[u8]) -&gt; Result&lt;Action&gt;
 <li class="warn">⚠ 주장 변경 #1: LLM-judge 검색 관련성 액션 두 개에 대한 4세대+20 관측이 뒤집혔다.<ul>
 <li>대상은 <code>LLM_JUDGE_RELEVANT_TO_SEARCH</code>·<code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH</code>다.</li>
 <li>2026-09-13 daily(4세대+20)는 이 두 액션이 &quot;Phoenix 검색 랭킹 config <code>xrecsys_search</code>(4세대+4에서 도입)의 자연스러운 확장&quot;이라고 했다. 또 &quot;grox나 dedicated LLM judge가 (query, tweet) 쌍에 relevant·not 라벨을 흘려 주는 파이프라인이 어딘가에 있어야 한다&quot;고 했다.</li>
-<li>4일 만에 vacate된 것으로 봐서, 라벨의 프로덕션 연결이 진행되지 않은 채 되돌려졌다고 봐야 한다.</li>
+<li>5일 만에 vacate된 것으로 봐서, 라벨의 프로덕션 연결이 진행되지 않은 채 되돌려졌다고 봐야 한다.</li>
 <li>정본에서 이 두 라벨의 미공개 언급을 삭제한다.</li>
 </ul>
 </li>

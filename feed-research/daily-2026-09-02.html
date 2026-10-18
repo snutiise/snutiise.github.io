@@ -42,7 +42,7 @@
 </header>
 <ul class="meta">
 <li><span class="meta-k">요일</span>수요일</li>
-<li><span class="meta-k">읽는 시간</span>23분</li>
+<li><span class="meta-k">읽는 시간</span>24분</li>
 </ul>
 <div class="doc-intro">
 <ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
@@ -61,13 +61,13 @@
 <div class="blk ctx"><p><span class="lbl">배경</span> visibility-filtering(VF)은 포스트마다 이 뷰어에게 보여도 되는지를 판정하는 서비스다. X는 2026-08-13에 4세대를 공개하면서 Rust로 다시 쓴 <code>visibility-filtering/</code> 스택 전체를 공개했고, 그 뒤 후속 커밋들이 이 스택을 매일 조금씩 다듬어 왔다. 지금까지 밝혀진 내용은 네 가지다.</p></div>
 <ul>
 <li>labeling path는 Content Understanding → Labeling Rules → Storage → Visibility Filtering의 4단계다.</li>
-<li>세 SafetyLevel(지면별 정책 묶음)에 규칙이 모두 54개 걸려 있다. 세 레벨은 <code>FilterAll</code>·<code>TimelineHome</code>·<code>TimelineHomeRecommendations</code>다.</li>
+<li>규칙은 세 SafetyLevel(지면별 정책 묶음)로 나뉜다. 추천 포스트용 <code>TimelineHomeRecommendations</code>에 54개(팔로잉용 <code>TimelineHome</code>의 28개 포함), <code>FilterAll</code>에 1개가 걸려 있다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7ba7768/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/registry.rs</code></a>의 <code>wired_rule_order_matches_pre_migration_sequence</code> 테스트.</li>
 <li>VF는 fail-closed로 동작한다. 판정 없이 리턴되는 경로는 모두 drop으로 처리한다.</li>
 <li>dark_traffic 미러링, reference_compare 하니스, 90건 golden corpus로 재작성 결과의 회귀를 자동으로 막는다.</li>
 </ul>
 <p>이번 커밋은 이 스택에 두 가지를 더한다.</p>
 <ul>
-<li>첫째, 어느 나라에서 age-gating을 강제하는지를 처음 코드에 명시한다. 종전에는 규칙 3개가 &quot;no_stated_age + gated country&quot;로 판정한다는 것만 밝혀졌고, 그 &quot;gated country&quot; 목록은 공개되지 않았다.</li>
+<li>첫째, 어느 나라에서 age-gating을 강제하는지를 처음 코드에 명시한다. 종전에는 나이를 밝히지 않은 뷰어를 거르는 규칙이 &quot;no_stated_age + gated country&quot;로 판정한다는 것만 밝혀졌고, 그 &quot;gated country&quot; 목록은 공개되지 않았다.</li>
 <li>둘째, motion-reveal이라는 영상 회피 대응 기법을 처음 밝힌다(아래 C에서 설명한다). Grok LLM이 이 기법으로 처리된 프레임을 받아 판정에 참고하도록 프롬프트가 구조화됐다.</li>
 </ul>
 <div class="blk find"><p><span class="lbl">새로 알게 된 것</span></p></div>
@@ -106,7 +106,7 @@
 <li>부분 로드가 정책 이해에 혼선을 만드는 시나리오를 원천 차단한다.</li>
 </ul>
 </li>
-<li>NSFW 나이 게이팅 규칙 세 개에 국가 목록이 주입됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6384ca7d2c8570fbc645c20c3291730739ac00ce/visibility-filtering/rules/nsfw_age_gating.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/nsfw_age_gating.rs</code></a>.<ul>
+<li>NSFW 나이 게이팅 규칙 세 개 가운데 나이 미확인 뷰어 규칙 하나에만 국가 목록이 주입됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6384ca7d2c8570fbc645c20c3291730739ac00ce/visibility-filtering/rules/nsfw_age_gating.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/nsfw_age_gating.rs:68-88</code></a>.<ul>
 <li>NSFW/GORE 라벨이 붙은 미디어 후보에 대해 세 규칙이 병렬로 작동한다.</li>
 <li>로그아웃 뷰어면 국가와 상관없이 무조건 드롭한다(<code>SensitiveViewerLoggedOutDropRule</code>).</li>
 <li>뷰어가 18세 미만으로 확인되면 국가와 상관없이 드롭한다(<code>SensitiveViewerUnderageDropRule</code>).</li>
@@ -126,7 +126,7 @@ if <code>context.viewer().has_no_stated_age() &amp;&amp; context.viewer().countr
 <h3 id="b-고인기-영상만-따로-검사하는-안전-파이프라인이-새로-생겼다">B. 고인기 영상만 따로 검사하는 안전 파이프라인이 새로 생겼다</h3>
 <p>이번에 생긴 특수 영상 파이프라인은 grox(Grok 기반 nearline 분류기 서브레포)의 안전 판정 파이프라인 가운데 가장 비싼 층이다. grox는 Content-understanding 단계에서 이미 여러 안전 판정 파이프라인을 돌리고 있었다. 새 파이프라인은 고팬(deluxe tier, 즉 favorite 카운트가 임계 이상인 영상)에만 진입하고, 다단 태스크 DAG를 거친 뒤 Grok 4.5 심판까지 호출한다. 이런 구성이 코드로 처음 공개됐다는 것이 이번 커밋의 핵심이다.</p>
 <ul>
-<li><p>새 파일이 8단 태스크 DAG를 정의한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6384ca7d2c8570fbc645c20c3291730739ac00ce/grox/flows/ptos/plan_safety_ptos_special_video.py" target="_blank" rel="noopener"><code>grox/flows/ptos/plan_safety_ptos_special_video.py</code></a>.</p>
+<li><p>새 파일이 태스크 9개가 한 줄로 이어지는 9단 DAG를 정의한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6384ca7d2c8570fbc645c20c3291730739ac00ce/grox/flows/ptos/plan_safety_ptos_special_video.py" target="_blank" rel="noopener"><code>grox/flows/ptos/plan_safety_ptos_special_video.py</code></a>.</p>
 <ul>
 <li><p>새 파일은 <code>grox/flows/ptos/plan_safety_ptos_special_video.py</code>(55줄)이고, 파이프라인 이름은 <code>PlanSafetyPtosSpecialVideo</code>다.</p>
 </li>
@@ -138,8 +138,8 @@ if <code>context.viewer().has_no_stated_age() &amp;&amp; context.viewer().countr
                 → category_detection
                     → policy_detection
                         → safemodel_sex_nudity
-                        → adult_content_cross_validation (양쪽 결과에 의존)
-                            → result_sink
+                            → adult_content_cross_validation (policy·safemodel 두 결과에 의존)
+                                → result_sink
 </code></pre>
 </li>
 </ul>
@@ -198,9 +198,9 @@ def _technique_signals(cls, convo_video: ConvoVideo) -&gt; dict[str, bool]:
 <h3 id="d-스크리닝을-통과한-영상은-기존-판정-단계를-지나-grok-45-심판까지-간다">D. 스크리닝을 통과한 영상은 기존 판정 단계를 지나 Grok 4.5 심판까지 간다</h3>
 <p>motion-reveal 스크리닝 뒤로는 기존 파이프라인이 그대로 이어진다.</p>
 <ul>
-<li>스크리닝 뒤에는 카테고리 판정과 정책 판정을 거친 다음, safemodel 판정과 cross-validation이 병렬로 돈다.<ul>
+<li>스크리닝 뒤에는 카테고리 판정과 정책 판정을 거친 다음, safemodel 판정 뒤에 cross-validation이 돈다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6384ca7d2c8570fbc645c20c3291730739ac00ce/grox/flows/ptos/plan_safety_ptos_special_video.py" target="_blank" rel="noopener"><code>plan_safety_ptos_special_video.py</code></a>의 <code>TASK_DEPENDENCIES</code>.<ul>
 <li>카테고리 판정은 <code>TaskSafetyPtosCategoryDetection</code>, 정책 판정은 <code>TaskSafetyPtosPolicyDetection</code>이다.</li>
-<li>병렬로 도는 두 태스크는 <code>TaskSafetyPtosSafemodelSexNudity</code>와 <code>TaskSafetyPtosAdultContentCrossValidation</code>이다.</li>
+<li>차례로 도는 두 태스크는 <code>TaskSafetyPtosSafemodelSexNudity</code>와 <code>TaskSafetyPtosAdultContentCrossValidation</code>이다. 뒤쪽은 정책 판정과 safemodel 판정 결과에 모두 의존한다.</li>
 <li>그 뒤 <code>TaskWriteSafetyPostAnnotationsResultSink</code>가 결과를 기록한다.</li>
 </ul>
 </li>
@@ -213,7 +213,7 @@ def _technique_signals(cls, convo_video: ConvoVideo) -&gt; dict[str, bool]:
 <li>비용 관리와 recall 향상을 동시에 달성하려는 구성이다 <span class="badge est">추정</span>.</li>
 </ul>
 </li>
-<li>cross-validation 태스크에서 「특수 영상 filter가 실패하면 fail-close로 Soft 강등한다」는 동작이 확인된다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6384ca7d2c8570fbc645c20c3291730739ac00ce/grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py</code></a> 132–140줄.<ul>
+<li>특수 영상 경로에서 Grok 4.5 심판 호출이 실패하면 Soft로 강등한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6384ca7d2c8570fbc645c20c3291730739ac00ce/grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py</code></a> 102–117줄.<ul>
 <li>확인한 곳은 이 태스크의 <code>_cross_validate</code> 흐름이다.</li>
 <li>Grok 심판 호출이 예외로 실패하면, <code>task_type == SAFETY_PTOS_SPECIAL_VIDEO</code>인 특수 영상 경로에서는 원 판정을 유지하지 않고 Soft로 강제 강등한다(&quot;Grok 4.5 Cross Validation failed&quot;).</li>
 <li>다른 경로에서는 원 판정 유지가 default였고, 특수 영상 경로만 fail-close 정책이 다르다.</li>
@@ -232,7 +232,7 @@ def _technique_signals(cls, convo_video: ConvoVideo) -&gt; dict[str, bool]:
 <ul>
 <li>첫째, X가 어느 나라에서 age-gating을 강제하는지 코드에 처음 명시했다.<ul>
 <li>이 목록은 원래 Scala VF(<code>country_specific_nsfw_content_gating.yml</code>)에도 있었다. Rust VF에도 default로 들어오고 두 목록이 어긋나면 metric으로 관측할 수 있게 되면서, X가 Rust로의 이관을 안전하게 완료하려는 흐름이 보인다.</li>
-<li>16개국의 선택 기준은 명시되지 않았다. 목록에는 EU 회원국 5개(독일·스페인·프랑스·이탈리아·네덜란드·포르투갈), 영국·캐나다·호주 같은 앵글로 국가, 브라질·아르헨티나·멕시코의 라틴아메리카, 한국·인도네시아·태국·필리핀의 아시아 국가가 들어 있다.</li>
+<li>16개국의 선택 기준은 명시되지 않았다. 목록에는 EU 회원국 6개(독일·스페인·프랑스·이탈리아·네덜란드·포르투갈), 영국·캐나다·호주 같은 앵글로 국가, 브라질·아르헨티나·멕시코의 라틴아메리카, 한국·인도네시아·태국·필리핀의 아시아 국가가 들어 있다.</li>
 <li>미국은 목록에 없다. 미국 안에서는 나이 미확인 뷰어에게도 이 규칙이 걸리지 않는다.</li>
 <li>로그아웃 뷰어와 미성년으로 확인된 뷰어는 국가와 상관없이 드롭하는 별도 규칙(위 A절)이 맡는다.</li>
 </ul>
@@ -274,7 +274,7 @@ def _technique_signals(cls, convo_video: ConvoVideo) -&gt; dict[str, bool]:
 <li>Snap이 광고 지면의 I2I(item-to-item) retrieval을 다룬 CAMIE 논문을 내고, abstract에서 프로덕션 배포를 진술했다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2608.30255" target="_blank" rel="noopener">arXiv 2608.30255</a>, 2026-08-31 제출.<ul>
 <li>대상 지면은 Snap Dynamic Product Ads(DPA)로, 광고 지면이다.</li>
 <li>다루는 문제는 별개로 학습된 시각/텍스트/멀티모달 인코더가 임베딩 공간을 분절시키고, co-engagement 신호(같은 유저가 두 상품을 함께 본 관계)를 반영하지 못한다는 것이다.</li>
-<li>저자는 Snap 5명이다(Xiaodong Liu, Siman Wang, Congfei Zhang, Hsiang-wei Chao, Xiao Bai 외).</li>
+<li>저자는 12명이고, HTML 본문은 전원을 Snap Inc. 소속으로 적는다(Xiaodong Liu, Siman Wang, Congfei Zhang, Hsiang-wei Chao, Xiao Bai 외) <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2608.30255" target="_blank" rel="noopener">arXiv 2608.30255</a>.</li>
 <li><code>radar.md</code>에 관찰 항목으로 추가했다.</li>
 </ul>
 </li>

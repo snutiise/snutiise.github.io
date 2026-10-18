@@ -41,7 +41,7 @@
 <h1 id="instagram">Instagram</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-08-09">2026-08-09</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc toc-long"><summary>목차<span class="toc-n">11</span></summary><ol><li><a href="#한-줄-요약">한 줄 요약</a></li><li><a href="#피드-지면">피드 지면</a></li><li><a href="#후보-생성-retrieval">후보 생성 (retrieval)</a><ol><li><a href="#단계별-후보-수--facebook보다-크고-단조-감소한다">단계별 후보 수</a></li><li><a href="#소스-타입-4종과-tunable-weight">소스 타입 4종과 tunable weight</a></li><li><a href="#two-tower를-고른-이유는-캐시다">two-tower를 고른 이유는 캐시다</a></li><li><a href="#재학습-주기--시간-단위">재학습 주기</a></li><li><a href="#retrieval-dsl--실제-쿼리가-공개돼-있다">retrieval DSL</a></li><li><a href="#igql--ig2vec--1차-원문을-확보하지-못했다">IGQL / IG2Vec</a></li></ol></li><li><a href="#랭킹">랭킹</a><ol><li><a href="#세-가지-결합-형태--facebook과-가장-다른-부분">세 가지 결합 형태</a></li><li><a href="#weight를-정하는-방법--facebook은-설문-instagram은-최적화">weight를 정하는 방법</a></li><li><a href="#1st-stage는-2nd-stage의-distillation이다">1st stage는 2nd stage의 distillation이다</a></li><li><a href="#예측-헤드--지면마다-다르다-전부-확인-verbatim">예측 헤드</a></li><li><a href="#실제-피처-이름-발췌-전부-확인-verbatim">실제 피처 이름 (발췌, 전부 확인 verbatim)</a></li><li><a href="#mosseri의-지면별-신호-순서--facebook에-없는-공개-형태">Mosseri의 지면별 신호 순서</a></li><li><a href="#초장기-유저-히스토리--dv365">초장기 유저 히스토리</a></li><li><a href="#모델-운영-규모--instagram만-공개했다">모델 운영 규모</a></li><li><a href="#팔로워-수-입력-제거">팔로워 수 입력 제거</a></li></ol></li><li><a href="#재순위다양성필터">재순위·다양성·필터</a><ol><li><a href="#같은-계정-3연속-차단은-틀렸다--통설-검증">&quot;같은 계정 3연속 차단&quot;은 틀렸다</a></li><li><a href="#정책-필터--점수-임계값과-정책-문서-두-층">정책 필터</a></li><li><a href="#원본성originality--instagram이-facebook보다-먼저-더-강하게-적용했다">원본성(originality)</a></li><li><a href="#청소년--추천-자격-자체를-나이로-제한한다">청소년</a></li></ol></li><li><a href="#콜드스타트">콜드스타트</a><ol><li><a href="#신규-유저--facebook에-없는-공개가-여기-있다">신규 유저</a></li><li><a href="#신규-콘텐츠">신규 콘텐츠</a></li></ol></li><li><a href="#피드백-신호">피드백 신호</a><ol><li><a href="#negative가-예측-헤드로-존재한다--그것도-지면마다-다른-이름으로">negative가 예측 헤드로 존재한다</a></li><li><a href="#dm-공유send가-예측-헤드다">DM 공유(send)가 예측 헤드다</a></li><li><a href="#유저-컨트롤--your-algorithm">유저 컨트롤</a></li></ol></li><li><a href="#규제--2026년-현재-진행형">규제</a></li><li><a href="#이-서비스에서-나온-일반화-노트">이 서비스에서 나온 일반화 노트</a></li><li><a href="#열린-질문">열린 질문</a></li><li><a href="#출처">출처</a><ol><li><a href="#meta-공식--엔지니어링">Meta 공식</a></li><li><a href="#meta-공식--제품정책">Meta 공식</a></li><li><a href="#transparency-center-ai-system-card-규제-대응-1차-문서">Transparency Center (AI system card, 규제 대응 1차 문서)</a></li><li><a href="#논문">논문</a></li><li><a href="#규제기관">규제기관</a></li><li><a href="#2차-등급-하향-필수">2차 (등급 하향 필수)</a></li></ol></li></ol></details></nav>
 <div class="prose">
@@ -226,17 +226,18 @@
 <ul>
 <li class="warn"><strong>⚠ IG Feed는 700 → 500이지만, FB Feed는 500 → 500이다</strong>(facebook.md 참고).<ul>
 <li>같은 회사의 같은 이름 지면인데 pass 0(경량 모델로 후보를 줄이는 단계)의 후보 수가 다르다.</li>
-<li><strong>Facebook 쪽만 단조 감소가 없다.</strong></li>
+<li><strong>FB Feed(500→500)와 IG Reels Chaining(~100→~100)은 줄지 않는다.</strong></li>
 <li>Meta 문서가 지면마다 다른 해상도로 서술한다는 facebook.md의 관찰이 Instagram에서도 반복된다.</li>
 </ul>
 </li>
 <li>Explore의 1500 → 100은 <strong>15:1 축소</strong>다. Facebook 카드 가운데 이만큼 공격적인 축소 비율을 보이는 곳은 없다.</li>
 <li>2023년 블로그의 서술은 카드보다 덜 구체적이다 <span class="badge ok">확인</span>.<ul>
-<li>retrieval이 가져오는 후보: <em>&quot;hundreds of relevant items from a media pool of billions of items&quot;</em></li>
-<li>1st stage가 남기는 후보: <em>&quot;thousands of candidates&quot;</em></li>
-<li>2nd stage가 남기는 후보: <em>&quot;the 100 best candidates&quot;</em></li>
-<li>최종적으로 보여 주는 양: <em>&quot;few hundred that are finally presented to the user&quot;</em></li>
-<li><strong>카드의 1500과 블로그의 &quot;thousands&quot;가 어긋난다.</strong> 두 서술 사이에는 3년의 시차가 있고, 서술의 해상도도 다르다.</li>
+<li>소스 하나가 고르는 후보: <em>&quot;hundreds of relevant items from a media pool of billions of items&quot;</em></li>
+<li>퍼널 전체의 시작: <em>&quot;starting with thousands of candidates&quot;</em></li>
+<li>1st stage 랭커가 받는 후보: <em>&quot;can recall thousands of candidates&quot;</em></li>
+<li>2nd stage 랭커가 받는 후보: <em>&quot;operates on the 100 best candidates from the first stage&quot;</em></li>
+<li>랭킹 전체의 축소: <em>&quot;from a few thousand to few hundred that are finally presented to the user&quot;</em></li>
+<li>블로그의 수치는 단계별 입력이고, 카드의 1500은 retrieval이 가져오는 수다. 둘은 같은 자릿수라서 어긋난다고 볼 근거가 없다 <span class="badge est">추정</span>. 두 서술 사이에는 3년의 시차가 있고, 서술의 해상도도 다르다.</li>
 </ul>
 </li>
 </ul>
@@ -545,7 +546,7 @@ p_i(c) = max_{h ∈ H} sim_i(c, h)
 <li>이 문장은 Facebook Feed 카드의 &quot;you wouldn&#39;t see multiple video posts in a row&quot;보다 <strong>오히려 덜 구체적이다.</strong></li>
 </ul>
 </li>
-<li>반면 <strong>retrieval 단계의 다양성은 구체적으로 공개돼 있다.</strong> <a href="#retrieval-dsl--%EC%8B%A4%EC%A0%9C-%EC%BF%BC%EB%A6%AC%EA%B0%80-%EA%B3%B5%EA%B0%9C%EB%8F%BC-%EC%9E%88%EB%8B%A4">retrieval DSL 절</a>의 IGQL 쿼리에 있는 <code>diversify_by(seed_id, method=round_robin)</code>이 그것이다.<ul>
+<li>반면 <strong>retrieval 단계의 다양성은 구체적으로 공개돼 있다.</strong> <a href="#retrieval-dsl--%EC%8B%A4%EC%A0%9C-%EC%BF%BC%EB%A6%AC%EA%B0%80-%EA%B3%B5%EA%B0%9C%EB%8F%BC-%EC%9E%88%EB%8B%A4">retrieval DSL 절</a>의 2020년 쿼리에 있는 <code>diversify_by(seed_id, method=round_robin)</code>이 그것이다.<ul>
 <li>Instagram의 다양성 처리는 랭킹 후 재배열보다 <strong>후보 생성 단계의 seed 라운드로빈</strong>이 주력일 수 있다 <span class="badge est">추정</span>.</li>
 </ul>
 </li>
@@ -727,7 +728,7 @@ p_i(c) = max_{h ∈ H} sim_i(c, h)
 <h2 id="이-서비스에서-나온-일반화-노트">이 서비스에서 나온 일반화 노트</h2>
 <p>Instagram에서 나온 관찰은 아래 topics 노트에서 일반화해 다룬다.</p>
 <ul>
-<li><code>topics/multi-task-ranking.md</code>는 Meta 안의 3종 결합 형태를 정리한다. 덧셈형인 FB의 <code>Σ w·P</code>, 곱셈형인 IG 2020의 <code>Π P^w</code>, 음수항을 더한 IG 2023의 <code>Σ w·P</code>다. 곱셈형의 hard-veto 성질도 함께 다룬다.</li>
+<li><code>topics/multi-task-ranking.md</code>는 Meta 안의 4종 결합 형태를 정리한다. 덧셈형인 FB의 <code>Σ w·P</code>, 곱셈형인 IG 2020의 <code>Π P^w</code>, 음수항을 더한 IG 2023의 <code>Σ w·P</code>, 곱셈 페널티인 IG 2025 알림의 <code>R×D</code>다. 곱셈형의 hard-veto 성질도 함께 다룬다.</li>
 <li><code>topics/candidate-allocation.md</code>는 IG Explore의 1500→100(15:1)과 FB Feed의 500→500을 비교하고, 소스별 tunable weight를 다룬다.</li>
 <li><code>topics/embedding-retrieval.md</code>는 two-tower를 &quot;item tower 캐시 가능&quot;이라는 이유로 고른 사례, FAISS/HNSW, first-stage distillation 라벨 <code>PSelect</code>를 다룬다.</li>
 <li><code>topics/feed-diversity.md</code>는 retrieval 단계의 <code>diversify_by(round_robin)</code>과 랭킹 후 pass 2를 비교하고, 알림의 곱셈 페널티 수식을 정리한다.</li>
@@ -757,7 +758,7 @@ p_i(c) = max_{h ∈ H} sim_i(c, h)
 <h3 id="meta-공식--엔지니어링">Meta 공식 — 엔지니어링</h3>
 <ul>
 <li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023, 블로그. <strong>덧셈형 value model, two-tower, distillation 라벨, 매시간 재학습의 1차 출처다.</strong></li>
-<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> — 2020-12-10, 블로그 (Amogh Mahapatra). <strong>곱셈형 value model과 IGQL 쿼리, one-hop/two-hop 확장의 1차 출처다.</strong> ⚠ <a href="https://engineering.fb.com/2020/12/10/web/how-instagram-suggests-new-content/" target="_blank" rel="noopener">How Instagram suggests new content</a>와 <strong>같은 글인데 제목만 다르다.</strong></li>
+<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> — 2020-12-10, 블로그 (Amogh Mahapatra). <strong>곱셈형 value model과 retrieval 질의 언어 쿼리, one-hop/two-hop 확장의 1차 출처다.</strong> 글에는 IGQL이라는 이름이 없다. ⚠ <a href="https://engineering.fb.com/2020/12/10/web/how-instagram-suggests-new-content/" target="_blank" rel="noopener">How Instagram suggests new content</a>와 <strong>같은 글인데 제목만 다르다.</strong></li>
 <li><a href="https://engineering.fb.com/2025/05/21/production-engineering/journey-to-1000-models-scaling-instagrams-recommendation-system/" target="_blank" rel="noopener">Journey to 1000 models: Scaling Instagram&#39;s recommendation system</a> — 2025, 블로그. 1000개 이상의 모델, 주 10회 이상의 런치, Sourcing·ESR·LSR, <code>ig_stories_tray_mtml</code>을 담고 있다.</li>
 <li><a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a> — 2025, 블로그. <strong>Meta가 공개한 가장 구체적인 다양성 수식이다.</strong></li>
 <li class="warn">⚠ <a href="https://ai.meta.com/blog/powered-by-ai-instagrams-explore-recommender-system/" target="_blank" rel="noopener">Powered by AI: Instagram&#39;s Explore recommender system</a> — 2019, 블로그. <strong>2026-08-09에 HTTP 500을 반환해서 열람하지 못했다.</strong> 이 노트는 이 글을 근거로 쓰지 않았다.</li>

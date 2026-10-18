@@ -67,7 +67,7 @@
 <ul>
 <li>AI trend는 X의 &quot;Trending&quot; 지면(사람들이 많이 이야기하는 이벤트)에 올라오는 항목이다.<ul>
 <li>이 커밋 전에는 tweet에 &quot;AI trend&quot; 라벨을 붙이는 로직이 home-mixer 파이프라인에 없었다.</li>
-<li>Strato는 X의 실시간 스토리지와 서비스 조회를 담당하는 레이어다.</li>
+<li>Strato는 X 코드가 데이터를 조회하거나 저장할 때 거치는 내부 시스템이다.</li>
 <li>Grok이 트윗을 보고 어느 AI trend에 속하는지 판정해 그 결과를 Strato에 저장해 두는 upstream 파이프라인이 있었으리라고 보이지만(<code>batch_get_tweet_ai_trend</code> API), 그 파이프라인은 이 저장소 밖에 있다 <span class="badge est">추정</span>.</li>
 </ul>
 </li>
@@ -97,11 +97,12 @@
 Box::new(AiTrendFeedbackContextHydrator { strato_client: strato_client.clone() }),
 </code></pre></figure>
 </li>
-<li><p>이 hydrator는 게이트 3중 조건을 모두 만족할 때만 돈다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:54-58</code></a>.</p>
+<li><p>이 hydrator는 게이트 3중 조건을 모두 만족할 때만 돈다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs#L59-L63" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:59-63</code></a>.</p>
 <ul>
 <li>게이트 파라미터 <code>rust_home_mixer_enable_ai_trend_feedback_context</code>가 켜져 있어야 한다. 기본값은 false다.</li>
 <li>topic 요청이 아니어야 한다(topic 지면과 겹치지 않게).</li>
-<li>Following 지면이 아니어야 한다. OON(out-of-network) 후보만 대상으로 삼는다는 뜻이다.</li>
+<li>Following 지면(팔로잉 계정 포스트만 받는 요청)이 아니어야 한다. 이 조건은 요청 단위이고, 후보가 팔로잉 계정 것인지는 보지 않는다.</li>
+<li>hydrate 루프(L65-75)도 아래 원본 조건으로만 거르므로, For You 요청에 섞인 팔로잉 계정 후보도 대상이다.</li>
 <li>Following 파이프라인에는 연결되지 않았다.</li>
 </ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">query.params.get(EnableAiTrendFeedbackContext)
@@ -109,10 +110,10 @@ Box::new(AiTrendFeedbackContextHydrator { strato_client: strato_client.clone() }
     &amp;&amp; !query.in_network_only
 </code></pre></figure>
 </li>
-<li><p>후보는 &quot;standalone original post&quot;만 남기는 4중 조건을 거친다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:17-22</code></a>.</p>
+<li><p>후보는 &quot;standalone original post&quot;만 남기는 4중 조건을 거친다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs#L19-L24" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:19-24</code></a>.</p>
 <ul>
 <li>답글이거나, 리트윗이거나, 대화 조상이 있거나, 팔로잉한 사용자가 답글을 단 대상이면 후보에서 뺀다. 넷 중 하나라도 해당하면 빠진다.</li>
-<li>결국 인용이 아닌 원본 포스트에만 AI trend 라벨을 붙일 수 있다.</li>
+<li>결국 답글·리포스트·대화 조상·팔로잉 답글 대상이 아닌 원본 포스트에만 AI trend 라벨을 붙일 수 있다. 인용 포스트인지는 보지 않는다.</li>
 </ul>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn is_eligible_original_post(candidate: &amp;PostCandidate) -&gt; bool {
     candidate.in_reply_to_tweet_id.is_none()
@@ -373,7 +374,7 @@ pub fn load_tensor&lt;&#39;py&gt;(
 </ul>
 <div class="blk why"><p><span class="lbl">의미</span> 임베딩 테이블 로더 core를 순수 Rust 인터페이스로 노출해서, 학습 파이프라인이나 Rust-native 서빙 코드의 다른 경로에서 pyo3 스택 없이도 재사용할 수 있도록 준비한 것이다. 8/19 커밋(4세대+4)에서 Phoenix <code>xrecsys_search</code>의 vocab이 100M/100M/30M로 커진 것과 방향이 같다. 큰 임베딩 테이블을 여러 서빙·학습 컨텍스트에서 로드해야 할 필요가 커지고 있다는 정황이다.</p></div>
 <h3 id="두-심판-호출-위치에서-grok-46을-쓰는-비율이-01에서-03으로-올랐다">두 심판 호출 위치에서 Grok 4.6을 쓰는 비율이 0.1에서 0.3으로 올랐다</h3>
-<p>grox(Grok 기반 nearline 분류기 서브레포)에서, 2026-08-19의 4세대+4가 도입한 Grok 4.6 shadow dial이 하루 만에 10%에서 30%로, 3배 올랐다 <span class="badge ok">확인</span>. 이 dial은 두 심판 호출 위치(아동 안전 cross-model validation, deluxe 4.3 카테고리 재분류)에서 호출을 Grok 4.5 대신 4.6으로 보낼 확률이다.</p>
+<p>grox(Grok 기반 nearline 분류기 서브레포)에서, 2026-08-19의 4세대+4가 도입한 Grok 4.6 dial이 하루 만에 10%에서 30%로, 3배 올랐다 <span class="badge ok">확인</span>. 이 dial은 두 심판 호출 위치(아동 안전 cross-model validation, deluxe 4.3 카테고리 재분류)에서 호출을 Grok 4.5 대신 4.6으로 보낼 확률이다. 4.6의 응답도 4.5와 똑같이 판정에 쓰이므로, 결과를 버리는 shadow가 아니라 실트래픽을 나누는 dial이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/grox/flows/ptos/classifier.py#L281-L290" target="_blank" rel="noopener"><code>classifier.py:281-290</code>@aad7179</a>.</p>
 <ul>
 <li><p>바뀐 것은 상수 한 줄이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py:114</code></a>.</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">-_GROK_4_6_INTERNAL_DIAL = 0.1
@@ -387,9 +388,9 @@ pub fn load_tensor&lt;&#39;py&gt;(
 </ul>
 </li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> 이번 상향은 4.5에서 4.6으로 넘어가는 gradual rollout에서 shadow가 회로차단을 트립시키지 않았고, 판정 disagreement rate도 허용 범위였다는 점을 뒷받침한다 <span class="badge est">추정</span>. 그렇지 않았다면 dial을 3배로 올리지 못했을 것이다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이번 상향은 4.5에서 4.6으로 넘어가는 gradual rollout에서, 실트래픽 10%를 받은 4.6이 회로차단을 트립시키지 않았고 판정 품질도 허용 범위였다는 점을 뒷받침한다 <span class="badge est">추정</span>. 그렇지 않았다면 dial을 3배로 올리지 못했을 것이다.</p></div>
 <ul>
-<li>4세대+2가 도입한 Grok 4.5 심판 계층은 매일 정교해지고 있고, 이번 커밋은 그 흐름의 네 번째 커밋에 해당한다. 흐름은 +2 도입 → +3 로깅 세분화 → +4 4.6 shadow 10% → +5 30%다.</li>
+<li>4세대+2가 도입한 Grok 4.5 심판 계층은 매일 정교해지고 있고, 이번 커밋은 그 흐름의 네 번째 커밋에 해당한다. 흐름은 +2 도입 → +3 로깅 세분화 → +4 4.6 dial 10% → +5 30%다.</li>
 <li>다음 커밋에서 50%나 100%로 뛰면 4.6 완전 전환에 가까워진 것이고, 다시 낮아지면 회귀를 관측한 것이다.</li>
 </ul>
 <h3 id="grok-스트리밍-응답을-조건이-맞으면-중간에-끊을-수-있게-됐다">Grok 스트리밍 응답을 조건이 맞으면 중간에 끊을 수 있게 됐다</h3>
@@ -415,7 +416,7 @@ async with aclosing(self._sample_streaming_raw(request, **kwargs)) as raw_stream
 </code></pre></figure>
 </li>
 </ul>
-<div class="blk why"><p><span class="lbl">의미</span> 이 변경은 4세대+4에서 도입된 Grok 4.6 shadow가 늘어난 트래픽을 감당하려는 sampling 인프라 최적화로 볼 여지가 있다 <span class="badge est">추정</span>. 근거는 dial이 30%로 오르는 변경과 같은 커밋에 들어 있다는 정황이다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 이 변경은 4세대+4에서 도입된 Grok 4.6 dial이 늘린 트래픽을 감당하려는 sampling 인프라 최적화로 볼 여지가 있다 <span class="badge est">추정</span>. 근거는 dial이 30%로 오르는 변경과 같은 커밋에 들어 있다는 정황이다.</p></div>
 <ul>
 <li>안전 판정 응답은 JSON 태그(<code>&lt;json&gt;...&lt;/json&gt;</code>)에 감싸여 오는 경우가 많은데, 태그가 닫히고 나면 뒤따르는 토큰은 의미가 없다.</li>
 <li><code>stop_predicate=lambda r: &quot;&lt;/json&gt;&quot; in r</code> 같은 콜백으로 일찍 끊으면 토큰 비용을 줄이고, TTFT 이후의 지연도 줄일 수 있다.</li>
@@ -471,7 +472,7 @@ async with aclosing(self._sample_streaming_raw(request, **kwargs)) as raw_stream
 <td>Grok 4.6 dial 3배</td>
 <td><code>classifier.py</code></td>
 <td align="right">+1/−1</td>
-<td>파라미터 변경: shadow 10% → 30%</td>
+<td>파라미터 변경: 실트래픽 10% → 30%</td>
 </tr>
 <tr>
 <td>grok_sampler stop_predicate</td>
