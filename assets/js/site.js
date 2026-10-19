@@ -72,18 +72,12 @@ if (btn && th) btn.addEventListener('click', () => {
  th.focus();
 });
 
-// Naver + counter: production, blog only
+// Naver: production, blog only
 if (prod && 'track' in b.dataset) {
  window.wcs_add = { wa: 'a4fc7be0d37ba' };
- const w = d.createElement('script'), x = new XMLHttpRequest();
+ const w = d.createElement('script');
  w.src = 'https://wcs.naver.net/wcslog.js';
  w.onload = () => window.wcs_do?.();
  d.head.append(w);
- x.onload = () => { // "total,ip,n": never show the IP
-  const v = x.responseText.trim().split(',')[0], el = $('hits');
-  if ((x.status == 200 || x.status == 201) && /^\d+$/.test(v) && el) { el.textContent = v + ' Hit!'; el.hidden = false; }
- };
- x.open('GET', 'https://us-central1-gitblog-885f6.cloudfunctions.net/countVisitor');
- x.send();
 }
 })();
