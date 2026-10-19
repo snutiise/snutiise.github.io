@@ -55,7 +55,7 @@ python3 -m http.server 4000 --bind 127.0.0.1 -d /tmp/site
 | `_posts/` | 글 (Markdown) |
 | `_layouts/`, `_includes/` | 템플릿. 테마 gem 없이 전부 여기 있는 것만 쓴다(`base`, `post` 두 레이아웃) |
 | `assets/css/site.css` | 사이트 전체 스타일(블로그 + feed-research). 웹폰트·외부 CSS 없음 |
-| `assets/js/site.js` | 메뉴 표시, 목차 따라가기, /posts/ 거르기, Disqus 클릭 로드(글·리서치), 방문자 카운터·Naver 분석(운영 주소의 블로그 페이지에서만) |
+| `assets/js/site.js` | 메뉴 표시, 목차 따라가기, /posts/ 거르기, Disqus 클릭 로드(글·리서치), Naver 분석(운영 주소의 블로그 페이지에서만) |
 | `assets/img/` | 글 이미지, 파비콘 |
 | `feed-research/`, `_data/feed_research.yml` | 생성물. 위 "하지 말 것" 참고 |
 | `scripts/test-site.sh` | 빌드 산출물 검사 |
