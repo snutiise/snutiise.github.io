@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-20 — feed-research</title>
+<meta name="description" content="In one line: X rolled back both the experimental dwell-regret alternative scoring in home-mixer, its feed-assembly service, and the 19-feature user gate…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-20.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-20.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-20.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-20.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-20 — feed-research">
+<meta property="og:description" content="In one line: X rolled back both the experimental dwell-regret alternative scoring in home-mixer, its feed-assembly service, and the 19-feature user gate…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-20.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-20.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-20">2026-09-20</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Sunday</li>
+<li><span class="meta-k">Reading time</span>29 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-20.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X rolled back both the experimental dwell-regret alternative scoring in home-mixer, its feed-assembly service, and the 19-feature user gate that decided entry to it. Only the weighted path remains for score computation.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-home-mixers-experimental-dwell-regret-alternative-scoring-was-rolled-back--x"><span class="num">1</span>Home-mixer&#39;s experimental dwell-regret alternative scoring was rolled back — X</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#radar">Radar</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-home-mixers-experimental-dwell-regret-alternative-scoring-was-rolled-back--x"><span class="num">1</span>Home-mixer&#39;s experimental dwell-regret alternative scoring was rolled back — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/8b25829" target="_blank" rel="noopener">xai-org/x-algorithm@8b25829</a> — GitHub commit, author commit 2026-09-18T23:55:39Z, 41 files, +2,877/−1,828. These notes number the commits that came after X&#39;s public source Gen4 (2026-08-13, <a href="https://github.com/xai-org/x-algorithm/commit/47c1bcd" target="_blank" rel="noopener">47c1bcd</a>) in order; this commit is Gen4+25.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> This commit was registered 22 hours after the commit covered yesterday, Gen4+24 (<a href="https://github.com/xai-org/x-algorithm/commit/c279172" target="_blank" rel="noopener">c279172</a>), on the same date (2026-09-18). The 1,828 deleted lines roughly balance the 2,877 added lines, but the deletions are concentrated in three intertwined files (item A below). The commit rolls back one experimental scoring mode in home-mixer and also touches several other areas.</p></div>
+<p>The commit covers five axes.</p>
+<ul>
+<li>A. In the ranking scoring of home-mixer (the service that receives X&#39;s feed requests, gathers candidates, and ranks them), one experimental scoring mode introduced early in Gen4 was dropped.<ul>
+<li>Deleting the whole file <code>home-mixer/scorers/value_model_gate.rs</code> (−537) also cut <code>home-mixer/scorers/ranking_scorer.rs</code> substantially, by −465 lines.</li>
+<li><code>home-mixer/params/param.rs</code> lost 18 related parameters, at −110 lines.</li>
+</ul>
+</li>
+<li>B. A cold-start slice, distinguished by a dataset_type tag, was formally wired into Phoenix (X&#39;s For You ranking and candidate retrieval model stack) retrieval.</li>
+<li>C. Phoenix bundle export was extended from ranking only to also support two-tower (a retrieval model that embeds users and posts separately and matches them) retrieval.<ul>
+<li>In the Phoenix serving/train line, <code>recsys_bundle_export.py</code> was substantially reworked at +559/−107.</li>
+</ul>
+</li>
+<li>D. VF (visibility-filtering, a service that decides per post whether it may be shown to this viewer) gained a server implementation of the <code>evaluate_tweets</code> gRPC, which was a stub until yesterday. A hydrator also appeared that replaces the visibility fields TES (Tweet Entity Service, an X-internal tweet metadata service) used to supply. This hydrator fetches fields from Strato (an X-internal system that code goes through to read or store data) columns.<ul>
+<li>On the addition side, two new files appeared: <code>visibility-filtering/evaluate_tweets.rs</code> (+258) and <code>visibility-filtering/hydration/tes_composite.rs</code> (+607).</li>
+</ul>
+</li>
+<li>E. In infrastructure cleanup, the CUDA kernels were split out of the xrex repo into the external package <code>xrex_cuda_kernels</code>. Also, fav-count-based reasoning gating was added to the adult spam clone detection flow of grox (a Grok-based nearline classifier sub-repo).<ul>
+<li>The name of this detection flow starts with <code>media_injected_adult_infrared</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Of the five axes, A and D are events in different directions: the unwinding and the maturing of experiment infrastructure that has built up in Gen4. A is the cleanup of a separate scoring mode introduced early in Gen4, because the measured results were poor (no evidence is public; it is observed only as the deletion of whole files). D is a maturing flow in which a stub that had only the client interface open in Gen4+24 yesterday now extends to server logic.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The experimental scoring mode gated dwell-regret and its user gate were rolled back entirely</span></p></div>
+<ul>
+<li><p>The mode that used dwell-regret scoring through a gate, and the file that defined its per-user gate, were both rolled back <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The evidence file <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/home-mixer/scorers/value_model_gate.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/value_model_gate.rs</code></a> does not exist at 8b25829.</li>
+<li>The mode is <code>gated_dwell_regret</code>, and the file is <code>value_model_gate</code>.</li>
+<li>In the earlier Gen4 open-source history, this file defined <code>GateModel::from_params()</code>.</li>
+<li>GateModel normalized 19 user-state features with log1p, then produced a gate score as a logistic linear combination. It then flipped the assignment by request hash only within a hysteresis band.</li>
+<li>The feature list is <code>seq_len·n_fav·n_reply·n_rt_quote·n_vqv·n_click·n_bm_share·n_profile_follow·n_photo·n_negfb·n_7d·n_1d·active_days·active_days_7d·days_since_last·span_days·followers·followings·account_age_years</code>.</li>
+<li>The patch of the rollback commit shows this entire logic deleted, at −537 lines.</li>
+</ul>
+</li>
+<li><p>GateModel fired in <code>ranking_scorer.rs</code> only when the <code>ValueModelMode</code> parameter was in gating mode. At that point, depending on per-user conditions, it decided whether to use a dwell-regret-family alternative score based on dwell time.</p>
+<ul>
+<li><code>ValueModelMode</code> had three values (<code>weighted</code> / <code>dwell_regret_sigmoid</code> / <code>gated_dwell_regret</code>).</li>
+</ul>
+</li>
+<li><p>8b25829 removed all three value branches.</p>
+<blockquote>
+<pre tabindex="0"><code>-        let use_dwell_regret = match query.params.get(ValueModelMode).as_str() {
+-            DWELL_REGRET_SIGMOID_MODE =&gt; true,
+-            GATED_DWELL_REGRET_MODE =&gt; GateModel::from_params(&amp;query.params)
+-                .is_some_and(|gate| gate.serve_new_scoring(query)),
+-            _ =&gt; false,
+-        };
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a>, the deleted portion of 2026-09-18 (the actual source is gone)</p>
+</blockquote>
+</li>
+<li><p>There is no replacement logic. The conditional branch itself was removed, and only the <code>use_dwell_regret == false</code> branch remains in the <code>weighted_parts</code> and <code>weighted_scores</code> computation.</p>
+<ul>
+<li>Home-mixer scoring was simplified once more after Gen4+8 (2026-08-25) moved client-side head-weight generation to the server, and settled on a single weighted path.</li>
+</ul>
+</li>
+<li><p>Related elements were also deleted from <code>ranking_scorer.rs</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a> (+12/−465).</p>
+<ul>
+<li>The <code>DwellRegretWeights</code> struct and its <code>from_params()</code> constructor.<ul>
+<li>The struct&#39;s 13 tuning fields were <code>alpha_favorite</code>·<code>alpha_reply</code>·<code>alpha_retweet</code>·<code>alpha_quote</code>·<code>alpha_share</code>·<code>alpha_share_via_dm</code>·<code>alpha_share_via_copy_link</code>·<code>neg_not_interested</code>·<code>neg_block_author</code>·<code>neg_mute_author</code>·<code>neg_report</code>·<code>temperature</code>·<code>dwell_floor</code>.</li>
+</ul>
+</li>
+<li>The whole <code>compute_dwell_regret_base_scores()</code> function. This function averaged each parameter within the candidate set, then turned each candidate&#39;s relative preference into <code>centered_ratio = p / mean − 1</code>. It multiplied <code>positive</code> and <code>negative</code> by <code>sigmoid(positive/T)</code> and <code>exp(min(negative,0)/T)</code> respectively, and produced the final score as <code>dwell × modulation</code>. In other words, it is an alternative scoring function that &quot;modulates dwell time by engagement signals&quot;.</li>
+<li>The <code>centered_ratio()</code> and <code>sigmoid()</code> helpers.</li>
+<li>The logic that skipped <code>MultiplierPreOffset</code> under the <code>use_dwell_regret</code> branch.</li>
+<li>Seven regression tests, the <code>GATE_WEIGHTS_ALL_ZERO</code> constant, and the <code>&quot;rust_home_mixer_value_model_mode&quot;: &quot;weighted&quot;</code> override line in the existing regression tests.<ul>
+<li>Test names include <code>dwell_regret_neutral_post_scores_dwell</code>, <code>dwell_regret_above_average_likeable_is_boosted</code>, <code>dwell_regret_report_sinks_candidate</code>, <code>dwell_regret_floor_applies_to_low_dwell</code>, <code>dwell_regret_per_request_normalization_amplifies_for_low_engagement_set</code>, and others.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>The related parameters were also deleted symmetrically in the parameter mirror <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (+8/−110).</p>
+<ul>
+<li>This file is a mirror that periodically carries over production config values. This mirror sync time changed to <code>2026-09-17T20:46:44Z → 2026-09-18T16:21:20Z</code>.</li>
+<li>18 params were deleted.</li>
+</ul>
+</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Feature switch key</th>
+<th align="right">Default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ValueModelMode</code></td>
+<td><code>rust_home_mixer_value_model_mode</code></td>
+<td align="right"><code>&quot;weighted&quot;</code></td>
+</tr>
+<tr>
+<td><code>DwellRegretTemperature</code></td>
+<td><code>..._dwell_regret_temperature</code></td>
+<td align="right">10.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretDwellFloor</code></td>
+<td><code>..._dwell_regret_dwell_floor</code></td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretAlphaFavorite</code></td>
+<td><code>..._dwell_regret_alpha_favorite</code></td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretAlphaReply</code></td>
+<td><code>..._dwell_regret_alpha_reply</code></td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretAlphaRetweet</code></td>
+<td><code>..._dwell_regret_alpha_retweet</code></td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretAlphaQuote</code></td>
+<td><code>..._dwell_regret_alpha_quote</code></td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretAlphaShare</code></td>
+<td><code>..._dwell_regret_alpha_share</code></td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretAlphaShareViaDm</code></td>
+<td><code>..._dwell_regret_alpha_share_via_dm</code></td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretAlphaShareViaCopyLink</code></td>
+<td><code>..._dwell_regret_alpha_share_via_copy_link</code></td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td><code>DwellRegretNegNotInterested</code></td>
+<td><code>..._dwell_regret_neg_not_interested</code></td>
+<td align="right">−10,000</td>
+</tr>
+<tr>
+<td><code>DwellRegretNegBlockAuthor</code></td>
+<td><code>..._dwell_regret_neg_block_author</code></td>
+<td align="right">−8,000</td>
+</tr>
+<tr>
+<td><code>DwellRegretNegMuteAuthor</code></td>
+<td><code>..._dwell_regret_neg_mute_author</code></td>
+<td align="right">−15,000</td>
+</tr>
+<tr>
+<td><code>DwellRegretNegReport</code></td>
+<td><code>..._dwell_regret_neg_report</code></td>
+<td align="right">−60,000</td>
+</tr>
+<tr>
+<td><code>DwellRegretGateWeights</code></td>
+<td><code>..._dwell_regret_gate_weights</code></td>
+<td align="right">19-feature logistic weight string</td>
+</tr>
+<tr>
+<td><code>DwellRegretGateBias</code></td>
+<td><code>..._dwell_regret_gate_bias</code></td>
+<td align="right">1.033918</td>
+</tr>
+<tr>
+<td><code>DwellRegretGateThreshold</code></td>
+<td><code>..._dwell_regret_gate_threshold</code></td>
+<td align="right">−0.634264</td>
+</tr>
+<tr>
+<td><code>DwellRegretGateHysteresisBand</code></td>
+<td><code>..._dwell_regret_gate_hysteresis_band</code></td>
+<td align="right">0.0</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li><p>The production default of the rolled-back parameter confirms that the gate held actually trained weights. This is because the default string of <code>DwellRegretGateWeights</code> was still present at the time of deletion.</p>
+<blockquote>
+<p><code>&quot;seq_len:0.530298,n_fav:-0.082139,n_reply:0.485541,n_rt_quote:0.056561,n_vqv:-0.072778,n_click:-0.176675,n_bm_share:-0.167574,n_profile_follow:-0.221285,n_photo:-0.106004,n_negfb:0.031839,n_7d:-0.075799,n_1d:-0.241730,active_days:0.047017,active_days_7d:-0.126896,days_since_last:-0.034238,span_days:-0.052186,followers:-0.066642,followings:0.064140,account_age_years:-0.045455&quot;</code></p>
+</blockquote>
+<ul>
+<li>Strong positive weights were placed on two axes, <code>seq_len</code> (current session sequence length) and <code>n_reply</code> (28-day reply count).</li>
+<li>Negative weights were placed on the remaining interaction counts (<code>n_click</code>, <code>n_bm_share</code>, <code>n_profile_follow</code>, <code>n_1d</code>).</li>
+<li>In other words, the goal appears to have been serving dwell-regret alternative scoring to users who are &quot;long-session active and have strong recent reply activity&quot;.</li>
+<li>These coefficients are no longer applied to any user.</li>
+</ul>
+</li>
+</ul>
+<p>The experimental alternative function that sat beside ranking scoring in Gen4 (modulating dwell time by engagement signals) and its user gating were removed all at once, and ranking scoring narrowed back to a single weighted path. How to reflect the dwell signal here appears to have moved to adding heads at training time and redefining score combination <span class="badge est">inferred</span>. Examples are the <code>click_dwell_time</code> sigmoid BCE (threshold=10s) formally wired in Gen4+22 and the <code>EnableCdwellOnImpr</code> (click × dwell product) of Gen4+23 <span class="badge est">inferred</span>. The evidence is that the timing of the two flows is adjacent, and the observation that once the circuit modulating dwell through a separate scoring function disappeared, only circuits treating dwell as a head itself and as a combination term remain.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A cold-start slice was wired into Phoenix retrieval, but it is not requested by default</span></p></div>
+<ul>
+<li><p>A cold-start slice distinguished by a dedicated tag was formally wired into Phoenix retrieval <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The evidence file is <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/home-mixer/sources/phoenix_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/phoenix_source.rs</code></a> (+67/−19).</li>
+<li>The tag is <code>HOME_COLD_DATASET_TYPE=13</code>.</li>
+</ul>
+</li>
+<li><p>A new parameter <code>PhoenixColdStartMaxResults</code> was added, so two caps are passed together when calling the retrieval RPC.</p>
+<ul>
+<li>The feature switch is <code>rust_home_mixer_phoenix_cold_start_max_results</code>, and the default is <code>0</code>.</li>
+</ul>
+<blockquote>
+<pre tabindex="0"><code>         quality_factor::apply(query.params.get(PhoenixMaxResults)),
++        query.params.get(PhoenixColdStartMaxResults),
+</code></pre>
+</blockquote>
+<ul>
+<li>Because the default is 0, production by default still does not request the cold-start slice.</li>
+</ul>
+</li>
+<li><p>Response candidates carry dataset_type, and served_type (the source label attached to a candidate) differs by that value.</p>
+<ul>
+<li>The response candidate (<code>ScoredCandidate</code>) carries a <code>dataset_type: u32</code> field.</li>
+<li>If that value is <code>HOME_COLD_DATASET_TYPE = 13</code>, served_type maps to the new enum <code>ForYouPhoenixRetrievalCold</code>; otherwise it maps to the existing <code>ForYouPhoenixRetrieval</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const HOME_COLD_DATASET_TYPE: u32 = 13;
+
+fn served_type_for_dataset(dataset_type: u32) -&gt; pb::ServedType {
+    if dataset_type == HOME_COLD_DATASET_TYPE {
+        pb::ServedType::ForYouPhoenixRetrievalCold
+    } else {
+        pb::ServedType::ForYouPhoenixRetrieval
+    }
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/home-mixer/sources/phoenix_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/phoenix_source.rs</code></a></p>
+</blockquote>
+</li>
+<li><p>A matching observation line was attached on the side-effect side too <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/home-mixer/side_effects/scored_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/scored_stats_side_effect.rs</code></a> (+25/−0).</p>
+<ul>
+<li>The new function <code>record_phoenix_retrieval_cold_stats</code> emits size statistics of selected/non-selected candidates to the stat receiver under the prefix <code>PhoenixRetrievalColdTweets</code>.</li>
+<li>It is the third observation axis alongside the existing MoE slice (<code>PhoenixRetrievalMoeTweets</code>). MoE (Mixture of Experts) is a model structure that, for each input, picks and uses some of several expert subnetworks.</li>
+</ul>
+</li>
+<li><p>The MoE source and Topics source do not share this cold-start slice logic (confirmed in the patch).</p>
+<ul>
+<li><code>phoenix_moe_source.rs</code> and <code>phoenix_topics_source.rs</code> each also grew by 1 line, but both are new import line additions.</li>
+<li>The two sources keep using the <code>ForYouPhoenixRetrievalMoe</code> and <code>ForYouPhoenixRetrievalTopics</code> served_type as before.</li>
+</ul>
+</li>
+</ul>
+<p>Until now, X&#39;s cold-start handling had two axes:</p>
+<ul>
+<li>Users whose history is below a threshold are routed to a separate model fleet. Retrieval and ranking each have <code>Phoenix*NewUserInferenceClusterId</code>.</li>
+<li>New authors (at or below <code>ColdStartImpressionThreshold=1000</code>) get a <code>PostUnexploredWeight=0.02</code> boost, and there is the Thompson sampling option from Gen4+1.</li>
+</ul>
+<p>This wiring opens a third axis at the candidate level. Within the candidate set returned by the same Phoenix retrieval RPC, a separate cap is placed on the &quot;cold&quot; subset by the dataset_type tag, and it is observed. That is, Phoenix retrieval itself appears to have been extended to always return a cold candidate slice together, regardless of user history <span class="badge est">inferred</span>. The evidence is that the default is 0, so it has not yet entered the production default, but the observation stat lines were also wired symmetrically, which indicates that the A/B infrastructure is complete.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Phoenix bundle export can now export the forward program of two-tower retrieval as well as ranking</span></p></div>
+<ul>
+<li><p>Phoenix bundle export was extended to export the two-tower retrieval forward in addition to the ranking forward <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The evidence file is <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a> (+559/−107).</li>
+<li>This file was introduced at 634 lines in Gen4+13 (2026-09-01, 7ba7768). It exported the ranking model (<code>RecsysAggregatedModelConfig</code>), lowered with <code>jax.export</code>, to StableHLO MLIR bytecode, <code>.jax_export</code>, and <code>MANIFEST.json</code>.</li>
+<li>This commit attached retrieval two-tower program export alongside it. Two new axes appeared.</li>
+</ul>
+</li>
+<li><p>Axis 1: the number of program kinds grew to two <span class="badge ok">verified</span>. Two constants distinguish the program kind within the export bundle.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">KIND_RANKING = &quot;recsys_ranking_forward&quot;
+KIND_RETRIEVAL = &quot;recsys_retrieval_forward&quot;
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>Axis 2: because the retrieval export must carry additional resources in the bundle, new data structures and wire keys were introduced.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">POST_TABLE_KEY = &quot;post_embeddings.embeddings&quot;
+POST_DATASET_TYPES_KEY = &quot;post_embeddings.dataset_types&quot;
+POST_IDS_KEY = &quot;post_embeddings.post_ids&quot;
+AUTHOR_IDS_KEY = &quot;post_embeddings.author_ids&quot;
+</code></pre></figure>
+</blockquote>
+<ul>
+<li>The new dataclass <code>RetrievalExport</code> holds five attributes that must be extracted from the trainer&#39;s <code>RetrievalModelRunner</code> at export time. The attributes are <code>large_k</code>, <code>retrieval_dataset_types</code>, <code>enable_async_topk</code>, <code>enable_radix_select_topk</code>, and <code>enable_dataset_slice_topk</code>.</li>
+<li>The manifest block carries the items below.<ul>
+<li>large_k</li>
+<li>target dataset types (a list of name·value pairs)</li>
+<li>post table geometry (rows·width·dtype)</li>
+<li>three data keys (POST_TABLE_KEY·POST_DATASET_TYPES_KEY·POST_IDS_KEY·AUTHOR_IDS_KEY)</li>
+<li><code>topk_unordered</code> flag</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>The retrieval forward extracts a user embedding with the user tower, matches it against the whole post table, and returns top-K for each target dataset type <span class="badge ok">verified</span> — new function <code>_make_retrieval_forward_fn</code>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def forward_fn(
+    batch: Any, merged_embeddings: jax.Array, post_table: jax.Array, dataset_types: jax.Array
+):
+    recsys_embeddings = _recsys_embeddings_from_merged(
+        merged_embeddings, embedding_slices, packed_geometry
+    )
+    model = model_config.make(sharding_context=make_legacy_sharding_context(mesh))
+    results = model.forward(
+        batch, recsys_embeddings, post_table, dataset_types,
+        retrieval.large_k, target_values,
+        dataset_ranges=None,
+        use_async_topk=retrieval.use_async_topk,
+        use_radix_select_topk=retrieval.use_radix_select_topk,
+        post_scales=None,
+    )
+    flat: list[jax.Array] = []
+    for indices, scores in results:
+        flat.append(indices)
+        flat.append(scores)
+    return tuple(flat)
+</code></pre></figure>
+</blockquote>
+<ul>
+<li>Each target dataset type yields two outputs (<code>indices_&lt;name&gt;</code>, <code>scores_&lt;name&gt;</code>). This naming rule is defined in the <code>RetrievalExport.output_names</code> property.</li>
+</ul>
+</li>
+<li><p>For two-tower, the rule for computing the serving sequence length differs.</p>
+<ul>
+<li><code>_make_export_config</code> also gained two arguments, <code>two_tower: bool = False</code> and <code>mesh_devices: int = 1</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def _user_tower_sequence_len(
+    *, training_seq_len, training_history_seq_len, num_user_prefix_tokens, history_seq_len,
+) -&gt; int:
+    prefix_tokens = training_seq_len - training_history_seq_len
+    if prefix_tokens != num_user_prefix_tokens:
+        raise ValueError(
+            f&quot;cannot derive the serving user-tower sequence_len: sequence_len &quot;
+            f&quot;{training_seq_len} - history_seq_len {training_history_seq_len} = {prefix_tokens} &quot;
+            f&quot;prefix tokens, but the model reserves num_user_prefix_tokens=&quot;
+            f&quot;{num_user_prefix_tokens}. The user tower is built as prefix + history; if &quot;
+            &quot;history_seq_len was overridden for serving, also override &quot;
+            &quot;model_config.user_tower_config.model_config.sequence_len to &quot;
+            f&quot;{num_user_prefix_tokens + history_seq_len} (prefix + serving history), as the &quot;
+            &quot;jax slot does — otherwise the attention kernel cannot be sized for serving&quot;
+        )
+    return prefix_tokens + history_seq_len
+</code></pre></figure>
+</blockquote>
+<ul>
+<li>The ranking export&#39;s serving sequence is <code>prefix + history + candidate</code>, but the retrieval export has only <code>prefix + history</code>. There is no candidate axis, and it emits only the user embedding.</li>
+<li>The overrides of <code>_make_export_config</code> also use <code>model_config.user_tower_config.model_config.sequence_len</code> instead of <code>model_config.model_config.sequence_len</code>.</li>
+</ul>
+</li>
+<li><p>The third new addition is distributed export. The retrieval bundle is exported over a mesh and can be distributed across multiple devices.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">if not two_tower and mesh_devices != 1:
+    raise NotImplementedError(
+        &quot;ranking programs are single-device (one executable per GPU); &quot;
+        f&quot;mesh_devices={mesh_devices} is only for retrieval bundles&quot;
+    )
+</code></pre></figure>
+</blockquote>
+<ul>
+<li>The reason is also stated explicitly. Ranking is served with one executable per GPU, but retrieval has to split the post table across several devices, so it is exported with SPMD.</li>
+<li><code>_export_mesh</code> checks <code>export_cfg.parallel_config.mesh_shape()</code> to build the devices. <code>_retrieval_shardings</code> specifies <code>NamedSharding</code> for batch/params/post_table/dataset_types.</li>
+<li>Embedding rows are partitioned across the data axis, and params are replicated.</li>
+</ul>
+</li>
+<li><p>Several constraints are imposed explicitly.</p>
+<ul>
+<li><code>enable_int8_post_table</code>, <code>enable_bloom_filter</code>, and <code>enable_topic_filter</code> are not supported. These options are supported only by the native runtime, and StableHLO export uses a bf16 post table with no per-post filter.</li>
+<li><code>enable_dataset_slice_topk=True</code> is ignored and a warning is raised. The export program always compiles only the mask-then-topk-over-whole-table path.</li>
+<li>The <code>using_seqpack + two_tower</code> combination is prohibited. Packing does not fit the SPMD model.</li>
+<li>With <code>DEBUG_ALLOW_RANDOM_INIT=1</code>, the export itself is refused. This is because exporting without a mask would emit an invalid program.</li>
+</ul>
+</li>
+<li><p><code>build_bundle</code> now accepts both kinds of models.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">two_tower = isinstance(model_config, RecsysTwoTowerModelConfig)
+if not two_tower and (
+    not isinstance(model_config, RecsysAggregatedModelConfig)
+    or isinstance(model_config, RecsysGenRecsModelConfig)
+):
+    raise NotImplementedError(
+        &quot;StableHLO bundle export supports ranking (RecsysAggregatedModelConfig) and &quot;
+        f&quot;retrieval (RecsysTwoTowerModelConfig) only, got {type(model_config).__name__}&quot;
+    )
+</code></pre></figure>
+</blockquote>
+</li>
+</ul>
+<p>Until now, Phoenix serving carried only the ranking forward in a StableHLO bundle. With this commit, preparation for carrying retrieval two-tower in the same bundle frame is complete. Because infrastructure for exporting retrieval distributed across several devices via SPMD was attached too, the direction is for Phoenix retrieval&#39;s serving stack to be unified under the same bundle format as ranking. It may not be a coincidence that this landed at the same time as the <code>PhoenixColdStartMaxResults</code> wiring in B above <span class="badge est">inferred</span>. In effect, while the retrieval serving axis was being tightened, the slice observation interface via the dataset_type tag settled alongside it <span class="badge est">inferred</span>.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. VF now has a server that receives verdict requests, and takes the visibility fields for verdicts from a Strato column instead of TES</span></p></div>
+<ul>
+<li>A server implementation of the gRPC that receives verdict requests was attached to VF, and the visibility fields TES used to supply moved to a Strato column hydrator <span class="badge ok">verified</span>.<ul>
+<li>New files: <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/visibility-filtering/evaluate_tweets.rs" target="_blank" rel="noopener"><code>visibility-filtering/evaluate_tweets.rs</code></a> (+258), <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/visibility-filtering/hydration/tes_composite.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/tes_composite.rs</code></a> (+607)</li>
+<li>Files changed together:<ul>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/8b25829/visibility-filtering/server.rs" target="_blank" rel="noopener"><code>visibility-filtering/server.rs</code></a>(+86/−2)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/8b25829/visibility-filtering/filter.rs" target="_blank" rel="noopener"><code>visibility-filtering/filter.rs</code></a>(+336/−13)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/8b25829/visibility-filtering/hydration/tes_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/tes_hydrator.rs</code></a>(+113/−320)</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/8b25829/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs</code></a>(+78/−22)</li>
+</ul>
+</li>
+<li>This gRPC is <code>evaluate_tweets</code>.</li>
+</ul>
+</li>
+</ul>
+<p>This axis splits into two sub-axes.</p>
+<p><strong>D1. The verdict-request RPC that was a stub until yesterday was filled in with server logic by this commit.</strong></p>
+<ul>
+<li><p><a href="daily-2026-09-18.html">daily/2026-09-18.md</a> records the observation that Gen4+23 (42266f3) on 2026-09-17 opened only the client interface of the <code>evaluate_tweets</code> RPC and the Thrift decoder for the response payload. According to the same observation, the server implementation was <code>Err(Status::unimplemented(&quot;EvaluateTweets is not served yet&quot;))</code>.</p>
+</li>
+<li><p>This commit fills that <code>evaluate_tweets</code> stub with server logic. The <code>server.rs</code> patch directly shows the unimplemented stub being replaced with a real implementation.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">     async fn evaluate_tweets(
+         &amp;self,
+-        _: Request&lt;vf_pb::EvaluateTweetsRequest&gt;,
++        request: Request&lt;vf_pb::EvaluateTweetsRequest&gt;,
+     ) -&gt; Result&lt;Response&lt;vf_pb::EvaluateTweetsResponse&gt;, Status&gt; {
+-        Err(Status::unimplemented(&quot;EvaluateTweets is not served yet&quot;))
++        self.evaluate_tweets.handle(request).await
+     }
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>The new server endpoint <code>EvaluateTweetsEndpoint</code> (258 new lines) receives a request, runs the internal filter, and fills the response with a per-tweet <code>Outcome</code>.</p>
+<ul>
+<li>It receives the request&#39;s three fields (<code>viewer_id</code>, <code>country_code</code>, <code>safety_level</code>) and a tweet list.</li>
+<li>safety_level is converted from the Thrift enum to the internal Rust <code>SafetyLevel</code> enum. Only three values are allowed: <code>FILTER_ALL</code>, <code>TIMELINE_HOME</code>, and <code>TIMELINE_HOME_RECOMMENDATIONS</code>.</li>
+<li>It then calls <code>FilterTweets::run</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let candidates = req.tweets.iter()
+    .filter(|o| o.quote_context.is_none())
+    .map(|o| RawCandidate { tweet_id: TweetId(o.tweet_id), request_author_id: None })
+    .collect();
+let response = self.filter_tweets.run(FilterRequest { viewer_id, country_code, safety_level, candidates }).await;
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>Three metrics (<code>evaluate_tweets_requests</code>, <code>evaluate_tweets_latency_ms</code>, <code>evaluate_tweets_batch_size</code>) are recorded for each request.</p>
+</li>
+<li><p>The <code>evaluate_tweets_loopback</code> integration test pins the fact that the server logic is wired in. This test starts the gRPC server on a tokio TCP listener and makes a round-trip call with XaiVfClient.</p>
+</li>
+</ul>
+<p><strong>D2. Besides the verdict, an evaluation status is attached to the result.</strong></p>
+<ul>
+<li><p>An <code>EvaluationStatus</code> axis was added to <code>FilterOutcome</code>. A new enum appears in <code>filter.rs</code>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EvaluationStatus {
+    Evaluated,
+    UnresolvedAuthor,
+    Failed,
+}
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>Previously the filter could emit only one <code>Verdict</code> per tweet. Now one of three statuses is attached next to the verdict.</p>
+<ul>
+<li>A tweet whose hydration succeeded is <code>Evaluated</code>.</li>
+<li>A tweet whose author did not come out of hydration is <code>UnresolvedAuthor</code>, and its verdict is <code>Verdict::unresolved_author()</code>.</li>
+<li>A tweet that hit the rules with insufficient fields because hydration itself failed is <code>Failed</code>.</li>
+<li><code>HydrationOutput</code> also gained a new field <code>failed_ids: HashSet&lt;TweetId&gt;</code> to distinguish the third case (<code>Failed</code>).</li>
+</ul>
+</li>
+<li><p>The axis names line up with the client-side <code>EvaluationResult { Evaluated(Box&lt;Action&gt;), NotEvaluated, Failed }</code> (introduced in Gen4+23), and we infer that the server and client axes mesh as follows <span class="badge est">inferred</span>.</p>
+<ul>
+<li><code>EvaluationStatus::UnresolvedAuthor + Verdict::unresolved_author()</code> → <code>EvaluationResult::NotEvaluated</code></li>
+<li><code>EvaluationStatus::Failed</code> → <code>EvaluationResult::Failed</code></li>
+<li><code>EvaluationStatus::Evaluated + Verdict::*</code> → <code>EvaluationResult::Evaluated(Action)</code></li>
+<li>It is left as an inference because the patch does not show the mapping directly, only the assembly of <code>EvaluateTweetsResponse</code>. However, the value names of the two axes are symmetric.</li>
+</ul>
+</li>
+</ul>
+<p><strong>D3. The seven visibility field kinds that TES handled moved to a separate Strato column hydrator.</strong></p>
+<ul>
+<li><p><code>tes_hydrator.rs</code> shrank substantially, by −320 lines, and most of the deleted part is the <code>TweetHydration</code> struct.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">-#[derive(Default)]
+-pub(crate) struct TweetHydration {
+-    pub(crate) nullcast: TweetHydrationBatch&lt;bool&gt;,
+-    pub(crate) community: TweetHydrationBatch&lt;i64&gt;,
+-    pub(crate) nsfw_user: TweetHydrationBatch&lt;bool&gt;,
+-    pub(crate) nsfw_admin: TweetHydrationBatch&lt;bool&gt;,
+-    pub(crate) takedown_reasons: TweetHydrationBatch&lt;Vec&lt;TakedownReason&gt;&gt;,
+-    pub(crate) edit_control: TweetHydrationBatch&lt;EditControl&gt;,
+-    pub(crate) media: TweetHydrationBatch&lt;MediaFeature&gt;,
+-}
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>These seven axes were unified into a single <code>TweetHydrationBatch&lt;TweetForVisibility&gt;</code>. <code>TweetForVisibility</code> is an 11-field struct defined in the new file <code>tes_composite.rs</code>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) struct TweetForVisibility {
+    pub(crate) author_id: u64,
+    pub(crate) source_tweet_id: Option&lt;u64&gt;,
+    pub(crate) is_nullcast: bool,
+    pub(crate) nsfw_user: bool,
+    pub(crate) nsfw_admin: bool,
+    pub(crate) has_takedown: bool,
+    pub(crate) takedown_reasons: Vec&lt;TakedownReason&gt;,
+    pub(crate) media: MediaFeature,
+    pub(crate) is_community_tweet: bool,
+    pub(crate) edit_control: Option&lt;EditControl&gt;,
+    pub(crate) exclusive_conversation_author_id: Option&lt;u64&gt;,
+}
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>The source that fetches this data is a fetch operation on a Strato column, not TES <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/visibility-filtering/hydration/tes_composite.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/tes_composite.rs</code></a>.</p>
+<ul>
+<li>The column is <code>tweetypie/federated/tweetForVisibility.Tweet</code>, and the operation is <code>fetch</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const COLUMN: &amp;str = &quot;tweetypie/federated/tweetForVisibility.Tweet&quot;;
+const OPERATION: &amp;str = &quot;fetch&quot;;
+</code></pre></figure>
+</blockquote>
+<ul>
+<li><code>ProdTweetForVisibilitySource::get_tweets_for_visibility</code> sends the list of tweet_ids as a batch call to this column. The response is decoded as MVal (Strato), and the Thrift-defined <code>Tweet</code> is flattened with <code>TweetForVisibility::project()</code> and returned.</li>
+<li>In other words, a VF-specific Strato column interface separate from TES was opened.</li>
+</ul>
+</li>
+<li><p><code>TesHydrator</code> still exists, but it now orchestrates two sources.</p>
+<ul>
+<li>From TES it still receives <code>PureCoreData</code> (corpus-dimension signals such as author_id, text, and source_tweet_id).</li>
+<li>From <code>TweetForVisibilitySource</code> it receives the flag/label axes that the visibility rules require.</li>
+<li>That is, corpus data and visibility data were split onto different Strato backends.</li>
+</ul>
+</li>
+</ul>
+<p>Until now, VF had referenced TES&#39;s broad tweet fields as they are. It now breaks from that practice and looks up only the minimum field set needed for visibility rules from a separate Strato column. Three axes settled together:</p>
+<ul>
+<li>In <a href="https://github.com/xai-org/x-algorithm/commit/7ba7768" target="_blank" rel="noopener">Gen4+13</a>, the VF rules were restructured into a two-way tweet/author split.</li>
+<li><a href="https://github.com/xai-org/x-algorithm/commit/42266f3" target="_blank" rel="noopener">Gen4+23</a> deleted its own twemcache subtree of 3,234 lines entirely and moved to the company-wide <code>xai_cache</code>, while opening the evaluate_tweets client interface as a stub.</li>
+<li>Today the server implementation and the TES separation are completed.</li>
+</ul>
+<p>That is, in Gen4 VF was reorganized layer by layer in the order rules → dependencies → serving interface.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. grox&#39;s adult spam video detection turns on reasoning mode only for posts whose like count is at or above a threshold</span></p></div>
+<ul>
+<li><p>Reasoning mode was attached to the grox detection flow through fav-count (like count) gating <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The evidence file is <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/grox/flows/ptos/task_safety_ptos_media_injected_adult_infrared_video_spam_detection.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_media_injected_adult_infrared_video_spam_detection.py</code></a> (+14/−9).</li>
+<li>The target is the <code>media_injected_adult_infrared_video_spam_detection</code> flow. It was introduced in Gen4+24 and compares a reference video bundle with the VLM storyboard of the candidate video.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">use_reasoning = post.get_fav_count() &gt;= MEDIA_INJECTED_REASONING_FAV
+...
+prompt = media_injected_adult_infrared_video_spam_detection_prompt()
+system_prompt = (
+    _strip_thinking_restrictions(prompt) if use_reasoning else prompt
+)
+...
+assistant_content = [] if use_reasoning else [THINKING_CONTROL_END]
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>For posts whose fav count is at or above the threshold, a path where the model thinks explicitly opens.</p>
+<ul>
+<li>It strips the &quot;thinking restrictions&quot; from the system prompt and leaves the <code>THINKING_CONTROL_END</code> marker of the assistant response empty.</li>
+</ul>
+</li>
+<li><p>The value of the threshold <code>MEDIA_INJECTED_REASONING_FAV</code> went into <code>grox/flows/ptos/constants.py</code>, but the value is not exposed in the patch.</p>
+</li>
+<li><p>The <code>SafetyPtosPolicyCrossValidator</code> of Gen4+7 (2026-08-24) turned on reasoning only for the categories <code>USE_REASONING_CATEGORIES = {ViolentSpeech, SuicideOrSelfHarm}</code>. This time, reasoning is gated on the individual post axis by fav count.</p>
+</li>
+</ul>
+<p>This gating is a typical binary branch for spending cost only on threads with high fav counts. It is in the same family as the <code>oai-gemma4-26b-reply-spam</code> binary branch of Gen4+22 (2026-09-16) (threads over 150k followers). The <code>deluxe_fav_count_threshold</code> special-video entry gate of Gen4+12 (2026-09-01) is in the same family too.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The MoE inference cluster ID of Phoenix retrieval was rolled forward <span class="badge ok">verified</span>.<ul>
+<li>The evidence is <code>param.rs</code>, and the value changed: <code>Experiment2Memy04 → Experiment3Memy04</code>.</li>
+</ul>
+</li>
+<li>The loaders of three CUDA kernels were changed to load the external package <code>xrex_cuda_kernels</code> instead of in-repo sources <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/cuda/adler32/__init__.py" target="_blank" rel="noopener"><code>phoenix/xrex/cuda/adler32/__init__.py</code></a> (+21/−6).<ul>
+<li><p>Other files: <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/cuda/top_k_by_key/__init__.py" target="_blank" rel="noopener"><code>phoenix/xrex/cuda/top_k_by_key/__init__.py</code></a> (+26/−6), <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/cuda/unique/__init__.py" target="_blank" rel="noopener"><code>phoenix/xrex/cuda/unique/__init__.py</code></a> (+15/−5), <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/cuda/__init__.py" target="_blank" rel="noopener"><code>phoenix/xrex/cuda/__init__.py</code></a> (+11/−4)</p>
+</li>
+<li><p>Until now they were imported with <code>from xrex.cuda.&lt;name&gt;.src import &lt;name&gt;_api</code> (a subfolder in the repo). Now this changes to <code>import xrex_cuda_kernels.&lt;name&gt;_api as &lt;name&gt;_api</code> (an external package). For example, <code>adler32/__init__.py</code> changed like this:</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">try:
+    import xrex_cuda_kernels.adler32_api as adler32_api
+except ModuleNotFoundError:
+    adler32_api = None
+else:
+    jax.ffi.register_ffi_target(&quot;xrex_adler32&quot;, adler32_api.adler32(), platform=&quot;CUDA&quot;)
+    _FFI_BACKENDS.add(&quot;gpu&quot;)
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>If a module is missing, it silently falls back instead of throwing an exception.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">if _MISSING:
+    _log.warning(
+        &quot;xrex.cuda.adler32: xrex_cuda_kernels.%s not installed; the zlib pure_callback &quot;
+        &quot;reference path runs instead of the compiled kernel(s)&quot;,
+        &quot;, &quot;.join(_MISSING),
+    )
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>In environments where the package is not installed, the pure-Python reference path of zlib&#39;s <code>pure_callback</code> runs instead. <code>top_k_by_key</code> and <code>unique</code> follow the same pattern.</p>
+</li>
+<li><p>Until now the xrex repo even contained the CUDA kernel sources (<code>src/</code>). With this commit, the kernel binaries were split into a separately installed Python package (not included in the open-source release).</p>
+</li>
+<li><p>Open-source users run the reference path, and only the production xrex environment uses the compiled kernels. This is cleanup in the same direction as Gen4+21 (2026-09-15) changing the H100 attn kernel (<code>pallas_ranker_varlen_attn → cutedsl_ranker_varlen_attn</code>).</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a Gen4+25 row to the top-level timeline table of <a href="x.html">../services/x.md</a> and created a detailed section at the bottom.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X&#39;s open source, which had been moving in an additive direction through yesterday&#39;s commit (Gen4+24), today for the first time in Gen4 also carries a rollback. In addition, Gen4 is &quot;maturing&quot; on three axes.</p></div>
+<ul>
+<li>The rolled-back <code>value_model_gate</code> (the 19-feature user gate) and the two scoring modes <code>dwell_regret_sigmoid</code> and <code>gated_dwell_regret</code> were introduced early in Gen4. They coexisted with the removal of client-side head weights in Gen4+8 (2026-08-25), but the reason to roll them forward appears to have disappeared in the measured metrics (no A/B results are public).</li>
+<li>What was rolled back was an experimental path not in the canon, so the canon gets no new claim, only the observation that &quot;this axis was tried and then cleaned up&quot;.</li>
+<li>The first axis that is maturing is the dataset_type axis of Phoenix retrieval (B above). The server is complete through dataset_slice_topk, and the open-source code exposes only the candidate slice cap and observation stats.</li>
+<li>The second axis is Phoenix bundle export (C above). The format, which could previously carry only ranking, was extended to carry the retrieval two-tower as well, and SPMD distributed export was attached.</li>
+<li>The third axis is VF (D above). Three layers were organized in this order: rules (Gen4+13) → deps (Gen4+23) → serving interface (today). Through Gen3, VF was a &quot;label consumer&quot;; in Gen4, VF is taking shape as &quot;a separate service that stores, looks up, and serves labels&quot;.</li>
+</ul>
+<h2 id="corrections">Corrections</h2>
+<p>The server implementation of the verdict service that yesterday&#39;s daily predicted was confirmed today, and we found a commit attribution error in the source summary of the same daily.</p>
+<ul>
+<li>The prediction in the <code>## What to check next</code> section of yesterday&#39;s daily (<a href="daily-2026-09-19.html">2026-09-19.md</a>) was partly confirmed. The item &quot;server-side implementation of the VF <code>evaluate_tweets</code> RPC&quot; was confirmed as being implemented, exactly that server, in today&#39;s commit (D1 above).<ul>
+<li>However, the source summary at the top of yesterday&#39;s daily wrongly attributed evaluate_tweets to c279172 (yesterday&#39;s commit). In c279172, VF actually had only a 2-line addition to <a href="https://github.com/xai-org/x-algorithm/blob/c279172/visibility-filtering/hydration/gizmoduck_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></a> (confirmed with gh api).</li>
+<li>The evaluate_tweets client stub shipped in Gen4+23 (2026-09-17, <a href="https://github.com/xai-org/x-algorithm/commit/42266f3" target="_blank" rel="noopener">42266f3</a>), and <a href="daily-2026-09-18.html">daily/2026-09-18.md</a> cited it correctly as 42266f3.</li>
+<li>The canon is not affected. The Gen4+23 row in x.md already states 42266f3 explicitly.</li>
+</ul>
+</li>
+<li>The fact that home-mixer scoring had a separate <code>ValueModelMode</code> experiment was not in the canon (services/x.md) and was mentioned in only one place, <a href="daily-2026-09-10.html">daily/2026-09-10.md</a>. Now that it is rolled back, there is no need to fold this axis into the canon again.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><p>There are five things to follow up on from today&#39;s commit.</p>
+<ul>
+<li>Check when the cold-start cap <code>PhoenixColdStartMaxResults</code> is turned on — the open-source default of this parameter is 0. Which training and serving config supplies the actual value, and in what ratio it splits against <code>PhoenixMaxResults=1000</code>, determine the actual share of the dataset_type=13 cold-start slice.</li>
+<li>Check whether the bundle export of the two-tower model config (<code>RecsysTwoTowerModelConfig</code>) is actually used — Phoenix retrieval serving has so far run on the native runtime (<code>RetrievalModelRunner</code>). The checkpoint to watch is whether it moves to StableHLO bundle serving.<ul>
+<li>Check which batch job (the <code>recsys_export.py</code> family) actually triggers the second kind supported by the new build_bundle, and which retrieval serving engine loads the exported bundle.</li>
+</ul>
+</li>
+<li>Check whether the schema of the VF-only Strato column stabilizes — this column may settle into an interface exposing only the minimal field set needed for VF&#39;s visibility rules, or it may widen again toward TES over time. Which way it goes determines whether the VF-TES separation lasts.<ul>
+<li>The target column is <code>tweetypie/federated/tweetForVisibility.Tweet</code>.</li>
+</ul>
+</li>
+<li>Check the actual value of the reasoning threshold <code>MEDIA_INJECTED_REASONING_FAV</code> — this value, added to <code>grox/flows/ptos/constants.py</code>, is still undisclosed. Also check at what scale it compares with <code>GROK_GEMMA_FOLLOWER_SPLIT</code> (150k) in Gen4+22 or <code>deluxe_fav_count_threshold</code> in Gen4+12.</li>
+<li>Check whether the new served_type <code>ForYouPhoenixRetrievalCold</code> appears in production A/B — confirm when the new stat line shows up with measured values on the dashboard. Also check whether the ranking scorer recognizes this served_type and handles it separately (a continuation of the Gen4+16 <code>is_phoenix_moe(c)</code> condition expansion).</li>
+</ul></div>
+<h2 id="radar">Radar</h2>
+<p>We triaged 30 new papers today, and judging by titles and abstracts, none satisfies all three conditions. The three conditions are platform-company authors, a production deployment or A/B result claim, and novelty in a ranking or retrieval mechanism. The target is arXiv cs.IR, the count is based on 30 parsed <code>&lt;entry&gt;</code> elements, and the period is 2026-09-15–09-17. This period largely overlaps the window yesterday&#39;s daily covered, and the few items that looked worth a brief review are also only academic increments.</p>
+<ul>
+<li>&quot;Single-Token Expected-Value Scoring for Cold-Start Candidate Ranking&quot;(2026-09-16): The title is about cold-start ranking, but the authors are academic and the abstract has no production claim. We did not pass it.</li>
+<li>&quot;SURF: Subtractive Updates for Recommender Forgetting&quot;(2026-09-16): It addresses handling deletion requests (unlearning) and has no production deployment claim.</li>
+<li>&quot;One-Step Retrieval Framework for Real-Time Sponsored Search Ads Using Hierarchical Text Representations&quot;(2026-09-16): It is platform sponsored search ads retrieval, but the company affiliation needs confirmation. The abstract alone does not state an A/B claim explicitly. We defer adding it to watching.</li>
+<li>&quot;LIGE-GR&quot;(2026-09-16) was already added to yesterday&#39;s radar.</li>
+</ul>
+<p>Because today is Sunday, we skipped the industry blog sweep (done on Mondays only).</p>
+<p>Zero passed.</p>
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-19.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-19</span></a><a class="pg-next" href="daily-2026-09-22.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-22</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-20.html" data-title="일일 리포트 2026-09-20"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

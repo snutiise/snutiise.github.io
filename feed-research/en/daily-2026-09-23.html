@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-23 — feed-research</title>
+<meta name="description" content="In one line: X added modes that let the re-ranking service VMRanker either receive value model inputs or compute value model scores. Both parameters that…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-23.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-23.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-23.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-23.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-23 — feed-research">
+<meta property="og:description" content="In one line: X added modes that let the re-ranking service VMRanker either receive value model inputs or compute value model scores. Both parameters that…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-23.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-23.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-23">2026-09-23</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Wednesday</li>
+<li><span class="meta-k">Reading time</span>25 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-23.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>2</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added modes that let the re-ranking service VMRanker either receive value model inputs or compute value model scores. Both parameters that turn on the new modes are false by default.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-re-ranking-service-vmranker-is-ready-to-compute-the-value-model--x"><span class="num">1</span>Re-ranking service VMRanker is ready to compute the value model — X</a></li><li><a href="#2-recsys-2026-paper-treating-recommender-observability-as-a-counterfactual-measurement-problem--netflix"><span class="num">2</span>RecSys 2026 paper treating recommender observability as a counterfactual measurement problem — Netflix</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same commit, X began recording which retrieval source each candidate came from and introduced a new path that publishes 5% of requests to Kafka.</li>
+<li>X&#39;s visibility verdict engine (VF) was rewritten so that verdicts are expressed as a two-branch tree of hide and show.</li>
+<li>Netflix published a RecSys 2026 paper that treats recommender-system observability as a counterfactual measurement problem. In the Row Curators verification, R² against A/B was 0.82.</li>
+</ul>
+<h2 id="1-re-ranking-service-vmranker-is-ready-to-compute-the-value-model--x"><span class="num">1</span>Re-ranking service VMRanker is ready to compute the value model — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/3aa0fa33" target="_blank" rel="noopener">xai-org/x-algorithm @ 3aa0fa33</a> — GitHub, 2026-09-22 commit (+5,588/−2,601, 72 files), code. By convention the commit message is the single line <code>Open-source X Recommendation Algorithm</code>. These notes number the commits that followed the fourth release of X&#39;s recommendation code (the Gen4 release) in sequence; this commit is Gen4+26.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Since the 2026-08-13 Gen4 release, X has mirrored its production code to the open-source repository every day or every other day. home-mixer (the service that assembles the X For You feed) collects candidates from several retrieval sources, scores them with the engagement probabilities predicted by Phoenix, and uses VMRanker to re-rank the candidates for the feed. Phoenix is X&#39;s Grok-based recommendation Transformer. This commit covers three directions together: preparing to expand VMRanker&#39;s role, recording the retrieval origin of each candidate, and rewriting the visibility rule engine.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. VMRanker gained modes that send value model inputs or compute the value model</span></p></div>
+<p>VMRanker is home-mixer&#39;s post-processing ranker, a gRPC service that until now served only as a <a href="https://en.wikipedia.org/wiki/Determinantal_point_process" target="_blank" rel="noopener">DPP</a> re-ranker (a probabilistic model that avoids selecting similar candidates together). With this commit it is ready to expand into a &quot;service that computes the value model itself&quot; (the value model produces a candidate&#39;s final effective value).</p>
+<ul>
+<li>VMRanker calls now split into three modes: the existing DPP-only re-ranking, a mode that sends value model inputs for shadow evaluation, and a mode that actually computes the new value model score <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a>, new <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/vm_ranker_request.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker_request.rs</code></a> (+74).<ul>
+<li>The mode is selected by two new parameters, <code>VMRankerSendValueModelInputs</code> and <code>VMRankerComputeValueModel</code>. Both are false by default.</li>
+<li><code>dpp_only</code> is the existing behavior.</li>
+<li><code>send_inputs</code> sends the viewer context and candidate policy flags to run a shadow evaluation.</li>
+<li><code>compute_value_model</code> actually computes the new value model score.</li>
+<li>The VMRanker request payload carries the 12 fields of the new domain type <code>FsRecipientInputs</code>.<ul>
+<li><code>user_id</code>, <code>country_code</code>, <code>language_code</code>, <code>client_app_id</code>, <code>client_version</code>, <code>user_roles</code>, <code>datacenter</code>, <code>has_phone_number</code>, <code>resurrection_time_ms</code>, <code>product</code>, <code>now_ms</code>, <code>fs_overrides</code></li>
+</ul>
+</li>
+<li>It also carries 8 per-candidate fields and 26 <code>PhoenixScores</code> fields.</li>
+<li>A sixth cluster, <code>Experiment6</code>, was newly registered.</li>
+</ul>
+</li>
+<li>Two policy decisions made by author cold start handling are now attached to candidates as tags <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a> (+85/−20).<ul>
+<li><code>AuthorColdStart::apply_with_decisions()</code> is new and returns <code>ColdStartOutcome { scores, author_policy_zeroed: Vec&lt;bool&gt;, lift: Option&lt;ColdStartLift&gt; }</code>.</li>
+<li><code>author_policy_zeroed[i]</code> records whether this candidate was masked to a zero score by the MoE ranking policy. MoE (mixture of experts) is a model structure that selects and uses some of several expert sub-models.</li>
+<li><code>lift</code> records which candidate was lifted to which rank.</li>
+<li>Once <code>RankingScorer</code> fills these two fields into <code>PostCandidate</code>, downstream components (VMRanker and the new Kafka pipeline) can see them.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Each candidate now records which retrieval source it came from, and part of the requests is sent to Kafka</span></p></div>
+<p>home-mixer gained a new attribution pipeline for analyzing candidate contributions per retrieval source offline. Each candidate records, as a vector, which retrieval source, which cluster, and which rank it entered with, and 5% of requests are published to Kafka together with selected/non-selected labels.</p>
+<ul>
+<li>A new side effect publishes the retrieval candidate list of sampled requests to a Kafka topic <span class="badge ok">verified</span> — new <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/side_effects/retrieval_candidates_kafka_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/retrieval_candidates_kafka_side_effect.rs</code></a> (+209).<ul>
+<li>It is gated by two new parameters, <code>RetrievalCandidatesKafkaSamplePercent</code> (default 5.0) and <code>RetrievalCandidatesKafkaMaxCandidates</code> (default 200).</li>
+<li>For each request, one <code>RetrievalCandidateBatch</code> proto is published to <code>RETRIEVAL_CANDIDATES_TOPIC</code>. The proto holds <code>request_id</code>, <code>viewer_id</code>, <code>request_time_ms</code>, <code>sample_rate</code>, <code>ranker_cluster</code>, <code>experiment_buckets</code>, and the candidate list.</li>
+<li>It is enabled only inside <code>is_prod()</code>, and in-network-only requests and cached requests are excluded.</li>
+</ul>
+</li>
+<li>Candidates now keep a record of the retrieval source that fetched them <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>.<ul>
+<li>The new field is <code>PostCandidate::retrieval_sources: Vec&lt;RetrievalSource&gt;</code>. <code>RetrievalSource</code> is <code>{served_type, cluster: Option&lt;PhoenixRetrievalCluster&gt;, score: Option&lt;f32&gt;, position: Option&lt;u32&gt;}</code>.</li>
+<li>The three retrieval RPC sources, Phoenix, MoE, and Topics, migrated candidate creation to the new helper <code>candidates_from_retrieval_response()</code>, which assigns a rank (1-based) by descending score per served_type.</li>
+<li>The Simclusters source also attaches <code>RetrievalSource::from_served_type(ForYouSimclusters)</code>.</li>
+<li>For duplicate candidates coming from several sources, the dedup filter (<a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/filters/drop_duplicates_filter.rs" target="_blank" rel="noopener"><code>filters/drop_duplicates_filter.rs</code></a>) merges the <code>retrieval_sources</code> vectors, leaving multiple source records on a single candidate.</li>
+<li>Corresponding aggregate metrics were wired up as well. <code>record_retrieval_source_contribution</code> in <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/side_effects/scored_stats_side_effect.rs" target="_blank" rel="noopener"><code>side_effects/scored_stats_side_effect.rs</code></a> emits the following three families.<ul>
+<li><code>Phoenix.RetrievalContribution.Selected</code>(source·mode=credited/inclusive)</li>
+<li><code>PhoenixTopK</code>(k ∈ {10, 100, 200, 500, 1000})</li>
+<li><code>SelectedTotal</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The verdict of the visibility verdict engine (VF) became a two-branch tree of hide and show</span></p></div>
+<p>visibility-filtering (VF) is the service that decides, for each post, whether it may be shown to this viewer. This commit completely rewrote the VF rule engine. The verdict changed from a single flat action to a binary verdict tree, and rules moved from functions to data (a predicate list, an audience, and an action).</p>
+<ul>
+<li>The verdict is now a tree with two branches, hide and show. Hiding includes drop and tombstone (a treatment that leaves only a notice in place of the post) <span class="badge ok">verified</span> — new <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/verdict.rs</code></a> (+62), <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>visibility-filtering/treatment.rs</code></a> (+446).<ul>
+<li><p>The previous verdict was a flat <code>VfAction</code> (3 variants: Allow/Drop/Interstitial). The new verdict is a binary <code>Verdict</code> tree (<code>Withheld{Drop|Tombstone}</code> | <code>Shown{media?, engagement?}</code>).</p>
+</li>
+<li><p>The new definition:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub enum Verdict {
+    Withheld(Decided&lt;Withholding&gt;),
+    Shown { media: Option&lt;Decided&lt;MediaInterstitial&gt;&gt;, engagement: Option&lt;Decided&lt;LimitedEngagement&gt;&gt; },
+}
+pub enum Withholding { Drop(FilteredReason), Tombstone(TombstoneReason) }
+</code></pre></figure>
+</li>
+<li><p><code>Withheld</code> is terminal (a policy or regulatory drop, or a tombstone).</p>
+</li>
+<li><p><code>Shown</code> is non-terminal, so the two restrictions, media interstitial and limited engagement, can overlap at the same time.</p>
+</li>
+<li><p>Each decision records the rule name separately in <code>by: &amp;&#39;static str</code>.</p>
+</li>
+<li><p>The enum slots <code>TombstoneReason::LocalRegulations</code> and <code>LimitedEngagementReason::ConversationControl</code> have a wire format but no rule triggers them yet, so they are marked <code>#[expect(dead_code)]</code>. Local-regulation replacement rendering and conversation-control policy are preparation to come into these slots.</p>
+</li>
+</ul>
+</li>
+<li>Rules are now written as data, not functions. A rule consists of a name, a condition list, an audience, and an action <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/rules/rule_spec.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/rule_spec.rs</code></a> (+240/−69).<ul>
+<li>The previous <code>RuleSpec::{Tweet, Author, Custom}</code> enum was replaced by the struct <code>RuleClause { rule_name, when: &amp;[Condition], applies_to: Audience, action: ActionSpec }</code>.</li>
+<li>Predicates are cataloged in 4 families: 11 <code>TweetPredicate</code>, 8 <code>AuthorPredicate</code>, 5 <code>ViewerPredicate</code>, and 5 <code>RelationshipPredicate</code>.</li>
+<li>There are 3 audiences: <code>Everyone</code> / <code>ExceptAuthor</code> / <code>ExceptAuthorAndFollowers</code>.</li>
+<li>ActionSpec has 4 variants: <code>Drop</code> / <code>Tombstone</code> / <code>Interstitial{legacy, media}</code> / <code>LimitedEngagement</code>.</li>
+<li>The new helper <code>tweet_timestamp_ms(tweet_id)</code> extracts the tweet creation time from the Snowflake epoch (<code>1288834974657 ms</code>, 22-bit shift).</li>
+<li>Policy assembly happens in <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>rules/registry.rs</code></a>. The order of the 30 rules for <code>TimelineHome</code> and the 56 rules for <code>TimelineHomeRecommendations</code> is locked by the regression test <code>wired_rule_order_matches_pre_migration_sequence</code>.</li>
+</ul>
+</li>
+<li>The NSFW interstitial (a warning screen laid over the content) is applied for different reasons depending on when the tweet was created <span class="badge ok">verified</span>.<ul>
+<li>The new rule <code>NsfwHighPrecisionAdultInterstitialRule</code> branches on the predicate <code>CreatedAfter(1705536000000)</code> (2024-01-18 UTC).</li>
+<li>Tweets created after that are blurred with <code>InterstitialReason::Nudity(true)</code>, and earlier tweets with the existing <code>InterstitialReason::Sensitive(true)</code>.</li>
+<li>We infer that the semantics of the <code>NSFW_HIGH_PRECISION</code> label changed by policy on 2024-01-18, and that the rule handles the two periods separately by point in time instead of reinterpreting the old label <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>A new SafetyLevel was introduced for the hydration stage. At this level only 6 tweet-only rules run <span class="badge ok">verified</span>.<ul>
+<li>SafetyLevel is the unit that determines the rule list (policy) VF applies. The new level <code>TimelineHomeHydration</code> was introduced as the 4th of 4 variants.</li>
+<li>In the hydration stage, only tweet-only rules run, without the author-state and socialgraph rules.<ul>
+<li><code>TWEET_LABEL_DROPS</code> / <code>EXCLUSIVE_TWEET_DROP</code> / <code>TAKEDOWN_DROPS</code> / <code>SENSITIVE_VIEWER_DROPS</code> / <code>NSFW_MEDIA_INTERSTITIALS</code> / <code>NSFW_AUTHOR_INTERSTITIAL</code></li>
+</ul>
+</li>
+<li>The Thrift <code>TIMELINE_HOME_HYDRATION</code> enum (value 4) is now recognized. In the 2026-09-18 commit (Gen4+25), this value was a stub marked <code>unimplemented</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Two filters in Phoenix retrieval serving merged into the model runner, and an int8 quantization option appeared</span></p></div>
+<ul>
+<li>In the Phoenix xrex serving code, the bloom filter and topic filter that lived in separate files were unified into a single model_runner <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/xrex/inference/model_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/model_runner.py</code></a> (+328).<ul>
+<li>The class that absorbed both filters is <code>RetrievalModelRunner</code>.</li>
+<li>The deleted files are <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/inference/serving_filters_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/serving_filters_runner.py</code></a> (−543) and <a href="https://github.com/xai-org/x-algorithm/blob/8b25829/phoenix/xrex/models/recsys_two_tower_serving_filters.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_two_tower_serving_filters.py</code></a> (−173).</li>
+<li>The topic filter loads parquet files for 6 options (<code>1fav_topic_option_{0..5}_1day.parquet</code>) and picks one per request. Option 0 is the default, and 1–5 are A/B alternatives.</li>
+<li>The bloom filter allocates mask buffers in pinned host memory per bucket, and Rust (<code>RetrieveRequestBatch::build_eligible_mask_into_shards()</code>) fills them.</li>
+<li>If either of the two is enabled, live post-embeddings hotswap is disabled and serving falls back to the drained finalize path.</li>
+<li>This fallback is presumably to avoid a stale mismatch, because the pinned mask is strongly coupled to all_post_ids <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>An option to quantize the post embedding table to int8 was added <span class="badge ok">verified</span> — new <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/xrex/inference/int8_post_table.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/int8_post_table.py</code></a> (+11).<ul>
+<li>The <code>quantize_post_table()</code> function converts bf16 to int8 with per-post absolute-max scaling. The scale is float32.</li>
+<li>When the <code>RetrievalModelRunner.enable_int8_post_table</code> flag is on, it requantizes and caches whenever the post embedding object changes (<code>cache[0] is not x</code> identity check).</li>
+<li><code>RecsysTwoTowerModel.forward()</code> newly takes a <code>post_scales</code> argument and performs the matmul after the int8 → bf16 conversion.</li>
+<li>With the new sharding pspec <code>((&quot;stage&quot;, &quot;expert&quot;, &quot;replica&quot;, &quot;data&quot;), (&quot;seq&quot;, &quot;model&quot;))</code>, the first axis of the post embedding expanded to 4-axis sharding. Pipeline and data parallel axes were added.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The Phoenix serving engine&#39;s copy_port client was heavily refactored so that one slow transfer no longer blocks the next batch <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a> (+879/−93).<ul>
+<li>The copy_port client is the client with which a serving node downloads embedding tables and dense weights in parallel from the trainer or peers.</li>
+<li>The batch-by-batch approach is gone, replaced by streaming continuation based on <code>tokio::task::JoinSet</code>, so a slow-tail transfer does not block the next batch.</li>
+<li>There are two new env vars. <code>COPY_PORT_TRAINER_CONNS_PER_SOURCE</code> is the number of parallel connections opened to one trainer (clamped to 1–16). <code>XAI_RECSYS_RDMA=1</code> is RDMA mode, in which connection multiplexing is disabled.</li>
+<li>The new <code>spawn_striped_trainer_downloads()</code> splits one trainer&#39;s list of owned files evenly by the number of connections and pipelines them.</li>
+<li>This is presumably an optimization to reduce checkpoint hot-swap latency <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>Two constants hardcoded in home-mixer were moved to FS (FeatureSwitch, a configuration switch whose value can be changed at runtime) parameters <span class="badge ok">verified</span>.<ul>
+<li>The <code>NEW_USER_OON_WEIGHT_FACTOR</code> constant moved to <code>NewUserOonWeightFactor</code> (FS <code>rust_home_mixer_new_user_oon_weight_factor</code>, default <code>0.00001</code>).</li>
+<li>The <code>ANN_MAX_POST_CANDIDATE_AGE_HOURS</code> constant moved to <code>SimclustersMaxCandidateAgeHours</code> (FS <code>rust_home_mixer_simclusters_max_candidate_age_hours</code>, default 48).</li>
+<li>The Simclusters cache key was extended to <code>signal_id → (signal_id, max_candidate_age_hours)</code>, so experiments with different ages get different cache entries.</li>
+</ul>
+</li>
+<li>A kill-switch decider that can turn off the Phoenix MoE candidate source immediately was added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/home-mixer/sources/phoenix_moe_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/phoenix_moe_source.rs</code></a> (+66/−19).<ul>
+<li>When the new decider <code>disable_home_mixer_phoenix_moe_source</code> is on, the MoE source is disabled immediately.</li>
+<li>An FS takes time to roll out, whereas a decider propagates within seconds.</li>
+<li><code>PhoenixMoeColdStartMaxResults</code> (default 0) was also introduced, so the cold-start slice cap introduced for non-MoE sources in the 2026-09-18 commit (Gen4+25) is now exposed for MoE as well.</li>
+</ul>
+</li>
+<li>Grox (X&#39;s LLM annotation pipeline) now hands replies that contain a quoted tweet from its simple reply scorer to the full scorer, and repairs LLM output JSON in 3 steps <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3aa0fa33/grox/flows/reply_spam/classifier_simple_reply_scorer.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/classifier_simple_reply_scorer.py</code></a> (+103/−3).<ul>
+<li>The simple scorer is <code>SimpleReplyScorer</code>. A reply with a quoted tweet (quoted_post) skips the simple path and is delegated to the full <code>ReplyScorer</code> path (counter <code>task.spam_comment_detection.full_scorer.count</code>).</li>
+<li>The LLM output JSON parser defends in the following 3 steps.<ol>
+<li>Extract with <code>re.search(r&quot;\{.*\}&quot;, output, re.DOTALL)</code>.</li>
+<li>If that fails, use <code>json_repair.repair_json()</code>.</li>
+<li>If it still fails, pull out only the number with the regex <code>r&#39;&quot;score&quot;:\s*([\d.]+)&#39;</code>.</li>
+</ol>
+</li>
+<li>Parse failures are counted in 3 families: <code>task.reply_ranker.invalid.count{reason=invalid_format|invalid_score_format|score_out_of_range}</code>.</li>
+<li>The new histogram <code>ranked_replies_scores</code> observes the score distribution in 4 buckets (0.0, 1.0, 2.0, 3.0).</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;The framework treats recommender-system observability as a counterfactual measurement problem: estimating what the recommender would have done, and what engagement would have followed, in the absence of a specific content item or model decision.&quot;
+— <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement (arXiv 2609.22747)</a>, 2026-09-19 (quoted from the Netflix source; see the section below)</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a <code>Gen4+26</code> row to the <code>Public source Gen4</code> table in <a href="x.html">services/x.md</a>, summarizing commit 3aa0fa33. The three axes of the open questions are what the VMRanker value model actually is, how retrieval attribution is used downstream, and when the VF Tombstone/LimitedEngagement slots get filled; all are to be watched in later commits.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The VMRanker expansion, the retrieval attribution pipeline, and the VF verdict tree rewrite arrived together in one commit, and all three axes follow Gen4&#39;s recurring pattern of &quot;infrastructure wiring is complete but ranking behavior is unchanged.&quot; However, the Kafka publishing of retrieval candidates already runs on 5% of eligible requests under the default of 5.0 (percent; see <code>RetrievalCandidatesKafkaSamplePercent</code> above).</p></div>
+<ul>
+<li>VMRanker is ready to compute the value model.</li>
+<li>The retrieval attribution pipeline records candidate origin on the candidate itself and produces a 5% Kafka sample along with aggregate metrics.</li>
+<li>The VF verdict tree rewrite can express overlapping restrictions and opened the Tombstone/LimitedEngagement slots.</li>
+<li>In the Phoenix xrex serving layer as well, the bloom filter and topic filter that were separate files were unified into model_runner, and int8 post table quantization came with them. This is an axis of large-scale readiness for retrieval serving.</li>
+<li>There are three checkpoints to watch: when <code>VMRankerComputeValueModel=true</code> is turned on in an experiment, which offline job takes the retrieval attribution Kafka data as input, and in which rule the Tombstone/LimitedEngagement slots are first filled.</li>
+</ul>
+<h2 id="2-recsys-2026-paper-treating-recommender-observability-as-a-counterfactual-measurement-problem--netflix"><span class="num">2</span>RecSys 2026 paper treating recommender observability as a counterfactual measurement problem — Netflix</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a> — arXiv, v1 submitted 2026-09-19, paper. Accepted at RecSys 2026 (2026-10-02, Minneapolis). Of the four authors, three (Chaoran Guo, Ding Tong, Scarlet Chen) are affiliated with Netflix (Los Gatos), and Ting-Po Lee states that the research was conducted at Netflix (affiliation location San Jose). The <a href="https://arxiv.org/html/2609.22747v1" target="_blank" rel="noopener">HTML version</a> confirmed the email domain <code>@netflix.com</code> for the three.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In a large-scale recommender system, looking only at raw engagement signals such as views and clicks mixes several factors together. The mixed factors are content quality, model behavior, presentation bias, and audience reach. This makes it hard to attribute which cause produced which outcome. For example, if a new model misplaces good content and the CTR comes out low, that content is undervalued as long as only raw CTR is examined. Netflix says it has built and deployed, over several years and on top of several recommenders, a framework that approaches this problem by &quot;redefining recommender-system observability as a counterfactual measurement problem.&quot; This approach estimates what recommendation would have appeared, and what engagement would have followed, had a specific content item or a specific model decision not existed. Counterfactual measurement itself is not a new concept. The angle of this source is the viewpoint of &quot;supporting two audiences, content creators and model developers, with a single measurement foundation,&quot; and the extension to cascading recommenders (multi-stage recommendation in which upstream stages filter the candidate pool first). This paper released the methodology for three axes (bias reduction, relativity, incrementality) and one production verification case (Row Curators A/B alignment R²=0.82, automatic detection of label misattribution).</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Measurement has three axes and presupposes logged exposure probabilities left by exploration</span></p></div>
+<ul>
+<li>Netflix deploys measurement along three axes in its own recommenders <span class="badge ok">verified</span> §3.1.<ul>
+<li>Bias reduction corrects exposure propensity with SNIPS. SNIPS is the self-normalized variant of inverse propensity score (IPS, an estimate that weights observations by the inverse of the exposure probability). The alignment between the policy $\pi_e$ and the logging policy $\pi_0$ is gauged by a match function $m$, and the paper states explicitly that exact matching is a special case of unbiased estimation.</li>
+<li>Relativity separates algorithm performance from content performance. It uses the SNIPS difference for policy-to-policy comparison and position-adjusted SNIPS for item-to-item comparison. To mitigate position bias, it compares each position lift of content $c_i$ against random content and then aggregates by position weight.</li>
+<li>Incrementality measures the real contribution of content by asking counterfactually &quot;how much value is lost if this item is removed.&quot; Netflix presents the methods for this axis in two cases, single-stage and cascading.</li>
+</ul>
+</li>
+<li>The framework takes an Exploration &amp; Exploitation module as a precondition <span class="badge ok">verified</span> §3.1.<ul>
+<li>The framework operates on a contextual bandit or RL setup. Arm $a_j$ is selected with probability $\pi(a_j|x_j)$ according to policy $\pi$, and that probability is logged.</li>
+<li>In other words, the framework cannot be applied as is to a recommender that does no exploration and has no logged propensity.</li>
+<li>Netflix states that this condition is already met by most of its own recommenders.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. In single-stage, incremental contribution is measured against a counterfactual policy with the item removed; in cascades, the method differs by audience</span></p></div>
+<ul>
+<li>Single-stage incrementality is measured with Leave-One-Out measurement <span class="badge ok">verified</span> §3.2.<ul>
+<li>It places a &quot;Leave-One-Out policy&quot; on top of the Exploration policy, simulating a counterfactual in which a specific item is removed, and aggregates the SNIPS difference of the two policies by position.</li>
+<li>The match function is 1 under one of the following two conditions.<ul>
+<li>The explored arm is the top pick of the Exploration policy and is not the item being removed.</li>
+<li>The explored arm is the second-best and the top is the item being removed.</li>
+</ul>
+</li>
+<li>To reduce variance, the logged probability is clipped from below at the 10th percentile.</li>
+</ul>
+</li>
+<li>In cascading recommenders, the method differs by audience <span class="badge ok">verified</span> §3.3.<ul>
+<li><p>In a cascade the candidate pool is filtered upstream, so low engagement may be due to upstream filtering.</p>
+</li>
+<li><p>For upstream model developers, the question is &quot;was it good to put this item in the candidate pool,&quot; and Leave-One-Out is reused. However, the target action is a set rather than a single top pick, so the match $m$ is redefined with a set similarity such as Jaccard.</p>
+<ul>
+<li>If the lift is large for many items, it means the upstream really adds value to the downstream.</li>
+<li>If not, it means the pool is interchangeable from the downstream&#39;s perspective.</li>
+</ul>
+</li>
+<li><p>For content creators and platform observability, each item&#39;s contribution across the whole pipeline is decomposed into two values.</p>
+<p>Incrementality(i) = Irreplaceability(i) · Universality(i)</p>
+<ul>
+<li>Irreplaceability is the conditional causal lift when i is in the candidate pool, estimated with the self-normalized Hájek IPS.</li>
+<li>Universality is the probability that i is eligible.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Row Curators&#39; offline measurement aligned with real A/B at R²=0.82, and one case automatically detected label misattribution</span></p></div>
+<ul>
+<li><p>The alignment between Row Curators&#39; offline incrementality measurement and real A/B was R²=0.82 <span class="badge ok">verified</span> §4.2.</p>
+<ul>
+<li>A &quot;Row Curator&quot; on the Netflix homepage is a title collection row created by content curators.</li>
+<li>The offline incrementality measurement for this row was compared with the real A/B ground truth. The A/B removed the row series from the recommender and measured the loss in user engagement.</li>
+<li>Across 11 A/Bs, the alignment was R²=0.8212.</li>
+<li>Netflix cites robustness in heterogeneous propensity environments as the reason for choosing the self-normalized Hájek estimator.</li>
+<li>There are three production details.<ul>
+<li>Propensity is clipped to [0.0001, 0.9999].</li>
+<li>At least 100 observations per row are required.</li>
+<li>Results are aggregated across homepages of different lengths.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;For the Irreplaceability estimate, we tried different estimators and eventually selected the self-normalized Hájek estimator for robust observability signal under such heterogeneous propensities. In practice, we clip the propensities to [0.0001, 0.9999] to further reduce variance, require at least 100 observations for each row, and aggregate across homepages of varying lengths. Across 11 A/B tests, the R² between our proposed row-incrementality measurement and the A/B-test ground truth is 0.8212, providing strong validation of our approach.&quot;
+— <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">arXiv 2609.22747</a>, 2026-09-19</p>
+</blockquote>
+</li>
+<li><p>In the model developer observability case, label misattribution was detected automatically <span class="badge ok">verified</span> §4.3.</p>
+<ul>
+<li>Incrementality time-series monitoring detected a performance dip for a specific content A while other similar content stayed stable.</li>
+<li>Tracing the cause showed it was &quot;positive label misattribution in the model.&quot;</li>
+<li>The authors conclude that the framework makes discoveries that raw engagement would miss and lets model developers reach the root cause faster.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. There are five things the paper does not disclose</span></p></div>
+<ul>
+<li>The paper does not state the following five things <span class="badge obs">observed</span> close reading of the paper.<ul>
+<li>It does not name which recommenders the framework was deployed on. The homepage row curation is the only clear case.</li>
+<li>The absolute values of the core online metrics are not public.</li>
+<li>Its relationship to generation lines such as FM, GenRec, and GenPage is not stated. It is unclear whether this framework was used for GenRec&#39;s A/B alignment or is its own line.<ul>
+<li>FM is Netflix&#39;s Foundation Model that centralizes member representations. GenRec is an LLM ranker, and GenPage is a model that generates a whole page with a single Transformer.</li>
+</ul>
+</li>
+<li>The individual results of the 11 Row Curators A/Bs are not presented in the body of the paper, and are aggregated only into a single R².</li>
+<li>It does not mention countermeasures for recommenders the framework does not yet cover (such as those without exploration).</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Created a new subsection, &quot;Counterfactual observability framework (2026-09, RecSys 2026),&quot; under the <code>Training cycle·evaluation</code> section of <a href="netflix.html">services/netflix.md</a>. The canon already held the statement &quot;offline metrics do not predict A/B (the same admission for 10 years)&quot; and the way the popularity-based winner proxy of <a href="netflix.html#popularity-based-winner--offline-proxy-task">MediaFM</a> (Netflix&#39;s foundation model for video previews) acts as a gate. This source went in beside them as a statement that a separate &quot;in-operation observability&quot; axis is being set up on the basis of counterfactual measurement. That subsection holds the Row Curators A/B alignment R²=0.82 and the automatic detection case of label misattribution. It also states explicitly the difference in position: the MediaFM proxy is &quot;checkpoint gating (the qualifying round),&quot; whereas this framework is &quot;production monitoring (observation during the match).&quot;</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This source presents its own framework, based on counterfactual measurement, for &quot;production observability,&quot; one axis of the alignment problem between offline evaluation and A/B tests. Netflix has candidly acknowledged that this alignment is low (&quot;does not predict A/B results as well as we would like,&quot; 2015). Row Curators A/B alignment R²=0.82 is a strong result: the framework&#39;s offline estimates explain 82% of the actual A/B results (given that a random baseline would be near 0).</p></div>
+<ul>
+<li>In the repository canon, this framework sits alongside MediaFM&#39;s popularity-based winner (an offline proxy for checkpoint gating), but its role is different. The winner is selection before deployment, and this framework is observation after deployment.</li>
+<li>Whether this framework was used to verify the A/B results in the GenRec paper is a follow-up item.</li>
+<li>Because it presumes exploration-based logged propensity, it cannot be applied as is to a non-exploring recommender (for example, a pure Foundation Model shadow deployment).</li>
+<li>Netflix&#39;s release of its recommender measurement methodology as a separate paper is the first company statement on the counterfactual measurement line in this repository&#39;s corpus. Its position and purpose are separate from the offline gating of <a href="netflix.html#artwork-and-video-preview-personalization--maps-multimodal-asset-personalization-at-scale-2026-08-production">MAPS</a> (Netflix&#39;s artwork and video preview personalization system).</li>
+</ul>
+<h2 id="radar">Radar</h2>
+<p>Today I triaged 30 new arXiv cs.IR papers and passed 3, and 2 of them were added to <a href="radar.html">radar.md</a>. The remaining 1 that passed is the Netflix source, which section 2 above covers in detail and which was folded directly into the service canon, so it is not added to the radar. The number of parsed <code>&lt;entry&gt;</code> elements is 30, and the target period is 2026-09-18–09-21.</p>
+<ul>
+<li>UNIQUE is a Baidu·Beihang·CityU paper that unifies retrieval and ranking in an industrial mobile feed and uses single-layer flat quantization <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2609.23718" target="_blank" rel="noopener">arXiv 2609.23718</a>, 2026-09-20 v1.<ul>
+<li>It was accepted at RecSys 2026.</li>
+<li>The author affiliations were confirmed in the <a href="https://arxiv.org/html/2609.23718v1" target="_blank" rel="noopener">HTML version</a>: Baidu Inc., Beihang University, Hong Kong Institute of AI for Science.</li>
+<li>The paper identifies two problems: hierarchical quantization instability in candidate retrieval and information loss between the retrieval and ranking stages.</li>
+<li>It claims that unifying generative code-based retrieval and target-aware ranking in an early-fusion single architecture aims at both end-to-end training and efficient candidate generation.</li>
+<li>Baidu is not a canon service (a service this repository tracks with a canon document), but it operates the Baidu App, a large-scale industrial mobile feed.</li>
+<li>Whether the paper states production deployment and A/B figures at the abstract level requires a close read. It was added to the radar as awaiting deep dive.</li>
+</ul>
+</li>
+<li>MuSeR is a Kuaishou multi-interest sequence retrieval that compresses user histories of 10^4–10^5 scale with hierarchical temporal compression on top of the deployed MGS <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2609.23677" target="_blank" rel="noopener">arXiv 2609.23677</a>, 2026-09-20 v1.<ul>
+<li>The HTML version confirmed that the author affiliation is a Kuaishou domain.</li>
+<li>The approach keeps recent actions at full resolution and compresses older segments by progressive pooling, so that lifelong history fits within a fixed serving budget.</li>
+<li>Kuaishou already has several threads on the radar, such as <a href="radar.html#swim-kuaishou-main-feed--redesigns-the-evaluator-of-generator-evaluator-re-ranking-as-a-session-survival-process">SWIM</a>, <a href="radar.html#unirec-kuaishou--aligns-cascade-pre-ranking--ranking-fusion-with-two-stage-joint-learning-app-usage-duration-0616">UniRec</a>, and <a href="radar.html#drem-kuaishou-short-video--ensemble-ranking-with-dual-correction-of-pxtr-noise">DrEM</a>.</li>
+<li>MuSeR sits adjacent to <a href="radar.html#chroniclerec-tencent-pcg--pre-compresses-ultra-long-user-behavior-sequences-into-target-independent-chronicle-tokens-for-weixin-moments-ads-pcvr-gmv-161-95-ci-0678-2547">Tencent&#39;s ChronicleRec</a>, and both pre-compress ultra-long behavior sequences. MuSeR adds one data point to the radar&#39;s lifelong user modeling angle.</li>
+</ul>
+</li>
+</ul>
+<p>The other 27 were rejected and are not under watch. They did not satisfy the requirement triangle: platform-company authors, a production A/B statement, and novelty in mechanism or scale. The rejected list is Ascent (clinical MCP), UK-PRBENCH (legal case law retrieval), Semantic ID reproducibility study, Baidu·Google AI search auditing (external audit), Graded-Relevance e-commerce multimodal, publication bias biomedical causal search, UniK universal knowledge, Q-TIE temporal IR, YouTube Music LLM rationale (music domain), UNDRR disaster schema extraction, Redundancy Reduction Sequential Recommendation (academic), PSD LLM agent memory, Answer-Oriented Context AI search, candidate-job matching bi-encoder eval, Brand Visibility AI Search, MM-ContextFold multimodal RAG, EU research policy, Inherit4Rec (Kuaishou parameter inheritance, mechanism-novel but rejected in this batch because it mentions no production A/B), Static-vs-Agentic RAG Taiwan history, Attributable RAG citations, R-GEAN medication change (EHR), Per-Query Gating LLM rerankers, Dense-Sparse Fusion BEIR SciFact, DOA-SORT multi-object tracking (non-IR), GEO score cross-engine, AdaMerge visual doc retrieval, and semantic candidate-job matching hybrid retrieval.</p>
+<p>Industry blog scanning is done only on Mondays. Today, a Wednesday, was not a target.</p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check how the three axes opened by the X commit 3aa0fa33 connect in follow-up commits. There are three checkpoints to watch:<ul>
+<li>When <code>VMRankerComputeValueModel=true</code> is turned on by an experiment (currently false by default)</li>
+<li>Which offline job takes the 5% sample of the retrieval attribution Kafka (<code>RETRIEVAL_CANDIDATES_TOPIC</code>) as input</li>
+<li>In which rule the VF <code>TombstoneReason::LocalRegulations</code> / <code>LimitedEngagementReason::ConversationControl</code> slots are first filled</li>
+</ul>
+</li>
+<li>Check how far the Netflix counterfactual observability framework is used — watch whether it was used to verify GenRec&#39;s A/B results and whether sources for other surfaces (FM, GenPage, MediaFM, MAPS) quote this framework&#39;s measurement. Also watch whether follow-up statements appear at the time of the RecSys 2026 presentation (2026-10-02).</li>
+<li>Decide whether to read the UNIQUE original text closely — check whether the Baidu App feed deployment claim and A/B figures appear in the body outside the abstract. If they do, decide whether it is a promotion candidate for an SID (semantic ID, a token sequence that represents an item as hierarchical codes) / early-fusion thread such as <code>topics/generative-retrieval.md</code>. Re-check at the time of the RecSys 2026 presentation.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-22.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-22</span></a><a class="pg-next" href="daily-2026-09-24.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-24</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-23.html" data-title="일일 리포트 2026-09-23"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

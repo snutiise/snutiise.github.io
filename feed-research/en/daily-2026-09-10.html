@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-10 — feed-research</title>
+<meta name="description" content="In one line: X made the 26 engagement-head weights used in ranking scores perturbable in a fixed direction per user and per head. The default perturbation…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-10.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-10.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-10.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-10.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-10 — feed-research">
+<meta property="og:description" content="In one line: X made the 26 engagement-head weights used in ranking scores perturbable in a fixed direction per user and per head. The default perturbation…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-10.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-10.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-10">2026-09-10</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>33 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-10.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X made the 26 engagement-head weights used in ranking scores perturbable in a fixed direction per user and per head. The default perturbation strength is 0.0, so default behavior is unchanged.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">10</span></summary><ol><li><a href="#1-per-user-ranking-weight-perturbation-and-a-search-only-embedding-appeared--x"><span class="num">1</span>Per-user ranking weight perturbation and a search-only embedding appeared — X</a><ol><li><a href="#a-a-mechanism-was-added-that-perturbs-ranking-weights-in-a-fixed-direction-per-user-and-head">A. A mechanism was added that perturbs ranking weights in a fixed direction per user and head</a></li><li><a href="#b-grox-gained-a-new-multimodal-post-embedding-stack-dedicated-to-the-search-surface">B. grox gained a new multimodal post embedding stack dedicated to the search surface</a></li><li><a href="#c-text-structure-signals-of-the-post-were-added-to-the-phoenix-serving-request">C. Text structure signals of the post were added to the Phoenix serving request</a></li><li><a href="#d-ptos-gained-a-path-that-crops-only-the-first-10-seconds-of-long-videos-to-re-judge-adult-content">D. PTOS gained a path that crops only the first 10 seconds of long videos to re-judge adult content</a></li><li><a href="#e-phoenix-fa4-attention-kernels-were-released-with-forward-and-backward-for-both-sm80-and-sm90">E. Phoenix FA4 attention kernels were released with forward and backward for both SM80 and SM90</a></li><li><a href="#f-the-other-changes-center-on-serving-infrastructure-cleanup-and-the-connections-that-support-bd">F. The other changes center on serving infrastructure cleanup and the connections that support B–D</a></li></ol></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>There were no new sources for Meta and Netflix.</p>
+<h2 id="1-per-user-ranking-weight-perturbation-and-a-search-only-embedding-appeared--x"><span class="num">1</span>Per-user ranking weight perturbation and a search-only embedding appeared — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/49815da" target="_blank" rel="noopener">xai-org/x-algorithm@49815da</a> — X.AI Corp., 2026-09-08 19:23 UTC, public source code. 78 files, +10,938/−982. A regular cron mirror of <code>Open-source X Recommendation Algorithm</code>. These notes number the commits that came after X&#39;s Gen4 release in order, and this commit is Gen4+17.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X&#39;s open-source mirror is a regular commit that streams the production canon (the code that serves as the reference in production) via cron. Yesterday&#39;s (2026-09-09) edition went up to Gen4+16 (<a href="https://github.com/xai-org/x-algorithm/commit/902a06f" target="_blank" rel="noopener">902a06f</a>), and this commit is the next one. The previous two editions centered on side changes. This commit, by contrast, bundles five distinct lines of change at once (+10,938/−982, 78 files).</p></div>
+<ul>
+<li>A new mechanism lets the ranking scorer perturb engagement-head weights deterministically on every serving request.</li>
+<li>grox (X&#39;s nearline LLM annotation pipeline) gained a new multimodal embedding stack dedicated to the search surface.</li>
+<li>Phoenix&#39;s (Grok-based Transformer ranker) serving proto gained <code>ContentFeatures</code>, a structured content feature.</li>
+<li>PTOS (policy-based violation category verdicts) gained a deep rescan plan that re-scans only the beginning of a video for adult content.</li>
+<li>Phoenix&#39;s FA4 (flash attention kernels written in CuTeDSL) was released at large scale, both forward and backward, for two GPU architectures.</li>
+</ul>
+<h3 id="a-a-mechanism-was-added-that-perturbs-ranking-weights-in-a-fixed-direction-per-user-and-head">A. A mechanism was added that perturbs ranking weights in a fixed direction per user and head</h3>
+<p>The ranking scorer can now raise or lower the weights of the 26 engagement heads in a fixed direction per user and per head. Because the default strength is 0.0, default behavior remains deterministic as before.</p>
+<ul>
+<li><p>home-mixer (the service that serves X home timeline feed requests) gained two new parameters that perturb weights <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+<ul>
+<li>The perturbation strength is <code>WeightPerturbationSigma</code> (f64, default 0.0).</li>
+<li>The salt that determines the sign is <code>WeightPerturbationSalt</code> (String, default <code>&quot;&quot;</code>).</li>
+<li>The sync time in the file header was also updated from <code>2026-09-04T16:22:24Z</code> → <code>2026-09-08T16:24:06Z</code>.</li>
+</ul>
+</li>
+<li><p>The scorer applies this perturbation right after reading the weights from the parameters <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a>.</p>
+<ul>
+<li><p><code>.perturbed(query)</code> was appended after <code>ScoringWeights::from_params(&amp;query.params)</code>.</p>
+</li>
+<li><p>The logic of <code>perturbed()</code> itself is shown below:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn perturbed(mut self, query: &amp;ScoredPostsQuery) -&gt; Self {
+    let sigma = query.params.get(WeightPerturbationSigma);
+    if sigma &lt;= 0.0 {
+        return self;
+    }
+    let salt = query.params.get(WeightPerturbationSalt);
+    for (head, weight) in self.weights_mut() {
+        *weight *= (sigma * perturbation_sign(&amp;salt, query.user_id, head)).exp();
+    }
+    self.recompute_sums();
+    self
+}
+
+pub(crate) fn perturbation_sign(salt: &amp;str, user_id: u64, head: &amp;str) -&gt; f64 {
+    let digest = md5::compute(format!(&quot;{salt}:{user_id}:{head}&quot;));
+    if digest[0] &amp; 1 == 1 { 1.0 } else { -1.0 }
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>The perturbation targets all 26 engagement heads <span class="badge ok">verified</span> — the two files above.</p>
+<ul>
+<li>The target heads are <code>favorite</code>·<code>reply</code>·<code>retweet</code>·<code>photo_expand</code>·<code>video_open</code>·<code>click</code>·<code>open_link</code>·<code>profile_click</code>·<code>vqv</code>·<code>share</code>·<code>share_via_dm</code>·<code>share_via_copy_link</code>·<code>dwell</code>·<code>quote</code>·<code>quoted_click</code>·<code>quoted_vqv</code>·<code>dwell_time</code>·<code>click_dwell_time</code>·<code>active_secs_5m_residual_norm</code>·<code>follow_author</code>·<code>post_unexplored</code>·<code>not_interested</code>·<code>block_author</code>·<code>mute_author</code>·<code>report</code>·<code>not_dwelled</code>.</li>
+<li>All 26 are targets: the Gen4 ranker&#39;s 17 core positive heads, 5 negative heads, and 3 continuous heads, plus 1 <code>post_unexplored</code>. The first three groups correspond to engagement, user feedback, and dwell·click_dwell·active_secs, respectively.</li>
+</ul>
+</li>
+<li><p>After the weights are perturbed, the positive, negative, and total sums are also recomputed <span class="badge ok">verified</span>. So downstream gating logic that uses the sums reflects the perturbed values as is.</p>
+<ul>
+<li>The sum fields are <code>positive_sum</code>·<code>negative_sum</code>·<code>total_sum</code>, and <code>recompute_sums()</code> handles the recomputation.</li>
+<li>An example of downstream gating is the total_sum scaling of the <code>not_dwelled</code> penalty.</li>
+</ul>
+</li>
+<li><p>The sign is determined by <code>md5(salt:user_id:head)</code>, so under the same salt the result is fixed per user <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The same salt and the same user give the same sign. It is deterministic across requests.</li>
+<li>Even with the same salt and the same user, the sign is independent per head. The 26 heads are perturbed in different directions.</li>
+<li>Changing the salt reshuffles every per-user assignment. This preserves reproducibility while letting exploration restart by cycling the salt (salt cycling).</li>
+</ul>
+</li>
+<li><p>The perturbation multiplier is an exponential function of σ <span class="badge ok">verified</span>. The coefficient multiplier is <code>exp(sigma × sign)</code> = <code>exp(±sigma)</code>.</p>
+<ul>
+<li>At σ=0.1 the weight is multiplied by ×1.105 or ×0.905, and at σ=0.3 by ×1.35 or ×0.74.</li>
+<li>Because the scale is exponential, multiplicative symmetry is guaranteed. Up and down at σ=0.1 are exact multiplicative inverses, producing a symmetric distribution in log-space.</li>
+</ul>
+</li>
+</ul>
+<p>The purpose of this mechanism can be read three ways. The contract itself is <span class="badge ok">verified</span>, and the purposes are <span class="badge est">inferred</span>.</p>
+<ol>
+<li>It can be read as gradient-free infrastructure for weight A/B tests. It is a wobble experiment that measures the sensitivity of weight combinations with production user traffic. Setting a different <code>WeightPerturbationSalt</code> per experiment arm gives each arm an independent noise profile. The contract is <span class="badge ok">verified</span>, and its use for A/B is <span class="badge est">inferred</span>.</li>
+<li>It can also be read as on-policy exploration or a bootstrap-style bandit. The interpretation is that perturbing the scores themselves before VMRanker (a remote gRPC service that acts as the slate reranker in home-mixer) forces impressions to diversify <span class="badge est">inferred</span>. As a bandit technique, it is closer to Thompson sampling than to UCB, but it uses fixed noise instead of a posterior and is deterministic per user-head pair <span class="badge est">inferred</span>.</li>
+<li>It can also be read as a tool for model bias auditing or robustness measurement. The interpretation is that it observes which heads the model score stably depends on even when the weights are perturbed <span class="badge est">inferred</span>.</li>
+</ol>
+<ul>
+<li>Since the default is <code>0.0</code>, the production default is still deterministic <span class="badge ok">verified</span> — param.rs.</li>
+<li>The mere existence of this contract as an option is a signal. So far Gen4 has introduced stochasticity through individual gates. <code>EnableViewerColdStart</code>&#39;s Thompson and <code>ValueModelMode</code>&#39;s dwell_regret_sigmoid are examples. This time it added a unified stochastic layer that targets all engagement-head weights.</li>
+<li>This mechanism follows the same trend as the Gen4+16 change that made codivert impressions remain symmetric. The A/B infrastructure itself keeps getting thicker in Gen4.</li>
+</ul>
+<p>The following is not public in the open source code <span class="badge ok">verified</span>:</p>
+<ul>
+<li>In which experiment framework the salt value is actually set</li>
+<li>The actual production σ value</li>
+<li>Which surfaces (For You / Following / RankedFollowing) it applies to</li>
+<li>Where result logging flows as a side_effect</li>
+</ul>
+<h3 id="b-grox-gained-a-new-multimodal-post-embedding-stack-dedicated-to-the-search-surface">B. grox gained a new multimodal post embedding stack dedicated to the search surface</h3>
+<p>grox built a third pipeline dedicated to the search surface next to the two existing embedding pipelines. It also gained a backfill path that embeds past posts after the fact, and a mechanism that automatically tunes, to match throughput, the fav threshold used to select backfill targets.</p>
+<ul>
+<li>There are 17 new or modified files <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/49815da/grox/flows/mm_emb" target="_blank" rel="noopener"><code>grox/flows/mm_emb/</code></a>.<ul>
+<li>11 new files, 1,026 lines in total, were added. The embedder and renderer are <code>embedder_v8_search.py</code> (113) and <code>renderer_v8_search.py</code> (461).</li>
+<li>The plan files are <code>plan_post_embedding_v8_search.py</code> (34) and <code>plan_post_embedding_v8_search_for_reply.py</code> (37). The backfill plans are <code>plan_post_embedding_v8_search_backfill.py</code> (43) and <code>plan_post_embedding_v8_search_backfill_batch.py</code> (16).</li>
+<li>The backfill-side files are <code>task_backfill_fanout.py</code> (85), <code>task_backfill_gate.py</code> (60), and <code>backfill_consumer_dedup.py</code> (49). The fav-related files are <code>batched_fav_hydrator.py</code> (65) and <code>adaptive_min_fav.py</code> (63).</li>
+<li>The modified files are <code>generators.py</code> (+82), <code>constants.py</code> (+9), and <code>task_multimodal_post_embedding.py</code> (+52). <code>task_write_mm_embedding_sink.py</code> (+90), <code>task_rate_limit.py</code> (+15), and <code>task_embedding_pub.py</code> (+5) were also changed.</li>
+</ul>
+</li>
+<li>A third pipeline was wired in alongside the two existing embedding pipelines <span class="badge ok">verified</span>.<ul>
+<li>The existing pipelines are legacy <code>v5_1</code> and current <code>v8_2</code>, and the new pipeline is <code>v8_search</code>.</li>
+<li>The four new plans are <code>mm_emb_v8_search</code>, <code>mm_emb_v8_search_backfill</code>, <code>mm_emb_v8_search_backfill_batch</code>, and <code>mm_emb_v8_search_for_reply</code>.</li>
+</ul>
+</li>
+<li>There are separate embedding models for real-time and backfill <span class="badge ok">verified</span>. A separate backfill model being attached means that volume the real-time embedder cannot handle is absorbed by another instance.<ul>
+<li>The two embedding model keys <code>RECSYS_V8_SEARCH_EMBED</code> and <code>RECSYS_V8_SEARCH_BACKFILL_EMBED</code> look up endpoints from <code>grox_config</code>.</li>
+</ul>
+</li>
+<li>The state key and the version tag are separated, and the new embedding occupies a vector slot independent of v5 and v8.2 <span class="badge ok">verified</span>.<ul>
+<li>The tags are <code>V8_SEARCH_STATE_KEY = &quot;v8_search&quot;</code> and <code>V8_SEARCH_MODEL_VERSION = &quot;v8_search_1&quot;</code>.</li>
+<li>The slot is <code>MultimodalPostEmbeddingState.embeddings[&quot;v8_search&quot;]</code>.</li>
+</ul>
+</li>
+<li>Each of the three kafka streams is wired to its corresponding Plan <span class="badge ok">verified</span>.<ul>
+<li><code>POST_EMBEDDING_V8_SEARCH_STREAM</code> uses the <code>grox-multimodal-embedding-requests-with-summary</code> topic.</li>
+<li><code>POST_EMBEDDING_V8_SEARCH_FOR_REPLY_STREAM</code> uses <code>content-understanding-...-min-traction-for-grox-multi-modal</code>.</li>
+<li><code>POST_EMBEDDING_BACKFILL_STREAM</code> uses <code>grox-multimodal-embedding-backfill</code>.</li>
+</ul>
+</li>
+</ul>
+<p>The renderer turns one post into one document for embedding. The renderer function is <code>V8SearchEmbedPostRenderer.render_for_embedding</code>.</p>
+<ul>
+<li>An instruction prefix stating the recommendation purpose is attached at the very start of the document <span class="badge ok">verified</span>. This is a common pattern in E5·GTE-family instruction-tuned embeddings.<ul>
+<li><p>The original prefix text is this single line:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">INSTRUCTION_PREFIX = &quot;Represent this X post (formerly Twitter) for recommendation: capture its topic, intent, key entities, and likely engagement.&quot;
+</code></pre></figure>
+</li>
+<li><p>When reproducing, a prompt in the <code>Represent this X post ... recommendation:</code> style induces embeddings aligned to a search-ranking-purpose vector space.</p>
+</li>
+</ul>
+</li>
+<li>An author block precedes the post text <span class="badge ok">verified</span>. The block holds the author bio, verified, follower count, following count, and account join month.<ul>
+<li>The follower count is attached in two representations. One is the value that <code>_humanize_followers</code> abbreviates into a human-readable form in K/M/B units, and the other is the bucket from <code>_tier_label</code> (<code>&lt;10</code>·<code>10-100</code>·<code>100-1K</code>·…·<code>&gt;100M</code>).</li>
+<li>This setup lets the encoder see both signals at once, the &quot;exact number&quot; and the &quot;scale bucket&quot;.</li>
+</ul>
+</li>
+<li>Each text field is truncated at a length cap <span class="badge ok">verified</span>.<ul>
+<li>The body is truncated to <code>MAX_POST_TEXT = 4000</code> characters, and the quoted post to <code>MAX_QUOTED_TEXT = 1000</code> characters.</li>
+<li>The ASR transcript is <code>MAX_ASR = 2000</code>, the card title is <code>MAX_CARD_TITLE = 100</code>, and the article title is <code>MAX_ARTICLE_TITLE = 200</code>.</li>
+<li>The dangling media URL (<code>https://twitter.com/user/status/N/photo/1</code>) in the body is removed with a regex.</li>
+</ul>
+</li>
+<li>For media, frames of the original post and the quoted post share one budget <span class="badge ok">verified</span>.<ul>
+<li>The frame budget is <code>MAX_MEDIA = 16</code>. The embedder&#39;s actual frame cap (default) is <code>MAX_FRAMES = 4</code>.</li>
+<li>For video, <code>is_video: True</code> and the transcript are rendered too.</li>
+</ul>
+</li>
+<li>A post with neither text nor media is discarded downstream <span class="badge ok">verified</span>.<ul>
+<li>The renderer returns <code>document</code> and the embedding becomes an empty list. The warning log <code>Post {post.id} has no text or media content</code> is emitted.</li>
+<li>The downstream task <code>TaskMultimodalPostEmbeddingV8Search</code> discards it with <code>TaskStopExecution</code>.</li>
+</ul>
+</li>
+</ul>
+<p>The embedder receives the vector through an OpenAI-compatible API and then normalizes it again. The embedder class is <code>MultimodalPostEmbedderV8Search</code>.</p>
+<ul>
+<li>The embedding request sends text and images together through the OpenAI-compatible embed API <span class="badge ok">verified</span>. The timeout is 60 seconds.<ul>
+<li>It calls <code>embed_openai_async(text=text, images=images)</code> with the <code>XaiEmbeddingClientHttp</code> client.</li>
+</ul>
+</li>
+<li>It looks up the author&#39;s core information and passes it to the renderer <span class="badge ok">verified</span>. The lookup uses a <code>StratoUserCore</code> fetch from Strato (the X internal system that code goes through to read or store data).<ul>
+<li>If the lookup fails, the <code>post_embedding_v8_search.core_user_fetch_error</code> counter increments.</li>
+</ul>
+</li>
+<li>The vector returned by the API is re-normalized to L2 norm 1 <span class="badge ok">verified</span>. This forces dot-product similarity in search ranking to equal cosine similarity.<ul>
+<li>The re-normalization function is <code>_renormalize</code>.</li>
+</ul>
+</li>
+<li>The observability metrics are three histograms and two counters <span class="badge ok">verified</span>.<ul>
+<li>The histograms are <code>render_duration_ms</code>, <code>encode_duration_ms</code>, and <code>total_duration_ms</code>, and the counters are <code>image_count</code> and <code>core_user_hit</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Separately from the real-time pipeline that processes new posts, a new backfill path embeds past posts after the fact.</p>
+<ul>
+<li><p>The backfill path splits the post_id list received from kafka into batches, runs dedup and a fav lookup per batch, and sends them to per-instance plans <span class="badge ok">verified</span>. Within the plan, they must pass two gates before being embedded and written to the sink.</p>
+<ul>
+<li><p>The diagram below shows the backfill 5-DAG architecture.</p>
+<pre tabindex="0"><code>KafkaMmBackfillRequestLoader(TOPIC_BACKFILL=&quot;grox-multimodal-embedding-backfill&quot;)
+  ↓ (splits the byte-packed list&lt;i64&gt; of post_id into batches of size BATCH_SIZE)
+TaskBackfillBatchFanout
+  ↓ (BackfillConsumerDedup: removes post_id values already observed within the batch)
+  ↓ (BatchedFavHydrator: looks up the fav count per batch)
+  ↓ (asyncio.Semaphore(FANOUT_CONCURRENCY=240): cap on parallel execution)
+PlanPostEmbeddingV8SearchBackfill (runs per instance)
+  ↓
+TaskBackfillFavGate + TaskBackfillPreloadGate + TaskMultimodalPostEmbeddingV8SearchBackfill + TaskWriteV8SearchSink
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>The interesting part here is the adaptive fav threshold (<code>AdaptiveMinFav</code>). The fav threshold that selects backfill targets is not a fixed value; it moves with the actual pass QPS <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>The target QPS and the starting threshold are set as below.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">_TARGET_QPS = float(os.environ.get(&quot;MM_EMB_BACKFILL_TARGET_QPS&quot;, &quot;5&quot;))
+_min_fav = AdaptiveMinFav(start=MIN_FAV_COUNT, target_qps=_TARGET_QPS)
+</code></pre></figure>
+</li>
+<li><p>Like a PI (proportional-integral) controller, it observes backfill&#39;s actual pass QPS and adjusts the fav threshold dynamically.</p>
+</li>
+<li><p>If the gate pass QPS is higher than the target (default 5 QPS), it raises the threshold, and if lower, it lowers it. The threshold starts at fav 20k.</p>
+</li>
+<li><p><code>deadband=0.1</code> is the range within which no adjustment is made, up to ±10%.</p>
+</li>
+<li><p><code>warmup_s=60</code> makes it only observe during the first 60 seconds.</p>
+</li>
+<li><p><code>gain=0.3</code> is the adjustment strength relative to the error.</p>
+</li>
+<li><p><code>floor=0</code>·<code>cap=20000</code> are the bounds.</p>
+</li>
+</ul>
+</li>
+<li><p>Such a mechanism is needed because backfill traffic must be tuned precisely. It must not exceed the embedding server&#39;s GPU/CPU budget and the downstream kafka sink&#39;s processing capacity.</p>
+<ul>
+<li>A hardcoded threshold (e.g., <code>MIN_FAV_COUNT = 20_000</code>) cannot react to kafka replay speed or server queue pressure. <code>AdaptiveMinFav</code> throttles this automatically.</li>
+<li>What is new is that it applies a rate limiter pattern, common in infrastructure code, to selecting embedding targets.</li>
+</ul>
+</li>
+<li><p>The backfill entry filter has two layers, <code>TaskBackfillFavGate</code> and <code>TaskBackfillPreloadGate</code> <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The first layer, <code>TaskBackfillFavGate</code>, lets in only posts whose like count is at or above the dynamic threshold. The condition is <code>post.counts.likes &gt;= min_fav</code>, and filtered posts are observed via <code>task.backfill_gate.dropped.count{reason=low_favs|fav_count_missing}</code>.</li>
+<li>The second layer, <code>TaskBackfillPreloadGate</code>, skips posts that already have an embedding. If <code>StratoPostMultimodalEmbeddingMhSearchAi().fetch(post_id, V8_SEARCH_MODEL_VERSION)</code> is non-null, the post is skipped, and it passes only when none exists.</li>
+</ul>
+</li>
+<li><p>The PI controller reflects in the target only the QPS that leads to actual embedding <span class="badge ok">verified</span>.</p>
+<ul>
+<li>It calls <code>_min_fav.observe_pass()</code> when a post passes <code>TaskBackfillPreloadGate</code>.</li>
+<li>In other words, posts skipped because an embedding already exists (preload hits) do not enter the rate calculation.</li>
+</ul>
+</li>
+</ul>
+<p>This change is the first time a vector space dedicated to the search surface has been separated out.</p>
+<ul>
+<li>Until now, X&#39;s grox multimodal embeddings reused a single v5 vector space and a single v8.2 vector space across ranking, retrieval, and search. This was observed in Gen4+13 on 2026-09-01.</li>
+<li>It corresponds to Phoenix expanding to the search ranking surface with the <code>xrecsys_search</code> config in Gen4+4 (2026-08-19). The search document embedding pipeline that pairs with the search ranking model is now complete.</li>
+</ul>
+<p>The model and consumer of the search embedding are not public <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The actual models behind the two endpoints <code>RECSYS_V8_SEARCH_EMBED</code> and <code>RECSYS_V8_SEARCH_BACKFILL_EMBED</code> (dimension, base architecture, training data) are not in the open source code.</li>
+<li>How the search surface consumes them (retrieval index name, ANN parameters) is also not public.</li>
+<li>The Kafka topic <code>grox-multimodal-embedding-v8-search</code> was registered, but the consumer-side surface code did not come with it <span class="badge ok">verified</span>.</li>
+</ul>
+<h3 id="c-text-structure-signals-of-the-post-were-added-to-the-phoenix-serving-request">C. Text structure signals of the post were added to the Phoenix serving request</h3>
+<p>The Phoenix serving proto gained a new message carrying seven content features for the post and the quoted post, and the home-mixer ranker gained a builder that produces the values. Among them, text length, newline count, and URL presence are text characteristics exposed for the first time.</p>
+<ul>
+<li><p>Two content feature fields were added to the post info message <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>.</p>
+<ul>
+<li><p>Two fields, <code>contentFeatures</code> and <code>quotedContentFeatures</code>, were added to <code>TweetInfo</code>, and both are of the new message type <code>ContentFeatures</code>. Quoted posts were wired in the same way.</p>
+</li>
+<li><p>The new proto message is shown below:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-protobuf" data-lang="protobuf">message TweetInfo {
+  // ...
+  ScoreInfo scoreInfo = 35;
+  ContentFeatures contentFeatures = 36;
+  ContentFeatures quotedContentFeatures = 37;
+}
+
+message ContentFeatures {
+  bool hasVideo = 1;
+  uint32 maxVideoDurationMs = 2;
+  bool hasPhoto = 3;
+  uint32 mediaCount = 4;
+  uint32 weightedTextLen = 5;
+  uint32 newlineCount = 6;
+  bool hasUrl = 7;
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>Of the seven signals, the media signals were previously individual fields and are now bundled into one struct, and the other three are newly exposed text characteristics <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The media signals are <code>has_video</code>·<code>has_photo</code>·<code>media_count</code>·<code>max_video_duration_ms</code>.</li>
+</ul>
+</li>
+<li><p>The text length <code>weighted_text_len</code> is not a simple character count but follows <a href="https://developer.twitter.com/en/docs/counting-characters" target="_blank" rel="noopener">Twitter&#39;s own text length counting rules</a> as is (URL=23, CJK 2×, etc.) <span class="badge ok">verified</span>.</p>
+<ul>
+<li>URLs are always counted as 23 characters. This matches the <code>t.co</code> shortener policy.</li>
+<li>CJK characters and emoji count as 2 characters. Every character outside the single-weight ranges (<code>SINGLE_WEIGHT_CODEPOINT_RANGES</code>) counts as 2 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/models/content_features.rs" target="_blank" rel="noopener"><code>content_features.rs:72-85</code></a>.</li>
+<li>ASCII and basic Latin characters count as 1 character. Punctuation is split by range: ASCII punctuation and general punctuation such as U+2010–U+201F count as 1, and punctuation outside the ranges counts as 2.</li>
+<li>Variation selectors (<code>0xFE0E</code>·<code>0xFE0F</code>), skin-tone modifiers (<code>0x1F3FB..0x1F3FF</code>), and tag characters (<code>0xE0020..0xE007F</code>) count as 0. They are absorbed into the base emoji.</li>
+<li>A media attachment URL is not an external URL. If there is a media attachment (attachment_urls=1), the first URL is treated as a media URL and subtracted from the external URL count.</li>
+</ul>
+</li>
+<li><p>The newline count <code>newline_count</code> is the number of <code>\n</code> characters <span class="badge ok">verified</span>. It is a proxy for post formats such as tweets that build lists with line breaks or poem-style posts.</p>
+</li>
+<li><p><code>has_url</code> indicates whether there is at least one external URL <span class="badge ok">verified</span>.</p>
+</li>
+<li><p>The builder that produces the features exports only two pure functions (<code>build</code>·<code>build_quoted</code>), in Gen4&#39;s code style <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/models/content_features.rs" target="_blank" rel="noopener"><code>home-mixer/models/content_features.rs</code></a> (185 new lines).</p>
+<ul>
+<li><p>In the builder (<code>home-mixer/models/content_features.rs</code>), the actual computation is handled by <code>TextMetrics::of(text, attachment_urls)</code>.</p>
+</li>
+<li><p>Five regression tests pin Twitter&#39;s text weighting rule in code.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">assert_eq!(weighted(&quot;&quot;), 0);
+assert_eq!(weighted(&quot;hello world&quot;), 11);
+assert_eq!(weighted(&quot;日本語&quot;), 6);  // 3 CJK characters × 2
+assert_eq!(weighted(&quot;see https://t.co/abc123 now&quot;), 3 + 1 + 23 + 1 + 3);  // URL=23
+assert_eq!(weighted(&quot;ok 👍🏽&quot;), 2 + 1 + 2);  // skin-tone modifier counts as 0
+assert_eq!(weighted(&quot;日本\u{3000}語&quot;), 4 + 2 + 2);  // ideographic space also counts as CJK
+</code></pre></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p>In Gen4+17, the structural signals of the text itself were promoted to a first-class field of the serving wire format.</p>
+<ul>
+<li>Until now, the content signals the Phoenix ranker consumed were of two kinds. One is hashed features looked up from the embedding table, and the other is scattered booleans and integers such as <code>has_media</code>·<code>has_video</code>·<code>view_count</code>.</li>
+<li>In particular, <code>weighted_text_len</code> is directly tied to the post&#39;s 280-character cap (by weight) <span class="badge ok">verified</span> — <a href="https://docs.x.com/fundamentals/counting-characters" target="_blank" rel="noopener">X developer docs Counting Characters</a>. So the ranker can explicitly learn &quot;how full this post is / whether it is a pass-through that only drops in a URL&quot;.</li>
+</ul>
+<p>However, how the ranking heads consume this signal is not in this commit <span class="badge ok">verified</span>. This is because there is not yet any code in <code>phoenix/xrex/models/recsys_model.py</code> that reads <code>content_features</code> <span class="badge ok">verified</span>. It is on the wire, but whether training consumes it is something to observe in the next commit.</p>
+<h3 id="d-ptos-gained-a-path-that-crops-only-the-first-10-seconds-of-long-videos-to-re-judge-adult-content">D. PTOS gained a path that crops only the first 10 seconds of long videos to re-judge adult content</h3>
+<p>A new path crops the opening portion of videos 30 seconds or longer that already passed PTOS once but carry no NSFW tag, and re-judges them. Only popular posts enter, and a separate rate limit caps the cost.</p>
+<ul>
+<li>This path consists of a new plan, an entry filter, and added constants <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/plan_safety_ptos_adult_content_leading_frames.py" target="_blank" rel="noopener"><code>grox/flows/ptos/plan_safety_ptos_adult_content_leading_frames.py</code></a> (56 new lines), <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py</code></a> (81 new lines), <a href="https://github.com/xai-org/x-algorithm/blob/49815da/grox/flows/ptos/constants.py" target="_blank" rel="noopener"><code>grox/flows/ptos/constants.py</code></a> (+15).</li>
+<li>To become a rescan target, a post must pass all six gates <span class="badge ok">verified</span>. The gates are in <code>TaskSafetyPtosAdultContentLeadingFramesFilter._eligible_with_post</code>.</li>
+</ul>
+<ol>
+<li>The post must have an author (<code>post.user</code>). Anonymous users and deleted users are excluded.</li>
+<li>The fav count must be at or above the deluxe-tier threshold (<code>post.get_fav_count() &gt;= deluxe_fav_count_threshold</code>). This threshold was introduced in Gen4+12 for cost control, and only popular posts enter.</li>
+<li><code>post.media</code> or <code>post.quoted_post.media</code> must contain a video of 30 seconds or longer. The criterion is <code>ADULT_CONTENT_LEADING_FRAMES_MIN_DURATION_SECONDS = 30.0</code>.</li>
+<li>A prior PTOS verdict must exist. <code>StratoSafetyPostAnnotationsResultDirectMh.fetch(post_id)</code> must be non-null. That is, posts that already passed through the PTOS pipeline once are the targets.</li>
+<li>The prior verdict must not be NSFW. If <code>prior.safetyBoolMetadata.isNsfw == True</code>, the post was already handled and is skipped.</li>
+<li>The prior verdict must have a violated policy in the AdultContent category, or the fav count must be 512 or more (<code>ADULT_CONTENT_LEADING_FRAMES_UNCONDITIONAL_FAV</code>). Meeting either one is enough.</li>
+</ol>
+<ul>
+<li>A video that passes is cropped to its first 10 seconds and re-judged <span class="badge ok">verified</span>.<ul>
+<li><code>video.crop_seconds = 10.0</code> (<code>ADULT_CONTENT_LEADING_FRAMES_CROP_SECONDS</code>) is set, and downstream media hydration crops and judges only that length.</li>
+<li>The video then goes through the 8-stage DAG again: category detection → policy detection → safemodel sex/nudity verdict → cross-validation.</li>
+</ul>
+</li>
+</ul>
+<p>This path is needed for the following reasons:</p>
+<ul>
+<li>Videos longer than 30 seconds have a high media hydration cost (decoding, frame extraction, model calls). So the real-time pipeline extracts and judges only predetermined sample frames.</li>
+<li>However, if an evading user fills the first 15 seconds or more with normal content and places adult content later, the real-time verdict may miss it.</li>
+<li><code>PlanSafetyPtosSpecialVideo</code>, introduced in Gen4+12, handles content hidden by static overlays such as captions or watermarks. The path in Gen4+17 handles time-axis evasion, which disguises the first few seconds as safe.</li>
+<li>Despite the name leading-frames, it actually &quot;crops the first 10 seconds and re-judges&quot;, so it appears aimed especially at cases where adult content appears briefly at the start <span class="badge est">inferred</span>.</li>
+<li>Some posts have an AdultContent violated policy in the prior verdict but are not <code>isNsfw</code>. This is because the Grok 4.5 judge in the Gen4+2 adult content cross-validator allows only demotion. So even when the primary is AdultContent, it may not harden into an NSFW tag.<ul>
+<li>This path acts as a second judge that can overturn a demoted verdict.</li>
+</ul>
+</li>
+</ul>
+<p>The implication of the 512 fav entry threshold is also worth reading.</p>
+<ul>
+<li>The deluxe threshold (<code>deluxe_fav_count_threshold</code>) is likely a much higher value (the Gen4+7 log suggests deluxe = 5,000 or more <span class="badge est">inferred</span>). So unconditionally admitting only cases with 512 or more favs and no prior AdultContent is meant to cover low-intensity signal cases where the prior verdict did not catch AdultContent.</li>
+<li>512 counts as a moderately popular post on Twitter. At this scale, user reactions to false positives or misses (reports, mutes) have likely already occurred.</li>
+</ul>
+<p>The operating figures and the judge model are not public <span class="badge ok">verified</span>.</p>
+<ul>
+<li>How often this path is actually triggered in production</li>
+<li>The rate at which re-judging actually overturns verdicts (precision and recall)</li>
+<li>Which judge model is used<ul>
+<li>The plan DAG shows that the regular category, policy, safemodel and cross-validation stages are all run again <span class="badge ok">verified</span>.</li>
+</ul>
+</li>
+</ul>
+<p>However, a separate rate limit (<code>TaskRateLimitSafetyPtosAdultContentLeadingFrames</code>) is configured, so there is a cost cap <span class="badge ok">verified</span>.</p>
+<h3 id="e-phoenix-fa4-attention-kernels-were-released-with-forward-and-backward-for-both-sm80-and-sm90">E. Phoenix FA4 attention kernels were released with forward and backward for both SM80 and SM90</h3>
+<p>Phoenix&#39;s FA4 attention kernels were released with both forward and backward for two GPU architectures (SM80 Ampere, SM90 Hopper). This is the first time the original backward pass has been released.</p>
+<ul>
+<li>Six files were added and five files were modified <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/49815da/phoenix/xrex/cutedsl/ranker_fa4" target="_blank" rel="noopener"><code>phoenix/xrex/cutedsl/ranker_fa4/</code></a>.</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col class="w8"><col class="w8"><col></colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>Status</th>
+<th>Lines</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>flash_fwd.py</code></td>
+<td>added</td>
+<td>1,333</td>
+<td>SM80/Ampere forward kernel</td>
+</tr>
+<tr>
+<td><code>flash_fwd_sm90.py</code></td>
+<td>added</td>
+<td>1,465</td>
+<td>SM90/Hopper forward kernel</td>
+</tr>
+<tr>
+<td><code>flash_bwd.py</code></td>
+<td>added</td>
+<td>1,954</td>
+<td>SM80/Ampere backward kernel</td>
+</tr>
+<tr>
+<td><code>flash_bwd_sm90.py</code></td>
+<td>added</td>
+<td>1,864</td>
+<td>SM90/Hopper backward kernel</td>
+</tr>
+<tr>
+<td><code>flash_bwd_preprocess.py</code></td>
+<td>added</td>
+<td>329</td>
+<td>Computes dO, row_sum and softmax_LSE (pre-bwd)</td>
+</tr>
+<tr>
+<td><code>ampere_helpers.py</code></td>
+<td>added</td>
+<td>135</td>
+<td>SM80-only utilities (warp shuffle, register layout)</td>
+</tr>
+<tr>
+<td><code>block_sparse_utils.py</code></td>
+<td>modified</td>
+<td>+412/−314</td>
+<td>Rewrite of the block-sparse iterator</td>
+</tr>
+<tr>
+<td><code>ranker_attention_fa4.py</code></td>
+<td>modified</td>
+<td>+273/−130</td>
+<td>Refactor of the fwd entry point</td>
+</tr>
+<tr>
+<td><code>ranker_attention_varlen_fa4.py</code></td>
+<td>modified</td>
+<td>+178/−211</td>
+<td>Migration and cleanup of Gen4+15 varlen support</td>
+</tr>
+<tr>
+<td><code>mask.py</code></td>
+<td>modified</td>
+<td>+63/−1</td>
+<td>AttentionMask extension (for bwd)</td>
+</tr>
+<tr>
+<td><code>flash_bwd_postprocess.py</code></td>
+<td>modified</td>
+<td>+2/−7</td>
+<td>Cleanup of the existing post-bwd file</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>The new code totals 7,080 lines, and the modifications are also large <span class="badge ok">verified</span>. This is the strand with the most lines in this commit <span class="badge ok">verified</span>.</li>
+<li>The released kernels are a fork of the original Dao-AILab/flash-attention code, modified by X.AI <span class="badge ok">verified</span>. The file headers state the source and license.<ul>
+<li><p>The header text is copied as is.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python"># Derived from flash-attention (https://github.com/Dao-AILab/flash-attention);
+# modified by X.AI Corp.
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 X.AI Corp.
+</code></pre></figure>
+</li>
+<li><p>The license is Apache-2.0. Relicensing from the original BSD 3-Clause is allowed.</p>
+</li>
+<li><p>A copyright notice for the flash-attention subcomponent was also added to the <code>phoenix/NOTICE</code> file (+198 lines).</p>
+</li>
+</ul>
+</li>
+<li>The kernel classes (<code>FlashAttentionForwardBase</code>, <code>FlashAttentionBackwardSm80</code>) reveal the main characteristics <span class="badge ok">verified</span>.<ul>
+<li>They are written in CuTeDSL (the cutlass Python DSL), a new approach to metaprogramming NVIDIA&#39;s CUTLASS kernels in Python. The code loads it with <code>import cutlass</code> and <code>import cutlass.cute as cute</code>.</li>
+<li>They support asymmetric attention, where the hidden dim of Q·K and V may differ (<code>head_dim</code> != <code>head_dim_v</code>). This is a trick in ranking models to reduce the memory footprint by lowering the value dimension.</li>
+<li>They support Grouped Query Attention (<code>pack_gqa</code>). Several Q heads share one KV head, so an optimization common in LLMs is also applied to ranking attention.</li>
+<li>They support <code>is_causal</code>, <code>is_local</code>, <code>score_mod</code> and <code>mask_mod</code>. In ranking, causal masking is needed for sequence history attention, and <code>score_mod</code> and <code>mask_mod</code> are the user-defined modifier hooks of Flex Attention.</li>
+<li>The <code>has_aux_tensors</code> option is a path for feeding extra sideband tensors into attention. It is likely connected to the backbone scores introduced in Gen4+14 <span class="badge est">inferred</span>.</li>
+<li>Two schedulers, <code>SingleTileScheduler</code> and <code>SingleTileVarlenScheduler</code>, handle fixed-length and variable-length seqlen respectively. The signature extension of <code>build_dense_block_sparse_layout</code> introduced in Gen4+15 is now complete through varlen backward.</li>
+</ul>
+</li>
+<li>Some characteristics exist only in the backward kernel (<code>FlashAttentionBackwardSm80</code>) <span class="badge ok">verified</span>.<ul>
+<li>The tile sizes (<code>m_block_size=64</code>, <code>n_block_size=128</code>, <code>num_stages_Q=2</code>, <code>num_stages_dO=2</code>, <code>num_threads=256</code>) are matched to the register and shared memory budget of the SM80 generation.</li>
+<li>The JIT function <code>_bs_bwd_seq_at</code> performs the index mapping among three iterator domains (mask axis, full axis, diag axis) with constexpr subtiles. This is the core of block-sparse backward.</li>
+<li>Preprocess and postprocess are separated. Using the <code>softmax_LSE</code> (log-sum-exp) saved in forward, pre-bwd precomputes dO·row_sum, and this stage is the 329 lines of <code>flash_bwd_preprocess.py</code>.</li>
+<li>The main bwd kernel uses these values, and post-bwd accumulates the partial sums of dQ (<code>flash_bwd_postprocess.py</code>).</li>
+<li>The dual-block iteration from the Flash Attention 2 paper was reimplemented in CuTeDSL.</li>
+</ul>
+</li>
+</ul>
+<p>This release means three things:</p>
+<ul>
+<li>On the open-source side, this is the first release of the original backward pass. Gen4+15 (see the <a href="daily-2026-09-05.html">2026-09-05 daily</a>) released the rewrite of FA4 forward varlen support. Backward is essential for training, so until now it existed only in X&#39;s internal repository, and the open-source mirror had only forward. Now the training and serving attention kernels of the X ranker are fully open source.</li>
+<li>The SM90 connection is confirmed. When the <code>SAVE_H100_RECSYS = 32</code> remat policy (a memory-saving approach that recomputes activations instead of storing them during backpropagation) was introduced in Gen4+15, we only observed it as &quot;the first code signal that training runs on H100 as well&quot;.<ul>
+<li>This commit explicitly includes both the forward and backward files for SM90 (H100), so the H100 training connection is now complete. What the <code>SAVE_H100_RECSYS</code> remat policy actually uses is now confirmed in code.</li>
+<li>The SM90/H100 alternative path to <code>_GB300_OVERRIDES</code> in Gen4+6 also became clear. GB300 is Grace Blackwell 300, the SM100 generation.</li>
+<li>X maintains attention kernels optimized for each of two hardware generations, GB300 and H100.</li>
+</ul>
+</li>
+<li>X reused the flash-attention upstream code. It chose to fork and modify the Dao-AILab original rather than write CuTeDSL from scratch. This choice signals that the attention kernel is standardized infrastructure verified by the LLM community, and that X has not departed from that standard.</li>
+</ul>
+<p>Performance figures and the actual sparse pattern are not public <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Actual benchmarks of the SM90/SM80 kernels (GB/s, TFLOPS, speedup over baseline) are not in the open source.</li>
+<li><code>block_sparse_utils.py</code> was substantially rewritten, but which sparse pattern is actually used is not stated in the model config <span class="badge ok">verified</span>.</li>
+</ul>
+<h3 id="f-the-other-changes-center-on-serving-infrastructure-cleanup-and-the-connections-that-support-bd">F. The other changes center on serving infrastructure cleanup and the connections that support B–D</h3>
+<p>The remaining changes are collected one per line: serving and training infrastructure cleanup, connections that support B–D above, and small edits with no semantic change.</p>
+<ul>
+<li>Replaced the device blob of the CutlassCall custom_call with a SHA256 digest to stabilize the AOT cache key <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/xrex/utils/aot.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/aot.py</code></a> (+54/−1).<ul>
+<li><code>_sanitize_cutlass_calls</code> walks the <code>stablehlo.custom_call{target=CuteDSLRT_NvJaxCutlassCall}</code> ops in StableHLO. It replaces the <code>module</code> field (ELF/fatbin bytes) of backend_config with the SHA256 digest <code>device_digest:&lt;hex&gt;</code>.</li>
+<li><code>cutlass_module_device_digest</code> parses the ELF header and hashes only the device blob section.</li>
+<li><code>AOT_CACHE_VERSION</code> was also updated from <code>&quot;20260705&quot;</code> to <code>&quot;20260904&quot;</code>.</li>
+<li>As a result, the JAX AOT cache has a stable cache key for the same CUDA kernel binary and avoids recompilation hell. This connection is essential for cases with many embedded kernels, such as ranking models.</li>
+</ul>
+</li>
+<li>The serving loader (<code>copy_port_client.rs</code>) checks for the existence of <code>MANIFEST.json</code> and picks only checkpoints whose bundle is complete <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a> (+207/−9).<ul>
+<li><code>full_prefixes_newest_first</code> was split out as a helper that returns the prefixes present in all channels, newest first.</li>
+<li><code>select_bundle_checkpoint</code> picks the newest checkpoint for which <code>export/MANIFEST.json</code> exists non-empty in every channel. The newest checkpoint that is still unbundled is skipped with a warn log.</li>
+<li><code>download_named_files</code> is new and atomically downloads a list of specific file names. It randomly picks a channel in which all the files exist.</li>
+<li>The <code>.mlirbc</code> bundle system (StableHLO export) from Gen4+13 is now fully connected to the serving loader. Only checkpoints whose bundle is complete are loaded for serving.</li>
+</ul>
+</li>
+<li>The serving sequence_len is now computed automatically from the training config <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a> (+48).<ul>
+<li><code>_serving_sequence_len</code> back-computes the prefix token length from the training config. The values used are <code>sequence_len</code>, <code>history_seq_len</code>, <code>candidate_seq_len</code>, <code>num_negatives_per_example</code> and <code>num_global_negatives_per_example</code>.</li>
+<li>At serving time, it overrides the attention kernel size with <code>serving_seq_len = prefix + history + candidate</code>.</li>
+<li>If it disagrees with <code>num_user_prefix_tokens</code>, it fails closed with a <code>ValueError</code>.</li>
+<li><code>model_sequence_len</code> was also added to the MANIFEST.</li>
+</ul>
+</li>
+<li><code>quote_hydrator.rs</code> was expanded substantially and now also hydrates the media info of quoted posts <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/candidate_hydrators/quote_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/quote_hydrator.rs</code></a> (+142/−12).<ul>
+<li><code>MediaInfoCacheClient</code> is injected as a new dependency. <code>get_quoted_content</code> looks up the core data and media info of the quoted post in parallel within a 200ms timeout, and falls back on a cache miss.</li>
+<li>This is an upstream condition for the <code>ContentFeatures.quotedContentFeatures</code> connection in Gen4+17.</li>
+</ul>
+</li>
+<li>Refactored the media info lookup (<code>media_info_hydrator.rs</code> +70/−15) <span class="badge ok">verified</span>. The path that hydrates max_video_duration_ms and similar values needed for the content features computation was widened here.</li>
+<li>The PTOS reclassification trigger was widened <span class="badge ok">verified</span>. The policy detection in <code>task_safety_ptos_policy.py</code> (+4/−1) also handles re-judging on the leading-frames path.<ul>
+<li><code>TaskRateLimitSafetyPtosAdultContentLeadingFrames</code> was added to <code>task_rate_limit.py</code>.</li>
+</ul>
+</li>
+<li>The whole file <code>home-mixer/bin/pipeline_components_json.rs</code> (76 lines) was deleted <span class="badge ok">verified</span>. It appears to have been a JSON dump utility for offline debugging, and we presume it could no longer be maintained <span class="badge est">inferred</span>.</li>
+<li>Eight candidate-pipeline files were lightly edited (+103/−38) <span class="badge ok">verified</span>. The signatures of the pipeline core were tidied, with no separate semantic change.</li>
+<li><code>safety_label_source/proto.rs</code> of VF (visibility-filtering, a service that decides for each post whether this viewer may see it) changed by +34/−38 <span class="badge ok">verified</span>. The proto was slightly extended, with no semantic change.</li>
+<li>Lightly edited video_tools to improve video hydration accuracy <span class="badge ok">verified</span>. The changes are <code>image.py</code> +42/−19, <code>subtitles.py</code> +3/−1 and <code>video_frames.py</code> +7/−7.</li>
+<li>A new API was added to the VF client (visibility-filtering-client/vf_client.rs, +119/0) <span class="badge ok">verified</span>. Whether it is a semantic extension or a refactor needs separate confirmation.</li>
+<li>Made minor cleanups to the multi-step reply spam pipeline introduced in Gen4+15 <span class="badge ok">verified</span>. In grox/flows/reply_spam, −17 lines were removed from task_write.py and −9 lines from task_multi_step_reply_spam.py.</li>
+<li>The five pipeline edits in grox/flows/mm_emb finish wiring the v8-search stack from B <span class="badge ok">verified</span>.<ul>
+<li>The v8-search sink was connected in <code>task_write_mm_embedding_sink.py</code> (+90).</li>
+<li>The v8-search and v8-search-backfill tasks were added to <code>task_multimodal_post_embedding.py</code> (+52).</li>
+<li>The rest are <code>task_rate_limit.py</code> (+15), <code>task_embedding_pub.py</code> (+5) and <code>constants.py</code> (+9).</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a new &quot;### Gen4+17 (2026-09-08, 49815da)&quot; subsection after the &quot;Safety / visibility-filtering / labeling pipeline&quot; section of <a href="x.html">services/x.md</a>. The <code>In one line</code> summary already covers up to Gen4+14 and has grown long, so as with Gen4+15 and +16 we did not extend it and reflected the change only in the subsection. <code>Last updated</code> moved from 2026-09-05 to 2026-09-10, and the <code>git log checked directly</code> line from 2026-09-04 to 2026-09-10. The commits checked went from 15 to 18 (4 commits of progress: +85ac72a, +9b0dc31, +902a06f, +49815da).</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This commit adds another layer to the A/B and exploration infrastructure, separates search further from ranking, and adds defense layers for content understanding and safety verdicts. The commit reads along these three strands.</p></div>
+<ol>
+<li>A/B and exploration infrastructure is being built up in layers. Following the codivert impression in Gen4+16 and the backbone scores request in Gen4+14, this weight perturbation is the first unified contract at the ranking scorer layer that can inject stochasticity into real user traffic.<ul>
+<li>It does not exactly match any line of the bandit literature, whether Thompson sampling, bootstrap or Rademacher perturbation. It combines salt-based deterministic reproducibility with independence across user-head combinations obtained via md5.</li>
+<li>The production default is off, but the connection itself is complete.</li>
+</ul>
+</li>
+<li>The separation of search from ranking is deepening. The search surface now has a vector space, model and backfill pipeline completely separate from For You.<ul>
+<li>The flow is Phoenix <code>xrecsys_search</code> (Gen4+4) → the non-padding connection of search-query embeddings (Gen4+13) → this v8-search embedding pipeline.</li>
+<li>How much thicker X search becomes than in earlier generations is the point to watch.</li>
+</ul>
+</li>
+<li>The layers of content understanding and safety are rising. In content verdicts and ranker inputs, defense layers against text, video, time and overlay evasion are each growing as separate paths.<ul>
+<li><code>ContentFeatures</code>: text-structure signals as ranking input</li>
+<li>leading-frames rescan: response to time-axis evasion</li>
+<li>Special Video motion-reveal: response to static-overlay evasion (Gen4+12)</li>
+<li>PTOS cross-validator: 3 categories (Gen4+7)</li>
+<li>Adult content cross-validator (Gen4+2)</li>
+</ul>
+</li>
+</ol>
+<p>Some things also remain unknown from this commit alone.</p>
+<ul>
+<li>The actual production σ value of the weight perturbation, the salt assignment logic, and how to observe the results</li>
+<li>The dim, base model and retrieval index connection of the v8-search embeddings</li>
+<li>In which ranking head and how ContentFeatures is actually used (to observe in the next commit)</li>
+<li>Benchmark figures (GB/s, TFLOPS) of the FA4 SM80/SM90 kernels</li>
+<li>The actual reclassification rate (precision and recall) of the leading-frames path</li>
+<li>The details of what the <code>MediaInfoCacheClient</code> connection in <code>quote_hydrator.rs</code> hydrates for the first time in Gen4+17</li>
+</ul>
+<h2 id="corrections">Corrections</h2>
+<p>No conclusions were overturned. This commit added new evidence to the thread and does not conflict with existing conclusions. We note only that the Gen4+15 &quot;first code signal that training runs on H100&quot; is now fully confirmed by the original FA4 SM90 forward and backward in this commit.</p>
+<h2 id="radar">Radar</h2>
+<p>No new entries were added to the radar. We parsed 30 arXiv cs.IR papers, and 0 passed the acceptance criteria (platform-company authors or a production A/B claim). The candidates that stood out are as follows:</p>
+<ul>
+<li><code>SequenceO1: End-to-End Ultra-Long (100K) Sequence Modeling in Recommendation with Low-Rank Caching</code> models sequences of 100K length in recommendation. It was rejected because it has no production A/B.</li>
+<li><code>EAGER: Enrich-and-Align Generative Query Recommendation from Clicked Items in E-commerce Search</code> recommends queries generatively in e-commerce search. It has neither a platform affiliation nor production results.</li>
+<li><code>Task-Blind No MORE: Multi-Task Information Flow in Unified Ranking Backbones</code> deals with multi-task information flow in unified ranking backbones. It is an academic increment and was rejected.</li>
+<li><code>Exploring Bottom-Up Clustering for Creating Semantic IDs</code> is a methodology for generating Semantic IDs. It has no evidence to attach to the thread already tracked in topics/semantic-ids.md.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><p>Most of what to check next is the values and consumers that were not released in this commit.</p>
+<ul>
+<li>The actual production σ value of the weight perturbation — in the next commit, check whether the default in <code>home-mixer/params/param.rs</code> changes from 0.0 to non-zero. Also check whether the salt assignment logic appears under <code>home-mixer/util/experiments/</code>. If <code>salt</code> is set in an experiment framework (GrowthBook, etc.), that connection may be released as well.</li>
+<li>How <code>ContentFeatures</code> is consumed in the ranking head — in the next commit, check whether embedding code is attached to <code>phoenix/xrex/models/recsys_model.py</code> or <code>recsys_two_tower_model.py</code>. The target fields are <code>weighted_text_len</code>, <code>newline_count</code> and <code>has_url</code>. This code is the point where the completion of wire and consume can be observed.</li>
+<li>The v8-search retrieval index connection — check when the code that consumes the <code>grox-multimodal-embedding-v8-search</code> topic and builds the index is attached. It would land in Phoenix <code>xrex/data/retrieval_dataset.py</code> or <code>phoenix-rankall</code>.</li>
+<li>The actual metrics of leading-frames — check whether production A/B results or a counter dashboard are released anywhere. Direct observation is difficult.</li>
+<li>FA4 SM90 benchmarks — check whether H100 training speedup and throughput figures are published in Phoenix TRAINING.md or a follow-up blog post.</li>
+<li>arXiv cs.IR follow-up — the 100K sequence axis of SequenceO1 may be compared with the Gen4 ranker&#39;s <code>history_seq_len 1022</code> (<code>xrecsys_search</code> in Gen4+4), so we will watch whether production evidence is attached.</li>
+</ul>
+<p>Lookup failed: none.</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-09.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-09</span></a><a class="pg-next" href="daily-2026-09-11.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-11</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-10.html" data-title="일일 리포트 2026-09-10"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

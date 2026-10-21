@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sequence Transformer ranking (in-context candidate scoring) — feed-research</title>
+<meta name="description" content="Sequence Transformer ranking puts a user's behavior history in as a token sequence, appends the candidates to be scored after the same sequence, and scores…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/sequence-transformer-ranking.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/sequence-transformer-ranking.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/sequence-transformer-ranking.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/sequence-transformer-ranking.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Sequence Transformer ranking (in-context candidate scoring) — feed-research">
+<meta property="og:description" content="Sequence Transformer ranking puts a user's behavior history in as a token sequence, appends the candidates to be scored after the same sequence, and scores…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/sequence-transformer-ranking.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/sequence-transformer-ranking.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Cross-service topics</p>
+<h1 id="sequence-transformer-ranking-in-context-candidate-scoring">Sequence Transformer ranking (in-context candidate scoring)</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Translated from</span><a href="../sequence-transformer-ranking.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc toc-long"><summary>Contents<span class="toc-n">13</span></summary><ol><li><a href="#why-this-structure">Why this structure</a></li><li><a href="#core-design-elements">Core design elements</a><ol><li><a href="#1-sequence-layout">1. Sequence layout</a></li><li><a href="#2-attention-mask--the-most-important-part-of-the-design">2. Attention mask</a></li><li><a href="#3-where-the-parameters-are">3. Where the parameters are</a></li><li><a href="#4-content-does-not-enter">4. Content does not enter</a></li></ol></li><li><a href="#the-real-scope-of-the-hand-engineered-feature-removal-claim">The real scope of the &quot;hand-engineered feature removal&quot; claim</a></li><li><a href="#meta--the-transformer-lineage-is-two-not-one">Meta</a></li><li><a href="#lineage-a-organic--hstu--ultra-hstu">Lineage A (organic)</a><ol><li><a href="#1-all-features-are-merged-into-one-time-series">1. All features are merged into one time series</a></li><li><a href="#2-it-states-why-numerical-features-can-be-dropped">2. It states why numerical features can be dropped</a></li><li><a href="#3-retrieval-and-ranking-become-different-tasks-on-the-same-sequence">3. Retrieval and ranking become different tasks on the same sequence</a></li><li><a href="#4-it-drops-softmax-and-gives-two-reasons">4. It drops softmax and gives two reasons</a></li><li><a href="#5-the-relative-position-bias-carries-both-position-and-time">5. The relative position bias carries both position and time</a></li><li><a href="#6-m-falcon-solving-the-same-problem-as-xs-candidate-block-mask-in-a-different-way">6. M-FALCON: solving the same problem as X&#39;s candidate block mask in a different way</a></li><li><a href="#hstus-results-and-deployment-surface">HSTU&#39;s results and deployment surface</a></li><li><a href="#ultra-hstu-2026">ULTRA-HSTU (2026)</a></li></ol></li><li><a href="#lineage-b-ads--dhen--wukong--interformer--gem-serving-via-marm">Lineage B (ads)</a><ol><li><a href="#llatte-taking-the-sequence-model-out-of-the-ranker">LLaTTE: taking the sequence model out of the ranker</a></li><li><a href="#gem-training-infrastructure">GEM training infrastructure</a></li><li><a href="#gem-2026-generation">GEM 2026 generation</a></li><li><a href="#marm-does-not-say-it-serves-gem">MARM does not say it serves GEM</a></li></ol></li><li><a href="#the-two-lineages-do-not-cite-each-other--measurement">The two lineages do not cite each other</a></li><li><a href="#dv365--compress-the-sequence-in-advance-instead-of-lengthening-it-instagram">DV365</a></li><li><a href="#how-to-read-the-unified-model-claim">How to read the &quot;unified model&quot; claim</a></li><li><a href="#x-vs-meta--contrast-on-this-topic">X vs Meta</a></li><li><a href="#who-uses-this">Who uses this</a></li><li><a href="#not-yet-verified">Not yet verified</a></li><li><a href="#sources">Sources</a></li></ol></details></nav>
+<div class="prose">
+<p>Sequence Transformer ranking puts a user&#39;s behavior history in as a token sequence, appends the candidates to be scored <strong>after the same sequence</strong>, and scores all of them in a single forward pass. It contrasts with the traditional &quot;feature vector → MLP/DCN/MaskNet&quot; ranker.</p>
+<p>These notes cover X&#39;s Phoenix (X&#39;s current production ranking Transformer) and two Meta lineages together. One Meta lineage started on the organic side (general, non-ads content) with the generative recommendation model HSTU, and the other started on the ads side with DHEN and leads to GEM. Two points run through the whole note.</p>
+<ul>
+<li><strong>Where the two companies independently reached the same conclusion:</strong> they put candidates in the sequence and isolate them with a mask, so that scores can be cached. <span class="badge est">inferred</span> (<a href="#6-m-falcon-solving-the-same-problem-as-xs-candidate-block-mask-in-a-different-way">intersection</a>)</li>
+<li><strong>Where they diverged:</strong> Meta has two lineages, and the two do not cite each other. <span class="badge obs">observed</span> (<a href="#the-two-lineages-do-not-cite-each-other--measurement">measurement</a>)</li>
+</ul>
+<h2 id="why-this-structure">Why this structure</h2>
+<p>This structure replaces hand-built features with attention and lets the candidates share the cost of encoding the history. <span class="badge est">inferred</span></p>
+<ul>
+<li>It replaces feature engineering with attention. Instead of hand-building user×item cross features, a candidate token attends directly to the history tokens. <span class="badge est">inferred</span> — this structure is the basis for X&#39;s claim that it removed &quot;all hand-engineered features&quot;.</li>
+<li>Packing N candidates into one sequence lets the N candidates share the cost of encoding the history. This costs less than running a separate forward pass per candidate. <span class="badge est">inferred</span> — it follows from the attention mask design, and it is hard to explain X&#39;s reason for placing a candidate block in the sequence any other way.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="core-design-elements">Core design elements</h2>
+<p>X Phoenix puts the user, the history, and the candidates in one sequence, and uses an attention mask so that candidates cannot see each other. <span class="badge ok">verified</span> Most parameters sit in the ID embedding tables. <span class="badge est">inferred</span> Content such as text or images does not enter the input. <span class="badge ok">verified</span></p>
+<h3 id="1-sequence-layout">1. Sequence layout</h3>
+<p>X concatenates a user token, S history tokens, and C candidate tokens into one flat sequence. <span class="badge ok">verified</span> xai-org/x-algorithm, 2026 — <code>phoenix/recsys_model.py:617-624</code></p>
+<ul>
+<li>The order is <code>[user] + [history × S] + [candidates × C]</code>.</li>
+</ul>
+<h3 id="2-attention-mask--the-most-important-part-of-the-design">2. Attention mask — the most important part of the design</h3>
+<p>X uses the attention mask to keep candidates from seeing each other, which makes a candidate&#39;s score independent of what else is in the same batch. However, with the default settings RoPE breaks this batch independence again. <span class="badge ok">verified</span></p>
+<p>Whether candidates may see each other separates <strong>pointwise ranking from slate optimization</strong>. Pointwise ranking scores each candidate separately, and slate optimization chooses a whole list to show together in one step.</p>
+<p>X <strong>keeps only the diagonal</strong> in the candidate block (self-attend only). <span class="badge ok">verified</span> — <code>phoenix/grok.py:39-71</code>, unit test <code>phoenix/test_recsys_model.py:94-121</code></p>
+<pre tabindex="0"><code>        user  h1  h2  c1  c2  c3
+user  [  1    0   0   0   0   0 ]
+h1    [  1    1   0   0   0   0 ]
+h2    [  1    1   1   0   0   0 ]
+c1    [  1    1   1   1   0   0 ]
+c2    [  1    1   1   0   1   0 ]
+c3    [  1    1   1   0   0   1 ]
+</code></pre>
+<p>As a result, a candidate&#39;s score does not depend on what else is in the same batch. So <strong>scores can be cached</strong>, and splitting a list and calling the model several times gives the same results. X states this explicitly in the README as a goal. <span class="badge ok">verified</span> — <code>README.md:328</code></p>
+<p>There are three caveats.</p>
+<ul>
+<li>The user token (position 0) <strong>sees only itself</strong> because of the causal mask. It is not a token that summarizes the history; it is a prefix/bias token that other tokens read. <span class="badge ok">verified</span> — <code>test_recsys_model.py:105-107</code><ul>
+<li>A causal mask lets each token see only itself and the tokens before it.</li>
+</ul>
+</li>
+<li>The README says the user and history tokens see each other bidirectionally, but <strong>the code is strictly causal.</strong> The README and the code directly contradict each other. <span class="badge ok">verified</span> — <code>grok.py:62</code> (<code>jnp.tril</code>) vs <code>phoenix/README.md:158</code><ul>
+<li>The original text of X&#39;s <code>phoenix/README.md:158</code> is &quot;User + History: Full bidirectional attention among themselves&quot;.</li>
+</ul>
+</li>
+<li>Even though the mask guarantees batch independence, <strong>RoPE breaks it.</strong> With the default, a candidate&#39;s score depends on the slot it occupies. <span class="badge ok">verified</span> — <code>grok.py:88-109</code>, <code>recsys_model.py:362</code>, <code>run_pipeline.py:132-162</code><ul>
+<li>RoPE (rotary position embedding) is a positional encoding that rotates query and key vectors according to token position.</li>
+<li>With <code>right_anchored_rope=False</code> (the default), candidate slot 0 and slot 40 get different rotations, so the scores differ.</li>
+<li>A helper that fixes this (<code>right_anchored_rope_positions</code>) exists in the code, but the released pipeline does not turn that helper on.</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-where-the-parameters-are">3. Where the parameters are</h3>
+<p><strong>99.8% of X Phoenix&#39;s parameters are ID embedding tables, and the Transformer is only 0.8M.</strong> <span class="badge est">inferred</span></p>
+<ul>
+<li>This is a value computed from the released mini config (128-dim, 4-layer, vocab 1M×3). The checkpoint is on Git LFS, so we could not count directly.</li>
+<li>The calculation matches the file sizes stated in <code>phoenix/README.md:222-230</code>. <code>model_params.npz</code> is 3MB and <code>embedding_tables.npz</code> is 1.4GB.</li>
+</ul>
+<p>With this ratio, a serving structure that keeps the embedding tables in a separate service or in host memory and <strong>runs only the Transformer on the accelerator</strong> is natural. In fact, the released code handles embedding lookup outside the model with numpy fancy-indexing. <span class="badge ok">verified</span> — <code>recsys_model.py:103-116</code>, <code>run_pipeline.py:292-297</code></p>
+<h3 id="4-content-does-not-enter">4. Content does not enter</h3>
+<p>Neither text nor images enter X Phoenix. The tokens are <strong>only hashed IDs and a few categorical/scalar channels</strong>. <span class="badge ok">verified</span> — <code>recsys_model.py:238-250</code>, <code>:307-314</code></p>
+<ul>
+<li>What goes in: 2 post ID hashes, 2 author ID hashes, action multi-hot, product surface (16 kinds), post age bucket, dwell time</li>
+<li>What does not go in: follower count, engagement count, author reputation, text/topic/language, cross features</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="the-real-scope-of-the-hand-engineered-feature-removal-claim">The real scope of the &quot;hand-engineered feature removal&quot; claim</h2>
+<p>The X README says it removed every hand-engineered feature without exception, but <strong>taken literally this is false.</strong> Several hand-built elements remain inside the model.</p>
+<p>The README writes the following. <span class="badge ok">verified</span> — <code>README.md:55</code></p>
+<blockquote>
+<p>&quot;We have eliminated <strong>every single</strong> hand-engineered feature and most heuristics from the system&quot;</p>
+</blockquote>
+<p>Going through what remains inside the model one by one:</p>
+<ul>
+<li>The post age bucket divides time up to 4800 minutes (80 hours) into 60-minute units and has overflow/missing sentinels. A person chose all of these values. <span class="badge ok">verified</span> <code>recsys_model.py:33-55</code></li>
+<li>Dwell normalization clips at 30 seconds and scales linearly. <span class="badge ok">verified</span> <code>recsys_model.py:58-90</code></li>
+<li>The product surface is a 16-way categorical, and its value is decided by an <code>if</code> statement on the Rust side. <span class="badge ok">verified</span> <code>home-mixer/scorers/phoenix_scorer.rs:73-77</code></li>
+<li>ID hashing uses a custom-built linear-congruential hash. There are 2 hashes per entity, and the magic offset is <code>pad = 65</code>. <span class="badge ok">verified</span> <code>run_pipeline.py:76-129</code></li>
+<li>The 19 action vocabulary entries and the <code>2x-1</code> signed encoding were also chosen by people. <span class="badge ok">verified</span> <code>recsys_model.py:425</code></li>
+</ul>
+<p>The accurate statement is &quot;content and author features were removed&quot;. The time, surface, and hashing handling remain as they were.</p>
+<p>And this concerns only the inside of the model. The serving layer outside the model has 17 filters and many hand-tuned constants. The details are in <a href="x.html">x.md</a>.</p>
+<hr>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="meta--the-transformer-lineage-is-two-not-one" class="part">Meta — the Transformer lineage is two, not one</h2>
+<p>Speaking of &quot;Meta&#39;s sequence model&quot; in the singular is wrong. There is an <strong>organic HSTU lineage</strong> and an <strong>ads DHEN→GEM lineage</strong>, and as <a href="#the-two-lineages-do-not-cite-each-other--measurement">confirmed below</a> <strong>they do not cite each other.</strong></p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="lineage-a-organic--hstu--ultra-hstu">Lineage A (organic) — HSTU → ULTRA-HSTU</h2>
+<p>Where X&#39;s Phoenix is &quot;replace the existing ranker with a Transformer&quot;, HSTU <strong>changes the problem definition itself.</strong> It merges all features into one time series and treats retrieval and ranking as different tasks on the same sequence. <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2402.17152v3" target="_blank" rel="noopener">Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations</a>, ICML 2024 (arXiv 2024-02)</p>
+<h3 id="1-all-features-are-merged-into-one-time-series">1. All features are merged into one time series</h3>
+<p>HSTU merges and encodes all features into one unified time series. <span class="badge ok">verified</span> The paper calls such a model a GR (generative recommender).</p>
+<blockquote>
+<p>&quot;In GRs, we consolidate and encode these features into a single unified time series.&quot;</p>
+</blockquote>
+<p>How they are merged is also stated concretely.</p>
+<ul>
+<li>For categorical features, the longest time series is taken as the <strong>main time series</strong>. This is usually the time series of items the user engaged with. <span class="badge ok">verified</span></li>
+<li>Slowly changing features (demographics, followed creators) are compressed and merged by keeping only the earliest entry in each consecutive segment. <span class="badge ok">verified</span> The paper&#39;s wording is &quot;keeping the earliest entry per consecutive segment&quot;.</li>
+</ul>
+<h3 id="2-it-states-why-numerical-features-can-be-dropped">2. It states why numerical features can be dropped</h3>
+<p>HSTU argues <strong>why numerical features can be dropped</strong>. On the surface it resembles the X README claim that it removed &quot;all hand-engineered features&quot; (<a href="#the-real-scope-of-the-hand-engineered-feature-removal-claim">section above</a>).</p>
+<blockquote>
+<p><em>&quot;the categorical features (e.g., item topics, locations) over which we perform these aggregations are already sequentialized and encoded in GRs. Hence, we can remove numerical features in GRs given a sufficiently expressive sequential transduction architecture coupled with a target-aware formulation ... can meaningfully capture numerical features as we increase the overall sequence length and compute&quot;</em> <span class="badge ok">verified</span></p>
+</blockquote>
+<p>That is, counters and ratios are aggregates of categorical sequences, so the logic is that the model reconstructs them if the sequence is long enough.</p>
+<p>The paper also attaches verification. If a DLRM (an existing deep learning recommendation model that takes a feature vector as input) is given only the same features as the GR, its performance drops sharply. <span class="badge ok">verified</span> The paper&#39;s wording is &quot;the performance of DLRMs is significantly degraded&quot;.</p>
+<p><span class="badge est">inferred</span> X&#39;s same claim has no such ablation (an experiment that removes or swaps components to compare performance). Even for the same sentence, the amount of supporting evidence differs.</p>
+<h3 id="3-retrieval-and-ranking-become-different-tasks-on-the-same-sequence">3. Retrieval and ranking become different tasks on the same sequence</h3>
+<p>In HSTU, retrieval is predicting the next item, and ranking is predicting the next action on a sequence that interleaves item and action tokens.</p>
+<ul>
+<li>retrieval: next-item prediction <code>p(Φ_{i+1}|u_i)</code></li>
+<li>ranking: item and action tokens are <strong>interleaved</strong>: <code>p(a_{i+1}|Φ_0, a_0, Φ_1, a_1, ..., Φ_{i+1})</code></li>
+</ul>
+<p>The reason for interleaving is exactly the same kind of problem that X&#39;s mask design addresses. The paper explains that the interaction between the target and the history features must happen as early as possible. In a standard autoregressive setup the interaction happens late (for example, via softmax after the encoder output), so it cannot be made to happen early. <span class="badge ok">verified</span></p>
+<blockquote>
+<p>&quot;&#39;interaction&#39; of target ... and historical features needs to occur as early as possible, which is infeasible with a standard autoregressive setup where &#39;interaction&#39; happens late (e.g., via softmax after encoder output)&quot;</p>
+</blockquote>
+<h3 id="4-it-drops-softmax-and-gives-two-reasons">4. It drops softmax and gives two reasons</h3>
+<p>HSTU uses &quot;pointwise aggregated (normalized) attention&quot; instead of softmax, and uses SiLU as the nonlinearity. <span class="badge ok">verified</span> The paper gives two reasons for dropping softmax.</p>
+<ul>
+<li>Because of normalization, softmax <strong>erases the information &quot;how many times was it seen.&quot;</strong> The number of past data points related to the target is a strong feature of preference intensity, and the paper says it is hard to capture after softmax normalization. This is fatal if the goal is to predict intensity such as dwell/time-spent.<blockquote>
+<p>&quot;the number of prior data points related to target serves as a strong feature indicating the intensity of user preferences, which is hard to capture after softmax normalization&quot;</p>
+</blockquote>
+</li>
+<li>Softmax is robust to noise by construction, but it is less suited to a vocabulary that keeps changing (non-stationary) in a streaming setting. <span class="badge ok">verified</span><blockquote>
+<p>&quot;while softmax activation is robust to noise by construction, it is less suited for non-stationary vocabularies in streaming settings&quot;</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="5-the-relative-position-bias-carries-both-position-and-time">5. The relative position bias carries both position and time</h3>
+<p>HSTU&#39;s relative position bias (a value added to the attention score according to the distance between tokens) carries both position and time. <span class="badge ok">verified</span> The paper writes this term as <code>rab^{p,t}</code> and describes it as a &quot;relative attention bias that incorporates positional&quot; term, and this term also carries a time term. <span class="badge ok">verified</span></p>
+<p>X handled this slot with RoPE, and that became the cause of the broken batch independence (<a href="#2-attention-mask--the-most-important-part-of-the-design">caveat 3 above</a>). <strong>The two companies filled the same slot differently, and the side effects differ too.</strong> <span class="badge est">inferred</span></p>
+<h3 id="6-m-falcon-solving-the-same-problem-as-xs-candidate-block-mask-in-a-different-way">6. M-FALCON: solving the same problem as X&#39;s candidate block mask in a different way</h3>
+<p>HSTU uses M-FALCON to split candidates into microbatches and uses the encoder-level KV cache to cut cost and tail latency. <span class="badge ok">verified</span> The name comes from &quot;M-FALCON (Microbatched-Fast Attention Leveraging Cacheable OperatioNs)&quot;.</p>
+<ul>
+<li>It splits <code>m</code> candidates into microbatches of <code>b_m</code> and adjusts the attention mask and bias so that the attention operations for the candidates within a microbatch are identical. <span class="badge ok">verified</span><blockquote>
+<p>&quot;modifying attention masks and rab^{p,t} biases such that the attention operations performed for b_m candidates are identical&quot;</p>
+</blockquote>
+</li>
+<li>It reuses the encoder-level KV cache across forward passes to reduce cost, or across requests to reduce tail latency. <span class="badge ok">verified</span><blockquote>
+<p>&quot;leverage encoder-level KV caching ... either across forward passes to reduce cost, or across requests to minimize tail latency&quot;</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>This is the most important intersection in this note.</strong> X isolated the candidate block with a diagonal mask to make scores cacheable, and Meta amortized the history-encoding cost with candidate microbatches and the KV cache. <strong>The two companies independently arrived at &quot;put candidates in the sequence, but isolate them from each other.&quot;</strong> <span class="badge est">inferred</span> — the basis is that the mask descriptions in the two sources aim at functionally the same properties (independence between candidates and a reusable prefix).</p>
+<h3 id="hstus-results-and-deployment-surface">HSTU&#39;s results and deployment surface</h3>
+<p>The main results reported by the paper are as follows.</p>
+<ul>
+<li>5.3×–15.2× versus a FlashAttention2-based Transformer at length 8192. <span class="badge ok">verified</span></li>
+<li>It handles a model <strong>285× more complex than a DLRM at 1.50×–2.99× higher QPS</strong>. <span class="badge ok">verified</span></li>
+<li>The production metric improved by <strong>12.4%</strong>. <span class="badge ok">verified</span></li>
+</ul>
+<p class="warn"><strong>⚠ The surface is anonymized.</strong> The paper says only &quot;a large internet platform&quot;. We could not confirm whether it was applied to Facebook Feed. See open question 5 in <a href="facebook.html">facebook.md</a>.</p>
+<h3 id="ultra-hstu-2026">ULTRA-HSTU (2026)</h3>
+<p>ULTRA-HSTU is the successor to HSTU, and <strong>it begins by criticizing the previous generation.</strong> The criticism is that many recent approaches rely heavily on cross-attention to address the quadratic computational bottleneck in sequential modeling, which can limit the representational power of self-attention. <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2602.16986" target="_blank" rel="noopener">arXiv 2602.16986</a>, 2026-02-19</p>
+<blockquote>
+<p>&quot;many recent approaches rely heavily on cross-attention mechanisms to address the quadratic computational bottleneck in sequential modeling, which can limit the representational power gained from self-attention.&quot;</p>
+</blockquote>
+<p>As results, the paper presents training and inference scaling speed, serving scale, and consumption and engagement gains. <span class="badge ok">verified</span></p>
+<ul>
+<li>&quot;over 5x faster training scaling and 21x faster inference scaling&quot;</li>
+<li>&quot;serving billions of users daily&quot;</li>
+<li>&quot;4% to 8% consumption and engagement improvements&quot;</li>
+</ul>
+<p><span class="badge est">inferred</span> The cross-attention criticism reads as a jab at approaches that &quot;compress in advance and attach&quot;, like DV365 (Instagram&#39;s ultra-long history compression model, <a href="#dv365--compress-the-sequence-in-advance-instead-of-lengthening-it-instagram">section below</a>). It means two strategies for handling ultra-long history are competing inside the same company. However, the paper does not name DV365 directly.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="lineage-b-ads--dhen--wukong--interformer--gem-serving-via-marm">Lineage B (ads) — DHEN → Wukong → InterFormer → GEM, serving via MARM</h2>
+<p>The ads side started from a <strong>feature interaction lineage</strong> (feature interaction: the combined effect of features) and added sequences later. Its starting point differs from HSTU&#39;s. <span class="badge est">inferred</span> — the basis is the release order in the table below (2022 DHEN and 2024 Wukong are interaction, and sequences begin with InterFormer in 2024). GEM is Meta&#39;s ads recommendation foundation model, and as of the 2026-10-13 blog its backbone is Kunlun. <span class="badge ok">verified</span> (<a href="#gem-2026-generation">GEM 2026 generation</a>)</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="w6"><col><col class="grow"><col></colgroup>
+<thead>
+<tr>
+<th>Year</th>
+<th>Name</th>
+<th>What it solves</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span class="nw">2022</span></td>
+<td>DHEN</td>
+<td>Hierarchical ensemble of heterogeneous interaction modules. NE (normalized entropy) 0.27%, training throughput 1.2×</td>
+<td><span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2203.11014" target="_blank" rel="noopener">arXiv 2203.11014</a></td>
+</tr>
+<tr>
+<td><span class="nw">2024</span></td>
+<td>Wukong</td>
+<td>Scaling law holds with stacked factorization machines alone. Up to over 100 GFLOP/example</td>
+<td><span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2403.02545" target="_blank" rel="noopener">arXiv 2403.02545</a></td>
+</tr>
+<tr>
+<td><span class="nw">2024</span></td>
+<td>InterFormer</td>
+<td><strong>Interleaving</strong> sequence learning and cross-features. Avoids early summarization</td>
+<td><span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2411.09852" target="_blank" rel="noopener">arXiv 2411.09852</a></td>
+</tr>
+<tr>
+<td><span class="nw">2025</span></td>
+<td>GEM</td>
+<td>Ads foundation model that includes the two above</td>
+<td><span class="badge ok">verified</span> <a href="https://engineering.fb.com/2025/11/10/ml-applications/metas-generative-ads-model-gem-the-central-brain-accelerating-ads-recommendation-ai-innovation/" target="_blank" rel="noopener">GEM blog</a>, <span class="nw">2025-11-10</span></td>
+</tr>
+<tr>
+<td><span class="nw">2026</span></td>
+<td>LLaTTE</td>
+<td>The sequence part of GEM. 2-stage structure and an asynchronous upstream user model</td>
+<td><span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2601.20083" target="_blank" rel="noopener">arXiv 2601.20083</a>, <span class="nw">2026-01-27</span></td>
+</tr>
+<tr>
+<td><span class="nw">2026</span></td>
+<td>MARM</td>
+<td>Per-request routing serving. O(1T) parameters</td>
+<td><span class="badge ok">verified</span> <a href="https://engineering.fb.com/2026/03/31/ml-applications/meta-adaptive-ranking-model-bending-the-inference-scaling-curve-to-serve-llm-scale-models-for-ads/" target="_blank" rel="noopener">MARM blog</a>, <span class="nw">2026-03-31</span></td>
+</tr>
+<tr>
+<td><span class="nw">2026-02</span></td>
+<td>Kunlun</td>
+<td>GDPA, HSP, Sliding Window Attention, CompSkip, Event-level Personalization. MFU 17% → 37% on B200, <em>&quot;deployed in major Meta Ads models&quot;</em></td>
+<td><span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">arXiv 2602.10016</a>, <span class="nw">2026-02-10</span> (v3 <span class="nw">2026-06-05</span>)</td>
+</tr>
+<tr>
+<td><span class="nw">2026-08</span></td>
+<td>GEM training</td>
+<td>Training infrastructure: 2× E2E MFU over 12 months, 4× total FLOPs. Custom kernels (JFA, GDPA, BlockAttention), MXFP8, 5D parallelism</td>
+<td><span class="badge ok">verified</span> <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">GEM Training blog</a>, <span class="nw">2026-08-03</span></td>
+</tr>
+<tr>
+<td><span class="nw">2026-10</span></td>
+<td>GEM <span class="nw">2026</span> generation</td>
+<td>Backbone replaced from InterFormer to <strong>Kunlun</strong>. Domain-specific models unified into a single central model; transfer to downstream models via LoopFM, distillation, and Solaris</td>
+<td><span class="badge ok">verified</span> <a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">GEM <span class="nw">2026</span> blog</a>, <span class="nw">2026-10-13</span></td>
+</tr>
+</tbody></table></div>
+<p>The GEM blog states the lineage directly. GEM extended the Wukong architecture, and InterFormer is a structure that alternates sequence learning and cross-feature interaction layers. <span class="badge ok">verified</span></p>
+<blockquote>
+<p>&quot;GEM enhances the <strong>Wukong</strong> architecture to use stackable factorization machines with cross-layer attention connections&quot;</p>
+</blockquote>
+<blockquote>
+<p>&quot;Our design, <strong>InterFormer</strong>, employs parallel summarization with an interleaving structure that alternates between sequence learning ... and cross-feature interaction layers.&quot;</p>
+</blockquote>
+<h3 id="llatte-taking-the-sequence-model-out-of-the-ranker">LLaTTE: taking the sequence model out of the ranker</h3>
+<p>LLaTTE is the sequence part of GEM, a structure that moves the heavy sequence model out of the ranker. <span class="badge ok">verified</span> — the blog <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">From User Sequences to Scaling Laws</a>, 2026-08-05, and arXiv 2601.20083. However, a few sentences quoted as coming from LLaTTE are not in the blog body. <span class="badge obs">observed</span></p>
+<ul>
+<li>It does not keep the sequence model inside the ranker but <strong>moves it out into an asynchronous upstream user model.</strong> <span class="badge ok">verified</span> (LLaTTE blog) This is the same strategy as Instagram DV365, which is covered again in the <a href="#dv365--compress-the-sequence-in-advance-instead-of-lengthening-it-instagram">DV365 section</a>.<blockquote>
+<p>&quot;a two-stage architecture that offloads the heavy computation of large, long-context models to an asynchronous upstream user model&quot;</p>
+</blockquote>
+<ul>
+<li>The upstream user model is a model that separates heavy user modeling from lightweight online ranking and runs it separately at an earlier stage.</li>
+</ul>
+</li>
+<li class="warn">⚠ The two sentences the canon quoted on 2026-08-09 are not in the body of the 2026-08-05 blog. <span class="badge obs">observed</span> Original text rechecked on 2026-08-10. They may be sentences quoted from the paper, but we have not yet re-verified this.<ul>
+<li>The two sentences are &quot;Deployed as the largest user model at Meta&quot; and &quot;4.3% conversion uplift on Facebook Feed and Reels&quot;.</li>
+</ul>
+</li>
+<li><strong>The measured A/B figures in the blog body</strong> are cumulative effects and include other model improvements, so they are not the effect of LLaTTE alone. <span class="badge ok">verified</span><ul>
+<li>The blog figures are &quot;a cumulative lift of 6% in conversions on Instagram, 3% in conversions on Facebook and 3.5% in ad clicks on Facebook&quot;.</li>
+<li>The blog writes &quot;cumulative&quot; and states explicitly that &quot;broader model innovations&quot; are included.</li>
+</ul>
+</li>
+<li>LLaTTE&#39;s core formulation has two parts. One is a multi-stage sequence model that separates heavy offline user modeling from lightweight online ranking. The other is a learning technique that learns feature interactions directly from data with dense tokenization and target-aware attention. <span class="badge ok">verified</span> (LLaTTE blog)<blockquote>
+<p>&quot;(1) a multi-stage sequence model that decouples heavy offline user modeling from lightweight online ranking tasks and (2) a learning technique based on <strong>dense tokenization and target-aware attention</strong> that efficiently learns feature interactions directly from data&quot;</p>
+</blockquote>
+<ul>
+<li>To confirm the scaling law with the word &quot;prerequisite&quot;, you have to check the paper (the re-verification item above).</li>
+</ul>
+</li>
+<li class="warn"><strong>⚠ The quote that semantic features are a prerequisite for scaling is also not in the blog body.</strong> <span class="badge obs">observed</span> 2026-08-10; the paper must be checked again.<ul>
+<li>The quote is &quot;semantic features bend the scaling curve: they are a prerequisite for scaling&quot;. This is a claim that <strong>scaling itself does not work without semantic features</strong>.</li>
+<li>It points in the opposite direction from HSTU saying it &quot;goes with raw categorical engagement features alone&quot;.</li>
+<li>The corresponding blog sentence is &quot;Semantic content features from foundation models complement traditional collaborative filtering... especially helpful in cold-start scenarios&quot;. It is a softer expression than &quot;prerequisite&quot;.</li>
+<li>The discussion of LLM-derived features is in <a href="llm-in-recsys.html">llm-in-recsys.md</a>.</li>
+</ul>
+</li>
+<li>The point that LLaTTE is part of GEM (LLaTTE ⊂ GEM) is confirmed by the primary source, the following sentence in the blog body. <span class="badge ok">verified</span> (LLaTTE blog)<blockquote>
+<p>&quot;This unified platform for sequence modeling is a core component of Meta&#39;s Generative Ads Recommendation Model (GEM)&quot;</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="gem-training-infrastructure">GEM training infrastructure</h3>
+<p>The 2026-08-03 blog post gave the lineage table&#39;s GEM entry <strong>concrete figures on the training infrastructure</strong> for the first time. Until then, only GEM&#39;s architecture unification (Wukong, InterFormer) was known. <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">Training GEM at LLM Scale</a>, 2026-08-03</p>
+<ul>
+<li>GEM is the foundation model for Instagram and Facebook ads recommendation, and it trains at LLM scale on several thousand of the latest-generation GPUs. <span class="badge ok">verified</span>(GEM Training blog post)<blockquote>
+<p>&quot;the foundation model behind ads recommendations across Instagram and Facebook, now trains at LLM scale on several thousand of the latest-generation GPUs&quot;</p>
+</blockquote>
+<ul>
+<li>The blog post describes the hybrid architecture as &quot;trillions of sparse embedding parameters and billions of dense parameters&quot;.</li>
+</ul>
+</li>
+<li>Over the past 12 months, it doubled E2E training efficiency while quadrupling total training FLOPs. <span class="badge ok">verified</span>(GEM Training blog post)<blockquote>
+<p>&quot;we doubled GEM&#39;s E2E training efficiency to 20-25% MFU while scaling total training FLOPs 4x over the past 12 months&quot;</p>
+</blockquote>
+<ul>
+<li>Here the baseline is before the initial GEM release (2025-11), and the metric is end-to-end Model FLOPs Utilization.</li>
+</ul>
+</li>
+<li>Infrastructure tuned for LLM training does <strong>not transfer directly</strong> to recommendation models, so custom kernels were needed. <span class="badge ok">verified</span>(GEM Training blog post) The reasons the LLM stack cannot be reused as is are the recommendation system&#39;s sparse embeddings, jagged tensors (sequence tensors of uneven length), and heterogeneous attention.<blockquote>
+<p>&quot;AI infrastructure optimized for LLM training (kernels, parallelism, low precision recipes etc.) does <strong>not directly transfer</strong>&quot;</p>
+</blockquote>
+</li>
+<li>The compute-efficiency techniques are custom attention kernels and MXFP8 low-precision arithmetic. <span class="badge ok">verified</span>(GEM Training blog post)<ul>
+<li>The kernels are <strong>JFA (Jagged Flash Attention), GDPA (Generalized Dot-Product Attention), and BlockAttention</strong>.</li>
+<li>MXFP8 is used in attention and the MLP.</li>
+</ul>
+</li>
+<li>On the scaling-efficiency side, it reduces communication overhead with 2D FSDP, Expert Parallelism (dense), Fully Sharded 2D Model Parallelism (sparse), and SM-free collectives. <span class="badge ok">verified</span>(GEM Training blog post)</li>
+<li><strong>DHEN was absorbed, not replaced.</strong> <span class="badge ok">verified</span>(GEM Training blog post) In the blog post text, &quot;Deep Hierarchical Ensemble Network experts&quot; remain as GEM&#39;s expert module.<ul>
+<li>As of the 2025-11 generation, &quot;GEM = Wukong·InterFormer unification&quot; in the lineage table is valid, and DHEN is part of it. The backbone replacement in the 2026-10 generation is in the <a href="#gem-2026-generation">section below</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="gem-2026-generation">GEM 2026 generation</h3>
+<p>As of the 2026-10-13 blog post, GEM&#39;s backbone changed from InterFormer to Kunlun, and the per-domain models were merged into one central model. <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM): Scaling the Central Model and Compute Engine for Frontier Ads AI</a>, 2026-10-13 (blog post, no author listed)</p>
+<ul>
+<li class="warn"><p><strong>⚠ Claim changed: the backbone changed from InterFormer to Kunlun.</strong> <span class="badge ok">verified</span>(GEM 2026 blog post) &quot;GEM = Wukong·InterFormer unification&quot; in the table above describes the 2025-11 generation. The blog post compares Kunlun with &quot;the previous version (Interformer)&quot;.</p>
+<blockquote>
+<p>&quot;Compared to the previous version (Interformer), Kunlun delivers 2x performance gains with the same computation scaling.&quot;</p>
+</blockquote>
+<ul>
+<li>Kunlun first appeared in a 2026-02 paper (<a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">arXiv 2602.10016</a>), and the paper&#39;s abstract also says &quot;Kunlun is now deployed in major Meta Ads models&quot;.</li>
+<li>CompSkip (computation skipping that bypasses some components) is described as &quot;reduce FLOPS by 43% with negligible quality loss&quot;.</li>
+</ul>
+</li>
+<li><p><strong>It merged the per-domain models into one.</strong> <span class="badge ok">verified</span>(GEM 2026 blog post) It keeps shared experts alongside domain-specific experts, and trains on per-surface data mixed virtually rather than physically merged.</p>
+<blockquote>
+<p>&quot;The 2026 generation of GEM shifts from isolated per-domain optimizations — such as Facebook, Instagram, Reels — to a single central foundation model.&quot;</p>
+</blockquote>
+</li>
+<li><p>It states that it increased the length of long-term engagement history in production by 2× and confirmed the capability to extend it up to 25×. <span class="badge ok">verified</span>(GEM 2026 blog post) Model complexity is 2.5× that of the previous GEM.</p>
+</li>
+<li><p><strong>Three methods for transferring knowledge to vertical models were laid out.</strong> <span class="badge ok">verified</span>(GEM 2026 blog post)</p>
+<ol>
+<li><p>LoopFM is a post-training technique that passes GEM&#39;s internal representations and long-term history memory to vertical models. The blog post claims &quot;2x of transfer effectiveness beyond knowledge distillation&quot;.</p>
+</li>
+<li><p>It also uses soft label distillation.</p>
+</li>
+<li><p>Solaris precomputes GEM embeddings for the user-ad pairs needed by the next request.</p>
+<blockquote>
+<p>&quot;It speculatively precomputes foundation model embeddings for the user-ad pairs a future request is likely to need, and delivers them just-in-time on the serving hot path.&quot;</p>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p>The performance figures the blog post gives are as follows. <span class="badge ok">verified</span>(GEM 2026 blog post)</p>
+<ul>
+<li>Across Meta ad surfaces and objectives: &quot;18.9% conversion improvement and 12% ad click-through rate (CTR) improvement across Meta&#39;s ad surfaces and objectives&quot;. It does not disclose the period or the baseline for these two figures.</li>
+<li>Targeted users: &quot;5.8%, 4.1%, and 1.6% conversion uplift on Facebook, Instagram, and off-site conversion for targeted users over the past year&quot;. These three figures are cumulative over &quot;the past 1 year&quot;.</li>
+<li>It does not disclose the A/B design <span class="badge ok">verified</span> (the text has no description of the design).</li>
+</ul>
+</li>
+<li><p>Relationship to the organic feed: as of the blog post, GEM trains only on ads data. <span class="badge ok">verified</span>(GEM 2026 blog post) For the future, it writes &quot;extend GEM to learn from all of Meta&#39;s platform data, capturing behavior across organic and ads engagements&quot;.</p>
+<ul>
+<li>This is the first official statement that lineage A (HSTU) and lineage B could merge at the data level <span class="badge est">inferred</span> — it is a statement of plans, not a deployment fact.</li>
+</ul>
+</li>
+<li><p>Solaris points in the same direction as LLaTTE&#39;s &quot;asynchronous upstream user model&quot;. Heavy computation is done ahead of time outside the request path, and the ranker only reads the result <span class="badge est">inferred</span> — the two blog posts do not cite each other, so it is unknown whether they are the same system.</p>
+</li>
+<li><p>The blog post from the same week (2026-10-12), <a href="https://engineering.fb.com/2026/10/12/ml-applications/turning-opportunistic-ai-inference-capacity-into-better-ads-recommendations/" target="_blank" rel="noopener">Turning Opportunistic AI Inference Capacity Into Better Ads Recommendations</a>, describes using idle inference capacity for ranking. <span class="badge ok">verified</span> Rank More Ads evaluates more ranking candidates when capacity is available, and Serve Better Models routes requests to a larger model. <span class="badge ok">verified</span> It does not disclose effect figures.</p>
+</li>
+</ul>
+<h3 id="marm-does-not-say-it-serves-gem">MARM does not say it serves GEM</h3>
+<p>GEM does <strong>not appear</strong> in the MARM blog post text. It appears only in the sidebar &quot;Related Posts&quot; link (full text checked 2026-08-09). MARM describes itself as per-request routing and O(1T) parameter scaling, and describes the routing as &quot;replaces a &#39;one-size-fits-all&#39; inference approach with intelligent request routing&quot;. <strong>&quot;MARM serves GEM&quot; is plausible but has no primary source.</strong> <span class="badge est">inferred</span> — the only evidence is circumstantial: the same organization, the same period, and the same ads surface.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="the-two-lineages-do-not-cite-each-other--measurement">The two lineages do not cite each other — measurement</h2>
+<p>The text of three ads-side blog posts states its own lineage but never mentions HSTU once. <span class="badge obs">observed</span> 2026-08-09</p>
+<ul>
+<li>The corpus examined is the <strong>3 blog post texts</strong> in the table below. The sidebar and Related Posts were excluded.</li>
+<li>This is the result of fetching each text and counting strings. To reproduce, fetch the text at each URL and count occurrences of <code>HSTU</code>/<code>Wukong</code>/<code>InterFormer</code>/<code>GEM</code>.</li>
+<li>We say nothing about anything outside this corpus (papers, internal documents).</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="grow"><col class="w4"><col class="w6"><col class="w8"><col class="w8"></colgroup>
+<thead>
+<tr>
+<th>Document</th>
+<th>HSTU</th>
+<th>Wukong</th>
+<th>InterFormer</th>
+<th>GEM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GEM blog post (<span class="nw">2025-11-10</span>)</td>
+<td><strong>0</strong></td>
+<td>2</td>
+<td>1</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MARM blog post (<span class="nw">2026-03-31</span>)</td>
+<td><strong>0</strong></td>
+<td>4</td>
+<td>0</td>
+<td>0 (text)</td>
+</tr>
+<tr>
+<td>LLaTTE blog post (<span class="nw">2026-08-05</span>)</td>
+<td><strong>0</strong></td>
+<td>0</td>
+<td>0</td>
+<td>4</td>
+</tr>
+</tbody></table></div>
+<p><strong>It is 0 in three independent documents.</strong></p>
+<p><span class="badge est">inferred</span> <strong>&quot;Meta has one unified recommendation Transformer&quot; is a common misconception.</strong> At least in the public literature as of 2026-08, the organic lineage and the ads lineage have separate paper families and separate citation graphs. However, the absence of citations does not prove that they share no code. Blog posts rarely cite sources to begin with.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="dv365--compress-the-sequence-in-advance-instead-of-lengthening-it-instagram">DV365 — compress the sequence in advance instead of lengthening it (Instagram)</h2>
+<p>Instagram&#39;s DV365 <strong>does not lengthen the model&#39;s sequence</strong>; it compresses long history into embeddings offline in advance and feeds them to multiple models. <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2506.00450" target="_blank" rel="noopener">DV365: Extremely Long User History Modeling at Instagram</a>, KDD 2025</p>
+<p>Figures and operational detail are in <a href="instagram.html">instagram.md</a>. Here we cover only the <strong>structural position</strong>.</p>
+<ul>
+<li>The history it covers is up to 70,000 interactions, with an average of 40,000 interactions. <span class="badge ok">verified</span></li>
+<li>Offline, it builds 200 embeddings with multi-slicing and pooling and feeds them to 15 downstream models. <span class="badge ok">verified</span></li>
+<li>The paper claims that applying it on top of existing attention-family sequence models (including HSTU) is still incremental. That is, it holds that <strong>attention has diminishing returns at a length of 40K</strong>. <span class="badge ok">verified</span></li>
+</ul>
+<p>Within Meta there are three answers to &quot;ultra-long history&quot;. <span class="badge est">inferred</span></p>
+<ul>
+<li>HSTU uses the sequence as is, at full length, and amortizes the cost with Stochastic Length and M-FALCON.</li>
+<li>DV365 compresses it offline into features.</li>
+<li>LLaTTE separates it out as an asynchronous upstream user model.</li>
+</ul>
+<p>DV365 and LLaTTE share the same form of &quot;moving heavy computation out of the ranker&quot;, and ULTRA-HSTU only criticizes recent approaches that rely on cross-attention in general terms without naming either model. <strong>All three directions are in production at the same time.</strong> <span class="badge est">inferred</span></p>
+<p>X has no such distinction at all. The history length in Phoenix&#39;s public config is much shorter, and the code has no mechanism for compressing history. <span class="badge ok">verified</span> xai-org/x-algorithm, 2026</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="how-to-read-the-unified-model-claim">How to read the &quot;unified model&quot; claim</h2>
+<p>Meta&#39;s <strong>unification of recommendation models has been declared as a goal and has no evidence in the literature yet.</strong> <span class="badge est">inferred</span> The <a href="#the-two-lineages-do-not-cite-each-other--measurement">measurement above</a> (0 HSTU citations) and the two statements below point in the same direction.</p>
+<p>This is the part most often misquoted while these notes were being written, so we state it explicitly. The original text and details are in <a href="facebook.html">facebook.md</a>.</p>
+<ul>
+<li>Zuckerberg said in Q3 2025 that <strong>three giant transformers</strong> run Facebook, Instagram, and ads recommendation, and that unification was at the &quot;working on&quot; stage. <span class="badge ok">verified</span> Therefore, <strong>by the Q3 2025 statement, the three are separate.</strong> Also, <strong>Threads is not in</strong> this list. See <a href="threads.html">threads.md</a>.<blockquote>
+<p>&quot;there are <strong>three giant transformers</strong> that run Facebook, Instagram, and ads recommendations&quot;</p>
+</blockquote>
+</li>
+<li class="warn"><strong>⚠ Susan Li&#39;s Q4 2025 &quot;consolidation&quot; statement is not about organic unification.</strong> <span class="badge ok">verified</span> The sentence mentions &quot;Facebook Feed&quot;, but the performance metric is &quot;a 12% increase in <strong>ads quality</strong>&quot;. It is a per-surface unification of ads ranking models, not a unification of organic Feed ranking.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="x-vs-meta--contrast-on-this-topic">X vs Meta — contrast on this topic</h2>
+<p><strong>Three systems carry out the same slogan, &quot;remove dense features&quot;, to different degrees.</strong> <span class="badge est">inferred</span> And the ads lineage goes in the opposite direction altogether. LLaTTE says semantic features are a precondition for scaling. Describing them as one industry trend erases this conflict. <span class="badge est">inferred</span></p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th></th>
+<th>X (Phoenix, <span class="nw">2026</span>)</th>
+<th>Meta (HSTU lineage)</th>
+<th>Meta (ads lineage)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Starting point</td>
+<td>Replace the existing ranker with a Transformer</td>
+<td>Redefine recommendation as a generative task</td>
+<td>Add sequences to a feature-interaction network</td>
+</tr>
+<tr>
+<td>Candidate handling</td>
+<td>Candidate-block diagonal mask</td>
+<td>Interleaving and M-FALCON microbatches</td>
+<td>2-stage, separate upstream user model</td>
+</tr>
+<tr>
+<td>Normalization</td>
+<td>Standard softmax attention</td>
+<td><strong>Pointwise aggregated, SiLU</strong></td>
+<td>Undisclosed</td>
+</tr>
+<tr>
+<td>Position/time</td>
+<td>RoPE (breaks batch independence)</td>
+<td><code>rab^{p,t}</code> (position and time)</td>
+<td>Undisclosed</td>
+</tr>
+<tr>
+<td>Dense features</td>
+<td>Still present (age buckets, dwell clip)</td>
+<td><strong>Removed, justified by ablation</strong></td>
+<td>Claims semantic features are <strong>required</strong></td>
+</tr>
+<tr>
+<td>What can be verified</td>
+<td>Down to constants, masks, and bugs (code)</td>
+<td>Structure and ratios (paper)</td>
+<td>Ratios only (blog post)</td>
+</tr>
+</tbody></table></div>
+<hr>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="who-uses-this">Who uses this</h2>
+<p>The services confirmed with a primary source are X and Meta. <span class="badge ok">verified</span> Other services have not yet been investigated.</p>
+<ul>
+<li><strong>X</strong>: Phoenix is the current production ranker. <span class="badge ok">verified</span> xai-org/x-algorithm, released 2026-01</li>
+<li><strong>X (2025 Scala generation)</strong>: The same name, <code>Phoenix</code>, was also in the Scala home-mixer (the service that assembles the For You feed) as a rescorer. A Transformer ranker first entered alongside the existing heavy ranker and fully took over in 2026. <span class="badge ok">verified</span> twitter/the-algorithm <code>c54bec0</code>, 2025-09-03<ul>
+<li>7 files besides <code>PhoenixScorer</code> were newly added in this commit.</li>
+<li>The heavy ranker is the production ranker of the 2025 Scala generation, and appears under the name Navi in x.md.</li>
+</ul>
+</li>
+<li><strong>Meta (organic)</strong>: It runs from HSTU (ICML 2024) to ULTRA-HSTU (2026), and ULTRA-HSTU writes &quot;serving billions of users daily&quot;. <strong>⚠ The paper anonymizes the surface</strong>, so which app it is cannot be confirmed. <span class="badge ok">verified</span>(existence) / <span class="badge est">inferred</span>(surface) Details are in <a href="facebook.html">facebook.md</a>.</li>
+<li><strong>Meta (ads)</strong>: It runs from DHEN to Wukong to InterFormer to GEM, and the sequence part is LLaTTE. It is stated explicitly that it was deployed to Facebook Feed and Reels ads. As of the 2026-10 blog post, GEM&#39;s backbone is Kunlun, and it handles Facebook, Instagram, and Reels with one model. <span class="badge ok">verified</span><ul>
+<li>There is no primary source that MARM handles serving for this lineage <span class="badge est">inferred</span> (<a href="#marm-does-not-say-it-serves-gem">MARM section</a>).</li>
+</ul>
+</li>
+<li><strong>Instagram</strong>: DV365 feeds <strong>15 product models</strong> of Instagram and Threads upstream. It is a form that moves the sequence model out of the ranker. <span class="badge ok">verified</span> Details are in <a href="instagram.html">instagram.md</a>.</li>
+<li><strong>Threads</strong>: There is no statement about its own sequence model. It is mentioned only as a <strong>consumer</strong> of DV365. <span class="badge ok">verified</span> Details are in <a href="threads.html">threads.md</a>.</li>
+<li><strong>Other services</strong>: Not yet investigated. Pinterest TransAct and Kuaishou are likely to belong to the same family, but this repository has not yet confirmed them with a primary source. <strong>This is an open question.</strong></li>
+</ul>
+<p>Retraining and freshness (GEM continuous online training, DV365 6-hour refresh) are in <a href="model-freshness.html">model-freshness.md</a>. We do not repeat them here.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="not-yet-verified">Not yet verified</h2>
+<p>On the Meta side, we have not yet confirmed HSTU&#39;s deployment surface, the relationship between the two lineages, what MARM serves, or the attention mask shape. On the X side, we do not know Phoenix&#39;s production sequence length.</p>
+<ul>
+<li><strong>Which surface HSTU runs on.</strong> The HSTU paper says only &quot;a large internet platform&quot;. ULTRA-HSTU narrowed it to &quot;a large-scale production <strong>video serving platform</strong> that reaches billions of users daily&quot;, which is currently the most specific information. See open question 5 in <a href="facebook.html">facebook.md</a>.</li>
+<li><strong>Whether the two lineages actually share code.</strong> We measured that there are no citations (<a href="#the-two-lineages-do-not-cite-each-other--measurement">table above</a>), but that does not prove infrastructure separation.</li>
+<li><strong>What MARM serves.</strong> GEM is not in the text. Its relationship to LLaTTE and GEM rests on circumstantial evidence only.</li>
+<li><strong>The substance of ULTRA-HSTU&#39;s &quot;sparse attention&quot; and &quot;model topology&quot;.</strong> We confirmed only abstract-level statements.</li>
+<li><strong>The shape of Meta&#39;s attention mask.</strong> For X, the mask can be seen in code, but Meta disclosed only that M-FALCON &quot;modifies&quot; the mask. We could not confirm exactly what form the isolation between candidates takes.</li>
+<li><strong>Phoenix&#39;s production sequence length.</strong> Only the mini config is public. It cannot be compared directly with Meta&#39;s 8192 / 40K.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<p><strong>X</strong></p>
+<ul>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, public source code (Apache 2.0). All of <code>phoenix/</code>.</li>
+<li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — 2025-09-03 refresh commit <code>c54bec0</code>, public source code.</li>
+</ul>
+<p><strong>Meta — organic lineage</strong></p>
+<ul>
+<li><a href="https://arxiv.org/html/2402.17152v3" target="_blank" rel="noopener">Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers for Generative Recommendations</a> — ICML 2024 (arXiv 2024-02), paper. Primary source for HSTU, unified time series, pointwise aggregated attention, <code>rab^{p,t}</code>, Stochastic Length, and M-FALCON. ⚠ v4 returns 404 (2026-08-09), so v3 was used.</li>
+<li><a href="https://arxiv.org/abs/2602.16986" target="_blank" rel="noopener">ULTRA-HSTU</a> — 2026-02-19, paper. Criticizes reliance on cross-attention and presents 5×/21× scaling.</li>
+<li><a href="https://arxiv.org/abs/2506.00450" target="_blank" rel="noopener">DV365: Extremely Long User History Modeling at Instagram</a> — KDD 2025 (arXiv 2025-05-31), paper.</li>
+</ul>
+<p><strong>Meta — ads lineage</strong></p>
+<ul>
+<li><a href="https://arxiv.org/abs/2203.11014" target="_blank" rel="noopener">DHEN</a> — 2022-03-11, paper.</li>
+<li><a href="https://arxiv.org/abs/2403.02545" target="_blank" rel="noopener">Wukong: Towards a Scaling Law for Large-Scale Recommendation</a> — 2024-03-04, paper.</li>
+<li><a href="https://arxiv.org/abs/2411.09852" target="_blank" rel="noopener">InterFormer</a> — 2024-11-15, paper.</li>
+<li><a href="https://engineering.fb.com/2025/11/10/ml-applications/metas-generative-ads-model-gem-the-central-brain-accelerating-ads-recommendation-ai-innovation/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM)</a> — 2025-11-10, blog post. Primary source for the Wukong·InterFormer lineage statement.</li>
+<li><a href="https://arxiv.org/abs/2601.20083" target="_blank" rel="noopener">LLaTTE: Scaling Laws for Multi-Stage Sequence Modeling in Large-Scale Ads Recommendation</a> — 2026-01-27, paper / <a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">From User Sequences to Scaling Laws</a> — 2026-08-05, blog post.</li>
+<li><a href="https://engineering.fb.com/2026/03/31/ml-applications/meta-adaptive-ranking-model-bending-the-inference-scaling-curve-to-serve-llm-scale-models-for-ads/" target="_blank" rel="noopener">Meta Adaptive Ranking Model (MARM)</a> — 2026-03-31, blog post.</li>
+<li><a href="https://engineering.fb.com/2026/08/03/ml-applications/training-gem-at-llm-scale-meta-ads-recommendation-foundation-model/" target="_blank" rel="noopener">Training GEM at LLM Scale</a> — 2026-08-03, blog post. GEM training infrastructure (12-month MFU 2×, JFA·GDPA·BlockAttention·MXFP8, 5D parallelism).</li>
+<li><a href="https://arxiv.org/abs/2602.10016" target="_blank" rel="noopener">Kunlun: Establishing Scaling Laws for Massive-Scale Recommendation Systems through Unified Architecture Design</a> — 2026-02-10 (v3 2026-06-05), paper. Backbone of the GEM 2026 generation.</li>
+<li><a href="https://engineering.fb.com/2026/10/13/ml-applications/metas-generative-ads-model-gem-scaling-the-central-model-and-compute-engine-for-frontier-ads-ai/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM): Scaling the Central Model and Compute Engine for Frontier Ads AI</a> — 2026-10-13, blog post. InterFormer → Kunlun replacement, single central model, LoopFM·Solaris.</li>
+<li><a href="https://engineering.fb.com/2026/10/12/ml-applications/turning-opportunistic-ai-inference-capacity-into-better-ads-recommendations/" target="_blank" rel="noopener">Turning Opportunistic AI Inference Capacity Into Better Ads Recommendations</a> — 2026-10-12, blog post. Serving policy that uses idle capacity to increase candidate count and model size. No figures.</li>
+</ul>
+<p><strong>Statements</strong></p>
+<ul>
+<li>Zuckerberg Q3 2025 / Susan Li Q4 2025 earnings calls — the original quotes are in <a href="facebook.html">facebook.md</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/sequence-transformer-ranking.html" data-title="시퀀스 트랜스포머 랭킹 (in-context candidate scoring)"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

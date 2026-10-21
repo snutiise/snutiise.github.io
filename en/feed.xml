@@ -1,0 +1,39 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    {%- assign docs = site.en_posts | reverse %}
+    <title>{{ site.title | xml_escape }} (English)</title>
+    <description>{{ site.description | xml_escape }} (English edition)</description>
+    <link>{{ site.url }}{{ site.baseurl }}/en/</link>
+    <atom:link href="{{ "/en/feed.xml" | prepend: site.baseurl | prepend: site.url }}" rel="self" type="application/rss+xml"/>
+    {%- comment -%}
+      한국어 feed.xml 의 영어판(두 파일 30줄씩이라 include 로 묶지 않았다). 한 피드에 두 언어를 섞지 않는다 — 리더에
+      같은 글이 두 번 뜬다. 채널 날짜는 최신 글의 날짜다. 영어 글이 아직 없으면 날짜를 내지 않는다
+      (date_to_rfc822 는 nil 에 InvalidDateError 를 던진다. pubDate·lastBuildDate 는 RSS 2.0 에서 선택이다).
+    {%- endcomment %}
+    <language>en</language>
+    {%- if docs.first %}
+    <pubDate>{{ docs.first.date | date_to_rfc822 }}</pubDate>
+    <lastBuildDate>{{ docs.first.date | date_to_rfc822 }}</lastBuildDate>
+    {%- endif %}
+    <generator>Jekyll v{{ jekyll.version }}</generator>
+    {% for post in docs limit:10 %}
+      <item>
+        <title>{{ post.title | xml_escape }}</title>
+        <description>{{ post.content | strip_html | normalize_whitespace | truncatewords:100 | xml_escape }}</description>
+        <pubDate>{{ post.date | date_to_rfc822 }}</pubDate>
+        <link>{{ post.url | prepend: site.baseurl | prepend: site.url }}</link>
+        <guid isPermaLink="true">{{ post.url | prepend: site.baseurl | prepend: site.url }}</guid>
+        {% for tag in post.tags %}
+        <category>{{ tag | xml_escape }}</category>
+        {% endfor %}
+        {% for cat in post.categories %}
+        <category>{{ cat | xml_escape }}</category>
+        {% endfor %}
+      </item>
+    {% endfor %}
+  </channel>
+</rss>

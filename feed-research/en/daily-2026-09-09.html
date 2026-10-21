@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-09 — feed-research</title>
+<meta name="description" content="In one line: Belatedly found a 2026-02 blog post stating that Shopify deployed a generative recommendation model built on Meta's HSTU for product…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-09.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-09.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-09.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-09.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-09 — feed-research">
+<meta property="og:description" content="In one line: Belatedly found a 2026-02 blog post stating that Shopify deployed a generative recommendation model built on Meta's HSTU for product…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-09.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-09.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-09">2026-09-09</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Wednesday</li>
+<li><span class="meta-k">Reading time</span>7 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-09.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>Belatedly found a 2026-02 blog post stating that Shopify deployed a generative recommendation model built on Meta&#39;s HSTU for product recommendation, and added it to the radar.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-deployed-a-generative-recommendation-model-based-on-hstu-for-product-recommendation--shopify"><span class="num">1</span>Deployed a generative recommendation model based on HSTU for product recommendation — Shopify</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-deployed-a-generative-recommendation-model-based-on-hstu-for-product-recommendation--shopify"><span class="num">1</span>Deployed a generative recommendation model based on HSTU for product recommendation — Shopify</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://shopify.engineering/generative-recommendations" target="_blank" rel="noopener">Shopify&#39;s Foundational Generative Recommender System</a> — Shopify Engineering, 2026-02-25, industry blog post. The authors are Ali Khanafer and Yang Liu (both Senior Staff ML Engineers).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Shopify serves product recommendations on two surfaces: the Shop app (the app for buyers) and merchant storefronts. Previously, it ensembled several signals through separate candidate generators and rankers.</p></div>
+<p>Here, a &quot;generative&quot; recommendation model means a sequence Transformer that treats a user&#39;s interaction sequence (search, view, add to cart, purchase) as a token sequence and predicts the next interaction autoregressively. It does not generate items as text; it predicts a product embedding from the catalog as the next token.</p>
+<p>The base architecture is HSTU (Hierarchical Sequential Transduction Units), which Meta released in 2024. HSTU is a recsys-specific Transformer that places candidates and history in one sequence through an attention mask, so one forward pass can score several candidates at once. Shopify says it used this as a starting point and changed the details to fit the e-commerce context. This source is an attempt to add a generative recommender to the existing stack as both a candidate generator and one ranking candidate source.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The model reads a buyer&#39;s raw event sequence together with time information</span></p></div>
+<ul>
+<li>It is an autoregressive sequence predictor that takes the buyer&#39;s raw event sequence (search, view, add to cart, purchase) directly as input. Causal masking keeps it from referring to future events <span class="badge ok">verified</span>.</li>
+<li>For time information, it combines a rotary encoding inspired by RoPE (rotary positional embedding) with a relative attention bias, so attention can use both absolute time and relative recency <span class="badge ok">verified</span>.</li>
+</ul>
+<blockquote>
+<p>&quot;RoPE-inspired rotary encoding so attention can carry an absolute notion of time&quot;
+— <a href="https://shopify.engineering/generative-recommendations" target="_blank" rel="noopener">Shopify&#39;s Foundational Generative Recommender System</a>, 2026-02-25</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Training introduced a new way to pick negatives and sped up training</span></p></div>
+<ul>
+<li>To improve the quality of contrastive learning, it shares negatives (comparison examples that are not the correct answer) across batches, and introduced positive-aware hard negative selection, which picks hard negatives while knowing the positive <span class="badge ok">verified</span>.</li>
+<li>To raise recall step by step within the ensemble, it used a boosting-based approach that treats the predictions of other ensemble models as hard negatives <span class="badge ok">verified</span>.<ul>
+<li>This approach targets the problem that a new model picks only candidates that overlap with existing candidate generators and so adds nothing to the ensemble total; it puts candidate diversity directly into the training objective.</li>
+</ul>
+</li>
+<li>CUDA kernel optimization raised pipeline training speed by up to 7.3x over the baseline <span class="badge ok">verified</span>.<ul>
+<li>This is an improvement in training throughput, not an architectural scaling law. We still read it as a sign that the serving and training cost of the HSTU family remains a tuning target.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;In our internal benchmarking, the full training pipeline reached up to 7.3x speedup&quot;
+— <a href="https://shopify.engineering/generative-recommendations" target="_blank" rel="noopener">Shopify&#39;s Foundational Generative Recommender System</a>, 2026-02-25</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A/B results were disclosed, but the baseline model name and the recommendation request volume were not</span></p></div>
+<ul>
+<li>In the production A/B, Shop orders rose +0.94%, high-quality CTR +5%, conversion rate +0.71%, and final product recall@4 +4.8% (all relative) <span class="badge ok">verified</span>.<ul>
+<li>The baseline is the existing recommendation stack, and the specific model name was not disclosed.</li>
+</ul>
+</li>
+<li>For serving scale, it gave only a metric from the platform-wide traffic context, not the number of product recommendation requests: 2.2 trillion edge requests handled during BFCM 2025 (Black Friday Cyber Monday) <span class="badge ok">verified</span>.<ul>
+<li>It describes the peak event scale as being in the billions.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;Shop orders increased by 0.94% relative. High quality click-through rate increased by 5% percent relative...Conversion rate increased by 0.71% relative.&quot;
+— <a href="https://shopify.engineering/generative-recommendations" target="_blank" rel="noopener">Shopify&#39;s Foundational Generative Recommender System</a>, 2026-02-25</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. As a next step, it plans to represent products with semantic IDs</span></p></div>
+<ul>
+<li>As a next step, it plans to introduce semantic IDs (SID) to represent a product as a token sequence drawn from a small token vocabulary, which would reduce dependence on large embedding tables and open up text query integration <span class="badge ok">verified</span>.<ul>
+<li>This direction has not yet been deployed.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;when products are modeled independently, the system relies on very large embedding tables...can become a bottleneck&quot;
+— <a href="https://shopify.engineering/generative-recommendations" target="_blank" rel="noopener">Shopify&#39;s Foundational Generative Recommender System</a>, 2026-02-25</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a Shopify GRs entry to the &quot;New this month&quot; section of <a href="radar.html">radar.md</a>. Also added it as additional evidence to two open threads (topics watched in radar.md), &quot;Recommendation model scaling laws&quot; and &quot;Generative retrieval / semantic ID&quot;.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This source is the first statement from the e-commerce product recommendation domain in the HSTU lineage. However, the baseline model&#39;s identity and parameter scale are not public, so it is weak evidence for the scaling law thread.</p></div>
+<ul>
+<li>This source was published in 2026-02, so it is not a fresh announcement, but it is a statement this repository had missed for over six months. It was found today through WebSearch cross-checking.</li>
+<li>Shopify is the sixth industry company attached to the HSTU lineage. The lineage is summarized in <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a>.<ul>
+<li>The existing lineage is Meta HSTU and Wukong originals, Netflix Foundation Model, Meta ads LLaTTE, Alibaba TransRetrieval, ByteDance ReST, and Tencent PCG CCFormer.</li>
+<li>Until now, the statements were concentrated in three domains. In ads: Meta LLaTTE, Alibaba TransRetrieval, and ByteDance ReST. In streaming video: Netflix FM. In social and content: the Meta HSTU original and Tencent PCG.</li>
+<li>Shopify is the first statement from a separate domain, e-commerce product recommendation.</li>
+<li>It is also evidence that the HSTU license and the open-source reference implementation are accessible enough for other companies to adopt in production.</li>
+</ul>
+</li>
+<li>In terms of SID adoption stage, Shopify sits at a midpoint. It deployed to production without SID, using large embedding tables, and plans to move to SID afterward.<ul>
+<li>Most recent statements in the <a href="radar.html#generative-retrieval--semantic-id">generative retrieval / semantic ID thread</a> are follow-up improvements on systems that already deployed SID: Kuaishou HD-Rec and PushDualGen, Alibaba PailitaoGR, Spotify GLIDE, and Tencent BARGE.</li>
+<li>This is consistent with the observation that SID adoption proceeds in sequence at companies that actually feel the embedding-table scale problem in practice.</li>
+</ul>
+</li>
+<li>The production A/B lift itself is not larger than in other statements (Shop orders +0.94%, conversion +0.71%).<ul>
+<li>However, it should be read together with the facts that e-commerce is a surface where absolute conversion figures are inherently low and that Shopify cites scale (2.2 trillion edge requests at BFCM) as its evidence.</li>
+<li>Not disclosing what the baseline was counts against its reproduction value.</li>
+</ul>
+</li>
+<li>There are also limits. Credit to the original HSTU is not stated explicitly, and the baseline model&#39;s identity and parameter scale are not public.<ul>
+<li>The text does not credit the original HSTU authors (Meta, Jiaqi Zhai et al., <a href="https://arxiv.org/abs/2402.17152" target="_blank" rel="noopener">arXiv 2402.17152</a>) or the company Meta, and only links an open-source tutorial.</li>
+<li>Because the baseline model&#39;s identity and parameter scale are not public, the evidence it adds to the scaling law thread is weak. Whether these two pieces of information appear in follow-up sources (such as a RecSys industry track) is the point to watch.<ul>
+<li>The identity here means whether the baseline is a previous two-tower structure (one that embeds users and items separately), a DLRM family model, or a GBDT ranker.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="corrections">Corrections</h2>
+<p>Nothing was overturned. This source added new evidence to the threads and does not conflict with existing conclusions.</p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li>Added <a href="https://shopify.engineering/generative-recommendations" target="_blank" rel="noopener">Shopify Generative Recommender</a> to &quot;New this month&quot; on the radar (a watchlist of papers and trends outside the tracked services). It is a belated discovery of a 2026-02 announcement.</li>
+<li>Also added it to the &quot;Recommendation model scaling laws&quot; and &quot;Generative retrieval / semantic ID&quot; threads.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Watch whether Shopify&#39;s follow-up sources disclose the semantic ID adoption statement and the baseline&#39;s identity — the RecSys 2026 industry track or KDD 2027 are the likely venues.</li>
+<li>Watch the domain axis of the list of HSTU-adopting companies — the key is how widely open-source HSTU is actually used in production. Since the sixth company was e-commerce, if another statement appears, we will sort out which parts of the per-domain benchmark axis (ads, content, video, e-commerce) it fills.</li>
+<li>Watch for follow-up statements on Meta&#39;s HSTU license — whether Meta keeps releasing its own improvements as open-source reference implementations, or leaves only production improvements as statements, sets the upper bound on the pace of industry adoption.</li>
+</ul>
+<p>Lookup failed: none.</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-08.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-08</span></a><a class="pg-next" href="daily-2026-09-10.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-10</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-09.html" data-title="일일 리포트 2026-09-09"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

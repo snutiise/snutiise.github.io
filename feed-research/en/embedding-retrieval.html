@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embedding-based candidate generation — feed-research</title>
+<meta name="description" content="Candidate generation (retrieval) is the stage that first picks, from all content, the candidates to pass to the ranking model. Embedding-based candidate…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/embedding-retrieval.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/embedding-retrieval.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/embedding-retrieval.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/embedding-retrieval.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Embedding-based candidate generation — feed-research">
+<meta property="og:description" content="Candidate generation (retrieval) is the stage that first picks, from all content, the candidates to pass to the ranking model. Embedding-based candidate…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/embedding-retrieval.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/embedding-retrieval.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Cross-service topics</p>
+<h1 id="embedding-based-candidate-generation">Embedding-based candidate generation</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Translated from</span><a href="../embedding-retrieval.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">20</span></summary><ol><li><a href="#family-1--graph-decomposition-simclusters">Family 1</a><ol><li><a href="#before-quoting-constants--code-defaults-differ-from-the-actual-production-run">Before quoting constants</a></li><li><a href="#sann--search-is-an-inverted-index-scan-not-ann">SANN</a></li></ol></li><li><a href="#family-2--graph-embedding-twhin">Family 2</a></li><li><a href="#family-3--two-tower-deepretrieval">Family 3</a></li><li><a href="#index-layer--three-kinds-coexist">Index layer</a></li><li><a href="#meta--the-interesting-part-is-in-the-index-not-the-encoder">Meta</a></li><li><a href="#layer-0--ebr-2020-ann-was-not-split-out-as-a-separate-service">Layer 0</a></li><li><a href="#layer-1--silvertorch-20252026-moved-the-index-into-tensors-inside-the-model">Layer 1</a></li><li><a href="#layer-2--mol-and-h-indexer-drop-the-dot-product-but-supplement-it-with-an-index">Layer 2</a></li><li><a href="#layer-3--rankgraph-use-a-co-engagement-graph-as-the-retrieval-index">Layer 3</a></li><li><a href="#layer-4--andromeda--hillmonn-train-the-index">Layer 4</a></li><li><a href="#layer-5--instagram-a-case-where-serving-cost-decided-the-architecture">Layer 5</a></li><li><a href="#layer--1--facebook-connected-content-has-no-ann-at-all">Layer -1</a></li><li><a href="#case-netflix--a-second-sample-of-the-no-retrieval-extreme">Case: Netflix</a></li><li><a href="#x-vs-meta--structural-contrast">X vs Meta</a></li><li><a href="#what-generalizes-from-this-case">What generalizes from this case</a></li><li><a href="#who-uses-this">Who uses this</a></li><li><a href="#not-yet-verified">Not yet verified</a></li><li><a href="#sources">Sources</a></li></ol></details></nav>
+<div class="prose">
+<p>Candidate generation (retrieval) is the stage that first picks, from all content, the candidates to pass to the ranking model. Embedding-based candidate generation is summarized in one sentence: &quot;find the items closest to the user in a vector space.&quot; Behind that sentence, however, are three very different families. Each family builds its vectors differently, and X runs all 3 families <strong>at the same time</strong>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Family</th>
+<th>How the vectors are built</th>
+<th>X implementation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Graph decomposition</td>
+<td>Splits the follow graph into communities and uses the degree of membership as the vector</td>
+<td>SimClusters</td>
+</tr>
+<tr>
+<td>Graph embedding</td>
+<td>Uses the edges of a heterogeneous graph as the training objective</td>
+<td>TwHIN</td>
+</tr>
+<tr>
+<td>Two-tower</td>
+<td>Trains a user tower and an item tower separately and scores with a dot product</td>
+<td>DeepRetrieval, Phoenix retrieval</td>
+</tr>
+</tbody></table></div>
+<p>DeepRetrieval, in the two-tower family, is the main candidate generator for posts from accounts the user does not follow in X 2025. Phoenix retrieval is the candidate source that does the same job in the 2026 public code (xai-org/x-algorithm).</p>
+<p><strong>Placing Meta alongside adds one more point of comparison.</strong> What X&#39;s sources let us confirm is &quot;how the vectors are built&quot; (the encoder family). What Meta&#39;s sources let us confirm is mostly &quot;where and how those vectors are stored&quot; (the index). The two are different halves of the same question, so reading only one body of literature leaves the other side invisible.</p>
+<p>The difference between the two companies&#39; sources is likely a difference in public channels rather than in the actual systems <span class="badge est">inferred</span> (<a href="#x-vs-meta--structural-contrast">X vs Meta section</a>). However, X moved to two-tower at the time Meta used two-tower and ANN (approximate nearest neighbor search) as baselines to beat, and this opposite movement is not explained by the sources <span class="badge est">inferred</span> (<a href="#x-vs-meta--structural-contrast">same section</a>).</p>
+<h2 id="family-1--graph-decomposition-simclusters">Family 1 — Graph decomposition (SimClusters)</h2>
+<p>SimClusters vectors are <strong>sparse vectors</strong>. The number of dimensions equals the number of communities, and most values are 0. These vectors are built by <strong>community detection</strong>, not by training.</p>
+<p>The pipeline has five stages <span class="badge ok">verified</span> — <code>src/scala/com/twitter/simclusters_v2/</code>.</p>
+<ol>
+<li>Build cosine similarity between producers (accounts that receive follows) from the follow graph. Producer eligibility is set by <code>minActiveFollowers</code>, and the top <code>topK</code> are kept <span class="badge ok">verified</span> — <code>UpdateKnownFor20M145K2020.scala:65-66</code>.</li>
+<li>Cap the number of neighbors with <code>maxNeighbors</code>, and keep the larger of the two directional scores (<code>Max(score)</code>) to make the graph symmetric. If <code>squareWeightsEnable</code> is on, the edge weight becomes <code>cos² × 10</code>. This <code>10</code> is <strong>hardcoded</strong>. A separate <code>wtCoeff</code> parameter sits next to it but is not used here <span class="badge ok">verified</span> — <code>UpdateKnownForSBFRunner.scala:321-339,409-413</code>, <code>UpdateKnownFor20M145K2020.scala:84</code>.</li>
+<li>Metropolis-Hastings community detection builds <strong>KnownFor</strong> (producer → community). This stage <strong>runs 1 time per week</strong> (<code>batchIncrement = Days(7)</code>) <span class="badge ok">verified</span> — <code>UpdateKnownFor20M145K2020.scala:46</code>.</li>
+<li>Multiplying the follow matrix by KnownFor produces <strong>InterestedIn</strong>, the per-user communities (<code>InterestedIn = followMatrix × KnownFor</code>). It uses <code>socialProofThreshold = 2</code> and <code>maxClustersPerUser = 50</code> <span class="badge ok">verified</span> — <code>InterestedInFromKnownFor.scala:85-86,327-336</code>.</li>
+<li>Tweet embeddings are accumulated in real time by <strong>adding the user&#39;s InterestedIn vector each time a like is pressed</strong> <span class="badge ok">verified</span> — <code>simclusters_v2/README.md:65-67</code>, <code>summingbird/storm/TweetJob.scala:123-207</code>.</li>
+</ol>
+<h3 id="before-quoting-constants--code-defaults-differ-from-the-actual-production-run">Before quoting constants — code defaults differ from the actual production run</h3>
+<p>The hyperparameter values visible in the code of the KnownFor job (UpdateKnownFor20M145K2020) are fallbacks used when no CLI argument is given. This is because the job takes all of its hyperparameters in the form <code>args.int(&quot;name&quot;, default)</code>. The same file also keeps <strong>the actual production run command as a comment, and two of its values disagree with the code defaults</strong> <span class="badge ok">verified</span> — <code>UpdateKnownFor20M145K2020.scala:144,155</code>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Code default</th>
+<th>Production command in comment</th>
+<th>Match?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>minActiveFollowers</code></td>
+<td>400 <code>:65</code></td>
+<td><code>--minActiveFollowers 400</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>topK</code> (number of producers)</td>
+<td>20,000,000 <code>:66</code></td>
+<td><code>--topK 20000000</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>maxNeighbors</code></td>
+<td><strong>400</strong> <code>:69</code></td>
+<td><strong><code>--maxNeighbors 100</code></strong></td>
+<td>❌ 4×</td>
+</tr>
+<tr>
+<td><code>maxEpochs</code></td>
+<td><strong>3</strong> <code>:83</code></td>
+<td><strong><code>--maxEpochs 4</code></strong></td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>wtCoeff</code></td>
+<td>10.0 <code>:84</code></td>
+<td><code>--wtCoeff 10.0</code></td>
+<td>✅ (but not used in step 2 above)</td>
+</tr>
+</tbody></table></div>
+<p>The docstring of the neighboring file also gives <code>maxEpochs</code> as 4: &quot;run the clustering algorithm for x iterations (<strong>x = 4 in the prod setting</strong>)&quot; <span class="badge ok">verified</span> — <code>UpdateKnownForSBFRunner.scala:50</code>. In other words, <strong>two independent documents point to 4, and only the code default is 3.</strong> The values to quote are 100 and 4 <span class="badge est">inferred</span>.</p>
+<p><strong>Two more facts are important.</strong></p>
+<ul>
+<li><strong>&quot;145,000 communities&quot; is not in the code.</strong> The community count k is not a hyperparameter set by configuration but a value that emerges from the run <span class="badge ok">verified</span> — repo-wide <code>grep 145000</code>, <code>ModelVersions.scala:11-13</code>, <code>UpdateKnownForSBFRunner.scala:636,646</code>.<ul>
+<li>The integer <code>145000</code> appears in the whole repo only in one line of prose at <code>README.md:33</code> (&quot;In production … k ~= 145000&quot;).</li>
+<li>Otherwise there is only the model version string <code>&quot;20M_145K_2020&quot;</code>.</li>
+<li>In the code, k is <strong>carried over from last week&#39;s result</strong> (<code>maxClusterIdInPreviousAssignment</code>).</li>
+</ul>
+</li>
+<li><strong>The algorithm itself is not in the repo.</strong> The repo only imports <code>com.twitter.sbf.core.MHAlgorithm</code>, and there is no <code>com/twitter/sbf/</code> source tree. Only the configuration values are public <span class="badge ok">verified</span> — <code>UpdateKnownForSBFRunner.scala:5-9</code>.</li>
+</ul>
+<p><strong>The speed of time decay differs by layer</strong> <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The fav signal in InterestedIn has a half-life of <strong>100 days</strong> <span class="badge ok">verified</span> — <code>InterestedInFromKnownFor.scala:286-301</code>.</li>
+<li>Tweet embeddings have a half-life of <strong>8 hours</strong> <span class="badge ok">verified</span> — <code>summingbird/common/Configs.scala:38</code>.</li>
+</ul>
+<p>User taste is forgotten slowly, and content popularity is forgotten quickly. Within the same system, the two half-lives are set 300× apart (100 days × 24 hours ÷ 8 hours) <span class="badge ok">verified</span> — <a href="https://github.com/twitter/the-algorithm/blob/c54bec0/src/scala/com/twitter/simclusters_v2/scalding/InterestedInFromKnownFor.scala" target="_blank" rel="noopener"><code>InterestedInFromKnownFor.scala:291-292</code></a>, <a href="https://github.com/twitter/the-algorithm/blob/c54bec0/src/scala/com/twitter/simclusters_v2/summingbird/common/Configs.scala" target="_blank" rel="noopener"><code>summingbird/common/Configs.scala:38</code></a> (<code>c54bec0</code>).</p>
+<h3 id="sann--search-is-an-inverted-index-scan-not-ann">SANN — search is an inverted-index scan, not ANN</h3>
+<p>Despite the name &quot;SimClusters ANN&quot;, SANN is <strong>not a graph index like HNSW.</strong> It brute-force scans the entire inverted index from communities to tweets <span class="badge ok">verified</span> — <code>simclusters-ann/.../ApproximateCosineSimilarity.scala</code>.</p>
+<p>The scan range is set by two constants.</p>
+<pre tabindex="0"><code>Scan at most 50 candidate clusters × at most 200 tweets per cluster → accumulate scores → top N
+</code></pre>
+<p><span class="badge ok">verified</span> — <code>maxScanClusters = 50</code>, <code>maxTopTweetsPerCluster = 200</code>, <code>SimClustersANNCandidateSource.scala:325-347</code></p>
+<p>There are 4 scoring modes, chosen at runtime <span class="badge ok">verified</span> — <code>:111-119</code>.</p>
+<ul>
+<li><code>LogCosine</code>: uses <code>score / sourceEmbedding.logNorm / log(1 + norm)</code>.</li>
+<li><code>Cosine</code>: uses <code>score / l2norm / sqrt(...)</code>.</li>
+<li><code>NoSourceNorm</code>: skips source normalization.</li>
+<li><code>DotProduct</code>: applies no normalization.</li>
+</ul>
+<p>The production default is <code>PairEmbeddingCosineSimilarity</code>, with <code>minScore = 0.7</code> and a candidate age cap of <code>1.days</code> <span class="badge ok">verified</span> — <code>:325-347</code>.</p>
+<p><strong>This approach works because the vectors are sparse.</strong> If only 50 dimensions are other than 0, scanning the inverted index costs less than a graph index. It cannot be used with dense vectors <span class="badge est">inferred</span>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="family-2--graph-embedding-twhin">Family 2 — Graph embedding (TwHIN)</h2>
+<p>TwHIN trains (lhs, relation, rhs) triples of a heterogeneous graph (a graph with multiple node and edge types). <strong>It is in the TransE family, but uses a dot product rather than distance.</strong> TransE is a graph embedding approach that trains so that the first node vector plus the relation vector comes close to the second node vector. TwHIN adds the relation vector on the RHS side and uses the dot product of that result and the LHS as the score.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">translated = x[:, 1, :] + trans_embs      # add the relation vector to the RHS
+score      = (x[:, 0, :] * translated).sum(-1)
+</code></pre></figure>
+<p><span class="badge ok">verified</span> — <code>the-algorithm-ml/projects/twhin/models/models.py:53-54,90</code></p>
+<p><strong>The public training code has several problems, so it should not be reproduced as is</strong> <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The config file docstring says &quot;apply the transform to lhs&quot;, but the code <strong>applies it to rhs</strong> <span class="badge ok">verified</span> — <code>config.py:39-41</code> vs <code>models.py:54</code>.</li>
+<li>Relation embeddings are looked up with <code>self.all_trans_embs.data[batch.rels]</code>. <strong>Going through <code>.data</code> detaches them from autograd.</strong> The relation vectors are not trained along this path <span class="badge ok">verified</span> — <code>models.py:36</code>.</li>
+<li>Negative samples are <strong>given label 1</strong> and distinguished by lowering their weight with <code>neg_weight</code> <span class="badge ok">verified</span> — <code>models.py:150-159</code>.<ul>
+<li>The code is <code>labels = cat([batch.labels, ones(num_negatives)])</code>.</li>
+</ul>
+</li>
+<li>Negative scores are computed <strong>without</strong> the relation vector. Only positive samples receive <code>+ trans_embs</code> <span class="badge ok">verified</span> — <code>models.py:67-68,83-87</code>.</li>
+<li><code>global_negatives</code> is only assigned and is not used in <code>forward()</code>. <strong>It is dead code</strong> <span class="badge ok">verified</span> — <code>models.py:25</code>.</li>
+<li>Validation dataset creation is commented out, and the LR scheduler is off (<code>scheduler = None</code>) <span class="badge ok">verified</span> — <code>run.py:49</code>, <code>optimizer.py:63-64</code>.</li>
+</ul>
+<p><strong>The production dimension count is not public.</strong> The only public config is a single example (<code>embedding_dim: 4</code>), and the test constant is <code>EMB_DIM = 128</code> <span class="badge ok">verified</span> — <code>local.yaml</code>, <code>test_models.py:16-17</code>.</p>
+<p>The serving side is well exposed, separately from the training code <span class="badge ok">verified</span>.</p>
+<ul>
+<li>It uses 6 Manhattan (X&#39;s internal KV store) datasets <span class="badge ok">verified</span> — <code>TwhinEmbeddingsStore.scala:32-49</code>.<ul>
+<li>They are <code>twhin_user_positive_embeddings</code>, <code>twhin_user_negative_embeddings</code>, <code>twhin_tweet_embeddings</code>, <code>twhin_video_embeddings</code>, and 2 rebuild datasets.</li>
+</ul>
+</li>
+<li><strong>If engagement is below 16, the embedding is set to 0</strong> <span class="badge ok">verified</span> — <code>:32-49,57-65</code>.<ul>
+<li>The threshold is <code>MinEngagementCount = 16</code>; at or above it, the embedding is normalized by dividing by the count.</li>
+</ul>
+</li>
+<li>It also enters as a home ranking feature <span class="badge ok">verified</span> — <code>TwhinEmbeddingsAdapter.scala:33-46</code>.<ul>
+<li><code>user.twhin.tw_hi_n.user_engagement_as_float_tensor</code> is one example.</li>
+</ul>
+</li>
+</ul>
+<p><strong>In other words, TwHIN is used for retrieval and is also a ranking feature.</strong> The same embedding is reused in two places.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="family-3--two-tower-deepretrieval">Family 3 — Two-tower (DeepRetrieval)</h2>
+<p>DeepRetrieval is the main OON (out-of-network, posts from accounts the user does not follow) candidate generator in X 2025. <strong>The user tower is called remotely in real time, and the item tower&#39;s output is precomputed and stored in a vector DB.</strong></p>
+<pre tabindex="0"><code>user embedding = Hydra EmbeddingGenerationService gRPC call
+item      = VecDB collection (precomputed)
+search        = annClient.search(collection, vector, SearchParams(limit, scoreThreshold), filter)
+</code></pre>
+<p><span class="badge ok">verified</span> — <code>DeepRetrievalUserEmbeddingQueryFeatureHydrator.scala:92-98</code>, <code>DeepRetrievalUserTweetANNCandidateSource.scala:77-84</code></p>
+<p><strong>u2i and i2i differ starting from how they are called</strong> <span class="badge ok">verified</span>. u2i finds items with a user vector, and i2i finds items similar to a seed item.</p>
+<ul>
+<li>u2i: the client carries the user vector and calls <code>search(vector)</code>.</li>
+<li>i2i: does not send a vector and calls <code>searchById(tweetId)</code>. The server looks up the seed tweet&#39;s vector itself (<code>DeepRetrievalTweetTweetANNCandidateSource.scala:71-77</code>).</li>
+</ul>
+<p><strong>The latency budget is very tight.</strong> User embedding generation gets 150ms per request and 250ms overall, and only 1% retries are allowed <span class="badge ok">verified</span> — <code>HydraEmbeddingGenerationServiceClientModule.scala:19-40</code>.</p>
+<p><strong>A payload filter is applied together with the vector search.</strong> The filter fields are <code>category</code>, <code>isHighQuality</code>, <code>isHighNegEngRatio</code>, and <code>tier</code>. In other words, it is not a pure nearest-neighbor search but a <strong>filtered ANN</strong> <span class="badge ok">verified</span> — <code>DeepRetrievalUserTweetANNCandidateSource.scala:103-121</code>.</p>
+<p><strong>There are at least 12 vector DB collections, serving multiple models at once</strong> <span class="badge ok">verified</span> — <code>TweetMixerGlobalParams.scala:461-1149</code>. Examples of collection names are as follows.</p>
+<ul>
+<li><code>tweet-deep-retrieval</code>, <code>tweet-deep-retrieval-exp3</code>, <code>tweet-deep-retrieval-media</code></li>
+<li><code>content-exploration-deep-retrieval</code>, <code>content-exploration-text-emb</code></li>
+<li><code>creator-incentive-retrieval-v1</code>, <code>refreshed-twhin-tweet</code>, etc.</li>
+</ul>
+<p><strong>The training code is not public.</strong> <code>tweet-mixer/</code> has only inference calls; the model structure, loss function, and negative sampling are absent <span class="badge ok">verified</span> — repo-wide.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="index-layer--three-kinds-coexist">Index layer — three kinds coexist</h2>
+<p>X&#39;s code has several vector indexes with different purposes side by side, and each embedding family uses a different index <span class="badge ok">verified</span>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Purpose</th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>In-house HNSW (Scala/Java)</td>
+<td>Legacy ANN service</td>
+<td><strong>No production values in the repo.</strong> See below</td>
+</tr>
+<tr>
+<td>FAISS SWIG binding</td>
+<td><code>IndexHNSWFlat/PQ/SQ</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Qdrant</td>
+<td>TwHIN only</td>
+<td><code>collectionName = &quot;twhin-prod&quot;</code>, <code>topK = 100</code>, <strong>timeout 20ms</strong></td>
+</tr>
+<tr>
+<td>VecDB (in-house thrift)</td>
+<td>DeepRetrieval family</td>
+<td><code>SearchParams(limit, scoreThreshold)</code> and payload filter</td>
+</tr>
+<tr>
+<td>SANN inverted index</td>
+<td>SimClusters</td>
+<td>See above</td>
+</tr>
+</tbody></table></div>
+<p><span class="badge ok">verified</span> — <code>TwHINANNCandidateSource.scala:76-78</code>, <code>ann/src/main/java/com/twitter/ann/faiss/swig/</code></p>
+<p><strong>The HNSW numbers should not be quoted.</strong> None of the three values that grep finds is a production setting <span class="badge ok">verified</span>.</p>
+<ul>
+<li><code>efConstruction = 200</code> and <code>maxM = 16</code> are values from <strong>example code for a recall benchmark</strong> <span class="badge ok">verified</span> — <code>ann/.../experimental/Runner.scala:28-29</code>.<ul>
+<li>The same <code>main()</code> also contains <code>dimen = 300</code>, <code>trainDataSetSize = 2000</code>, and <code>testDataSetSize = 30</code>.</li>
+</ul>
+</li>
+<li><code>ef = 800</code> is the value of <strong>a random query for JIT warmup</strong>, not a serving default <span class="badge ok">verified</span> — <code>HnswQueryIndexServer.scala:95</code>.<ul>
+<li>It is the value in <code>queryWithDistance(randomQuery(), 100, HnswParams(ef = 800))</code> inside <code>warmup()</code>.</li>
+</ul>
+</li>
+<li>The real values are all job arguments, received in the form <code>args.int(&quot;ef_construction&quot;)</code> <span class="badge ok">verified</span> — <code>IndexBuilderApp.scala:59</code>, <code>IndexBuilderFromBQApp.scala:124</code>, <code>IndexingStrategy.scala:50</code>. <strong>No config file that passes the arguments is in the repo.</strong></li>
+</ul>
+<p>We confirmed the same caveat on the 2026 Rust side. A hardcoded constant <code>p::AUTHOR_DIVERSITY_DECAY</code> remained in a scorer file that was disconnected from the module tree. <strong>&quot;A grep finds the number&quot; and &quot;that number is actually running&quot; are different matters.</strong></p>
+<p><strong>All embedding search results are wrapped in memcache.</strong> The TTL is 600 seconds, with <strong>20% jitter</strong>. The formula is <code>randomizedTTL(ttl, earlyExpiration = 0.2)</code> = <code>ttl - ttl × 0.2 × rand()</code> <span class="badge ok">verified</span> — <code>Utils.scala:47-49</code>. This appears intended to prevent a thundering herd caused by simultaneous expiry <span class="badge est">inferred</span>.</p>
+<p>There is one exception. Only the tweet-tweet <strong>embedding</strong> ANN has a TTL of 180 seconds <span class="badge ok">verified</span> — <code>DeepRetrievalTweetTweetEmbeddingANNCandidateSource.scala:52</code>.</p>
+<p><strong>The cache code has one caveat.</strong> In <code>MemcachedCandidateSource</code>, the path where the cache is &quot;off&quot; <strong>still writes</strong>. Only reads are skipped <span class="badge ok">verified</span> — <code>MemcachedCandidateSource.scala:41-53</code>.</p>
+<hr>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="meta--the-interesting-part-is-in-the-index-not-the-encoder" class="part">Meta — the interesting part is in the index, not the encoder</h2>
+<p>If Meta&#39;s public retrieval literature is laid out chronologically, <strong>two-tower appears only once in the middle, and everything before and after is about indexes.</strong> In 2020, ANN was added inside the query language of an existing inverted index. In 2024–2026, the index was either trained, as in HILL, or moved inside the model tensors, as in SilverTorch. The question this lineage asks is &quot;what to treat the index as&quot; rather than &quot;which embedding to use.&quot;</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="layer-0--ebr-2020-ann-was-not-split-out-as-a-separate-service">Layer 0 — EBR 2020: ANN was not split out as a separate service</h2>
+<p>Facebook Search&#39;s EBR (Embedding-based Retrieval) did not split ANN out as a separate service. Instead, it <strong>added one nearest-neighbor operator</strong> to the existing Boolean inverted index (Unicorn) <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2006.11632" target="_blank" rel="noopener">Embedding-based Retrieval in Facebook Search</a>, KDD 2020 (arXiv 2020-06). It is a Facebook Search deployment case, but it is placed here because it is the starting point of the later Meta-wide retrieval literature.</p>
+<p>The added operator is the single line below.</p>
+<pre tabindex="0"><code>(nn &lt;key&gt; :radius &lt;radius&gt;)
+</code></pre>
+<p>Because this operator is part of the Boolean query language, hybrid retrieval expressions that freely mix embeddings and terms became possible <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p><em>&quot;By having the (nn) operator as part of our Boolean query language we can now support <strong>hybrid retrieval expressions</strong>, with arbitrary combinations of embeddings and terms.&quot;</em></p>
+</blockquote>
+<p>For example, in an expression like <code>(and (term &quot;sports&quot;) (nn user_emb :radius 0.3))</code>, <strong>term matching and embedding search are composed within a single query.</strong> It is not a structure in which a separate ANN service is attached and detached. The paper also states directly why it was built this way <span class="badge ok">verified</span>. Instead of using a separate system, NN was implemented with existing primitives, and it inherited all existing features such as real-time updates, efficient query planning and execution, and multi-hop query support.</p>
+<blockquote>
+<p><em>&quot;By implementing NN support in terms of pre-existing primitives, instead of writing a separate system, we <strong>inherited all the features of the existing system</strong>, such as realtime updates, efficient query planning and execution, and support for multi-hop queries.&quot;</em></p>
+</blockquote>
+<p><strong>The paper chose radius mode over top-K mode</strong> <span class="badge ok">verified</span>. It wrote that radius mode can give a better trade-off between system performance and result quality. As a possible reason, it noted that in radius mode the other conditions of the matching expression constrain the NN search, while top-K mode must scan the whole index.</p>
+<blockquote>
+<p><em>&quot;we found that <strong>radius mode can give better trade-off</strong> of system performance and result quality. One possible reason is that radius mode enables a <strong>constrained NN search</strong> (constrained by other parts of the matching expression) but top K mode provides a more relaxed operation which needs to <strong>scan the whole index</strong> to get top K results.&quot;</em></p>
+</blockquote>
+<p><strong>That is, the filter is not applied after the ANN result but constrains the ANN search itself.</strong> X&#39;s DeepRetrieval is also a &quot;filtered ANN&quot; with payload filters (<a href="#family-3--two-tower-deepretrieval">Family 3</a>). However, X passes the filter to the vector DB, whereas in Meta 2020 <strong>the filter is the query language itself</strong>. These are answers to the same problem that are two steps apart <span class="badge est">inferred</span>.</p>
+<p>The paper also recorded results from quantization tuning and operational guidance.</p>
+<ul>
+<li>Both PCA and OPQ were tried for data transformation, and OPQ was generally more effective <span class="badge ok">verified</span> same paper.<blockquote>
+<p><em>&quot;We experimented with both PCA and OPQ to transform the data, and observed that <strong>OPQ is generally more effective</strong>.&quot;</em></p>
+</blockquote>
+</li>
+<li>Beyond a certain size, the accuracy gain from the PQ (product quantization, a quantization that splits a vector into pieces to compress it) byte count was limited <span class="badge ok">verified</span> same paper: <em>&quot;we found that the accuracy improvement is limited after x &gt; d/4.&quot;</em></li>
+<li>It recommends comparing IMI and IVF as the coarse quantizer <span class="badge ok">verified</span> same paper: <em>&quot;It is useful to compare between <strong>IMI and IVF</strong> algorithms.&quot;</em></li>
+<li>The operational guidance states explicitly to tune online, not against offline recall <span class="badge ok">verified</span> same paper: <em>&quot;<strong>Tune nprobe, num_clusters, and pq_bytes online</strong> to understand the real perf impact.&quot;</em></li>
+</ul>
+<p>The paper also covers hard negative mining (a technique that picks negative samples the model easily confuses with positives for training) in concrete terms.</p>
+<ul>
+<li>Online HNM builds a small pool from the other positive documents in the batch and picks the document with the highest similarity as the hardest negative <span class="badge ok">verified</span> same paper: <em>&quot;select the documents which received the highest similarity scores as the hardest negatives&quot;</em>.</li>
+<li>Offline HNM runs in the following order <span class="badge ok">verified</span> same paper.<ol>
+<li>Generate the top K for each query.</li>
+<li>Select hard negatives.</li>
+<li>Retrain.</li>
+<li>Repeat this process.</li>
+</ol>
+</li>
+<li><strong>The hardest ones should not be used</strong> <span class="badge ok">verified</span> same paper. The paper wrote the result of comparing sampling by rank position as follows.<blockquote>
+<p><em>&quot;using the <strong>hardest examples is not the best strategy</strong>. We compared sampling from different rank positions and found <strong>sampling between rank 101-500</strong> achieved the best model recall.&quot;</em></p>
+</blockquote>
+</li>
+</ul>
+<p>This last quote is the most valuable in practice <span class="badge est">inferred</span>. Most papers only state &quot;use hard negatives,&quot; but this paper is one of the few primary sources that says with numbers that <strong>the rank range you sample from determines the result</strong> <span class="badge est">inferred</span>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="layer-1--silvertorch-20252026-moved-the-index-into-tensors-inside-the-model">Layer 1 — SilverTorch (2025–2026): moved the index into tensors inside the model</h2>
+<p>SilverTorch made the item index, eligibility filter, scoring layer, and user tower all into tensors or operators inside a single PyTorch model <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2026/05/26/ml-applications/silvertorch-index-as-model-new-retrieval-paradigm-recommendation-systems/" target="_blank" rel="noopener">SilverTorch blog post</a>, 2026-05-26 / <a href="https://arxiv.org/html/2511.14881v3" target="_blank" rel="noopener">paper HTML</a>, arXiv 2025-11 first version.</p>
+<blockquote>
+<p><em>&quot;<strong>Index as Model</strong>: Every retrieval component — the item index, eligibility filter, scoring layer and user tower — becomes <strong>a tensor or operator inside a single PyTorch model</strong>.&quot;</em></p>
+</blockquote>
+<p>SilverTorch has three components <span class="badge ok">verified</span>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>What</th>
+<th>Replaces</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Bloom Index</strong></td>
+<td><em>&quot;a bloom-filter-based GPU indexing structure. It addresses the <strong>warp divergence</strong> of forward index, ensures <strong>contiguous memory access</strong> through bitwise operations&quot;</em></td>
+<td>CPU inverted-index filter</td>
+</tr>
+<tr>
+<td><strong>fused Int8 ANN kernel</strong></td>
+<td><em>&quot;representing embeddings with 8-bit integers and leveraging GPU&#39;s <strong>dp4a instruction</strong> (computing four multiply-adds in one instruction)&quot;</em>, <em>&quot;streams item embeddings directly from the embedding table ... avoiding intermediate tensor construction&quot;</em></td>
+<td>Faiss-GPU</td>
+</tr>
+<tr>
+<td><strong>OverArch</strong></td>
+<td><em>&quot;a SilverTorch model includes additional scoring layers (referred to as the <strong>OverArch</strong> layer)&quot;</em>, &quot;The OverArch implements <strong>Mixture of Logits (MoL)</strong>&quot;</td>
+<td>Part of later-stage ranking</td>
+</tr>
+</tbody></table></div>
+<p>The reported improvements are as follows.</p>
+<ul>
+<li>The Bloom index is <strong>291–523×</strong> faster than the CPU inverted index <span class="badge ok">verified</span>.</li>
+<li>The fused Int8 ANN kernel is <strong>2.2–14.7×</strong> faster than Faiss-GPU <span class="badge ok">verified</span>.</li>
+<li>Overall throughput improves <strong>23.7×</strong> in requests per second <span class="badge ok">verified</span>.</li>
+<li>TCO improves <strong>20.9×</strong> <span class="badge ok">verified</span>.</li>
+</ul>
+<p><strong>The key point is that the policy filter went inside the GPU kernel</strong> <span class="badge est">inferred</span>. The place where the filter sits is different in all three cases.</p>
+<ul>
+<li>X passes the filter to the vector DB as a payload condition.</li>
+<li>Meta 2020 expressed the filter as a Boolean clause of the query language.</li>
+<li>SilverTorch made the filter a <strong>bitwise operation inside the model forward pass</strong>.</li>
+</ul>
+<p>In all three generations, &quot;where the filter is placed&quot; determines the architecture.</p>
+<p>Index refresh cycles and streaming in-place updates are not repeated here. They are covered in <a href="model-freshness.html">model-freshness.md</a>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="layer-2--mol-and-h-indexer-drop-the-dot-product-but-supplement-it-with-an-index">Layer 2 — MoL and h-indexer: drop the dot product, but supplement it with an index</h2>
+<p>Meta&#39;s KDD 2023 paper uses MoL (Mixture of Logits) instead of the dot product as the similarity function, and supplements the ANN index that this made unusable with the h-indexer <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2306.04039" target="_blank" rel="noopener">Revisiting Neural Retrieval on Accelerators</a>, KDD 2023 (Meta).</p>
+<p>The paper&#39;s problem statement is clear <span class="badge ok">verified</span>. Dot-product-based models produce low-rank recommendations, and dot products cannot capture complex user-item interactions. The paper views these interactions as multifaceted and likely high rank.</p>
+<blockquote>
+<p><em>&quot;dot product-based models produce <strong>low-rank</strong> recommendations&quot;</em>, <em>&quot;dot products cannot capture complex user-item interactions, which are <strong>multifaceted and likely high rank</strong>.&quot;</em></p>
+</blockquote>
+<ul>
+<li><strong>MoL</strong> (Mixture of Logits) expresses similarity as an adaptive mixture of several more elementary logits <span class="badge ok">verified</span> same paper: <em>&quot;parameterize ϕθ(u,x) as an <strong>adaptive mixture of more elementary logits</strong>&quot;</em>.<ul>
+<li>The formula in the follow-up paper is <code>ϕ(q,x) = Σ_{p=1..P} π_p(q,x)·⟨f_p(q), g_p(x)⟩</code>. That is, an adaptive gating weight is applied to the dot products of P pairs of low-rank embeddings <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2407.15462" target="_blank" rel="noopener">Retrieval with Learned Similarities</a>, Bailu Ding (Microsoft) and Jiaqi Zhai (Meta), arXiv 2024-07.</li>
+</ul>
+</li>
+<li>The <strong>h-indexer</strong> is a 1-stage search that pulls a wide set of candidates in front of MoL <span class="badge ok">verified</span>. MoL is not a dot product, so an ANN index cannot be used, and search is therefore split into 2 stages <span class="badge ok">verified</span>.<blockquote>
+<p><em>&quot;an accelerator friendly algorithm, <strong>h-indexer</strong>, is used to find a large number of candidates (<strong>k′=10⁵</strong>) out of a <strong>100M corpus</strong>, and then a complex similarity function (e.g., mixture-of-logits) is used to find the final top k (e.g., <strong>100</strong>) candidates.&quot;</em></p>
+</blockquote>
+</li>
+<li>Serving latency is comparable to an optimized CPU MIPS baseline (MIPS is a search for the items with the largest dot product) <span class="badge ok">verified</span>.<blockquote>
+<p><em>&quot;The median serving GPU latency of our proposed architecture is <strong>30ms</strong>, comparable with optimized CPU MIPS baseline (<strong>20ms</strong>).&quot;</em></p>
+</blockquote>
+</li>
+</ul>
+<p><strong>In short, it is not that &quot;the dot product was dropped&quot; but that &quot;the dot product was demoted to stage 1&quot;</strong> <span class="badge est">inferred</span>. The price of higher expressiveness is paid by stacking one more index layer. Read together with the statement that the OverArch of <a href="#layer-1--silvertorch-20252026-moved-the-index-into-tensors-inside-the-model">SilverTorch</a> implements MoL, MoL appears to have moved from the 2023 paper into the 2026 production serving stack <span class="badge est">inferred</span>. However, the two documents do not explicitly link to each other.</p>
+<p class="warn">⚠ <strong>The h-indexer is not in the MoL paper (2407.15462).</strong> The source is the KDD 2023 paper <span class="badge obs">observed</span> 2026-08-09. The inspected corpus is <strong>2 HTML full texts, v3 and v4,</strong> of arXiv 2407.15462, and the string <code>h-indexer</code> appears 0 times in them.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="layer-3--rankgraph-use-a-co-engagement-graph-as-the-retrieval-index">Layer 3 — RankGraph: use a co-engagement graph as the retrieval index</h2>
+<p>The RankGraph family builds a graph linked by relations in which users engaged together (co-engagement) and uses it for retrieval <span class="badge ok">verified</span>.</p>
+<ul>
+<li><strong>RankGraph</strong> builds a heterogeneous graph (users, posts, ads, and so on) that spans several products <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2509.02942" target="_blank" rel="noopener">arXiv:2509.02942</a>, 2025-09.<ul>
+<li>The graph goes through a GPU GNN and contrastive learning and is used for similarity retrieval and real-time clustering.</li>
+<li>The paper positions RankGraph as a <strong>component of a recommendation foundation model</strong>.</li>
+</ul>
+</li>
+<li><strong>RankGraph-2</strong> uses two paths, <strong>U2U2I / U2I2I</strong> <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2606.18379" target="_blank" rel="noopener">arXiv HTML 2606.18379</a>, 2026.<ul>
+<li>U2U2I traverses the graph in the order user→user→item, and U2I2I in the order user→item→item.</li>
+<li>It builds 3 edge types (U-U, I-I, U-I) <strong>from engagement data alone</strong>.</li>
+<li>For I-I edges it corrects popularity bias and precomputes neighbors based on PPR (Personalized PageRank).</li>
+<li>Offline recall rose by up to <strong>3.8×</strong>.</li>
+<li>In a 14-day A/B, CTR rose by <strong>+0.96%</strong> and CVR by <strong>+2.75%</strong>. The change in U2U serving infrastructure cost is −83%.</li>
+</ul>
+</li>
+</ul>
+<p><strong>The RankGraph family has a different goal from X&#39;s SimClusters</strong> <span class="badge est">inferred</span>. SimClusters decomposes the <strong>follow graph</strong> into communities and updates 1 time per week. RankGraph-2 rebuilds the entire <strong>engagement graph</strong> every 3 hours (<a href="model-freshness.html">model-freshness.md</a>). The difference between a social-graph basis and a behavior-graph basis shows up directly as a difference in update cycle. However, X also uses engagement edges in TwHIN, so simplifying this to &quot;X = social / Meta = behavior&quot; is wrong.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="layer-4--andromeda--hillmonn-train-the-index">Layer 4 — Andromeda + HILL/MoNN: train the index</h2>
+<p>Andromeda, Meta&#39;s ads retrieval engine, organizes ads into a multi-layer hierarchical index and trains this index together with the retrieval model <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2024/12/02/production-engineering/meta-andromeda-advantage-automation-next-gen-personalized-ads-retrieval-engine/" target="_blank" rel="noopener">Meta Andromeda</a>, 2024-12-02.</p>
+<blockquote>
+<p><em>&quot;Andromeda organizes ads into a <strong>hierarchical index with multiple layers</strong>, reducing the number of inference steps by focusing only on most relevant nodes.&quot;</em>
+<em>&quot;The <strong>hierarchical index and retrieval models are jointly trained</strong>, which aligns the index representations with neural networks; this improves both precision and recall compared to <strong>commonly used two-tower neural networks or approximate nearest neighbor search</strong>.&quot;</em></p>
+</blockquote>
+<p><strong>The last phrase of the second quote is the most important line in these notes.</strong> Meta explicitly named two-tower and ANN as <strong>baselines it has to beat</strong>. A primary source directly refutes the framing in which this repository has recorded that &quot;two-tower is the standard.&quot;</p>
+<ul>
+<li>It names the Grace Hopper Superchip and MTIA as hardware <span class="badge ok">verified</span>: <em>&quot;NVIDIA Grace Hopper Superchip and <strong>Meta Training and Inference Accelerator (MTIA)</strong> hardware&quot;</em></li>
+<li>It reports gains in retrieval recall and in ad quality on some segments <span class="badge ok">verified</span>: <em>&quot;+<strong>6% recall</strong> improvement to the retrieval system, delivering +<strong>8% ads quality</strong> improvement on selected segments&quot;</em></li>
+</ul>
+<p>The internal structure of the Andromeda-family index was published as a paper in 2026 <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2604.12965v1" target="_blank" rel="noopener">Efficient Retrieval Scaling with Hierarchical Indexing for Large Scale Recommendation</a>, Meta, arXiv 2026-04-14.</p>
+<ul>
+<li><strong>MoNN</strong> (Modular Neural Network) strengthens the learning of user-item interactions beyond a single dot product while maintaining efficiency <span class="badge ok">verified</span> same paper.<blockquote>
+<p><em>&quot;enhances the learning of sophisticated user and item interactions <strong>beyond a single dot product</strong> while maintaining high efficiency.&quot;</em></p>
+</blockquote>
+<ul>
+<li>MoNN is the foundation retrieval model of the Meta Ads Platform. The paper states: <em>&quot;currently in service for recommending advertisements to daily Facebook and Instagram users.&quot;</em></li>
+</ul>
+</li>
+<li><strong>HILL</strong> is a method that organizes the memory of the foundation retrieval model hierarchically, so that search along the structure is fast while exactness is maintained <span class="badge ok">verified</span> same paper.<blockquote>
+<p><em>&quot;aims to <strong>hierarchically organize the memory in the foundation retrieval model</strong>, such that the searching and retrieval along the structure can be speed up and maintain the exactness.&quot;</em></p>
+</blockquote>
+</li>
+<li>Tree construction itself is training <span class="badge ok">verified</span> same paper.<ul>
+<li>The paper writes that it aims at a learning-based tree construction method: <em>&quot;we aim to design a <strong>learning-based tree construction method</strong>&quot;</em>.</li>
+<li>It places a cross-attention that uses item embeddings as the query.</li>
+<li>Inspired by residual quantization, it tries to pass residue between input item embeddings: <em>&quot;inspired by <strong>residual quantization</strong> ... we aim to pass residue between input item embedding&quot;</em>.</li>
+<li>It is trained together with the foundation retrieval model: <em>&quot;enjoys the <strong>co-training</strong> with the foundation retrieval model.&quot;</em></li>
+</ul>
+</li>
+<li>The paper writes that it concretized the concept of <strong>test-time training</strong> in the recommendation system domain <span class="badge ok">verified</span> same paper.<blockquote>
+<p><em>&quot;fine-tuning the model on this set further improves inference performance, and concretize the concept of <strong>&#39;test-time training&#39;</strong> within the recommendation system domain.&quot;</em></p>
+</blockquote>
+</li>
+</ul>
+<p class="warn">⚠ <strong>Andromeda, HILL, and MoNN are all ads-side literature.</strong> We could not find a first-party statement that the same stack is used for organic feed retrieval <span class="badge est">inferred</span>. The inspected corpus is the Meta blog and papers in the source list below, plus 15 system cards from the Transparency Center (viewed 2026-08-09). This is not evidence that nothing exists in undisclosed material. However, the direction matches the single line <em>&quot;a novel <strong>hierarchical</strong> deep neural retrieval architecture&quot;</em> from the 2023 organic-side blog quoted in <a href="facebook.html">facebook.md</a>, so there is room to read it as a lineage connection <span class="badge est">inferred</span>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="layer-5--instagram-a-case-where-serving-cost-decided-the-architecture">Layer 5 — Instagram: a case where serving cost decided the architecture</h2>
+<p>Instagram is a case where a serving cost constraint decided the retrieval model structure <span class="badge ok">verified</span>. Detailed quotes and context are in <a href="instagram.html">instagram.md</a>.</p>
+<ul>
+<li><strong>The reason for choosing two-tower is the cache, not accuracy</strong> <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>, 2023-08-09.<blockquote>
+<p><em>&quot;user and item embeddings <strong>can be cached</strong>, making inference for the Two Tower model extremely efficient&quot;</em></p>
+</blockquote>
+<ul>
+<li>On ANN, the post writes only this: <em>&quot;e.g., FAISS, HNSW, etc&quot;</em>.</li>
+<li><strong>The serving constraint that the item-tower output can be cached decided the model structure.</strong> It is a kind of reason that almost never appears in papers, and it is the sentence closest to the reason this repository exists.</li>
+<li>In return, the item-tower retraining cycle is tied to the cost of rebuilding the index. Details are in <a href="model-freshness.html">model-freshness.md</a>.</li>
+</ul>
+</li>
+<li><strong>The label of the first-stage ranker is whether the item made the top-K chosen by the second-stage ranker</strong> <span class="badge ok">verified</span>. That is, retrieval and ESR (early-stage ranking) are built as distillation of the ranker.<blockquote>
+<p><em>&quot;We train the first stage ranker to predict the output of the second stage with the label: PSelect = { media in top K results ranked by the second stage}&quot;</em></p>
+</blockquote>
+</li>
+<li><strong>IGQL is a retrieval-only DSL, and IG2Vec is an account embedding.</strong> The 2019 original text <strong>could not be accessed because of HTTP 500</strong>, so primary evidence for these names is missing <span class="badge obs">observed</span> 2026-08-09.<ul>
+<li>The original address is <code>ai.meta.com/blog/powered-by-ai-instagrams-explore-recommender-system/</code>.</li>
+<li>We requested 3 URLs directly: <code>ai.meta.com</code>, <code>ai.facebook.com</code>, and a Medium mirror.</li>
+</ul>
+</li>
+<li>However, <strong>the way it works is still preserved in the 2020 post</strong> <span class="badge ok">verified</span>. The 2020 post refers to this query language without a name, and the query that these notes call IGQL is as follows.</li>
+</ul>
+<pre tabindex="0"><code>user.let(seed_id=user_id)
+    .liked(max_num_to_retrieve=30)
+    .account_nn(embedding_config=default)
+    .posted_media(max_media_per_account=10)
+    .filter(non_recommendable_model_threshold=0.2)
+    .rank(ranking_model=default)
+    .diversify_by(seed_id, method=round_robin)
+</code></pre>
+<p>The <code>account_nn(embedding_config=default)</code> in this query is the IG2Vec-family account embedding plus nearest neighbors <span class="badge est">inferred</span>. The basis is that the method name itself says account nearest-neighbor.</p>
+<p><strong>And this query matches the hybrid idea of <a href="#layer-0--ebr-2020-ann-was-not-split-out-as-a-separate-service">Layer 0</a></strong> <span class="badge est">inferred</span>. Embedding search (<code>account_nn</code>), policy filter (<code>filter</code>), ranking, and diversity are all inside <strong>one retrieval expression</strong>. The <code>(nn ...)</code> operator of Facebook Search 2020 and the query language of the Instagram 2020 post independently arrived at the same form <span class="badge est">inferred</span>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="layer--1--facebook-connected-content-has-no-ann-at-all">Layer -1 — Facebook connected content has no ANN at all</h2>
+<p>Facebook connected content needs no embedding search, because the corpus is already limited to the user&#39;s connections <span class="badge est">inferred</span> — <a href="facebook.html">facebook.md</a>. The funnel scale is described only for the unconnected side <span class="badge ok">verified</span> — <a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">ai.meta.com, 2023</a>: <em>&quot;billions → thousands → a few hundred&quot;</em>.</p>
+<p><strong>This structure is the root cause of the gap in the amount of literature between the two companies</strong> <span class="badge est">inferred</span>. X has few connections in its follow graph and a large OON share from the start, so retrieval was the product. Facebook was dominated by connected content until 2021, so the retrieval problem itself was small. The share of unconnected content changed from 11.7% in 2021 to 41.0% in 2025 Q4 (<a href="facebook.html">facebook.md</a>), and this period overlaps with the point when Meta&#39;s retrieval literature started to grow substantially.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-netflix--a-second-sample-of-the-no-retrieval-extreme">Case: Netflix — a second sample of the &quot;no retrieval&quot; extreme</h2>
+<p>As of TMIS 2015, Netflix has no ANN either. Facebook connected content has no ANN because &quot;the graph is the candidate set&quot;; Netflix has <strong>no ANN because &quot;the catalog is the candidate set.&quot;</strong> PVR (the ranker of the classic generation that ordered titles within genre rows) sorts &quot;the whole catalog (or a genre-filtered subset) per member&quot; <span class="badge ok">verified</span> — <a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">TMIS 2015</a>. With a corpus of thousands to tens of thousands, everything can be scored by brute force, so the problem of &quot;finding near items quickly&quot; does not exist. Netflix is a control showing that <strong>ANN is a product of the condition of a corpus in the hundreds of millions, not a technique in itself</strong>.</p>
+<p>Netflix also uses embeddings. However, the purpose is different.</p>
+<ul>
+<li><strong>Embedding store</strong>: the Foundation Model (FM) builds member embeddings and title embeddings in daily batches and puts them in the embedding store, and downstream models reuse them <strong>both as features and as candidate sources</strong> <span class="badge ok">verified</span> — <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">unified blog 2025</a>.<ul>
+<li>It is the same dual-use pattern as X&#39;s TwHIN serving both search and ranking features. Embedding reuse holds regardless of corpus size.</li>
+<li>The unified blog says only that these embeddings can also be used for candidate generation, and does not disclose whether ANN is used <span class="badge obs">observed</span> 2026-10-19 (1 blog body).</li>
+</ul>
+</li>
+<li><strong>New title embeddings are initialized from metadata, not from ID</strong> <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" rel="noopener">FM blog 2025</a>.<ul>
+<li>For a new title, the embedding is built as a metadata-based weighted combination, and the mixing ratio with the ID embedding is adjusted by entity-age-based attention <span class="badge ok">verified</span>.</li>
+<li>This is the opposite of X&#39;s TwHIN setting the embedding to 0 when engagement is below 16 (<a href="#family-2--graph-embedding-twhin">Family 2</a>). <strong>X discards when there is no signal; Netflix fills in with content information.</strong></li>
+<li>This is likely possible because it is a curated catalog in which every title has rich metadata <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>The classic generation&#39;s sims (title similarity) combined a non-personalized similarity list with personalized row selection <span class="badge ok">verified</span> TMIS 2015. The simplest form of i2i stayed alive until recently.</li>
+</ul>
+<p>The overall Netflix structure is in <a href="netflix.html">netflix.md</a>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="x-vs-meta--structural-contrast">X vs Meta — structural contrast</h2>
+<p>The contrast between the two companies&#39; materials is likely <strong>a difference in release channels rather than a real difference in systems</strong> <span class="badge est">inferred</span>. X released code, and Meta writes papers and blogs. Code reveals constants, and papers reveal multipliers.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Axis</th>
+<th>X</th>
+<th>Meta</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>What is published</td>
+<td><strong>Names and constants of candidate sources</strong> (11 home-mixer sources in Gen3 <code>0bfc279</code>; <code>maxScanClusters = 50</code> and a TTL of 600 seconds in <span class="nw">2025</span> <code>c54bec0</code>)</td>
+<td><strong>Index structure and multipliers</strong> (Bloom index 291–523×, Int8 kernel 2.2–14.7×)</td>
+</tr>
+<tr>
+<td>Unit of candidate generation</td>
+<td>Runs named sources in parallel, then concatenates</td>
+<td>Descends once through a hierarchical index</td>
+</tr>
+<tr>
+<td>Where filters apply</td>
+<td>Vector DB payload conditions and pipeline filters (17 in Gen3 <code>0bfc279</code>, 21 since the <span class="nw">2026-08-14</span> commit)</td>
+<td>Query-language Boolean clauses (<span class="nw">2020</span>) → GPU kernel bitwise (<span class="nw">2026</span>)</td>
+</tr>
+<tr>
+<td>Encoder</td>
+<td>SimClusters / TwHIN / two-tower, <strong>3 families run at once</strong></td>
+<td>two-tower is an option on one surface (IG Explore), and the ads side <strong>explicitly tries to beat it</strong></td>
+</tr>
+<tr>
+<td>Where the interesting engineering is</td>
+<td>Encoder and constants</td>
+<td><strong>Index</strong></td>
+</tr>
+<tr>
+<td>What cannot be seen</td>
+<td>Training code, loss, negative sampling (DeepRetrieval undisclosed)</td>
+<td>Per-source candidate count breakdown for the organic feed (no primary source found)</td>
+</tr>
+</tbody></table></div>
+<p><strong>Concluding &quot;X is encoder-centric, Meta is index-centric&quot; is wrong; the safe statement is only that &quot;the half each side published is different&quot;</strong> <span class="badge est">inferred</span>.</p>
+<p>However, one thing is not explained by the shape of the sources <span class="badge est">inferred</span>. <strong>Meta wrote directly that two-tower and ANN are baselines to beat, while X moved toward two-tower (DeepRetrieval, Phoenix retrieval) in 2025–2026.</strong> The two companies moved in opposite directions at the same time.</p>
+<hr>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-generalizes-from-this-case">What generalizes from this case</h2>
+<p>Looking at X alone yields generalizations about embedding families, vector search, embedding reuse, public code and constants, and time decay.</p>
+<ul>
+<li><p><strong>A service does not use only one embedding family.</strong> X runs SimClusters&#39; sparse graph decomposition, TwHIN&#39;s graph embedding, and DeepRetrieval&#39;s two-tower at the same time, and each family has a different index technology. The question &quot;which embedding do they use&quot; is wrong because the question itself is singular.</p>
+</li>
+<li><p><strong>Vector search is not pure nearest neighbor.</strong> In production, payload filters (quality, tier, category) are always applied together. This is the first reason that the paper&#39;s recall@k differs from production behavior.</p>
+</li>
+<li><p><strong>Embeddings are reused for search and for ranking features.</strong> TwHIN is the representative case. The cost of building them is split across two places.</p>
+</li>
+<li><p><strong>For sparse vectors, an inverted-index scan beats a graph index.</strong> This is why SimClusters does not use HNSW.</p>
+</li>
+<li><p><strong>Published training code is not production code.</strong> Reading X&#39;s public TwHIN code as &quot;this is how X trains&quot; is wrong. This code is in the following state:</p>
+<ul>
+<li>The validation loader is commented out.</li>
+<li>The scheduler is off.</li>
+<li>The relation embeddings are detached with <code>.data</code>.</li>
+</ul>
+</li>
+<li><p><strong>There are three kinds of constants, and all three may not be production.</strong></p>
+<ol>
+<li>The default in <code>args.int(name, default)</code> is a fallback, not the executed value.</li>
+<li>Literals in benchmark and warmup code have nothing to do with executed values.</li>
+<li>Constants in files cut off from the module tree are not executed.</li>
+</ol>
+<p>For X&#39;s SimClusters, the actual execution command remains in a comment in the same file, so we could confirm the first case. Without such a clue, <strong>numbers found by grep must not be quoted.</strong></p>
+</li>
+<li><p><strong>Time-decay constants differ by layer.</strong> At X, the half-life of taste is 100 days and the half-life of content is 8 hours. They are not unified under a single half-life.</p>
+</li>
+</ul>
+<p>Putting the Meta side alongside adds five more.</p>
+<ul>
+<li><strong>&quot;Where to put vector search&quot; is the core of the architecture decision.</strong><ul>
+<li>Instead of splitting ANN out as a separate service, Meta put it in as an operator (<code>(nn &lt;key&gt; :radius &lt;radius&gt;)</code>) inside the existing Boolean inverted index <span class="badge ok">verified</span> (<a href="https://arxiv.org/abs/2006.11632" target="_blank" rel="noopener">EBR, arXiv 2006.11632</a>, KDD 2020).</li>
+<li>5 years later, SilverTorch turned the index itself into a model tensor and put it on the GPU <span class="badge ok">verified</span> (<a href="https://arxiv.org/html/2511.14881v3" target="_blank" rel="noopener">SilverTorch, arXiv 2511.14881</a>, 2025-11).</li>
+<li>Both decisions changed the <strong>location of the index</strong>, not the encoder.</li>
+</ul>
+</li>
+<li><strong>Where filters are placed separates the generations.</strong> 2020 EBR put the filter inside the index query, the 2020 Instagram post put it inside the query language, and 2025 SilverTorch put it inside the GPU kernel <span class="badge ok">verified</span> (the three sources above). In effect, the same problem as X attaching payload filters to ANN calls was solved three different ways.</li>
+<li><strong>A serving cost constraint sometimes dictates the model structure.</strong> The reason Instagram explicitly gave for choosing two-tower in 2023 Explore is not accuracy but that <strong>the item tower output can be cached</strong> <span class="badge ok">verified</span> (<a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Instagram Explore</a>, 2023). Detailed quotes are in <a href="instagram.html">instagram.md</a>.</li>
+<li><strong>In Meta&#39;s literature, two-tower is not the goal but a baseline to beat.</strong> Andromeda describes its gains against two-tower/ANN, and MoL against dot-product models and a CPU MIPS baseline <span class="badge ok">verified</span> (<a href="#layer-2--mol-and-h-indexer-drop-the-dot-product-but-supplement-it-with-an-index">Layer 2</a>, <a href="#layer-4--andromeda--hillmonn-train-the-index">Layer 4</a>). Conversely, X <strong>moved</strong> toward two-tower in 2025–2026 <span class="badge ok">verified</span> (<a href="x.html">x.md</a>). The same technique is a destination on one side and a starting point on the other.<ul>
+<li>The baselines of the RankGraph family are Filament2, GAT-DGI, PBG, and HSTU, so they are not statements against two-tower/ANN <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2509.02942" target="_blank" rel="noopener">arXiv 2509.02942</a>, <a href="https://arxiv.org/abs/2606.18379" target="_blank" rel="noopener">arXiv 2606.18379</a>.</li>
+</ul>
+</li>
+<li><strong>The release channel determines what can be known.</strong> Source code reveals constants and hides ratios. Papers and blogs reveal ratios (+6% recall, 23.7× RPS) and hide constants. It is not that &quot;X has constants and Meta does not&quot; but that <strong>the half each side published is different.</strong> This is also why the X section and the Meta section of these notes differ in sentence density <span class="badge est">inferred</span>.</li>
+</ul>
+<p>Putting Netflix alongside adds two more.</p>
+<ul>
+<li><strong>The existence of a retrieval layer is a function of corpus size.</strong><ul>
+<li>With hundreds of millions of items (X OON, Meta unconnected), ANN is essential.</li>
+<li>When limited by a graph (Facebook connected), the graph is the candidate set.</li>
+<li>With thousands to tens of thousands (Netflix), everything can be scored by brute force.</li>
+<li>&quot;Which ANN do you use&quot; is a question that does not hold in the third case.</li>
+</ul>
+</li>
+<li><strong>Cold-start embeddings have two extremes: discard and fill.</strong> X&#39;s TwHIN uses a 0 vector when engagement is below 16, while the Netflix FM initializes from metadata and then blends it in with entity-age attention. UGC (user-uploaded content) has thin metadata and an unbounded set of items. A curated catalog has rich metadata and a finite set of items. This difference shows up directly in the design.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="who-uses-this">Who uses this</h2>
+<p>X, Instagram, and Meta ads use the embedding retrieval techniques covered in these notes <span class="badge ok">verified</span>. Facebook is where EBR was first published (search), but ANN does not appear in the connected content path <span class="badge est">inferred</span>. As of TMIS 2015, Netflix scores the whole catalog, and whether it uses ANN in the FM generation is not public <span class="badge ok">verified</span> (TMIS) / <span class="badge obs">observed</span> 2026-10-19 (FM unified blog). For Threads, the candidate generation approach itself is not public <span class="badge obs">observed</span> 2026-08-09.</p>
+<ul>
+<li><strong>X</strong> uses SimClusters, TwHIN, DeepRetrieval, and Phoenix retrieval <span class="badge ok">verified</span> — <a href="x.html">x.md</a>.<ul>
+<li>SimClusters (2020–) updates 1 time per week.</li>
+<li>DeepRetrieval was the mainstay in 2025, and Phoenix retrieval is in the 2026 public code.</li>
+<li>The encoder families are public, and the index has 3 layers: Qdrant/VecDB/FAISS.</li>
+</ul>
+</li>
+<li><strong>Facebook</strong> is where EBR was first published (search), but <strong>ANN does not appear in the connected content path</strong> <span class="badge est">inferred</span> — <a href="facebook.html">facebook.md</a>.<ul>
+<li>On the feed side, the share of unconnected content rose from 11.7% (2021 Q3) to 41.0% (2025 Q4), and this period overlaps with the period when retrieval literature grew substantially.</li>
+<li>In the connected content path, the follow graph is the candidate set.</li>
+</ul>
+</li>
+<li><strong>Instagram</strong> is the only case in this repository where a primary source says &quot;serving cost decided the model&quot; <span class="badge ok">verified</span> — <a href="instagram.html">instagram.md</a>.<ul>
+<li>The 2020 post released a retrieval query language that uses account-embedding nearest neighbors (<code>account_nn</code>) <span class="badge ok">verified</span>. The names IG2Vec and IGQL have no primary evidence because the 2019 original text could not be opened <span class="badge obs">observed</span> 2026-08-09.</li>
+<li>Explore uses two-tower (2023; cacheability was the reason for the choice).</li>
+</ul>
+</li>
+<li><strong>Meta</strong>&#39;s Layers 1–4 cover different surfaces. Only Layer 4 (Andromeda and HILL/MoNN) is explicitly stated to be ads-only <span class="badge ok">verified</span>.<ul>
+<li>For SilverTorch (Layer 1), the blog says it is the main retrieval system for UGC feeds and video content <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2026/05/26/ml-applications/silvertorch-index-as-model-new-retrieval-paradigm-recommendation-systems/" target="_blank" rel="noopener">SilverTorch blog</a>, 2026-05-26.</li>
+<li>The MoL and h-indexer (Layer 2) paper says only that it experimented in one of Meta&#39;s large recommendation deployments and does not name the surface <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2306.04039" target="_blank" rel="noopener">arXiv 2306.04039</a>.</li>
+<li>RankGraph (Layer 3) is a cross-domain graph holding users, posts, and ads together, and RankGraph-2 is described as deployed on several Meta surfaces <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2509.02942" target="_blank" rel="noopener">arXiv 2509.02942</a>, <a href="https://arxiv.org/abs/2606.18379" target="_blank" rel="noopener">arXiv 2606.18379</a>.</li>
+<li>There is no first-party statement that Andromeda and HILL/MoNN are also used for the organic feed <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><strong>Threads</strong> has <strong>no statement at all</strong> about embedding retrieval and ANN. The candidate generation approach itself is not public <span class="badge obs">observed</span> 2026-08-09 — <a href="threads.html">threads.md</a>.<ul>
+<li>The inspected sources are the body of the ig-threads-feed card and 2 Threads engineering blog posts.</li>
+</ul>
+</li>
+<li><strong>Netflix</strong> scores the whole catalog as of TMIS 2015. It builds the FM embedding store daily, uses it as dual-use for features and candidates, and initializes new titles from metadata <span class="badge ok">verified</span> — <a href="netflix.html">netflix.md</a>.</li>
+</ul>
+<p>Index rebuild and retraining cycles are summarized in <a href="model-freshness.html">model-freshness.md</a>. SilverTorch, the 3-hour cycle of RankGraph-2, and Instagram&#39;s daily item tower count here. They are not repeated here.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="not-yet-verified">Not yet verified</h2>
+<p>We could not yet confirm four things on the X side and five on the Meta side.</p>
+<ul>
+<li>X<ul>
+<li>We do not know the production embedding dimension and the actual relation set of TwHIN. Only the 4 relations in the example configuration are public.</li>
+<li>We do not know the model structure, loss, and negative sampling of DeepRetrieval. Only the inference call is public.</li>
+<li>We do not know the full list of what the legacy HNSW ANN service indexes.</li>
+<li>We do not know the scoring formula of GraphJet <code>TopSecondDegreeByCountForTweet</code>. It is an external project, so <a href="http://www.vldb.org/pvldb/vol9/p1281-sharma.pdf" target="_blank" rel="noopener">VLDB 2016 p1281</a> must be consulted.</li>
+</ul>
+</li>
+<li>Meta<ul>
+<li><strong>We do not know the per-source candidate counts of the organic feed.</strong> X has a constant for each source, but on the Meta side only the total funnel volumes of Facebook and Instagram are public. We do not know how many of them come from embedding sources.</li>
+<li><strong>We do not know whether Andromeda and HILL/MoNN also serve the organic feed.</strong> All of it is ads literature. We could not find a statement that the same infrastructure is used.</li>
+<li><strong>We do not know the current status of IG2Vec and IGQL.</strong> They have not been mentioned since the 2020 blog, and the original URL returns 500 (measured 2026-08-09). We cannot tell whether they were retired or only renamed.</li>
+<li><strong>We do not know the index update latency of SilverTorch.</strong> Throughput and TCO figures exist, but &quot;how many seconds until a new item becomes searchable&quot; does not.</li>
+<li><strong>We do not know whether radius mode is still used.</strong> It was the key choice of 2020 EBR, but the word radius does not appear again in later literature.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<p><strong>X</strong></p>
+<ul>
+<li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — commit <code>c54bec0</code> of 2025-09-03, public source code. We referred to <code>simclusters_v2/</code>, <code>simclusters-ann/</code>, <code>ann/</code>, and <code>tweet-mixer/</code>.</li>
+<li><a href="https://github.com/twitter/the-algorithm-ml" target="_blank" rel="noopener">twitter/the-algorithm-ml</a> — 2023, public source code. We referred to <code>projects/twhin/</code>.</li>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, public source code (Apache 2.0).</li>
+<li>SimClusters — KDD 2020 paper. Quoted from <code>simclusters_v2/README.md:9</code>. Figures not reproduced in the repo appear only in the paper.</li>
+</ul>
+<p><strong>Meta — index layers</strong></p>
+<ul>
+<li><a href="https://arxiv.org/abs/2006.11632" target="_blank" rel="noopener">Embedding-based Retrieval in Facebook Search</a> — 2020, paper (KDD 2020). Primary source for the <code>(nn &lt;key&gt; :radius &lt;radius&gt;)</code> operator, the radius vs. top-K comparison, OPQ/IMI tuning, and hard negative mining.</li>
+<li><a href="https://arxiv.org/abs/2306.04039" target="_blank" rel="noopener">Revisiting Neural Retrieval on Accelerators</a> — 2023, paper (KDD 2023). Definition of MoL and the <strong>primary source of the h-indexer</strong>.</li>
+<li><a href="https://arxiv.org/abs/2407.15462" target="_blank" rel="noopener">Retrieval with Learned Similarities</a> — 2024, paper. Follow-up to MoL. ⚠ The term h-indexer is <strong>not in this paper</strong> (full check of v3 and v4 HTML, 2026-08-09).</li>
+<li><a href="https://engineering.fb.com/2026/05/26/ml-applications/silvertorch-index-as-model-new-retrieval-paradigm-recommendation-systems/" target="_blank" rel="noopener">SilverTorch: Index as Model</a> — 2026-05-26, blog post / <a href="https://arxiv.org/html/2511.14881v3" target="_blank" rel="noopener">arXiv 2511.14881</a> — 2025-11 first version, paper. The OverArch and MoL mentions are <strong>only in the paper</strong> and not in the blog post.</li>
+<li><a href="https://arxiv.org/abs/2509.02942" target="_blank" rel="noopener">RankGraph</a> — 2025, paper. Uses a co-engagement graph for retrieval.</li>
+<li><a href="https://arxiv.org/html/2606.18379" target="_blank" rel="noopener">RankGraph-2</a> — 2026, paper. Covers the U2U2I / U2I2I paths and the 3-hour rebuild.</li>
+<li><a href="https://engineering.fb.com/2024/12/02/production-engineering/meta-andromeda-advantage-automation-next-gen-personalized-ads-retrieval-engine/" target="_blank" rel="noopener">Meta Andromeda</a> — 2024-12-02, blog post. Describes the trained hierarchical index and explicitly names two-tower and ANN as baselines.</li>
+<li><a href="https://arxiv.org/html/2604.12965v1" target="_blank" rel="noopener">HILL / MoNN</a> — 2026-04-14, paper. Covers the structure of the Andromeda-family index in detail.</li>
+</ul>
+<p><strong>Netflix</strong></p>
+<ul>
+<li><a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">The Netflix Recommender System (TMIS)</a> — 2015, paper. Covers PVR&#39;s full-catalog ranking.</li>
+<li><a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" rel="noopener">Foundation Model for Personalized Recommendation</a> — 2025, blog post. Covers metadata-based cold start initialization and entity age attention.</li>
+<li><a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">Integrating Netflix&#39;s Foundation Model</a> — 2025, blog post. Covers the dual use of the embedding store.</li>
+</ul>
+<p><strong>Meta — service-side evidence</strong> (the original quotes are in the service notes)</p>
+<ul>
+<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023-08-09, blog post. States that two-tower was chosen because of <strong>item tower cacheability</strong>.</li>
+<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> — 2020-12-10, blog post. Gives example queries in the retrieval query language. The post does not use the name IGQL. ⚠ Duplicated on engineering.fb.com under a different title.</li>
+<li><a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">The AI behind unconnected content recommendations</a> — 2023, blog post. Describes a billions → thousands → hundreds funnel.</li>
+<li class="warn">⚠ The primary original text for the IG2Vec and IGQL names (2019 &quot;Powered by AI&quot;) returns <strong>HTTP 500 as of 2026-08-09</strong>. These notes did not use that post as evidence. <span class="badge obs">observed</span> 2026-08-09 (3 URLs requested)</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/embedding-retrieval.html" data-title="임베딩 기반 후보 생성"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

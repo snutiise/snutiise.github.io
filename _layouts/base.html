@@ -1,7 +1,25 @@
+{%- comment -%}
+  언어(page.lang)는 _config.yml defaults 가 정한다: en/ 아래 페이지와 _en_posts 는 en, 나머지는 ko.
+  짝(twin) 규칙은 하나다 — 영어판 URL = '/en' + 한국어판 URL. 글은 _posts 와 _en_posts 에 같은 파일 이름을 두면
+  slug 가 같아 이 규칙이 저절로 맞는다. 짝이 있으면 head.html 이 hreflang 세 줄을 내고 site-header.html 의 언어
+  전환 링크가 짝을 가리킨다. 없으면 전환 링크는 다른 언어의 홈이다. 검사: scripts/test-site.sh 17번.
+  리서치(/feed-research/ 와 /feed-research/en/)는 Jekyll 이 건드리지 못하는 정적 파일이라 이 레이아웃을 안 거친다.
+  생성기가 같은 규칙으로 직접 낸다(리서치만 /feed-research/en/ — SPEC §3.1).
+  변수 이름 twin* 은 include 들과 겹치지 않게 골랐다(toc.html 이 t·pre·n 등을 assign 한다 — include 는 문맥을 공유한다).
+{%- endcomment -%}
+{%- if page.lang == 'en' -%}
+{%- assign twin_url = page.url | remove_first: '/en' -%}
+{%- else -%}
+{%- assign twin_url = page.url | prepend: '/en' -%}
+{%- endif -%}
+{%- assign twin = site.pages | concat: site.posts | concat: site.en_posts | where: 'url', twin_url | first -%}
+{%- if twin -%}{%- assign twin_href = twin.url | replace: 'index.html', '' -%}
+{%- elsif page.lang == 'en' -%}{%- assign twin_href = '/' -%}
+{%- else -%}{%- assign twin_href = '/en/' -%}{%- endif -%}
 <!doctype html>
-<html lang="ko">
+<html lang="{{ page.lang }}">
 {% include head.html %}
-<body data-nav="{% if page.layout == 'post' %}/posts/{% else %}{{ page.nav }}{% endif %}" data-track>
+<body data-nav="{% if page.layout == 'post' %}{% if page.lang == 'en' %}/en{% endif %}/posts/{% else %}{{ page.nav }}{% endif %}" data-track>
 {% include site-header.html %}
 <main id="content" class="wrap">
 {{ content }}

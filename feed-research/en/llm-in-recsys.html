@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLMs in the recommendation pipeline — feed-research</title>
+<meta name="description" content="Based only on primary material released through 2026-08-13, X put an LLM in as a judge, Meta as an ads feature encoder, an offline judge for Groups Search,…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/llm-in-recsys.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/llm-in-recsys.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/llm-in-recsys.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/llm-in-recsys.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="LLMs in the recommendation pipeline — feed-research">
+<meta property="og:description" content="Based only on primary material released through 2026-08-13, X put an LLM in as a judge, Meta as an ads feature encoder, an offline judge for Groups Search,…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/llm-in-recsys.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/llm-in-recsys.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Cross-service topics</p>
+<h1 id="llms-in-the-recommendation-pipeline">LLMs in the recommendation pipeline</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-21">2026-10-21</time></li>
+<li><span class="meta-k">Translated from</span><a href="../llm-in-recsys.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">20</span></summary><ol><li><a href="#case-xs-grox-2026">Case: X&#39;s Grox (2026)</a><ol><li><a href="#what-it-extracts--9-plans">What it extracts</a></li><li><a href="#slop-score--the-llm-assigns-an-integer-to-low-quality-content">slop score</a></li><li><a href="#safety-labels-are-fail-closed-reply-quality-is-fail-open">Safety labels are fail-closed, reply quality is fail-open</a></li><li><a href="#hallucination-guard">Hallucination guard</a></li><li><a href="#2-stage-safety-structure">2-stage safety structure</a></li></ol></li><li><a href="#what-generalizes-from-this-case">What generalizes from this case</a></li><li><a href="#not-yet-confirmed--user-interest-summarization">Not yet confirmed</a></li><li><a href="#meta--two-things-are-mixed-llm-representation-real-and-llm-analogy-rhetoric">Meta</a></li><li><a href="#caveat-llm-scale--the-ranker-is-an-llm-the-problem-with-b">Caveat: &quot;LLM-scale&quot; ≠ &quot;the ranker is an LLM&quot; (the problem with B)</a></li><li><a href="#slot-1--content-annotation-only-for-ad-entities">Slot 1</a></li><li><a href="#slot-3--llattes-semantic-feature--decisive-evidence-for-a">Slot 3</a></li><li><a href="#slot-5--the-only-place-meta-names-llama-in-a-blog-post">Slot 5</a></li><li><a href="#role-6--a-product-exists-but-the-model-is-not-disclosed">Role 6</a></li><li><a href="#case-meta-connectionmind--metas-first-production-ab-claim-for-role-3-llm-as-ranker-2026-08">Case: Meta ConnectionMind</a></li><li><a href="#case-netflix--the-first-deployment-grade-first-party-statement-for-role-3-llm-as-ranker">Case: Netflix</a></li><li><a href="#framing-verification--is-x-is-the-product-surface-meta-is-upstream-correct">Framing verification</a></li><li><a href="#what-is-still-unconfirmed-on-the-meta-side">What is still unconfirmed on the Meta side</a></li><li><a href="#who-uses-this">Who uses this</a></li><li><a href="#sources">Sources</a></li></ol></details></nav>
+<div class="prose">
+<p>Based only on primary material released through 2026-08-13, X put an LLM in as a judge, Meta as an ads feature encoder, an offline judge for Groups Search, and a graph-path reasoner for heavy-user requests, and Netflix as the ranker itself <span class="badge est">inferred</span> (<a href="#framing-verification--is-x-is-the-product-surface-meta-is-upstream-correct">framing check</a>). At X, the content annotation pipeline Grox uses an LLM to attach quality and safety labels to posts ahead of time <span class="badge ok">verified</span> (<a href="#case-xs-grox-2026">Grox case</a>). Of these, the safety labels are passed to the filter and to the ad-adjacency verdict (whether ads may be placed next to a post) <span class="badge ok">verified</span> (<a href="#what-generalizes-from-this-case">What generalizes from this case</a>). Meta said it also uses an LLM as a graph-path reasoner for heavy users on an undisclosed short-form video surface <span class="badge ok">verified</span> (<a href="#case-meta-connectionmind--metas-first-production-ab-claim-for-role-3-llm-as-ranker-2026-08">ConnectionMind case</a>). Netflix&#39;s published experiment is limited to a surface where recommendations are precomputed in batch (a batch-compute surface) <span class="badge ok">verified</span> (<a href="#case-netflix--the-first-deployment-grade-first-party-statement-for-role-3-llm-as-ranker">Netflix case</a>).</p>
+<p>There are six slots where LLMs and VLMs (language models that also handle images) enter a recommender system. Mixing them up causes confusion, so we take them one slot at a time.</p>
+<ol>
+<li><strong>Content annotation (nearline)</strong>: Feed one item into an LLM, extract quality/topic/safety labels, and write them to a KV store. Serving only does a lookup.</li>
+<li><strong>Safety verdict</strong>: A special case of the annotation above, but looked at separately because behavior on failure differs. Passing content when no verdict exists is called fail-open; blocking it is called fail-closed.</li>
+<li><strong>The ranking model itself</strong>: An LLM architecture used as the ranker. Related discussion is in <a href="sequence-transformer-ranking.html">sequence-transformer-ranking.md</a>.</li>
+<li><strong>User interest summarization</strong>: Summarize user history with an LLM to build a profile.</li>
+<li><strong>Offline evaluation (LLM-as-judge)</strong>: An LLM scores the quality of ranking results. It does not enter the serving path.</li>
+<li><strong>Parsing user natural-language instructions</strong>: When a user states ranking preferences in words, the system interprets them and applies them to the ranker.</li>
+</ol>
+<p><strong>The two companies filled exactly opposite slots.</strong> X holds slots 1 and 2, and Meta holds slots 5 and 6 <span class="badge est">inferred</span>. Each cell in the table below is backed by primary sources later in these notes, but the &quot;opposite&quot; contrast itself is an interpretation of only what is public. Every <em>&quot;no statement&quot;</em> cell in the table is also <span class="badge est">inferred</span>. The corpus checked is the source list below (read 2026-08-09), and we say nothing about undisclosed systems.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Slot</th>
+<th>X</th>
+<th>Meta</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 Content annotation</td>
+<td><strong>Confirmed</strong> (Grox)</td>
+<td>ads only, both confirmed (HIR = entities, LLaTTE = fine-tuned LLaMA content embedding)</td>
+</tr>
+<tr>
+<td>2 Safety verdict</td>
+<td><strong>Confirmed</strong> (PTOS, fail-closed)</td>
+<td>No statement</td>
+</tr>
+<tr>
+<td>3 LLM as ranker</td>
+<td>A Transformer ranker exists (Phoenix)</td>
+<td><strong>For ads it is still an analogy (LLM-scale).</strong> For the organic feed, a <span class="nw">2026-08</span> ConnectionMind statement appeared (supplement below the table)</td>
+</tr>
+<tr>
+<td>4 User interest summarization</td>
+<td>Cannot confirm</td>
+<td>No statement</td>
+</tr>
+<tr>
+<td>5 LLM-as-judge</td>
+<td>No statement</td>
+<td><strong>Confirmed</strong> (Groups Search, Llama 3)</td>
+</tr>
+<tr>
+<td>6 Natural-language instructions</td>
+<td>None</td>
+<td><strong>A product exists; the model is undisclosed</strong></td>
+</tr>
+</tbody></table></div>
+<p>Supplementing the Meta organic feed cell for slot 3 (LLM as ranker) in the table:</p>
+<ul>
+<li>In the ConnectionMind statement, Llama 3.1-8B serves as a graph-path reasoner and serves the online hot path (the path run on every request) for 5–10% of heavy users.</li>
+<li>The remaining 90–95% is served by a Student GNN trained on meta-paths (graph path patterns defined by sequences of node and edge types) that the LLM discovered offline.</li>
+<li>The surface is undisclosed (&quot;short-form video platform&quot;). Details are in the <a href="#case-meta-connectionmind--metas-first-production-ab-claim-for-role-3-llm-as-ranker-2026-08">ConnectionMind case</a>.</li>
+</ul>
+<p><strong>The gap in slot 3 was first broken in 2026-07, and in 2026-08 Meta ConnectionMind gave a second statement.</strong> The first to break it was Netflix GenRec (<a href="#case-netflix--the-first-deployment-grade-first-party-statement-for-role-3-llm-as-ranker">Netflix case</a>).</p>
+<p class="warn">⚠ Claim changed <strong>(2026-08-13)</strong> Previously we wrote: <em>&quot;There is no first-party statement from either X or Meta that an LLM enters the organic feed ranking path&quot;</em>. When ConnectionMind made that statement, half of this claim was overturned.</p>
+<p>However, the forms in which the two companies put in an LLM are fundamentally different.</p>
+<ul>
+<li>Netflix GenRec is <strong>the ranker itself</strong>. It attaches a catalog softmax head to an LLM backbone.</li>
+<li>Meta ConnectionMind is a <strong>graph-path reasoner</strong>. The LLM emits path expansions as JSON and is aligned with F1-based GRPO (a reinforcement learning technique).</li>
+<li>ConnectionMind chose a <strong>hybrid</strong> in the serving layer. Most traffic is served by a GNN trained on meta-paths the LLM mined offline, and the LLM covers only the online hot path for 5–10% of heavy users.</li>
+</ul>
+<p>The most notable point in this slot is that <strong>what &quot;the LLM ranks&quot; means differs between the two cases</strong>.</p>
+<h2 id="case-xs-grox-2026">Case: X&#39;s Grox (2026)</h2>
+<p>Grox is a nearline content annotation pipeline with which X labels posts using an LLM. The code is in <code>grox/</code>, it is Kafka-based, and it does not sit in the request path. <span class="badge ok">verified</span> xai-org/x-algorithm, 2026 — <code>grox/main.py</code>, <code>grox/data_loaders/kafka_loader.py</code></p>
+<p>Grox runs as 3 processes. <code>grox-engine</code>, <code>grox-dispatcher</code>, and a gRPC server communicate through <code>multiprocessing.Manager</code> queues. <span class="badge ok">verified</span> — <code>grox/main.py</code>, <code>grox/schedules/context.py:19-28</code></p>
+<h3 id="what-it-extracts--9-plans">What it extracts — 9 plans</h3>
+<p>As of Gen3 (<code>0bfc279</code>), Grox has 9 plans, and 4 of them build multimodal post embeddings <span class="badge ok">verified</span> — <code>plan_master.py</code> and each plan file in <a href="https://github.com/xai-org/x-algorithm/tree/0bfc279/grox/plans" target="_blank" rel="noopener"><code>grox/plans/</code></a>. At HEAD (<code>862a123</code>, 2026-10-17), 21 plans are registered with <code>@register</code>, and the plan files moved under <code>grox/flows/</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/862a123/grox/flows" target="_blank" rel="noopener"><code>grox/flows/</code></a>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>plan</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>plan_initial_banger</code></td>
+<td>quality score, description, tags, Grok topics, <strong>slop score</strong>, minor-presence score, image-editability</td>
+</tr>
+<tr>
+<td><code>plan_post_safety</code></td>
+<td>&quot;deluxe&quot; safety bool metadata</td>
+</tr>
+<tr>
+<td><code>plan_safety_ptos</code></td>
+<td>PTOS policy violation verdict (2 stages: category detection → per-policy verdict)</td>
+</tr>
+<tr>
+<td><code>plan_spam_comment</code></td>
+<td>reply spam</td>
+</tr>
+<tr>
+<td><code>plan_reply_ranking</code></td>
+<td>reply score 0–3</td>
+</tr>
+<tr>
+<td><code>plan_post_embedding_*</code> (4)</td>
+<td>multimodal post embeddings v3/v4/v5_1</td>
+</tr>
+</tbody></table></div>
+<h3 id="slop-score--the-llm-assigns-an-integer-to-low-quality-content">slop score — the LLM assigns an integer to &quot;low-quality content&quot;</h3>
+<p>The slop score is a low-quality content score (an integer) assigned by the LLM, and it is an instrumented production feature, not an experiment. <span class="badge ok">verified</span> — <code>grox/classifiers/content/banger_initial_screen.py:33-41</code>, <code>grox/tasks/task_pub.py:317</code>, <code>:175-178</code></p>
+<ul>
+<li>In the classifier output schema, <code>slop_score: int | None</code> is a 1st-class field.</li>
+<li>This value is persisted as <code>slopScore</code>.</li>
+<li>Per-value counters are attached as well. An example counter name is <code>task.publish_unified_post_annotations.slop_score_3.count</code>.</li>
+</ul>
+<p>One and the same VLM call yields <strong>two kinds of results</strong>. One is quality screening (<code>BANGER_INITIAL_SCREEN</code>). The other is a ranking signal (<code>GROK_RANKER</code>). <span class="badge ok">verified</span> — <code>banger_initial_screen.py:49-52,157</code></p>
+<h3 id="safety-labels-are-fail-closed-reply-quality-is-fail-open">Safety labels are fail-closed, reply quality is fail-open</h3>
+<p>Within the same service, the handling is the opposite. When the LLM result is missing, the safety label is handled toward blocking, and reply quality toward passing <span class="badge ok">verified</span>. The design intent is clear.</p>
+<ul>
+<li><strong>Brand safety</strong>: A post that Grok (xAI&#39;s LLM) has not scored is simply classified as <code>MediumRisk</code>. In Gen3 (<code>0bfc279</code>), that meant no ad was placed next to it <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/models/brand_safety.rs" target="_blank" rel="noopener"><code>home-mixer/models/brand_safety.rs:47-51</code></a><ul>
+<li>Since the 2026-09-01 commit (Gen4+13), the default ads blender is multi-risk and places BSR-high ads even between MediumRisk posts <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7ba7768/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs</code></a>, <a href="x.html#ads">x.md ads section</a>.</li>
+</ul>
+</li>
+<li><strong>Reply ranking</strong>: When there is no result, the score is defaulted to the <strong>maximum of 3.0</strong>. <span class="badge ok">verified</span> — <code>grox/tasks/task_pub.py:451</code></li>
+</ul>
+<p>For posts after a specific snowflake ID, a post without a <code>PTOS_REVIEWED</code> label is always MediumRisk. The threshold ID is <code>2_054_275_414_225_846_272</code>, and a snowflake ID embeds its creation time. In other words, <strong>from some point on, LLM safety review was stated explicitly as a precondition for ad adjacency.</strong> <span class="badge ok">verified</span> — <code>home-mixer/models/brand_safety.rs:37,53</code></p>
+<h3 id="hallucination-guard">Hallucination guard</h3>
+<p>Grox <strong>checks topic IDs output by the LLM against a fetched allow-list.</strong> Unknown IDs are dropped and a counter is incremented. <span class="badge ok">verified</span> — <code>grox/tasks/task_pub.py:232-265</code></p>
+<p>JSON parsing has a 3-stage fallback. It tries pydantic <code>model_validate_json</code>, <code>json_repair</code>, and a regex in that order, and raises an exception if all fail. <span class="badge ok">verified</span> — <code>grox/classifiers/content/reply_ranking.py</code></p>
+<p>The temperature is not 0 but a value very close to 0 <span class="badge ok">verified</span> (the value itself) — <code>banger_initial_screen.py:45-47</code>. The value is <code>temperature = 0.000001</code>. It appears to be meant to avoid a zero-temperature code path, but the code gives no reason <span class="badge est">inferred</span>.</p>
+<p>If the reasoning API call fails, it <strong>silently falls back to the VLM on any exception.</strong> This means the model tier can vary per request. <span class="badge ok">verified</span> — <code>grox/classifiers/content/safety_ptos.py:269-280</code></p>
+<h3 id="2-stage-safety-structure">2-stage safety structure</h3>
+<p>The PTOS safety verdict supports 7 categories, and only 2 of them, AdultContent and ViolentMedia, go through the &quot;deluxe 4.2&quot; path. In deluxe mode, it <strong>unconditionally injects one more AdultContent recheck</strong> and removes it if there is no violation. This is a high-recall second pass deliberately applied to the highest-risk category. <span class="badge ok">verified</span> — <code>safety_ptos.py:217-230</code>, <code>grox/tasks/task_safety_ptos_policy.py:39-61</code></p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-generalizes-from-this-case">What generalizes from this case</h2>
+<p>In the Grox case, LLM output is produced ahead of time outside the request path and does not feed directly into the home ranker. <span class="badge ok">verified</span></p>
+<ul>
+<li><strong>Nearline is the standard for LLM annotation.</strong> It does not put the LLM in the request path; it processes ahead of time via Kafka and writes to KV. X blocks duplicate requests within a 60-second window with 9 dedup caches. <span class="badge ok">verified</span> — <code>grox/tasks/task_rate_limit.py:59…174</code><ul>
+<li>All 9 are <code>TTLCache(maxsize=10_000, ttl=60)</code>.</li>
+</ul>
+</li>
+<li><strong>LLM output does not enter the ranker directly; it is passed to the filter and ads layer.</strong> At X, Grok safety labels go to the filter and the brand-safety verdict. Topics go to a user-side multi-hot feature. As of Gen3 (<code>0bfc279</code>), the ranking Transformer (Phoenix) took only ID embeddings as input <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/models/query.rs" target="_blank" rel="noopener"><code>home-mixer/models/query.rs:78-79</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/phoenix/runners.py" target="_blank" rel="noopener"><code>phoenix/runners.py:130-144</code></a><ul>
+<li>The Phoenix README at HEAD (<code>862a123</code>) says the ranking model takes semantic IDs built from the post&#39;s multimodal embeddings as input features <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/phoenix/README.md" target="_blank" rel="noopener"><code>phoenix/README.md:241-249, 411</code></a>.</li>
+<li>The same README says the input of the multimodal post embedding itself is turned off in all registered ranking configs <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/phoenix/README.md" target="_blank" rel="noopener"><code>phoenix/README.md:412, 424-426</code></a>.</li>
+</ul>
+</li>
+<li><strong>As of Gen3 (2026-05-15), multimodal embeddings were built but home ranking did not use them.</strong> At that time, <code>multimodal</code> never appeared outside <code>grox/</code> <span class="badge ok">verified</span> — repo-wide grep.<ul>
+<li>At HEAD (<code>862a123</code>, 2026-10-17), <code>multimodal</code> appears in 28 files outside <code>grox/</code> <span class="badge ok">verified</span> — 2026-10-19 <code>git grep</code>.</li>
+<li>home-mixer reads the <code>tweet_multimodal_embeddings</code> dataset and uses it for dedup in the For You video carousel, and this dedup is on by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/home-mixer/clients/post_v8_search_embedding_client.rs" target="_blank" rel="noopener"><code>post_v8_search_embedding_client.rs:14</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/862a123/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1107-1112</code></a>.</li>
+<li>The name of the sink that exports the embeddings (<code>StratoPostMultimodalEmbeddingMhSearchAi</code>) points to search <span class="badge ok">verified</span> — <code>grox/tasks/task_write_mm_embedding_sink.py:47</code>.</li>
+<li>However, since a variant named <code>RECSYS_EMBED_V4</code> exists, an undisclosed internal recsys consumer is likely to exist <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="not-yet-confirmed--user-interest-summarization">Not yet confirmed — user interest summarization</h2>
+<p><strong>Whether X builds user profiles with an LLM cannot be determined from public sources alone.</strong></p>
+<p>home-mixer (the X service that handles For You feed requests) only <strong>reads</strong> <code>inferred_grok_topics</code>, a per-user inferred interest topic value. This value is a 32-bit multi-hot and is read from Strato (X&#39;s internal data lookup layer). The service that produces it is not in the public repo. <span class="badge ok">verified</span> — <code>home-mixer/query_hydrators/inferred_grok_topics_query_hydrator.rs:22-27</code></p>
+<p>Grox has no user summarization task. <code>TaskContext</code> has no user field at all, and the <code>TaskWithUser</code> abstract class exists but has no implementation. <span class="badge ok">verified</span> — <code>grox/schedules/types.py:56-69</code>, <code>grox/tasks/task.py</code></p>
+<hr>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="meta--two-things-are-mixed-llm-representation-real-and-llm-analogy-rhetoric" class="part">Meta — two things are mixed: LLM <strong>representation</strong> (real) and LLM <strong>analogy</strong> (rhetoric)</h2>
+<p>In the Meta recommendation literature, the word LLM refers to <strong>two different things</strong>. One is a representation (feature) that an LLM actually produced, and the other is the analogy by which the GEM, LLaTTE, and MARM blog posts liken ads models to LLMs. Mixing them reverses the conclusion.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col class="grow"><col class="w8"><col></colgroup>
+<thead>
+<tr>
+<th></th>
+<th>What</th>
+<th>Substance</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>A. LLM = representation</strong></td>
+<td>A fine-tuned LLaMA / custom LLM inference engine encodes content and entities into embeddings, and those vectors enter as <strong>input features of a regular (non-LLM) ranker</strong></td>
+<td><strong>Real</strong></td>
+<td>The LLaTTE paper (<em>&quot;fine-tuned LLaMA models&quot;</em>) and HIR (<em>&quot;customized LLM inference engine&quot;</em>); both are <strong>ads</strong></td>
+</tr>
+<tr>
+<td><strong>B. LLM = architectural analogy</strong></td>
+<td>Phrases such as &quot;LLM-inspired&quot;, &quot;LLM-style scaling laws&quot;, and &quot;LLM-Scale&quot; liken training scale, scaling curves, or parameter counts to LLMs. The models referred to are <strong>not language models</strong></td>
+<td><strong>Rhetoric</strong></td>
+<td>GEM, LLaTTE, MARM <strong>blog posts</strong></td>
+</tr>
+</tbody></table></div>
+<p>The primary source for A is the quotes in &quot;Slot 1&quot; and &quot;Slot 3&quot; below, and the primary source for B is the quotes in the table right below <span class="badge ok">verified</span>.</p>
+<p><strong>Therefore &quot;the Meta ads stack actually consumes LLM-derived features&quot; and &quot;Meta&#39;s ranking model is not an LLM&quot; are both true at the same time</strong> <span class="badge est">inferred</span>. These notes previously looked only at B and lumped A in as an analogy too; that was an error. We correct it here.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="caveat-llm-scale--the-ranker-is-an-llm-the-problem-with-b">Caveat: &quot;LLM-scale&quot; ≠ &quot;the ranker is an LLM&quot; (the problem with B)</h2>
+<p>LLM-scale-style phrases in Meta ads blog posts do not mean the ranker is an LLM. The phrases in the three posts liken training scale and recipe, the shape of the scaling curve, and parameter count, respectively, to LLMs. <span class="badge ok">verified</span> Full check of document bodies, 2026-08-09:</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Phrase</th>
+<th>Source</th>
+<th>Actual meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>&quot;an <strong>LLM-inspired paradigm</strong>&quot;</em>, <em>&quot;trained at the scale of large language models&quot;</em></td>
+<td><a href="https://engineering.fb.com/2025/11/10/ml-applications/metas-generative-ads-model-gem-the-central-brain-accelerating-ads-recommendation-ai-innovation/" target="_blank" rel="noopener">GEM blog post</a>, <span class="nw">2025-11-10</span></td>
+<td><strong>An analogy for training scale and recipe.</strong> It is an ads recommendation model, not a language model</td>
+</tr>
+<tr>
+<td><em>&quot;predictable, <strong>LLM-style scaling laws</strong>&quot;</em></td>
+<td><a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">LLaTTE blog post</a>, <span class="nw">2026-08-05</span></td>
+<td><strong>An analogy for the shape of the scaling curve.</strong> The same post states the difference itself: <em>&quot;Unlike LLMs, which process dense and continuous text, ads recommendation systems must integrate sparse ID features&quot;</em></td>
+</tr>
+<tr>
+<td><em>&quot;Serve <strong>LLM-Scale</strong> Models for Ads&quot;</em></td>
+<td><a href="https://engineering.fb.com/2026/03/31/ml-applications/meta-adaptive-ranking-model-bending-the-inference-scaling-curve-to-serve-llm-scale-models-for-ads/" target="_blank" rel="noopener">MARM blog post</a>, <span class="nw">2026-03-31</span></td>
+<td><strong>An analogy for parameter count (O(1T))</strong></td>
+</tr>
+</tbody></table></div>
+<p>The word &quot;Llama&quot; appears 0 times in the <strong>bodies</strong> of the GEM, LLaTTE, and MARM blog posts <span class="badge obs">observed</span> 2026-08-09. The corpus checked is the bodies of the 3 blog posts in the table above; the result of downloading each body and counting <code>Llama</code>/<code>LLaMA</code> strings is 0.</p>
+<p class="warn">⚠ <strong>However, this is limited to blog posts.</strong> The LLaTTE <strong>paper</strong> (arXiv 2601.20083) states explicitly <span class="badge ok">verified</span>: <em>&quot;dense content embeddings produced by <strong>fine-tuned LLaMA models</strong>&quot;</em>. This quote is revisited in <a href="#slot-3--llattes-semantic-feature--decisive-evidence-for-a">Slot 3</a> below. <strong>This is a case where the blog post says only B (analogy) and leaves A, the real LLM feature, only in the paper.</strong></p>
+<p><span class="badge est">inferred</span> We have repeatedly seen press and summary posts render these three phrases as &quot;Meta uses LLMs for <strong>feed</strong> ranking.&quot; This rendering is wrong in two places: the LLM goes not into the ranker but into the <strong>input features</strong>, and the surface is not the feed but <strong>ads</strong>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="slot-1--content-annotation-only-for-ad-entities">Slot 1 — content annotation: only for ad entities</h2>
+<p>The first-party statement that Meta annotates content with an LLM is confirmed on the ads side, in HIR. HIR processes the multimodal content of advertisers and products with an LLM inference engine and uses it as input features for representation learning. <span class="badge ok">verified</span> <a href="https://engineering.fb.com/2026/07/15/ai-research/exploring-hierarchical-interest-representation-for-meta-ads-deep-funnel-optimization/" target="_blank" rel="noopener">Exploring Hierarchical Interest Representation For Meta Ads Deep Funnel Optimization</a>, 2026-07-15</p>
+<blockquote>
+<p><em>&quot;We retrieve the multimodal information in summary text, images, and video and process it through a <strong>customized LLM inference engine</strong> that produces encoded feature inputs for our representation learning.&quot;</em>
+<em>&quot;multimodal advertiser and product content <strong>processed through LLMs</strong> enriches sparse interactions, enabling generalization to <strong>rare and unseen entities</strong>.&quot;</em>
+<em>&quot;These features are pulled from <strong>structured page metadata and advertiser catalog attributes</strong> and processed through vision or language models.&quot;</em></p>
+</blockquote>
+<p><strong>HIR has the same structure as X&#39;s Grox but a different target.</strong> Grox annotates posts that users uploaded, and HIR annotates <strong>advertiser and product entities</strong>. The purposes also differ. Grox&#39;s purpose is quality and safety verdicts (filter and ad-adjacency gating), and HIR&#39;s purpose is <strong>cold-start generalization</strong> (<em>&quot;rare and unseen entities&quot;</em>).</p>
+<p><span class="badge est">inferred</span> <strong>This is what divides the two companies&#39; LLM uses.</strong> X uses the LLM as a <em>judge</em>, and Meta (ads) uses it as a <em>feature encoder</em>. The same phrase &quot;content understanding&quot; points to opposite roles.</p>
+<p><span class="badge est">inferred</span> We <strong>could not find</strong> a first-party statement that Meta annotates organic feed content with an LLM. Here, organic feeds are Facebook Feed, Instagram Feed, Reels, and Threads. The corpus checked is the Meta blog posts and papers in the source list below plus 15 Transparency Center system cards (read 2026-08-09). HIR is explicitly ads deep funnel literature.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="slot-3--llattes-semantic-feature--decisive-evidence-for-a">Slot 3 — LLaTTE&#39;s &quot;semantic feature&quot; = decisive evidence for A</h2>
+<p>The LLaTTE paper writes that semantic features are a prerequisite for scaling. <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2601.20083" target="_blank" rel="noopener">LLaTTE (arXiv 2601.20083)</a>, 2026-01-27:</p>
+<blockquote>
+<p><em>&quot;semantic features <strong>bend the scaling curve</strong>: they are a prerequisite for scaling, enabling the model to effectively utilize the capacity of deeper and longer architectures.&quot;</em></p>
+</blockquote>
+<p>The blog post also lists &quot;content/semantic enrichment&quot; as one of the scaling axes <span class="badge ok">verified</span>.</p>
+<p><strong>The same paper states directly that the source of this semantic feature is an LLM</strong> <span class="badge ok">verified</span> (full HTML text checked 2026-08-09):</p>
+<blockquote>
+<p><em>&quot;we introduce dense content embeddings produced by <strong>fine-tuned LLaMA models</strong> as well as Content Understanding models processing heterogeneous multimodal signals (e.g., text and images)&quot;</em>
+<em>&quot;when <strong>LLaMA content embeddings</strong> are enabled...&quot;</em></p>
+</blockquote>
+<p>In other words, &quot;semantic feature = LLM output&quot; is confirmed, not presumed. <strong>The blog post does not state this; only the paper does.</strong></p>
+<p>This is where A and B diverge. <strong>The LLaTTE model itself is not an LLM, but vectors produced by LLaMA enter its input.</strong> The first part is B (&quot;Unlike LLMs…&quot;) and the latter part is A, and both sentences are in the same post.</p>
+<p>This LLaTTE claim ties directly to the opposition in <a href="sequence-transformer-ranking.html">sequence-transformer-ranking.md</a>. HSTU (the sequence model on the Meta organic recommendation side) says &quot;raw categorical engagement feature&quot; alone is sufficient, and LLaTTE says semantic features are a <strong>prerequisite</strong> for scaling. <strong>Two lineages within the same company say opposite things.</strong></p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="slot-5--the-only-place-meta-names-llama-in-a-blog-post">Slot 5 — the only place Meta names Llama <strong>in a blog post</strong></h2>
+<p>The Facebook Groups Search blog post says it uses Llama 3 as an automated judge for grading search results. <span class="badge ok">verified</span> <a href="https://engineering.fb.com/2026/04/21/ml-applications/modernizing-the-facebook-groups-search-to-unlock-the-power-of-community-knowledge/" target="_blank" rel="noopener">Modernizing the Facebook Groups Search</a>, 2026-04-21</p>
+<blockquote>
+<p>&quot;We utilize <strong>Llama 3 with multimodal capabilities as an automated judge to grade search results against queries.</strong>&quot;</p>
+</blockquote>
+<p>The use matters. This grading is an <strong>offline evaluation inside the build verification test (BVT)</strong>, not the serving path. Even the detail that the prompt was designed to recognize a <em>&quot;somewhat relevant&quot;</em> category is public.</p>
+<p>The same post writes about <strong>putting an LLM into ranking in the future tense</strong>:</p>
+<blockquote>
+<p><em>&quot;LLMs in Ranking: <strong>We plan to</strong> apply LLMs directly within the ranking stage.&quot;</em>
+<em>&quot;Adaptive Retrieval: <strong>We are exploring</strong> LLM-driven adaptive retrieval strategies...&quot;</em></p>
+</blockquote>
+<p><strong>That is, in Meta&#39;s public literature as of 2026-08, &quot;putting an LLM directly into the ranking stage&quot; is a plan, not a deployment</strong> <span class="badge est">inferred</span>. The future tense in the quotes above is <span class="badge ok">verified</span>, but the part &quot;no deployment statement in the whole public literature&quot; is limited to the same corpus (blog posts, papers, 15 cards). It is also about Groups <strong>search</strong>, not the feed.</p>
+<p class="warn">⚠ &quot;Directly&quot; matters here. Putting <strong>LLM output in as features</strong> is already deployed on the ads side (A above).</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="role-6--a-product-exists-but-the-model-is-not-disclosed">Role 6 — A product exists, but the model is not disclosed</h2>
+<p>Meta has one thing X does not: <strong>a surface where users instruct the ranking in natural language.</strong></p>
+<ul>
+<li><strong>Threads Dear Algo / Your Algo</strong>: Users write Dear Algo in a public post, followed by what they want to see more or less of. The instruction text reads: <em>&quot;Just type &#39;Dear Algo&#39; in a public Threads post, followed by what you&#39;d like to see more or less of.&quot;</em> The application window is 3 days for public posts and 1, 3, or 7 days for private ones. <span class="badge ok">verified</span> Details are in <a href="threads.html">threads.md</a>.</li>
+<li><strong>Instagram Your Algorithm</strong>: AI summarizes the user&#39;s topics of interest and shows them, and it accepts free-text input. It applies across Feed, Reels, and Explore. <span class="badge ok">verified</span> Details are in <a href="instagram.html">instagram.md</a>.</li>
+</ul>
+<p><strong>Neither product discloses which model parses the natural language.</strong> Instagram says only &quot;AI&quot;. <span class="badge obs">observed</span> 2026-08-09 (corpus inspected: the body of the 2 newsroom posts above)</p>
+<p><span class="badge est">inferred</span> Because the system takes free text and converts it into topic preferences, there must be an LLM or at least a text classifier. However, <strong>it could also be implemented with a lightweight topic classifier</strong>, so there is no basis to assert that it is an LLM.</p>
+<p><span class="badge est">inferred</span> This is also the <strong>productized form</strong> of role 4 (user interest summary). The fact that Instagram <strong>shows</strong> users &quot;the AI-summarized topics of your interest&quot; means that profile exists internally. X&#39;s <code>inferred_grok_topics</code> is the other side of the same object. On X, this value is only read, and its producer is not public. In other words, <strong>on X only the pipeline is visible and the product is not, while on Meta only the product is visible and the pipeline is not.</strong></p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-meta-connectionmind--metas-first-production-ab-claim-for-role-3-llm-as-ranker-2026-08">Case: Meta ConnectionMind — Meta&#39;s first production A/B claim for role 3 (LLM as ranker) (2026-08)</h2>
+<p>ConnectionMind is a paper in which Meta says it put an LLM into the online serving path of recommendation. Llama 3.1-8B handles requests from 5–10% of heavy users directly, and a lightweight GNN trained on graph paths found by that LLM handles the rest. The paper did not disclose the surface. <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2608.10187" target="_blank" rel="noopener">ConnectionMind: Leveraging Social Networks and Large Language Models for Personalized Recommendation at Meta (arXiv 2608.10187)</a>, 2026-08-10</p>
+<p>There are 6 authors. The 1st author, Haoyu Han, is an intern at Michigan State University, and the other 5 are affiliated with Meta Platforms (Menlo Park). There is no affiliation footnote with an internal team name (Core Ranking / GenAI, etc.). <span class="badge ok">verified</span> same paper</p>
+<p>There are three key points.</p>
+<ol>
+<li><strong>Serving is hybrid.</strong> The LLM is on the online hot path only for the top 5–10% heavy users. A <strong>Student GNN</strong> serves the other 90–95%. This GNN is trained on meta-paths that the LLM discovered offline.<ul>
+<li>§6.1 says: <em>&quot;For this cohort, requests are routed to the full ConnectionMind LLM&quot;</em> / <em>&quot;we employ an offline distillation pipeline. The LLM processes historical contexts to discover effective meta-paths. These paths are extracted to train a lightweight Graph Neural Network (Student GNN)&quot;</em>.</li>
+<li>This is a different compromise from Netflix GenRec&#39;s &quot;100% LLM on batch-compute surfaces.&quot;</li>
+<li><strong>This is the first organic-feed statement in which an LLM actually enters the hot path, and also a dual statement that the GNN still serves the majority.</strong></li>
+</ul>
+</li>
+<li><strong>The LLM emits graph paths as JSON.</strong> This <strong>behaves completely differently</strong> from Netflix GenRec&#39;s &quot;pooled hidden state → catalog softmax&quot; scorer. ConnectionMind actually generates text.<ul>
+<li>In §4.1, the state s_d is a prompt containing: <em>&quot;current paths, candidate next-hop edges, and compact textual node profiles&quot;</em>.</li>
+<li>The LLM outputs: <em>&quot;structured action with two components: path expansions and surfaced item–path pairs&quot;</em>.</li>
+<li>Beam search and constrained decoding are not stated explicitly, and outputs are verified after the fact with a format reward.</li>
+<li>Training goes from <strong>SFT</strong> to <strong>GRPO</strong>. SFT does teacher-forcing with BFS shortest paths.</li>
+<li>The GRPO reward is format −1/+1, an F1-based recommendation reward, and step-wise shaping. The weights are α_rec=0.5·α_step=0.3·α_fmt=0.2.</li>
+</ul>
+</li>
+<li><strong>The deployed backbone is Llama 3.1-8B-Instruct</strong> <span class="badge ok">verified</span> §6.1. The A/B ran for several weeks on tens of millions of users.<ul>
+<li>The results are watch time +0.43% ± 0.14%, exposure +0.33% ± 0.08%, and video sessions +0.22% ± 0.13%.</li>
+<li>The offline benchmarks are the public Delicious and Foursquare sets. They are not Meta data, and there are no LightGCN, SASRec, or HSTU baselines.</li>
+</ul>
+</li>
+</ol>
+<p class="warn">⚠ Four cautions apply when handling this statement:</p>
+<ul>
+<li><strong>The surface is not public.</strong> The paper says only &quot;short-form video platform&quot; for the surface. The graph schema points to Facebook Reels/Video, but it should not be cited that way. This surface caveat is included in the ranking section of <a href="facebook.html">facebook.md</a>, where the statement was folded in.<ul>
+<li>The graph schema is User–Group, Group–Item, Page–Item, and Item–Item (Co-watch).</li>
+</ul>
+</li>
+<li><strong>Meta&#39;s own systems (HSTU/GEM/LLaTTE/MARM) are cited 0 times.</strong> The only Meta-affiliated citation is Fan et al. 2019 GraphRec. The paper does not establish how this relates to the company&#39;s other ranking lines. It may be a parallel line from a separate team.</li>
+<li><strong>The offline experiments are academic benchmarks.</strong> It used Delicious 60/20/20 and Foursquare as benchmarks. There are no strong sequential/generative-rec baselines, and no deep ablation on Meta data.</li>
+<li><strong>Serving cost and latency are entirely undisclosed.</strong> The paper does not say what SLO the 8B LLM actually sustains on the heavy-user hot path, or what the GPU cost, QPS, and p99 latency are. This contrasts sharply with the Netflix GenRec serving-layer blog post, which describes vLLM, MSS (Netflix&#39;s common model inference backend), and FSx pre-materialization.</li>
+</ul>
+<p><strong>Even so, this paper shakes the center of our judgment on role 3.</strong> Until 2026-08, this note&#39;s proposition was &quot;Meta does not use LLMs for ranking itself.&quot; Even if limited to the heavy-user cohort, an 8B LLM on the online hot path overturns half of that proposition. <strong>However, the form differs from Netflix.</strong> Netflix replaced the scoring function itself with an LLM backbone, while Meta put the LLM in as a path explorer over a graph. The newly revealed fact is that the substance of role 3 differs by company.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-netflix--the-first-deployment-grade-first-party-statement-for-role-3-llm-as-ranker">Case: Netflix — The first deployment-grade first-party statement for role 3 (LLM as ranker)</h2>
+<p>Netflix uses an internal LLM as the ranker itself in GenRec and reported metric improvements in an A/B test on ~10% of traffic. However, the experiment is limited to batch-compute surfaces, and there is no full-rollout statement yet. <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec: Towards LLM-Native Recommendation at Netflix</a>, 2026-07</p>
+<ul>
+<li><strong>A model post-trained from an internal LLM on Netflix data ranks directly</strong> <span class="badge ok">verified</span> same post.<ul>
+<li>Training is split into 2 stages. The Netflix-adapted LLM is updated rarely, and the ranking post-training is updated frequently.</li>
+<li>The ranking backbone is ~1B-10B.</li>
+</ul>
+</li>
+<li><strong>Features are expressed in language instead of vectors (verbalization).</strong> This is a first-party statement that the feature engineering problem becomes a prompt and context construction problem <span class="badge ok">verified</span> same post. The original text reads: <em>&quot;The context window becomes our new &#39;feature budget&#39;&quot;</em>.</li>
+<li><strong>Training uses a reward-weighted loss</strong> <span class="badge ok">verified</span> same post. It is not full RL, and GRPO is future work.<ul>
+<li>On efficiency, it uses &quot;roughly 40×&quot; fewer Phase-2 labels, and offline MRR (mean reciprocal rank of the correct answer) improves by &quot;about +1.6%&quot;.</li>
+</ul>
+</li>
+<li><strong>Serving is vLLM&#39;s prefill-only approach</strong> <span class="badge ok">verified</span> same post. It is 1 pass for the whole candidate set, not 1 pass per candidate. This is a concrete form of reusing LLM serving infrastructure for recommendation.<ul>
+<li>The original text reads: <em>&quot;the model consumes the prompt once and scores the entire candidate set in a single forward pass, with no token-by-token decoding&quot;</em>.</li>
+</ul>
+</li>
+<li><strong>Short-term and long-term metrics improved significantly in a 4-week A/B on ~10% of traffic</strong> <span class="badge ok">verified</span> same post. It is a measured deployment experiment, not Meta Groups Search&#39;s &quot;plan&quot; or GEM&#39;s &quot;analogy.&quot; However, it is limited to <em>&quot;batch-compute recommendation surfaces&quot;</em>, and there is no full-rollout statement yet.</li>
+<li><strong>The serving stack was published in a separate blog post</strong> <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a>, 2026-07-17. GenRec is not an experimental side effect; it is part of the criteria for selecting the serving stack.<ul>
+<li>This item is explicitly listed among the 4 workloads for which Netflix adopted vLLM as its paved-path engine (the in-house standard path): <em>&quot;prefill-only inference for ranking and retrieval&quot;</em>.</li>
+<li>The post describes two factors that determine GenRec&#39;s batch serving cost. One is constrained-decoding batch scaling, and the other is model pre-materialization (Amazon FSx).</li>
+<li>In V0, batch scaling hit a GIL bottleneck, and V1 uses C++ multi-threading: <em>&quot;logits processing time staying flat as batch size grows&quot;</em>.</li>
+<li>Details are in <code>services/netflix.md</code> §GenRec serving layer.</li>
+</ul>
+</li>
+</ul>
+<p class="warn">⚠ &quot;The LLM ranks&quot; is easy to misread. <strong>The scoring structure is not generation</strong> <span class="badge ok">verified</span> same post:</p>
+<blockquote>
+<p><em>&quot;we extract a pooled hidden state h&quot;</em> → combined with item i&#39;s learned embedding eᵢ and the scoring head ϕ via <em>&quot;(e.g., via dot product or small MLP)&quot;</em> to give sᵢ, then ranked by softmax. <em>&quot;All parameters — the backbone, scoring head, and item embeddings — are trained jointly.&quot;</em></p>
+</blockquote>
+<p>The LLM does not <strong>generate</strong> item titles to recommend. The LLM is an <strong>encoder</strong> that produces the user representation h, and the final scoring is still an embedding dot product or a small MLP.</p>
+<p><span class="badge est">inferred</span> Seen this way, the actual form of role 3 is closer to <strong>replacing the sequence Transformer backbone with an LLM and changing the input representation from IDs and features to text</strong> than to &quot;making recommendation a generative model.&quot; In effect, it is the same skeleton as Netflix FM (a GPT-style sequence Transformer with ID and feature tokens), with only the backbone and input changed. Related discussion is in <a href="sequence-transformer-ranking.html">sequence-transformer-ranking.md</a>. Missing this distinction leads to confusing GenRec with <strong>generative retrieval</strong> of the semantic ID family (IDs that represent an item as a sequence of semantic tokens), but the two are different approaches. Generative retrieval is covered in the &quot;generative retrieval / semantic ID&quot; entry of <a href="radar.html">radar.md</a>.</p>
+<p>Netflix&#39;s other roles are as follows:</p>
+<ul>
+<li><strong>Role 1 (content annotation)</strong>: There is no first-party statement on LLM annotation. For artwork selection, only <strong>research-stage</strong> papers exist on VLM/LLM post-training <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2601.02764" target="_blank" rel="noopener">arXiv 2601.02764</a>, 2026-01.<ul>
+<li>Content metadata has traditionally been tag-based, and because Netflix is a curated catalog that already has rich metadata per item, demand for UGC (user-generated content) annotation is small to begin with <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><strong>Role 6 (natural-language instruction)</strong>: There is a conversational search beta. Users state mood and intent in natural language and it recommends <span class="badge ok">verified</span> — <a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">About Netflix 2025</a>.<ul>
+<li>The OpenAI collaboration claim is secondary reporting, and we could not confirm a primary source <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<p>Placed alongside X and Meta, X put the LLM in as a <em>judge</em> (annotation, safety); Meta as a <em>feature encoder</em> (ads), an <em>offline judge</em>, and, from 2026-08, a <em>graph path reasoner</em> for heavy-user requests; and Netflix as <strong>the ranker itself</strong>. Of the three, only Netflix has an LLM as the scoring function in the serving path. However, the published experiment is limited to batch-compute surfaces.</p>
+<p><span class="badge est">inferred</span> Corpus size may explain this order: with thousands of candidates the LLM inference cost is affordable, and with corpora of hundreds of millions under a millisecond-level budget, as at X and Meta, it is natural to start with roles 1 and 2 (offline). Details are in <a href="netflix.html">netflix.md</a>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="framing-verification--is-x-is-the-product-surface-meta-is-upstream-correct">Framing verification — is &quot;X is the product surface, Meta is upstream&quot; correct?</h2>
+<p>The hypothesis set at the start of this note is <strong>only half right.</strong> It is corrected here.</p>
+<ul>
+<li><strong>The wrong half</strong>: X&#39;s Grok is not a product surface visible to users. Grox is a <strong>nearline pipeline</strong>, and users see neither the slop score nor the PTOS verdict. If anything, <strong>the side with a user-facing natural-language surface is Meta</strong> (Dear Algo, Your Algorithm). The hypothesis had this part backwards.</li>
+<li><strong>The right half</strong>: X&#39;s LLM output <strong>actually makes decisions in the serving path</strong>. It passes filters and gates ad adjacency (<code>brand_safety.rs</code>). Until ConnectionMind in 2026-08, Meta&#39;s published LLM uses were the <strong>offline evaluation</strong> of Groups Search and the <strong>offline feature encoding</strong> of HIR, and entering the serving path was &quot;we plan to&quot;.<ul>
+<li>ConnectionMind said it sends requests from the top 5–10% most active users to the LLM <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2608.10187" target="_blank" rel="noopener">arXiv 2608.10187</a> §6.1.</li>
+</ul>
+</li>
+</ul>
+<p>The accurate statement is this <span class="badge est">inferred</span>. The evidence grade is medium. It is solid based on the public literature, but it says nothing about undisclosed systems. <strong>Updated 2026-08-13: ConnectionMind overturned the second sentence.</strong></p>
+<blockquote>
+<p><strong>X wired LLM verdicts into production decisions, and Meta uses LLMs as an (ads) feature encoder, a (Groups Search) offline judge, and now a graph path reasoner on the heavy-user hot path (on an undisclosed short-form video surface). The first first-party statement of an LLM entering the organic feed ranking path was Netflix GenRec (2026-07, LLM = scoring function), and Meta ConnectionMind (2026-08, LLM = graph path reasoner) is the second.</strong></p>
+</blockquote>
+<p class="warn">⚠ <strong>The risk that the public asymmetry looks like a conclusion is still this note&#39;s biggest risk.</strong> There are four points where this framing could be shaken:</p>
+<ul>
+<li>Meta barely publishes its organic feed stack. Absence did not mean non-use, and in fact this was confirmed when ConnectionMind appeared.</li>
+<li>X publishes its source, so everything that exists can be seen.</li>
+<li>Netflix&#39;s statement is limited to <em>batch-compute</em> surfaces, and Meta&#39;s is limited to 5–10% of heavy users. Neither company has &quot;100% LLM on the full hot path.&quot;</li>
+<li>When lining up the three companies in one line, the differences in surface type and serving cohort must not be erased.</li>
+</ul>
+<p><span class="badge est">inferred</span>(secondhand) A 2026 Digiday article reported the same direction. The article title is &quot;Meta&#39;s LLM bet has yet to touch its core ads business&quot;. <strong>It is secondary reporting, so it was not used as evidence, and the conclusion above was built from Meta first-party documents alone.</strong></p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-is-still-unconfirmed-on-the-meta-side">What is still unconfirmed on the Meta side</h2>
+<p>As of this note&#39;s last updated date (2026-08-13), most Meta-side questions are open. Only the source of LLaTTE&#39;s semantic features was resolved, on 2026-08-09, and one follow-up question remains there.</p>
+<ul>
+<li><strong>The natural-language parser of Dear Algo / Your Algorithm.</strong> Nothing is public about whether it is an LLM or a classifier, or where it attaches in the pipeline (candidate filter / score boost).</li>
+<li><strong>Whether organic feed content has LLM annotation.</strong> Only the ads side (HIR) is confirmed.</li>
+<li><del><strong>Whether LLaTTE&#39;s semantic features are LLM output.</strong></del> <strong>Resolved (2026-08-09).</strong> The paper writes &quot;fine-tuned LLaMA models&quot; directly, and it is covered under item A above. The remaining question is <strong>whether those LLaMA embeddings also enter the organic feed ranker</strong>, which we have not yet confirmed.</li>
+<li><strong>Whether the &quot;LLMs in Ranking&quot; plan of Groups Search was actually deployed.</strong> As of 2026-04 it was in the future tense.</li>
+<li><strong>Whether Meta has an LLM safety verdict equivalent to X&#39;s PTOS.</strong> Meta handles content policy enforcement separately from the recommendation literature, so we could not confirm it within the scope of this repository.</li>
+</ul>
+<hr>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="who-uses-this">Who uses this</h2>
+<p>X (Grox), Meta ads and Facebook Groups Search, and Netflix (GenRec) have stated in primary material that they use LLMs <span class="badge ok">verified</span>. Instagram and Threads released features where users enter ranking preferences in natural language <span class="badge ok">verified</span>. However, the bodies of the relevant newsroom posts for the two services do not disclose which model parses that natural language <span class="badge obs">observed</span> 2026-08-09.</p>
+<ul>
+<li><strong>X</strong>: Uses Grox. It was split into a dedicated service in the 2026 generation <span class="badge ok">verified</span>.</li>
+<li><strong>X (2025 Scala generation)</strong>: Grok-based filters and features entered home-mixer/tweet-mixer first. All 24 Grok-related files were newly added in the 2025-09-03 commit, and the 2023 snapshot has 0. <span class="badge ok">verified</span> twitter/the-algorithm <code>c54bec0</code>, 2025 — <code>git ls-tree -r --name-only c54bec0 | grep -ci grok</code> = 24, and the same command gives 0 at the 2023 tip <code>72eda9a</code>.<ul>
+<li>Examples of the files are <code>GrokGoreFilter</code>, <code>GrokNsfwFilter</code>, <code>GrokSpamFilter</code>, <code>GrokViolentFilter</code>, <code>GrokSlopScoreRescorer</code>, and <code>GrokAnnotationsFeatureHydrator</code>.</li>
+<li>Of these, the 4 safety filters are boilerplate made by copying 61–66% of the existing <code>PreviouslyServedTweetsFilter.scala</code>, according to git copy detection. <span class="badge ok">verified</span> — <code>git show --name-status -C -C --diff-filter=C c54bec0</code></li>
+</ul>
+</li>
+<li><strong>Meta ads</strong>: <strong>LLM features are real.</strong> Dense content embeddings made by HIR&#39;s <em>&quot;customized LLM inference engine&quot;</em> (encoding advertiser and product content, 2026-07) and the LLaTTE paper&#39;s &quot;fine-tuned LLaMA models&quot; enter as ranker inputs <span class="badge ok">verified</span>.<ul>
+<li>Separately, &quot;LLM-scale&quot; in the GEM/LLaTTE/MARM <strong>blog posts</strong> is an <strong>analogy</strong> about model architecture. The two must be distinguished (the A/B table above). Details are in <a href="facebook.html">facebook.md</a>.</li>
+<li>As of the 2026-10-19 GenRecs Tokenization blog post, Meta ads ranking and retrieval use sequences of semantic tokens (semantic ID) instead of item IDs as the input representation, and together with GEM and the Adaptive Ranking Model delivered conversion +0.35% <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2026/10/19/ml-applications/genrecs-tokenization-transforming-ads-recommendation-at-meta-with-stable-model-vocabulary/" target="_blank" rel="noopener">GenRecs Tokenization</a> (blog).<ul>
+<li>The tokens are made by quantizing content embeddings from a pretrained multimodal model combined with engagement-based representations <span class="badge ok">verified</span>. Against the A/B table above, this is a statement that extends A (representation) to the ID role <span class="badge est">inferred</span>.</li>
+<li>The +0.35% was measured in 2026-02 (footnote &quot;Meta Internal Data, measured in February 2026&quot;) <span class="badge ok">verified</span>. Details are in <a href="daily-2026-10-21.html">daily 2026-10-21</a>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Facebook Groups Search</strong>: Uses Llama 3 as an <strong>offline automated judge</strong>. An LLM in the ranking stage is at the planning stage. <span class="badge ok">verified</span></li>
+<li><strong>Instagram</strong>: Your Algorithm has an AI-generated topic summary and free-text input. <strong>The model is undisclosed.</strong> <span class="badge ok">verified</span> (feature) / <span class="badge obs">observed</span> 2026-08-09 (model not stated, body of the relevant newsroom post) → <a href="instagram.html">instagram.md</a></li>
+<li><strong>Threads</strong>: Has Dear Algo / Your Algo. It is the only case that makes ranking preferences a <strong>public social object</strong>. Reposting applies someone else&#39;s preferences to my feed. The parser is not public. <span class="badge ok">verified</span> (feature) / <span class="badge obs">observed</span> 2026-08-09 (model not stated, body of the relevant newsroom post) → <a href="threads.html">threads.md</a></li>
+<li><strong>Facebook Feed (organic)</strong>: There is still no system card or blog statement about the organic feed itself.<ul>
+<li>However, ConnectionMind (2026-08) said it deployed Llama 3.1-8B on the heavy-user hot path of an undisclosed &quot;short-form video platform&quot; <span class="badge ok">verified</span> (the statement itself).</li>
+<li>From the graph schema, that surface is likely Facebook Reels/Video, but it cannot be confirmed <span class="badge est">inferred</span> (surface). Details are in the ConnectionMind section of <a href="facebook.html">facebook.md</a>.</li>
+</ul>
+</li>
+<li><strong>Netflix</strong>: In GenRec, <strong>the LLM is the ranker itself</strong> (10% traffic A/B, 2026). Conversational search is a beta, and the artwork LLM is at the research stage. <span class="badge ok">verified</span> Details are in <a href="netflix.html">netflix.md</a>.</li>
+<li><strong>Other services</strong>: Not yet investigated. <strong>This is an open question.</strong></li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<p><strong>X</strong></p>
+<ul>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, public source code (Apache 2.0). There are 60 files under <code>grox/</code>.</li>
+<li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — 2025-09-03 commit <code>c54bec0</code>, public source code.</li>
+</ul>
+<p><strong>Meta</strong></p>
+<ul>
+<li><a href="https://engineering.fb.com/2026/07/15/ai-research/exploring-hierarchical-interest-representation-for-meta-ads-deep-funnel-optimization/" target="_blank" rel="noopener">Exploring Hierarchical Interest Representation For Meta Ads Deep Funnel Optimization</a> — 2026-07-15, blog post. The primary source for &quot;customized LLM inference engine&quot;.</li>
+<li><a href="https://engineering.fb.com/2026/04/21/ml-applications/modernizing-the-facebook-groups-search-to-unlock-the-power-of-community-knowledge/" target="_blank" rel="noopener">Modernizing the Facebook Groups Search to Unlock the Power of Community Knowledge</a> — 2026-04-21, blog post. <strong>The only ranking-adjacent document on the Meta engineering blog that names Llama</strong> <span class="badge obs">observed</span> 2026-08-09 (inspected: the bodies of the 6 blog posts in this list). Including papers, LLaTTE arXiv 2601.20083 also names LLaMA explicitly.</li>
+<li><a href="https://engineering.fb.com/2025/11/10/ml-applications/metas-generative-ads-model-gem-the-central-brain-accelerating-ads-recommendation-ai-innovation/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM)</a> — 2025-11-10, blog post. <em>&quot;LLM-inspired paradigm&quot;</em>.</li>
+<li><a href="https://engineering.fb.com/2026/08/05/ml-applications/from-user-sequences-to-scaling-laws-a-multi-stage-architecture-for-metas-ads-ranking/" target="_blank" rel="noopener">From User Sequences to Scaling Laws</a> — 2026-08-05, blog post / <a href="https://arxiv.org/abs/2601.20083" target="_blank" rel="noopener">LLaTTE (arXiv 2601.20083)</a> — 2026-01-27, paper. Semantic feature.</li>
+<li><a href="https://engineering.fb.com/2026/03/31/ml-applications/meta-adaptive-ranking-model-bending-the-inference-scaling-curve-to-serve-llm-scale-models-for-ads/" target="_blank" rel="noopener">Meta Adaptive Ranking Model</a> — 2026-03-31, blog post. <em>&quot;LLM-Scale&quot;</em>.</li>
+<li><a href="https://about.fb.com/news/2026/02/threads-dear-algo/" target="_blank" rel="noopener">Control Your Threads Feed With New Dear Algo Feature</a> — 2026-02-11, blog post.</li>
+<li><a href="https://about.instagram.com/blog/announcements/reels-algorithm-control" target="_blank" rel="noopener">Control Your Instagram Reels Algorithm (Your Algorithm)</a> — first published 2025-12-10 / updated 2026-06-10, blog post.</li>
+<li><a href="https://arxiv.org/abs/2608.10187" target="_blank" rel="noopener">ConnectionMind: Leveraging Social Networks and Large Language Models for Personalized Recommendation at Meta (arXiv 2608.10187)</a> — 2026-08-10, paper. <strong>Meta&#39;s first production A/B statement for role 3.</strong> Llama 3.1-8B, hybrid serving, watch time +0.43%.</li>
+<li><a href="https://engineering.fb.com/2026/10/19/ml-applications/genrecs-tokenization-transforming-ads-recommendation-at-meta-with-stable-model-vocabulary/" target="_blank" rel="noopener">GenRecs Tokenization: Transforming Ads Recommendation at Meta with Stable Model Vocabulary</a> — 2026-10-19, blog post. Semantic ID tokenization of ad items, conversion +0.35%.</li>
+<li class="warn">⚠ Digiday, <em>&quot;Meta&#39;s LLM bet has yet to touch its core ads business&quot;</em> — 2026, <strong>secondary reporting</strong>. The direction agrees, but it was not used as evidence for this note.</li>
+</ul>
+<p><strong>Netflix</strong></p>
+<ul>
+<li><a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec: Towards LLM-Native Recommendation at Netflix</a> — 2026-07, blog post. <strong>The deployment-grade first-party statement for role 3.</strong></li>
+<li><a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a> — 2026-08-10, paper. The academic version of the blog post. It contains figures the blog post does not disclose, such as the loss formula (ℒ = α·ranking + β·language + γ·other with catalog softmax), the +0.006% core metric, the Phase 1/2 contribution breakdown, the context 5000→1700 example, and GRPO preliminary results.</li>
+<li><a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">Unveiling Our Innovative New TV Experience</a> — 2025, announcement. Introduces the conversational search beta.</li>
+<li><a href="https://arxiv.org/abs/2601.02764" target="_blank" rel="noopener">Artwork LLM Post-training</a> — 2026-01, paper. Research stage.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/llm-in-recsys.html" data-title="추천 파이프라인 안의 LLM"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feed diversity — the layer that deliberately breaks score-ordered sorting — feed-research</title>
+<meta name="description" content="Sorting only by ranker score produces runs of the same author, the same topic, and the same video. The diversity layer prevents such runs. There are five…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/feed-diversity.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/feed-diversity.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/feed-diversity.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/feed-diversity.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Feed diversity — the layer that deliberately breaks score-ordered sorting — feed-research">
+<meta property="og:description" content="Sorting only by ranker score produces runs of the same author, the same topic, and the same video. The diversity layer prevents such runs. There are five…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/feed-diversity.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/feed-diversity.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Cross-service topics</p>
+<h1 id="feed-diversity--the-layer-that-deliberately-breaks-score-ordered-sorting">Feed diversity — the layer that deliberately breaks score-ordered sorting</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Translated from</span><a href="../feed-diversity.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">20</span></summary><ol><li><a href="#case-x--uses-all-four">Case: X</a><ol><li><a href="#1-author-diversity-decay-2026">1. Author-diversity decay (2026)</a></li><li><a href="#2-mmr--2025-scala">2. MMR</a></li><li><a href="#3-dpp--2026-a-separate-service">3. DPP</a></li><li><a href="#4-dedup--in-practice-this-is-the-densest-part">4. Dedup</a></li><li><a href="#5-learned-slate-decoder--2026-10-training-code-only-released">5. Learned slate decoder</a></li></ol></li><li><a href="#case-meta--nothing-published-for-the-main-feeds">Case: Meta</a><ol><li><a href="#however-facebook-also-uses-diversity-as-a-ranking-feature">However, Facebook also uses diversity as a ranking feature</a></li><li><a href="#the-only-exception--the-multiplicative-penalty-in-instagram-notifications-2025">The only exception</a></li><li><a href="#retrieval-stage-diversity--instagrams-main-effort-may-be-here">Retrieval-stage diversity</a></li><li><a href="#debunk--instagram-blocks-3-consecutive-posts-from-the-same-account">Debunk</a></li></ol></li><li><a href="#case-netflix--the-unit-of-diversity-is-the-page-not-the-list">Case: Netflix</a></li><li><a href="#what-generalizes-from-this-case">What generalizes from this case</a></li><li><a href="#who-uses-this">Who uses this</a></li><li><a href="#not-yet-confirmed">Not yet confirmed</a></li><li><a href="#sources">Sources</a><ol><li><a href="#public-source-code">Public source code</a></li><li><a href="#meta-blog-posts">Meta blog posts</a></li><li><a href="#meta-transparency-center-primary-documents-for-regulatory-compliance">Meta Transparency Center (primary documents for regulatory compliance)</a></li><li><a href="#netflix">Netflix</a></li></ol></li></ol></details></nav>
+<div class="prose">
+<p>Sorting only by ranker score produces runs of the same author, the same topic, and the same video. The diversity layer prevents such runs. There are five main approaches, and most services stack several of them.</p>
+<ol>
+<li><strong>Decay</strong>: multiply the score of the nth item with the same key (such as author) by <code>f(n) &lt; 1</code>. It is a purely pointwise approach that scores each item separately, and its computation cost is low.</li>
+<li><strong>Greedy re-ranking (MMR, maximal marginal relevance)</strong>: add the distance from already selected items to the score. The score depends on the state of the list selected so far.</li>
+<li><strong>Slate optimization (DPP, determinantal point process)</strong>: treat the bundle of items shown at once (the slate) as one set and maximize the determinant of that whole set. It is the most expensive and the most principled approach.</li>
+<li><strong>Dedup</strong>: never show the same thing twice. It is closer to hygiene than to diversity.</li>
+<li><strong>Calibration</strong>: match the genre and topic distribution of the list to the distribution in the user&#39;s history. The goal is &quot;same proportions as the history&quot; rather than &quot;different from each other&quot;, so the goal itself differs. Netflix published the formula (see the <a href="#case-netflix--the-unit-of-diversity-is-the-page-not-the-list">Netflix section</a> below).</li>
+</ol>
+<p><strong>However, comparing services with this list requires first checking whether each approach is published.</strong> All four of X&#39;s approaches (decay, MMR, DPP, dedup) can be read in source code, but <strong>Meta has never published any of the four at the algorithm level for its main feeds</strong> <span class="badge est">inferred</span>. The corpus we examined is listed in the <a href="#case-meta--nothing-published-for-the-main-feeds">&quot;Case: Meta&quot;</a> section below. This absence is itself the second finding of this note.</p>
+<h2 id="case-x--uses-all-four">Case: X — uses all four</h2>
+<p>X&#39;s decay, MMR, DPP, and dedup approaches can all be read in public source code <span class="badge ok">verified</span> (<a href="#who-uses-this">Who Uses This</a>). The 2025 Scala generation has MMR, a category penalty, and 6 dedup filters, and the 2026 generation has author decay, DPP, and 3 dedup filters <span class="badge ok">verified</span> (Who Uses This section). The 2026-10-14 commit released the training code of a learned slate decoder, but its serving switch is off by default <span class="badge ok">verified</span> (<a href="#5-learned-slate-decoder--2026-10-training-code-only-released">section 5</a>).</p>
+<h3 id="1-author-diversity-decay-2026">1. Author-diversity decay (2026)</h3>
+<p>The 2026 generation&#39;s author decay multiplies a post&#39;s score by a multiplier that depends on its rank by score among posts from the same author, and this multiplier has a floor <span class="badge ok">verified</span>. The function that sets the multiplier is shown below <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs:186-188</code></a> (Gen3 <code>0bfc279</code>).</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn diversity_multiplier(decay_factor: f64, floor: f64, position: usize) -&gt; f64 {
+    (1.0 - floor) * decay_factor.powf(position as f64) + floor
+}
+</code></pre></figure>
+<p>Here <code>position</code> is the <strong>rank within the same author</strong> after sorting by score in descending order. It is not the position in the final feed <span class="badge ok">verified</span> — <code>:198-214</code>.</p>
+<p>The design has two notable points.</p>
+<ul>
+<li><strong>There is a floor <code>floor</code>.</strong> With <code>decay^n</code> alone, the score of an author&#39;s 10th post converges to 0 and is effectively banned. With a floor, <code>floor</code> times the original score always remains however many posts there are. In other words, this decay is <strong>a penalty, not a per-author cap</strong>.</li>
+<li>The values of <code>decay_factor</code> and <code>floor</code> are read from a FeatureSwitch (runtime configuration). In Gen3 (<code>0bfc279</code>) those values were not in the repo, and the defaults in the Gen4 (<code>47c1bcd</code>) mirror are <code>AuthorDiversityDecay</code> 0.5 and <code>AuthorDiversityFloor</code> 0.25 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</li>
+</ul>
+<p>In the first Gen3 public commit <code>aaa167b</code> (2026-01-20), this decay was a separate scorer, <code>author_diversity_scorer.rs</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aaa167b/home-mixer/scorers/mod.rs" target="_blank" rel="noopener"><code>aaa167b</code> <code>scorers/mod.rs</code></a>. In <code>0bfc279</code> (2026-05-15), the decay moved into the ranking scorer; the file remained but was dropped from the <code>scorers/mod.rs</code> declarations <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/mod.rs" target="_blank" rel="noopener"><code>0bfc279</code> <code>scorers/mod.rs</code></a>. The file was deleted in the Gen4 release commit <code>47c1bcd</code> (2026-08-13) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commits/main/home-mixer/scorers/author_diversity_scorer.rs" target="_blank" rel="noopener">file commit history</a>.</p>
+<h3 id="2-mmr--2025-scala">2. MMR — 2025 Scala</h3>
+<p>The 2025 Scala generation&#39;s MMR adds to the relevance score a weighted minimum distance from the candidates already selected <span class="badge ok">verified</span>. Diversity is not applied to the front part of the list, and the computed result overwrites the original score in place <span class="badge ok">verified</span>.</p>
+<p>The MMR score is computed with the formula below <span class="badge ok">verified</span> — <code>DiversityRescoringFeatureHydrator.scala:102</code>.</p>
+<pre tabindex="0"><code>score = relevance + diversityWeight × minDistance(candidate, already selected)
+</code></pre>
+<ul>
+<li>The embedding dimension is 128 <span class="badge ok">verified</span> <code>:32</code>.</li>
+<li>The distance is not cosine similarity but <strong>the L2 distance between L2-normalized embeddings</strong> <span class="badge ok">verified</span> <code>:64-69</code>.</li>
+</ul>
+<p><strong>Diversity is not applied at all to the top part.</strong> <code>minDistance</code> skips the distance computation and uses a default value when the condition below holds <span class="badge ok">verified</span> <code>:92-93,102</code>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">if (selected.isEmpty || selected.size &lt; (1 - diversityRatio) * n) None   // → getOrElse(2.0)
+</code></pre></figure>
+<p>That is, the default <code>2.0</code> is used not only &quot;for the first candidate&quot; but for <strong>all of the first <code>(1-diversityRatio)×n</code> items of the list</strong>. Because the constant 2.0 is added equally to everyone, that part keeps the pure relevance order. <strong>Diversity applies only to the later part of the list.</strong></p>
+<p><strong>MMR overwrites every <code>ScoreFeature</code> value</strong> <span class="badge ok">verified</span> <code>:28,70,91</code>. It reads relevance from <code>ScoreFeature</code> and writes it back to the same slot. In other words, what is called the &quot;ranker score&quot; after this point is already a value mixed with diversity.</p>
+<p>The same generation has a separate category version. It applies a greedy penalty using the category counts of SimClusters (clusters that split the follow graph into communities), and the computation is the two lines below <span class="badge ok">verified</span> — <code>CategoryDiversityRescoringFeatureHydrator.scala:69,72</code>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">penalty += math.log(cnt + 1) / math.log(2)          // log2(cnt+1)
+score = math.max(relevance - weight * penalty, 0.00001)
+</code></pre></figure>
+<p><strong>MMR adds to the score, and the category version subtracts from it.</strong> MMR &quot;rewards difference&quot;, and the category version &quot;penalizes sameness&quot;. Both are in the same pipeline, and each is turned on and off by a parameter (param-gated) <span class="badge ok">verified</span> — <code>ScoredTweetsRecommendationPipelineConfig.scala:580-601</code>.</p>
+<ul>
+<li>MMR parameter: <code>TwhinDiversityRescoringParam</code> <code>:589-590</code></li>
+<li>Category parameter: <code>CategoryDiversityRescoringParam</code> <code>:593-594</code></li>
+</ul>
+<p><strong>When both are on, they apply on top of each other.</strong> The <code>ScoreFeature</code> that the category version reads as relevance is already the value MMR overwrote. The two adjustments are not independent but <strong>compose in series</strong> <span class="badge ok">verified</span>. The basis is the in-place overwrite by MMR described above.</p>
+<p><strong>The two adjustments appear to run after the top-K cut, but the execution position cannot be confirmed from the code</strong> <span class="badge est">inferred</span>.</p>
+<ul>
+<li>Both are placed in a stage named <code>postSelectionFeatureHydration</code>, so they appear to run <strong>after</strong> the top-K cut <span class="badge est">inferred</span>. The only basis is the stage name and the fact that this stage is placed after <code>resultSelectors</code> (<code>:574-577</code>, including <code>DropRequestedMaxResults</code>).</li>
+<li>However, <code>RecommendationPipelineConfig.scala</code> in <code>product-mixer/core</code>, the framework code vendored in the repo, defines only <code>resultSelectors</code> (<code>:136</code>) → <code>postSelectionFilters</code> (<code>:142</code>). <strong>There is no <code>postSelectionFeatureHydration</code> hook at all.</strong> That is, the execution position cannot be confirmed from the code <span class="badge ok">verified</span> (absence) — <code>grep -r postSelectionFeatureHydration product-mixer/</code> → 0 hits</li>
+</ul>
+<h3 id="3-dpp--2026-a-separate-service">3. DPP — 2026, a separate service</h3>
+<p>The 2026 generation&#39;s DPP is computed by a separate service <span class="badge ok">verified</span>. The <code>VMRanker</code> scorer in home-mixer (X&#39;s service that serves the For You feed) calls this service over gRPC and <strong>overwrites the existing score</strong> with the response score <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs:47-52</code></a> (Gen3 <code>0bfc279</code>).</p>
+<p>DPP parameters are built only when at least one of theta and max_selected_rank is positive <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>vm_ranker.rs:112-120</code></a>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let dpp_params = if dpp_theta &gt; 0.0 || dpp_max_selected_rank &gt; 0 {
+    Some(DppParams { theta: dpp_theta, max_selected_rank: dpp_max_selected_rank })
+} else { None };
+</code></pre></figure>
+<p><code>theta</code> controls the trade-off between relevance and diversity, and <code>max_selected_rank</code> appears to be the length of the top part to which DPP is applied <span class="badge est">inferred</span>. The basis is the names and DPP convention; the code has no explanation.</p>
+<p><strong>The DPP service itself has been in the repo&#39;s <code>vm-ranker/</code> since the Gen4 release (2026-08-13)</strong> <span class="badge ok">verified</span>. The kernel matrix is built from candidate scores and embedding cosine similarity <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>vm-ranker/dpp.rs:94-133</code></a> (HEAD <code>862a123</code>, 2026-10-17).</p>
+<ul>
+<li>The kernel element is <code>L_ij = exp(α·q_i) · exp(α·q_j) · cos(e_i, e_j)</code>, where <code>q_i</code> is the candidate score divided by the top score and <code>α = θ / (2(1 − θ))</code> <span class="badge ok">verified</span> (same file).</li>
+<li>Selection is a greedy DPP that updates the Cholesky decomposition one row at a time <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/862a123/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>dpp.rs:223</code></a>.</li>
+<li>The Gen4 release commit has the same kernel <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>vm-ranker/dpp.rs:94-124</code></a>.</li>
+<li>Up to Gen3 (<code>0bfc279</code>), the repo had only the client and the proto mapping, and <code>xai_vm_ranker_proto</code> was an external crate <span class="badge ok">verified</span>.</li>
+</ul>
+<p><strong>When the call fails, the DPP result silently disappears.</strong> If gRPC fails, it returns <code>Err</code> for every candidate, and the pipeline&#39;s <code>update_all</code> <strong>skips this <code>Err</code> without even logging it</strong> <span class="badge ok">verified</span> — <code>candidate-pipeline/scorer.rs</code> (default <code>update_all</code> implementation), <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>vm_ranker.rs:33-38</code></a>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn update_all(&amp;self, candidates: &amp;mut [C], scored: Vec&lt;Result&lt;C, String&gt;&gt;) {
+    for (candidate, scored) in candidates.iter_mut().zip(scored) {
+        if let Ok(scored) = scored { self.update(candidate, scored); }
+    }
+}
+</code></pre></figure>
+<p>→ <strong>If VMRanker has an outage, a pure score-ordered feed goes out without diversity optimization, and nothing in the response indicates it.</strong> This is fail-open behavior. Observing this state requires a separate metric.</p>
+<p>VMRanker as a whole can be turned off with the <code>EnableVMRanker</code> FeatureSwitch <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>vm_ranker.rs:18-20</code></a>.</p>
+<p><strong>For topic requests, DPP is skipped by default (2026-10-14).</strong> The default of the new switch <code>TopicDppEnabled</code> is false <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/mod.rs:85-87</code></a>.</p>
+<h3 id="4-dedup--in-practice-this-is-the-densest-part">4. Dedup — in practice, this is the densest part</h3>
+<p>In both generations, dedup is split across several filters <span class="badge ok">verified</span>. The 2026 generation has the following three filters <span class="badge ok">verified</span> <code>home-mixer/filters/</code>:</p>
+<ul>
+<li><code>drop_duplicates_filter</code></li>
+<li><code>retweet_deduplication_filter</code></li>
+<li><code>dedup_conversation_filter</code></li>
+</ul>
+<p>The 2025 Scala generation has 6 dedup filters alone, and <strong>each filter&#39;s trigger condition is narrow</strong> <span class="badge ok">verified</span>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Filter</th>
+<th>Rule</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>RetweetDeduplicationFilter</code></td>
+<td>First puts <strong>all non-retweets</strong> in the candidate pool into seen. Then removes a retweet if its own id or its original id is in seen</td>
+<td><code>:27-36</code></td>
+</tr>
+<tr>
+<td><code>MediaIdDeduplicationFilter</code></td>
+<td>Targets <strong>only candidates with exactly 1 media item</strong>. Multi-media candidates are not targeted</td>
+<td><code>:26,33-35</code></td>
+</tr>
+<tr>
+<td><code>ClipClusterDeduplicationFilter</code></td>
+<td>Applies <strong>only when there is 1 cluster</strong>. It counts the <em>distinct values</em> of a <code>Map[Long,Long]</code>, so 4 images in the same cluster are also targeted</td>
+<td><code>:24-27,29</code></td>
+</tr>
+<tr>
+<td><code>DuplicateConversationTweetsFilter</code></td>
+<td>After removing ancestors, keeps only one reply per root by <code>maxBy(ScoreFeature)</code>. <strong>All candidates without a root (non-conversations) pass</strong></td>
+<td><code>:33-40</code></td>
+</tr>
+<tr>
+<td><code>QuoteDeduplicationFilter</code></td>
+<td><strong>Removes the quoted original</strong> (not the quote post)</td>
+<td><code>:23-26</code>, pipeline wiring <code>:603,609</code></td>
+</tr>
+<tr>
+<td><code>KeepTopKCandidatesPerCommunity</code></td>
+<td>Keeps <strong>1 per community</strong> and <strong>limits total community candidates to 3</strong> (<code>MaxCandidatesPerCommunity = 1</code>, <code>MaxCommunityCandidates = 3</code>)</td>
+<td><code>:14-15,30,32</code></td>
+</tr>
+</tbody></table></div>
+<p>The <code>if (mediaIds.size == 1)</code> condition in <code>MediaIdDeduplicationFilter</code> appears to be <strong>deliberate conservatism</strong>, because removing a post when two 4-image posts overlap by only one image would be excessive <span class="badge est">inferred</span>. The code gives no reason. In addition, the file name is <code>MediaDeduplicationFilter.scala</code> but the object name is <code>MediaIdDeduplicationFilter</code> <span class="badge ok">verified</span>.</p>
+<p><strong>The direction of <code>QuoteDeduplicationFilter</code> is the opposite of intuition.</strong> Reading it as &quot;quote dedup&quot; suggests it would remove the quote post, but it actually removes <strong>the quoted original</strong> from the feed. This is presumably because the quote already shows the original <span class="badge est">inferred</span>.</p>
+<p>tweet-mixer, which handles generating candidates from accounts the viewer does not follow (OON, out-of-network), has a separate rule that keeps <strong>only 1 per author, for low-signal users only</strong> <span class="badge ok">verified</span> — <code>HomeRecommendedTweetsRecommendationPipelineConfig.scala:364</code>. Low-signal users are users with a small follow graph.</p>
+<ul>
+<li>The code is <code>DropDuplicateCandidates(duplicationKey = _.features.getOrElse(AuthorIdFeature, None))</code>.</li>
+</ul>
+<h3 id="5-learned-slate-decoder--2026-10-training-code-only-released">5. Learned slate decoder — 2026-10, training code only released</h3>
+<p>The page-level RL decoder whose training code X released in the 2026-10-14 commit puts a diversity penalty in both the slot-selection stage and the training loss <span class="badge ok">verified</span>. The serving switch is off by default <span class="badge ok">verified</span>.</p>
+<p>The released decoder is <code>page_rl</code>, a <strong>page-level RL decoder</strong> for immersive surfaces <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_decoder.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/page_decoder.py</code></a>. The decoder picks slots one at a time, and at each step adds the two features below to the logit as negatively weighted features <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_decoder.py" target="_blank" rel="noopener"><code>page_decoder.py:85-119, 233-247</code></a>.</p>
+<ul>
+<li>&quot;Whether the author is the same as one already picked&quot;</li>
+<li>&quot;How many leading levels of the SID overlap&quot;. SID (semantic ID) is an ID that represents an item as a multi-level hierarchical code.</li>
+</ul>
+<p>The training loss also includes a penalty (weight 0.5) for placing the same author or similar SIDs consecutively <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_decoder.py" target="_blank" rel="noopener"><code>page_decoder.py:569-578</code></a>.</p>
+<ul>
+<li>Whereas approaches 1–3 above apply diversity as rules <strong>after</strong> the score is set, this approach <strong>learns</strong> the size of the diversity penalty together with the dwell reward. It is in the same direction as Netflix GenPage (single-Transformer page generation) moving row selection into the generative distribution <span class="badge est">inferred</span>. The only basis is the structural similarity that both companies place diversity inside a generative model rather than in a separate layer.</li>
+<li>The serving switch <code>serve_page_decoder</code> is False by default, and home-mixer has no code that uses this decoder <span class="badge ok">verified</span>. The deployment scope is unknown.</li>
+<li>For details, see the section on the 2026-10-14 commit in <a href="x.html">x.md</a>. These notes number X commits after the Gen4 release in sequence, and this commit is Gen4+41.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-meta--nothing-published-for-the-main-feeds">Case: Meta — nothing published for the main feeds</h2>
+<p>Although Meta publishes ranking documents steadily, it <strong>has never written about diversity and dedup at the algorithm level</strong> <span class="badge est">inferred</span>. This contrasts with X, where the form of the decay function, the MMR formula, and the trigger conditions of the 6 dedup filters can be read line by line. This is not a gap in our survey but a finding we made.</p>
+<ul>
+<li>The documents Meta keeps publishing are 30 per-surface AI system cards, DSA risk assessment documents, and engineering blogs.<ul>
+<li>An AI system card is a document that explains the ranking approach for each surface, and DSA is the EU Digital Services Act.</li>
+</ul>
+</li>
+<li>These documents disclosed prediction head names, individual feature sentences, per-stage candidate counts, and even how weights are set.</li>
+</ul>
+<p>The diversity statements available for Meta&#39;s main feeds are <strong>all</strong> listed below.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>All published sentences</th>
+<th>Grade and source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Facebook Feed</td>
+<td>Blog (<span class="nw">2021</span>) description of pass 2: <em>&quot;the contextual pass. Here, contextual features, such as <strong>content-type diversity rules</strong>, are added to help diversify Juan&#39;s News Feed.&quot;</em> Card description: <em>&quot;tries to ensure that your Feed has a <strong>balanced mix of content types</strong>. That means, for example, <strong>you wouldn&#39;t see multiple video posts in a row</strong>&quot;</em></td>
+<td><span class="badge ok">verified</span> <a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/" target="_blank" rel="noopener">engineering.fb.com, <span class="nw">2021</span></a> · <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">fb-feed card</a></td>
+</tr>
+<tr>
+<td>Instagram Feed</td>
+<td><em>&quot;The system also tries to ensure your feed has a balanced mix of content types.&quot;</em> It is <strong>even less specific</strong> than the Facebook sentence</td>
+<td><span class="badge ok">verified</span> <a href="https://transparency.meta.com/features/explaining-ranking/ig-feed/" target="_blank" rel="noopener">ig-feed card</a></td>
+</tr>
+<tr>
+<td>Instagram (Mosseri)</td>
+<td><em>&quot;we try to avoid showing <strong>too many</strong> posts from the same person <strong>in a row</strong>, or <strong>too many</strong> suggested posts back to back&quot;</em></td>
+<td><span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/announcements/instagram-ranking-explained" target="_blank" rel="noopener">Instagram Ranking Explained, <span class="nw">2023</span></a></td>
+</tr>
+<tr>
+<td>Instagram Explore</td>
+<td>&quot;in case we would like to increase the diversity of results, we might <strong>shuffle items based on some business rules</strong> (e.g., <strong>&#39;Do not show items from the same authors in a sequence&#39;</strong>)&quot;. <strong>This is the only sentence on a Meta organic surface that gives a rule as an example.</strong> However, it says &quot;in case we would like to&quot;, so whether it actually fires is unconfirmed</td>
+<td><span class="badge ok">verified</span> <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system, <span class="nw">2023</span></a></td>
+</tr>
+<tr>
+<td>Threads</td>
+<td><strong>Not a single sentence.</strong> There is not even a statement at the level of <em>&quot;multiple video posts in a row&quot;</em></td>
+<td><span class="badge obs">observed</span> <span class="nw">2026-08-09</span> (body text of the <a href="https://transparency.meta.com/features/explaining-ranking/ig-threads-feed/" target="_blank" rel="noopener">ig-threads-feed card</a>, 1 item)</td>
+</tr>
+</tbody></table></div>
+<p><strong>For algorithm names such as MMR/DPP, decay functions, thresholds N, and dedup rules, we found no primary source for any of them (no primary source found)</strong> <span class="badge est">inferred</span>.</p>
+<ul>
+<li>The corpus we examined is the 6 primary sources in the table above, 15 Transparency Center system cards, and the body text of engineering.fb.com, ai.meta.com, and about.instagram.com (accessed 2026-08-09).</li>
+<li>This result is not evidence that undisclosed material also lacks them.</li>
+<li>Author diversity alone is an exception. Explore gave &quot;same authors in a sequence&quot; as an example (see the table above).</li>
+<li class="warn">⚠ The Instagram <strong>notification</strong> blog (2025) names &quot;maximal marginal relevance (MMR)&quot;. However, it concerns notifications rather than feeds, so the scope of the absence claim above is <strong>limited to feed surfaces</strong> <span class="badge ok">verified</span>.</li>
+</ul>
+<p>What can be known is only the <strong>position</strong> where diversity is applied. Diversity is applied in <strong>pass 2</strong>, a separate pass after pointwise scoring ends <span class="badge ok">verified</span> 2021. This is structurally the same position as X placing MMR and DPP in a post-selection stage <span class="badge est">inferred</span>.</p>
+<p>There is also a statement that listwise (looking at the whole list together) prediction and delivery frequency control exist <span class="badge ok">verified</span> <a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">ai.meta.com, 2023</a>. However, their form is not public.</p>
+<blockquote>
+<p><em>&quot;pointwise <strong>and listwise</strong> predictions&quot;</em></p>
+</blockquote>
+<blockquote>
+<p><em>&quot;personalized methodology for <strong>delivery frequency control</strong> to optimize for long-term user value&quot;</em></p>
+</blockquote>
+<h3 id="however-facebook-also-uses-diversity-as-a-ranking-feature">However, Facebook also uses diversity as a ranking feature</h3>
+<p><strong>On Facebook, the same diversity concept is both a re-ranking rule and a ranking input.</strong> A corresponding feature actually exists on the card <span class="badge ok">verified</span> <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">fb-feed</a>.</p>
+<blockquote>
+<p><em>&quot;Number of times you have seen posts with the same content type (e.g. video, photo, etc) as the current post <strong>in the past hour</strong>&quot;</em></p>
+</blockquote>
+<p>Within the scope this repository recorded, X&#39;s diversity on the home-mixer serving path is entirely post-hoc score manipulation (decay, MMR, DPP, dedup), and no ranker feature of the &quot;how many times has the user recently seen the same type&quot; family appears. However, <strong>we did not review X&#39;s full ranker feature list to confirm this, so it is <span class="badge est">inferred</span>.</strong> Confirming it would settle whether this contrast holds (see <a href="#not-yet-confirmed">&quot;Not Yet Confirmed&quot;</a> below).</p>
+<p>The decoder in section 5, which learns a diversity penalty, is excluded from this contrast because its serving switch is off by default <span class="badge ok">verified</span> (<a href="#5-learned-slate-decoder--2026-10-training-code-only-released">section 5</a>).</p>
+<h3 id="the-only-exception--the-multiplicative-penalty-in-instagram-notifications-2025">The only exception — the multiplicative penalty in Instagram notifications (2025)</h3>
+<p>The post on Instagram notification ranking is <strong>the most mechanical diversity disclosure in all of Meta</strong>. However, its subject is <strong>notifications, not feeds.</strong> This framework multiplies a notification candidate&#39;s base relevance score by a multiplier that cuts the score according to similarity to recently sent notifications <span class="badge ok">verified</span> (see the quote from the post below).</p>
+<pre tabindex="0"><code>Score(c) = R(c) × D(c)
+D(c) = ∏_{i=1..m} (1 - w_i · p_i(c))
+p_i(c) = max_{h ∈ H} sim_i(c, h)
+</code></pre>
+<p>Source: <a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a>, 2025-09-02</p>
+<p class="warn">⚠ <strong>The three lines above are not a verbatim quote.</strong> In the original post, these formulas are <strong>rendered as LaTeX images (<code>latex.php?latex=…</code>)</strong>, so they do not exist as body text. The notation above was transcribed from looking at those images <span class="badge obs">observed</span> 2026-08-09 (we fetched the post body and confirmed that every formula position is an image tag).</p>
+<p>However, <strong>each component is directly supported by prose in the body rather than by the images</strong> <span class="badge ok">verified</span> same post:</p>
+<ul>
+<li>They combine by multiplication: <em>&quot;the product of its base ranking score and a diversity demotion multiplier&quot;</em></li>
+<li><em>&quot;R(c) represents the candidate&#39;s base relevance score&quot;</em></li>
+<li><em>&quot;D(c) ∈ [0,1] is a penalty factor that reduces the score based on similarity to recently sent notifications&quot;</em></li>
+<li><em>&quot;sim_i(·,·) is a predefined similarity function for dimension i&quot;</em></li>
+</ul>
+<p>→ Only the exact form of the product symbol and the <code>max</code> operator depends on the images; the rest (the multiplicative structure, the definitions of <code>R</code> and <code>D</code>, and the fact that the comparison target is recent send history) is confirmed by text <span class="badge est">inferred</span>. The interpretation below is based on that text.</p>
+<ul>
+<li>Symbol meanings:<ul>
+<li><code>R(c)</code>: base relevance</li>
+<li><code>D(c) ∈ [0,1]</code>: penalty</li>
+<li><code>H</code>: <strong>recent send history</strong></li>
+<li><code>w_i ∈ [0,1]</code>: per-dimension strength</li>
+<li><code>τ_i</code>: similarity threshold</li>
+</ul>
+</li>
+<li>The baseline implementation defines <code>p_i(c)</code> this way: <em>&quot;equals 1 if the similarity exceeds a threshold τ_i and 0 otherwise&quot;</em>. That is, it is <strong>a step function, not a continuous similarity</strong>.</li>
+<li>There are 4 dimensions: <strong>content / author / notification type / product surface</strong></li>
+</ul>
+<p>Placed next to X&#39;s two forms, all three differ.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col><col><col class="w10"></colgroup>
+<thead>
+<tr>
+<th></th>
+<th>Comparison set</th>
+<th>Direction</th>
+<th>Combination</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>X <span class="nw">2025</span> MMR</td>
+<td><strong>Candidates already selected</strong> in this request</td>
+<td><strong>Rewards</strong> distance</td>
+<td>Addition</td>
+</tr>
+<tr>
+<td>X <span class="nw">2025</span> category penalty</td>
+<td>Category counts in this request</td>
+<td><strong>Penalty</strong> for sameness</td>
+<td>Addition</td>
+</tr>
+<tr>
+<td>IG <span class="nw">2025</span> notifications</td>
+<td><strong>Recent send history <code>H</code></strong> (outside the request)</td>
+<td><strong>Penalty</strong> for similarity</td>
+<td><strong>Multiplication</strong></td>
+</tr>
+</tbody></table></div>
+<p>Two points matter especially.</p>
+<ul>
+<li><strong>The comparison set differs.</strong> X&#39;s MMR compares candidates with each other within the slate, whereas Instagram notifications compare against <strong>what was already sent in the past</strong>. Notifications are not a slate but a stream sent one at a time along the time axis, so the comparison target has to be history <span class="badge est">inferred</span>.</li>
+<li><strong>Multiplication makes it a veto.</strong> When <code>w_i = 1</code> and the similarity exceeds the threshold, <code>D(c) = 0</code> and the whole score becomes 0. With X&#39;s additive form, relevance can win however large the penalty is, and the category version sets a floor with <code>max(…, 0.00001)</code> <span class="badge ok">verified</span>. The property that a multiplicative penalty works as a <strong>hard veto</strong> is of the same nature as the Instagram 2020 value model → <a href="multi-task-ranking.html">multi-task-ranking.md</a>.</li>
+</ul>
+<h3 id="retrieval-stage-diversity--instagrams-main-effort-may-be-here">Retrieval-stage diversity — Instagram&#39;s main effort may be here</h3>
+<p>Instagram&#39;s diversity may rely mainly on <strong>mixing in advance at the candidate generation stage</strong> rather than on re-arranging after ranking <span class="badge est">inferred</span>. The post-ranking wording stays at the level of <em>&quot;too many&quot;</em>, whereas on the retrieval side even method names and parameter values appear.</p>
+<p>The retrieval DSL (the language for writing candidate generation queries) has a one-line <code>diversify_by(seed_id, method=round_robin)</code> <span class="badge ok">verified</span> — <a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a>, 2020. This is <strong>round-robin per seed account</strong>, and <code>max_media_per_account=10</code> in the same query is of the same kind.</p>
+<p>X also places a round-robin weave in tweet-mixer (mixing source and signal buckets in turn) and a dedup of 1 post per author for low-signal users at the retrieval stage, so <strong>the stage of application itself is shared</strong> <span class="badge est">inferred</span> → <a href="candidate-allocation.html">candidate-allocation.md</a>.</p>
+<h3 id="debunk--instagram-blocks-3-consecutive-posts-from-the-same-account">Debunk — &quot;Instagram blocks 3 consecutive posts from the same account&quot;</h3>
+<p><strong>We could not find a Meta primary source</strong> for this widely repeated story <span class="badge est">inferred</span>. The corpus checked is the same as in <a href="#case-meta--nothing-published-for-the-main-feeds">the Meta case section</a> (15 cards and 3 Meta blog families, read 2026-08-09). <strong>The one thing we confirmed directly is that Mosseri&#39;s actual sentence contains no number</strong> <span class="badge obs">observed</span> 2026-08-09 (1 post body, quoted below).</p>
+<p>Mosseri&#39;s actual sentence is below <span class="badge ok">verified</span> — <a href="https://about.instagram.com/blog/announcements/instagram-ranking-explained" target="_blank" rel="noopener">Instagram Ranking Explained</a>, 2023-05-31.</p>
+<blockquote>
+<p><em>&quot;we try to avoid showing <strong>too many</strong> posts from the same person <strong>in a row</strong>, or <strong>too many</strong> suggested posts back to back&quot;</em></p>
+</blockquote>
+<ul>
+<li>He said &quot;too many&quot;, so there is no threshold. He said &quot;try to avoid&quot;, so it is not a hard constraint either.</li>
+<li><strong>We could not find the number &quot;3&quot; in Meta documents</strong> <span class="badge est">inferred</span> (same corpus).</li>
+<li>The same sentence states <strong>two different constraints</strong>. One is consecutive posts from the same author; the other is <strong>consecutive suggested (unconnected) posts</strong>. The latter has no counterpart statement for Facebook.</li>
+<li>Ironically, <strong>X is the one with a constant &quot;3&quot; actually in code</strong> <span class="badge ok">verified</span>. <code>MaxCandidatesPerCommunity = 1</code> and <code>MaxCommunityCandidates = 3</code> are those values <span class="badge ok">verified</span> (table in section 4). For author diversity, X&#39;s function form (<code>(1-floor)·decay^n + floor</code>) is also readable, and the coefficient values are decay 0.5 and floor 0.25 in the Gen4 (<code>47c1bcd</code>) mirror <span class="badge ok">verified</span> (<a href="#1-author-diversity-decay-2026">section 1</a>).</li>
+<li>This misunderstanding has the same shape as X&#39;s &quot;in-network 50:50&quot; (the story that posts from followed and unfollowed accounts are mixed half and half) <span class="badge est">inferred</span>. <strong>One qualitative sentence hardens into a specific constant as it circulates</strong> <span class="badge est">inferred</span>. The section that covers that misunderstanding is in <a href="candidate-allocation.html">candidate-allocation.md</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-netflix--the-unit-of-diversity-is-the-page-not-the-list">Case: Netflix — the unit of diversity is the page, not the list</h2>
+<p>As of TMIS 2015, Netflix&#39;s diversity sits in the row selection stage, not in a re-ranking layer <span class="badge ok">verified</span>. Because the home is a 2-dimensional page of rows × columns rather than a single stream, the position where diversity is applied also differs from X and Meta. The primary source for the fifth approach, calibration, is also on the Netflix side, but there is no production deployment claim <span class="badge est">inferred</span>.</p>
+<p>When choosing about 40 rows from tens of thousands of candidate rows per member, it &quot;optimizes for relevance and diversity&quot; <span class="badge ok">verified</span> <a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">TMIS 2015</a>.</p>
+<ul>
+<li>It dropped templates in 2015 and allows &quot;a home with no BYW rows at all, or a home that is half BYW.&quot; BYW is a Because You Watched row.</li>
+<li>Because templates were dropped, diversity is a <strong>page composition problem</strong>, not a problem of manipulating item order.</li>
+<li>If X&#39;s MMR and DPP deal with &quot;how to rearrange a sorted list,&quot; Netflix deals with &quot;which rows of different perspectives to place side by side.&quot;</li>
+</ul>
+<p><strong>The primary source for the fifth approach, calibration, is Steck&#39;s paper.</strong> <a href="https://dl.acm.org/doi/10.1145/3240323.3240372" target="_blank" rel="noopener">Calibrated Recommendations (RecSys 2018)</a> does greedy re-ranking with a KL-divergence penalty so that if a user watched 70% romance and 30% action, the recommendation list keeps that ratio. The form is greedy re-ranking like MMR, but the goal is <strong>&quot;match the history distribution,&quot; not &quot;make items differ from each other.&quot;</strong> Optimizing only for accuracy lets the majority taste (action) monopolize the list. Calibration is the device that prevents that monopoly (crowding-out).</p>
+<ul>
+<li class="warn">⚠ <strong>There is no production deployment claim.</strong> The paper proposes a methodology. We could not find a sentence saying &quot;we deployed calibration&quot; in any Netflix blog post or talk <span class="badge est">inferred</span>. The corpus checked is all tags of netflixtechblog and the research.netflix.com publication list (read 2026-08-09). <strong>Do not write &quot;Netflix uses calibrated recommendations&quot;; &quot;a Netflix researcher proposed it&quot; is as far as is safe.</strong></li>
+<li>There is still a reason to keep it in this note. Decay, MMR, DPP, and dedup all belong to the &quot;penalize sameness&quot; family, while calibration alone follows a different criterion: <strong>distribution matching</strong>. So it makes us ask first, &quot;what is this diversity aiming at?&quot; when looking at a diversity layer.</li>
+</ul>
+<p><strong>Dedup may point in the opposite direction.</strong> X removes duplicates with 6 dedup filters. Netflix home, meanwhile, appears to allow the same title in several rows.</p>
+<ul>
+<li>Each row has a different recommendation <strong>reason</strong>, such as genre, BYW, or Trending, and once artwork personalization (full rollout in 2017 <span class="badge ok">verified</span>) is layered on, a duplicate impression of the same title works as &quot;a retry with a different explanation&quot; <span class="badge est">inferred</span>.</li>
+<li>We have not found a primary source for the cross-row duplication rule, and have not yet observed it directly.</li>
+<li>If confirmed, it becomes a case where the premise of item 4 in the top list, &quot;dedup is hygiene,&quot; is overturned depending on surface structure.</li>
+</ul>
+<p><strong>Artwork is a separate lever that moves perceived diversity.</strong> Even for the same title, a different image is picked per member with a bandit (online learning that adjusts choices by watching responses), and this approach was fully rolled out in 2017 <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76" target="_blank" rel="noopener">blog post</a>: <em>&quot;we&#39;ve rolled it out to everyone!&quot;</em></p>
+<p>Even with the same item set, the visual diversity of the screen differs. It is a layer with no counterpart in the X or Meta literature.</p>
+<p>Details are in <a href="netflix.html">netflix.md</a>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-generalizes-from-this-case">What generalizes from this case</h2>
+<ul>
+<li><strong>Diversity overwrites the ranking score.</strong> X overwrites the <code>score</code> field as-is in both the 2025 MMR and the 2026 VMRanker. When you see a &quot;ranker score&quot; in a log, check which stage the value comes from. This is why X 2026 keeps <code>weighted_score</code> and <code>score</code> as separate fields <span class="badge ok">verified</span> <code>ranking_scorer.rs:277-281</code>.</li>
+<li><strong>Put a floor on decay.</strong> Make it a penalty rather than a cap, so that popular authors do not disappear completely.</li>
+<li><strong>Expensive diversity (MMR/DPP) is applied to the already narrowed list, not the whole candidate pool.</strong> In both X 2025 and 2026 it is placed in the post-selection stage <span class="badge est">inferred</span> (for 2025 the hook is not in the vendored core, so we could not confirm where it runs).</li>
+<li><strong>Diversity is applied toward the back of the list, not the front.</strong> X 2025 MMR adds a constant to the first <code>(1-diversityRatio)×n</code> items, effectively preserving pure relevance order. The distance reward is given only after that. The top few follow accuracy and those below follow diversity, and this division is explicit.</li>
+<li><strong>The diversity layer is fail-open.</strong> The feed goes out without this layer, so if it stops silently, nobody notices. Decay runs inside the same process and does not stop, while DPP is a remote call and does stop. This asymmetry explains why decay is kept <span class="badge est">inferred</span>.</li>
+<li><strong>Keep dedup rules narrow.</strong> X repeatedly uses the condition &quot;only when exactly 1&quot;. It appears to have judged that over-removal costs more than under-removal <span class="badge est">inferred</span>.</li>
+<li><strong>What is not published is also data.</strong> Meta publishes even how it sets prediction heads, candidate counts, and weights, yet stays consistently silent only on diversity and dedup. This may be because diversity rules amount to &quot;what to show less,&quot; which easily becomes a target of policy disputes <span class="badge est">inferred</span>. The only evidence is that the direction matches the pattern of demotion (impression demotion) documents being heavily deleted in 2025 → <a href="facebook.html">facebook.md</a>.</li>
+<li><strong>Whether a penalty is multiplicative or additive decides whether it is a veto.</strong> The multiplication in IG notifications sets the score to 0 when items are similar. The additive form in X MMR and categories leaves room for relevance to win. The same name &quot;diversity penalty&quot; points to opposite strengths.</li>
+<li><strong>When reading diversity logic, first ask what the comparison reference set is.</strong> Check first whether it compares within the slate, as X MMR does, or against past impression and send history, as IG notifications do. Even with the same max-similarity formula, this choice makes it a completely different approach.</li>
+<li><strong>There is no rule that diversity must live only in post-hoc re-ranking.</strong> Facebook uses &quot;the number of same-content-type impressions in the last 1 hour&quot; <strong>as a ranking feature</strong>, and Instagram states round-robin explicitly in the retrieval DSL. Looking only for post-hoc layers misses half.</li>
+<li><strong>Surface structure decides the unit of diversity.</strong> In a single stream (X, Meta), adjacency within the list is the problem, so decay and MMR are the answer. In a 2-dimensional page (Netflix), row composition is the problem, so diversity moves into the row selection algorithm. The same word &quot;diversity&quot; manipulates different objects.</li>
+<li><strong>&quot;Penalize sameness&quot; and &quot;match the distribution&quot; are different goals.</strong> Decay, MMR, and DPP penalize adjacent sameness, while calibration fits the genre distribution of the whole list to the history. The former lets the top-scoring taste monopolize the list as long as the items differ. The latter prevents that monopoly (crowding-out) itself.</li>
+<li><strong>Publishing the formula and deploying are separate.</strong> Netflix calibration is one of the few diversity algorithms whose full formula is public via a RecSys paper, yet there is no deployment claim. Conversely, Meta&#39;s deployment is certain (pass 2) but there is no formula. &quot;Level of disclosure&quot; and &quot;certainty of deployment&quot; are independent criteria.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="who-uses-this">Who uses this</h2>
+<p>X has all four diversity approaches readable as source code <span class="badge ok">verified</span>. Threads, meanwhile, has no primary source at all for diversity and dedup <span class="badge obs">observed</span> 2026-08-09.</p>
+<ul>
+<li><strong>X</strong>: <strong>All four approaches are readable as source code.</strong> → <a href="x.html">x.md</a> <span class="badge ok">verified</span><ul>
+<li>2025: MMR, category penalty, 6 dedup filters</li>
+<li>2026: author decay, DPP, 3 dedup filters. Since 2026-10 there is also training code for a trained slate decoder.</li>
+</ul>
+</li>
+<li><strong>Facebook</strong>: The pass 2 context pass has a content-type diversity rule. The algorithm is undisclosed, and the only concrete rule is the single line <em>&quot;multiple video posts in a row&quot;</em>. Instead, <strong>the same concept also exists as a ranking feature.</strong> → <a href="facebook.html">facebook.md</a> <span class="badge ok">verified</span></li>
+<li><strong>Instagram</strong>: The feed has only wording at the level of <em>&quot;too many … in a row&quot;</em>. Retrieval has <code>diversify_by(round_robin)</code>. <strong>Only for notifications did it publish the full multiplicative penalty formula.</strong> → <a href="instagram.html">instagram.md</a> <span class="badge ok">verified</span></li>
+<li><strong>Threads</strong>: There is <strong>no primary source at all</strong> for diversity and dedup. → <a href="threads.html">threads.md</a> <span class="badge obs">observed</span> 2026-08-09 (body of the ig-threads-feed card and 2 Threads engineering blog posts)</li>
+<li><strong>Netflix</strong>: Diversity is in the row selection stage (since 2015). It published the calibration formula (2018, deployment unconfirmed). It has a separate lever, artwork personalization, and dedup may in fact be looser. → <a href="netflix.html">netflix.md</a> <span class="badge ok">verified</span></li>
+<li><strong>Other services</strong>: Not yet investigated. <strong>This is an open question.</strong></li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="not-yet-confirmed">Not yet confirmed</h2>
+<p>We have not yet answered the questions below.</p>
+<ul>
+<li><strong>Does the X ranker input have a feature in the family of &quot;recent impressions of the same content type&quot;?</strong> To write that there is none, the whole repo must be checked. The contrast with Facebook depends on this check.</li>
+<li><strong>The form of Meta&#39;s pass 2 diversity rule.</strong> We do not even know whether it is a hard slot constraint or a score penalty → <a href="facebook.html">facebook.md</a> open question 2.</li>
+<li><strong>Does the Instagram notification framework also apply to the feed?</strong> The post limits its wording to the notification surface.</li>
+<li><strong>Does a diversity or dedup layer actually exist on Threads?</strong> We cannot tell whether the absence means &quot;not published&quot; or &quot;does not exist.&quot;</li>
+<li><strong>The form of Meta&#39;s listwise prediction and delivery frequency control.</strong> Only existence statements exist, with no mechanical wording.</li>
+<li><strong>Whether Netflix calibration is deployed.</strong> There is only the paper and no deployment claim.</li>
+<li><strong>Netflix&#39;s rule for allowing duplicates across rows.</strong> There is no primary source or direct observation yet.</li>
+<li><strong>Where does diversity go under a GenPage regime?</strong> If the explicit point of applying diversity, row selection, disappears, diversity dissolves implicitly into the learned generative distribution. There is no statement on this → <a href="netflix.html">netflix.md</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<h3 id="public-source-code">Public source code</h3>
+<ul>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, public source code (Apache 2.0). <code>home-mixer/scorers/</code>, <code>home-mixer/filters/</code>, <code>candidate-pipeline/</code>. The topic request paragraph in section 5 and the DPP section is as of commit <code>17c96bf</code> (2026-10-14). The home-mixer line-number quotes in sections 1 and 3 are as of <code>0bfc279</code>, the Gen4 defaults as of <code>47c1bcd</code>, and the DPP kernel as of <code>862a123</code>. Other line-number quotes without a sha are as of the time of writing (2026-08).</li>
+<li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — commit <code>c54bec0</code> of 2025-09-03, public source code. <code>home-mixer/</code>.</li>
+</ul>
+<h3 id="meta-blog-posts">Meta blog posts</h3>
+<ul>
+<li><a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a> — 2025, blog post. <strong>The only diversity formula Meta has published.</strong></li>
+<li><a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/" target="_blank" rel="noopener">How machine learning powers Facebook&#39;s News Feed ranking algorithm</a> — 2021, blog post. Pass 2 is the contextual pass.</li>
+<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> — 2020, blog post. <code>diversify_by(seed_id, method=round_robin)</code>.</li>
+<li><a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">The AI behind unconnected content recommendations</a> — 2023, blog post. pointwise and listwise, delivery frequency control.</li>
+<li><a href="https://about.instagram.com/blog/announcements/instagram-ranking-explained" target="_blank" rel="noopener">Instagram Ranking Explained</a> — 2023-05-31, blog post. <strong>Primary basis for the rebuttal of &quot;3 in a row&quot;.</strong></li>
+</ul>
+<h3 id="meta-transparency-center-primary-documents-for-regulatory-compliance">Meta Transparency Center (primary documents for regulatory compliance)</h3>
+<ul>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">fb-feed</a> · <a href="https://transparency.meta.com/features/explaining-ranking/ig-feed/" target="_blank" rel="noopener">ig-feed</a> · <a href="https://transparency.meta.com/features/explaining-ranking/ig-threads-feed/" target="_blank" rel="noopener">ig-threads-feed</a> — AI system card. Evidence for the diversity wording and its absence.</li>
+</ul>
+<h3 id="netflix">Netflix</h3>
+<ul>
+<li><a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">The Netflix Recommender System (TMIS)</a> — 2015, paper. Relevance and diversity optimization in row selection, retirement of templates.</li>
+<li><a href="https://dl.acm.org/doi/10.1145/3240323.3240372" target="_blank" rel="noopener">Calibrated Recommendations (Steck, RecSys)</a> — 2018, paper. <strong>Primary source of the calibration formula. There is no deployment claim.</strong></li>
+<li><a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76" target="_blank" rel="noopener">Artwork Personalization</a> — 2017, blog post. Full rollout statement.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/feed-diversity.html" data-title="피드 다양성 — 점수순 정렬을 일부러 망가뜨리는 레이어"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

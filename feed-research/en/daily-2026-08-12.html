@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-08-12 — feed-research</title>
+<meta name="description" content="In one line: There were no new announcements from the tracked X, Meta, or Netflix. Instead, four recommendation papers from Alibaba and Kuaishou, published…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-08-12.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-08-12.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-08-12.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-08-12.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-08-12 — feed-research">
+<meta property="og:description" content="In one line: There were no new announcements from the tracked X, Meta, or Netflix. Instead, four recommendation papers from Alibaba and Kuaishou, published…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-08-12.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-08-12.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-08-12">2026-08-12</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Wednesday</li>
+<li><span class="meta-k">Reading time</span>13 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-08-12.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>4</b> (all radar candidates)</li><li class="chip">Canon files updated: <b>0</b></li><li class="chip">Radar entries: <b>2</b> new, 2 open threads updated</li></ul>
+<div class="lead"><span class="lb">In one line</span>There were no new announcements from the tracked X, Meta, or Netflix. Instead, four recommendation papers from Alibaba and Kuaishou, published within the same three days and containing production statements, passed the acceptance criteria.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">6</span></summary><ol><li><a href="#1-an-llm-writes-executable-ranking-strategies-instead-of-scores--taobao"><span class="num">1</span>An LLM writes executable ranking strategies instead of scores — Taobao</a></li><li><a href="#2-generate-the-sid-first-and-attach-explanatory-copy-only-when-needed--kuaishou"><span class="num">2</span>Generate the SID first and attach explanatory copy only when needed — Kuaishou</a></li><li><a href="#3-leave-the-pipeline-as-is-and-an-agentic-layer-on-top-tunes-the-parameters--taobao"><span class="num">3</span>Leave the pipeline as is, and an agentic layer on top tunes the parameters — Taobao</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>Taobao&#39;s MetaStrategy has an LLM write ranking strategies instead of scores, and runs that inference outside the serving path.</li>
+<li>Kuaishou&#39;s PushDualGen generates the SID (semantic ID, an ID that turns an item&#39;s semantic embedding into a sequence of discrete tokens) first and attaches explanatory copy only when needed.</li>
+<li>In Taobao&#39;s DREAM, the existing recommendation pipeline stays as is, and an agentic layer on top of it adjusts parameters.</li>
+</ul>
+<h2 id="1-an-llm-writes-executable-ranking-strategies-instead-of-scores--taobao"><span class="num">1</span>An LLM writes executable ranking strategies instead of scores — Taobao</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2608.09440" target="_blank" rel="noopener">MetaStrategy: Generative Ranking with Executable LLM Strategies</a> — arXiv 2608.09440, 2026-08-10, paper (Alibaba/Taobao, 15 authors)</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The production statements this repository has tracked on how to put an LLM in the serving path fall into two families. In Netflix GenRec, the LLM itself becomes the scoring function and scores items (<a href="netflix.html">services/netflix.md</a> GenRec section). In Yandex Music Gryphon-v2, the LLM generates Semantic-ID sequences and replaces retrieval and ranking in one step (<a href="radar.html">radar.md</a> new this month). In both families, the LLM is a function that runs in real time on the online serving path, which means the LLM must run on every request. This paper&#39;s MetaStrategy is a third approach: the LLM is not in the serving path, and it writes and deploys the ranking strategy itself.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The LLM outputs an executable policy bundle, not a score</span></p></div>
+<ul>
+<li><p>What the LLM outputs is an executable policy bundle, not a score <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The LLM takes the request context and emits a typed JSON bundle. The bundle contains objective weights, content/category preferences, experience constraints, and position policies.</li>
+<li>Put plainly, the bundle says, &quot;for this slot, set the objective function weights like this, the category preferences like this, and the position policy like this.&quot;</li>
+<li>A deterministic validator and compiler instantiate this bundle as an isolated Generator. This Generator is compiled deterministically into the Generator role of the Generator-Evaluator (GE) architecture.</li>
+<li>The GE architecture is a re-ranking structure in which a Generator builds a candidate list and an Evaluator scores the list. Here, the list-level Evaluator makes the new Generator compete atomically with the incumbent (the existing strategy).</li>
+</ul>
+<blockquote>
+<p>&quot;a large language model (LLM) policy emits a typed JSON bundle controlling objective weights, content and category preferences, experience constraints, and position policies. A deterministic validator and compiler instantiate an isolated Generator that competes atomically with incumbents under the list-level Evaluator of the Generator-Evaluator (GE) architecture.&quot;
+— <a href="https://arxiv.org/abs/2608.09440" target="_blank" rel="noopener">MetaStrategy abstract</a>, 2026-08-10</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. LLM inference runs nearline, and there is no observable increase in the response time of synchronous ranking</span></p></div>
+<ul>
+<li><p>LLM inference runs nearline (precomputed close to real time, separately from request handling) <span class="badge ok">verified</span>. There is no observable increase in the response time (RT) of synchronous ranking <span class="badge ok">verified</span>.</p>
+<ul>
+<li>It was deployed on the Taobao homepage &quot;Guess You Like&quot; surface using diff-triggered nearline generation.</li>
+<li>LLM inference does not run synchronously with the request. The LLM runs outside the serving request, and only the compiled strategy is applied online.</li>
+</ul>
+<blockquote>
+<p>&quot;We deploy MetaStrategy in Taobao Homepage Guess You Like through diff-triggered nearline generation; LLM inference remains outside synchronous ranking, with no observable increase in response time (RT).&quot;
+— <a href="https://arxiv.org/abs/2608.09440" target="_blank" rel="noopener">same abstract</a>, 2026-08-10</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. In a user-level A/B, clicks, item detail views, and transaction value all improved</span></p></div>
+<ul>
+<li>In an A/B with users randomly assigned for 7 days, click PV, item-detail PV, and transaction value all improved <span class="badge ok">verified</span>. This is a statement obtained in the production environment.<ul>
+<li>MetaStrategy beat the incumbent in 27.93% of treatment-group GE calls.</li>
+<li>Click PV improved by +2.11%, item-detail PV by +3.12%, and transaction value by +2.83%.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The policy is trained in an environment that replays real requests, and compressed into a small student model</span></p></div>
+<ul>
+<li><p>The policy is trained in a production-path replay environment <span class="badge ok">verified</span>. It is an environment that re-executes requests actually left in the logs through the current re-ranking stack without exposing them to users.</p>
+<ul>
+<li>The reward is built by combining three kinds: selection, relative-rank, and baseline-lift.</li>
+<li>It applies a self-competitive curriculum, which feeds frequent strategies back in as competitors, together with Evaluator-routed on-policy distillation, and compressed two 4B teachers into one 0.8B student.</li>
+</ul>
+<blockquote>
+<p>&quot;self-competitive curriculum that feeds frequent strategies back as competitors, and Evaluator-routed reward-augmented on-policy distillation that transfers complementary 4B-parameter Teachers into a compact 0.8B-parameter Student.&quot;
+— <a href="https://arxiv.org/abs/2608.09440" target="_blank" rel="noopener">same abstract</a>, 2026-08-10</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> None. Added as a new entry under &quot;new this month&quot; in <a href="radar.html">radar.md</a>. Appended the line &quot;a third angle, different from GenRec/Gryphon&quot; to the <a href="radar.html#spread-of-llm-native-ranking--who-follows-after-genrec">LLM-native ranking open thread</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> MetaStrategy presents, with a production statement, a third way of using the LLM as an offline policy compiler. This repository&#39;s <a href="llm-in-recsys.html">LLM-in-recsys topic</a> has so far covered two ways of putting an LLM in the serving path (scoring function and generator).</p></div>
+<ul>
+<li>The approach has two advantages. LLM latency is not exposed to users, so a large and slow model can be used. And because the output is typed JSON, it combines naturally with the deterministic guardrails of the existing ranking stack.</li>
+<li>In exchange, it pays the cost that the LLM cannot react to per-request detail. The GenRec/Gryphon side is bound to be ahead in reading real-time intent within a session.</li>
+<li><a href="#3-leave-the-pipeline-as-is-and-an-agentic-layer-on-top-tunes-the-parameters--taobao">DREAM</a>, published at Taobao within the same three days, addresses real-time intent, the problem that remains as that cost, in a different way. That is why the symmetry of the two approaches is interesting.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-generate-the-sid-first-and-attach-explanatory-copy-only-when-needed--kuaishou"><span class="num">2</span>Generate the SID first and attach explanatory copy only when needed — Kuaishou</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2608.07989" target="_blank" rel="noopener">PushDualGen: Enabling LLMs to Generate Semantic IDs with Interpretable Copy for Industrial Push Recommendation</a> — arXiv 2608.07989, 2026-08-08, paper (Kuaishou, 12 authors)</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Kuaishou is one of the few platforms publicly pushing LLM-native recommendation in production. The first generation, OneRec, performs end-to-end user personalization with SIDs, and the second generation, OneRec-Thinking, adds CoT before generating the SID to leave a reasoning trace. The problem with OneRec-Thinking is clear. CoT generates many tokens, so inference cost is high, and the burden grows on surfaces with heavy request volume such as large-scale push recommendation. This paper&#39;s PushDualGen is the third generation that fills that role.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. It generates the SID first, and generates the explanatory text at serving only when needed</span></p></div>
+<ul>
+<li><p>PushDualGen is a duo generation structure that produces the SID first and the explanatory text afterward <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The explanatory text (copy) is an additional output that can be skipped at serving time, so it is generated at serving only when needed. That lets the whole model stay a lightweight generator.</li>
+<li>Thanks to this structure, it can trace &quot;why this item was recommended&quot; without paying the cost on every request the way CoT does.</li>
+</ul>
+<blockquote>
+<p>&quot;PushDualGen, a lightweight generator, which first generates the SID and then produces a copy as a skippable explanation.&quot;
+— <a href="https://arxiv.org/abs/2608.07989" target="_blank" rel="noopener">PushDualGen abstract</a>, 2026-08-08</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Deployed to Kuaishou push recommendation; in the online A/B, effective play rate rose and dissatisfaction rate fell</span></p></div>
+<ul>
+<li><p>It stated that it was deployed to production on the Kuaishou push recommendation surface <span class="badge ok">verified</span>.</p>
+<ul>
+<li>In the online A/B, the effective play rate rose by a relative +8.50%, and the dissatisfaction rate fell by a relative 37.70%.</li>
+<li>In the long term, exposure of long-tail videos also improved.</li>
+</ul>
+<blockquote>
+<p>&quot;The effective play rate for videos recommended to users has relatively increased by 8.50%, while the dissatisfaction rate has relatively fallen by 37.70%. In the long term, PushDualGen optimises the content ecosystem, providing more exposure for long-tail videos.&quot;
+— <a href="https://arxiv.org/abs/2608.07989" target="_blank" rel="noopener">same abstract</a>, 2026-08-08</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The previous day&#39;s HD-Rec reported only benchmark results, and PushDualGen was deployed to production</span></p></div>
+<ul>
+<li>Following HD-Rec, which passed the previous day, Kuaishou&#39;s SID extension family passed the acceptance criteria two days in a row (the radar criteria: platform-company authors or production deployment/A/B claims, mechanism novelty, and large-scale results).</li>
+<li>HD-Rec is a cross-domain SID study using a hierarchical codebook and a domain sparse MoE (mixture of experts, a structure that uses only some expert networks for each input), and it presents only benchmark results. PushDualGen, by contrast, was deployed to production.</li>
+<li>The two papers are different directions of development that branched out of the same family.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> None. Appended the line &quot;2026-08-12 additional evidence&quot; to the <a href="radar.html#generative-retrieval--semantic-id">radar.md generative retrieval / semantic ID open thread</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The signal strengthens that Kuaishou keeps releasing the SID family (OneRec → OneRec-Thinking → PushDualGen) generation by generation. If this line continues, the early judgment in the <a href="radar.html#spread-of-llm-native-ranking--who-follows-after-genrec">LLM-native thread</a> that only Netflix GenRec was validated by a large-scale A/B will change before long.</p></div>
+<ul>
+<li>We have not yet confirmed whether the HD-Rec authors (Ruiming Tang, Guorui Zhou, Han Li) overlap with the PushDualGen authors.</li>
+<li>If they overlap, one team is pushing SID; if they do not, the company is pushing SID along two branches.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="3-leave-the-pipeline-as-is-and-an-agentic-layer-on-top-tunes-the-parameters--taobao"><span class="num">3</span>Leave the pipeline as is, and an agentic layer on top tunes the parameters — Taobao</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2608.09408" target="_blank" rel="noopener">DREAM Technical Report</a> — arXiv 2608.09408, 2026-08-10, paper (Alibaba/Taobao, 75 authors)</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The existing industrial recommendation pipeline has a classic bottleneck. Retrieval → ranking → re-ranking are split into modules, so information and objectives are fragmented, rules are rigid, and the pipeline cannot react to real-time intent. This paper&#39;s DREAM solves the problem with a policy layer added on top of the pipeline without changing it. An intent engine made of three layers (L0/L1/L2) compresses on-device signals into structured intent and sends it to the cloud, and the MetaModel reasons over that intent in the M1-M2-M3 stages of summary, strategy planning, and parameter translation, then adjusts the pipeline parameters.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. It filters device signals by trigger conditions and greatly reduces what is sent to the cloud</span></p></div>
+<ul>
+<li>The edge-cloud trigger chain compresses reporting volume to about 8.7% <span class="badge ok">verified</span>.<ul>
+<li>Instead of sending all on-device signals, it filters them by trigger conditions.</li>
+<li>Greatly reducing the load on the cloud side was the precondition for deployability.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. IPV and GMV rose in the A/B without changing the pipeline models</span></p></div>
+<ul>
+<li><p>In the A/B, controlling re-ranking alone improved the metrics, and extending control to fine ranking widened the improvement <span class="badge ok">verified</span>.</p>
+<ul>
+<li>With re-ranking control alone, IPV improved by +2.06%, Core IPV by +2.39%, and GMV by +0.88%.</li>
+<li>Extending control to fine ranking raised them to +2.71%, +3.06%, and +1.31% respectively, and PV also improved consistently by more than +1%.</li>
+<li>These results were obtained without replacing the models and without compromising serving stability.</li>
+</ul>
+<blockquote>
+<p>&quot;Large-scale A/B tests on Taobao&#39;s homepage feed show that re-ranking control alone improves IPV by 2.06%, Core IPV by 2.39%, and GMV by 0.88%. Extending control to fine ranking raises these gains to 2.71%, 3.06%, and 1.31%, respectively... These gains require neither replacement of pipeline models nor compromise of serving stability, supporting agentic meta-control as a viable paradigm for industrial recommendation.&quot;
+— <a href="https://arxiv.org/abs/2608.09408" target="_blank" rel="noopener">DREAM abstract</a>, 2026-08-10</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A dual loop of offline simulation and online feedback optimizes the two modules together</span></p></div>
+<ul>
+<li>A dual loop called Reward Dual Loop optimizes the intent engine and the MetaModel at the same time <span class="badge ok">verified</span>.<ul>
+<li>One loop is an offline simulation that explores the strategy space, and the other is online feedback that calibrates the results.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> None. Added as a new entry under &quot;new this month&quot; in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> DREAM and MetaStrategy are two approaches from the same company (Taobao), aimed at roughly the same surface (the homepage feed), so the symmetry is clear. MetaStrategy is a policy compiler, and DREAM is a real-time adjuster.</p></div>
+<ul>
+<li>MetaStrategy has the LLM compile policy JSON nearline and inject it into the ranking stack. DREAM has an agentic MetaModel receive on-device intent and adjust pipeline parameters.</li>
+<li>Judging from the substantially overlapping author lists, the same organization is likely experimenting along two branches. For example, Chengyu Lai, Jiuning Lin, Bin Zhang, and Han Zhu are among those named on both papers.</li>
+<li>It is worth watching whether the two approaches converge into one or are each deployed in parallel.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="corrections">Corrections</h2>
+<p>None.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<p>Of the 30 new papers skimmed today, 4 passed the acceptance criteria (3 from Alibaba, 1 from Kuaishou). The scope is new arXiv cs.IR submissions, filtered through a triage stage that looks only at titles and abstracts. Three papers from the same company (Alibaba) within three days is an unusual cluster, so it is recorded separately. In effect, large Chinese platforms disclosed, as one bundle, how they serve the LLM/SID family from different angles.</p>
+<ul>
+<li>Added MetaStrategy (section 1 above) as a new entry in <a href="radar.html#new-this-month">radar.md new this month</a> and added one line to the <a href="radar.html#spread-of-llm-native-ranking--who-follows-after-genrec">LLM-native thread</a>.</li>
+<li>For PushDualGen (section 2 above), added one line, &quot;2026-08-12 additional evidence&quot;, to the <a href="radar.html#generative-retrieval--semantic-id">SID thread</a>.</li>
+<li>Added DREAM (section 3 above) as a new entry in <a href="radar.html#new-this-month">radar.md new this month</a>.</li>
+<li>IntHQ (<a href="https://arxiv.org/abs/2608.09634" target="_blank" rel="noopener">arXiv 2608.09634</a>, 2026-08-10) gets no radar entry and is only recorded in the daily.<ul>
+<li>It is a paper from Amap (Alibaba Maps, travel recommendation).</li>
+<li>It presents a three-pronged method for fusing multi-task into generative recommendation: Dual-Stream Decoupling, Task-Interactive Modeling, and Hierarchical Querying.</li>
+<li>It reports that UVCTR improved by +1.60% in the production A/B.</li>
+<li>However, its mechanism novelty is relatively low; it is closer to tidying up an existing combination of generative and multi-task. That is why no radar entry was created.</li>
+<li>We will decide on promotion when more papers of the same family accumulate.</li>
+</ul>
+</li>
+<li>The remaining 26 were dropped from the acceptance criteria as purely academic increments (RAG optimization, academic retrieval, medical/legal/edu domains, POI, RISC-V ANNS, etc.).</li>
+<li>The industry blog sweep is done on Mondays, so it was not done today, Wednesday. The next sweep is on 2026-08-17 (Mon).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Read the MetaStrategy body closely — the body needs to confirm the three items below. The nearline LLM latency also does not appear in the abstract. <strong>Deep dive needed</strong> (a human triggers it).<ul>
+<li>Why two 4B teachers are used (the paper says they combine different strengths)</li>
+<li>How the production-path replay environment is implemented</li>
+<li>Details of the self-competitive curriculum</li>
+</ul>
+</li>
+<li>Read the DREAM body closely — the details below need to be confirmed. Because the paper has 75 authors, the team structure also needs to be understood. <strong>Deep dive needed</strong>.<ul>
+<li>The intent L0/L1/L2 schema</li>
+<li>Prompts and outputs for each MetaModel M1-M2-M3 stage</li>
+<li>Details of the on-device trigger chain</li>
+</ul>
+</li>
+<li>Write up the Kuaishou OneRec/OneRec-Thinking/PushDualGen lineage — including HD-Rec, the SID family has now passed twice in a row. A section to place alongside Netflix GenRec in <code>topics/llm-in-recsys.md</code> is becoming necessary. At the next industry blog sweep (2026-08-17), we will also look at Kuaishou&#39;s engineering material.</li>
+<li>Re-examine the relationship between the two Taobao home feed approaches (MetaStrategy vs DREAM) — the two papers target the same surface, and we need to check the author lists again to see whether they come from separate teams or are two experiments by the same team. If overlapping authors are confirmed, we will raise it as a topic candidate (policy compilation vs real-time tuning).</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-08-11.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-08-11</span></a><a class="pg-next" href="daily-2026-08-13.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-08-13</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-08-12.html" data-title="일일 리포트 2026-08-12"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

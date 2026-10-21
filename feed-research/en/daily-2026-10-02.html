@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-02 — feed-research</title>
+<meta name="description" content="In one line: X's visibility-filtering service (VF) now decides, for each action-limit reason, which actions to block and what notice text to show, and its…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-02.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-02.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-02.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-02.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-02 — feed-research">
+<meta property="og:description" content="In one line: X's visibility-filtering service (VF) now decides, for each action-limit reason, which actions to block and what notice text to show, and its…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-02.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-02.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-02">2026-10-02</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>22 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-02.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X&#39;s visibility-filtering service (VF) now decides, for each action-limit reason, which actions to block and what notice text to show, and its responses carry per-action text.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-vf-now-decides-the-blocked-actions-and-notice-text-for-action-limits--x"><span class="num">1</span>VF now decides the blocked actions and notice text for action limits — X</a></li><li><a href="#2-generative-ads-retrieval-gear-deployed-in-douyin-ads-production--radar"><span class="num">2</span>Generative ads retrieval GEAR deployed in Douyin Ads production — radar</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same X commit (2026-10-01, b79b947), abuse-enforcement-service gained a module that restarts the service when the Kafka config changes in operation.</li>
+<li>In the same commit, the phoenix-rankall config was split into a separate module, which revealed an SID (an ID that represents an item as a sequence of semantic tokens) backfill QPS cap of 800k.</li>
+<li>The GEAR paper from Douyin (ByteDance) stated that it deployed generative ads retrieval to Douyin Ads production.</li>
+</ul>
+<h2 id="1-vf-now-decides-the-blocked-actions-and-notice-text-for-action-limits--x"><span class="num">1</span>VF now decides the blocked actions and notice text for action limits — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/b79b947" target="_blank" rel="noopener">xai-org/x-algorithm@b79b947</a> — public source code, commit of 2026-10-01 02:13 UTC. These notes number X commits after the Gen4 release in order, and this commit is Gen4+33. The total change is +2,490/−506 across 47 files. Of these, 4 are new files: 3 new in VF (829 lines, of which the two limited-actions files account for 703 lines) and 1 new in abuse-enforcement (173 lines). phoenix-rankall <code>config/mod.rs</code> is modified by +84 lines.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> visibility-filtering (VF) is a service that decides, for each post, whether it may be shown to this viewer. X&#39;s For You timeline layers two kinds of visibility decisions onto ranked candidates. One is the Withheld axis of the Verdict tree, which issues drops and tombstones; the other is the restriction axis, which additionally applies a media interstitial or limited engagement to a Shown post. <code>LimitedEngagement</code> on the second axis means the viewer cannot perform actions such as reply, like, or retweet on that tweet. Until now, the code carried only &quot;one reason&quot;; which of the 26 actions to block and what to show in the UI was mapped by downstream home-mixer (the service that assembles the For You feed) or by the client. This commit brings that whole mapping into VF, declares the policy as data (FeatureSwitches and a stringcenter bundle), and promotes the payload sent over the wire into a list of &quot;action × localized Prompt&quot;.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. VF sets the actions to block and the notice text for each restriction reason as data</span></p></div>
+<p>VF has a new limited-actions policy system, made up of two new files totaling 703 lines. There are five restriction reasons: ConversationControl, ReadonlyViewer, BlockedViewer, RootAuthorBlockedViewer, and StaleTweet. In code, these five are variants of <code>LimitedEngagementReason</code>.</p>
+<ul>
+<li><p>The new policy file takes a restriction reason and resolves, through FeatureSwitches, the list of actions to block for that reason and the combination of copy settings <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/params/limited_actions_policy.rs" target="_blank" rel="noopener"><code>limited_actions_policy.rs:14-115</code></a>.</p>
+<ul>
+<li>The file is VF <code>visibility-filtering/params/limited_actions_policy.rs</code>, with 306 new lines.</li>
+<li>The input is <code>LimitedEngagementReason</code>. What it resolves is the <code>LimitedActionType</code> list attached to that reason and the combination of copy namespace / prompt_type / learn_more_url.</li>
+<li>The return value is <code>LimitedActionsPolicies</code> (reason → <code>Vec&lt;LimitedAction&gt;</code>).</li>
+</ul>
+</li>
+<li><p>The tests pin the list of actions to block for each of the five reasons <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/params/limited_actions_policy.rs" target="_blank" rel="noopener"><code>limited_actions_policy.rs:143-230</code></a>.</p>
+<ul>
+<li>ConversationControl → [Reply]</li>
+<li>BlockedViewer → 19 actions (Reply·Retweet·QuoteTweet·Like·React·SendViaDm·AddToBookmarks·AddToMoment·PinToProfile·ShareTweetVia·Follow·ListsAddRemove·Embed·CopyLink·VoteOnPoll·ShowRetweetActionMenu·ReplyDownVote·EditTweet·Highlight)</li>
+<li>RootAuthorBlockedViewer → [Reply]</li>
+<li>ReadonlyViewer → 14 actions (all write actions when the viewer is in read-only mode)</li>
+<li>StaleTweet → 15 actions (including copy, share, and view engagement)</li>
+</ul>
+</li>
+<li><p>The new copy file loads the notice text from the localized UI text bundle, and it also has a mechanism that compares the bundle hash against pinned metadata <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/limited_actions_copy.rs" target="_blank" rel="noopener"><code>limited_actions_copy.rs:1-85</code></a>.</p>
+<ul>
+<li>The file is VF <code>visibility-filtering/limited_actions_copy.rs</code>, with 397 new lines.</li>
+<li>It loads the <code>StringCenter</code> bundle, which holds the localized UI text, from <code>/config/stringcenter/visibility-ltd-actions.json</code>. The mechanism that compares the bundle hash against pinned metadata is <code>DriftCheck</code>.</li>
+<li>The bundle loader assembles <code>Prompt { headline, subtext, kind }</code> from <code>LimitedActionType</code> and <code>PromptCopy</code>.</li>
+<li><code>LimitedActionType</code> is a 26-variant enum: Reply·Retweet·QuoteTweet·Like·React·SendViaDm·AddToBookmarks·AddToMoment·PinToProfile·ViewTweetActivity·ShareTweetVia·Follow·ListsAddRemove·MuteConversation·Embed·ViewHiddenReplies·HideCommunityTweet·CopyLink·VoteOnPoll·RemoveFromCommunity·ShowRetweetActionMenu·ReplyDownVote·Autoplay·EditTweet·Highlight·ViewPostEngagements.</li>
+<li><code>PromptCopy</code> consists of a namespace, a prompt_type, and an optional learn_more_url.</li>
+<li><code>kind</code> has three variants: <code>Basic</code>, <code>SeeConversation</code> (CTA), and <code>LearnMore { language, link_text, url }</code>.</li>
+</ul>
+</li>
+<li><p>The signature changed so that the function converting a verdict result into a Thrift action takes this policy as its third argument <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>The changed function is <code>thrift_action(verdict, level, policies)</code> in <code>treatment.rs</code>, and the added argument is <code>&amp;LimitedActionsPolicies</code>.</p>
+</li>
+<li><p>The rules → thrift/proto projection layer isolated in the previous commit (Gen4+32, which introduced <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>treatment.rs</code></a>) appears to have its role extended in this commit.</p>
+</li>
+<li><p>The changed signature:</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn thrift_action(
+    verdict: &amp;Verdict,
+    level: SafetyLevel,
+    policies: &amp;LimitedActionsPolicies,
+) -&gt; Action {
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>treatment.rs:16-20</code></a></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>The response for a restricted tweet is now assembled as a new Thrift type, and the wire changes from passing &quot;only the restriction reason enum&quot; to a &quot;payload that also carries a localized prompt per action&quot; <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Nine symbols were added to the Thrift imports, including <code>BasicLimitedActionPrompt</code> · <code>CtaLimitedActionPrompt</code> · <code>LimitedAction</code> · <code>LimitedActionCtaType</code> · <code>LimitedActionPrompt</code> · <code>LimitedActionsPolicy</code> · <code>LocalizedMessage</code> · <code>LocalizedMessageLimitedActionPrompt</code> · <code>MessageLink</code>.</li>
+<li>The assembly path is Verdict&#39;s <code>Shown{engagement: Some(...)}</code>, and the result is <code>LimitedEngagements</code>.</li>
+</ul>
+</li>
+<li><p>VF&#39;s EvaluateTweets endpoint holds three fields, and one of them is the limited-action copy <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/evaluate_tweets.rs" target="_blank" rel="noopener"><code>evaluate_tweets.rs:22-40</code></a>.</p>
+<ul>
+<li>The <code>EvaluateTweetsEndpoint</code> in VF <code>evaluate_tweets.rs</code> has the fields <code>filter_tweets</code>, <code>client_switches</code>, and <code>limited_actions_copy</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A single tweet can now accumulate multiple restriction reasons</span></p></div>
+<ul>
+<li><p>The restriction information changed from a structure that wrapped a single reason to one that accumulates multiple reasons <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p><code>LimitedEngagement</code> in VF <code>models/verdict.rs</code> switched from a single-reason wrapper to a structure that accumulates a first reason and a rest Vec.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LimitedEngagement {
+    first: LimitedEngagementReason,
+    rest: Vec&lt;LimitedEngagementReason&gt;,
+}
+
+impl LimitedEngagement {
+    pub fn add(&amp;mut self, reason: LimitedEngagementReason) {
+        if !self.reasons().any(|held| held == reason) {
+            self.rest.push(reason);
+        }
+    }
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>verdict.rs:67-98</code></a></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>On the rules side too, when a rule meets a new reason on a tweet that is already restricted, it appends the reason to the Vec <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>rules/registry.rs</code></a>.</p>
+<ul>
+<li>When <code>collect_specs</code> matches <code>ActionSpec::LimitedEngagement(reason)</code> and an engagement already exists, it appends to the Vec with <code>limit.value.add(*reason)</code>.</li>
+<li>In other words, if BlockedViewer and ReadonlyViewer both apply to the same tweet, VF, not downstream, builds the union of the action sets under the two reasons <span class="badge ok">verified</span> — <code>limited_engagements</code> in <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>treatment.rs</code></a>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. VF registered the Brazilian electoral court label as an official drop label</span></p></div>
+<ul>
+<li>The Brazilian electoral court label was added in two places in the country-specific NSFW content gating policy tree of VF&#39;s rules <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>registry.rs:513-517, 648-652</code></a>.<ul>
+<li>The added label is <code>brazil_election_legal/drop/undesirable</code>, and the policy tree is <code>country_specific_nsfw_content_gating</code> in <code>rules/registry.rs</code>.</li>
+<li>The two places are the general drop list and the label drop list.</li>
+</ul>
+</li>
+<li>In the previous commit (Gen4+32), the home-mixer Brazil 2026 election handle list grew by 9, from 2,786 to 2,795, and now VF also registers the Brazilian electoral court label as an official drop label.</li>
+<li>This means that when VF receives from the labeling service a tweet carrying the <code>brazil_election_legal</code> label, it routes the tweet to the <code>drop/undesirable</code> path whether the label was generated by Grok or assigned by a person.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. VF records which service called on each request</span></p></div>
+<ul>
+<li>A new file extracts the calling service&#39;s identity from the x509 certificate of the gRPC request peer <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/caller_identity.rs" target="_blank" rel="noopener"><code>caller_identity.rs:1-56</code></a>.<ul>
+<li>VF <code>caller_identity.rs</code> is new, at 126 lines.</li>
+<li>Of the SAN URI and the subject CN, it takes the one that starts with the <code>twtr:svc:</code> prefix and uses it as the service-to-service identity.</li>
+<li>The metric <code>vf_requests_by_caller</code> is aggregated by three labels (<code>caller_identity</code>, <code>rpc: FilterTweets|EvaluateTweets|GetSafetyLabels</code>, <code>deadline: present|absent</code>).</li>
+</ul>
+</li>
+<li>The tests pin three cases <span class="badge ok">verified</span>.<ul>
+<li>The SAN URI takes priority.</li>
+<li>If there is no SAN, it falls back to the CN.</li>
+<li>If neither starts with the <code>twtr:svc:</code> prefix, there is no identity.</li>
+</ul>
+</li>
+<li>Every EvaluateTweets request is counted in the caller identity metric <span class="badge ok">verified</span> (the endpoint file linked in card A).<ul>
+<li>The request handler calls <code>caller_identity::record(Endpoint::EvaluateTweets, &amp;request)</code> at the very start.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. abuse-enforcement-service applies Kafka config changes by restarting</span></p></div>
+<p>abuse-enforcement-service is the service that decides actual actions (label/challenge/suspension), and its Rust rewrite was released on 2026-09-23. Starting with this commit, the service captures its boot-time config (boot_config) and builds the Kafka producers on top of it. The captured value is a <code>serde_json::Value</code>. Previously, lib.rs pulled the producers out with <code>DynamicConfig.kafka_producers()</code>. A dedicated module (<a href="https://github.com/xai-org/x-algorithm/blob/b79b947/abuse-enforcement-service/service-lib/src/restart_on_config_change.rs" target="_blank" rel="noopener"><code>restart_on_config_change.rs</code></a>) that restarts the service when the Kafka config changes in operation was also added. As a result, the kafka producer binding has narrowed to react only to the &quot;boot-time snapshot&quot;.</p>
+<ul>
+<li>The new module compares the config captured at boot with the live config in operation, and prompts a restart of the service if a designated path changes <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/abuse-enforcement-service/service-lib/src/restart_on_config_change.rs" target="_blank" rel="noopener"><code>restart_on_config_change.rs:1-85</code></a>.<ul>
+<li><code>restart_on_config_change.rs</code> in abuse-enforcement-service is new, at 173 lines.</li>
+<li>The value captured at boot is a <code>serde_json::Value</code>, and the watched targets are designated JSON pointer paths.</li>
+<li>There are three default watched paths: <code>/kafka/consumer/topic_labels</code>, <code>/topic_labels</code>, and <code>/kafka/producer</code>.</li>
+<li>The result has three states (<code>Check::{Unchanged, Invalid, Restart(Vec&lt;String&gt;)}</code>). If nothing changed, it is Unchanged.</li>
+<li>If something changed, it runs <code>validate(live)</code>. If validation passes, the result is Restart (the list of changed paths); if it fails, the result is Invalid. On Invalid, it does not restart and only logs.</li>
+</ul>
+</li>
+<li>A metric signaling a pending restart is reported with two labels, valid and invalid <span class="badge ok">verified</span>.<ul>
+<li>The metric name is <code>CONFIG_RESTART_PENDING</code>.</li>
+</ul>
+</li>
+<li>The function that builds the Kafka producers was changed to take the boot-time config snapshot instead of the live config <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/abuse-enforcement-service/service-lib/src/lib.rs" target="_blank" rel="noopener"><code>lib.rs:831-840, 1385-1392</code></a>.<ul>
+<li>In lib.rs (+325/−55), the signature changed from <code>build_kafka_producers(cfg, dynamic_config)</code> to <code>build_kafka_producers(cfg, boot_config)</code>.</li>
+<li>boot_config is the boot-time config snapshot captured with <code>dynamic_config.config().unwrap_or(serde_json::Value::Null)</code>. Producer building refers only to the <code>kafka_producers</code> section of this snapshot.</li>
+<li>growthbook.rs (+132/−32) gained a new function, <code>kafka_producers_from_config(Option&lt;&amp;Value&gt;)</code>. As a result, the way producer config is obtained changed from &quot;calling a DynamicConfig method&quot; to &quot;parsing the JSON Value directly&quot;.</li>
+<li>In <code>rules.rs</code> (+65/−51), the lifetime was fine-tuned from <code>rules_cache.resolve(entity_type, rules_override.as_deref())</code> to <code>as_ref()</code> (no change in meaning).</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. The Kafka config of phoenix-rankall moved into its existing config module, and we confirmed the SID backfill figures in that module</span></p></div>
+<p>phoenix-rankall is a Kafka consumer that handles SID backfill and ranking scores. Previously, kafka.rs alone held the topic, group, bootstrap, SASL, SSL, wily, and SID settings. In this commit that responsibility moved to <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/config/mod.rs</code></a>, which has existed since the Gen4 release (+84 lines), leaving only a thin adapter in kafka.rs that calls <code>KafkaConsumerBuilder</code>. The config sources are declared explicitly in both env vars and the CLI (binary name <code>xai-recsys-rankall</code>). The SID backfill constants already in this module also stand out: a QPS cap of 800k, a batch of 5,000, and a minimum post age of 180 seconds.</p>
+<ul>
+<li>The Kafka config that kafka.rs held moved to the existing CLI module <code>config/mod.rs</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>config/mod.rs:1-98</code></a>.<ul>
+<li><p>phoenix-rankall <code>src/config/mod.rs</code> is a +84/−0 modification. This file has existed since the Gen4 release (47c1bcd), and the <a href="daily-2026-08-16.html">2026-08-16 daily</a> also quotes it.</p>
+</li>
+<li><p>The binary name is <code>xai-recsys-rankall</code>, and there are about 20 CLI arguments that take their values from environment variables.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[derive(Debug, Parser)]
+#[command(name = &quot;xai-recsys-rankall&quot;)]
+pub struct Cli {
+    #[arg(long, value_enum, env = &quot;PIPELINE&quot;)]
+    pub pipeline: PipelineKind,
+    #[arg(long, default_value = &quot;/s/kafka/main-2:kafka-tls&quot;, env = &quot;KAFKA_BOOTSTRAP&quot;)]
+    pub bootstrap: String,
+    #[arg(long, default_value_t = 12, env = &quot;SEEK_HOURS&quot;)]
+    pub seek_hours: u64,
+    #[arg(long, default_value = &quot;phoenix.HomeExperiment1Lap7.&quot;, env = &quot;SCORE_PREFIX&quot;)]
+    pub score_prefix: String,
+    #[arg(long, default_value_t = 180, env = &quot;DUMP_INTERVAL_SECS&quot;)]
+    pub dump_interval_secs: u64,
+    #[arg(long, default_value_t = 180.0, env = &quot;SID_MIN_POST_AGE_SECONDS&quot;)]
+    pub sid_min_post_age_seconds: f64,
+    #[arg(long, default_value_t = 5000, env = &quot;SID_BACKFILL_BATCH_SIZE&quot;)]
+    pub sid_backfill_batch_size: usize,
+    #[arg(long, default_value_t = 800_000, env = &quot;SID_BACKFILL_QPS_CAP&quot;)]
+    pub sid_backfill_qps_cap: usize,
+    #[arg(long, default_value_t = 1.0, env = &quot;SID_BACKFILL_MAX_AGE_HOURS&quot;)]
+    pub sid_backfill_max_age_hours: f64,
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>config/mod.rs:9-96</code></a></p>
+</blockquote>
+</li>
+<li><p>The figures worth noting here are <code>SID_BACKFILL_QPS_CAP = 800_000</code> and <code>SCORE_PREFIX = &quot;phoenix.HomeExperiment1Lap7.&quot;</code>.</p>
+</li>
+<li><p>The former states explicitly that the SID (Semantic ID) backfill QPS cap is 800k.</p>
+</li>
+<li><p>The latter means that phoenix-rankall consumes the ranking scores of Phoenix (a Grok-based Transformer ranker) for a specific experiment group, Experiment1 Lap7 on the Home surface.</p>
+</li>
+<li><p>There are more figures. SID backfill runs with a batch of 5,000 at 30-second intervals, a minimum post age of 180 seconds, and a maximum post age of 1 hour.</p>
+</li>
+<li><p>The Kafka dump interval is 180 seconds, 3 versions are retained, and the upper bound on how far back in Kafka time to rewind on restart is 12 hours.</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>VF&#39;s fallback cache, which managed its 64 shards itself, was completely rewritten to delegate this to a quick_cache sync Cache <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/hydration/fallback_cache.rs" target="_blank" rel="noopener"><code>fallback_cache.rs:1-50</code></a>.<ul>
+<li>The changed file is VF <code>hydration/fallback_cache.rs</code> (+69/−173).</li>
+<li>The earlier structure of 64 shards × Mutex-wrapped unsync Cache (with a generation counter and a CacheEntry wrapper) was replaced by a quick_cache sync Cache and OptionsBuilder. Shard distribution and creation logic are delegated to the library.</li>
+<li>The generic parameter also narrowed from <code>FallbackCache&lt;K, V&gt;</code> to <code>FallbackCache&lt;V&gt;</code>. The key is now hardcoded as <code>u64</code>.</li>
+<li>Calls that took the Mutex each time through the <code>with_locked_shard</code> pattern are gone, so this refactor removes all Mutex contact at the fallback cache.</li>
+</ul>
+</li>
+<li>There are also some minor changes.<ul>
+<li>In VF <code>rules/golden_corpus/oon_tweet_label.rs</code> (+76/−3), the golden corpus for the oon_tweet label group was expanded slightly.</li>
+<li>The test fixture in VF <code>params/client_switches.rs</code> (+63/−13) was extended to load two files, <code>scala_client_switches.yml</code> and <code>limited_actions_policy.yml</code>.</li>
+<li>VF <code>hydration/execute.rs</code> (+27/−24) was fine-tuned following the Fetcher change.</li>
+<li>In Phoenix <code>python/training/xai-checkpointing/xai_checkpointing/orbax_encrypted.py</code> (+42/−11), checkpoint encryption was refactored. It is omitted because it is not a feed pipeline.</li>
+<li>grox (Grok-based nearline classifier) <code>flows/reply_spam/task_write.py</code> (+13/−1) changed.</li>
+<li>home-mixer <code>query_hydrators/served_history_query_hydrator.rs</code> (+5/−7) changed.</li>
+<li>In home-mixer <code>params/param.rs</code> (+4/−4), only the cron sync time changed (no substantive change in value). We will check again in the next commit whether it was reflected.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> added a Gen4+33 row to the <code>Generation flow</code> table and added the full Gen4+33 analysis to the generation detail section (after line 2043). The &quot;Source&quot; section of the service canon is unchanged. The existing commit references remain valid.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Deciding which actions to block and what notice text to show for a restriction reason has moved into VF. Four layers of facts overlap in this commit.</p></div>
+<ol>
+<li><p>The authority over the &quot;restriction reason&quot; has been pulled into VF. Until now, the only information VF put on the engagement axis of the Verdict was a single reason enum, and which actions that reason blocks and what the UI text says were the job of downstream (home-mixer, the client). From this commit, the following three things happen inside VF:</p>
+<ul>
+<li><code>LimitedActionsPolicies</code> holds the reason → action list mapping, based on FeatureSwitches.</li>
+<li><code>LimitedActionsCopy</code> holds (action, user locale, country) → localized Prompt.</li>
+<li><code>treatment.rs::thrift_action</code> combines the two and puts the per-action Prompt list directly inside the Thrift payload <code>LimitedEngagements</code>.</li>
+</ul>
+<p>As a result, the client does not need to maintain its own localization or action mapping tables, and every decision of reason → action → text is declared as server-side data. This change pairs with Gen4+32, where <code>treatment.rs</code> was isolated as the rules → thrift/proto/metric projection layer. The previous commit &quot;gathered the wire projection point into one file,&quot; and this commit &quot;raised the richness of the data passing through that projection point up to the UI level.&quot;</p>
+</li>
+<li><p>As <code>LimitedEngagement</code> changed to a structure that accumulates multiple reasons, the situation where the same tweet has several restriction reasons at once is now modeled explicitly.</p>
+<ul>
+<li>Previously, once rules decided the engagement, any later ActionSpec::LimitedEngagement match was dropped (a dead-code path).</li>
+<li>From this commit, if rules decide the engagement several times, the reasons accumulate in the Vec through <code>limit.value.add(*reason)</code>.</li>
+<li>In other words, when BlockedViewer (19 actions restricted) and ReadonlyViewer (14 actions restricted) overlap, VF merges the action lists of the two reasons into a union by action type and puts it in the payload together with the first reason <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>treatment.rs:128-148</code></a> and the test <code>a_limit_sends_its_first_reason_and_the_union_of_its_reasons_policies</code>.</li>
+<li>Combinations such as ConversationControl with StaleTweet, or RootAuthorBlockedViewer with BlockedViewer, also become possible.</li>
+</ul>
+</li>
+<li><p>abuse-enforcement-service switched to a &quot;boot-time config snapshot&quot; model.</p>
+<ul>
+<li>After 2026-09-23, when the Rust rewrite was released, this service had been using live config through a DynamicConfig object. From this commit, the Kafka producer binding depends only on the boot-time JSON Value snapshot.</li>
+<li>Instead, when the Kafka config in operation (topics, SASL authentication, bootstrap servers) changes, the <code>restart_on_config_change</code> module restarts the service to apply the new config.</li>
+<li>This pattern keeps the kafka producer lifecycle simple (no hot swap).</li>
+<li>It also makes config changes clearly visible in logs and metrics (restart events).</li>
+<li>Finally, it provides a fail-safe that does not restart if config validation (<code>validate(live)</code>) fails.</li>
+<li>This approach applies only to changes in core config (topic labels, kafka producer config), and everything else is still a live reload path.</li>
+</ul>
+</li>
+<li><p>phoenix-rankall exposed an experiment group identifier and a QPS cap. Splitting out the CLI config module looks like an organizational refactor, but two figures are exposed in the process.</p>
+<ul>
+<li>The first is <code>SCORE_PREFIX = &quot;phoenix.HomeExperiment1Lap7.&quot;</code>. It means that the Phoenix ranking service publishes the scores of a specific experiment group on the Home surface, &quot;Experiment1 Lap7&quot;, to a Kafka topic, and phoenix-rankall consumes only the scores with that specific prefix.</li>
+<li>The name &quot;Lap7&quot; appears to be an experiment iteration number <span class="badge est">inferred</span>.</li>
+<li>The second is <code>SID_BACKFILL_QPS_CAP = 800_000</code>. It is the figure saying that the SID backfill QPS cap is 800k.</li>
+<li>SID backfill is designed not to apply to all posts but to process only posts in a specific window (at most 1 hour, at least 3 minutes). <code>SID_BACKFILL_MAX_AGE_HOURS = 1</code> appeared in an earlier commit and is kept this time as well.</li>
+<li>Considering that the posts shown per day number in the hundreds of millions to billions, and reading this QPS cap together with the window design, the picture is that the SID embedding table is kept only for the subset of posts within the last 1 hour of freshness that the 800k QPS range covers.</li>
+<li>Posts outside the freshness window remain without an SID or in a stale state.</li>
+</ul>
+</li>
+</ol>
+<p>Registering the Brazilian electoral court label in VF is an expansion of label vocabulary, not added logic. The Brazil 2026 election filter (handles hardcoded on the home-mixer side) was introduced in Gen4+1. This registration means that when VF receives from the labeling service a tweet carrying the <code>brazil_election_legal</code> label, it handles the tweet through the drop path regardless of the label&#39;s origin. The rule looks at the label type (<code>BRAZIL_ELECTION_LEGAL</code>) and the request country (<code>br</code>), and exempts the author themselves <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b79b947/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>tweet_rules.rs:570-579</code></a>. The home-mixer handle list and the VF label, two axes, work together. After the previous commit raised the Brazil handle list to 2,795, adding the VF label registration means that the declaration that the two paths cooperate during the election period is now explicit in code.</p>
+<h2 id="2-generative-ads-retrieval-gear-deployed-in-douyin-ads-production--radar"><span class="num">2</span>Generative ads retrieval GEAR deployed in Douyin Ads production — radar</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2609.39327" target="_blank" rel="noopener">arXiv 2609.39327</a> — arXiv, 2026-09-30 v1, paper. The title is &quot;Generative End-to-end Ad Retrieval at Douyin&quot;. All 11 authors are affiliated with Douyin (ByteDance), which we confirmed in the <a href="https://arxiv.org/html/2609.39327v1" target="_blank" rel="noopener">HTML version</a>.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Generative retrieval represents items as sequences of semantic tokens (Semantic ID) rather than ID embeddings, and replaces search with autoregressive generation. At industrial scale, two bottlenecks are known. Representation collapse is the problem where the item tokenizer converges to degenerate results under continual distribution shift, which makes end-to-end adaptation unstable. Item collision is the problem where, as the candidate pool grows huge, different items share the same token sequence and retrieval precision drops. The two problems are coupled: enlarging the codebook capacity to relieve collisions aggravates collapse. The paper&#39;s GEAR is a generative ads retrieval that addresses both bottlenecks, and the paper states that it is serving in Douyin Ads.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. GEAR jointly optimizes the tokenizer, generator, and reranker end to end</span></p></div>
+<p>GEAR is a framework that jointly optimizes the tokenizer, generator, and reranker end to end. It has two core mechanisms:</p>
+<ul>
+<li>BasisVQ reparameterizes the codebook as an orthogonal basis. This enables global gradient sharing and rigid spatial rotation of latent space, and stabilizes gradient dynamics without ad-hoc heuristics.<ul>
+<li>It extends BasisVQ to a prefix-aware BasisRQ, which greatly raises the expressiveness of the codebook within the same asymptotic time complexity.</li>
+</ul>
+</li>
+<li>The context-conditioned reranking head sits inside the generation process and disambiguates colliding items with minimal computational overhead.</li>
+</ul>
+<blockquote>
+<p>&quot;It currently serves hundreds of millions of daily active users on Douyin Ads, yielding substantial empirical improvements in extensive online A/B tests.&quot;
+— <a href="https://arxiv.org/abs/2609.39327" target="_blank" rel="noopener">arXiv 2609.39327</a>, 2026-09-30</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a 2–4 line GEAR pointer to &quot;new this month&quot; in <a href="radar.html">radar.md</a>. Douyin (ByteDance) is outside the tracked services, so we do not fold it into a service canon.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> GEAR is the first explicit statement of SID-generation retrieval settled onto the ad surface of Douyin Ads. The SID-family predecessors Kuaishou HD-Rec/PushDualGen, Spotify GLIDE, and Tencent BARGE have already deployed SID-generation retrieval across various modalities and surfaces. Alibaba PailitaoGR reported only offline experiments with data built from Pailitao online search logs, and has no deployment or A/B statement <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2608.26658" target="_blank" rel="noopener">arXiv 2608.26658</a>. It is the fourth statement in the past month under the angle that &quot;generative retrieval is settling in at industrial scale&quot;, and the trend so far is as follows:</p></div>
+<ul>
+<li>(a) Snap GRP v0.1 (2026-09-29) unified retrieval, ranking, and reward in a single encoder-decoder, and achieved serving latency −69% and A/B view time +0.82%.</li>
+<li>(b) Tencent PCG TGR (2026-09-01) bundled ranking, retrieval, slate generation, and reason tokens into one frame and deployed it on 5 surfaces.</li>
+<li>(c) Kuaishou OneTrans-V2 (2026-09-23) unified a 3-stage cascade into a single Transformer, and achieved GMV +9.74%.</li>
+<li>(d) Today&#39;s GEAR explicitly addresses two structural bottlenecks of generative retrieval itself (representation collapse, item collision), and is serving hundreds of millions of DAU on Douyin Ads.</li>
+</ul>
+<p>Unlike (a), (b), and (c), GEAR focuses only on retrieval, and targets the two known problems of that role with BasisVQ (codebook orthogonal basis reparameterization) and a context-conditioned reranking head. An earlier work on generative retrieval in the ads domain is Taobao TransRetrieval (2026-08-28). However, TransRetrieval is on the Transformer scaling side, treating the scaling problem as field heterogeneity, not on the SID-generation side. GEAR opens a Douyin line of SID-generation retrieval in ads, so whether ads retrieval converges toward generative approaches is the next checkpoint to watch.</p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li>GEAR (Douyin / ByteDance) deployed generative ad retrieval in Douyin Ads production for hundreds of millions of DAU. The affiliation, deployment scale, and mechanism are confirmed facts <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2609.39327" target="_blank" rel="noopener">arXiv 2609.39327</a>.<ul>
+<li>It resolves the two bottlenecks end to end: representation collapse with BasisVQ (orthogonal basis codebook), and item collision with a context-conditioned reranking head.</li>
+<li>It states that it obtained &quot;substantial empirical improvements&quot; in online A/B tests.</li>
+<li>Added to radar.md under new this month.</li>
+</ul>
+</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Watch the production distribution of the VF restriction policy: the next checkpoint to watch is for which reasons FeatureSwitches are actually reported missing.<ul>
+<li>The counter to watch is <code>limited_actions_policy_missing{reason=*,missing=actions|copy}</code>.</li>
+<li>Whether each of the 5 reasons in <code>LimitedActionsPolicies</code> has full data backing, and at what % the Default copy namespace is used, shows the rollout status.</li>
+</ul>
+</li>
+<li>Watch the restart frequency of abuse-enforcement-service: the observation target is how the <code>config_restart_pending{valid=true|false}</code> metric is distributed in production. In particular, the share of invalid (validate failed) shows how many times the fail-safe actually worked in configuration change operations.</li>
+<li>Check whether phoenix-rankall <code>HomeExperiment1Lap7</code> is actually used: this prefix is an environment-variable default, not hardcoded. So whether it is overridden to another prefix (e.g., Lap8, Experiment2) in the actual production deployment will be observed in the environment-variable changes of the next commit.</li>
+<li>Run a deep dive on GEAR: the deep-dive targets are the statement of serving hundreds of millions of DAU on Douyin Ads and the mathematical detail of the two axes, representation collapse and item collision. Deep dive needed.<ul>
+<li>The details to watch are the BasisVQ orthogonal basis reparameterization formula, prefix-aware BasisRQ, and how the context-conditioned reranking head is integrated into the generation process.</li>
+</ul>
+</li>
+<li>In the arXiv cs.IR triage, 30 papers were parsed and 1 (GEAR) passed.<ul>
+<li>The other 29 were academic RAG / dense retrieval / semantic ID (generative retrieval) variants / LLM-based reranking / benchmarks such as Overview-of-BioASQ.</li>
+<li>Facebook Forum GR (2609.38646, Meta affiliation confirmed) is a pilot-style application of generative retrieval to forum posts, and was dropped because it has no production deployment statement.</li>
+<li>Kuaishou LLM-Rec Challenge 2026 (2609.39828) was dropped because it is challenge material and its mechanism novelty is weak.</li>
+</ul>
+</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-01.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-01</span></a><a class="pg-next" href="daily-2026-10-03.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-03</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-02.html" data-title="일일 리포트 2026-10-02"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

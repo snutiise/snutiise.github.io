@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self' 'sha256-SQoM1waKvArawtgHOajGQ6qVA/XBeZreK7kqaKNRUD0='; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Netflix — feed-research</title>
+<meta name="description" content="Netflix recommendation is a system that optimizes page (row × column) composition over a curated catalog (thousands to tens of thousands of titles), not…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/netflix.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/netflix.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/netflix.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/netflix.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Netflix — feed-research">
+<meta property="og:description" content="Netflix recommendation is a system that optimizes page (row × column) composition over a curated catalog (thousands to tens of thousands of titles), not…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/netflix.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body class="svc-netflix" data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/netflix.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Service canon</p>
+<h1 id="netflix">Netflix</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Translated from</span><a href="../netflix.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc toc-long"><summary>Contents<span class="toc-n">13</span></summary><ol><li><a href="#summary">Summary</a></li><li><a href="#generation-breakdown--read-this-first-to-avoid-confusing-the-sources">Generation breakdown</a></li><li><a href="#feed-surfaces">Feed surfaces</a></li><li><a href="#candidate-generation-retrieval">Candidate generation (retrieval)</a></li><li><a href="#ranking">Ranking</a><ol><li><a href="#foundation-model-2025-production">Foundation Model (2025, production)</a></li><li><a href="#genrec-2026-large-scale-ab">GenRec (2026, large-scale A/B)</a></li><li><a href="#genrec-serving-layer--disclosed-in-a-separate-blog-post-2026-07">GenRec serving layer</a></li><li><a href="#genrec-arxiv-paper--figures-the-blog-post-did-not-disclose-2026-08-10">GenRec arXiv paper</a></li><li><a href="#objective-function--retention-family-not-a-weighted-sum">Objective function</a></li><li><a href="#classic-generation-rankers-for-reference-2015">Classic-generation rankers (for reference, 2015)</a></li></ol></li><li><a href="#re-ranking-diversity-and-filters">Re-ranking, diversity, and filters</a></li><li><a href="#artwork-and-video-preview-personalization--maps-multimodal-asset-personalization-at-scale-2026-08-production">Artwork and video preview personalization</a><ol><li><a href="#clip-based-unified-two-tower--one-model-for-5-canvas-types">CLIP-based unified two-tower</a></li><li><a href="#mediafm--in-house-tri-modal-foundation-model-for-video-previews">MediaFM</a></li><li><a href="#popularity-based-winner--offline-proxy-task">Popularity-Based Winner</a></li><li><a href="#netflix-embedding-store--infrastructure-layer">Netflix Embedding Store</a></li><li><a href="#implication--artwork-and-previews-became-a-separate-axis-of-the-personalization-stack">Implication</a></li></ol></li><li><a href="#cold-start">Cold start</a></li><li><a href="#feedback-signals">Feedback signals</a></li><li><a href="#training-cadence-and-evaluation">Training cadence and evaluation</a><ol><li><a href="#counterfactual-observability-framework-2026-09-recsys-2026">Counterfactual observability framework (2026-09, RecSys 2026)</a></li><li><a href="#measuring-the-value-of-recommendations--choice-model--small-scale-nudge-ab-validation-ijio-paper-ec-26">Measuring the value of recommendations</a></li></ol></li><li><a href="#ads">Ads</a></li><li><a href="#open-questions">Open questions</a></li><li><a href="#sources">Sources</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="summary">Summary</h2>
+<p>Netflix recommendation is a system that optimizes <strong>page (row × column) composition</strong> over a curated catalog (thousands to tens of thousands of titles), not &quot;per-source candidate allocation.&quot; Since 2015 it has generated pages with ML and no templates <span class="badge ok">verified</span>, and in 2025 it centralized member representations in a Foundation Model (FM) <span class="badge ok">verified</span>. In 2026 a generational shift is under way toward the LLM ranker GenRec and GenPage, which generates the whole page with a single Transformer <span class="badge ok">verified</span>.</p>
+<figure class="diagram" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 0 900 578" font-family="-apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif" role="img" aria-label="Netflix recommendation pipeline diagram">
+<style>
+.db{fill:var(--card,#fff);stroke:var(--line,#d9d5cd);stroke-width:1}
+.d2{fill:var(--code-bg,#f1efe9);stroke:var(--line,#d9d5cd);stroke-width:1}
+.hl{fill:color-mix(in srgb, var(--svc,#e50914) 7%, var(--card,#fff));stroke:var(--svc,#e50914);stroke-width:1.4}
+.bd{fill:none;stroke:var(--line,#d9d5cd);stroke-width:1;stroke-dasharray:4 4}
+.t{fill:var(--fg,#1a1a1a);font-size:13.5px;font-weight:700}
+.s{fill:var(--muted,#6b6b6b);font-size:11.5px}
+.n{fill:var(--muted,#6b6b6b);font-size:11px}
+.a{stroke:var(--muted,#8a877f);stroke-width:1.5;fill:none;marker-end:url(#arnf)}
+.af{stroke:var(--svc,#e50914);stroke-width:1.3;fill:none;stroke-dasharray:5 4;marker-end:url(#arnf2)}
+.g{fill:var(--svc,#e50914);font-size:11px;font-weight:700}
+</style>
+<defs>
+<marker id="arnf" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted,#8a877f)"/></marker>
+<marker id="arnf2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--svc,#e50914)"/></marker>
+</defs>
+
+<rect class="db" x="20" y="14" width="840" height="56" rx="10"/>
+<text class="t" x="440" y="38" text-anchor="middle">Catalog — thousands to tens of thousands of titles</text>
+<text class="s" x="440" y="58" text-anchor="middle">No retrieval layer: PVR ranks the whole catalog per member → no reason for ANN or per-source caps</text>
+<line class="a" x1="440" y1="70" x2="440" y2="94"/>
+
+<rect class="bd" x="20" y="96" width="840" height="100" rx="10"/>
+<text class="n" x="34" y="116">Row candidate generation — tens of thousands per member, dedicated ranker per type (classic-generation skeleton)</text>
+<rect class="d2" x="32" y="128" width="153" height="54" rx="8"/>
+<text class="t" x="108" y="151" text-anchor="middle" font-size="12.5">PVR genre rows</text>
+<text class="n" x="108" y="169" text-anchor="middle">Ranks full catalog</text>
+<rect class="d2" x="197" y="128" width="153" height="54" rx="8"/>
+<text class="t" x="273" y="151" text-anchor="middle" font-size="12.5">Top Picks</text>
+<text class="n" x="273" y="169" text-anchor="middle">Optimizes head only</text>
+<rect class="d2" x="362" y="128" width="153" height="54" rx="8"/>
+<text class="t" x="438" y="151" text-anchor="middle" font-size="12.5">Trending Now</text>
+<text class="n" x="438" y="169" text-anchor="middle">Minutes-to-days trend + personalization</text>
+<rect class="d2" x="527" y="128" width="153" height="54" rx="8"/>
+<text class="t" x="603" y="151" text-anchor="middle" font-size="12.5">Continue Watching</text>
+<text class="n" x="603" y="169" text-anchor="middle">Resume/abandon detection</text>
+<rect class="d2" x="692" y="128" width="153" height="54" rx="8"/>
+<text class="t" x="768" y="151" text-anchor="middle" font-size="12.5">BYW · sims</text>
+<text class="n" x="768" y="169" text-anchor="middle">Similar titles</text>
+<line class="a" x1="440" y1="196" x2="440" y2="220"/>
+
+<rect class="hl" x="20" y="222" width="840" height="62" rx="10"/>
+<text class="t" x="440" y="246" text-anchor="middle">Row selection — relevance + diversity optimization · templates retired (2015~)</text>
+<text class="s" x="440" y="266" text-anchor="middle">"A home with 0 BYW rows or a home that is half BYW" — page composition is the allocation and diversity layer</text>
+<line class="a" x1="440" y1="284" x2="440" y2="308"/>
+
+<rect class="db" x="20" y="310" width="840" height="56" rx="10"/>
+<text class="t" x="440" y="333" text-anchor="middle">Homepage — about 40 rows × up to 75 titles per row (varies by device)</text>
+<text class="s" x="440" y="353" text-anchor="middle">Artwork personalization bandit — same title gets a different image per member (full rollout 2017)</text>
+<line class="a" x1="440" y1="366" x2="440" y2="390"/>
+<text class="n" x="452" y="382">play · complete · thumbs</text>
+
+<rect class="db" x="20" y="392" width="840" height="60" rx="10"/>
+<text class="t" x="440" y="416" text-anchor="middle">Reward learning — r(user, item) = f(play, complete, thumb)</text>
+<text class="s" x="440" y="436" text-anchor="middle">Retention cannot be optimized directly (once per account per month) → proxy reward + contextual bandit + delayed feedback prediction (2024)</text>
+<path class="af" d="M 20 422 H 2 V 253 H 12"/>
+<text class="g" x="-8" y="345" transform="rotate(-90 -8 345)" text-anchor="middle">Reward → policy update</text>
+
+<rect class="bd" x="20" y="478" width="840" height="86" rx="10"/>
+<text class="n" x="34" y="498">Generation shift — as of 2026-08</text>
+<rect class="d2" x="32" y="508" width="216" height="44" rx="8"/>
+<text class="t" x="140" y="527" text-anchor="middle" font-size="12.5">Classic 2015-22</text>
+<text class="n" x="140" y="543" text-anchor="middle">Several dedicated rankers + bandit</text>
+<line class="a" x1="252" y1="530" x2="274" y2="530"/>
+<rect class="d2" x="278" y="508" width="266" height="44" rx="8"/>
+<text class="t" x="411" y="527" text-anchor="middle" font-size="12.5">Foundation Model 2025 (production)</text>
+<text class="n" x="411" y="543" text-anchor="middle">Monthly pretraining + daily fine-tuning · 3 consumption modes</text>
+<line class="a" x1="548" y1="530" x2="570" y2="530"/>
+<rect class="hl" x="574" y="508" width="274" height="44" rx="8"/>
+<text class="t" x="711" y="527" text-anchor="middle" font-size="12.5">GenRec · GenPage 2026 (A/B stage)</text>
+<text class="n" x="711" y="543" text-anchor="middle">LLM ranker 10% traffic · page generation</text>
+</svg>
+<figcaption>Netflix recommendation pipeline — page composition structure and generation shift</figcaption></figure>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="generation-breakdown--read-this-first-to-avoid-confusing-the-sources">Generation breakdown — read this first to avoid confusing the sources</h2>
+<p>Netflix recommendation sources span four generations: Classic, Unified, FM, and LLM-native <span class="badge ok">verified</span> (table below). In the LLM-native generation, the LLM ranker GenRec won a 10% traffic A/B on batch-compute surfaces (surfaces whose recommendations are precomputed in bulk rather than computed when a request arrives) <span class="badge ok">verified</span> (<a href="#genrec-2026-large-scale-ab">GenRec section</a>). GenPage (RecSys 2026), which generates the homepage, has also appeared <span class="badge ok">verified</span> (<a href="#re-ranking-diversity-and-filters">Re-ranking, diversity, and filters section</a>). There is still no full rollout statement <span class="badge ok">verified</span> (table below). The source this document calls TMIS 2015 is the paper The Netflix Recommender System (2015) by Gomez-Uribe and Hunt.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="w8"><col class="w8"><col class="grow"><col></colgroup>
+<thead>
+<tr>
+<th>Generation</th>
+<th>Period</th>
+<th>Core</th>
+<th>Source grade</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Classic</td>
+<td>~<span class="nw">2015</span>-<span class="nw">2022</span></td>
+<td>Used several dedicated rankers (PVR, Top-N, Trending, Continue Watching, sims), template-free page generation, and bandits (artwork/billboard) together</td>
+<td><span class="badge ok">verified</span> The TMIS <span class="nw">2015</span> paper describes the production system</td>
+</tr>
+<tr>
+<td>Unified</td>
+<td><span class="nw">2023</span>-<span class="nw">2024</span></td>
+<td>A trend of merging models into one. After consolidation (<span class="nw">2023</span>), UniCoRn (a single ranker combining search and recommendation, RecSys <span class="nw">2024</span>) appeared</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>FM</td>
+<td><span class="nw">2025</span>~</td>
+<td>The Foundation Model (a GPT-style sequence Transformer) builds member representations centrally. It is pretrained monthly and fine-tuned daily</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>LLM-native</td>
+<td><span class="nw">2026</span>~</td>
+<td>The LLM ranker GenRec won a 10% traffic A/B on <strong>batch-compute surfaces</strong>. GenPage (RecSys <span class="nw">2026</span>), which generates the homepage, has also appeared. There is still no full rollout statement</td>
+<td><span class="badge ok">verified</span> Includes the fact that it is at the experiment stage</td>
+</tr>
+</tbody></table></div>
+<p>Most market analyses take the Classic generation, that is, the 2015 paper, as their baseline. This is the same pattern as X&#39;s fixation on the 2023 snapshot.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="feed-surfaces">Feed surfaces</h2>
+<p>The Netflix homepage is a two-dimensional grid of rows and columns. It has about 40 rows, each holding up to 75 titles, and the counts differ by device <span class="badge ok">verified</span> <a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">TMIS 2015</a>.</p>
+<ul>
+<li>Row types are genre rows (PVR), Top Picks (Top-N ranker), Trending Now, Continue Watching, and Because You Watched (BYW, sims) <span class="badge ok">verified</span> TMIS 2015. Each row having its <strong>own ranker</strong> is a hallmark of the Classic generation.</li>
+<li>Recommendations influence about 80% of viewing time, and search accounts for the remaining 20% <span class="badge ok">verified</span> TMIS 2015. Keep in mind that this is a 2015 figure.</li>
+<li>The savings from personalization and recommendation are &quot;more than $1B/year&quot; <span class="badge ok">verified</span> TMIS 2015. This is Netflix&#39;s own estimate.</li>
+<li>In 2025-05 the TV home was redesigned to include recommendations that respond to a moment&#39;s mood and interest. On mobile, a vertical clip feed is being tested <span class="badge ok">verified</span> <a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">About Netflix 2025</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="candidate-generation-retrieval">Candidate generation (retrieval)</h2>
+<p><strong>As of TMIS 2015, there is effectively no retrieval layer.</strong> PVR &quot;sorts the whole catalog (or a genre-filtered subset) per member&quot; <span class="badge ok">verified</span> TMIS 2015. Because the corpus is on the scale of thousands to tens of thousands, the whole catalog can be scored, and there is no reason for per-source caps like X&#39;s 500/400 to appear. The allocation problem shifts from item selection to <strong>row selection</strong> (→ <a href="candidate-allocation.html">candidate-allocation.md</a>).</p>
+<ul>
+<li>Row candidates reach tens of thousands per member (&quot;tens of thousands of rows&quot;), and the row selection algorithm picks and orders them by relevance and diversity <span class="badge ok">verified</span> TMIS 2015.</li>
+<li>Since 2015, templates have been removed, allowing &quot;a home with no BYW rows at all, or a home that is half BYW&quot; <span class="badge ok">verified</span> TMIS 2015.</li>
+<li>In the FM era, member embeddings and title embeddings are produced in daily batches into an embedding store. These embeddings are features for downstream models rather than for search, and they are also used as a candidate source <span class="badge ok">verified</span> <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">FM unification blog 2025</a>. The blog does not disclose whether it uses ANN for candidate generation <span class="badge obs">observed</span> 2026-10-19 (1 blog post body).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="ranking">Ranking</h2>
+<p>In production, the Foundation Model (FM) builds member representations, and downstream models use them in three ways <span class="badge ok">verified</span> (<a href="#foundation-model-2025-production">Foundation Model section</a>). The LLM ranker GenRec improved both short-term and long-term metrics in a large-scale A/B on batch-compute surfaces, but neither the blog post nor the paper discloses a full rollout <span class="badge ok">verified</span> (<a href="#genrec-2026-large-scale-ab">GenRec section</a>, <a href="#genrec-arxiv-paper--figures-the-blog-post-did-not-disclose-2026-08-10">paper section</a>). As of the 2024 long-term satisfaction blog post, the objective is not a weighted sum of action probabilities but a proxy reward with retention as the north star <span class="badge ok">verified</span> (<a href="#objective-function--retention-family-not-a-weighted-sum">Objective function section</a>).</p>
+<h3 id="foundation-model-2025-production">Foundation Model (2025, production)</h3>
+<p>FM is a model that turns a member&#39;s interaction history into a token sequence and trains on it with GPT-style autoregressive next-token prediction <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" rel="noopener">FM blog 2025-03</a>. Downstream models use FM in 3 ways, all in production <span class="badge ok">verified</span> The result of combining the two posts.</p>
+<ul>
+<li>Connects directly to multiple prediction heads (FM blog 2025-03).</li>
+<li>Used through the embedding store (unification blog 2025-11).</li>
+<li>Used as a subgraph and through fine-tuning (unification blog).</li>
+</ul>
+<p>Here is what is known about the model design and scale.</p>
+<ul>
+<li>When converting interaction history into tokens, adjacent actions are merged. This approach can be compared to BPE <span class="badge ok">verified</span> FM blog.</li>
+<li>Each token carries heterogeneous features, with request-time features separated from post-action features <span class="badge ok">verified</span> FM blog.<ul>
+<li>Request-time features are time, device, and location.</li>
+<li>Post-action features are title and watch time.</li>
+</ul>
+</li>
+<li>The objective is weighted, and multi-token prediction is added to prevent myopic optimization <span class="badge ok">verified</span> FM blog.<ul>
+<li>The blog&#39;s wording is &quot;a 5-minute trailer play and a 2-hour completion cannot carry the same weight.&quot;</li>
+</ul>
+</li>
+<li>There is a statement that scaling laws were confirmed <span class="badge ok">verified</span> FM blog. The blog describes it as &quot;consistent improvement as data and model size increase.&quot;</li>
+<li>The parameter count of the production FM is undisclosed. The 2M→1B scale study (2026) is at the production-shadow stage <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2605.23312" target="_blank" rel="noopener">arXiv 2605.23312</a>.<ul>
+<li>Production-shadow is a stage in which the model runs on real traffic but its results are not shown to members.</li>
+</ul>
+</li>
+</ul>
+<h3 id="genrec-2026-large-scale-ab">GenRec (2026, large-scale A/B)</h3>
+<p>GenRec is a ranker built by post-training an internal LLM on Netflix data <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec blog 2026-07</a>. It unrolls the input into sentences instead of feature vectors and scores the whole candidate set in a single forward pass <span class="badge ok">verified</span> GenRec blog. In a large-scale A/B run on batch-compute surfaces, both short-term and long-term metrics improved significantly <span class="badge ok">verified</span> GenRec blog.</p>
+<ul>
+<li>GenRec has 2 phases <span class="badge ok">verified</span> GenRec blog.<ul>
+<li>The first phase (Phase 1) is a Netflix-adapted LLM and is updated infrequently (&quot;updated relatively infrequently&quot;).</li>
+<li>The second phase (Phase 2) is ranking post-training and is updated more often (&quot;refreshed more frequently&quot;).</li>
+</ul>
+</li>
+<li>It uses <strong>verbalization</strong> instead of feature vectors <span class="badge ok">verified</span> GenRec blog.<ul>
+<li>The blog puts it as &quot;The context window becomes our new &#39;feature budget&#39;&quot;.</li>
+<li>The user message consists of the following elements: <em>&quot;verbalized context, profile, history, item metadata, and task&quot;</em>.</li>
+</ul>
+</li>
+<li><strong>Scoring is not text generation.</strong> It is a structure that attaches a learned item-embedding scorer to the LLM backbone, not a generative model <span class="badge ok">verified</span> GenRec blog.<ul>
+<li>A pooled hidden state h is extracted from the backbone: <em>&quot;we extract a pooled hidden state h&quot;</em>.</li>
+<li>The learned embedding eᵢ of item i and the scoring head ϕ combine to produce sᵢ, and softmax ranks the items. An example of the combination: <em>&quot;(e.g., via dot product or small MLP)&quot;</em>.</li>
+<li>The three parts are trained together: <em>&quot;All parameters — the backbone, scoring head, and item embeddings — are trained jointly.&quot;</em></li>
+</ul>
+</li>
+<li>It uses only prefill (the step that reads the prompt and builds only the internal state), and it is <strong>1 pass for the whole candidate set</strong>, not 1 pass per candidate <span class="badge ok">verified</span> GenRec blog.<ul>
+<li>The blog explains: <em>&quot;the model consumes the prompt once and scores the entire candidate set in a single forward pass, with no token-by-token decoding&quot;</em>.</li>
+<li>It states 3 serving cost drivers (model size, context length, prefill vs autoregressive) and uses vLLM.</li>
+</ul>
+</li>
+<li>There are 4 context engineering rules <span class="badge ok">verified</span> GenRec blog.<ul>
+<li>High-signal actions such as long plays and thumbs-up are all kept (<em>retain in full</em>).</li>
+<li>Low-signal actions such as very short plays and quick hovers are dropped (<em>omit</em>).</li>
+<li>Repeated actions such as binge-watching are summarized or compressed (<em>summarize or compress</em>).</li>
+<li>New releases and cold-start items are selectively described in detail (<em>elaborate selectively</em>).</li>
+<li>The blog describes the compression result this way: <em>&quot;roughly one-third of the original budget with negligible degradation in offline ranking metrics&quot;</em>. ⚠ The negligible degradation holds for <strong>offline metrics only</strong>.</li>
+</ul>
+</li>
+<li>It aligns to long-term satisfaction with a reward-weighted loss. It is not full RL; GRPO, a reinforcement learning method, was left as future work because of &quot;higher cost&quot; <span class="badge ok">verified</span> GenRec blog.<ul>
+<li>One source of the weights is a long-term satisfaction proxy: <em>&quot;return behavior, catalog exploration, or sustained engagement&quot;</em>.</li>
+<li>Another source is rebalancing by content type and release stage: <em>&quot;games vs. movies, new releases vs. evergreen titles&quot;</em>.</li>
+</ul>
+</li>
+<li>It used &quot;roughly 40×&quot; fewer Phase-2 labels, and offline MRR (the mean reciprocal rank of the correct item) was &quot;about +1.6%&quot; <span class="badge ok">verified</span> GenRec blog.<ul>
+<li>Separately, the blog states that this matches or exceeds production, as follows: <em>&quot;10–40× fewer Phase-2 labeled examples, depending on configuration&quot;</em>.</li>
+<li>40× should be used only in connection with the MRR statement.</li>
+</ul>
+</li>
+<li>In the online A/B on batch-compute surfaces, both short-term and long-term metrics improved significantly <span class="badge ok">verified</span> GenRec blog.<ul>
+<li>The experiment scale is as follows: <em>&quot;we ran a large A/B test on batch-compute recommendation surfaces, covering ~10% of Netflix traffic over ~4 weeks&quot;</em>.</li>
+<li class="warn">⚠ The condition <strong>batch-compute surfaces only</strong> is stated explicitly.</li>
+<li>The post neither confirms nor denies applying it to real-time serving surfaces <span class="badge est">inferred</span>. Reading it as &quot;not yet in real time&quot; is our inference, not the source.</li>
+</ul>
+</li>
+<li>The ranking backbone size is: <em>&quot;~1B to ~10B parameters&quot;</em>. <strong>This is a first-party statement, among the first in the industry, that an LLM entered the organic feed ranking path.</strong> <span class="badge ok">verified</span> GenRec blog (→ revised the claim in <a href="llm-in-recsys.html">llm-in-recsys.md</a>)</li>
+<li>There is no Limitations/Future Work section <span class="badge obs">observed</span> rechecked 2026-08-09. Sentences about the outlook are scattered throughout the body.<ul>
+<li><em>&quot;substantial headroom as we further scale data and input signals&quot;</em></li>
+<li><em>&quot;opens the door to natural-language steering for future experiences&quot;</em></li>
+<li><em>&quot;text-generation use cases&quot;</em> such as explaining the reason for a recommendation</li>
+</ul>
+</li>
+</ul>
+<h3 id="genrec-serving-layer--disclosed-in-a-separate-blog-post-2026-07">GenRec serving layer — disclosed in a separate blog post (2026-07)</h3>
+<p>A separate serving blog post half-reveals which infrastructure GenRec runs on <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a>, 2026-07-17. By summer 2025, Netflix had switched its inference engine from TensorRT-LLM to vLLM, and it scores every model from XGBoost to LLMs with the same gRPC call <span class="badge ok">verified</span> serving blog. We secured the original text as an archive.org snapshot.</p>
+<ul>
+<li>The evidence is the timing of the engine switch and the breadth of the workload <span class="badge ok">verified</span> serving blog.<ul>
+<li>It started with TensorRT-LLM and switched to vLLM at the point marked <em>&quot;By summer 2025&quot;</em>.</li>
+<li>The decisive reason was the widening of the workload: <em>&quot;embedding generation, <strong>prefill-only inference for ranking and retrieval</strong>, autoregressive decoding, and custom models with non-trivial per-step constraint logic&quot;</em>.</li>
+<li>GenRec appears explicitly as 1 of the 4 main workloads that became the criteria for choosing the serving stack.</li>
+</ul>
+</li>
+<li>It uses a common serving path regardless of model type <span class="badge ok">verified</span> serving blog.<ul>
+<li>Model Scoring Service (MSS) is the shared inference backend: <em>&quot;the shared inference backend, supporting XGBoost, TensorFlow, PyTorch, and LLMs behind a unified interface&quot;</em>.</li>
+<li>The structure is a Java control plane on top of Triton.</li>
+<li>The design principle is also stated explicitly: <em>&quot;A key design goal of our system was that LLM models should NOT be special snowflakes. Every model — XGBoost ensemble or large-scale LLMs — is scored via the same gRPC call&quot;</em>.</li>
+<li>The OpenAI-compatible API was attached only as an <strong>additional frontend</strong>.</li>
+</ul>
+</li>
+<li>Cold start is solved with infrastructure <span class="badge ok">verified</span> serving blog.<ul>
+<li>Downloading a large LLM from S3 or HF at boot time exceeds the scheduler timeout.</li>
+<li>So models are materialized in advance on a high-performance file system at model announcement time: <em>&quot;We materialize models on Amazon FSx at the time of model announcement&quot;</em>.</li>
+<li>Netflix&#39;s distinctive property that &quot;with a curated catalog, item inflow is an event&quot; also shows up unchanged in the serving layer.</li>
+</ul>
+</li>
+<li>The scaling problem of constrained decoding set the upper bound on batch size <span class="badge ok">verified</span> serving blog.<ul>
+<li>Constrained decoding is an approach that restricts, by rules, which tokens can be chosen during decoding.</li>
+<li>In vLLM V0, the custom logits processor ran sequentially per request: <em>&quot;the GIL prevents Python from parallelizing the per-request work. CPU time in logit processing therefore grows linearly with batch size&quot;</em>.</li>
+<li>V1 (Q4 2025) restructured this processing to the batch level and rewrote the hot path in multithreaded C++: <em>&quot;reimplemented the hot path in C++ with multi-threading to step around the GIL&quot;</em>.</li>
+<li>As a result, logits processing time did not grow as the batch grew: <em>&quot;logits processing time staying flat as batch size grows&quot;</em>.</li>
+<li>This is why GenRec&#39;s &quot;whole candidate set in 1 pass&quot; scoring holds at batch scale.</li>
+<li>Two operational cautions follow. The state machine must be resynchronized on partial prefill and preemption.</li>
+</ul>
+</li>
+<li>Deployment uses Red-Black and Versioned together <span class="badge ok">verified</span> serving blog.<ul>
+<li>Red-Black is used when the interface is stable, and Versioned when the schema changes: <em>&quot;Versioned solves that gap by maintaining an independent deployment for every (modelId, modelVersion) pair&quot;</em>.</li>
+<li>In GenRec generation changes where the schema changes, the structure pays in GPU cost for the period when the old and new models serve at the same time.</li>
+</ul>
+</li>
+<li>Absolute values for GPU generation, QPS, batch size, and latency are also missing from this post <span class="badge obs">observed</span> original text rechecked 2026-08-10.<ul>
+<li>No Model FLOPs metric or throughput figures appear either.</li>
+<li>To calculate an upper bound on GenRec&#39;s batch serving cost, this item must stay an open question.</li>
+</ul>
+</li>
+</ul>
+<h3 id="genrec-arxiv-paper--figures-the-blog-post-did-not-disclose-2026-08-10">GenRec arXiv paper — figures the blog post did not disclose (2026-08-10)</h3>
+<p>The GenRec paper is the academic version covering the same system as the blog post. Nothing in it explicitly contradicts the blog post, and <strong>quantitative detail, the loss formula, and the team structure</strong> are new <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a>, 2026-08-10. There are 6 authors (Ying Li, Shradha Sehgal, Arjun Rao, Rein Houthooft, Yaochen Zhu, Ashish Rastogi), and §8 lists all contributors by team.</p>
+<ul>
+<li><strong>It discloses measured values of the online core metric for the first time</strong> <span class="badge ok">verified</span> §5.1.<ul>
+<li>The paper&#39;s sentence: <em>&quot;we observe a +0.006% relative improvement on our core online metric, which is statistically meaningful at Netflix scale&quot;</em>.</li>
+<li>The blog post said only &quot;statistically significant&quot; and gave no absolute value. The paper itself characterizes this value as &quot;meaningful at Netflix scale.&quot;</li>
+</ul>
+</li>
+<li><strong>It breaks down the contributions of Phase 1 and Phase 2 separately</strong> <span class="badge ok">verified</span> §5.3.<ul>
+<li>Phase 1 is +10–20% in offline MRR over the OSS backbone, and Phase 2 is +35–50% over Phase 1 at its latest point in time.</li>
+<li><strong>Two weeks after Phase 1 is trained, Phase 2&#39;s relative gain widens to ~80%.</strong> The paper gives this reason: <em>&quot;increasing staleness of the less frequently updated Phase-1 backbone&quot;</em>.</li>
+<li>It newly emerged that <strong>the time axis determines the relative value of the two phases</strong>.</li>
+</ul>
+</li>
+<li><strong>An absolute example of context compression appeared, and the figure of 1/3 serving cost was added</strong> <span class="badge ok">verified</span> §5.4.<ul>
+<li>Context sentence: <em>&quot;the context length can be reduced to roughly a third of the original token budget (for example, from about 5,000 tokens down to about 1,700 tokens) with only negligible degradation&quot;</em></li>
+<li>Cost sentence: <em>&quot;serving cost is reduced to roughly a third of original cost as well&quot;</em></li>
+<li>An absolute token example was attached to the blog&#39;s &quot;roughly one-third&quot;, and a quantitative claim was added that cost also falls to 1/3.</li>
+</ul>
+</li>
+<li><strong>It discloses the loss function formula</strong> <span class="badge ok">verified</span> §4.4-§4.5.<ul>
+<li>ℒ = α·ℒ_ranking + β·ℒ_language + γ·ℒ_miscellaneous, with α+β+γ=1. The paper does not disclose the α·β·γ values.</li>
+<li>The ranking loss is softmax cross-entropy over the whole catalog (or candidate set), and it is replaced with sampled softmax when the catalog is too large.</li>
+<li><strong>At inference only the ranking head is used, and the LM head is kept for training regularization.</strong></li>
+<li>It also explicitly names text generation as a future extension: <em>&quot;future text generation use cases (e.g., natural-language explanations)&quot;</em>.</li>
+</ul>
+</li>
+<li><strong>The training data is in a user/assistant conversation format</strong> <span class="badge ok">verified</span> §4.2, §4.4.<ul>
+<li>The user message contains context, profile, history, item metadata, and task. The blog listed only this side.</li>
+<li><strong>The assistant message contains the actual engagement</strong> (play, play duration, abandon, thumb, etc.).</li>
+<li>The positive label is defined as follows: <em>&quot;high-quality engaged events (e.g., high-duration plays, strong explicit feedback), with denoising logic and thresholds that vary by content types&quot;</em>.</li>
+</ul>
+</li>
+<li><strong>GRPO actually did better</strong> <span class="badge ok">verified</span> §4.6.<ul>
+<li>The blog post treated it as &quot;future work&quot;, but the paper writes: <em>&quot;In preliminary experiments, RL-style methods (e.g. GRPO) showed additional gains over supervised finetuning, but their high training overhead makes them better suited for future work&quot;</em>.</li>
+<li>They tried it and confirmed improvement over SFT, but finally adopted the reward-weighted loss because of cost.</li>
+</ul>
+</li>
+<li><strong>In a sweep growing Phase-2 data from 1x to 20x, both the ~1B and ~10B backbones improved monotonically</strong> <span class="badge ok">verified</span> §5.2.<ul>
+<li>The scaling patterns of the two backbones were also similar. The absolute curves and slopes are not disclosed.</li>
+</ul>
+</li>
+<li><strong>Serving cost is roughly proportional to the product of model size and context length</strong> <span class="badge ok">verified</span> §4.7.<ul>
+<li>The paper&#39;s sentence: <em>&quot;inference cost in practice is roughly proportional to the product of model size and context length&quot;</em></li>
+<li>There are two cost optimization axes: using a smaller or <strong>distilled</strong> model, and context compression.</li>
+<li>Distillation (a method that trains a smaller model to imitate the outputs of a larger one) was not mentioned in the blog post.</li>
+</ul>
+</li>
+<li><strong>The paper explicitly positions GenRec as not in the Semantic ID (SID) family</strong> <span class="badge ok">verified</span> §2.<ul>
+<li>Semantic ID is a token sequence that represents an item as a hierarchical code.</li>
+<li>Sentence at the end of §2.2: <em>&quot;Most LLM-based generative retrieval systems rely on autoregressive decoding with beam search at inference time... Our work avoids these limitations by augmenting the base LLM architecture with a catalog-aware ranking head, so that it can rank a large candidate set in a single forward pass&quot;</em></li>
+<li>The paper itself lays out the differences from SID/generative families such as Google PLUM, Kuaishou OneRec-Think, Spotify GLIDE, and Yandex Gryphon (→ <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>, the generative retrieval thread in <a href="radar.html">radar.md</a>).</li>
+</ul>
+</li>
+<li><strong>The team structure was revealed</strong> <span class="badge ok">verified</span> §8. A collaboration among 3 teams that was absent from the blog post appears in §8.<ul>
+<li><strong>AI for members</strong> (22 people): includes the lead authors and Justin Basilico.</li>
+<li><strong>AI platform and serving</strong> (13 people): owns the serving infrastructure.</li>
+<li><strong>Product</strong>: 4 people.</li>
+<li>Justin Basilico is known as Netflix&#39;s head of personalization. This is the first time his name has been confirmed in a document adjacent to GenRec.</li>
+</ul>
+</li>
+<li><strong>The paper also does not affirm a full rollout</strong> <span class="badge ok">verified</span> §7.<ul>
+<li>Sentence in §7: <em>&quot;GenRec represents an initial step toward a more LLM-centric recommendation stack at Netflix. Our results suggest that this is a viable and promising path for large-scale personalization in <strong>at least some scenarios</strong>&quot;</em></li>
+<li>Expressions such as batch-compute surfaces only, &quot;some scenarios&quot;, and &quot;initial step&quot; follow.</li>
+<li>The canon&#39;s open questions (whether there is a full rollout, whether real-time surfaces are covered, the source of the candidate set) are not answered in the paper either, so they stay as they are.</li>
+</ul>
+</li>
+<li><strong>Items still not public in the paper</strong> include:<ul>
+<li>α/β/γ values</li>
+<li>Absolute values for GPU generation, QPS, and latency</li>
+<li>Quantitative speedup of prefill vs autoregressive</li>
+<li>Details of Phase 1&#39;s training data and objective function</li>
+<li>Identity of the base OSS model (Llama? Mistral?)</li>
+<li>Specific names of the A/B surfaces</li>
+<li>secondary metrics/guardrails</li>
+<li>The party that builds the candidate set</li>
+</ul>
+</li>
+</ul>
+<h3 id="objective-function--retention-family-not-a-weighted-sum">Objective function — retention family, not a weighted sum</h3>
+<p>Netflix&#39;s north star for recommendation is retention, but what it actually optimizes is a proxy reward <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/recommending-for-long-term-member-satisfaction-at-netflix-ac15cada49ef" target="_blank" rel="noopener">long-term satisfaction blog post 2024</a>.</p>
+<ul>
+<li>It treats the problem as a contextual bandit (a framework that picks an action given the context, then updates the policy from the reward received) <span class="badge ok">verified</span> long-term satisfaction blog post.</li>
+<li>It cites &quot;1 signal per account per month&quot;, noise, and the difficulty of attribution as reasons it cannot optimize retention directly <span class="badge ok">verified</span> long-term satisfaction blog post.</li>
+<li>The published proxy reward has this form: <strong>r(user, item) = f(play, complete, thumb)</strong> <span class="badge ok">verified</span> long-term satisfaction blog post.</li>
+<li>Delayed feedback is handled by the Delayed Feedback Prediction Model. This model predicts p(final feedback | observed feedback) and injects it into the reward <span class="badge ok">verified</span> long-term satisfaction blog post.</li>
+<li>The blog post states explicitly that &quot;CTR over-optimization encourages clickbait.&quot; This is structurally different from the <code>Σ w·P(action)</code> weighted-sum framing of X and Meta <span class="badge ok">verified</span> long-term satisfaction blog post (→ <a href="multi-task-ranking.html">multi-task-ranking.md</a>).</li>
+<li>Weights and rewards are set through a reward engineering loop (hypothesis → reward revision → bandit policy → A/B) <span class="badge ok">verified</span>.</li>
+</ul>
+<h3 id="classic-generation-rankers-for-reference-2015">Classic-generation rankers (for reference, 2015)</h3>
+<p>The classic generation had a dedicated ranker for each row type <span class="badge ok">verified</span> TMIS 2015.</p>
+<ul>
+<li>PVR: sorts the whole catalog and blends popularity with personalization <span class="badge ok">verified</span> TMIS 2015.</li>
+<li>Top-N: optimizes only the head <span class="badge ok">verified</span> TMIS 2015.</li>
+<li>Trending: adds personalization to trends on a scale of minutes to days <span class="badge ok">verified</span> TMIS 2015.</li>
+<li>Continue Watching: distinguishes resuming from abandoning. It uses elapsed time, stopping point, partial viewing, and device <span class="badge ok">verified</span> TMIS 2015.</li>
+<li>sims: similarity is non-personalized, and row selection is personalized <span class="badge ok">verified</span> TMIS 2015.</li>
+</ul>
+<p>UniCoRn (2024) in the unified generation unified search, pre-query, and More Like This into a single contextual ranker. With personalization, <strong>offline metrics</strong> rose 7% in search and 10% in recommendation <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2408.10394" target="_blank" rel="noopener">RecSys 2024</a>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="re-ranking-diversity-and-filters">Re-ranking, diversity, and filters</h2>
+<p>Netflix&#39;s diversity lives in the <strong>page construction stage</strong>, not in list re-ranking. It optimizes row selection &quot;for relevance and diversity&quot; <span class="badge ok">verified</span> TMIS 2015 (→ <a href="feed-diversity.html">feed-diversity.md</a>).</p>
+<ul>
+<li>Calibrated Recommendations (Steck, RecSys 2018) is a re-ranking approach that preserves the genre proportions of the watch history in the recommendation list, and its formula is published <span class="badge ok">verified</span>. However, <strong>there is no production deployment claim</strong> <span class="badge est">inferred</span>. Stating that deployment status cannot be known is the accurate state (<a href="https://dl.acm.org/doi/10.1145/3240323.3240372" target="_blank" rel="noopener">paper</a>).</li>
+<li>We could not find a primary source for the rule that allows or caps the same title appearing in multiple rows. Duplication may work as a &quot;different reason to recommend&quot; rather than as a bug <span class="badge est">inferred</span>.<ul>
+<li>Combined with a different theme per row and artwork personalization, duplicate impressions may be by design.</li>
+<li>This has to be observed directly on a real Home, and we have not yet done so.</li>
+</ul>
+</li>
+<li>Artwork and video preview personalization are a separate means of adjusting perceived diversity. Even for the same title, each member sees a different image and video preview.<ul>
+<li>The generation changed from the 2017 bandit to the 2026 MediaFM tri-modal foundation model (see the <a href="#artwork-and-video-preview-personalization--maps-multimodal-asset-personalization-at-scale-2026-08-production">Artwork and video preview personalization</a> section).</li>
+</ul>
+</li>
+<li>GenPage (2026) replaces page construction itself with autoregressive generation by a single Transformer. End-to-end latency fell 20% and core engagement metrics improved. It is still at the experiment stage <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">arXiv 2606.31031</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="artwork-and-video-preview-personalization--maps-multimodal-asset-personalization-at-scale-2026-08-production">Artwork and video preview personalization — MAPS (Multimodal Asset Personalization at Scale, 2026-08 production)</h2>
+<p>Netflix shows each member a different artwork and video preview even for the same title, and as of 2026-08 a production system called MAPS handles this <span class="badge ok">verified</span> (<a href="#clip-based-unified-two-tower--one-model-for-5-canvas-types">CLIP section</a>, <a href="#mediafm--in-house-tri-modal-foundation-model-for-video-previews">MediaFM section</a>). The MAPS blog post groups three products under this name: CLIP artwork, query-aware artwork, and MediaFM video preview.</p>
+<p>The generation moved from the <strong>2017 bandit</strong> (<a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76" target="_blank" rel="noopener">Artwork Personalization</a>, full rollout) to the <strong>2026 CLIP two-tower and MediaFM</strong>. A two-tower is a structure that encodes the member and the item separately and then matches the two to produce a score. The figures are in the 2026-08-18 arXiv paper (<a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">Multimedia Asset Personalization via Multimodal Embeddings at Netflix</a>), and the 2026-08-28 <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">blog post</a> disclosed the system name <strong>MAPS</strong> and the architecture context. There are two expansion directions: the unified CLIP model on the artwork side and MediaFM on the video preview side.</p>
+<h3 id="clip-based-unified-two-tower--one-model-for-5-canvas-types">CLIP-based unified two-tower — one model for 5 canvas types</h3>
+<p>Previously, a separate model was trained and served for each of the 5 artwork canvas types (billboard / vertical box / horizontal panel / short panel / landscape panel) <span class="badge ok">verified</span> §3. This structure was unified into a <strong>single two-tower that concatenates the CLIP image embedding (768-d) to the item tower</strong> <span class="badge ok">verified</span> §3.</p>
+<ul>
+<li><p><strong>Reward-weighted training</strong>: balances the per-canvas training examples with reward weights so that training does not skew toward a particular canvas.</p>
+</li>
+<li><p><strong>Cold start</strong>: new titles and assets are served from &quot;day zero&quot; with only the CLIP embedding, even without interaction history. This removes a limitation that ID-only models inherently had.</p>
+</li>
+<li><p><strong>Online A/B result</strong>: the core discovery metric rose by a relative <strong>+0.127%</strong> (p&lt;0.005) <span class="badge ok">verified</span> §5.1.</p>
+<ul>
+<li>Against the Eclipse UI holdback (a control group left without the new change), discovery rose <strong>+0.233%</strong> and streaming hours rose <strong>+0.184%</strong>, and the authors estimate an additional <strong>≈350M streaming hours</strong> per year.</li>
+</ul>
+</li>
+<li><p><strong>Turning on V1 and V2 each alone did not move the online metrics</strong> <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS blog post 2026-08-28</a>.</p>
+<ul>
+<li>V1 applied only the image embedding, and V2 applied only the canvas unification. Both were flat and non-significant, offline and online.</li>
+<li>Only V3, which combined the two ideas, obtained a statistically significant lift and was deployed to production.</li>
+<li>On short-panel, V3&#39;s offline IPS relative lift (<strong>+5.691%</strong>) was larger than the sum of the V1 and V2 lifts.</li>
+<li>IPS is an offline metric often used in off-policy evaluation; it estimates a new model&#39;s counterfactual performance from logged random-exposure data.</li>
+<li>This is a case where the observation &quot;turning on a single content feature alone did not move anything&quot; is stated explicitly.</li>
+</ul>
+<blockquote>
+<p>&quot;Neither idea moved our online core member metrics on its own. V1 and V2 were both flat and non-significant, and only V3 won a statistically significant lift.&quot;
+— <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS blog post</a>, 2026-08-28</p>
+</blockquote>
+</li>
+<li><p><strong>In the holdback run during the 2025 TV home screen overhaul, the lift was larger than in the steady-state ablation</strong> <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS blog post</a>, 2026-08-28.</p>
+<ul>
+<li>It was a cold-start situation in which the UI overhaul suddenly made short-panel the dominant canvas.</li>
+<li>V3 was deployed just before the overhaul, and a holdback A/B ran for a month. A small control group kept the previous per-canvas models.</li>
+<li>It obtained a <strong>statistically significant lift in both the core discovery metric and streaming hours</strong>.</li>
+<li>This is a case where signal transfer across canvases in a single model was measured.</li>
+</ul>
+</li>
+<li><p><strong>It also extended to search.</strong> Reusing CLIP&#39;s joint text-image space, it applied <strong>query-aware artwork</strong> to the search canvas, and playthrough rate rose <strong>+0.36%</strong> (p&lt;0.05) <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Ranking score = α · personalization + (1−α) · cos(text_emb(query), image_emb(asset)) as a blend, with α tuned through online A/B.</li>
+<li>The blog post states that <strong>additional modeling effort is effectively 0</strong> (because the CLIP embedding is already in the asset representation) <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS blog post</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="mediafm--in-house-tri-modal-foundation-model-for-video-previews">MediaFM — in-house tri-modal foundation model (for video previews)</h3>
+<p>MediaFM is a <strong>shot-level tri-modal FM</strong> that Netflix trained in-house, and it is served in production <span class="badge ok">verified</span> §4. A shot is one continuous stretch filmed without a camera cut.</p>
+<ul>
+<li><strong>Modalities</strong>: visual is encoded with SeqCLIP (a CLIP-style frame encoder), audio with <strong>wav2vec 2.0</strong>, and timed-text with <strong>text-embedding-3-large</strong>.<ul>
+<li>For each shot, the three are concatenated into a <strong>2,304-d unit-normed</strong> vector.</li>
+</ul>
+</li>
+<li><strong>Encoder</strong>: a BERT-style 3-layer / 8-head transformer.<ul>
+<li>It does self-supervised pretraining with <strong>Masked Shot Modeling</strong> (20% of shots masked) and <strong>cosine distance loss</strong>.</li>
+<li>The preview representation is obtained by <strong>mean-pooling</strong> the contextualized shot embeddings.</li>
+</ul>
+</li>
+<li><strong>Training corpus</strong>: it uses a large-scale shot corpus drawn from the Netflix show catalog. The specific scale was not disclosed.</li>
+<li><strong>Applied surface</strong>: applied to video preview personalization on all device platforms. Preview length is 30–90 seconds, and the gain was largest on the TV UI surface.</li>
+<li><strong>Online A/B result</strong>: the streaming metric rose by a relative <strong>+0.193%</strong> (p&lt;0.02) <span class="badge ok">verified</span> §5.2.<ul>
+<li>The offline IPS metric rose <strong>0.380%</strong>.</li>
+<li>Tri-modal being better than the visual-only baseline was confirmed both offline and online.</li>
+</ul>
+</li>
+</ul>
+<h3 id="popularity-based-winner--offline-proxy-task">Popularity-Based Winner — offline proxy task</h3>
+<p>Netflix introduced a new offline proxy task to gate MediaFM checkpoint releases <span class="badge ok">verified</span> §5.4. <strong>This proxy gates every new MediaFM checkpoint</strong>, and a checkpoint moves on to A/B only after the candidate space has been reduced.</p>
+<ul>
+<li><strong>Definition</strong>: it predicts &quot;which asset would have won if exposed under an unpersonalized, uniform serving policy&quot; using <strong>only the asset content embedding as input</strong>. It is a binary classification in the linear probe style (training only a linear classifier on top of fixed embeddings).</li>
+<li><strong>Why it is valid</strong>: it can rank embedding quality without end-to-end integration or an A/B test. A correlation with online outcomes was also observed.<ul>
+<li>The ranking by probe accuracy, the ranking by offline IPS, and the ranking by online A/B result agreed across all three signals.</li>
+</ul>
+</li>
+<li><strong>Figures</strong>: MediaFM probe accuracy is <strong>+25.90 percentage points</strong> higher than pick-at-random. SeqCLIP alone is <strong>+18.75 pp</strong> higher. The tri-modal uplift was reproduced on the shot-level proxy as well.</li>
+<li><strong>Why it matters</strong>: this is a case that partly sidesteps Netflix&#39;s long-standing problem that &quot;offline metrics do not predict A/B&quot;, through a single task that looks only at embedding quality.</li>
+</ul>
+<h3 id="netflix-embedding-store--infrastructure-layer">Netflix Embedding Store — infrastructure layer</h3>
+<p>The platform layer consists of 3 stages of precomputation and caching <span class="badge ok">verified</span> §4.3. This 3-stage caching made low-latency serving and cheap screening possible at the same time.</p>
+<ul>
+<li><strong>Content embedding</strong>: precomputed at the moment an asset enters the catalog (ingestion time) <span class="badge ok">verified</span> §4.3.</li>
+<li><strong>Item-tower projection</strong>: cached per asset <span class="badge ok">verified</span> §4.3.</li>
+<li><strong>Daily materialization</strong>: precomputes the selection of the top ~500 titles per profile <span class="badge ok">verified</span> §4.3.</li>
+</ul>
+<p>Batch production of member embeddings was already in production in the FM era (see the <a href="#candidate-generation-retrieval">candidate generation</a> section), and MediaFM established the <strong>item-side embedding pipeline</strong> in the same way. The two flows correspond to each other.</p>
+<p>The 2026-08-28 <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS blog post</a> named this store the <strong>Netflix Embedding Store</strong> and stated two properties explicitly <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p><strong>There is no training-serving skew</strong> <span class="badge ok">verified</span> MAPS blog post.</p>
+<ul>
+<li>Exactly the same embeddings are served at training time and at online inference time.</li>
+<li>Because the Embedding Store is the only source of truth, there is no room for the training pipeline and the serving pipeline to see different values.</li>
+</ul>
+</li>
+<li><p><strong>Foundation model updates and personalization model deployments are decoupled</strong> <span class="badge ok">verified</span> MAPS blog post.</p>
+<ul>
+<li>When a new embedding or a new version of an existing one appears, it is registered, backfilled across the whole catalog, and self-validated. After that, downstream can switch with one line of config.</li>
+<li>Embedding generations are switched without changing the training or serving code of downstream models.</li>
+</ul>
+<blockquote>
+<p>&quot;Its key property is that it decouples foundation-model updates from personalization-model deployments. A new embedding, or a new version of an existing one, can be registered, backfilled across the catalog, and validated entirely on its own, without touching the training or serving code of any model that consumes it.&quot;
+— <a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS blog post</a>, 2026-08-28</p>
+</blockquote>
+</li>
+</ul>
+<p>The blog post explicitly states that as a next step it will unify image, text, and video into one <strong>shared semantic space</strong>, opening up cross-modal retrieval and unified asset ranking <span class="badge ok">verified</span>. This means the member-side FM and the item-side MediaFM will likely keep flowing through the same store.</p>
+<h3 id="implication--artwork-and-previews-became-a-separate-axis-of-the-personalization-stack">Implication — artwork and previews became a separate axis of the personalization stack</h3>
+<p>The 2026-08 MediaFM paper established artwork personalization as a <strong>separate production system</strong>. Until then, this canon mentioned this axis only in one line under Re-ranking, diversity, and filters, because there had been no major update since the 2017 bandit. Four things changed:</p>
+<ol>
+<li>The architecture was unified <strong>from per-canvas models to a single model</strong> (5→1).</li>
+<li>The modality was widened <strong>from visual-only to tri-modal</strong>. It was verified quantitatively that audio and timed-text contribute to the uplift.</li>
+<li><strong>The place where cold start is handled moved from inside the ranker to pretrained embeddings</strong> (day-zero CLIP embeddings).</li>
+<li><strong>Offline gating was incorporated into the production process as a precondition for A/B</strong> (popularity-based winner).</li>
+</ol>
+<p>This can be seen as <strong>the item-side counterpart</strong> to Netflix&#39;s move to &quot;centralize member representation with an FM&quot;. The member side is the FM (2025) and the item side is MediaFM (2026). The two embeddings are heading toward being combined into a common substructure for the ranker, retrieval, artwork, and previews.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="cold-start">Cold start</h2>
+<p>New titles are a programmed catalog whose release dates are known in advance, so this is a problem of <strong>exploration and promotion</strong>, not of &quot;index coverage&quot;. The FM initializes new title embeddings from metadata <span class="badge ok">verified</span> FM blog post 2025.</p>
+<ul>
+<li><strong>New titles (billboard)</strong>: an incrementality bandit maximizes P(play|impression)−P(play|no impression). This means it does not waste a surface on a title the member would watch anyway <span class="badge ok">verified</span> <a href="https://www.slideshare.net/JayaKawale/a-multiarmed-bandit-framework-for-recommendations-at-netflix" target="_blank" rel="noopener">Kawale &amp; Amat 2018 slides</a>. We could not confirm whether it was fully rolled out.</li>
+<li><strong>New titles (FM)</strong>: initializes the new title embedding as a weighted combination of metadata, and mixes the ID embedding and the metadata embedding with entity-age-based attention <span class="badge ok">verified</span> FM blog post 2025. This is the opposite of X, which treats new items by ID only.</li>
+<li><strong>New content types</strong>: there is a case study on live event cold start, and live engagement rose +20% in a global experiment <span class="badge ok">verified</span> <a href="https://dl.acm.org/doi/10.1145/3705328.3748112" target="_blank" rel="noopener">RecSys 2025</a>.</li>
+<li><strong>New members</strong>: a title picker survey is given at sign-up. The survey is optional, and if it is skipped, a &quot;diverse and popular&quot; set is given <span class="badge ok">verified</span> TMIS 2015 §5.5 and <a href="https://help.netflix.com/en/node/100639" target="_blank" rel="noopener">help.netflix.com</a>.<ul>
+<li>We confirmed that the survey is given, from the 2015 paper through the current help document.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="feedback-signals">Feedback signals</h2>
+<p>Implicit signals dominate. Netflix logs what was watched, how it was watched (device, time, day of week, intensity), where it was discovered, and even <strong>what was shown but not played</strong> <span class="badge ok">verified</span> TMIS 2015.</p>
+<ul>
+<li>Explicit signals changed from star ratings to thumbs up and down in 2017. Up means &quot;more like this&quot; and down means &quot;stop recommending&quot;. Rating activity rose 200% compared with star ratings <span class="badge ok">verified</span> <a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs" target="_blank" rel="noopener">About Netflix 2017</a>.</li>
+<li>In 2022 it added Two Thumbs Up (&quot;really liked it&quot;), and this rating is reflected more specifically <span class="badge ok">verified</span> <a href="https://about.netflix.com/en/news/two-thumbs-up-even-better-recommendations" target="_blank" rel="noopener">About Netflix 2022</a>.</li>
+<li>% Match is a <strong>display</strong> score computed &quot;from viewing habits and behavior analysis only&quot; <span class="badge ok">verified</span> 2017 presentation. The same presentation says thumbs are used to learn taste further and improve recommendations <span class="badge ok">verified</span>. There is no statement that explicit ratings go into the UI&#39;s % Match (→ <a href="survey-signals.html">survey-signals.md</a>).</li>
+<li>There is also a mechanism against clickbait. Artwork labels exclude &quot;induced play but low-quality engagement&quot; <span class="badge ok">verified</span> 2017.</li>
+<li>It states explicitly that demographics (age, gender) are not used <span class="badge ok">verified</span> help.netflix.com.</li>
+<li>Session intent is handled by FM-Intent. It predicts the next intent and item at the same time, and is in production <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/fm-intent-predicting-user-session-intent-with-hierarchical-multi-task-learning-94c75e18f4b8" target="_blank" rel="noopener">blog post 2025</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="training-cadence-and-evaluation">Training cadence and evaluation</h2>
+<p>The FM <strong>retrains from scratch monthly and fine-tunes daily.</strong> This is the most concretely disclosed cadence among big-tech recommendation models <span class="badge ok">verified</span> unified blog post 2025-11.</p>
+<ul>
+<li>Classic-generation sources mention &quot;data up to two days ago&quot; as an example of the offline experiment protocol <span class="badge ok">verified</span> TMIS 2015.<ul>
+<li><strong>This is not a statement about the production training cadence.</strong> The cadence itself is not public.</li>
+<li>The classic-generation system has a 3-layer (offline/nearline/online) structure <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/system-architectures-for-personalization-and-recommendation-e081aa94b5d8" target="_blank" rel="noopener">2013 blog post</a>.</li>
+</ul>
+</li>
+<li>Evaluation has 2 stages. After narrowing candidates by interleaving, it moves to an A/B with ~2 million people per cell over 2-6 months <span class="badge ok">verified</span> <a href="https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55" target="_blank" rel="noopener">2017 blog post</a> and TMIS 2015.<ul>
+<li>Interleaving mixes the results of two rankers in one list and checks which side&#39;s results are chosen more.</li>
+<li>Netflix mixes with the team-draft method and judges by share of watch time. It achieves &quot;95% power with 100× fewer people&quot; than A/B.</li>
+</ul>
+</li>
+<li>It candidly acknowledges the limits of offline metrics. In 2015 it said offline metrics &quot;do not predict A/B results as well as we want&quot;, and in 2024 it said &quot;offline improvements are flat/negative online&quot;. This has been the same admission for 10 years <span class="badge ok">verified</span>.</li>
+</ul>
+<h3 id="counterfactual-observability-framework-2026-09-recsys-2026">Counterfactual observability framework (2026-09, RecSys 2026)</h3>
+<p>Netflix published a paper on a framework that observes deployed recommender systems through counterfactual measurement <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a>, 2026-09-19, RecSys 2026 accepted. Counterfactual measurement estimates what would have happened without a specific content item or model decision. It is a framework that Netflix &quot;built and deployed on multiple recommenders over several years&quot;, and this paper is its first academic statement. All 4 authors are affiliated with Netflix Los Gatos.</p>
+<p><strong>Offline gating</strong> (MediaFM&#39;s popularity-based winner) is pre-deployment selection, while this framework is the <strong>post-deployment observation</strong> (observability) axis. The two sit in different places.</p>
+<ul>
+<li><p><strong>It redefines observability as a counterfactual measurement problem</strong> <span class="badge ok">verified</span> paper.</p>
+<ul>
+<li>The paper&#39;s definition: <em>&quot;estimating what the recommender would have done, and what engagement would have followed, in the absence of a specific content item or model decision&quot;</em></li>
+<li>There are two audiences. One is content creators, and the other is model developers.</li>
+</ul>
+</li>
+<li><p><strong>There are three measurement axes</strong> (§3.1) <span class="badge ok">verified</span> paper.</p>
+<ul>
+<li>Bias reduction is done with SNIPS (self-normalized IPS).</li>
+<li>Relativity is measured by policy-versus-policy comparison and by position-adjusted item-versus-item comparison.</li>
+<li>Incrementality is measured by counterfactual leave-one-out.</li>
+<li>The authors emphasize as the unifying point that the three axes support both audiences on one measurement foundation.</li>
+</ul>
+</li>
+<li><p><strong>It was extended to cascading recommenders</strong> (§3.3) <span class="badge ok">verified</span> paper. A cascading recommender is a recommender that narrows candidates through multiple stages.</p>
+<ul>
+<li><p>The metric for upstream model developers treats the target action as a set and redefines the match function with set similarity such as Jaccard.</p>
+</li>
+<li><p>The metric for content creators decomposes item i&#39;s whole-pipeline contribution into two values:</p>
+<p>Incrementality(i) = Irreplaceability(i) · Universality(i)</p>
+<p>Irreplaceability is the conditional causal lift when i is in the candidate pool (a self-normalized Hájek IPS estimator), and Universality is the probability that i is eligible.</p>
+</li>
+</ul>
+</li>
+<li><p><strong>Row Curators A/B alignment R²=0.8212</strong>: the value from comparing the offline incrementality measurement with the actual A/B ground truth <span class="badge ok">verified</span> §4.2.</p>
+<ul>
+<li>A Row Curator is a title collection row that content curators create on the Netflix homepage.</li>
+<li>The ground truth A/B removed that row series from the recommender and measured the loss in user engagement.</li>
+<li>R² = 0.8212 across 11 A/Bs.</li>
+<li>It also disclosed production details. It clips propensity to [0.0001, 0.9999], requires at least 100 observations per row, and aggregates across homepages of different lengths.</li>
+</ul>
+<blockquote>
+<p>&quot;Across 11 A/B tests, the R² between our proposed row-incrementality measurement and the A/B-test ground truth is 0.8212, providing strong validation of our approach.&quot;
+— <a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">arXiv 2609.22747</a>, 2026-09-19</p>
+</blockquote>
+</li>
+<li><p><strong>There is a case where label misattribution was detected automatically</strong> <span class="badge ok">verified</span> §4.3.</p>
+<ul>
+<li>Incrementality time-series monitoring detected a situation where similar content was stable but only a specific content item A dipped in performance.</li>
+<li>The root cause turned out to be positive label misattribution in the model.</li>
+<li>This is a case where the framework caught a finding that raw engagement would have missed.</li>
+</ul>
+</li>
+<li><p><strong>Exploration is a precondition</strong> <span class="badge ok">verified</span> §3.1. The framework works on a contextual bandit / RL setup and requires logged propensity.</p>
+<ul>
+<li>Netflix states that this condition is already met by most of its own recommenders.</li>
+<li>However, a constraint comes with it: <strong>it cannot be applied as is to lines served without exploration (e.g., a pure Foundation Model shadow deployment)</strong> <span class="badge est">inferred</span> (the paper does not address this constraint explicitly).</li>
+</ul>
+</li>
+<li><p><strong>What the paper did not disclose</strong> <span class="badge obs">observed</span> close reading of the paper.</p>
+<ul>
+<li>The names of the recommenders the framework is deployed on. Only Row Curators was named explicitly.</li>
+<li>Absolute values of core online metrics</li>
+<li>Relationship to the FM, GenRec, GenPage, and MediaFM/MAPS generation lines. Whether this framework was used to verify GenRec&#39;s batch-compute A/B results is a follow-up item.</li>
+<li>Individual results of the 11 A/Bs. They were aggregated into R² alone.</li>
+<li>Countermeasures for recommenders without exploration</li>
+</ul>
+</li>
+</ul>
+<p>Among the tracked services, Netflix is the only company in this repository that has steadily disclosed the limits of offline/online alignment; after &quot;does not predict A/B results as well as we want&quot; (2015) and &quot;offline improvements are flat/negative online&quot; (2024), the counterfactual measurement framework (2026) has now appeared. If the earlier statements were an admission of the problem, this source is an in-house methodology for one axis of that problem, &quot;production observability&quot;. Within this repository&#39;s corpus, it is the first statement by a company-year combination to publish a recommender measurement methodology as a standalone paper. Its purpose (gating vs monitoring) and its timing (before vs after deployment) differ from <a href="#popularity-based-winner--offline-proxy-task">MediaFM&#39;s popularity-based winner</a>, so the two axes are complementary.</p>
+<h3 id="measuring-the-value-of-recommendations--choice-model--small-scale-nudge-ab-validation-ijio-paper-ec-26">Measuring the value of recommendations — choice model + small-scale nudge A/B validation (IJIO paper, EC &#39;26)</h3>
+<p>This paper estimates the value of personalized recommendations with a choice model instead of a large experiment that turns personalization off, and validates it with a small-scale nudge A/B <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2511.07280" target="_blank" rel="noopener">The Value of Personalized Recommendations: Evidence from Netflix (arXiv 2511.07280)</a>, v1 2025-11-10 · v5 2026-06-08, paper. The summary blog post is <a href="https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96" target="_blank" rel="noopener">Measuring the Impact of Personalized Recommendations</a>. We could not confirm the blog post&#39;s publication date, and the RSS date 2026-10-14 is a bulk republication value. 6 authors are affiliated with Netflix.</p>
+<ul>
+<li><p>Instead of a large experiment that turns recommendation personalization off, the paper estimates daily viewing choices with a low-rank choice model and adds a &quot;recommendation effect&quot; term for recommended titles. Identification comes from natural variation such as algorithm exploration <span class="badge ok">verified</span> (blog).</p>
+</li>
+<li><p>For validation, it used a randomized A/B that slightly raises or lowers the impressions of a specific category. Measuring the diversion ratio in this A/B and comparing it with the model prediction gives a correlation of 0.86 and an R² of 0.73 <span class="badge ok">verified</span> (blog).</p>
+<ul>
+<li>The diversion ratio shows where viewing shifts when a set of titles is shown less.</li>
+</ul>
+</li>
+<li><p>In the counterfactual comparison, engagement relative to the current recommendations is −16% for random, −12% for popularity-ordered, and −4% for matrix factorization. Popularity-ordered and MF recommendations increased viewing concentration <span class="badge ok">verified</span> (blog, abstract).</p>
+</li>
+<li><p>Of the viewing difference produced by recommendations, mechanical exposure is about 7%, and most of it comes from selection and targeting <span class="badge ok">verified</span> (blog).</p>
+<ul>
+<li>Selection is the effect of showing titles to people who would have watched them anyway, and targeting is the effect of showing them to people whose decisions the recommendation changes.</li>
+<li>The targeting effect is about 7 times the exposure effect and is largest for mid-popularity titles.</li>
+</ul>
+<blockquote>
+<p>&quot;Relative to the current system, random recommendations reduce engagement by 16%, popularity-based recommendations reduce engagement by 12%, and matrix factorization reduces engagement by 4%.&quot;
+— <a href="https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96" target="_blank" rel="noopener">Measuring the Impact of Personalized Recommendations</a> (blog)</p>
+</blockquote>
+</li>
+<li><p>If the <a href="#counterfactual-observability-framework-2026-09-recsys-2026">counterfactual observability framework</a> above is an operational tool that measures the increment of &quot;individual item and model decisions&quot;, this paper is an economics measurement of the value of the &quot;whole recommender system&quot; <span class="badge est">inferred</span>.</p>
+<ul>
+<li>The basis is that the two sources use different measurement units.</li>
+<li>The paper did not disclose whether the &quot;current system&quot; used as the comparison is the FM generation or an earlier one <span class="badge ok">verified</span> (absence).</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="ads">Ads</h2>
+<p>The only things public about Netflix ads are the event pipeline (frequency capping, Flink/Druid) and the targeting products. The targeting products consist of 17 categories and 100+ interests. <strong>As of 2026-08, there are no public materials on the engineering of the ads ranking model</strong> <span class="badge ok">verified</span> (we confirmed the absence). It is currently impossible even to describe the organic lineage and the ads lineage separately, as is done for Meta.</p>
+<ul>
+<li>The ads business started with the 2022-11 Microsoft partnership, went through the 2024-01 in-house decision, and in 2025 the Ads Suite went live in all 12 countries <span class="badge ok">verified</span> <a href="https://about.netflix.com/en/news/netflix-upfront-2025-the-center-of-attention" target="_blank" rel="noopener">Upfront 2025</a> and <a href="https://netflixtechblog.com/behind-the-scenes-building-a-robust-ads-event-processing-pipeline-e4e86caf9249" target="_blank" rel="noopener">pipeline blog post</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="open-questions">Open questions</h2>
+<ul>
+<li>Have GenRec and GenPage been fully rolled out? As of 2026-08, statements go only as far as the A/B stage. <span class="badge obs">observed</span> Rechecked on 2026-08-09: netflixtechblog has no follow-up post on GenRec. However, the index is JS-rendered, so we relied on search results.</li>
+<li>Has GenRec been applied to real-time serving surfaces as well? The public A/B is limited to batch-compute surfaces. There is no statement on whether the cost of 1 prefill pass holds at real-time candidate scale.</li>
+<li>Where does GenRec&#39;s candidate set come from? The post does not disclose who builds the candidate set that is scored (FM embedding retrieval or the existing per-source candidates).</li>
+<li>Has Calibrated Recommendations been deployed in production?</li>
+<li>How many parameters does the production FM have?</li>
+<li>What is the primary source for the rule that allows duplicates across rows?</li>
+<li>What is the structure of the ads ranking model? There are no public materials.</li>
+<li>Does a unified system named &quot;Hydra&quot; actually exist? There is only secondary reporting, and we could not confirm a primary source.</li>
+<li>Does Netflix use semantic IDs? There is no primary source. The PRS 2025 semantic tokenization talk was Spotify&#39;s, which is commonly confused.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">The Netflix Recommender System (Gomez-Uribe &amp; Hunt)</a> — 2015, paper (production description)</li>
+<li><a href="https://netflixtechblog.com/learning-a-personalized-homepage-aa8ec670359a" target="_blank" rel="noopener">Learning a Personalized Homepage</a> — 2015, blog post</li>
+<li><a href="https://netflixtechblog.com/to-be-continued-helping-you-find-shows-to-continue-watching-on-7c0d8ee4dab6" target="_blank" rel="noopener">To Be Continued (Continue Watching)</a> — 2016, blog post</li>
+<li><a href="https://netflixtechblog.com/recommending-for-the-world-8da8cbcf051b" target="_blank" rel="noopener">Recommending for the World (global single model)</a> — 2016, blog post</li>
+<li><a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76" target="_blank" rel="noopener">Artwork Personalization</a> — 2017, blog post</li>
+<li><a href="https://netflixtechblog.com/interleaving-in-online-experiments-at-netflix-a04ee392ec55" target="_blank" rel="noopener">Interleaving</a> — 2017, blog post</li>
+<li><a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs" target="_blank" rel="noopener">Goodbye Stars, Hello Thumbs</a> — 2017, talk</li>
+<li><a href="https://netflixtechblog.com/ava-the-art-and-science-of-image-discovery-at-netflix-a442f163af6" target="_blank" rel="noopener">AVA</a> — 2018, blog post</li>
+<li><a href="https://dl.acm.org/doi/10.1145/3240323.3240372" target="_blank" rel="noopener">Calibrated Recommendations (Steck)</a> — 2018, paper</li>
+<li><a href="https://netflixtechblog.com/ml-platform-meetup-infra-for-contextual-bandits-and-reinforcement-learning-4a90305948ef" target="_blank" rel="noopener">Bandit infrastructure</a> — 2019, blog post</li>
+<li><a href="https://arxiv.org/abs/1903.04638" target="_blank" rel="noopener">Search: Netflix Case Study (SIGIR)</a> — 2019, paper</li>
+<li><a href="https://ojs.aaai.org/aimagazine/index.php/aimagazine/article/view/18140" target="_blank" rel="noopener">DL for RecSys: A Netflix Case Study</a> — 2021, paper (only the abstract was verified)</li>
+<li><a href="https://about.netflix.com/en/news/two-thumbs-up-even-better-recommendations" target="_blank" rel="noopener">Two Thumbs Up</a> — 2022, talk</li>
+<li><a href="https://research.netflix.com/publication/lessons-learnt-from-consolidating-ml-models-in-a-large-scale-recommendation" target="_blank" rel="noopener">Consolidating ML Models</a> — 2023, blog post</li>
+<li><a href="https://research.netflix.com/publication/reward-innovation-for-long-term-member-satisfaction" target="_blank" rel="noopener">Reward Innovation (RecSys)</a> — 2023, paper</li>
+<li><a href="https://arxiv.org/abs/2408.10394" target="_blank" rel="noopener">UniCoRn</a> — 2024, paper</li>
+<li><a href="https://netflixtechblog.com/recommending-for-long-term-member-satisfaction-at-netflix-ac15cada49ef" target="_blank" rel="noopener">Long-Term Member Satisfaction</a> — 2024, blog post</li>
+<li><a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" rel="noopener">Foundation Model</a> — 2025, blog post</li>
+<li><a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">FM unified 3 modes</a> — 2025, blog post</li>
+<li><a href="https://netflixtechblog.com/fm-intent-predicting-user-session-intent-with-hierarchical-multi-task-learning-94c75e18f4b8" target="_blank" rel="noopener">FM-Intent</a> — 2025, blog post</li>
+<li><a href="https://arxiv.org/abs/2508.07574" target="_blank" rel="noopener">Embedding stabilization (RecSys)</a> — 2025, paper</li>
+<li><a href="https://dl.acm.org/doi/10.1145/3705328.3748112" target="_blank" rel="noopener">Live cold start (RecSys)</a> — 2025, paper</li>
+<li><a href="https://arxiv.org/abs/2511.07280" target="_blank" rel="noopener">The Value of Personalized Recommendations: Evidence from Netflix</a> — 2025-11 (v5 2026-06), paper (IJIO, EC &#39;26)</li>
+<li><a href="https://netflixtechblog.com/measuring-the-impact-of-personalized-recommendations-4c26be3a4d96" target="_blank" rel="noopener">Measuring the Impact of Personalized Recommendations</a> — blog post, publication date unconfirmed (shown as 2026-10-14 because of the RSS bulk republication)</li>
+<li><a href="https://netflixtechblog.com/behind-the-streams-real-time-recommendations-for-live-events-e027cb313f8f" target="_blank" rel="noopener">Live real-time recommendation delivery</a> — 2025, blog post</li>
+<li><a href="https://netflixtechblog.com/behind-the-scenes-building-a-robust-ads-event-processing-pipeline-e4e86caf9249" target="_blank" rel="noopener">Ads pipeline</a> — 2025, blog post</li>
+<li><a href="https://about.netflix.com/en/news/netflix-upfront-2025-the-center-of-attention" target="_blank" rel="noopener">Upfront 2025 (Ads Suite)</a> — 2025, talk</li>
+<li><a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">New TV experience and conversational search beta</a> — 2025, talk</li>
+<li><a href="https://arxiv.org/abs/2605.23312" target="_blank" rel="noopener">1B scaling study</a> — 2026, paper (shadow stage)</li>
+<li><a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec</a> — 2026, blog post</li>
+<li><a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">GenPage (RecSys)</a> — 2026, paper</li>
+<li><a href="https://arxiv.org/abs/2601.02764" target="_blank" rel="noopener">Artwork LLM Post-training</a> — 2026, paper (research stage)</li>
+<li><a href="https://netflixtechblog.com/in-house-llm-serving-at-netflix-a5a8e799ea2c" target="_blank" rel="noopener">In-House LLM Serving at Netflix</a> — 2026-07-17, blog post. It covers GenRec&#39;s serving layer. vLLM, Triton, the Java control plane, MSS, and constrained decoding scaling appear</li>
+<li><a href="https://arxiv.org/abs/2608.10257" target="_blank" rel="noopener">GenRec: An LLM-Backed Recommendation Ranker at Netflix (arXiv 2608.10257)</a> — 2026-08-10, paper. It is the academic version of the GenRec blog post. It contains figures the blog post does not disclose: the loss formula, the Phase 1/2 contribution breakdown, the context 5000→1700 example, the +0.006% core metric, GRPO preliminary results, and the team structure</li>
+<li><a href="https://netflixtechblog.com/maps-netflixs-multimodal-asset-personalization-at-scale-32f96320785e" target="_blank" rel="noopener">MAPS: Netflix&#39;s Multimodal Asset Personalization at Scale</a> — 2026-08-28, blog post. It gives the name <strong>MAPS</strong> to the same system as arXiv 2608.18322 above. The figures are in the paper, and the blog post newly adds the following five things<ul>
+<li>The system name and the grouping of three products (CLIP artwork, query-aware artwork, MediaFM video preview)</li>
+<li>Measured holdback from the 2025 TV home screen redesign</li>
+<li>V1·V2 alone flat vs V3 significant ablation</li>
+<li>The name <strong>Netflix Embedding Store</strong> and its two properties (no training-serving skew, FM updates decoupled from personalization deployment)</li>
+<li>A plan to expand to a shared image·text·video semantic space as the next step</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">Multimedia Asset Personalization via Multimodal Embeddings at Netflix (arXiv 2608.18322)</a> — 2026-08-18, paper. It covers the production deployment of the artwork CLIP two-tower and the MediaFM tri-modal model (SeqCLIP, wav2vec 2.0, text-embedding-3-large), the +0.127%/+0.193% A/B lift, and gating checkpoints with a popularity-based winner proxy</li>
+<li><a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a> — 2026-09-19, paper (RecSys 2026 accepted). It is a counterfactual-measurement-based observability framework. It covers three axes (bias reduction/relativity/incrementality), support for single-stage and cascading setups, Row Curators A/B alignment R²=0.8212, and a case of automatic label misattribution detection</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/netflix.html" data-title="Netflix"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

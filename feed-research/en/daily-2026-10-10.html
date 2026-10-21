@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-10 — feed-research</title>
+<meta name="description" content="In one line: X added two fields to the inference request of its ranking model Phoenix that record whether a feed request is an app launch, a refresh, or a…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-10.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-10.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-10.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-10.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-10 — feed-research">
+<meta property="og:description" content="In one line: X added two fields to the inference request of its ranking model Phoenix that record whether a feed request is an app launch, a refresh, or a…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-10.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-10.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-10">2026-10-10</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>7 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-10.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added two fields to the inference request of its ranking model Phoenix that record whether a feed request is an app launch, a refresh, or a scroll down. The rest is H100 training efficiency improvements.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-the-ranking-request-gains-feed-request-context-fields-and-h100-packing-improves--x"><span class="num">1</span>The ranking request gains feed-request context fields, and H100 packing improves — X</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#source-check-notes">Source check notes</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-the-ranking-request-gains-feed-request-context-fields-and-h100-packing-improves--x"><span class="num">1</span>The ranking request gains feed-request context fields, and H100 packing improves — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/cb45b5501423126adfc508052116c2d67c0e3fec" target="_blank" rel="noopener">xai-org/x-algorithm@cb45b55</a> — xAI public repository, commit of 2026-10-09 05:42 UTC, code. 16 files, +1,228/−218. These notes number X commits after the Gen4 release in order, and this commit is Gen4+39.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X publishes the For You feed code by syncing it one commit per day. In the public repository <code>xai-org/x-algorithm</code>, Phoenix is a ranking model that puts a user&#39;s behavior history and candidate posts into one Transformer sequence and predicts the probabilities of actions such as like, reply, and dwell time. This commit concerns the request message passed to the ranking model and the model&#39;s training speed rather than feed behavior itself.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The ranking request gained fields for &quot;request context&quot; and &quot;cursor direction&quot;</span></p></div>
+<ul>
+<li><p>Two fields carrying the context of the feed request and the cursor direction were added to Phoenix&#39;s inference request message <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto:27-50, 175-176</code></a>.</p>
+<ul>
+<li>The message is named <code>PredictNextActionsRequest</code>, and the fields are <code>feed_request_context</code> (number 25) and <code>feed_cursor_direction</code> (number 26).</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">  FeedRequestContext feed_request_context = 25;
+  FeedCursorDirection feed_cursor_direction = 26;
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a> (code), 2026-10-09</p>
+</blockquote>
+</li>
+<li><p>The request-context enum distinguishes 14 ways a feed request can arise <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The enum is named <code>FeedRequestContext</code>.</li>
+<li>It includes app launch (<code>LAUNCH</code>), return to foreground (<code>FOREGROUND</code>, <code>FOREGROUND_TRUNCATE</code>), pull to refresh (<code>PULL_TO_REFRESH</code>), manual refresh (<code>MANUAL_REFRESH</code>), and screen navigation (<code>NAVIGATE</code>).</li>
+<li>It also includes viewport-based refresh, polling, background fetch, filling a timeline gap (<code>GAP</code>), right after sign-up (<code>SIGNUP</code>), viewing one&#39;s own thread, <code>AUTO</code>, and other.</li>
+</ul>
+</li>
+<li><p>The cursor-direction enum distinguishes the first request, fetching new posts at the top, scrolling down to fetch more, and a gap <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The enum is named <code>FeedCursorDirection</code>, and its four values are <code>INITIAL</code>, <code>TOP</code>, <code>BOTTOM</code>, and <code>GAP</code>, in that order.</li>
+</ul>
+</li>
+<li><p>Both enums had been defined in the proto file since a previous commit but were not used in any message. This diff added only two field lines <span class="badge ok">verified</span>.</p>
+</li>
+<li><p>As of this commit, no code that reads or fills these values exists anywhere in the public tree <span class="badge ok">verified</span>.</p>
+<ul>
+<li>A grep over the whole repository finds the two names only in two copies of the proto (one for Python, one for the Rust serving crate).</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The H100 home ranker training preset doubled the per-device batch and turned on several options</span></p></div>
+<ul>
+<li>The default home ranker preset is built by merging H100 overrides into a base configuration <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py:324-345, 427-432</code></a>.<ul>
+<li>The preset is named <code>home_direct_packed</code>. It merges <code>_H100_OVERRIDES</code> into the base configuration <code>_home_direct_packed_base()</code>.</li>
+</ul>
+</li>
+<li>The per-device batch rose from 256 to 512, and a setting that splits the batch into 2 microbatches was added. The unit computed at once is the same 256 users, but the number of users per gradient step doubled <span class="badge ok">verified</span>.<ul>
+<li>The settings are named <code>bs_per_device</code> and <code>num_microbatch=2</code>.</li>
+<li>A microbatch approach splits the batch of one step into several pieces, computes them in order, and then sums the gradients. It allows a large batch within the memory limit.</li>
+</ul>
+</li>
+<li>Expert parallelism was reduced from 256 to 128 <span class="badge ok">verified</span>.<ul>
+<li>The setting is named <code>ep</code>.</li>
+<li>Expert parallelism is a sharding approach that places the experts of an MoE model across several devices.</li>
+</ul>
+</li>
+<li>Four options were turned on <span class="badge ok">verified</span>.<ul>
+<li>Asynchronous embedding lookup (<code>use_async_emb</code>)</li>
+<li>Overlapping host work (<code>overlap_step_host_work</code>)</li>
+<li>Removing empty candidate slots (<code>seqpack_drop_empty_candidates</code>)</li>
+<li>An H100-specific recomputation policy (<code>SAVE_H100_QKV_ATTN_FFN</code>)<ul>
+<li>A recomputation policy (remat policy) decides which intermediate values to save during backpropagation and which to recompute.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>The learning rate of 7.1e-4 and the Muon optimizer settings are mostly unchanged, and only one option was added that shards the Newton-Schulz computation in units of 8 <span class="badge ok">verified</span>.<ul>
+<li>The option is named <code>muon_ns_shard_group_size=8</code>.</li>
+<li>The Newton-Schulz computation is the iterative calculation Muon uses to approximately orthogonalize the gradient momentum.</li>
+</ul>
+</li>
+<li>The GB300 preset did not change <span class="badge ok">verified</span>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A new packing layout that removes empty candidate slots and a candidate-region attention kernel were introduced</span></p></div>
+<p>Sequence packing is a training technique that concatenates the sequences of several users with different lengths into one long array to reduce padding waste.</p>
+<ul>
+<li><p>The old packing reserved a fixed number of candidate slots per user, so the empty slots of users with few candidates also entered the attention computation. The new layout gathers only the candidates actually filled, rounded up to a multiple of 16, into a &quot;candidate region&quot; at the end of the sequence <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/data/recsys/sequence_packing.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/sequence_packing.py:171-203, 579-754</code></a>.</p>
+</li>
+<li><p>The candidate token budget per user has two levels, 32 and 128, and the needed level is chosen at each step <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_recsys.py:172-195, 291-292, 404-470</code></a>.</p>
+<ul>
+<li>The setting is named <code>seqpack_candidate_tokens_per_user</code>.</li>
+<li>The whole training process agrees on the maximum needed at each step through a distributed KV store and then uses the smallest level that exceeds that value.</li>
+<li>To keep the total length constant, the mean of the history-length distribution (default 510) is reduced by as much as the budget grew.</li>
+</ul>
+</li>
+<li><p>If even 128 is not enough, candidates in the later slots within a user are left out of that batch&#39;s training <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The number left out is logged as <code>train/seqpack_dropped_candidate_slots</code>.</li>
+</ul>
+</li>
+<li><p>A new FlashAttention kernel dedicated to the candidate region was added. Each candidate token attends only to its own user&#39;s history span, and the kernel runs only on H100 (SM90) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/cutedsl/ranker_candidate_attention_fa4.py" target="_blank" rel="noopener"><code>phoenix/xrex/cutedsl/ranker_candidate_attention_fa4.py:31, 295</code></a>.</p>
+<ul>
+<li>The kernel is named <code>ranker_candidate_attention_fa4</code>. It is 369 lines of code written in CuTe DSL.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">if arch != 90:
+    raise NotImplementedError(&quot;ranker candidate attention: only SM90 (H100) is supported&quot;)
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/phoenix/xrex/cutedsl/ranker_candidate_attention_fa4.py" target="_blank" rel="noopener"><code>ranker_candidate_attention_fa4.py</code></a> (code), 2026-10-09</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Other changes</span></p></div>
+<ul>
+<li>The cron mirror of home-mixer (the service that assembles the For You feed) changed only its sync time, and no parameter values changed <span class="badge ok">verified</span>.<ul>
+<li>The cron mirror is a file that syncs and publishes production parameter values every day, and here it is <code>home-mixer/params/param.rs</code>.</li>
+<li>The new sync time is <code>2026-10-08T16:00:35Z</code>.</li>
+</ul>
+</li>
+<li>A field for the list of mentioned users was added to the post type of grox (the content classification service). No classifier reads this field yet <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cb45b55/grox/core/data_loaders/data_types.py" target="_blank" rel="noopener"><code>grox/core/data_loaders/data_types.py:711, 862-866</code></a>.<ul>
+<li>The type is named <code>Post</code>, and the field is <code>mentioned_users</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> I added a new &quot;Gen4+39&quot; section to <a href="x.html">services/x.md</a> summarizing A–D. In the open question section, I added an item to check whether <code>FeedRequestContext</code> is used as a feature. I added <code>cb45b55</code> to the commit list and the reference sha in the sources section.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> For the first time, there is a channel through which the ranking model can receive the context of a feed request <span class="badge ok">verified</span>. Nothing overturns the existing understanding.</p></div>
+<ul>
+<li>The probability of a reaction differs for the same user right after opening the app versus after scrolling deep into the feed, so these values are likely to be used as context features in a later stage <span class="badge est">inferred</span>. The only evidence is that the fields were added to the request message.</li>
+<li>B and C are training-efficiency changes that do not alter the model structure or loss, so we infer they have no direct effect on serving results <span class="badge est">inferred</span>.</li>
+<li>However, in batches that exceed the budget some candidates are left out of training, so the training data distribution may differ slightly <span class="badge est">inferred</span>.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check whether code is released in which home-mixer fills the two enum values and Phoenix reads them as features. If it is, the &quot;context feature&quot; reading, held as <span class="badge est">inferred</span>, can be confirmed or overturned.<ul>
+<li>The two enums are <code>FeedRequestContext</code> and <code>FeedCursorDirection</code>.</li>
+</ul>
+</li>
+<li>The deep dive items carried over from the previous commit (Gen4+38) are still unresolved. They are the video carousel response size and the VF (visibility-filtering) position-based verdict.<ul>
+<li>VF is the service that decides, for each post, whether it may be shown to this viewer.</li>
+</ul>
+</li>
+</ul></div>
+<h2 id="source-check-notes">Source check notes</h2>
+<p>Apart from the one X commit, there was no new source to fold in.</p>
+<ul>
+<li>X: since 2026-10-09 there is 1 commit, <code>cb45b55</code>, and no release.</li>
+<li>Meta: the latest post on engineering.fb.com is still &quot;NTS: Authenticated Time at Meta&quot; from 2026-10-06, which is unrelated to feeds. The latest post on ai.meta.com/blog is from 2026-07, so nothing is new. The Threads following-first re-tuning and Dear Algo, which came up in the WebSearch cross-check, are already in <a href="threads.html">services/threads.md</a>.</li>
+<li>Netflix: the latest post in the netflixtechblog.com RSS is from 2026-09-25, so nothing is new. The recommendation page on research.netflix.com did not render its list, so I opened the publications archive instead, and it has no items after 2026-10-09.</li>
+<li>arXiv cs.IR: 30 papers were parsed, and 0 passed the acceptance criteria. Two came close.<ul>
+<li><a href="https://arxiv.org/abs/2610.10920" target="_blank" rel="noopener">2610.10920</a> is an offline LM-based evaluation of where to place recommendation modules on an e-commerce search page. No affiliation is listed, and there is no deployment claim.</li>
+<li><a href="https://arxiv.org/abs/2610.10441" target="_blank" rel="noopener">2610.10441</a> (CrossWeave) is a bridging system that shows posts from other communities in a panel beside the feed. It is an academic prototype.</li>
+</ul>
+</li>
+</ul>
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-09.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-09</span></a><a class="pg-next" href="daily-2026-10-12.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-12</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-10.html" data-title="일일 리포트 2026-10-10"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

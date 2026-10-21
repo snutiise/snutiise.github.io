@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-16 — feed-research</title>
+<meta name="description" content="In one line: X added observation that measures the diversity of the For You slate at three stages: before heuristics, top 10, and final. X's public code now…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-16.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-16.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-16.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-16.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-16 — feed-research">
+<meta property="og:description" content="In one line: X added observation that measures the diversity of the For You slate at three stages: before heuristics, top 10, and final. X's public code now…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-16.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-16.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-16">2026-09-16</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Wednesday</li>
+<li><span class="meta-k">Reading time</span>19 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-16.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added observation that measures the diversity of the For You slate at three stages: before heuristics, top 10, and final. X&#39;s public code now has its first metric showing how much the heuristic layer changes the slate.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">5</span></summary><ol><li><a href="#1-slate-diversity-observation-and-ads-purchase-value-prediction-head-added--x"><span class="num">1</span>Slate diversity observation and ads purchase-value prediction head added — X</a></li><li><a href="#canon-update-summary">Canon update summary</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-slate-diversity-observation-and-ads-purchase-value-prediction-head-added--x"><span class="num">1</span>Slate diversity observation and ads purchase-value prediction head added — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/2d4a03c" target="_blank" rel="noopener">xai-org/x-algorithm@2d4a03c</a> — xAI public repository, 2026-09-15 commit, code. These notes number X commits after the Gen4 release in order, and 2d4a03c is Gen4+21. The change spans 17 files, +592/−9, across 5 axes, and the diff was checked through the GitHub API on 2026-09-16.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The final slate of X For You (the set of items shown at once) does not follow the scores assigned by the ranking model Phoenix as is. VMRanker&#39;s DPP (θ=0.65, K=150) reordering enforces diversity by cosine similarity, and what remains after heuristics such as author-repeat decay, the OON (out-of-network, accounts not followed) multiplier, and the new-author boost are added is the slate. Until now, X&#39;s public code had no metric measuring how much this heuristic layer changes the slate composition relative to the ranker&#39;s raw scores, that is, the real size of &quot;diversity gain vs ranking loss&quot;. This commit adds that observation layer and also changed the four things below.</p></div>
+<ul>
+<li>A new connection opened in the ads Phoenix ranker that regression-predicts the purchase value itself as a continuous head (previously only click and conversion probability heads existed).<ul>
+<li>A continuous head is an output head that predicts a continuous value by regression.</li>
+</ul>
+</li>
+<li>The attention kernel in the H100 two-tower training config moved to the same CUTe DSL family as GB300.</li>
+<li>The Kafka OTel export interval was relaxed from 30→120 seconds.</li>
+<li>The root follower threshold of the coordinated spam filter rose from 10k→30k.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. A new observation records response diversity in three stages</span></p></div>
+<ul>
+<li><p>A new observation side effect that measures response diversity in three stages was added to home-mixer (the service that assembles the For You feed) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/side_effects/response_diversity_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/response_diversity_stats_side_effect.rs</code></a> (186 lines, new)</p>
+<ul>
+<li>A side effect is a pipeline stage that runs in addition without changing the response.</li>
+<li>By default it runs on only 5% of requests, and inside an experiment bucket it runs on 100%. Each stage emits 12–15 metrics as histograms.</li>
+<li>The other files changed together are <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs</code></a> (+2) and <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (+7).</li>
+</ul>
+</li>
+<li><p>This side effect was wired into the Phoenix candidate pipeline as the 6th observation side effect <span class="badge ok">verified</span>(same commit).</p>
+<ul>
+<li>It is named <code>ResponseDiversityStatsSideEffect</code>, and its place is after <code>ScoredStatsSideEffect</code> and before <code>AuthorServedMetricsSideEffect</code>.</li>
+</ul>
+</li>
+<li><p>There are two run conditions <span class="badge ok">verified</span>(same commit).</p>
+<ul>
+<li>Default: if no experiment bucket is set on the feature-switch param <code>EnableResponseDiversityStatsExperimentBucket</code>, <code>DEFAULT_SAMPLING_RATE = 0.05</code> applies, that is, it runs on only 5% of requests.</li>
+<li>Experiment: if an experiment bucket is set on this param, it runs on 100% inside that bucket and emits each metric with <code>ddg</code> (experiment id) and <code>bucket</code> scope tags. This means the diversity distribution can be observed separately for each experiment arm.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if experiment_buckets.is_empty() &amp;&amp; random::&lt;f64&gt;() &gt;= DEFAULT_SAMPLING_RATE {
+    return Ok(());
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/side_effects/response_diversity_stats_side_effect.rs" target="_blank" rel="noopener"><code>response_diversity_stats_side_effect.rs</code></a></p>
+</blockquote>
+</li>
+<li><p>Each of the three stages is measured <span class="badge ok">verified</span>(same commit).</p>
+<ul>
+<li><code>final</code>: the finally selected candidates (<code>input.selected_candidates</code>) sorted by <code>score</code> in descending order. This is the slate actually delivered to the user.</li>
+<li><code>top10</code>: the top 10 of <code>final</code> (<code>TOP_POSITIONS = 10</code>).</li>
+<li><code>pre_heuristic</code>: merges <code>selected_candidates</code> and <code>non_selected_candidates</code> and takes the top K by <code>weighted_score</code> in descending order (K = final slate size).</li>
+<li><code>weighted_score</code> is the raw score (head-weight sum) obtained by multiplying per-head probabilities by weights and adding them, the value before applying DPP, author-decay, and the OON multiplier.</li>
+<li>In other words, <code>pre_heuristic</code> is the counterfactual of &quot;what diversity would the slate have had if only the raw-score top-K had gone out without the heuristic layer&quot;.</li>
+</ul>
+</li>
+<li><p>Each stage emits the metrics below, and all names carry the <code>ResponseDiversity.*</code> prefix <span class="badge ok">verified</span>(same commit).</p>
+</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Axis</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Size</code></td>
+<td>Number of candidates</td>
+</tr>
+<tr>
+<td><code>UniqueAuthors</code>·<code>UniqueAuthorRatio</code>·<code>MaxAuthorShare</code></td>
+<td>Author-axis cardinality and concentration</td>
+</tr>
+<tr>
+<td><code>AuthorHhi</code>·<code>AuthorEntropyNorm</code></td>
+<td>HHI (Herfindahl-Hirschman Index: the sum of squared per-author shares, a market-concentration metric applied to the slate) and Shannon entropy normalized as <code>entropy / ln(size)</code></td>
+</tr>
+<tr>
+<td><code>UniqueSources</code>·<code>SourceEntropyNorm</code></td>
+<td>Diversity of <code>served_type</code> (the retrieval source axis: Thunder / Phoenix retrieval / SimClusters, etc.)</td>
+</tr>
+<tr>
+<td><code>InNetworkShare</code></td>
+<td>Share of in-network (followed author) candidates</td>
+</tr>
+<tr>
+<td><code>SidCoverage</code></td>
+<td>Share of candidates that have a semantic ID (SID, an ID that represents a post as an RQ-VAE hierarchical code)</td>
+</tr>
+<tr>
+<td><code>UniqueSidL1</code>·<code>MaxSidL1Share</code>·<code>SidL1EntropyNorm</code></td>
+<td>Semantic ID L1 (top-level code of the RQ-VAE stacked residual codebook) diversity</td>
+</tr>
+<tr>
+<td><code>UniqueSidL2</code>·<code>SidL2EntropyNorm</code></td>
+<td>Semantic ID L2 diversity</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>A new primitive <code>Composition</code> that extracts multiset statistics for any axis was added <span class="badge ok">verified</span>(same commit). This struct is reused when the hydrator in C below computes the new slate bits.<ul>
+<li>Its fields are <code>size</code>, <code>unique</code>, <code>max_count</code>, <code>hhi</code>, and <code>entropy_norm</code>, and the file is <code>home-mixer/util/composition.rs</code> (63 lines, new).</li>
+<li>A single <code>from_keys&lt;K: Hash + Eq&gt;(iter)</code> produces statistics regardless of the axis.</li>
+</ul>
+</li>
+<li>The combination of a 5% sampling probability and three stages is a tuning that keeps observation accuracy while barely affecting ranking latency.<ul>
+<li>There are two sorts, and the entropy and HHI computations are O(n) passes over the vector.</li>
+<li>Observation is 100% only in experiment buckets, which leaves open the verification of even the tail distribution.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A parser that extracts actively engaged authors from the viewer&#39;s history was added</span></p></div>
+<ul>
+<li><p>A new function collects the ids of positively engaged authors from the viewer&#39;s recent interaction history carried in the request <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/util/viewer_history.rs" target="_blank" rel="noopener"><code>home-mixer/util/viewer_history.rs</code></a> (61 lines, new)</p>
+<ul>
+<li>The function is <code>positively_engaged_author_ids(columnar_sequence: &amp;bytes::Bytes) -&gt; Option&lt;HashSet&lt;u64&gt;&gt;</code>.</li>
+<li>The input is the Arrow IPC stream <code>ScoredPostsQuery.columnar_scoring_sequence</code> carried in the request. It holds the user&#39;s recent interaction history as columnar batches.</li>
+<li>It collects and returns the authorId of rows where <code>authorId</code> is greater than 0 and at least one of the 18 positive actions is on in the <code>actionNameMultiHot</code> fixed-size list.</li>
+</ul>
+</li>
+<li><p>The 18 positive actions are stated explicitly in the following list <span class="badge ok">verified</span>(same file).</p>
+<pre tabindex="0"><code>ServerTweetFav, ServerTweetReply, ServerTweetQuote, ServerTweetRetweet,
+ClientTweetClick, ClientQuotedTweetClick, ClientTweetOpenLink,
+ClientTweetClickProfile, ClientTweetPhotoExpand, ClientQuotedTweetPhotoExpand,
+ClientTweetVideoOpen, ClientTweetVideoQualityView, ClientQuotedTweetVideoQualityView,
+ClientTweetShare, ClientTweetClickSendViaDirectMessage, ClientTweetShareViaCopyLink,
+ClientTweetBookmark, ClientTweetFollowAuthor
+</code></pre>
+<ul>
+<li>That is, negative signals such as report, mute, block, and <code>not_dwelled</code>, and exposure-type signals such as dwell, are intentionally excluded. Two video quality views are in the list.</li>
+</ul>
+</li>
+<li><p>This set is a new constant set that has appeared nowhere else in X&#39;s public code. It fixes in code for the first time the definition of &quot;authors with whom a relationship was formed through active engagement&quot;.</p>
+</li>
+<li><p>Which ranking head this set corresponds to, that is, whether it exactly matches the positive engagement head definition at <code>phoenix/runners.py:233-253</code>, is outside the scope of this commit.</p>
+</li>
+<li><p>This function is used to compute one slate bit in C below (<code>AUTHOR_NOT_ENGAGED_BY_VIEWER</code>).</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. 12 bits representing slate diversity were added to the per-candidate bitset</span></p></div>
+<ul>
+<li>12 new slate-axis bits were added to the bitset that records attributes per candidate <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/candidate_hydrators/tweet_type_metrics_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/tweet_type_metrics_hydrator.rs</code></a> (+100/−4)<ul>
+<li>The target is the <code>TweetTypeMetrics</code> bitset, and the predicate slots are 239-244 and 315-320.</li>
+<li>The other files changed together are <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/util/tweet_type_metrics.rs" target="_blank" rel="noopener"><code>home-mixer/util/tweet_type_metrics.rs</code></a> (+27) and <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a> (+8).</li>
+</ul>
+</li>
+<li>Until now, <code>TweetTypeMetricsHydrator</code> set the bitset for each candidate with attributes of the tweet itself.<ul>
+<li>Examples are whether it is a retweet, the media type, the tweet age bucket, and six tiers of author follower scale.</li>
+</ul>
+</li>
+<li>This commit added six bits (239-244) that reflect slate-wide statistics onto every candidate in the slate <span class="badge ok">verified</span>(same commit). These bits are set identically for all candidates.<ul>
+<li><code>UNIQUE_AUTHOR_RATIO_LTE_50_PCT = 239</code>: slate unique_ratio ≤ 0.5</li>
+<li><code>UNIQUE_AUTHOR_LTE_5/10/15 = 240/241/242</code></li>
+<li><code>SINGLE_AUTHOR_GTE_25_PCT/50_PCT = 243/244</code></li>
+</ul>
+</li>
+<li>It also added six bits (315-320) reflecting the context each candidate has within the slate <span class="badge ok">verified</span>(same commit). These bits are set differently for each candidate.<ul>
+<li><code>AUTHOR_REPEAT_IN_SLATE = 315</code>, <code>AUTHOR_REPEAT_GTE_3_IN_SLATE = 316</code>: they turn on from the moment the same author_id is met for the second, and the third or later, time while iterating in descending score order. They are not on at the first encounter. This bit expresses &quot;which appearance of the same author this tweet is in the slate&quot;.</li>
+<li><code>AUTHOR_NOT_ENGAGED_BY_VIEWER = 317</code>: turns on when the candidate&#39;s author is not an account the viewer follows and is not in the positive-engagement set of B either. It is the bit that marks new authors unrelated to the viewer.</li>
+<li><code>HAS_SEMANTIC_IDS = 318</code>: turns on when semantic_ids are assigned to the candidate.</li>
+<li><code>SID_L1_REPEAT_IN_SLATE = 319</code>, <code>SID_L2_REPEAT_IN_SLATE = 320</code>: in descending-score iteration, they turn on for the second and later candidates when the same SID L1 (or L2) prefix is already in the slate.</li>
+</ul>
+</li>
+<li>A helper that safely cuts only the top codes from the SID array was added <span class="badge ok">verified</span>(same commit).<ul>
+<li><code>PostCandidate::semantic_id_prefix(levels: usize) -&gt; Option&lt;&amp;[i32]&gt;</code> returns a slice of the top <code>levels</code> codes, and returns <code>None</code> if <code>levels</code> is greater than the array length.</li>
+</ul>
+</li>
+<li>These bits are merged with the per-candidate base bitset and then stored compressed <span class="badge ok">verified</span>(same commit).<ul>
+<li>In <code>hydrate</code>, the slate-level bit set and the per-position bit set are merged by union into the per-candidate base bitset, compressed, and stored as the <code>tweet_type_metrics</code> payload.</li>
+</ul>
+</li>
+<li>TweetTypeMetrics has so far been an axis used in ranking training and serving logs and offline analysis, so slate diversity is now logged as a per-candidate feature and becomes accessible to training and modeling. However, this commit has no training config change that actually uses these bits, so only the connection was opened. Whether they are actually used is something to watch in follow-up commits.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. A head that regression-predicts the purchase value after an ads web click was added to the proto</span></p></div>
+<ul>
+<li><p>A continuous head predicting the actual purchase value after an ads web click and a per-advertiser purchase-value baseline message were added to the Phoenix proto <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a> (+9)</p>
+<ul>
+<li>The head is named <code>ADS_WEB_CT_PURCHASE_VALUE = 5</code>, and the message is named <code>PurchaseValueBaseline</code>.</li>
+<li>The other files changed together are <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs</code></a> (114 lines, new) and <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a> (+9).</li>
+</ul>
+</li>
+<li><p>The new head is the fifth value of the <code>ContinuousActionName</code> enum <span class="badge ok">verified</span>(same commit).</p>
+<ul>
+<li>The existing four were <code>DWELL_TIME = 1</code>, <code>CLICK_DWELL_TIME = 2</code>, <code>ACTIVE_SECS_5M_RESIDUAL_NORM = 3</code>, and <code>BRIDGE_PROBABILITY = 4</code>.</li>
+<li><code>ACTIVE_SECS_5M_RESIDUAL_NORM</code> is the residual normalization of the 5-minute moving average of active seconds. It predicts the active seconds of the next 5 minutes in this session, normalized by the previous moving average.</li>
+<li><code>BRIDGE_PROBABILITY</code> is the bridge probability between segments.</li>
+</ul>
+</li>
+<li><p>The new <code>ADS_WEB_CT_PURCHASE_VALUE = 5</code> is the regression target for the purchase value that occurs after a web click-through conversion <span class="badge ok">verified</span>(same commit).</p>
+<ul>
+<li>CT is an abbreviation of Click-Through, and here it means an actual purchase made on the landing page after an ads click.</li>
+</ul>
+</li>
+<li><p>A new field 23 was added to the <code>PredictNextActionsRequest</code> request payload <span class="badge ok">verified</span>(same commit).</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">repeated PurchaseValueBaseline purchase_value_baselines = 23;
+
+message PurchaseValueBaseline {
+  int64 impression_id = 1;
+  int64 advertiser_account_id = 2;
+  double mean_value_usd_28d = 3;
+}
+</code></pre></figure>
+<ul>
+<li>Each baseline is a tuple of <code>(impression_id, advertiser_account_id, advertiser&#39;s average purchase value over the last 28 days in USD)</code>.</li>
+</ul>
+</li>
+<li><p>The Rust helper <code>purchase_value.rs</code> provides baseline validation and lookup functions <span class="badge ok">verified</span>(same commit).</p>
+<ul>
+<li><code>is_valid_baseline</code> checks that the id is positive and the USD value is a positive finite number. It also provides <code>find_baseline(request, impression_id, advertiser_account_id)</code>.</li>
+</ul>
+</li>
+<li><p>Five unit tests pin down wire tag stability and backward compatibility <span class="badge ok">verified</span>(same commit).</p>
+<ul>
+<li>Wire tag: field 23 = <code>0xBA 0x01</code>, and it is independent of <code>returnLogitsList</code> field 22 = <code>0xB0 0x01 0x01</code>.</li>
+<li>Backward compatibility: an old request decodes normally with an empty baseline list.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Until now, ads ranking predicted only the ad click probability and used that probability multiplied by the price the advertiser pays as the ads ranking score. This continuous head instead predicts the purchase value itself that an ad impression and click will actually cause. The ad click probability here also includes the 20 conversion action probability heads introduced in the 2026-08-21 commit (Gen4+6).</p></div>
+<p>If the advertiser&#39;s average purchase baseline over the last 28 days is carried in the request payload, the residual of how far above or below that baseline this impression falls can be trained and served. However, this commit does not state whether the amount is the direct training target or a baseline offset. As the probability that this combination of user and ad drives an unusually large (small) purchase relative to the advertiser&#39;s average purchase value enters the ads ranking score, X ads ranking is ready to move toward a more advanced value-optimizing auction structure <span class="badge est">inferred</span>. This is in the same direction as what Meta and Google call VBB (Value-Based Bidding) and tCPA/tROAS, respectively <span class="badge est">inferred</span>.</p>
+<p>That the baseline is carried in each request means a separate offline pipeline must update the 28-day average of advertiser accounts daily and feed it in parallel into ad serving requests. Given the concern about serving traffic overhead, baselines for all advertiser accounts are likely not carried; it reads as attaching only the baselines of those advertisers whose ads will be seriously scored for this viewer at request time, selected by pre-pruning <span class="badge est">inferred</span>.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. The attention kernel for H100 training was unified into the same CUTe DSL family as GB300</span></p></div>
+<ul>
+<li><p>The attention implementation in the H100 training settings changed to a kernel of the same CUTe DSL family as GB300 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a> (+1/−1)</p>
+<ul>
+<li><p>The changed value is <code>pallas_ranker_varlen_attn</code> → <code>cutedsl_ranker_varlen_attn</code>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">_H100_OVERRIDES = {
+    &quot;bs_per_device&quot;: 480,
+    &quot;ep&quot;: 128,
+-    &quot;attn_impl&quot;: &quot;pallas_ranker_varlen_attn&quot;,
++    &quot;attn_impl&quot;: &quot;cutedsl_ranker_varlen_attn&quot;,
+}
+
+_GB300_OVERRIDES = {&quot;bs_per_device&quot;: 960, &quot;ep&quot;: 64, &quot;attn_impl&quot;: &quot;cutedsl_ranker_varlen_attn&quot;}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p><code>cutedsl_ranker_varlen_attn</code> is a variable-length attention kernel based on NVIDIA CUTLASS/CUTe DSL. This kernel had been in <code>_GB300_OVERRIDES</code> since the Gen4 release (47c1bcd, 2026-08-13) (<a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:340</code></a>). In Gen4+17 (49815da, 2026-09-08), the SM80 and SM90 forward and backward kernels were all released as open source (<code>phoenix/xrex/cutedsl/ranker_fa4/</code>).</p>
+</li>
+<li><p>The SM80 kernel is for A100 (compute capability 8.0), the SM90 kernel is for H100 (9.0), and GB300 (10.3) takes the arch 100 path <span class="badge ok">verified</span> — <a href="https://developer.nvidia.com/cuda-gpus" target="_blank" rel="noopener">NVIDIA compute capability table</a>, <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/xrex/cutedsl/ranker_attention_fa4.py" target="_blank" rel="noopener"><code>cutedsl_arch</code> in <code>ranker_attention_fa4.py</code></a>.</p>
+<ul>
+<li>So with this switch, H100 training uses the SM90 kernel. The two GPU generations use the same <code>attn_impl</code> name, but the kernel that actually runs differs by generation.</li>
+</ul>
+</li>
+<li><p>We could not confirm whether this commit lifts the constraint that the seqpack (packing that concatenates multiple user sequences into one batch row) training config forces <code>pallas_ranker_varlen_attn</code> on H100 only. This constraint was observed in Gen4+11 (bc8e5f0).</p>
+<ul>
+<li>If the <code>NotImplementedError</code> check stated explicitly in the seqpack code path still remains, the combination of seqpack and FA4 (flash attention v4 based on CUTe DSL) is still blocked. This is something to watch in follow-up commits.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. The Kafka metric export interval in Phoenix training grew from 30 seconds to 120 seconds</span></p></div>
+<ul>
+<li>The Kafka OTel (OpenTelemetry) export interval in Phoenix training grew from 30s → 120s, easing the metric export load by 4× <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/phoenix/xrex/data/streaming/kafkaloader.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/streaming/kafkaloader.py</code></a> (+2/−2)<ul>
+<li>The default <code>export_interval_ms</code> of <code>_init_otel_metrics</code> and <code>PhoenixKafkaDataset.metrics_export_interval_ms</code> both changed from 30_000 → 120_000.</li>
+</ul>
+</li>
+<li>This change reads as a pair with item H of Gen4+20 (6bb4594, 2026-09-12), the Kafka mTLS connection, but the direction is opposite. mTLS adds authentication overhead, and the relaxed export reduces metric load.</li>
+<li>Exporting OTel metrics 4× less often is a trade-off that gives up observation tail resolution of the training job and reduces the collector burden.</li>
+<li>This relaxation is evidence that metric host cost had actually become a burden <span class="badge est">inferred</span>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">G. The coordinated spam filter raised its root follower threshold from 10k to 30k</span></p></div>
+<ul>
+<li><p>The follower threshold of the coordinated spam filter in Grox (the Grok-based nearline annotation pipeline) rose from 10k → 30k <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py</code></a> (+1/−1)</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">class TaskCoordinatedSpamFilter(TaskFilterWithPost):
+-    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 10000
++    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 30000
+</code></pre></figure>
+</li>
+<li><p>The Grox reply-spam pipeline has two separate follower thresholds.</p>
+<ul>
+<li><code>TaskSpamFilter</code>·<code>TaskReplyRankingFilter</code>: since the Gen4 release it rose seven times: 15k → 30k (Gen4+1) → 40k (Gen4+2) → 60k (Gen4+3) → 80k (Gen4+6) → 100k (Gen4+7) → 120k (Gen4+8) → <strong>150k</strong> (Gen4+17) <span class="badge ok">verified</span> — per-commit values of <a href="https://github.com/xai-org/x-algorithm/blob/2d4a03c/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py</code></a>.</li>
+<li>Spam classification includes only conversations where both the root and the reply-target account have followers at or below the threshold (lines 77-93). So raising it means expanding the classification scope (inspecting conversations of larger accounts as well).</li>
+<li><code>TaskCoordinatedSpamFilter</code>: it was 1k at the Gen4 release, and after 5k (Gen4+15) and 10k (Gen4+17) it rose for the third time, now to <strong>30k</strong> <span class="badge ok">verified</span> — per-commit values of the same file. Coordinated spam is a type in which multiple accounts pair up and repeatedly post the same spam pattern.</li>
+<li>This filter skips the conversation when the root author&#39;s followers are below the threshold (lines 157-161, reason <code>low_blast_radius</code>). So raising it removes conversations under small accounts from judgment.</li>
+</ul>
+</li>
+<li><p>Both thresholds are rising, and the judgment scope of both filters moves toward conversations of large accounts <span class="badge ok">verified</span> — same file. General spam classification widens to conversations of larger accounts, and coordinated spam classification drops conversations under small accounts.</p>
+</li>
+<li><p>It reads as an adjustment to concentrate the cost of coordinated spam judgment on high-exposure conversations <span class="badge est">inferred</span>. The basis is that the skip reason is named <code>low_blast_radius</code>.</p>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a <code>Gen4+21</code> row to the Gen4 release table in <a href="x.html">../services/x.md</a> and created a new detail subsection <code>### Gen4+21 (2026-09-15, 2d4a03c) — …</code>. The ads section, the feedback signals section, and the Phoenix ranking section also received a short update on the new continuous head and the slate observation metrics, only to the extent connected in code.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Two axes opened side by side: slate diversity observation and ads purchase-value prediction. The purchase-value axis was only connected in this commit, and the diversity observation already runs on 5% of requests by default (A above).</p></div>
+<ol>
+<li>The observation scope widened to slate diversity. Until now, scoring observation in X&#39;s public code went only as far as per-candidate scores and per-head probabilities, and how much the slate-layer heuristics (DPP, author-decay, OON multiplier) change the candidate set was not measured.<ul>
+<li>The parallel observation of the three stages <code>pre_heuristic</code>/<code>top10</code>/<code>final</code> in this commit is the first connection that can measure the actual impact of the heuristic layer.</li>
+<li>In particular, since <code>pre_heuristic</code> is a counterfactual (&quot;without the heuristic&quot;), it makes it possible to measure the trade-off between diversity gain and ranking loss empirically.</li>
+<li>The reorganization of the slate layer has continued through the slate context pipeline of Gen4+4, the VMRanker DPP simplification of Gen4+8, and the seed anchor pinning of Gen4+20. This observation reads as the observation-side pair of that line.</li>
+</ul>
+</li>
+<li>Ads ranking widened from probability prediction to value prediction.<ul>
+<li>The 20 conversion actions of the 2026-08-21 commit (Gen4+6) were still heads predicting probability (whether a click or conversion occurs).</li>
+<li>The new continuous head takes the amount itself as its regression target. It also prepared a connection that carries the per-advertiser 28-day baseline in the request, enabling residual training.</li>
+<li>A value-optimizing auction means advertiser ROI optimization is handled directly in the serving layer, so there will likely be effects on both the ads ranking score computation and the auction logic after it.</li>
+</ul>
+</li>
+</ol>
+<p>Actual consumption (promoting the new bits and head in the training config, a production experiment ramp) is something to watch in follow-up commits.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="canon-update-summary">Canon update summary</h2>
+<p>Of the canon, only services/x.md was edited, and the pipeline diagram was left as is.</p>
+<ul>
+<li>Added a row to the Gen4 release table in <a href="x.html">services/x.md</a> and created a new <code>### Gen4+21</code> detail subsection.</li>
+<li>The diagram was not regenerated. The pipeline structure (stages, sources, figures, generation) did not change, and this change is an observation side effect, proto fields, and an attention kernel switch, so <code>assets/x-pipeline.svg</code> is left as is.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="corrections">Corrections</h2>
+<p>No claims were overturned.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<p>In this batch the arXiv cs.IR API kept responding with 429 (rate limit), so triage could not be done. It was abandoned after 6 retries, and the number of passed items folded in is also 0.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check whether the ads purchase-value head appears in the training config — this is where it is decided whether it is baseline offset regression or raw dollar regression.<ul>
+<li>Check whether <code>phoenix/xrex/models/recsys_model.py</code> or <code>xrecsys_two_tower.py</code> registers <code>ADS_WEB_CT_PURCHASE_VALUE</code> in the continuous loss, and in what shape <code>PurchaseValueBaseline</code> is actually attached to the serving batch.</li>
+</ul>
+</li>
+<li>Check the experiment results after <code>ResponseDiversityStatsSideEffect</code> is actually turned on — once 5% sample data accumulates, we can see in which experiment arms the real diversity gain and ranking loss of the heuristic layer diverge. In particular, check the differences in <code>AuthorHhi</code>, <code>InNetworkShare</code>, and <code>SidL1EntropyNorm</code> between <code>pre_heuristic</code> and <code>final</code>.</li>
+<li>Check whether the 12 new bits of <code>TweetTypeMetrics</code> (239-244, 315-320) are turned on in the training config — if slate context enters as candidate features, the ranker moves to slate-aware scoring (pointwise → slate-aware).<ul>
+<li>Watch the feature list update in Phoenix <code>recsys_model.py</code>.</li>
+</ul>
+</li>
+<li>Check whether the 18 actions of <code>positively_engaged_author_ids</code> exactly match the ranking head definition — if they do, this set becomes the canonical constant defining user relationships.<ul>
+<li>Compare against the positive engagement head indices in <code>phoenix/runners.py</code>.</li>
+</ul>
+</li>
+<li>Check the next value of the coordinated_spam threshold of 30k — it will show whether it keeps rising like the general spam threshold or this was tuning noise.</li>
+</ul>
+<p>Lookup failed: arXiv cs.IR API — HTTP 429 (rate limit exceeded), gave up after 6 retries.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-15.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-15</span></a><a class="pg-next" href="daily-2026-09-17.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-17</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-16.html" data-title="일일 리포트 2026-09-16"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

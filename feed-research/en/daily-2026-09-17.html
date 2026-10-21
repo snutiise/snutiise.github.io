@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-17 — feed-research</title>
+<meta name="description" content="In one line: X connected an ads purchase-value loss to training of the For You ranking model (default weight 0) and changed the click dwell-time head to a…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-17.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-17.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-17.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-17.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-17 — feed-research">
+<meta property="og:description" content="In one line: X connected an ads purchase-value loss to training of the For You ranking model (default weight 0) and changed the click dwell-time head to a…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-17.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-17.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-17">2026-09-17</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>20 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-17.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X connected an ads purchase-value loss to training of the For You ranking model (default weight 0) and changed the click dwell-time head to a binary classification at a 10-second threshold in the default config.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">5</span></summary><ol><li><a href="#1-ads-purchase-value-loss-wired-into-training-dwell-time-head-made-binary--x"><span class="num">1</span>Ads purchase-value loss wired into training; dwell-time head made binary — X</a></li><li><a href="#2-pcap-per-user-category-caps-in-marketplace-candidate-generation--meta"><span class="num">2</span>PCap: per-user category caps in Marketplace candidate generation — Meta</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same commit, X silently changed the embedding index mapping of the gender feature.</li>
+<li>X&#39;s ads brand safety V2 gate was rolled back in the mirror from true to false.</li>
+<li>Meta authors published the PCap paper, which sets per-user category caps at the candidate generation stage of Facebook Marketplace.</li>
+</ul>
+<h2 id="1-ads-purchase-value-loss-wired-into-training-dwell-time-head-made-binary--x"><span class="num">1</span>Ads purchase-value loss wired into training; dwell-time head made binary — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/fad2f71" target="_blank" rel="noopener">xai-org/x-algorithm@fad2f71</a> — GitHub commit, 2026-09-16 01:11Z, source code. 26 files changed (+552/−233). These notes number the daily X commits after the Gen4 release in sequence; this commit is Gen4+22.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Phoenix (the ranking Transformer of the X For You feed) has an output head per action and predicts continuous values such as dwell time or purchase value with continuous heads. In Gen4+21 (2d4a03c), only the wire of the ads purchase-value continuous head was opened. This head is <code>ADS_WEB_CT_PURCHASE_VALUE</code>, and the request field is <code>PurchaseValueBaseline</code>. This commit added three opt-in connections together (purchase value, <code>binary</code> loss, click_dwell feature), and the most notable change is <strong>connecting this head to the training loss</strong>.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The ads purchase-value loss is connected to the training graph, but the default weight is 0</span></p></div>
+<ul>
+<li>A Huber loss that predicts ads purchase value is now formally connected to the Phoenix training graph, with a default weight of 0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/loss_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/loss_recsys.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a>.<ul>
+<li>The loss function is <code>purchase_value_loss_compute</code>.</li>
+<li>The target is the <strong>ratio</strong> to the advertiser&#39;s 28-day average, not raw USD.</li>
+<li>The valid mask is an AND of eight terms. The eight terms are label_valid &amp; padding &amp; !negative_sample &amp; delayed_mask &amp; has_click &amp; has_purchase &amp; keeper_mask &amp; isfinite/positive on ratio·baseline.</li>
+<li>The checker <code>validate_purchase_value</code>, which enforces the activation conditions, verifies the following four things:<ul>
+<li>that slot 5 actually exists</li>
+<li>that the action head <code>ADS_PURCHASE_CONVERSION</code> actually exists</li>
+<li>that the Huber delta is positive and finite</li>
+<li>that no generic continuous loss is attached to the same slot</li>
+</ul>
+</li>
+<li>The serving activation function is Softplus.</li>
+</ul>
+</li>
+<li>The advertiser baseline is now also carried in the training data <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/data/recsys/recsys_batch.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/recsys_batch.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/data/parquet_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/parquet_recsys.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/data/recsys/feature_config.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/feature_config.py</code></a>.<ul>
+<li>Two slots, <code>value_label_valid: bool</code> and <code>value_baseline_mean_usd: float32</code>, were added to <code>PostSeq</code>.</li>
+<li>The Parquet reader <code>_read_value_labels</code> reads the <code>valueLabelValidSeq</code> and <code>valueBaselineMeanUsdSeq</code> columns and unpacks them into (batch, seq) arrays. The two column types are <code>pa.list_(bool_/float32, seq_len)</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A new binary classification loss type was added, and the click dwell-time head uses it in the default config</span></p></div>
+<ul>
+<li>A new <code>binary</code> kind was added to the continuous losses, so a given continuous head can be binarized at a threshold and trained with sigmoid and BCE <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_feature_prep.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_feature_prep.py</code></a>.<ul>
+<li>The first use is <code>click_dwell_time</code> (threshold=10s, default weight=1.0).</li>
+<li>Within this commit, the default training config began training the <code>click_dwell_time</code> head as a binary classification at a 10-second threshold. The defaults of <code>_home_direct_packed_base</code> changed to <code>click_dwell_loss_weight: 1.0</code> and <code>enable_click_dwell_time: True</code> (feature-prep).</li>
+<li><code>ContinuousActionLossConfig</code> accepts the new <code>loss_type=&quot;binary&quot;</code>, and a <code>binary_threshold: float = 10.0</code> field was added.</li>
+<li>The activation is forced to sigmoid. <code>output_cap</code> is forbidden by an assert because the output is a probability in [0,1].</li>
+<li>The loss is computed by <code>binary_threshold_loss_compute(gt_raw, logit, valid_mask, negative_sample_mask, threshold=10.0, mask_negatives=True, raw_weights=None)</code>. This function binarizes the ground truth with <code>gt_binary = (gt_raw &gt; threshold).float()</code> and then computes the loss with optax sigmoid BCE.</li>
+<li>The history encoder normalizes <code>history_seq.continuous_actions[..., 2]</code> with <code>log1p(clip(x, 0, 60)) / log1p(60)</code>, multiplies it by the <code>hist_click_dwell_time_vec</code> embedding, and adds the result to the user history vector.</li>
+</ul>
+</li>
+<li>The function that unpacks the continuous head outputs was changed to also return the raw logits of binary heads <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a>.<ul>
+<li>The return type of <code>decode_continuous</code> changed from a single <code>jax.Array</code> to a 2-tuple <code>(activated: jax.Array, head_logits_by_index: dict[int, jax.Array])</code> (lines 2283-2285).</li>
+<li>The model <code>__call__</code> that calls it changed its return from a 2-tuple to a 3-tuple <code>(logits, continuous_predictions, head_logits_by_index)</code>.</li>
+<li>The binary loss can be computed in a numerically stable way only with the raw logits from before the sigmoid. So the raw logit tensor is sent along for each binary head.</li>
+<li>The serving path also receives the 3-tuple from <code>__call__</code>, but discards the dict as <code>_head_logits</code>.</li>
+</ul>
+</li>
+<li>At serving time, predictions of sigmoid heads are restored to the original scale, but binary heads are an exception <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a>.<ul>
+<li><code>_rescale_sigmoid_heads_for_inference</code> multiplies the prediction of a sigmoid head by <code>norm_scale</code> to restore the original scale.</li>
+<li>The exception condition is <code>if loss_config.activation != &quot;sigmoid&quot; or loss_config.loss_type == &quot;binary&quot;: continue</code>.</li>
+<li>That is, binary heads remain probabilities in [0,1] at serving.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The embedding index of the gender feature silently changed from hardcoded (Male=2, Female=1) to the raw proto enum values</span></p></div>
+<ul>
+<li>The categorical embedding index of the gender feature <code>user_gender</code> silently changed from hardcoded values (Male=2, Female=1, other=0) to a direct cast of the proto enum integer <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/crates/common/xai-recsys/src/util.rs" target="_blank" rel="noopener"><code>phoenix/crates/common/xai-recsys/src/util.rs</code></a>.<ul>
+<li>A new regression test, <code>user_gender_is_raw_proto_enum</code>, pins all three values (Male, Female, Unknown) to match <code>g as i16</code> exactly.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The ads brand safety V2 gate was rolled back from true to false in the mirror</span></p></div>
+<ul>
+<li>The mirror value of the ads brand safety V2 gate (<code>EnableAdsBrandSafetyVerdictV2</code>) was rolled back from <code>true → false</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (+2/−2).<ul>
+<li><code>EnableAdsBrandSafetyVerdictV2</code> is in the param file of home-mixer (the service that assembles the For You feed). This file is a mirror that copies production setting values over by cron.</li>
+<li>The mirror sync time changed to <code>2026-09-14T16:22:15Z → 2026-09-15T16:25:02Z</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. grox&#39;s (Grok-based nearline classifier) reply spam classifier uses a dedicated fine-tuned model when the thread&#39;s followers exceed 150k, and the task eligibility threshold rose from 150k to 180k</span></p></div>
+<ul>
+<li>The reply spam classifier now splits its verdict model between <code>oai-gemma4-26b-reply-spam</code> and the default model by thread follower count, and the task_filter threshold was also raised <span class="badge ok">verified</span> — a change across three files.<ul>
+<li>The evidence files are <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/grox/flows/reply_spam/constants.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/constants.py</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/grox/flows/reply_spam/classifier_simple_reply_scorer.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/classifier_simple_reply_scorer.py</code></a>, and <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py</code></a>.</li>
+<li>The constant <code>GEMMA_REPLY_SPAM = &quot;oai-gemma4-26b-reply-spam&quot;</code> is new. This model is presumably a dedicated fine-tuned variant. <code>GEMMA_REPLY_SPAM_MIN_FOLLOWERS = 150_000</code> is used for model routing, and <code>GROK_GEMMA_FOLLOWER_SPLIT = 180_000</code> for task eligibility.</li>
+<li>The verdict model is chosen by <code>SimpleReplyScorer._sampler(post)</code>. If <code>max(post.ancestors[0].user.follower_count, post.ancestors[-1].user.follower_count) &gt; 150_000</code>, it uses <code>oai_gemma4_reply_spam</code>; otherwise it uses the default <code>oai_gemma4</code>.</li>
+<li>The follower thresholds in two task filters changed from <code>150000 → GROK_GEMMA_FOLLOWER_SPLIT</code> (180000). This raises them again from the 150k set in Gen4+17 (49815da) to 180k.<ul>
+<li>The changed constants are <code>TaskSpamFilter.FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION</code> and <code>TaskReplyRankingFilter.FOLLOWER_COUNT_THRESHOLD_FOR_REPLY_RANKING</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>XAUC, a clicked-only pairwise concordance metric, was attached to each continuous head <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a>.<ul>
+<li>XAUC pairs up clicked samples and measures how well the order of the predictions matches the order of the actual values.</li>
+<li>The function is <code>metric_xauc(pred, gt, valid_mask, max_samples=2048)</code>.</li>
+<li>It flat-reshapes the samples, stride-samples up to 2048 of them with <code>stride = max(N // 2048, 1)</code>, and computes pairwise concordance with a 2048×2048 outer difference.</li>
+<li>A valid pair is <code>pair_valid = mask_i &amp; mask_j &amp; (dy != 0)</code>. Concordant means <code>sign(dy) == sign(dp)</code>, tied means <code>dp == 0</code>, and ties are weighted 0.5.</li>
+<li>It is measured only on positive-only samples with <code>xauc_mask = _cont_loss_mask &amp; (xauc_gt &gt; 0)</code>.</li>
+<li>Each continuous head emits a <code>{metric_name}-xauc-clicked</code> stat, and binary heads additionally emit <code>-rce</code> and <code>-ratio-pos</code>.</li>
+</ul>
+</li>
+<li>The attention kernel override for H100 training was changed to a CUTe DSL kernel <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py</code></a> (+13/−1).<ul>
+<li>The value changed from <code>pallas_ranker_varlen_attn → cutedsl_ranker_varlen_attn</code>. With this, the move to align with the same CUTe DSL family as GB300 is complete down to the last remaining place.</li>
+<li>In Gen4+21, the override in <code>xrecsys_two_tower.py</code> was already CUTe DSL; this time it was also cleaned up in <code>xrecsys.py</code> (the ranking config lineage).</li>
+</ul>
+</li>
+<li>A DSCP=InferenceCritical tag was added to the gRPC client of VMRanker (the stage that sends candidate scores to a separate ranking server for refinement) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/home-mixer/clients/vm_ranker_client.rs" target="_blank" rel="noopener"><code>home-mixer/clients/vm_ranker_client.rs</code></a>.<ul>
+<li>DSCP is a QoS field in the IP header, used to classify and prioritize datacenter traffic.</li>
+<li>A single line, <code>.dscp(Some(Dscp::InferenceCritical))</code>, was added to the <code>LoadBalancedChannel::builder</code> chain.</li>
+</ul>
+</li>
+<li>When rendering a quote post, grox attaches <code>by @handle</code> and a self-quote marker <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/grox/core/lm/post.py" target="_blank" rel="noopener"><code>grox/core/lm/post.py</code></a>.<ul>
+<li>If the quoter and the quoted author have the same handle, <code>&quot;(this Post&#39;s author, quoting their OWN post)&quot;</code> is added.</li>
+</ul>
+</li>
+<li>AES (abuse-enforcement-service, which decides account actions from model scores) now passes an audit join key <code>score_id</code> in <code>decision_outcome</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/abuse-enforcement-service/service-lib/src/lib.rs" target="_blank" rel="noopener"><code>abuse-enforcement-service/service-lib/src/lib.rs</code></a>.<ul>
+<li>Two tests pass both the normal case and the legacy (empty string) case.</li>
+</ul>
+</li>
+<li>In the VF (visibility-filtering, the service that decides per post whether it may be shown to this viewer) sub-repo, 13 enums were unified from hand-written <code>as_str()</code> implementations to the <code>strum::IntoStaticStr</code> macro. The change spans 5 files.<ul>
+<li>The target enums are <code>RequestOutcome</code>, <code>SourceOutcome</code>, <code>CacheTier</code>, <code>CacheResult</code>, <code>ManhattanResult</code>, <code>BatchStage</code>, <code>ConnEvent</code>, <code>HydratorOutcome</code>, <code>SafetyLevel</code>, <code>LabelSource</code>, <code>FallbackReason</code>, <code>FailureKind</code>, and <code>WarmKeyResult</code>.</li>
+<li>The observability label strings stay in snake_case, so this is a pure refactor, at -180 lines.</li>
+<li>No change is observable in the observability metrics, and the details of this refactor are not covered here.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">class ContinuousActionLossConfig(Config):
+    loss_weight: float = 0.0
+    loss_type: Literal[&quot;mse&quot;, &quot;mae&quot;, &quot;huber&quot;, &quot;tweedie&quot;, &quot;binary&quot;] = &quot;mae&quot;
+    tweedie_power: float = 1.5
+    binary_threshold: float = 10.0
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a>, 2026-09-16.</p>
+</blockquote>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">ContinuousActionLossConfig(
+    action_index=recsys_pb2.ContinuousActionName.CLICK_DWELL_TIME,
+    metric_name=&quot;click-dwell-binary&quot;,
+    loss_weight=mparams.get(&quot;click_dwell_loss_weight&quot;, 0.0),
+    loss_type=&quot;binary&quot;,
+    binary_threshold=10.0,
+    norm_config=NormConfig(norm_scale=60.0),
+),
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py</code></a>, 2026-09-16. <code>&quot;click_dwell_loss_weight&quot;: 1.0</code> was also set in the <code>_home_direct_packed_base()</code> mparams.</p>
+</blockquote>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def _rescale_sigmoid_heads_for_inference(
+    candidate_continuous_predictions, continuous_action_losses, product_surface,
+):
+    for loss_config in continuous_action_losses:
+        if loss_config.activation != &quot;sigmoid&quot; or loss_config.loss_type == &quot;binary&quot;:
+            continue
+        ...
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/fad2f71/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a>, 2026-09-16. The evidence that binary heads remain probabilities in [0,1] at serving.</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a <code>Gen4+22</code> row to the Gen4 table of <a href="x.html">services/x.md</a> and created a new <code>### Gen4+22 (2026-09-16, fad2f71)</code> detail section with 12 sub-blocks (A–L). Added the commit sha to <code>## Sources</code> and corrected the post-Gen4 commit count from 21 → 23. Added a footnote to the Attention category head table in <code>## Ranking</code>: <strong>click_dwell changed to binary classification and <code>ContClickDwellTimeWeight</code> is unchanged in the mirror, so the effective contribution is reduced by ~60×</strong>. Updated <code>**Last updated:** 2026-09-16 → 2026-09-17</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> In this commit, three things moved together: the ads training target, the training approach of the dwell-time head, and the gender feature index.</p></div>
+<ul>
+<li>First, the training target of ads ranking moved closer to the auction objective function.<ul>
+<li>Until now, most ads heads predicted click and conversion <strong>probabilities</strong>. <code>ADS_WEB_CT_PURCHASE_VALUE</code> is a <strong>regression target</strong> on the actual <strong>amount</strong>, expressed as a ratio relative to the advertiser&#39;s 28-day average.</li>
+<li>Value-optimizing auctions (Meta VBB, Google tCPA/tROAS) use training targets in the same direction.</li>
+<li>Because the default of <code>purchase_value_loss_weight</code> is 0, whether it is actually active has to be observed from when this value appears in the mparams (the parameter bundle from which the training config reads values such as weights) of a following commit.</li>
+</ul>
+</li>
+<li>Second, the training meaning of the <code>click_dwell_time</code> head changed from <strong>regression to binary classification</strong>.<ul>
+<li>The Netflix N-tower and YouTube dwell family keep &quot;whether dwelled (binary)&quot; and &quot;dwell time(regression)&quot; in separate heads. In contrast, X in effect unified them into one head as a binary classification.</li>
+<li>The training target moved from &quot;predicting exact dwell seconds&quot; to &quot;the probability of dwelling 10 seconds or more&quot;.</li>
+<li>However, the symmetry with the serving side is shaken. Because <code>_rescale_sigmoid_heads_for_inference</code> explicitly skips the original-scale restoration for binary heads, this head remains a probability in [0,1] at serving.</li>
+<li>Because <code>ContClickDwellTimeWeight</code> is unchanged in the mirror, the effective contribution of this head in the ranking scorer is reduced by at least 60× compared with before (when a prediction in seconds was multiplied).</li>
+<li>No evidence that the weight was adjusted to match the deployment is confirmed in this commit.</li>
+</ul>
+</li>
+<li>Third, the <code>user_gender</code> categorical index was <strong>silently remapped</strong>.<ul>
+<li>If the proto Gender enum follows the common convention <code>UNKNOWN=0, MALE=1, FEMALE=2</code>, the embedding table indexes of Male/Female in <code>user_gender</code> are <strong>swapped</strong> relative to before (Male=2, Female=1).</li>
+<li>Until retraining, the sign of the gender signal is flipped at serving.</li>
+<li>Also, the non-binary values that were previously lumped into 0 now get a separate index as defined in the proto.</li>
+<li>What to watch is that there is no training reset paired with this migration. The proto Gender definition needs to be checked in the next commit.</li>
+</ul>
+</li>
+<li>XAUC was added because, for continuous heads such as dwell and purchase-value, <strong>order concordance rather than magnitude accuracy</strong> is directly tied to auction performance.<ul>
+<li>In ads value optimization, the ability to get the order of larger revenue right affects auction decisions more than the accuracy of the absolute revenue prediction.</li>
+<li>The stride sampling is not random and has a bias that depends on the sequence packing order. This reads as the budget limit of not computing more than 2048² pairs per training step taking priority.</li>
+</ul>
+</li>
+<li>The DSCP=InferenceCritical on VMRanker pairs with this path having been thinned out in Gen4+8. It is evidence that a deployment decision stands that <strong>VMRanker is critical to the tail latency of home ranking</strong>.</li>
+<li>The <code>true → false</code> rollback of <code>EnableAdsBrandSafetyVerdictV2</code> suggests that the expansion direction, which was introduced in Gen4+2 and went as far as the HighRisk promotion in Gen4+7, caused problems in measured metrics or is under review.</li>
+<li>Reading the two-model routing of grox reply spam together with the coordinated_spam threshold increase in Gen4+21 (10k → 30k), the whole spam pipeline is being refined toward <strong>handling high-follower and low-follower bands with different models and criteria</strong>.</li>
+<li>The self-quote (self-QT) marker gives a hint at the prompt layer so that the grox judge recognizes, at the semantic level, self-boosting patterns aimed at expanding reach.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-pcap-per-user-category-caps-in-marketplace-candidate-generation--meta"><span class="num">2</span>PCap: per-user category caps in Marketplace candidate generation — Meta</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2609.16452" target="_blank" rel="noopener">PCap: Personalized Retrieval-Stage Diversity Capping in Facebook Marketplace</a> — arXiv 2609.16452, submitted 2026-09-15, paper. All 11 authors are at Meta (Menlo Park and Boston) with <code>@meta.com</code> addresses, as confirmed in the <a href="https://arxiv.org/html/2609.16452" target="_blank" rel="noopener">HTML version</a>.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Approaches to securing diversity at the candidate generation (retrieval) stage have so far fallen on two main axes in this repository&#39;s corpus. One re-arranges the top candidates in ranking and re-ranking with a pairwise similarity penalty such as <strong>MMR and DPP</strong>, which penalizes candidates the more similar they are to each other; X&#39;s VMRanker DPP and YouTube&#39;s rerank stage belong here. The other <strong>secures coverage through source diversity</strong> by increasing the number of candidate generators itself, as in Netflix multi-source retrieval.</p></div>
+<p>The paper targets a characteristic of waterfall grid-style marketplace surfaces. In multi-source retrieval, each source has a category bias according to its own objective (for example, one source over-represents electronics), so the category distribution of the top candidate pool is skewed. As a result, the categories the user engages with also narrow. Also, users differ in how much diversity they want, so applying the same diversity policy to all users can impose too much diversity on &quot;narrow-clicking users&quot; and too little on &quot;broad-clicking users&quot;. This paper (PCap) inserts a new axis between the two existing ones: an approach that <strong>sets per-category caps at the retrieval scanning stage but personalizes the cap itself per user</strong>.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. PCap divides users into diversity buckets by the entropy of their clicked categories and applies a different category cap to each bucket</span></p></div>
+<ul>
+<li>A user&#39;s diversity preference is gauged with a proxy computed as Shannon entropy <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2609.16452" target="_blank" rel="noopener">arXiv 2609.16452 HTML</a>.<ul>
+<li>The formula is $S(u) = -\sum_{c \in C} p(c|u) \log p(c|u)$, where <code>p(c|u)</code> is the probability of category c for user u, obtained from recent clicks.</li>
+<li>The category groups use the hundreds of categories of the <strong>Facebook Product Taxonomy</strong> (FPT).</li>
+<li>After normalizing the scores, users are sorted into 6 diversity buckets. Bucket-1 is the users who click most narrowly and bucket-6 the most broadly.</li>
+</ul>
+</li>
+<li>Per-category caps are applied in two stages of multi-source retrieval, shard-scanning and aggregation <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2609.16452" target="_blank" rel="noopener">arXiv 2609.16452 HTML</a>.<ul>
+<li>The cap is computed as <code>retrieval source fetch count × tuned multiplier fk × the diversity multiplier mu of the user&#39;s bucket</code>.</li>
+<li>The detailed names of the sources are not public, but it states explicitly that there are multiple indexer shards and an aggregation stage.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The cap parameters are found with a sequential A/B procedure that narrows the range</span></p></div>
+<ul>
+<li>The authors created <strong>Parameter Tuning Sequence</strong> (PTS) as a new parameter search method <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2609.16452" target="_blank" rel="noopener">arXiv 2609.16452 HTML</a>.<ul>
+<li>PTS is a sequential range-narrowing A/B procedure. It keeps the control arm fixed and exposes candidate arms to a small share of traffic for several days each, replacing online grid search.</li>
+<li>It is used to search the high-dimensional combination space created by six buckets and multiple parameters.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. VPV rose significantly in both stages of the Marketplace Feed production A/B</span></p></div>
+<ul>
+<li>In the Marketplace Feed production A/B, VPV rose in both stages, and in Phase 2 PDP Clicks and Marketplace Sessions also rose <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2609.16452" target="_blank" rel="noopener">arXiv 2609.16452 HTML</a>.<ul>
+<li>As for the metrics, VPV is Viewport Views, PDP is Product Detail Page Clicks, and Marketplace Sessions are sessions that enter Marketplace.</li>
+<li>In Phase 1 (uniform cap vs no cap), VPV rose <strong>+0.3088%</strong> with p&lt;0.01. PF Latency was +8.6 ms.</li>
+<li>In Phase 2 (PCap vs uniform cap), all three metrics rose with p&lt;0.01: <strong>VPV +0.2243%, PDP Clicks +0.2250%, Marketplace Sessions +0.1708%</strong>. PF Latency was +0.8 ms.</li>
+<li>The diversity score (Pagination Feed) changed by <strong>−1.0537%</strong> in bucket-1 and <strong>+0.2469%</strong> in bucket-6.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;We propose a personalized capping framework (PCap) to improve the diversity in Facebook Marketplace by introducing user-level diversity constraints at the retrieval stage. PCap models individual diversity preferences using Shannon entropy-based scoring, segments users into diversity buckets, and applies personalized category caps during multi-source candidate retrieval.&quot;
+— <a href="https://arxiv.org/abs/2609.16452" target="_blank" rel="noopener">PCap: Personalized Retrieval-Stage Diversity Capping in Facebook Marketplace</a>, 2026-09-15.</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a PCap entry at the top of the <code>## New this month</code> section of <a href="radar.html">radar.md</a>. Facebook Marketplace is not a canon service of this repository, so it is covered in the radar. The current canon services are x, facebook, instagram, threads, and netflix; Marketplace is not among them. It is a promotion candidate for <a href="feed-diversity.html">topics/feed-diversity.md</a> once further observations accumulate.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> PCap adds a new angle to <a href="feed-diversity.html">topics/feed-diversity.md</a>, which this repository already tracks. Existing diversity discussion mainly covered pairwise approaches such as MMR and DPP (ranking and re-ranking) and responses based on multi-source retrieval. PCap <strong>sets category caps at retrieval scanning but sets the cap itself differently per user</strong>, a new angle between the two axes.</p></div>
+<ul>
+<li>First, the latency increase is small. The Phase 2 latency of +0.8 ms contrasts with diversity handling at the ranking and re-ranking stages.<ul>
+<li>DPP can spike P99 into the hundreds of ms because of determinant computation.</li>
+<li>An approach that keeps a counter at the scanning stage and enforces only per-category caps is O(n), so the latency upper bound is clear.</li>
+</ul>
+</li>
+<li>Second, it matters that the carrier metrics rise together as well.<ul>
+<li>Marketplace Sessions +0.17% means that users return to this surface more often. It therefore suggests that the diversity improvement led to an expansion of engagement, not a stagnation of it.</li>
+<li>This contrasts with the common view that diversity handling is a &quot;trade-off that cuts engagement&quot;.</li>
+</ul>
+</li>
+<li>Third, the diversity scores moving in opposite directions by bucket (bucket-1 −1.05%, bucket-6 +0.25%) serve as the basis for personalization.<ul>
+<li>The meaning of &quot;narrow for those who click narrowly, broad for those who click broadly&quot; is observed in the diversity score itself.</li>
+<li>However, because the paper does not break out engagement metrics by bucket in detail, how this direction connects to actual engagement is a subject for follow-up observation.</li>
+</ul>
+</li>
+<li>Fourth, the tuning method PTS is itself a reusable asset.<ul>
+<li>Online grid search that narrows the range through sequential range-narrowing can be carried over to ranking hyperparameters (for example, head weights) and other retrieval tuning.</li>
+</ul>
+</li>
+</ul>
+<p>There are two things to watch next. One is whether a statement appears that the same stack was extended to other Meta surfaces (Facebook Feed, Instagram, Reels), and the other is whether a second company adopts a personalized approach to retrieval-stage caps.</p>
+<p>Facebook Marketplace is not a canon service of this repository, so it is not a promotion target. However, it is an observation that attaches to <a href="feed-diversity.html">topics/feed-diversity.md</a> as a new angle on diversity personalization.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="corrections">Corrections</h2>
+<p>None.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<p>Added a PCap entry to the radar. The location is the <code>## New this month</code> section of <code>radar.md</code>, and it covers retrieval-stage diversity personalization capping on Meta&#39;s Facebook Marketplace.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Watch for when a config appears that actually sets the weight of the ads purchase-value loss above 0 — once this value is activated, the value-optimizing axis in the loss mix of ads ranking starts to actually affect training. The weight is <code>purchase_value_loss_weight</code> in mparams. What to watch is how the measured training curves of baseline offset regression and raw dollar regression diverge.</li>
+<li>Watch for when the <code>ContClickDwellTimeWeight</code> mirror is adjusted — with <code>click_dwell_loss_weight=1.0</code> and the <code>binary</code> head activated, the scale of the serving predictions has shrunk by 60×. If the mirror stays unchanged, it means this head is being deployed with its contribution effectively reduced.</li>
+<li>Check the actual value definitions of the proto <code>Gender</code> enum — we need to determine whether the Male/Female embedding indexes of <code>user_gender</code> were swapped. Check the enum definition in <code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code> or <code>xai-proto/proto/recsys.proto</code>.</li>
+<li>Watch whether the reason for the <code>EnableAdsBrandSafetyVerdictV2</code> rollback shows up in a later commit — <code>EnableAdsBrandSafetyVerdictV2</code> was introduced in Gen4+2 and moved in an expanding direction through Gen4+7, and was rolled back this time. Observe logs, comments, and PR comments for whether the reason is revealed.</li>
+<li>Watch whether a statement appears that another company adopted PTS (Parameter Tuning Sequence) — observe for a statement that it was extended to other Meta surfaces, or a similar sequential online tuning statement from a second company.</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-16.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-16</span></a><a class="pg-next" href="daily-2026-09-18.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-18</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-17.html" data-title="일일 리포트 2026-09-17"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

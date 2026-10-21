@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model freshness — how often it is rebuilt, and why it differs by surface — feed-research</title>
+<meta name="description" content="Meta calls the speed from collecting a signal to training on it and using it for recommendations &quot;freshness.&quot; It covers the whole path from data collection…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/model-freshness.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/model-freshness.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/model-freshness.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/model-freshness.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Model freshness — how often it is rebuilt, and why it differs by surface — feed-research">
+<meta property="og:description" content="Meta calls the speed from collecting a signal to training on it and using it for recommendations &quot;freshness.&quot; It covers the whole path from data collection…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/model-freshness.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/model-freshness.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Cross-service topics</p>
+<h1 id="model-freshness--how-often-it-is-rebuilt-and-why-it-differs-by-surface">Model freshness — how often it is rebuilt, and why it differs by surface</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Translated from</span><a href="../model-freshness.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">14</span></summary><ol><li><a href="#observed-cadences--one-table">Observed cadences</a></li><li><a href="#why-it-differs--four-structures">Why it differs</a><ol><li><a href="#1-the-index-is-a-coverage-problem-and-the-ranker-is-an-accuracy-problem">1. The index is a coverage problem and the ranker is an accuracy problem</a></li><li><a href="#2-once-the-output-is-cached-the-cost-of-rebuilding-the-cache-sets-that-towers-retraining-cadence">2. Once the output is cached, the cost of rebuilding the cache sets that tower&#39;s retraining cadence</a></li><li><a href="#3-each-parameter-type-has-a-different-freshness-budget">3. Each parameter type has a different freshness budget</a></li><li><a href="#4-what-a-graph-contains-sets-its-cadence">4. What a graph contains sets its cadence</a></li></ol></li><li><a href="#x--freshness-is-managed-through-time-decay-instead-of-a-retraining-cadence">X</a></li><li><a href="#case-netflix--the-most-concretely-disclosed-retraining-cadence-and-why-freshness-pressure-is-low">Case: Netflix</a></li><li><a href="#ads--the-oldest-case-of-treating-freshness-as-a-measurable-cost">Ads</a></li><li><a href="#freshness-was-promoted-from-an-infrastructure-metric-to-a-product-metric">Freshness was promoted from an infrastructure metric to a product metric</a></li><li><a href="#what-generalizes-from-this-case">What generalizes from this case</a></li><li><a href="#who-uses-this">Who uses this</a></li><li><a href="#not-yet-verified">Not yet verified</a></li><li><a href="#sources">Sources</a></li></ol></details></nav>
+<div class="prose">
+<p>Meta calls the speed from collecting a signal to training on it and using it for recommendations &quot;freshness.&quot; It covers the whole path from data collection to serving, not only the training cadence <span class="badge ok">verified</span> (<a href="#3-each-parameter-type-has-a-different-freshness-budget">section 3</a>).</p>
+<p>Even within the same company, the regeneration cadence differs by <strong>four orders of magnitude, from weeks to minutes</strong>, depending on the component. This is not a difference in engineering maturity but <strong>a difference in the economics of freshness at each layer</strong>. The point of these notes is the reason, not the cadence table.</p>
+<h2 id="observed-cadences--one-table">Observed cadences — one table</h2>
+<p>Even within one surface, the update cadence differs by component. As of the 2023 post, Instagram Explore fine-tunes its ranking model every 1 hour but regenerates item tower embeddings every 1 day <span class="badge ok">verified</span> (<a href="#2-once-the-output-is-cached-the-cost-of-rebuilding-the-cache-sets-that-towers-retraining-cadence">section 2</a>).</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col><col><col class="w8"></colgroup>
+<thead>
+<tr>
+<th>Service</th>
+<th>Component</th>
+<th>Cadence</th>
+<th>Grade</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Meta recommendations overall</td>
+<td>Model update latency (as of <span class="nw">2021</span>–22)</td>
+<td><strong>3–6 hours</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta recommendations overall</td>
+<td>After delta updates were introduced</td>
+<td><strong>10–30 minutes</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta recommendations overall</td>
+<td>Current</td>
+<td><strong>O(1 minute)</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta LSR</td>
+<td>item embedding update</td>
+<td><strong>zero-second latency is a gain</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta LSR</td>
+<td>dense parameter</td>
+<td><strong>tolerates tens of minutes of latency</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Instagram Explore</td>
+<td>Ranking model fine-tune</td>
+<td><strong>1 hour</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Instagram Explore</td>
+<td>two-tower <strong>item tower</strong> embeddings</td>
+<td><strong>1 day</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Instagram Explore</td>
+<td>two-tower <strong>user tower</strong></td>
+<td><strong>real-time at request time</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta RankGraph-2</td>
+<td>Full rebuild of the co-engagement graph</td>
+<td><strong>3 hours</strong> (24-hour window)</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta RankGraph-2</td>
+<td>Serving candidate pool filter</td>
+<td>Users active in the last <strong>15 minutes</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta SilverTorch</td>
+<td>Full model snapshot publish</td>
+<td>Cadence undisclosed (publish time dropped from days to 1 hour)</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta SilverTorch</td>
+<td>Index update between publishes</td>
+<td>Streaming in-place (figure undisclosed)</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Meta ads(GEM)</td>
+<td>foundation model</td>
+<td><em>&quot;continuous online training&quot;</em> (no figure)</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>X</td>
+<td>SimClusters <code>KnownFor</code> community detection</td>
+<td><strong>7 days</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>X</td>
+<td>Tweet SimClusters embeddings</td>
+<td>Accumulated in real time on every like</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>X</td>
+<td>Thunder in-network index retention</td>
+<td><strong>2 days</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>X</td>
+<td>Candidate source memcache TTL</td>
+<td><strong>600 seconds</strong> (±20% jitter)</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Netflix</td>
+<td>Foundation Model (FM) pretraining (from scratch)</td>
+<td><strong>Once a month</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Netflix</td>
+<td>FM fine-tuning</td>
+<td><strong>Daily</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Netflix</td>
+<td>FM embedding store update</td>
+<td><strong>Daily batch</strong></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Netflix</td>
+<td>Classic generation training data age</td>
+<td>Up to 2 days old. <strong>An example of an offline experiment protocol, not a production cadence claim</strong> (<span class="nw">2015</span>)</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Netflix</td>
+<td>GenRec ranking post-training</td>
+<td><em>&quot;frequently refreshed&quot;</em> (no figure)</td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+</tbody></table></div>
+<p>Sources and quotes are given in each section below.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="why-it-differs--four-structures">Why it differs — four structures</h2>
+<p>This note names four structural reasons why the update cadence differs by component <span class="badge est">inferred</span> (<a href="#1-the-index-is-a-coverage-problem-and-the-ranker-is-an-accuracy-problem">structure 1</a>–<a href="#4-what-a-graph-contains-sets-its-cadence">structure 4</a>).</p>
+<ul>
+<li>An item missing from the index is not shown at all, whereas a stale ranker only ranks slightly worse (<a href="#1-the-index-is-a-coverage-problem-and-the-ranker-is-an-accuracy-problem">structure 1</a>).</li>
+<li>For a tower whose output is cached, the cost of rebuilding the cache sets the retraining cadence (<a href="#2-once-the-output-is-cached-the-cost-of-rebuilding-the-cache-sets-that-towers-retraining-cadence">structure 2</a>).</li>
+<li>Even within one ranker, the tolerable latency differs by parameter type <span class="badge ok">verified</span> (<a href="#3-each-parameter-type-has-a-different-freshness-budget">structure 3</a>).</li>
+<li>The update cadence of a graph depends on what the graph contains <span class="badge est">inferred</span> (<a href="#4-what-a-graph-contains-sets-its-cadence">structure 4</a>).</li>
+</ul>
+<h3 id="1-the-index-is-a-coverage-problem-and-the-ranker-is-an-accuracy-problem">1. The index is a coverage problem and the ranker is an accuracy problem</h3>
+<p><strong>An item that is not in the candidate generation index does not have a low score; it does not exist at all.</strong> Until a new item enters the index, its probability of being reached is exactly 0. This is a binary problem.</p>
+<p>The ranking model is different. A ranker that is a day old still scores every candidate. Rankings get slightly worse, and this is <strong>graceful degradation</strong>.</p>
+<p>This difference is the primary cause of the asymmetry &quot;index updates take minutes or seconds, ranker retraining takes hours or days&quot; <span class="badge est">inferred</span>. There are two grounds.</p>
+<ul>
+<li>Meta states directly that it sets freshness budgets differently per component (<a href="#3-each-parameter-type-has-a-different-freshness-budget">structure 3</a>).</li>
+<li>SilverTorch (Meta&#39;s retrieval system that moves the index into tensors inside the model) built a separate streaming path <strong>solely for index freshness</strong>.</li>
+</ul>
+<p>Meta itself redefines freshness as an index problem. If the index is one module of the model, keeping the index fresh amounts to updating the weights of a production model without taking serving offline.</p>
+<blockquote>
+<p><em>&quot;With <strong>index as a model</strong> module, maintaining index freshness equates to <strong>updating the model weights of a neural network in production</strong>, at scale, without taking the model offline.&quot;</em></p>
+</blockquote>
+<p><span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2026/05/26/ml-applications/silvertorch-index-as-model-new-retrieval-paradigm-recommendation-systems/" target="_blank" rel="noopener">SilverTorch, engineering.fb.com</a>, 2026-05-26</p>
+<h3 id="2-once-the-output-is-cached-the-cost-of-rebuilding-the-cache-sets-that-towers-retraining-cadence">2. Once the output is cached, the cost of rebuilding the cache sets that tower&#39;s retraining cadence</h3>
+<p>The key advantage of a two-tower model (a structure in which the user tower and the item tower build user embeddings and item embeddings separately) is caching. Yet that same caching becomes the constraint.</p>
+<blockquote>
+<p><em>&quot;The main advantage of the Two Tower approach is that user and item embeddings <strong>can be cached</strong>, making inference for the Two Tower model extremely efficient.&quot;</em>
+<em>&quot;we can use an item tower to generate embeddings for items that can be used as candidates during retrieval. And we can do this <strong>on a daily basis using an offline pipeline</strong>.&quot;</em>
+<em>&quot;During online retrieval we use the <strong>user tower to generate user embedding on the fly</strong> by fetching the freshest user-side features.&quot;</em></p>
+</blockquote>
+<p><span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>, Vladislav Vorotilov·Ilnur Shugaepov, 2023-08-09</p>
+<p><strong>The two towers of the same model are updated at opposite cadences.</strong> The user tower runs on every request, so it can be changed at any time, but changing the item tower <strong>requires rebuilding the entire index.</strong> In other words, the item tower&#39;s retraining cadence is set not by model quality but by <strong>the cost of rebuilding the index</strong>.</p>
+<p>The same blog sets a much shorter cadence on the ranking side. It says the model can be re-trained (fine-tuned) every hour as new data arrives.</p>
+<blockquote>
+<p><em>&quot;neural networks allow us to do this by utilizing <strong>continual online training</strong>, meaning we can <strong>re-train (fine-tune) our models every hour</strong> as soon as we have new data.&quot;</em></p>
+</blockquote>
+<p><span class="badge ok">verified</span> — same post</p>
+<p><strong>Within one surface, ranking updates every 1 hour and the item tower every 1 day, a 24× difference, and what creates the difference is whether the output is cached.</strong></p>
+<p><strong>SilverTorch appears to be an attempt to break this coupling</strong> <span class="badge est">inferred</span>. According to the blog, SilverTorch periodically publishes the full model as a snapshot. In between, a streaming service reads real-time signals and edits specific tensors of the in-memory model in place. It neither stops serving nor redeploys the model.</p>
+<blockquote>
+<p><em>&quot;SilverTorch <strong>decouples freshness from the full model publish cycle</strong> through streaming updates. As model parameters get updated based on the latest training, we periodically publish the full model as a complete snapshot. <strong>Between publishes</strong>, a continuous streaming service reads real-time signals — new items, updated engagement features, changed eligibility — and applies <strong>targeted updates in-place to the specific tensors</strong> in the in-memory model.&quot;</em>
+<em>&quot;Updates land without interrupting serving and without redeploying the model.&quot;</em></p>
+</blockquote>
+<p><span class="badge ok">verified</span> — SilverTorch blog post, 2026</p>
+<p>The publish itself also got faster. It uses GPUs to compute item embeddings and clustering, which cut the publish time for building the model snapshot from days to 1 hour <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2511.14881v3" target="_blank" rel="noopener">SilverTorch paper HTML</a>, 2026.</p>
+<blockquote>
+<p><em>&quot;The publish leverages GPUs to compute item embeddings and clustering which reduce the publish time to build the model snapshot <strong>from days to 1 hour</strong>.&quot;</em></p>
+</blockquote>
+<p class="warn"><strong>⚠ However, the paper has no figure for streaming update latency either</strong> <span class="badge ok">verified</span> — same paper. The paper deferred the details of the fresh index to future work: <em>&quot;We leave the details of fresh index for future work.&quot;</em> It is an unusual combination in which the blog post explains the mechanism and the paper withholds the figure.</p>
+<h3 id="3-each-parameter-type-has-a-different-freshness-budget">3. Each parameter type has a different freshness budget</h3>
+<p>Even within the same ranker, the update latency each parameter type can tolerate differs <span class="badge ok">verified</span>. The most mechanical statement of this is Meta&#39;s @Scale 2025 talk. In late-stage ranking (LSR in the table) models, item embeddings can yield large gains with zero-second update latency, and dense parameters can tolerate tens of minutes of latency without hurting performance <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p><em>&quot;For instance, updates to <strong>item embeddings</strong> in late-stage ranking models can yield substantial gains with <strong>zero-second latency</strong>, whereas <strong>dense parameters can tolerate delays of tens of minutes</strong> without compromising performance.&quot;</em></p>
+</blockquote>
+<p><span class="badge ok">verified</span> — <a href="https://atscaleconference.com/model-freshness-systems-at-scale/" target="_blank" rel="noopener">Model Freshness Systems at Scale</a>, Xianzheng Dou·Lujia Zhang·Vahid Jazayeri·Vivek Khurana (Meta), @Scale 2025</p>
+<p><strong>The question &quot;how often is the model retrained&quot; is itself wrong.</strong> Even within one ranker, the embedding table and the dense layers have different freshness needs. The reason is an inference but a clear one: item embeddings hold <strong>new items and new popularity</strong>, so their distribution shifts quickly, while dense layers hold a slow function, &quot;how to combine engagement&quot; <span class="badge est">inferred</span>.</p>
+<p>The same talk presents both the definition of freshness and the improvements by generation.</p>
+<ul>
+<li>Freshness refers to how quickly signals are collected, trained on, and used for recommendations <span class="badge ok">verified</span> — same talk: <em>&quot;How quickly the signals can be <strong>ingested, trained on, and used for providing recommendations</strong> is referred to as &#39;freshness.&#39;&quot;</em><ul>
+<li>In other words, freshness covers <strong>the whole path from data collection to serving</strong>. It does not mean only the training cadence.</li>
+</ul>
+</li>
+<li>Model update latency as of 2021–22 was about 3–6 hours <span class="badge ok">verified</span>: <em>&quot;At this stage, the model-update latency was approximately <strong>three to six hours</strong>.&quot;</em></li>
+<li>After the improvement techniques were applied, freshness became about 10–30 minutes <span class="badge ok">verified</span>: <em>&quot;By leveraging these techniques, we achieved freshness at approximately <strong>10-30 minutes</strong>.&quot;</em></li>
+<li>As of @Scale 2025, current freshness is O(1 minute) <span class="badge ok">verified</span>: <em>&quot;This brings freshness down to <strong>O (one minute)</strong>.&quot;</em></li>
+</ul>
+<h3 id="4-what-a-graph-contains-sets-its-cadence">4. What a graph contains sets its cadence</h3>
+<p>Community detection on X&#39;s follow graph runs every 7 days, and the rebuild of Meta&#39;s co-engagement (a relationship of engaging with the same target) graph runs every 3 hours <span class="badge ok">verified</span> — the code below and the RankGraph-2 paper. <strong>The reason for the 56× difference is that the two graphs contain different things</strong> <span class="badge est">inferred</span>. Follow relationships are the social structure of people and change slowly, while co-engagement edges are <strong>attached to content</strong>, so they become invalid as quickly as content ages. Rebuilding a graph built on a 24-hour window every 3 hours means that more than half of the edges become meaningless within a day.</p>
+<p><strong>X&#39;s follow-graph community detection runs every 7 days.</strong> This cadence is set in the job that builds <code>KnownFor</code>, the per-account community membership in SimClusters (X&#39;s embedding that splits the follow graph into communities and uses degrees of membership as vectors).</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">override val firstTime: RichDate = RichDate(&quot;2020-10-04&quot;)
+override val batchIncrement: Duration = Days(7)
+</code></pre></figure>
+<p><span class="badge ok">verified</span> — <code>twitter/the-algorithm</code> @ <code>c54bec0</code>, <code>simclusters_v2/scalding/update_known_for/UpdateKnownFor20M145K2020.scala:44,46</code></p>
+<p><strong>This number is a constant that can be quoted.</strong> The hyperparameters in the same file take the form <code>args.int(name, default)</code>, so the values written in code differ from the production run values. The <code>maxNeighbors</code> 400 vs 100 case summarized in <a href="embedding-retrieval.html">embedding-retrieval.md</a> is one such case. By contrast, <code>batchIncrement</code> is <strong>stated in the schedule itself with <code>override val</code>.</strong> It is not overridden by runtime arguments <span class="badge ok">verified</span>.</p>
+<p><strong>Meta&#39;s co-engagement graph runs every 3 hours.</strong> According to the RankGraph-2 paper (Meta&#39;s system that uses a co-engagement graph as a retrieval index), the graph is built from 24 hours of engagement data and fully rebuilt every 3 hours. The whole pipeline finishes within 1 hour, which makes the 3-hour cadence possible. The paper adds that even a 3-hour refresh may be insufficient in extremely time-sensitive situations.</p>
+<blockquote>
+<p><em>&quot;The graph is constructed from <strong>24 hours of engagement data</strong> and <strong>fully reconstructed every 3 hours</strong>&quot;</em>
+<em>&quot;The entire pipeline completes within one hour, enabling the 3-hour refresh cycle&quot;</em>
+<em>&quot;the <strong>3-hour refresh may be insufficient</strong> for extremely time-sensitive scenarios&quot;</em></p>
+</blockquote>
+<p><span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2606.18379" target="_blank" rel="noopener">RankGraph-2: Lifecycle Co-Design for Billion-Node Graph Learning in Recommendation</a>, Meta, 2026 (<strong>HTML version, not PDF</strong>)</p>
+<p><strong>The same paper applies a freshness condition once more at the serving stage.</strong> Narrowing the candidate pool to recently active users (e.g., the past 15 minutes) gave the best quality <span class="badge ok">verified</span>: <em>&quot;filtering the candidate pool to <strong>recently active users (e.g., past 15 minutes)</strong> yields the best quality&quot;</em></p>
+<p><strong>The index refresh cadence of rebuilding every 3 hours and the serving-time filter on activity within 15 minutes are separate levers.</strong> When the index cannot be rebuilt more often, the lookup range is narrowed to compensate.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="x--freshness-is-managed-through-time-decay-instead-of-a-retraining-cadence">X — freshness is managed through time decay instead of a retraining cadence</h2>
+<p>X&#39;s public code has almost no clues about the model retraining cadence <span class="badge ok">verified</span>. Instead, freshness is expressed through <strong>decay constants and TTLs</strong> <span class="badge ok">verified</span>.</p>
+<p>On 2026-08-09, before the Gen4 release, the strings <code>hourly</code> / <code>daily</code> / <code>retrain</code> / <code>continual</code> appeared <strong>0 times</strong> across the whole 2026 Rust repo <span class="badge ok">verified</span> — GitHub code search, <code>xai-org/x-algorithm</code>, 2026-08-09</p>
+<p>In <code>phoenix/</code> at HEAD (<code>862a123</code>, 2026-10-17), these strings appear only in multimodal embedding snapshot paths and proto fields, and no wording mentions a ranker retraining cadence <span class="badge ok">verified</span> — 2026-10-19 <code>git grep</code>.</p>
+<p>The decay constants and TTLs are in the table below. Locations are as of <code>twitter/the-algorithm</code> @ <code>c54bec0</code>, except the Thunder row, which is <code>xai-org</code>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col><col><col class="w8"></colgroup>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Value</th>
+<th>Location</th>
+<th>Grade</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>InterestedIn fav signal half-life</td>
+<td><strong>100 days</strong></td>
+<td><code>InterestedInFromKnownFor.scala:286-301</code></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Tweet embedding half-life</td>
+<td><strong>8 hours</strong></td>
+<td><code>summingbird/common/Configs.scala:38</code></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Tweet embedding update</td>
+<td>Accumulated in real time on every like</td>
+<td><code>simclusters_v2/README.md:65-67</code></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>SANN candidate age cap</td>
+<td><strong>1 day</strong></td>
+<td><code>SimClustersANNCandidateSource.scala:325-347</code></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Candidate source memcache TTL</td>
+<td><strong>600 seconds</strong> + 20% jitter</td>
+<td><code>Utils.scala:47-49</code></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Tweet-to-tweet embedding ANN TTL</td>
+<td><strong>180 seconds</strong></td>
+<td><code>DeepRetrievalTweetTweetEmbeddingANNCandidateSource.scala:52</code></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Thunder in-network index retention</td>
+<td><strong>2 days</strong></td>
+<td><code>xai-org</code>, <code>thunder/posts/post_store.rs:521-526</code></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+</tbody></table></div>
+<p><strong>Within the same system, two half-lives differ by 300×</strong> <span class="badge ok">verified</span> — <a href="https://github.com/twitter/the-algorithm/blob/c54bec0/src/scala/com/twitter/simclusters_v2/scalding/InterestedInFromKnownFor.scala" target="_blank" rel="noopener"><code>InterestedInFromKnownFor.scala:291-292</code></a>, <a href="https://github.com/twitter/the-algorithm/blob/c54bec0/src/scala/com/twitter/simclusters_v2/summingbird/common/Configs.scala" target="_blank" rel="noopener"><code>summingbird/common/Configs.scala:38</code></a> (<code>c54bec0</code>). The half-life of taste is 100 days and the half-life of content is 8 hours, so 100 × 24 ÷ 8 = 300. Details are in <a href="embedding-retrieval.html">embedding-retrieval.md</a>.</p>
+<p><strong>X and Meta solve freshness at different layers</strong> <span class="badge est">inferred</span>. Meta keeps updating model parameters, while the approach visible in X&#39;s public code is closer to &quot;keep the model and communities for a long time and <strong>apply time decay to the inputs</strong>&quot; <span class="badge est">inferred</span>. However, X&#39;s ranker retraining cadence may simply be undisclosed, so <strong>this must not be settled as a comparison.</strong> What exists now is an absence of evidence, not a refutation.</p>
+<p>Thunder (the in-network index in X&#39;s 2026 code that holds the latest posts of followed accounts in memory) has one side effect from its 2-day retention. When a thread root expires, all replies under it disappear. <strong>This is a case where the index retention period determines product behavior</strong> <span class="badge ok">verified</span> — <a href="x.html">x.md</a></p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-netflix--the-most-concretely-disclosed-retraining-cadence-and-why-freshness-pressure-is-low">Case: Netflix — the most concretely disclosed retraining cadence, and why freshness pressure is low</h2>
+<p>Netflix is <strong>the case that discloses its retraining cadence most precisely among big-tech recommendation models.</strong> The Foundation Model (FM, Netflix&#39;s recommendation model pretrained on interaction data) is pretrained from scratch every month and fine-tuned every day.</p>
+<blockquote>
+<p><em>&quot;pre-trained from scratch every month on interaction data, then fine-tuned everyday&quot;</em></p>
+</blockquote>
+<p><span class="badge ok">verified</span> — <a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">Integrating Netflix&#39;s Foundation Model</a>, 2025-11</p>
+<p><strong>It is a dual cadence of monthly pretraining that rebuilds everything and daily fine-tuning that folds in updates incrementally.</strong> This moves the per-parameter-type freshness budget of <a href="#3-each-parameter-type-has-a-different-freshness-budget">structure 3</a> to the level of the whole model. The overall representation space is updated slowly while the latest data is reflected quickly.</p>
+<p>GenRec (Netflix&#39;s LLM ranker) repeats the same pattern. The Netflix-adapted LLM is updated rarely, and ranking post-training is performed frequently <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec blog post 2026</a>.</p>
+<p><strong>However, there is a structural reason this cadence can be looser than at X or Meta</strong> <span class="badge est">inferred</span>.</p>
+<ul>
+<li><strong>New items arrive on a schedule.</strong> UGC (user-uploaded content) appears at thousands per second at random, but the release dates of a programmed catalog are known in advance. The coverage pressure of <a href="#1-the-index-is-a-coverage-problem-and-the-ranker-is-an-accuracy-problem">structure 1</a>, &quot;if it is not in the index, reach is 0,&quot; is weak. So the new-title problem shifts from a freshness problem to a <strong>promotion problem</strong> (the billboard bandit). Details are in <a href="netflix.html">netflix.md</a>.</li>
+<li><strong>Content lives long.</strong> Unlike a world where the tweet embedding half-life is 8 hours, movies and series are consumed for months. There is no reason to rebuild a co-engagement graph every 3 hours.</li>
+</ul>
+<p>Netflix <strong>precomputes and caches the recommendation results themselves. This is an extreme case of structure 2.</strong></p>
+<ul>
+<li>Since the 2013 three-layer (offline/nearline/online) structure, precomputing results has been the default <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/system-architectures-for-personalization-and-recommendation-e081aa94b5d8" target="_blank" rel="noopener">2013 blog post</a></li>
+<li>For live events, it builds recommendations before the start and pushes them to devices in advance (100 million devices within 1 minute) <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/behind-the-streams-real-time-recommendations-for-live-events-e027cb313f8f" target="_blank" rel="noopener">live delivery blog post 2025</a></li>
+</ul>
+<p>In light of the claim of <a href="#2-once-the-output-is-cached-the-cost-of-rebuilding-the-cache-sets-that-towers-retraining-cadence">structure 2</a>, &quot;if the output is cached, the cost of rebuilding the cache sets the retraining cadence,&quot; the cached object here is not the embedding but <strong>the entire recommendation list</strong>.</p>
+<p>Calibrate with classic-generation figures. The TMIS 2015 paper gives &quot;data up to two days before&quot; as an example of an offline experiment protocol <span class="badge ok">verified</span>. It is not a production training cadence claim, but because it assumes latency of a day or more as normal operation, it is valid as indirect evidence that freshness had low priority at the time <span class="badge est">inferred</span>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="ads--the-oldest-case-of-treating-freshness-as-a-measurable-cost">Ads — the oldest case of treating freshness as a &quot;measurable cost&quot;</h2>
+<p>On the ads side, the abstract of the 2014 Facebook ad click prediction paper already lists freshness as a tunable factor <span class="badge ok">verified</span>. According to the abstract, choosing the optimal handling of data freshness, learning rate schema, and data sampling improves the model slightly. However, the effect is much smaller than adding a high-value feature or picking the right model to begin with <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p><em>&quot;Picking the optimal handling for <strong>data freshness</strong>, learning rate schema and data sampling improve the model <strong>slightly</strong>, though much less than adding a high-value feature, or picking the right model to begin with.&quot;</em></p>
+</blockquote>
+<p>— <a href="https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/" target="_blank" rel="noopener">Practical Lessons from Predicting Clicks on Ads at Facebook</a>, He et al., ADKDD 2014</p>
+<p class="warn"><strong>⚠ The figure in this paper for &quot;how much NE worsens as the training–test gap widens&quot; is only in the body PDF, so we did not verify it.</strong> NE (normalized entropy) is the prediction loss metric this paper uses. Under this repository&#39;s rule, figures obtained from a PDF are not quoted. Only the qualitative statement in the abstract is <span class="badge ok">verified</span>.</p>
+<p>The current statements on the ads side are qualitative <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2025/11/10/ml-applications/metas-generative-ads-model-gem-the-central-brain-accelerating-ads-recommendation-ai-innovation/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM)</a>, 2025-11-10. GEM is the foundation model (FM) for Meta ads. It is a structure that distills knowledge from this FM into per-surface vertical models (VM).</p>
+<ul>
+<li>It says VMs often suffer from stale supervision caused by delays in FM training and evaluation <span class="badge ok">verified</span> — same post. The same sentence also lists the mismatch between GEM or FM predictions and the VMs&#39; surface-specific objectives.<ul>
+<li><em>&quot;VMs often suffer from <strong>stale supervision</strong> caused by delays in FM training and evaluation as well as domain mismatches between GEM or FM predictions and the VMs&#39; surface-specific objectives.&quot;</em></li>
+</ul>
+</li>
+<li>The countermeasure is the <strong>student adapter</strong> <span class="badge ok">verified</span>. It is a lightweight component that refines the teacher model&#39;s outputs with the latest ground-truth data: <em>&quot;a lightweight component that refines the teacher&#39;s outputs using the <strong>most recent ground-truth data</strong>&quot;</em></li>
+<li>The FM itself is also kept updated through continuous online training <span class="badge ok">verified</span>: <em>&quot;we also perform <strong>continuous online training</strong> to refresh the FMs&quot;</em></li>
+</ul>
+<p><strong>Here the freshness problem becomes one step more complicated.</strong> In a structure that distills from a foundation model to a vertical model, <strong>the teacher&#39;s staleness propagates as bias in the student.</strong> So a layer that corrects with the latest labels is added separately on the student side. It is a form of staleness that did not exist in the single-model era.</p>
+<p class="warn"><strong>⚠ We could not find a primary source for the time figure &quot;ad models go stale within hours.&quot;</strong> The closest evidence is this phrase from @Scale 2025 <span class="badge est">inferred</span>: <em>&quot;three to six hours&quot;</em>. However, it is a statement about <strong>recommendation models overall</strong> and is not limited to ads <span class="badge est">inferred</span>. It must not be quoted as an ads figure.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="freshness-was-promoted-from-an-infrastructure-metric-to-a-product-metric">Freshness was promoted from an infrastructure metric to a product metric</h2>
+<p>Since 2025, Meta has <strong>reported the &quot;share of same-day posts&quot; directly in earnings calls</strong> <span class="badge ok">verified</span>. The IR transcript sources are in <a href="facebook.html">facebook.md</a>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="w6"><col class="grow"><col class="w8"></colgroup>
+<thead>
+<tr>
+<th>Quarter</th>
+<th>Statement</th>
+<th>Grade</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Q3 <span class="nw">2025</span></td>
+<td><em>&quot;surfacing <strong>twice as many Reels published that day</strong> than at the start of the year&quot;</em></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Q4 <span class="nw">2025</span></td>
+<td><em>&quot;surfacing over <strong>25% more Reels published that day</strong> than the prior quarter&quot;</em></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+<tr>
+<td>Q1 <span class="nw">2026</span></td>
+<td><em>&quot;<strong>same-day posts now representing more than 30% of recommended Reels</strong> on both Instagram and Facebook, more than double the levels one year ago&quot;</em></td>
+<td><span class="badge ok">verified</span></td>
+</tr>
+</tbody></table></div>
+<p>The SilverTorch blog post (2026) links the same metric to its own results <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p><em>&quot;The result shows up in the <strong>recency of recommended content</strong>. Same-day posts now represent a significant portion of recommendations...&quot;</em></p>
+</blockquote>
+<p><strong>Infrastructure freshness and the product recency metric were placed on the same footing</strong> <span class="badge est">inferred</span>. That it is reported as a separate metric for 3 consecutive quarters means recency was promoted to an explicit ranking objective, and if so, the freshness investment is <strong>part of the objective function</strong> rather than latency optimization <span class="badge est">inferred</span>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-generalizes-from-this-case">What generalizes from this case</h2>
+<p>The update cadence is not fixed to one value per model and differs by component even within one model <span class="badge ok">verified</span> (<a href="#2-once-the-output-is-cached-the-cost-of-rebuilding-the-cache-sets-that-towers-retraining-cadence">structure 2</a>, <a href="#3-each-parameter-type-has-a-different-freshness-budget">structure 3</a>). The factors this section&#39;s generalization names as separating cadences are whether output is cached, the parameter type, what the graph contains, and the form in which items arrive <span class="badge est">inferred</span> (<a href="#2-once-the-output-is-cached-the-cost-of-rebuilding-the-cache-sets-that-towers-retraining-cadence">structure 2</a>, <a href="#3-each-parameter-type-has-a-different-freshness-budget">structure 3</a>, <a href="#4-what-a-graph-contains-sets-its-cadence">structure 4</a>, <a href="#case-netflix--the-most-concretely-disclosed-retraining-cadence-and-why-freshness-pressure-is-low">Netflix case</a>).</p>
+<ul>
+<li><strong>&quot;How often is the model retrained&quot; is a singular question and has no answer.</strong> Even on one surface, IG Explore, the ranker updates every 1 hour and the item tower every 1 day. Looking at other systems, the RankGraph-2 graph is 3 hours, the X cache is 600 seconds, and the SilverTorch index is updated by streaming. A cadence figure that does not say which component it applies to is meaningless.</li>
+<li><strong>Freshness is end-to-end latency, not the training cadence.</strong> Meta&#39;s definition includes everything from collection through training to use in recommendations: <em>&quot;ingested, trained on, and used&quot;</em>. Even if you write &quot;trained hourly,&quot; if data collection is 3 hours late, freshness is 3 hours.</li>
+<li><strong>The freshness budget differs by parameter type.</strong> Zero-second latency is a gain for item embeddings, while dense layers tolerate tens of minutes. Publishing the whole model frequently all at once is both expensive and unnecessary.</li>
+<li><strong>A dual cadence of &quot;full rebuild + incremental update&quot; is a recurring pattern.</strong> The three cases below all follow this structure. The larger the representation, the slower the cadence it is placed on, and recency is left to the fast cadence.<ul>
+<li>SilverTorch: snapshot publish (cadence undisclosed), streaming in-place updates in between</li>
+<li>Netflix FM: monthly pretraining, daily fine-tuning</li>
+<li>GenRec: the adapted LLM rarely, post-training frequently</li>
+</ul>
+</li>
+<li><strong>If output is cached, the cost of rebuilding the cache sets that component&#39;s retraining cadence.</strong> The item tower of a two-tower model is the textbook case. To raise freshness, you should not train the model more often but <strong>change how the cache is updated</strong>, and SilverTorch&#39;s in-place tensor update is exactly that answer.</li>
+<li><strong>Index freshness and the serving-time filter are separate levers.</strong> RankGraph-2 rebuilds the graph every 3 hours while narrowing candidates at serving to users active within 15 minutes. When the index cannot be rebuilt more often, the lookup range can compensate.</li>
+<li><strong>A graph&#39;s update cadence follows the lifetime of what the graph contains.</strong> The follow graph is 7 days and the co-engagement graph is 3 hours, a 56× difference.</li>
+<li><strong>Freshness pressure is set by the form in which items arrive.</strong> With random bulk inflow (UGC), index coverage becomes a problem of minutes and seconds. With scheduled small-volume inflow (a programmed catalog), freshness turns into a promotion problem. What Netflix handles with a monthly and daily dual cadence is a difference in problem shape, not a technology gap.</li>
+<li><strong>In a distillation structure, the teacher&#39;s staleness becomes a new kind of staleness.</strong> GEM&#39;s student adapter is the response to it.</li>
+<li><strong>When checking a cadence figure in code, look at the kind of constant.</strong> X&#39;s <code>batchIncrement = Days(7)</code> can be quoted because it is an <code>override val</code>, but the <code>args.int(name, default)</code> values in the same file are not production run values (<a href="embedding-retrieval.html">embedding-retrieval.md</a>).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="who-uses-this">Who uses this</h2>
+<p>Meta disclosed the most detail on freshness infrastructure, and Netflix disclosed the most concrete retraining cadence <span class="badge ok">verified</span>. For X, we confirmed the decay constants and TTLs but could not find the ranker retraining cadence <span class="badge est">inferred</span>.</p>
+<ul>
+<li><strong>Meta / Facebook</strong>: disclosed the most detail on freshness infrastructure <span class="badge ok">verified</span>. Cold start and retrieval context are in <a href="facebook.html">facebook.md</a>.<ul>
+<li>@Scale 2025: from 3–6 hours to O(1 minute)</li>
+<li>SilverTorch: index as model, snapshot publish takes 1 hour, plus streaming in-place updates</li>
+<li>RankGraph-2: 3 hours</li>
+<li>GEM: continuous online training and student adapter</li>
+</ul>
+</li>
+<li><strong>Instagram Explore</strong>: the ranking model is fine-tuned every 1 hour and the item tower runs on a 1-day cadence <span class="badge ok">verified</span>. This repository does not yet have a service note.</li>
+<li><strong>X</strong>: we confirmed the decay constants and TTLs and <strong>could not find the ranker retraining cadence.</strong> Evidence is in <a href="x.html">x.md</a> and <a href="embedding-retrieval.html">embedding-retrieval.md</a>.<ul>
+<li>Decay and TTL <span class="badge ok">verified</span>: SimClusters <code>KnownFor</code> is 7 days, tweet embeddings accumulate in real time, half-lives are 100 days and 8 hours, Thunder is 2 days, and the cache TTL is 600 seconds.</li>
+<li>Retraining cadence <span class="badge est">inferred</span>: the public repo Gen2 has no training scheduler, and the official X blog post has no statement either. This is not evidence that the undisclosed internal pipeline has none.</li>
+</ul>
+</li>
+<li><strong>Netflix</strong>: the FM is monthly pretraining plus daily fine-tuning, and this is the most concrete disclosed cadence <span class="badge ok">verified</span> — <a href="netflix.html">netflix.md</a>. The embedding store is daily, and precomputing recommendation results is the default <span class="badge ok">verified</span> — same file. It appears to be a structure with low freshness pressure itself <span class="badge est">inferred</span> (<a href="#case-netflix--the-most-concretely-disclosed-retraining-cadence-and-why-freshness-pressure-is-low">Netflix case</a>).</li>
+<li><strong>Others</strong>: not yet investigated. <strong>They remain an open question.</strong></li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="not-yet-verified">Not yet verified</h2>
+<p>The remaining questions mostly concern undisclosed retraining cadences, releases missing figures or scope, and old evidence that may no longer hold.</p>
+<ul>
+<li><strong>Retraining cadence of X&#39;s ranker (Phoenix/Navi).</strong> The Phoenix training code has been in the repo since the Gen4 release (<code>47c1bcd</code>), but no wording mentions a retraining cadence even at HEAD (<code>862a123</code>) <span class="badge ok">verified</span> (<a href="x.html#phoenix-training-and-index-introduced-in-gen4">x.md Phoenix training section</a>).</li>
+<li><strong>Actual latency of SilverTorch streaming updates.</strong> The paper withheld this part (<em>&quot;future work&quot;</em>), and the blog post gives no figure either.</li>
+<li><strong>Hour-level staleness cost of Meta ads models.</strong> We could not secure a primary source. The 2014 paper has an experiment in its body, but it is a PDF and cannot be quoted under this repository&#39;s rule. Finding an HTML or ACM version would resolve it.</li>
+<li><strong>Ranker retraining cadence for the Facebook Feed core (non-Reels).</strong> It appears in neither the system card nor the 2021 blog post.</li>
+<li><strong>Which surface and which parameters the &quot;O(1 minute)&quot; in @Scale 2025 applies to.</strong> We confirmed only the talk summary and do not know the detailed scope.</li>
+<li><strong>Whether the Instagram Explore 1-hour fine-tune is still valid in 2026.</strong> The only evidence is a single 2023 post.</li>
+<li><strong>Whether X&#39;s simclusters_v2 batch jobs (KnownFor, 7-day cycle) still run.</strong> Not a single byte in <code>simclusters_v2/</code> has changed since 2023-04. The 2026 repo had no SimClusters references through Gen3, and Gen4 (<code>47c1bcd</code>) brought back a SimClusters candidate source in home-mixer <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/sources/simclusters_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/simclusters_source.rs</code></a>. <strong>Code being present does not mean it is running.</strong></li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://atscaleconference.com/model-freshness-systems-at-scale/" target="_blank" rel="noopener">Model Freshness Systems at Scale</a> — 2025, talk (@Scale, Meta). Xianzheng Dou, Lujia Zhang, Vahid Jazayeri, Vivek Khurana. <strong>The primary source for the freshness definition and the per-generation figures.</strong></li>
+<li><a href="https://engineering.fb.com/2026/05/26/ml-applications/silvertorch-index-as-model-new-retrieval-paradigm-recommendation-systems/" target="_blank" rel="noopener">SilverTorch: Index as Model — A New Retrieval Paradigm for Recommendation Systems</a> — 2026, blog post.</li>
+<li><a href="https://arxiv.org/html/2511.14881v3" target="_blank" rel="noopener">SilverTorch: A Unified Model-based System to Democratize Large-Scale Recommendation on GPUs</a> — 2026, paper. <strong>HTML version.</strong> Publish time dropped to &quot;days to 1 hour&quot;.</li>
+<li><a href="https://arxiv.org/html/2606.18379" target="_blank" rel="noopener">RankGraph-2: Lifecycle Co-Design for Billion-Node Graph Learning in Recommendation</a> — 2026, paper (Meta). <strong>HTML version.</strong> 3-hour rebuild, 24-hour window, 15-minute active-user filter.</li>
+<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023, blog post. Hourly fine-tune, daily item tower.</li>
+<li><a href="https://engineering.fb.com/2025/11/10/ml-applications/metas-generative-ads-model-gem-the-central-brain-accelerating-ads-recommendation-ai-innovation/" target="_blank" rel="noopener">Meta&#39;s Generative Ads Model (GEM)</a> — 2025, blog post. Stale supervision, student adapter.</li>
+<li><a href="https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/" target="_blank" rel="noopener">Practical Lessons from Predicting Clicks on Ads at Facebook</a> — 2014, paper (ADKDD). <strong>We confirmed only the abstract and did not quote figures from the body.</strong></li>
+<li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — 2025-09-03 commit <code>c54bec0</code>, public source code. <code>UpdateKnownFor20M145K2020.scala:44,46</code>, <code>InterestedInFromKnownFor.scala:286-301</code>, <code>summingbird/common/Configs.scala:38</code>, <code>Utils.scala:47-49</code>.</li>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, public source code. <code>thunder/posts/post_store.rs:521-526</code>.</li>
+<li>Meta IR transcripts (Q3 2025 / Q4 2025 / Q1 2026) — same-day share figures. The links are in the Sources section of <a href="facebook.html">facebook.md</a>.</li>
+<li><a href="https://netflixtechblog.medium.com/integrating-netflixs-foundation-model-into-personalization-applications-cf176b5860eb" target="_blank" rel="noopener">Integrating Netflix&#39;s Foundation Model</a> — 2025, blog post. <strong>The primary source for monthly pretraining and daily fine-tuning.</strong></li>
+<li><a href="https://netflixtechblog.com/system-architectures-for-personalization-and-recommendation-e081aa94b5d8" target="_blank" rel="noopener">System Architectures for Personalization and Recommendation</a> — 2013, blog post. Three layers: offline/nearline/online.</li>
+<li><a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">The Netflix Recommender System (TMIS)</a> — 2015, paper. Training data is &quot;up to two days old&quot;.</li>
+<li><a href="https://netflixtechblog.com/behind-the-streams-real-time-recommendations-for-live-events-e027cb313f8f" target="_blank" rel="noopener">Behind the Streams: Real-Time Recommendations for Live Events</a> — 2025, blog post. Precompute and delivery to 100 million devices within 1 minute.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/model-freshness.html" data-title="모델 신선도 — 얼마나 자주 다시 만드는가, 그리고 왜 지면마다 다른가"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

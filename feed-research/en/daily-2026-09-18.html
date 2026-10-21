@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-18 — feed-research</title>
+<meta name="description" content="In one line: X added a holdout filter that removes popular posts from the home feed for each viewer at a ratio set by fav-count bracket. It is off by default.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-18.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-18.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-18.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-18.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-18 — feed-research">
+<meta property="og:description" content="In one line: X added a holdout filter that removes popular posts from the home feed for each viewer at a ratio set by fav-count bracket. It is off by default.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-18.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-18.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-18">2026-09-18</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>26 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-18.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added a holdout filter that removes popular posts from the home feed for each viewer at a ratio set by fav-count bracket. It is off by default.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-a-holdout-filter-that-removes-some-popular-posts-per-viewer-was-added--x"><span class="num">1</span>A holdout filter that removes some popular posts per viewer was added — X</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same commit, the click-dwell ranking term was redefined as the product of dwell and click instead of the low-fav penalty (the gate is off by default).</li>
+<li>Two LLM-judge search relevance actions added five days earlier were reverted, and ads delayed conversion attribution was widened to 3 tiers.</li>
+<li>Added Meta&#39;s LIGE-GR paper to the radar as an item that needs a deep dive.</li>
+</ul>
+<h2 id="1-a-holdout-filter-that-removes-some-popular-posts-per-viewer-was-added--x"><span class="num">1</span>A holdout filter that removes some popular posts per viewer was added — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/42266f3" target="_blank" rel="noopener">xai-org/x-algorithm@42266f3</a> — source code, 2026-09-17 05:09Z, GitHub commit. 64 files changed (+2288/−3627). These notes number X commits after the Gen4 release in sequence, and this commit is Gen4+23.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The 64 files are more than double Gen4+22 (26 files), and the 3627 deleted lines far exceed the 2288 added lines. VF (visibility-filtering) is the service that decides, per post, whether it may be shown to this viewer. Most of the large deletion came from the removal of the VF sub-repo&#39;s own twemcache client folder (3,234 lines) in full. This commit put three kinds of changes together into the ranking and filter stack of home-mixer (the service that receives For You and Following feed requests).</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. A filter that removes a fixed share of popular posts per viewer was added at the end of the pipeline</span></p></div>
+<p>A completely new filter was attached at the end of the home-mixer pipeline. This filter, which drops candidates, is named <code>FavHoldoutFilter</code>. It maps <code>fav_count</code> (a post&#39;s cumulative favorite count) to a holdout probability in steps. Through user-post deterministic hashing, it removes only a fixed share of popular posts per viewer.</p>
+<ul>
+<li>Added a new filter <code>FavHoldoutFilter</code> to home-mixer that sets the holdout probability by fav count step <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/filters/fav_holdout_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/fav_holdout_filter.rs</code></a> (166 lines, new).<ul>
+<li><p>The filter is wired in <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs</code></a> right after <code>InventoryHoldoutFilter</code>. It is the last slot of the Gen4 filter list.</p>
+</li>
+<li><p>The decision function is the following step table:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const STEPS: &amp;&#39;static [(i64, u32)] = &amp;[
+    (10000, 15), (5000, 15), (3000, 15), (2000, 14), (1500, 13), (1000, 13),
+    (750, 12), (500, 11), (300, 10), (200, 9), (150, 8), (100, 7),
+    (75, 7), (50, 6), (30, 6), (20, 5), (15, 5), (10, 5),
+    (7, 4), (5, 4), (3, 3), (2, 3), (1, 2),
+];
+pub(crate) fn holdout_percent(fav_count: Option&lt;i64&gt;) -&gt; u32 {
+    let favs = fav_count.unwrap_or(0);
+    if favs &lt;= 1 { return 0; }
+    for &amp;(k, pct) in Self::STEPS { if favs &gt; k { return pct; } }
+    0
+}
+</code></pre></figure>
+</li>
+<li><p>The share is 15% when fav_count exceeds 10,000, 15% above 5,000, 14% above 2,000, 13% above 1,000, 12% above 750, 11% above 500, 7% above 100, 5% above 20, ..., 3% above 2, and 2% above 1.</p>
+</li>
+<li><p>If fav_count is 1 or less, the share is 0%, and all viewers always see the post.</p>
+</li>
+<li><p>The holdout decision reuses <code>InventoryHoldoutFilter::is_held_out(post_id, viewer_id, percent)</code>.</p>
+</li>
+<li><p>This function computes a 100-modular bucket for the <code>(post_id, viewer_id)</code> pair with a splitmix64-family double-mixing hash, and holds the post out if the bucket is below <code>percent</code>.</p>
+</li>
+<li><p>That is, the same user deterministically holds out the same post, and even for the same post, only a different subset is held out for each viewer.</p>
+</li>
+<li><p>The default param of <code>FavHoldoutFilter</code> is <code>EnableFavHoldout = false</code>. The param is defined as <code>rust_home_mixer_enable_fav_holdout</code> in <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Three ratio params that the existing inventory holdout filter uses by post type were confirmed</span></p></div>
+<ul>
+<li>The 3-tier holdout ratio params of the inventory holdout filter were confirmed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/filters/inventory_holdout_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/inventory_holdout_filter.rs</code></a>.<ul>
+<li>The filter is named <code>InventoryHoldoutFilter</code>. This resolves a long-standing undisclosed item.</li>
+<li>The filter file references three params: <code>InventoryHoldoutOriginalsPercent</code>, <code>InventoryHoldoutRepliesPercent</code> and <code>InventoryHoldoutRetweetsPercent</code>.</li>
+<li>Post type is determined as <code>retweeted_tweet_id.is_some() → Retweet</code>, <code>in_reply_to_tweet_id.is_some() → Reply</code>, and otherwise → Original. A quoted post is treated as Original.</li>
+<li>Each of the three values is clamped with <code>.min(100)</code>.</li>
+<li>The filter is active only when <code>EnableInventoryHoldout=true</code> <strong>AND</strong> at least one of the three values is &gt;0.</li>
+<li>The holdout target is hashed deterministically on <code>get_original_tweet_id()</code> (the original for a retweet, otherwise the post itself). In other words, a retweet shares the same holdout decision as the original.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The click-dwell ranking term can now use the product of dwell and click probability instead of the low-fav penalty</span></p></div>
+<p>In ranking scoring, the term that adjusted the dwell prediction by the fav rate was deleted, and a much simpler gate took its place. What was deleted is the previously introduced <code>EnableClickDwellLowFavRatePenalty</code> logic, a term that adjusted the dwell prediction as <code>(fav/baseline)^alpha</code> by multiplying four tuning parameters. When the new gate <code>EnableCdwellOnImpr</code> is on, the click_dwell_time prediction is multiplied by the click probability (<code>dwell × click</code>). Since the click_dwell head has been a binary classification probability since the 2026-09-16 commit (Gen4+22), this product is a per-impression probability, not seconds.</p>
+<ul>
+<li>The <code>EnableClickDwellLowFavRatePenalty</code> family was deleted entirely from ranking scoring and replaced by <code>EnableCdwellOnImpr</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a> (+10/−32).<ul>
+<li><p>The param-side change is in <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+</li>
+<li><p>Five fields held by <code>ScoringWeights</code> (<code>enable_click_dwell_low_fav_rate_penalty</code> and baseline/alpha/floor/cap) and the five corresponding params were deleted. These params had existed since the Gen4 release (2026-08-13) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>param.rs:388-412</code></a>.</p>
+</li>
+<li><p>A single <code>enable_cdwell_on_impr: bool</code> took their place.</p>
+</li>
+<li><p>The <code>param.rs</code> mirror keeps the <code>EnableCdwellOnImpr</code> definition as follows:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">param!(EnableCdwellOnImpr, bool, &quot;rust_home_mixer_enable_cdwell_on_impr&quot;, false);
+</code></pre></figure>
+</li>
+<li><p>The existing function <code>low_fav_penalized_click_dwell</code> was renamed <code>click_dwell_term</code>, and the computation was simplified as follows:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn click_dwell_term(&amp;self, scores: &amp;PhoenixScores) -&gt; Option&lt;f64&gt; {
+    if !self.enable_cdwell_on_impr {
+        return scores.click_dwell_time;
+    }
+    match (scores.click_dwell_time, scores.click_score) {
+        (Some(cd), Some(click)) =&gt; Some(cd * click),
+        (cd, None) =&gt; cd,
+        (None, _) =&gt; None,
+    }
+}
+</code></pre></figure>
+</li>
+<li><p>The gate observability label also changed from <code>gate.click_dwell_low_fav_rate_penalty → gate.cdwell_on_impr</code>.</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The MoE condition was dropped from the Treatment arm of the new-author boost, and the post age cap was extended from 24 hours to 48 hours</span></p></div>
+<p>Two gates on the Treatment arm of the author cold-start scorer (the scorer that boosts posts by new authors) were relaxed together; the MoE condition has existed since the 2026-09-04 commit (Gen4+16), and the age cap since Gen4. The <code>is_phoenix_moe(candidate)</code> condition that the Treatment arm required was removed, so any Treatment-corpus candidate is now a cold-start target regardless of its MoE (mixture of experts, a structure in which only some expert networks are used per input) label. Also, <code>ColdStartMaxPostAgeSecs</code> doubled from 86400 (24 hours) to 172800 (48 hours), and this age cap, which applied only to the Treatment arm, now applies to all arms. Three regression tests were removed and one name was unified; test names also changed: <code>treatment_viewer_cold_starts_treatment_moe_only</code> became <code>treatment_viewer_cold_starts_treatment_authors_only</code>, and <code>treatment_skips_post_older_than_max_post_age</code> became <code>skips_post_older_than_max_post_age</code>.</p>
+<ul>
+<li>Two gates were relaxed together on the Treatment arm of the author cold-start scorer <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a> (+7/−50).<ul>
+<li>Previously, <code>ViewerArm::Treatment</code> eligibility was <code>corpus == Treatment &amp;&amp; is_phoenix_moe(c)</code>. This change removed the <code>is_phoenix_moe(c)</code> condition, so only <code>corpus == Treatment</code> is checked.</li>
+<li>The separate function <code>cold_start_freshness_eligible(arm, c, max_age)</code>, which applied the age cap to the Treatment arm only, was deleted entirely.</li>
+<li>Now <code>apply_cold_start</code> applies <code>duration_since_creation_opt(c.tweet_id).is_some_and(|age| age &lt;= params.max_post_age)</code> as a filter for all arms.</li>
+<li>The <code>control_ignores_max_post_age</code> regression test was deleted and folded into <code>skips_post_older_than_max_post_age</code>.</li>
+</ul>
+</li>
+<li>The default of <code>ColdStartMaxPostAgeSecs</code> changed from <code>86400 → 172800</code> (24 hours → 48 hours) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.<ul>
+<li>This value is used as the max post age in the filter above. In other words, the posts that get the new-author boost have now widened to candidates within 48 hours of creation.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. Two LLM-judge search relevance labels added five days earlier were reverted, and an action presumed to be a live-stream reply signal and a reserved slot took their place</span></p></div>
+<p>In the serving proto recsys.proto of Phoenix (X&#39;s ranking Transformer that predicts engagement probabilities per candidate), there are two changes. One is that the two search relevance labels introduced in Gen4+20 (6bb4594, 2026-09-12) were reverted after five days; the two labels (<code>LLM_JUDGE_*</code>) are <code>LLM_JUDGE_RELEVANT_TO_SEARCH=107</code> and <code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH=108</code>. Their slots were replaced by <code>CLIENT_TWEET_LIVE_STREAM_REPLY=107</code> and <code>RESERVED_108</code>: <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code> is presumed to be a live-stream reply signal, and <code>RESERVED_108</code> is a reserved slot. The other is the 3-tier expansion of ads delayed conversion attribution.</p>
+<ul>
+<li>Two search relevance labels were deleted from the Phoenix proto, and a new action and a reserved slot took the same numbers <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>.<ul>
+<li><p>The deleted ones are <code>LLM_JUDGE_RELEVANT_TO_SEARCH</code> (107) and <code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH</code> (108). The replacements are <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code> (107) and <code>RESERVED_108</code> (108).</p>
+</li>
+<li><p>The evidence also includes the Python mirror <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a>.</p>
+</li>
+<li><p>The two labels were introduced five days earlier in Gen4+20 (6bb4594, 2026-09-12) and are reverted in this commit.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">// before (Gen4+20)
+LLM_JUDGE_RELEVANT_TO_SEARCH = 107;
+LLM_JUDGE_NOT_RELEVANT_TO_SEARCH = 108;
+// after (Gen4+23)
+CLIENT_TWEET_LIVE_STREAM_REPLY = 107;
+RESERVED_108 = 108;
+</code></pre></figure>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. 20 tier 2 and tier 3 actions were added to ads delayed conversion attribution</span></p></div>
+<p>Ads delayed conversion attribution (crediting conversions that occur late, after time has passed, to the ad) was expanded into a 3-tier structure. It extends from the previous single delay window to Tier 2 and Tier 3. In the proto, 20 slots inside the <code>reserved 214 to 252</code> range were filled with real actions.</p>
+<ul>
+<li>Ads delayed conversion attribution expanded to 3 tiers, and 20 action names were introduced (214-233) <span class="badge ok">verified</span> — same proto.<ul>
+<li><p>The existing <code>reserved 214 to 252</code> narrowed to <code>reserved 234 to 252</code>, and tier 2 and tier 3 were attached to slots 214-233. Tier 2 is 214-223 and tier 3 is 224-233.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">ADS_ATTRIBUTED_KEY_CLICK_CONVERSION_DELAYED_TIER_2 = 214;
+ADS_ATTRIBUTED_CLICK_CONVERSION_DELAYED_TIER_2 = 215;
+ADS_PURCHASE_CONVERSION_DELAYED_TIER_2 = 216;
+ADS_MID_FUNNEL_CONVERSION_DELAYED_TIER_2 = 217;
+ADS_ADD_TO_CART_CONVERSION_DELAYED_TIER_2 = 218;
+ADS_UPPER_FUNNEL_CONVERSION_DELAYED_TIER_2 = 219;
+ADS_WEB_CONVERSION_DELAYED_TIER_2 = 220;
+ADS_SEARCH_CONVERSION_DELAYED_TIER_2 = 221;
+ADS_SIGN_UP_CONVERSION_DELAYED_TIER_2 = 222;
+ADS_CHECKOUT_INITIATED_CONVERSION_DELAYED_TIER_2 = 223;
+// Next, the same 10 TIER_3 family entries follow at 224-233
+</code></pre></figure>
+</li>
+<li><p>Tier 2 and 3 were added a month after the existing 10 <code>*_DELAYED</code> actions (204-213) were introduced in Gen4+6 (28e414f, 2026-08-21).</p>
+</li>
+<li><p>This commit does not state explicitly which part of the observation window each tier covers. It also does not state how training loss treats the tiers (whether they are multiplied together for training, or each lag gets a different loss weight).</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">G. VF removed its own 3,234-line twemcache client and moved to the company-wide KV cache client</span></p></div>
+<p>There was a large reorganization in the visibility-filtering sub-repo. Instead of maintaining its own twemcache protocol, connection, ring and discovery, the VF sub-repo moved to the company-wide KV cache abstraction. All 11 files under <code>visibility-filtering/twemcache/</code> were removed. <code>safety_label_source/twemcache.rs</code> was rebased to depend on <code>xai_cache::CacheClient</code> of the new crate <code>xai_cache</code> (re-exporting <code>Key</code>, <code>Value</code> and <code>KVCacheError</code>).</p>
+<ul>
+<li>The VF sub-repo&#39;s own twemcache client was removed entirely <span class="badge ok">verified</span> — 11 files under <a href="https://github.com/xai-org/x-algorithm/tree/2d4a03c/visibility-filtering/twemcache" target="_blank" rel="noopener"><code>visibility-filtering/twemcache/</code></a>, 3,234 lines in total, were deleted.<ul>
+<li><p>The removed files are <code>accrual.rs</code> 267 lines, <code>client.rs</code> 640 lines, <code>connection.rs</code> 762 lines, <code>discovery.rs</code> 121 lines, <code>error.rs</code>, and <code>host_pool.rs</code> 359 lines. The rest are <code>host_pool_tests.rs</code> 639 lines, <code>key.rs</code> 92 lines, <code>metrics.rs</code> 87 lines, <code>mod.rs</code> 13 lines, and <code>ring.rs</code> 239 lines.</p>
+</li>
+<li><p>As the replacement code, the top imports of <code>safety_label_source/twemcache.rs</code> changed as follows:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">// before
+use crate::twemcache::{Key, TwemcacheClient, TwemcacheError, Value};
+// after
+use xai_cache::{CacheClient, KVCacheError, Key, Value};
+</code></pre></figure>
+</li>
+<li><p>The fallback mapping was also reorganized. The previous mapping was <code>TwemcacheError::Timeout → FallbackReason::Timeout</code>, <code>Backpressure → Backpressure</code>, <code>Unavailable|Io → Other</code>. The new mapping was unified into <code>KVCacheError::Timeout(_) → Timeout</code>, <code>Backpressure → Backpressure</code>, <code>_ → Other</code>.</p>
+</li>
+<li><p>In short, VF moved the twemcache protocol client it maintained itself (including accrual, discovery, host_pool and ring; <code>client.rs</code> alone is 640 lines) entirely to the company-wide KV cache abstraction. The maintenance surface shrinks, and behavior is unified with the client other services use.</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">H. VF gained a new RPC interface and a Thrift Action response decoder</span></p></div>
+<p>A new RPC was added to the VF service, along with a client function that decodes its response from Thrift. The new RPC <code>evaluate_tweets</code> was added to the <code>VisibilityFilteringService</code> trait. The new file <code>visibility-filtering-client/evaluated.rs</code> (122 lines) provides the function <code>decode_action</code>, which decodes the response payload of this RPC into a Thrift <code>Action</code>.</p>
+<ul>
+<li>Introduced the <code>evaluate_tweets</code> RPC and a Thrift <code>Action</code> payload decoder in the VF service <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/visibility-filtering-client/evaluated.rs" target="_blank" rel="noopener"><code>visibility-filtering-client/evaluated.rs</code></a> (122 lines, new).<ul>
+<li><p>A new async function was added to the traits in <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/visibility-filtering-client/vf_client.rs" target="_blank" rel="noopener"><code>visibility-filtering-client/vf_client.rs</code></a> and <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/visibility-filtering-client/tweet_safety_label.rs" target="_blank" rel="noopener"><code>visibility-filtering-client/tweet_safety_label.rs</code></a>.</p>
+</li>
+<li><p>Since the stub service returns <code>Err(Status::unimplemented(&quot;unused&quot;))</code>, only the client interface has been opened and the real implementation is pending.</p>
+</li>
+<li><p>The three states that <code>evaluated.rs</code> defines are in the following code:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub enum EvaluationResult { Evaluated(Box&lt;Action&gt;), NotEvaluated, Failed }
+pub const MAX_ACTION_BYTES: usize = 64 * 1024;
+pub fn decode_action(bytes: &amp;[u8]) -&gt; Result&lt;Action&gt;
+</code></pre></figure>
+</li>
+<li><p>The conditions <code>decode_action</code> imposes are as follows:</p>
+<ul>
+<li>64KB payload limit (all four caps of <code>TConfiguration</code> at 64KiB)</li>
+<li>Compact Thrift protocol</li>
+<li>No trailing bytes</li>
+<li><code>Action::NotEvaluated</code> is rejected</li>
+</ul>
+</li>
+<li><p>That is, the response of <code>evaluate_tweets</code> must be a Thrift encoding of <code>Evaluated(Action)</code>.</p>
+</li>
+<li><p><code>Action</code> is a long-standing spec in <code>xai_x_thrift::action</code>. Its variants include <code>MessageLink</code>, <code>LimitedAction</code> and <code>TweetVisibilityNudgeAction</code>.</p>
+</li>
+<li><p>In short, VF&#39;s response interface has begun to expand toward returning a full Action object to the client, not just the enumeration of filtered reason codes.</p>
+</li>
+<li><p>Read together with Gen4+20, which left the xDS LDS listener migration open, VF is moving from a simple client → server filter to a richer policy-verdict service.</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">I. Infrastructure was added to recompute the takedown labels of the Under-the-Hood transparency tool daily and to redact unenforced reasons</span></p></div>
+<p>Infrastructure that recomputes the audit labels of Under-the-Hood (UTH, X&#39;s transparency tool where users look up the visibility-impact labels attached to their accounts and posts) every day and redacts unenforced labels before serving was newly added. The UTH sub-repo gained a daily job stack for reproducing account takedown labels. The new files are <code>UthDailyPostTakedownLabelsJob.scala</code> (283 lines), <code>TakedownDeltas.scala</code> (169 lines), <code>TakedownLabels.scala</code> (103 lines) and <code>TakedownReplay.scala</code> (80 lines); in addition, +164 lines were added to <code>underTheHoodLabels.strato</code>. On the Gizmoduck (X&#39;s user information service) side, <code>RedactUnenforcedTakedownsFilter.scala</code> (81 lines) and <code>ReadFilters.scala</code> (39 lines) were introduced, and tweet-entity-service gained <code>TakedownReasonsTransform.scala</code> (73 lines) and <code>TakedownReasonsColumn.scala</code> (25 lines).</p>
+<ul>
+<li>Introduced the UTH daily label reproduction job stack <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/under-the-hood/scalding/UthDailyPostTakedownLabelsJob.scala" target="_blank" rel="noopener"><code>under-the-hood/scalding/UthDailyPostTakedownLabelsJob.scala</code></a> (283 lines, new).<ul>
+<li>The other evidence files are <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/under-the-hood/scalding/TakedownDeltas.scala" target="_blank" rel="noopener"><code>TakedownDeltas.scala</code></a> (169 lines), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/under-the-hood/scalding/TakedownLabels.scala" target="_blank" rel="noopener"><code>TakedownLabels.scala</code></a> (103 lines), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/under-the-hood/scalding/TakedownReplay.scala" target="_blank" rel="noopener"><code>TakedownReplay.scala</code></a> (80 lines) and <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/under-the-hood/strato/lib/underTheHoodLabels.strato" target="_blank" rel="noopener"><code>underTheHoodLabels.strato</code></a> (+164).</li>
+<li>Strato is the internal system that X code goes through to look up or store data.</li>
+<li>This stack is a Scala/Scalding batch job that reproduces and aggregates daily takedown label deltas per user and applies them to the Strato column (<code>underTheHoodReport.User.strato</code> +92/-22).</li>
+<li><code>UthPctdAccountTakedownEventsJob.scala</code> was heavily revised at +392/-63. <code>UthReferenceMonthMhPublisherJob.scala</code> (+30/-10) and <code>UthUserMonthMhPublisherJob.scala</code> (+140/-34) were also modified.</li>
+<li>This line is an audit and transparency tool pipeline, not ranking, so it is not a canon update target.</li>
+</ul>
+</li>
+<li>Introduced a filter that redacts unenforced takedown reasons so they are not exposed on the read path <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/takedowns/gizmoduck/RedactUnenforcedTakedownsFilter.scala" target="_blank" rel="noopener"><code>takedowns/gizmoduck/RedactUnenforcedTakedownsFilter.scala</code></a> (81 lines, new).<ul>
+<li>The other evidence files are <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/takedowns/gizmoduck/ReadFilters.scala" target="_blank" rel="noopener"><code>ReadFilters.scala</code></a> (39 lines, new), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/takedowns/tweet-entity-service/TakedownReasonsTransform.scala" target="_blank" rel="noopener"><code>takedowns/tweet-entity-service/TakedownReasonsTransform.scala</code></a> (73 lines) and <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/takedowns/tweet-entity-service/TakedownReasonsColumn.scala" target="_blank" rel="noopener"><code>TakedownReasonsColumn.scala</code></a> (25 lines).</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>Minor adjustments in five files of the Phoenix serving engine <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>emb_table.rs</code></a> (+15/-3).<ul>
+<li>The target directory is <code>phoenix/crates/serving/xai-recsys-engine/</code>.</li>
+<li>The other files are <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/grpc_util.rs" target="_blank" rel="noopener"><code>grpc_util.rs</code></a> (+9/-2), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>copy_port_client.rs</code></a> (+4), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/checkpoint_proxy.rs" target="_blank" rel="noopener"><code>checkpoint_proxy.rs</code></a> (+1) and <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/crates/serving/xai-recsys-engine/src/mem_util.rs" target="_blank" rel="noopener"><code>mem_util.rs</code></a> (+5/-1).</li>
+<li>The exact semantic changes of individual functions are not covered in this scan. Most appear to be minor improvements to emb table management and gRPC utilities <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>There were also minor adjustments on the Phoenix training side <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/xrex/cuda/__init__.py" target="_blank" rel="noopener"><code>phoenix/xrex/cuda/__init__.py</code></a> (+15/-14).<ul>
+<li>The other files are <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/xrex/cuda/async_emb/async_emb.py" target="_blank" rel="noopener"><code>async_emb/async_emb.py</code></a> (+5/-6), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>recsys_model.py</code></a> (+20/-24), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/xrex/data/recsys/recsys_batch.py" target="_blank" rel="noopener"><code>recsys_batch.py</code></a> (+6/-6) and <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>recsys_bundle_export.py</code></a> (+9/-2). <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>trainer.py</code></a> (+5/-4), <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/xrex/models/loss_recsys.py" target="_blank" rel="noopener"><code>loss_recsys.py</code></a> (+2/-2) and <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/phoenix/xrex/data/parquet_recsys.py" target="_blank" rel="noopener"><code>parquet_recsys.py</code></a> (+5/-1) also changed.</li>
+<li>This reads as a follow-up cleanup of the ads purchase value loss, binary loss and XAUC that Gen4+22 formally wired in <span class="badge est">inferred</span>.</li>
+<li>The <code>param.rs</code> mirror timestamp also moved a day later, from <code>2026-09-15T16:25:02Z → 2026-09-16T16:23:12Z</code>.</li>
+</ul>
+</li>
+<li>Minor adjustments on the grox (Grok-based nearline annotation pipeline) side <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/grox/flows/ptos/state.py" target="_blank" rel="noopener"><code>grox/flows/ptos/state.py</code></a> (+1).<ul>
+<li>The other files are <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/grox/flows/reply_spam/constants.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/constants.py</code></a> (+1/-1) and <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py</code></a> (+1/-1).</li>
+<li>It is a small fine-tuning of the follower-threshold split line from Gen4+22.</li>
+</ul>
+</li>
+<li>README was updated <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/README.md" target="_blank" rel="noopener"><code>README.md</code></a> (+1). Details were not scanned.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">impl FavHoldoutFilter {
+    const STEPS: &amp;&#39;static [(i64, u32)] = &amp;[
+        (10000, 15), (5000, 15), (3000, 15), (2000, 14), (1500, 13), (1000, 13),
+        (750, 12), (500, 11), (300, 10), (200, 9), (150, 8), (100, 7),
+        (75, 7), (50, 6), (30, 6), (20, 5), (15, 5), (10, 5),
+        (7, 4), (5, 4), (3, 3), (2, 3), (1, 2),
+    ];
+    pub(crate) fn holdout_percent(fav_count: Option&lt;i64&gt;) -&gt; u32 {
+        let favs = fav_count.unwrap_or(0);
+        if favs &lt;= 1 { return 0; }
+        for &amp;(k, pct) in Self::STEPS { if favs &gt; k { return pct; } }
+        0
+    }
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/filters/fav_holdout_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/fav_holdout_filter.rs</code></a>, 2026-09-17</p>
+</blockquote>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn click_dwell_term(&amp;self, scores: &amp;PhoenixScores) -&gt; Option&lt;f64&gt; {
+    if !self.enable_cdwell_on_impr {
+        return scores.click_dwell_time;
+    }
+    match (scores.click_dwell_time, scores.click_score) {
+        (Some(cd), Some(click)) =&gt; Some(cd * click),
+        (cd, None) =&gt; cd,
+        (None, _) =&gt; None,
+    }
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a>, 2026-09-17</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Updated five sections of <a href="x.html">services/x.md</a>.</p></div>
+<ul>
+<li>Filters section (21 filters, line 355): Added <code>FavHoldoutFilter</code> (new in Gen4+23) at the end of the filter list. Deleted &quot;the holdout ratio params need confirmation&quot; from the <code>InventoryHoldoutFilter</code> entry. Replaced it with a confirmed statement of the 3-tier param (<code>InventoryHoldoutOriginalsPercent</code>, <code>InventoryHoldoutRepliesPercent</code>, <code>InventoryHoldoutRetweetsPercent</code>) wiring. Also added a new <code>FavHoldoutFilter</code> entry.</li>
+<li>Attention scoring term (line 147): Added a sentence saying the computation of the click_dwell term was redefined in Gen4+23. The change is <code>EnableClickDwellLowFavRatePenalty</code> (a param present since the Gen4 release) → <code>EnableCdwellOnImpr</code> (dwell × click_score).</li>
+<li>Undisclosed list (lines 1416, 2535): Deleted the item asking where <code>LLM_JUDGE_RELEVANT_TO_SEARCH</code> and <code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH</code> connect. Stated explicitly that they were vacated, introduced in Gen4+20 and reverted in Gen4+23. The undisclosed line on the holdout ratio params of <code>InventoryHoldoutFilter</code> was resolved and deleted.</li>
+<li>Ads conversion action section (near line 1686): Added the Gen4+23 tier 2/3 expansion entry of 20 actions after the Gen4+9 entry.</li>
+<li>Commit sequence section (line 2545): Added <code>42266f3</code> (2026-09-17, Gen4+23) after <code>fad2f71</code> (Gen4+22), and changed &quot;23 commits since Gen4&quot; to &quot;24 commits since Gen4&quot;.</li>
+</ul>
+<p>Also added a new section &#39;Gen4+23 (2026-09-17, 42266f3)&#39; after Gen4+22, summarizing ten findings (A–J).</p>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Three kinds of changes came together in this commit: the popular-post holdout, the redefinition of the click_dwell term, and the relaxed cold-start gates. A change in the Phoenix proto adds a fourth layer on top.</p></div>
+<ul>
+<li>First, home-mixer ranking gained a new axis: a per-viewer deterministic holdout of popular posts.<ul>
+<li>Where <code>InventoryHoldoutFilter</code> was a 3-tier holdout by type (original, reply, retweet), <code>FavHoldoutFilter</code> is a 23-tier step holdout by popularity (fav count).</li>
+<li>The two filters are each deterministic for a viewer-post pair but make independent decisions. So home-mixer can now run two kinds of counterfactual holdout experiments in parallel, at a stage still before scoring.</li>
+<li>One is a uniform holdout by post type, and the other is a stepped holdout by popularity.</li>
+<li>Why a popularity holdout? If 15% of posts with 10K+ fav are held out, it becomes possible to observe how those viewers respond to the next-best candidate without that post.</li>
+<li>That is, infrastructure opens up to capture, through a measured experiment, the marginal contribution of top popular posts (the user loss when this post disappears from Home).</li>
+<li>Paired with the three-stage response diversity observation side effect in Gen4+21, X&#39;s ranking measurement infrastructure is expanding along two axes: diversity as a set-level counterfactual and holdout as a post-level counterfactual <span class="badge est">inferred</span>.</li>
+<li>If the diversity statistics observation in Gen4+21 observes slate (the bundle of candidates shown at once) composition without an A/B experiment, the holdout filter runs an A/B experiment automatically inside the filter.</li>
+</ul>
+</li>
+<li>Second, the definition of the click_dwell ranking term changed completely.<ul>
+<li>The former <code>EnableClickDwellLowFavRatePenalty</code> was a heuristic penalty that lowered the dwell prediction of low-fav-rate posts by (fav/baseline)^alpha, to suppress misjudgment based only on inflated dwell.</li>
+<li>In Gen4+22, as the click_dwell head changed to sigmoid BCE binary classification, the effective scale of the head had been reduced 60×.</li>
+<li>This commit cleaned up by removing the fav-based penalty (four tuning params and the corresponding fields were deleted).</li>
+<li><code>EnableCdwellOnImpr</code>, which took its place, is an alternative approach. It multiplies the click_dwell prediction (dwell probability or time given a click) by the click probability to convert it into a per-impression expected value.</li>
+<li>Since this redefinition multiplies the signals of two heads, it reduces the problem of the &quot;dwell-raising head&quot; and the &quot;click-raising head&quot; offsetting each other or double counting.</li>
+<li>This redefinition aligns with the practice of Netflix N-tower and YouTube ranker. They have long trained the dwell head as a conditional probability (P(dwell|click)) and then multiplied it by P(click) in serving to produce an unconditional expected value.</li>
+<li class="warn">⚠ Claim changed: Yesterday&#39;s (2026-09-17) canon described &quot;the effective contribution of the click_dwell_time head as reduced by ~60× from before&quot;. However, if this head is redefined as a product with click_score while <code>ContClickDwellTimeWeight</code> is not adjusted, the effective scale changes again.<ul>
+<li>More precisely, there are two cases. If <code>EnableCdwellOnImpr=false</code> (default), the 60× reduction is maintained.</li>
+<li>When it is on, the term becomes a product of probabilities (0-1 × 0-1). The previous term multiplied the click_dwell value by a fav-rate multiplier (with the gate off, the click_dwell value as is), and there was no term multiplying by click probability <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/42266f3/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs</code></a> diff.</li>
+<li>If the absolute weight is maintained, the effective scale could go to a much larger reduction rather than a 60× reduction, and the ranking contribution of this head could effectively be absorbed by the remaining heads.</li>
+<li>Whether it is actually deployed would be observed in whether the <code>EnableCdwellOnImpr</code> mirror is switched in the next commit and <code>ContClickDwellTimeWeight</code> is retuned <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Third, two gates on the Treatment arm of the cold-start scorer were relaxed together.<ul>
+<li>The removal of the <code>is_phoenix_moe</code> requirement means cold-start targets are now activated in the Treatment experiment without an MoE label.</li>
+<li>This gate, created in the 2026-09-04 commit (Gen4+16), was an experiment condition limiting the Phoenix MoE head to be used in training only for cold-start candidates; relaxing it presumably requires a judgment that the measured results showed the condition was unnecessary or even a loss <span class="badge est">inferred</span>.</li>
+<li>The expansion of max age from 24h to 48h means the new-author boost window doubled. Since this cap applies to post age, not author tenure, posts within 48 hours of creation also become cold-start targets.</li>
+<li>In the Treatment arm, both changes increase cold-start volume. In contrast, the Control and Holdout arms, which had no cap, newly get a 48-hour cap, so their condition actually tightened <span class="badge ok">verified</span> — the <code>author_cold_start.rs</code> diff in D above.</li>
+</ul>
+</li>
+<li>As the fourth layer, the two Phoenix proto changes indicate how future ranking signals will be organized.<ul>
+<li>The vacating of the two <code>LLM_JUDGE_*</code> labels after five days is a signal that xAI has, for now, folded its direction of transplanting LLM judge labels as a separate axis into search relevance ranking training.</li>
+<li>There are two possibilities. The judgment may have been routed in another way (e.g., reusing the existing <code>CLIENT_TWEET_RELEVANT_TO_SEARCH=105</code> label channel as is), or the label axis itself may have been left waiting for redefinition.</li>
+<li>The newly added <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code> (107) appears to be a client signal for live-stream replies; we need to watch whether the next commit folds it into the training signals.</li>
+<li>The 3-tier expansion of delayed conversion attribution is the most solid ads-infrastructure link in this commit.</li>
+<li>If the ads conversion observation window had two kinds so far, &quot;immediate&quot; and &quot;delayed&quot;, delayed is now split into tier 2 and tier 3 as well, and each observation lag is routed to a separate head.</li>
+<li>This matches the standard approach in the literature (Chapelle 2014, Yasui &amp; Sakata 2020 family), where delayed training applies per-lag masks to reduce lag bias <span class="badge est">inferred</span>.</li>
+<li>Read together with the <code>ADS_WEB_CT_PURCHASE_VALUE</code> Huber ratio loss formally wired in Gen4+22, X&#39;s ads training stack is moving toward value regression and per-lag delayed heads.</li>
+</ul>
+</li>
+<li>The VF twemcache removal and the <code>evaluate_tweets</code> RPC expansion are not on the ranking axis, but they are worth observing.<ul>
+<li>VF began expanding its client → server response from a sigil enum to a full Thrift <code>Action</code> object.</li>
+<li>If this direction continues, home-mixer may consume richer policy verdicts where it has so far consumed VF responses only as <code>FilteredReason</code>.</li>
+</ul>
+</li>
+<li>The introduction of the UTH label reproduction job stack is infrastructure for the daily recomputation of audit labels for the Under-the-Hood transparency tool that X announced.<ul>
+<li>This line serves a user audit tool rather than ranking, so it is not a candidate for a canon update. However, it is meaningful that it sits in the same repo as the ranking code in the repository&#39;s file layout.</li>
+<li>It leaves the intent that X keeps, in the same repository as ranking and safety, a line that lets users look up directly &quot;why was my post treated this way.&quot;</li>
+</ul>
+</li>
+</ul>
+<h2 id="corrections">Corrections</h2>
+<p>This commit overturned one claim from an earlier daily and partially overturned another.</p>
+<ul>
+<li class="warn">⚠ Claim changed #1: the Gen4+20 observation about the two LLM-judge search relevance actions was overturned.<ul>
+<li>The subjects are <code>LLM_JUDGE_RELEVANT_TO_SEARCH</code> and <code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH</code>.</li>
+<li>The 2026-09-13 daily (Gen4+20) said these two actions were &quot;a natural extension of the Phoenix search ranking config <code>xrecsys_search</code> (introduced in Gen4+4)&quot;. It also said &quot;somewhere there must be a pipeline in which grox or a dedicated LLM judge feeds relevant/not labels to (query, tweet) pairs&quot;.</li>
+<li>Because they were vacated after 5 days, we conclude that the labels were rolled back without being connected in production.</li>
+<li>We remove the undisclosed mention of these two labels from the canon.</li>
+</ul>
+</li>
+<li class="warn">⚠ Claim changed #2: the statement in the Gen4+22 daily that &quot;the effective contribution of the click_dwell_time head remains reduced by ~60× compared with before&quot; is partially overturned.<ul>
+<li>With <code>EnableCdwellOnImpr</code> introduced in Gen4+23, the final value of this head becomes (click_dwell_prob × click_prob).</li>
+<li>This produces a larger reduction than 60× (probability × probability is a much smaller scale than the original unit).</li>
+<li>The measured scale depends on the <code>ContClickDwellTimeWeight</code> adjustment and on whether <code>EnableCdwellOnImpr</code> is activated.</li>
+<li>We fold this redefinition into the Attention head section of the canon.</li>
+</ul>
+</li>
+</ul>
+<h2 id="radar">Radar</h2>
+<p>LIGE-GR (Meta) goes into the radar&#39;s new-this-month items, and SARA (Kuaishou) is added to the watching thread.</p>
+<ul>
+<li>LIGE-GR (Meta) is a new item that passed review on arXiv. It claims improvements of 1.14% time-spent on Instagram Reels and 0.72% time-spent on Facebook Video. The topic is a smooth leap from ranking to generative recommendation.<ul>
+<li>It is direct evidence for our tracked services (Instagram, Facebook, Threads), so it is a radar deep dive candidate.</li>
+<li>We add it to <code>## New this month</code> in <code>radar.md</code> (marked as needing a deep dive).</li>
+</ul>
+</li>
+<li>SARA (Kuaishou) covers articulated rationale for MLLM-based recommendation. It claims a Kuaishou production deployment (30+ days, 240M users).<ul>
+<li>Kuaishou is not one of our tracked services, but it is a large-scale production MLLM recommendation deployment, so we add it to the watching thread.</li>
+</ul>
+</li>
+<li>ANGLE is one-step sponsored search ads retrieval (<code>2609.18296</code>). We need to check the author affiliation of the deploying party to judge whether it is a platform company.</li>
+<li>PCap was already added to the radar yesterday (2026-09-17). We do not process it twice.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><p>From the next commit on, we watch when the params, actions, and RPCs opened this time are turned on or used. LIGE-GR gets a separate deep dive.</p>
+<ul>
+<li>Watch when <code>EnableFavHoldout</code> switches in the mirror — if this param changes from <code>false → true</code>, the fav-tier holdout becomes active in production. At that point, the thing to observe is under which experiment bucket the 15% holdout tier (10K+ fav) is actually activated. We also check whether the response diversity observation from Gen4+21 is logged together with this filter&#39;s activation.</li>
+<li>Watch when <code>EnableCdwellOnImpr</code> switches in the mirror and whether <code>ContClickDwellTimeWeight</code> is adjusted alongside — if the redefinition above is actually deployed, it determines how the click_dwell contribution, reduced after Gen4+22, is readjusted. Without a weight increase, this head&#39;s contribution effectively stays reduced; with an increase, the combined dwell × click signal enters ranking at a new scale.</li>
+<li>Check whether the Treatment-arm relaxation of the cold-start scorer led to A/B results — the removal of the MoE gate from Treatment eligibility and max_age 24h→48h arrived together, and either was triggered by measured results or prepares the next experiment setup. In the next commit, we watch how the related param mirrors are deployed.</li>
+<li>Check whether the <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code> (107) label is folded in as a training signal — we look at which training config&#39;s target head list this action is added to. Whether it is <code>xrecsys_search</code> or <code>_home_direct_packed_base</code> decides whether live-stream replies sit on the search relevance axis or the home ranking axis.</li>
+<li>Watch when the ads delayed conversion tier 2/3 training config is activated — we look at which metric group and loss weight the 20 newly introduced actions are activated under. How the Gen4+6 <code>split_head_training_by_source</code> option handles these tiers decides the actual approach to per-lag training.</li>
+<li>Watch the server-side implementation of the VF <code>evaluate_tweets</code> RPC — since only the client is open, when the server implementation starts returning which policy verdicts as Thrift <code>Action</code> decides whether the VF serving interface is substantively expanded.</li>
+<li>Do a deep dive on LIGE-GR — it is a paper in which Meta claims a smooth leap from ranking to generative on Instagram Reels and Facebook Video. Since it bears directly on our tracked services, we need to read the arXiv html and decide whether to fold it into the canon.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-17.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-17</span></a><a class="pg-next" href="daily-2026-09-19.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-19</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-18.html" data-title="일일 리포트 2026-09-18"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
