@@ -46,9 +46,9 @@
 <h1 id="멀티태스크-랭킹--참여-확률-여러-개를-하나의-점수로">멀티태스크 랭킹 — 참여 확률 여러 개를 하나의 점수로</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-22">2026-10-22</time></li>
 </ul>
-<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">21</span></summary><ol><li><a href="#왜-이-구조인가">왜 이 구조인가</a></li><li><a href="#케이스-meta--결합-형태가-지면마다-다르다">케이스: Meta</a><ol><li><a href="#읽는-법">읽는 법</a></li><li><a href="#x와-정반대인-부분--음수를-곱하는가">X와 정반대인 부분</a></li><li><a href="#가중치를-어디서-가져오는가--회사-간-진짜-분기점">가중치를 어디서 가져오는가</a></li><li><a href="#헤드-수-1922-vs-10--비교하면-안-되는-두-숫자">헤드 수 19~22 vs ~10</a></li></ol></li><li><a href="#케이스-x--설계-결정-6가지">케이스: X</a><ol><li><a href="#1-가중치는-코드에-없다">1. 가중치는 코드에 없다</a></li><li><a href="#2-음수-헤드를-곱셈에-넣는가-넣지-않는가">2. 음수 헤드를 곱셈에 넣는가 넣지 않는가</a></li><li><a href="#3-헤드-목록은-세대마다-다르고-레포-안에서도-여러-벌이-함께-존재한다">3. 헤드 목록은 세대마다 다르고, 레포 안에서도 여러 벌이 함께 존재한다</a></li><li><a href="#4-가중치-주입-경로가-요청-단위일-수-있다">4. 가중치 주입 경로가 요청 단위일 수 있다</a></li><li><a href="#5-부적격-헤드는-0이-아니라-bias로-대체된다">5. 부적격 헤드는 0이 아니라 bias로 대체된다</a></li><li><a href="#6-가중합-이후에도-점수가-계속-바뀐다">6. 가중합 이후에도 점수가 계속 바뀐다</a></li></ol></li><li><a href="#케이스-netflix--헤드가중치-프레임-자체를-벗어난다">케이스: Netflix</a></li><li><a href="#이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#출처">출처</a><ol><li><a href="#공개-소스코드">공개 소스코드</a></li><li><a href="#meta-엔지니어링-블로그-결합-수식의-1차-출처">Meta 엔지니어링 블로그 (결합 수식의 1차 출처)</a></li><li><a href="#meta-transparency-center-규제-대응-1차-문서">Meta Transparency Center (규제 대응 1차 문서)</a></li><li><a href="#netflix">Netflix</a></li></ol></li></ol></details></nav>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">22</span></summary><ol><li><a href="#왜-이-구조인가">왜 이 구조인가</a></li><li><a href="#케이스-meta--결합-형태가-지면마다-다르다">케이스: Meta</a><ol><li><a href="#읽는-법">읽는 법</a></li><li><a href="#x와-정반대인-부분--음수를-곱하는가">X와 정반대인 부분</a></li><li><a href="#가중치를-어디서-가져오는가--회사-간-진짜-분기점">가중치를 어디서 가져오는가</a></li><li><a href="#헤드-수-1922-vs-10--비교하면-안-되는-두-숫자">헤드 수 19~22 vs ~10</a></li></ol></li><li><a href="#케이스-x--설계-결정-6가지">케이스: X</a><ol><li><a href="#1-가중치는-코드에-없다">1. 가중치는 코드에 없다</a></li><li><a href="#2-음수-헤드를-곱셈에-넣는가-넣지-않는가">2. 음수 헤드를 곱셈에 넣는가 넣지 않는가</a></li><li><a href="#3-헤드-목록은-세대마다-다르고-레포-안에서도-여러-벌이-함께-존재한다">3. 헤드 목록은 세대마다 다르고, 레포 안에서도 여러 벌이 함께 존재한다</a></li><li><a href="#4-가중치-주입-경로가-요청-단위일-수-있다">4. 가중치 주입 경로가 요청 단위일 수 있다</a></li><li><a href="#5-부적격-헤드는-0이-아니라-bias로-대체된다">5. 부적격 헤드는 0이 아니라 bias로 대체된다</a></li><li><a href="#6-가중합-이후에도-점수가-계속-바뀐다">6. 가중합 이후에도 점수가 계속 바뀐다</a></li></ol></li><li><a href="#케이스-netflix--헤드가중치-프레임-자체를-벗어난다">케이스: Netflix</a></li><li><a href="#이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#출처">출처</a><ol><li><a href="#공개-소스코드">공개 소스코드</a></li><li><a href="#meta-엔지니어링-블로그-결합-수식의-1차-출처">Meta 엔지니어링 블로그 (결합 수식의 1차 출처)</a></li><li><a href="#meta-논문">Meta 논문</a></li><li><a href="#meta-transparency-center-규제-대응-1차-문서">Meta Transparency Center (규제 대응 1차 문서)</a></li><li><a href="#netflix">Netflix</a></li></ol></li></ol></details></nav>
 <div class="prose">
 <p>멀티태스크 랭킹은 랭커가 &quot;이 유저가 이 아이템을 좋아할까&quot;를 스칼라 하나로 예측하지 않는 구조다. <strong>행동 종류별로 확률을 따로 예측한 뒤 하나의 점수로 합쳐서</strong> 정렬한다. 행동마다 확률을 하나씩 내는 출력을 헤드라고 부른다.</p>
 <pre tabindex="0"><code>score = Σ_k  w_k · P(action_k | user, item)
@@ -72,7 +72,7 @@
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="케이스-meta--결합-형태가-지면마다-다르다">케이스: Meta — 결합 형태가 지면마다 다르다</h2>
 <p>Meta는 한 회사 안에서 결합 형태를 4종 공개했다(음수항이 있는 덧셈을 덧셈과 따로 셀 때). Facebook이 공개한 결합 형태는 선형 하나이고, Instagram은 세 가지를 서로 다른 문제에 쓴다고 공개했다.</p>
-<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col class="w10"><col class="grow"><col class="w6"></colgroup>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col><col class="grow"><col class="w6"></colgroup>
 <thead>
 <tr>
 <th>지면</th>
@@ -105,6 +105,12 @@
 <td><code>Score(c) = R(c) × D(c)</code>, <code>D(c) = ∏_{i=1..m} (1 - w_i · p_i(c))</code> ⚠ verbatim 아님(표 아래 설명)</td>
 <td><span class="nw">2025</span></td>
 </tr>
+<tr>
+<td>Instagram Feed (late-stage)</td>
+<td>덧셈(원래 항과 증분 항)</td>
+<td><code>s(c) = Σ_j [w_j^r p_j(c) + w_j^i Δ_j(c)]</code> ⚠ 원문 수식을 텍스트로 옮김</td>
+<td><span class="nw">2026</span></td>
+</tr>
 </tbody></table></div>
 <p>Notifications 행의 수식은 verbatim이 아니다. 원문은 LaTeX 이미지이고, 표의 두 식은 그 이미지를 옮긴 것이다 <span class="badge obs">관찰</span> 2026-08-09. 곱셈 구조와 <code>R</code>·<code>D</code> 정의는 본문 산문이 뒷받침한다 <span class="badge ok">확인</span> — <a href="feed-diversity.html">feed-diversity.md</a>.</p>
 <ul>
@@ -112,6 +118,7 @@
 <li>Instagram Suggested Posts 수식의 출처는 2020년 글이다 <span class="badge ok">확인</span> — <a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a>.</li>
 <li>Instagram Explore 수식의 출처는 2023년 글이다 <span class="badge ok">확인</span> — <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>.</li>
 <li>Instagram Notifications 수식의 출처는 2025년 글이다 <span class="badge ok">확인</span> — <a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a>.</li>
+<li>Instagram Feed 수식의 출처는 2026-10-20 논문이다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2610.27423" target="_blank" rel="noopener">arXiv 2610.27423</a> (논문). 각 예측에 섞인 뷰어 습관·아이템 인기·요청 구성의 기준선을 지우지 않고, 기준선을 넘는 증분 <code>Δ</code>를 별도 가중치의 항으로 더한다. 원문 HTML의 수식은 MathML이라 텍스트로 옮겼다. 자세한 내용은 <a href="instagram.html#feed-value-model--%EC%9B%90%EB%9E%98-%EC%98%88%EC%B8%A1%EA%B3%BC-%EC%A6%9D%EB%B6%84%EC%9D%84-%EB%94%B0%EB%A1%9C-%EA%B0%80%EC%A4%91%ED%95%9C%EB%8B%A4">instagram.md</a>에 있다.</li>
 </ul>
 <p>지면별 맥락은 <a href="facebook.html">facebook.md</a>와 <a href="instagram.html">instagram.md</a>에 있다. 여기서는 형태 비교만 한다.</p>
 <h3 id="읽는-법">읽는 법</h3>
@@ -506,7 +513,10 @@ else combinedScoreSum + Epsilon
 <ul>
 <li><strong>X</strong>: 2023·2025·2026 세 세대 모두 이 구조를 쓴다. 헤드 수는 세대와 파일에 따라 다르다(3세대 19~22, 4세대 README 24, <a href="#3-%ED%97%A4%EB%93%9C-%EB%AA%A9%EB%A1%9D%EC%9D%80-%EC%84%B8%EB%8C%80%EB%A7%88%EB%8B%A4-%EB%8B%A4%EB%A5%B4%EA%B3%A0-%EB%A0%88%ED%8F%AC-%EC%95%88%EC%97%90%EC%84%9C%EB%8F%84-%EC%97%AC%EB%9F%AC-%EB%B2%8C%EC%9D%B4-%ED%95%A8%EA%BB%98-%EC%A1%B4%EC%9E%AC%ED%95%9C%EB%8B%A4">설계 결정 3</a>). 가중치는 FeatureSwitch와 query feature로 주입한다 <span class="badge ok">확인</span> — <a href="x.html">x.md</a>.</li>
 <li><strong>Facebook</strong>: <code>Vijt = Σ wijtk·Yijtk</code>라는 덧셈형을 쓴다. pass 1은 포인트와이즈 멀티태스크 신경망이고, 가중치는 설문 correlation으로 정한다. Feed 카드에 헤드 10종이 있고, 본문에만 있는 부정 예측이 더 있다 <span class="badge ok">확인</span> — <a href="facebook.html">facebook.md</a>.</li>
-<li><strong>Instagram</strong>: 결합 형태가 3종이다(2020 곱셈, 2023 음수항이 있는 덧셈, 2025 곱셈 페널티). 가중치는 offline replay/offline tuning과 Bayesian optimization으로 정한다. <strong>지면×컴포넌트마다 별도 MTML 모델</strong>을 둔다(<code>ig_stories_tray_mtml</code>, 프로덕션 1,000개 이상) <span class="badge ok">확인</span> — <a href="instagram.html">instagram.md</a>.</li>
+<li><strong>Instagram</strong>: 결합 형태가 3종이다(2020 곱셈, 2023 음수항이 있는 덧셈, 2025 곱셈 페널티). 가중치는 offline replay/offline tuning과 Bayesian optimization으로 정한다. <strong>지면×컴포넌트마다 별도 MTML 모델</strong>을 둔다(<code>ig_stories_tray_mtml</code>, 프로덕션 1,000개 이상) <span class="badge ok">확인</span> — <a href="instagram.html">instagram.md</a>.<ul>
+<li>2026-10-20 논문 기준으로 Feed late-stage는 원래 예측 항과 기준선을 넘는 증분 항을 따로 가중하고, 같은 연산자를 Reels는 두 랭킹 단계에, Threads는 late-stage에 출시했으며 Facebook은 실험 중이다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2610.27423" target="_blank" rel="noopener">arXiv 2610.27423</a>.</li>
+</ul>
+</li>
 <li><strong>Threads</strong>: 헤드 10종은 공개했는데, <strong>결합 방식과 가중치 정보가 0이고 부정 헤드도 0이다.</strong> 같은 회사 안에서도 지면마다 공개 수준이 다르다는 것을 가장 선명하게 보여 주는 증거다 <span class="badge ok">확인</span> — <a href="threads.html">threads.md</a>.</li>
 <li><strong>Netflix</strong>: <code>Σ w·P</code> 형태가 아니다. 밴딧에 프록시 보상 <code>r=f(play, complete, thumb)</code>과 지연 피드백 예측을 결합한다. north star는 retention이다 <span class="badge ok">확인</span> — <a href="netflix.html">netflix.md</a>.</li>
 <li><strong>그 외 서비스</strong>: 아직 조사하지 않았다. YouTube의 multi-gate MoE(mixture-of-experts, 2019 RecSys)와 Pinterest 계열이 같은 범주에 있을 가능성이 높지만, 이 저장소에서는 아직 1차 출처로 확인하지 않았다. <strong>열린 질문이다.</strong></li>
@@ -526,6 +536,10 @@ else combinedScoreSum + Epsilon
 <li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023, 블로그. 덧셈형과 음수항, Bayesian optimization과 offline tuning을 다룬다.</li>
 <li><a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a> — 2025, 블로그. <code>Score = R×D</code> 곱셈 페널티를 다룬다.</li>
 <li><a href="https://engineering.fb.com/2025/05/21/production-engineering/journey-to-1000-models-scaling-instagrams-recommendation-system/" target="_blank" rel="noopener">Journey to 1000 models: Scaling Instagram&#39;s recommendation system</a> — 2025, 블로그. <code>ig_stories_tray_mtml</code> 명명 규칙이 나온다.</li>
+</ul>
+<h3 id="meta-논문">Meta 논문</h3>
+<ul>
+<li><a href="https://arxiv.org/abs/2610.27423" target="_blank" rel="noopener">Baseline and Incremental: User, Item, and Request Debiasing in Instagram Feed Ranking</a> — 2026-10-20 v1, 논문. Instagram Feed value model의 원래 항과 증분 항을 다룬다.</li>
 </ul>
 <h3 id="meta-transparency-center-규제-대응-1차-문서">Meta Transparency Center (규제 대응 1차 문서)</h3>
 <ul>
