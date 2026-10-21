@@ -48,6 +48,8 @@ python3 -m http.server 4000 --bind 127.0.0.1 -d /tmp/site
   `default-src 'none'` 에 `font-src 'self'`·`style-src 'self'` 만 연다. 글꼴은 아래 "글꼴" 의 자체 호스팅
   파일만 쓴다. `scripts/test-site.sh` 16번 검사가 CSS 의 `@import`·`url()` 이 같은 출처이고 산출물에
   있는지, `@import` 가 `site.css` 의 첫 규칙인지 본다(앞에 규칙이 있으면 브라우저가 `@import` 를 버린다).
+  `site.css` 를 쓰는 모든 페이지의 CSP 가 글꼴을 허용하는지도 본다. 리서치 페이지의 CSP 는 생성기가 내므로,
+  생성기에서 `font-src 'self'` 를 빼면(또는 그 판이 게시되기 전에 글꼴을 들이면) 이 검사가 실패한다.
 - **`feed-research/` 와 `_data/feed_research.yml` 을 손으로 고치지 않는다.**
   feed-research 저장소의 `scripts/publish-html.sh` 가 매일 생성해 이 저장소에
   커밋·푸시한다. 여기서 고치면 다음 게시 때 덮인다. 고칠 것은 그 저장소에서 고친다.

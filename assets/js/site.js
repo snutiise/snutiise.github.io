@@ -25,7 +25,7 @@ if (toc) {
   if (a) {
    a.setAttribute('aria-current', 'location');
    const t = a.offsetTop;
-   if (t < r.scrollTop || t > r.scrollTop + r.clientHeight - 48) r.scrollTop = t - r.clientHeight / 3;
+   if (t < r.scrollTop || t + a.offsetHeight > r.scrollTop + r.clientHeight - 8) r.scrollTop = t - r.clientHeight / 3; // whole entry (up to 3 lines) in view
   }
   on = a;
  };
