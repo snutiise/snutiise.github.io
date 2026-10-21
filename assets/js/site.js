@@ -25,7 +25,7 @@ if (toc) {
   if (a) {
    a.setAttribute('aria-current', 'location');
    const t = a.offsetTop;
-   if (t < r.scrollTop || t > r.scrollTop + r.clientHeight - 48) r.scrollTop = t - r.clientHeight / 3;
+   if (t < r.scrollTop || t + a.offsetHeight > r.scrollTop + r.clientHeight - 8) r.scrollTop = t - r.clientHeight / 3; // whole entry (up to 3 lines) in view
   }
   on = a;
  };
@@ -52,6 +52,17 @@ if (f) {
   }
   $('filter-count').textContent = t ? n + '편' : '';
  });
+}
+
+// copy buttons on code blocks (Clipboard API needs a secure context; without it, no button)
+if (navigator.clipboard) for (const fig of d.querySelectorAll('figure.highlight')) {
+ const pre = fig.querySelector('pre'), c = d.createElement('button');
+ if (!pre) continue;
+ c.type = 'button'; c.className = 'copy'; c.textContent = '복사'; c.setAttribute('aria-label', '코드 복사');
+ c.addEventListener('click', () => navigator.clipboard.writeText(pre.textContent).then(
+  () => { c.textContent = '복사됨'; setTimeout(() => { c.textContent = '복사'; }, 1500); },
+  () => { c.textContent = '실패'; }));
+ fig.append(c);
 }
 
 // Disqus on click; no page.identifier. Posts and research pages. Research bodies are untrusted text: they can
