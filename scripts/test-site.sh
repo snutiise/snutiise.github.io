@@ -465,7 +465,8 @@ const parse = (s) => {               // _posts 가 쓰는 꼴만: `key: value` �
 };
 const CODE = /\{% highlight [^%]*%\}([\s\S]*?)\{% endhighlight %\}|^\x60{3}[^\n]*\n([\s\S]*?)^\x60{3}/gm;
 const blocks = (b) => [...b.matchAll(CODE)].map((m) => (m[1] ?? m[2]).split('\n'));
-const set = (b, re) => [...new Set([...b.matchAll(re)].map((m) => m[1]))].sort().join(' ');
+// 끝의 문장부호는 URL 이 아니다: 'https://github.com/ 실행 결과' 가 영어에서 'https://github.com/.' 가 된다.
+const set = (b, re) => [...new Set([...b.matchAll(re)].map((m) => m[1].replace(/[.,;:!?]+$/, '')))].sort().join(' ');
 const count = (b, re) => (b.match(re) || []).length;
 // 영어판이 한국어로 남기는 말은 <span lang="ko"> 로 감싼다(허용). 그 span 만 태그 목록에서 뺀다.
 const tags = (b) => [...b.replace(CODE, '').replace(/<span lang=\x22ko\x22>/g, '').matchAll(/<([a-zA-Z][\w-]*)/g)].map((m) => m[1].toLowerCase()).sort().join();
