@@ -31,11 +31,19 @@
 <title>{{ meta_title }}</title>
 <meta name="description" content="{{ meta_desc }}">
 <link rel="canonical" href="{{ canon }}">
+{%- if twin -%}
+{%- assign self_href = page.url | replace: 'index.html', '' -%}
+{%- if page.lang == 'en' -%}{%- assign ko_href = twin_href -%}{%- assign en_href = self_href -%}
+{%- else -%}{%- assign ko_href = self_href -%}{%- assign en_href = twin_href -%}{%- endif %}
+<link rel="alternate" hreflang="ko" href="{{ ko_href | prepend: site.baseurl | prepend: site.url }}">
+<link rel="alternate" hreflang="en" href="{{ en_href | prepend: site.baseurl | prepend: site.url }}">
+<link rel="alternate" hreflang="x-default" href="{{ ko_href | prepend: site.baseurl | prepend: site.url }}">
+{%- endif %}
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}">
-<meta property="og:locale" content="ko_KR">
+<meta property="og:locale" content="{% if page.lang == 'en' %}en_US{% else %}ko_KR{% endif %}">
 <meta property="og:url" content="{{ canon }}">
 <meta property="og:title" content="{{ meta_title }}">
 <meta property="og:description" content="{{ meta_desc }}">
@@ -47,13 +55,16 @@
 <meta name="twitter:description" content="{{ meta_desc }}">
 <meta name="twitter:image" content="{{ og_image }}">
 {%- if page.layout == 'post' %}
+{%- if page.lang == 'en' -%}{%- assign about_url = '/en/about/' -%}{%- else -%}{%- assign about_url = '/about/' -%}{%- endif %}
 <meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":{{ page.title | jsonify | replace: '<', '\u003c' }},"datePublished":"{{ page.date | date_to_xmlschema }}","author":{"@type":"Person","name":"Jeon Seung Hoon","url":{{ '/about/' | absolute_url | jsonify | replace: '<', '\u003c' }}},"image":{{ og_image | jsonify | replace: '<', '\u003c' }},"mainEntityOfPage":{{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":{{ page.title | jsonify | replace: '<', '\u003c' }},"inLanguage":{{ page.lang | jsonify | replace: '<', '\u003c' }},"datePublished":"{{ page.date | date_to_xmlschema }}","author":{"@type":"Person","name":"Jeon Seung Hoon","url":{{ about_url | absolute_url | jsonify | replace: '<', '\u003c' }}},"image":{{ og_image | jsonify | replace: '<', '\u003c' }},"mainEntityOfPage":{{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }}}</script>
 {%- endif %}
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/assets/img/icons/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/img/icons/apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/css/site.css">
-<link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ '/feed.xml' | prepend: site.baseurl | prepend: site.url }}">
+{%- if page.lang == 'en' -%}{%- assign feed_path = '/en/feed.xml' -%}{%- assign feed_title = site.title | append: ' (English)' -%}
+{%- else -%}{%- assign feed_path = '/feed.xml' -%}{%- assign feed_title = site.title -%}{%- endif %}
+<link rel="alternate" type="application/rss+xml" title="{{ feed_title | escape }}" href="{{ feed_path | prepend: site.baseurl | prepend: site.url }}">
 <script src="/assets/js/site.js" defer></script>
 </head>

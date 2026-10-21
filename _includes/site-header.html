@@ -1,3 +1,27 @@
+{%- comment -%}
+  언어별 머리글. feed-research 생성기(build-html.mjs 의 HEADER_KO·HEADER_EN)와 바이트가 같아야 한다(test-site.sh 15번).
+  페이지마다 다른 것은 <li class="lang"> 의 href 하나 — 짝 페이지(base.html 의 twin_href)를 가리킨다. 15번은 그 값만
+  비우고 비교하고, 값이 맞는지는 17번이 본다. 보이는 글자는 EN/KO 두 글자(좁은 화면에서 nav 가 한 줄에 들어가게),
+  접근 이름은 aria-label 이 그 언어 이름으로 준다(보이는 글자를 포함한다 — WCAG 2.5.3).
+  twin_href 는 escape 하지 않는다 — head 의 hreflang 값과 같은 문자열이어야 17번이 비교할 수 있고, Jekyll URL 은
+  큰따옴표를 포함하지 않는다(작은따옴표는 포함: /Floyd's-Cycle-Detection-Algorithm/, 큰따옴표 속성 안이라 안전).
+{%- endcomment -%}
+{%- if page.lang == 'en' -%}
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="{{ twin_href }}" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+{%- else -%}
 <a class="skip" href="#content">본문으로 건너뛰기</a>
 <header class="site-head">
 <div class="wrap head-in">
@@ -8,6 +32,8 @@
 <li><a href="/tags/">태그</a></li>
 <li><a href="/feed-research/">리서치</a></li>
 <li><a href="/about/">소개</a></li>
+<li class="lang"><a href="{{ twin_href }}" hreflang="en" lang="en" aria-label="English (EN)">EN</a></li>
 </ul></nav>
 </div>
 </header>
+{%- endif -%}

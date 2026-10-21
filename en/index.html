@@ -1,0 +1,35 @@
+---
+layout: base
+nav: /en/
+---
+{%- comment -%}
+  영어 홈. 한국어 index.html 과 같은 마크업. 글은 site.en_posts 에서(오래된 것부터라 reverse).
+  리서치 절은 _data/feed_research_en.yml(생성물)이 있을 때만 낸다 — 번역 백로그가 따라잡기 전에도 홈이 깨지지 않는다.
+  r.summary 는 외부 원문에서 온 평문이라 자른 다음 escape 한다(strip_html 은 Fetcher<V> 같은 글자를 지운다).
+{%- endcomment %}
+<section class="intro">
+<p class="hero-role">Software engineer on the Feed team at Karrot</p>
+<h1>snutiise</h1>
+<ul class="links">
+<li><a href="https://github.com/snutiise">GitHub</a></li>
+<li><a href="/en/feed.xml">RSS</a></li>
+<li><a href="mailto:{{ site.email }}">Email</a></li>
+</ul>
+</section>
+{%- if site.data.feed_research_en %}
+<section class="sec" aria-labelledby="h-research">
+<h2 class="sec-h" id="h-research">Latest research</h2>
+<p class="sec-p">Recommender-system research, updated daily. The three latest daily reports.</p>
+<ul class="ls">
+{% for r in site.data.feed_research_en limit: 3 %}<li><time class="ls-date" datetime="{{ r.date | escape }}">{{ r.date | escape }}</time><div class="ls-body"><a class="ls-title ls-sum" href="/feed-research/en/daily-{{ r.date | escape }}.html">{{ r.summary | truncate: 160 | escape }}</a></div><span class="ls-meta">{{ r.weekday | escape }} · {{ r.minutes }} min</span></li>
+{% endfor %}</ul>
+<p class="more"><a href="/feed-research/en/">All research →</a></p>
+</section>
+{%- endif %}
+<section class="sec" aria-labelledby="h-recent">
+<h2 class="sec-h" id="h-recent">Recent posts</h2>
+<ul class="ls">
+{% assign docs = site.en_posts | reverse %}{% for p in docs limit: 5 %}{% include post-row.html post=p %}
+{% endfor %}</ul>
+<p class="more"><a href="/en/posts/">All {{ site.en_posts.size }} posts →</a></p>
+</section>

@@ -1,0 +1,24 @@
+---
+layout: base
+title: Series
+nav: /en/series/
+permalink: /en/series/index.html
+description: Posts grouped by series
+---
+{%- comment -%}
+  시리즈 이름은 번역하지 않는다(front matter 그대로) — 같은 이름은 같은 slug 라 #anchor 도 한국어판과 같다.
+  site.categories 는 한국어 글만 담으므로 site.en_posts 에서 묶는다. 글마다 카테고리가 하나뿐이라 첫 카테고리로
+  묶는 것이 site.categories 와 같다. 둘 이상 붙는 글이 생기면 en/tags.html 처럼 펼친다. 순서(오래된 것부터)도 한국어판과 같다.
+{%- endcomment %}
+{%- assign groups = site.en_posts | group_by_exp: 'p', 'p.categories.first' -%}
+<header class="page-head">
+<h1>Series</h1>
+<p class="page-desc">{{ groups.size }} series · {{ site.en_posts.size }} posts</p>
+</header>
+{% for c in groups %}<section class="sec" aria-labelledby="{{ c.name | slugify }}">
+<h2 class="sec-h" id="{{ c.name | slugify }}">{{ c.name | escape }}<span class="sec-n">{{ c.size }}</span></h2>
+<ul class="ls">
+{% for p in c.items %}{% include post-row.html post=p nometa=true %}
+{% endfor %}</ul>
+</section>
+{% endfor %}

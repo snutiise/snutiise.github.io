@@ -1,7 +1,11 @@
 /* 0x00 site.js: progressive enhancement only. No innerHTML. */
 (() => {
 const d = document, b = d.body, $ = i => d.getElementById(i),
-  prod = location.origin == 'https://snutiise.github.io';
+  prod = location.origin == 'https://snutiise.github.io',
+  // UI strings follow <html lang> (blog and research pages, both languages)
+  T = d.documentElement.lang == 'en'
+   ? { posts: n => n + (n == 1 ? ' post' : ' posts'), copy: 'Copy', copied: 'Copied', failed: 'Failed', copyCode: 'Copy code', preview: 'Comments do not load in previews.' }
+   : { posts: n => n + '편', copy: '복사', copied: '복사됨', failed: '실패', copyCode: '코드 복사', preview: '미리보기에서는 불러오지 않는다.' };
 
 // nav aria-current (x/index.html = x/)
 d.querySelector('.site-nav a[href="' + b.dataset.nav + '"]')?.setAttribute('aria-current', location.pathname.replace(/\/index\.html$/, '/') == b.dataset.nav ? 'page' : 'true');
@@ -50,7 +54,7 @@ if (f) {
    }
    ul.closest('section').hidden = !ul.querySelector('li:not([hidden])');
   }
-  $('filter-count').textContent = t ? n + '편' : '';
+  $('filter-count').textContent = t ? T.posts(n) : '';
  });
 }
 
@@ -58,10 +62,10 @@ if (f) {
 if (navigator.clipboard) for (const fig of d.querySelectorAll('figure.highlight')) {
  const pre = fig.querySelector('pre'), c = d.createElement('button');
  if (!pre) continue;
- c.type = 'button'; c.className = 'copy'; c.textContent = '복사'; c.setAttribute('aria-label', '코드 복사');
+ c.type = 'button'; c.className = 'copy'; c.textContent = T.copy; c.setAttribute('aria-label', T.copyCode);
  c.addEventListener('click', () => navigator.clipboard.writeText(pre.textContent).then(
-  () => { c.textContent = '복사됨'; setTimeout(() => { c.textContent = '복사'; }, 1500); },
-  () => { c.textContent = '실패'; }));
+  () => { c.textContent = T.copied; setTimeout(() => { c.textContent = T.copy; }, 1500); },
+  () => { c.textContent = T.failed; }));
  fig.append(c);
 }
 
@@ -70,7 +74,7 @@ if (navigator.clipboard) for (const fig of d.querySelectorAll('figure.highlight'
 const btn = d.querySelector('button#load-comments'), th = d.querySelector('div#disqus_thread[data-url]');
 if (btn && th) btn.addEventListener('click', () => {
  const n = d.querySelector('p#cm-note'), s = d.createElement('script');
- if (!prod) { n.textContent = '미리보기에서는 불러오지 않는다.'; n.hidden = false; return; }
+ if (!prod) { n.textContent = T.preview; n.hidden = false; return; }
  // embed.js reads window.disqus_<k> globals; an element id in content (e.g. a heading named disqus_identifier) would
  // clobber them through named access, so shadow them before configuring.
  for (const k of ['shortname', 'identifier', 'url', 'documentTitle', 'title', 'integration', 'integrationVersion', 'slug', 'category_id', 'container_id']) window['disqus_' + k] = undefined;

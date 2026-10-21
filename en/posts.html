@@ -1,0 +1,27 @@
+---
+layout: base
+title: Posts
+nav: /en/posts/
+permalink: /en/posts/index.html
+description: All posts in English
+---
+{%- comment -%}
+  한국어 posts.html 과 같은 마크업·같은 site.js 거르기. 글은 site.en_posts(오래된 것부터)를 reverse 해서 쓴다.
+{%- endcomment %}
+{%- assign docs = site.en_posts | reverse -%}
+<header class="page-head">
+<h1>Posts</h1>
+<p class="page-desc">{{ docs.size }} posts · {{ docs.last.date | date: '%Y' }}–{{ docs.first.date | date: '%Y' }} · translated from Korean</p>
+</header>
+<div class="sec filter" hidden>
+<label class="sec-h" for="post-filter">Filter</label>
+<div class="filter-in"><input id="post-filter" type="search" placeholder="Title, series, tag" autocomplete="off" aria-describedby="filter-count"><p class="filter-count" id="filter-count" role="status"></p></div>
+</div>
+{%- assign years = docs | group_by_exp: 'p', "p.date | date: '%Y'" -%}
+{% for y in years %}<section class="sec" aria-labelledby="y{{ y.name }}">
+<h2 class="sec-h year" id="y{{ y.name }}">{{ y.name }}<span class="sec-n">{{ y.size }}</span></h2>
+<ul class="ls" data-filter>
+{% for p in y.items %}{% include post-row.html post=p short=true filter=true %}
+{% endfor %}</ul>
+</section>
+{% endfor %}
