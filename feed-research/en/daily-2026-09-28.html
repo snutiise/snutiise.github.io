@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-28 — feed-research</title>
+<meta name="description" content="In one line: Pinterest said it deployed to production a standard-ads lightweight ranking model expanded from two-tower to 3-tower. In online A/B tests,…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-28.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-28.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-28.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-28.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-28 — feed-research">
+<meta property="og:description" content="In one line: Pinterest said it deployed to production a standard-ads lightweight ranking model expanded from two-tower to 3-tower. In online A/B tests,…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-28.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-28.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-28">2026-09-28</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Monday</li>
+<li><span class="meta-k">Reading time</span>12 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-28.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>Pinterest said it deployed to production a standard-ads lightweight ranking model expanded from two-tower to 3-tower. In online A/B tests, three click metrics each rose about 1%.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-expanded-ads-lightweight-ranking-from-two-tower-to-3-tower--radar-pinterest"><span class="num">1</span>Expanded ads lightweight ranking from two-tower to 3-tower — Radar (Pinterest)</a></li><li><a href="#lookup-summary">Lookup summary</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-expanded-ads-lightweight-ranking-from-two-tower-to-3-tower--radar-pinterest"><span class="num">1</span>Expanded ads lightweight ranking from two-tower to 3-tower — Radar (Pinterest)</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14" target="_blank" rel="noopener">Beyond Two Towers: Launching the 3-Tower Engagement Co-Train Model (Part 2)</a> — Pinterest Engineering Blog, 2026-09-17, blog post. It has eight authors, and the last author, Zhaohong Han, is explicitly listed as &quot;Manager II, Ads Lightweight Ranking&quot;. Part 1, which this post references, is &quot;Beyond Two Towers: Re-architecting the Serving Stack for Next-Gen Ads Lightweight Ranking Models (Part 1)&quot; by Xiao Yang et al. It is a prior source that the repository has not yet folded into the canon.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Lightweight ranking is an early stage of the ranking pipeline. In Pinterest&#39;s ads pipeline, it receives several hundred thousand candidate ads, cuts them to the top N, and leaves the remaining candidates to be scored in detail by the fine ranking (a heavier model) that follows. Pinterest&#39;s standard ads stack scores several hundred thousand candidate ads per user request. According to the blog post, on some surfaces the P99 of the post-targeting candidate count exceeds 200K.</p></div>
+<p>The architecture long used to handle this scale is the two-tower. The two-tower builds embeddings for the user side (query) and the item side (Pin) separately and scores with a dot product. Pin-side embeddings can be precomputed and cached outside the request, so scoring itself stays cheap no matter how many candidates there are. The cost is shallow expressiveness. Because the query-Pin interaction is handled by a single dot product, it cannot capture high-order interactions between the user sequence and candidate features. The industry convention was not to use anything beyond a two-tower in the lightweight ranking role, because the candidate count is too large to leave room for a heavier model.</p>
+<p>In the earlier post (Part 1), Pinterest deployed a serving stack called Nexus that separated candidate generation from scoring. Nexus set up a &quot;platform on which, in principle, anything from cross-attention to sequence modeling can be served&quot;, and this Part 2 is the first modeling statement built on top of it. It settles the first architecture that adds expressiveness on that platform while staying within the serving budget. This post is the first production statement that overturns that convention in the lightweight ranking role.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Kept the existing two-tower as is and added a cross tower as a third tower</span></p></div>
+<ul>
+<li>The model is a 3-tower structure made of a two-tower, a cross tower, and an inter module <span class="badge ok">verified</span>. It keeps the existing two-tower (query and Pin) as is and adds the cross tower as a third tower.<ul>
+<li>The cross tower takes three kinds of user sequences and four kinds of candidate features as input.</li>
+<li>The user sequences are organic engagement, ads engagement, and search history.</li>
+<li>The candidate features are advertiser ID, campaign ID, GraphSAGE embedding, and Pin PinnerSAGE embedding.</li>
+<li>The inter module merges the query, Pin, and cross embeddings with a shared-bottom MLP (an MLP in which the three tasks share the lower layers) to produce the logits for the three tasks.</li>
+<li>The authors also tried stacking DCN (Deep &amp; Cross Network) layers and adding MMoE as alternatives. However, they state that the shared-bottom MLP gave the largest latency gain relative to the performance loss.</li>
+</ul>
+</li>
+<li>The core design is to &quot;<strong>turn candidate features into query tokens</strong> and compute cross-attention with the user sequence&quot; <span class="badge ok">verified</span>.<ul>
+<li>This lets the query axis of the attention be controlled by the number of candidate features, so serving cost does not blow up with the candidate count.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. One model predicts three click probabilities on both a fast path and an accurate path</span></p></div>
+<ul>
+<li>The three tasks the model predicts are pCTR, pGCTR30, and pOCTR <span class="badge ok">verified</span>.<ul>
+<li>pCTR is the probability of an ad click.</li>
+<li>pGCTR30 is the probability of a good click, a click lasting 30 seconds or more. It looks at whether the user actually stays on the ad landing page.</li>
+<li>pOCTR is the probability of an outbound click that leaves for the advertiser&#39;s site.</li>
+<li>There were earlier signs that Pinterest&#39;s ads ranking optimizes all three metrics at once. However, this post is the first to publicly state in production that the three metrics are handled as three heads of one model in the lightweight ranking role.</li>
+</ul>
+</li>
+<li>The same model produces a fast score with the two-tower dot product for all candidates and an accurate score with the 3-tower path for a selected subset <span class="badge ok">verified</span>.<ul>
+<li><p>The two predictions have different losses but share parameters and are trained together (co-train).</p>
+</li>
+<li><p>The blog post states the loss function exactly as follows:</p>
+<blockquote>
+<p>&quot;L = (100 * L_main_ctr + 5 * L_main_gctr30 + 1 * L_main_octr) + (10 * L_cotrain_ctr + 5 * L_cotrain_gctr30 + 1 * L_cotrain_octr)&quot;
+— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14" target="_blank" rel="noopener">Beyond Two Towers Part 2</a></p>
+</blockquote>
+</li>
+<li><p>The main (three-tower) CTR is weighted 100 and the co-train (two-tower) CTR is weighted 10. gCTR30 and oCTR are weighted 5 and 1 in main, and 5 and 1 in co-train.</p>
+</li>
+<li><p>Main and co-train are separated so that the offline loss reduction concentrates on the three-tower prediction while the co-train two-tower head stays no worse than the production two-tower model it will replace.</p>
+</li>
+</ul>
+</li>
+<li>The embedding dimensions are split by task <span class="badge ok">verified</span>.<ul>
+<li>The query tower produces 192 dimensions, split into 144 for CTR, 32 for gCTR30, and 16 for oCTR.</li>
+<li>The Pin tower outputs 448 dimensions in total: the corresponding dimensions plus a 256-dimension candidate-feature projection for the cross tower. This projection is cached offline.</li>
+<li>In serving, the fast CTR score uses only the first 64 dimensions of the 144-dimension CTR segment. The three-tower CTR score uses the entire CTR segment together with the cross embedding.</li>
+<li>For gCTR30 and oCTR, the fast and slow paths share the entire embedding.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Serving has two stages, and only the top 40K candidates by utility are re-scored with the three-tower</span></p></div>
+<ul>
+<li>Serving is a two-stage flow, and the utility topK is 40K <span class="badge ok">verified</span>.<ul>
+<li>Stage 1 scores all candidates with the co-trained two-tower head and computes utility.</li>
+<li>Stage 2 re-scores only the top 40K by utility with the three-tower.</li>
+<li>40K is about the 70th percentile of candidates for Home Feed and Related Pins and the 90th percentile for Search. In most requests, most candidates reach the three-tower, but in P99 requests with an extremely large number of candidates, only the first 40K pass.</li>
+<li>The two-tower score and the three-tower score are blended before the final top-K selection. Candidates beyond 40K move on to later stages with their two-tower score kept.</li>
+</ul>
+</li>
+<li>Cutting the candidate subset with a heuristic can distort calibration (how well predicted probabilities match actual rates), and the authors address this concern explicitly <span class="badge ok">verified</span>.<ul>
+<li>They state that on auction candidates, the three-tower model actually reduced over-calibration, bringing predicted CTR closer to measured CTR.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Four serving optimizations cut P99 inference time from over 200ms to about 30ms</span></p></div>
+<ul>
+<li><p>The four serving optimizations together cut P99 model inference time from over 200ms to about 30ms, and the final model is only 1–2ms slower than production <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p>&quot;Together, these changes reduced P99 model inference from over 200 ms to about 30 ms, leaving the final model only 1–2 ms slower than production.&quot;
+— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14" target="_blank" rel="noopener">Beyond Two Towers Part 2</a></p>
+</blockquote>
+<ul>
+<li>The authors measured the effect of each component separately. Of the four optimizations, late expansion and BF16 gave the largest gains.</li>
+<li>They moved Pin preprocessing into the Pin tower. The cross module originally ran an MLP per candidate; they attached a 256-dimension projection to the Pin tower and moved it to an offline cache. At 100K candidates, this is -2ms.</li>
+<li>They changed FP32 to BF16. Only the three-tower path lowers precision, going from 103ms to 56ms at 50K candidates and from 45ms to 26ms at 20K candidates. Model quality is neutral.</li>
+<li>They applied late expansion of user features. The point at which user features are expanded (broadcast) to the candidate batch size was pushed deeper into the attention, rather than right before the attention keys and values are built. At 100K candidates, this is -15ms.</li>
+<li>They switched to pre-layer normalization. In cross-attention, LayerNorm had been applied after the attention to a large sequence; they changed it to pre-norm, applied to the input (batch 1) before the attention. At 100K candidates, this is -3ms.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. Offline, the loss of the three-tower prediction fell about 30% versus the existing two-tower</span></p></div>
+<ul>
+<li>On held-out standard ads data, the loss of the three-tower main prediction fell by ~30% in relative terms compared with the existing production two-tower <span class="badge ok">verified</span>.<ul>
+<li>The co-train two-tower prediction was roughly on par with the production two-tower. Only the gCTR30 co-train loss got slightly worse, which the authors judge acceptable given the main task gain.</li>
+<li>Based on this result, the authors state explicitly that &quot;<strong>the standalone production two-tower engagement model can be deprecated and the co-train head relied on with no quality loss</strong>&quot;.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. In the online A/B test, three click metrics each rose about 1% and cost per click fell about 1%</span></p></div>
+<ul>
+<li><p>In the online A/B test on standard ad surfaces (Home Feed, Related Pins, Search), the three engagement metrics each rose about 1% <span class="badge ok">verified</span>. Cost-per-click fell about 1%, and GPU spend increased by a &quot;modest&quot; amount <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p>&quot;In online A/B experiments on standard ads, the three-tower co-train model delivered around 1% gains in CTR, gCTR30, and oCTR, along with nearly 1% reductions in CPC, with only a modest increase in GPU spend.&quot;
+— <a href="https://medium.com/pinterest-engineering/beyond-two-towers-launching-the-3-tower-engagement-co-train-model-part-2-0b96167d2c14" target="_blank" rel="noopener">Beyond Two Towers Part 2</a></p>
+</blockquote>
+<ul>
+<li>Because the title is &quot;Launching&quot; and the body states the deprecation of the production two-tower model it replaces, we judge this to be an actual deployment.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a Pinterest 3-Tower Engagement Co-Train entry at the top of &quot;New this month&quot; in <a href="radar.html">radar.md</a>. Pinterest is not a service this repository tracks with canon documents (a canon tracked service), so no services canon is created.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This source fills three new roles in the repository corpus:</p></div>
+<ul>
+<li>It is the first production statement that extends the two-tower in ads lightweight ranking.<ul>
+<li>Until now the corpus had several ads ranking statements (Meta ads scaling laws, Snap CAMIE, Tencent ANGLE and ChronicleRec, TikTok Shop ReST, and others). However, most statements aimed at the lightweight/pre-rank role focused on candidate reduction and KD.</li>
+<li>Pinterest presents a practical pattern that adds expressiveness in the lightweight ranking role while avoiding a latency blowup with the candidate count. Its core is the idea of &quot;<strong>building query tokens from candidate features to control the attention query axis</strong>&quot;.</li>
+<li>This pattern may be reusable outside ad surfaces with large candidate counts.</li>
+</ul>
+</li>
+<li>The co-train pattern, which trains a fast head and a slow head together, appears for the first time in the lightweight ranking role.<ul>
+<li>Earlier statements in the repository with similar ideas were <a href="radar.html#unique-baidu--beihang--cityu--unified-retrieval--ranking-with-single-layer-flat-quantization-in-an-industrial-mobile-feed-recsys-2026-accepted">UNIQUE (Baidu)</a>, <a href="radar.html#unirec-kuaishou--aligns-cascade-pre-ranking--ranking-fusion-with-two-stage-joint-learning-app-usage-duration-0616">UniRec (Kuaishou)</a>, and <a href="radar.html#onetrans-v2--unifies-the-industrial-recommendation-retrieval-pre-rank-and-fine-rank-cascade-in-one-transformer-gmv-974-32-throughput">OneTrans-V2</a>. All of them aimed to unify different stages of a cascade (a recommendation pipeline that narrows candidates over several stages).</li>
+<li>Pinterest 3-Tower puts a fast head and a slow head in one model within a single stage (lightweight ranking) and re-scores only the candidate subset with the slow head.</li>
+<li>Splitting fast and slow within a stage, rather than unifying across stages, is a new role in the repository.</li>
+</ul>
+</li>
+<li>An ads lightweight ranking axis is added to the Pinterest statements the repository has covered.<ul>
+<li>While <a href="radar.html#pinterest-clr--expands-home-feed-conditional-embedding-retrieval-into-a-unified-architecture-p90-latency-down-85">Pinterest CLR</a> covered the candidate generation axis of the organic Home Feed and <a href="radar.html#pindco-pinterest--production-dco-that-selects-ad-creatives-in-real-time-with-whole-page-impact-launched-on-pinterest-ads-ad-ctr-309-relative">PinDCO</a> covered the ads creative selection axis, 3-Tower Co-Train is a statement on the ads lightweight ranking axis.</li>
+<li>With this source, it becomes clear how Pinterest&#39;s production recommendation and ads stack divides into three roles in the repository (organic retrieval / ads creative / ads lightweight ranking).</li>
+<li>The three statements were published between 2026-07-21 (PinDCO arXiv v1) and 2026-09-17 (3-Tower blog post). This is a point at which Pinterest is visibly increasing its public communication about the ads ranking pipeline.</li>
+</ul>
+</li>
+</ul>
+<p>Some open questions remain:</p>
+<ul>
+<li>The repository has not yet covered how candidate generation and scoring were separated in Part 1 (Nexus). If the next batch reads the Nexus details closely, the &quot;platform the 3-Tower sits on&quot; itself will enter the corpus, and this statement will be placed more precisely.</li>
+<li>The three directions the authors state explicitly as follow-ups are also worth tracking.<ul>
+<li>Expansion to objectives other than engagement (for example, web conversion)</li>
+<li>Longer sequence modeling</li>
+<li>Stronger offline, online, and infrastructure feedback loops</li>
+</ul>
+</li>
+</ul>
+<h2 id="lookup-summary">Lookup summary</h2>
+<p>The only source that passed today is Pinterest Engineering&#39;s 3-Tower post. The other sources had no new commits and no posts that passed.</p>
+<ul>
+<li><strong>X</strong> (<code>xai-org/x-algorithm</code>): There are 0 new commits. The latest commit is <code>4c5cfe8</code> (2026-09-26), already covered in yesterday&#39;s daily.</li>
+<li><strong>Netflix Tech Blog</strong>: There are 0 relevant new posts. The latest post (2026-09-25, &quot;Trading a Cloud Identity for Your Own&quot;) is on a security and infrastructure topic.</li>
+<li><strong>engineering.fb.com / ai.meta.com</strong>: There are 0 relevant new posts.</li>
+<li><strong>Google Research blog</strong> (Monday scan): There are 0 relevant new posts. The latest post (2026-09-24) is on a video generation topic.</li>
+<li><strong>Pinterest Engineering</strong> (Monday scan): One post passed, the 3-Tower post covered in the main text. We also saw 2026-09-11 &quot;Evolving Pinterest&#39;s Embedding Retrieval Platform&quot; in the list. However, the repository&#39;s Pinterest CLR thread already covers the organic Home Feed retrieval axis, so folding it into the main text is deferred to the What to check next items.</li>
+<li><strong>arXiv cs.IR triage</strong>: We parsed 30 and 0 passed.<ul>
+<li><strong>Beyond a Scalar: Distributional Serving Interfaces for Watch-Time Prediction</strong> (<a href="https://arxiv.org/abs/2609.28383" target="_blank" rel="noopener">2609.28383</a>) was rejected. Checking the <a href="https://arxiv.org/html/2609.28383v1" target="_blank" rel="noopener">HTML version</a>, all four authors are affiliated with Shanghai Jiao Tong University and Rice University, that is, academia, and there is no production deployment or A/B statement. The datasets are also the public KuaiRec, KuaiRand-1K, and WeChat21 rather than company production logs. It is an academic method, separate from the trend of watch-time distribution prediction being stated by a second production company after VK HEGM.</li>
+<li>The other 29 are either leftovers of the batch already triaged in yesterday&#39;s 09-27 daily (submitted 2026-09-23–24) or academic RAG, QA, and retrieval methods. The newly parsed batch overlapped with yesterday&#39;s because arXiv cs.IR has had no new submissions since 2026-09-25. 2026-09-25 is a Friday but this category had no new submissions, 2026-09-26 and 2026-09-27 are a weekend, and the 2026-09-28 batch is not yet public.</li>
+</ul>
+</li>
+</ul>
+<h2 id="radar">Radar</h2>
+<p>Added the <a href="radar.html#pinterest-3-tower-engagement-co-train--ads-lightweight-ranking-beyond-two-tower-ctr-gctr30-octr-up-1-each-cpc-down-1-launched">Pinterest 3-Tower Engagement Co-Train</a> entry to new this month.</p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><p>Next, we review two Pinterest posts and keep looking for a watch-time distribution prediction production statement from a second company after VK HEGM.</p>
+<ul>
+<li>Put Pinterest Nexus (Part 1) &quot;Beyond Two Towers: Re-architecting the Serving Stack for Next-Gen Ads Lightweight Ranking Models&quot; on the close-reading candidate list for the next Monday industry blog scan — the serving stack the 3-Tower sits on is not yet in the corpus.</li>
+<li>Decide in the next batch whether to fold the Pinterest Evolving Embedding Retrieval Platform post (published 2026-09-11) in as additional evidence — we saw it in today&#39;s list, but it overlaps with the CLR thread.</li>
+<li>Keep tracking a watch-time distribution prediction production statement from a second company after VK HEGM in the next batch — one academic method (2609.28383) turned up on arXiv today, but it is not a production statement.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-27.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-27</span></a><a class="pg-next" href="daily-2026-09-29.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-29</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-28.html" data-title="일일 리포트 2026-09-28"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

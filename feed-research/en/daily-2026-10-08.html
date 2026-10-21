@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-08 — feed-research</title>
+<meta name="description" content="In one line: X turned on by default the global popular posts candidate source it released four days earlier. It is a source that feeds everyone the same…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-08.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-08.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-08.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-08.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-08 — feed-research">
+<meta property="og:description" content="In one line: X turned on by default the global popular posts candidate source it released four days earlier. It is a source that feeds everyone the same…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-08.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-08.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-08">2026-10-08</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>8 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-08.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X turned on by default the global popular posts candidate source it released four days earlier. It is a source that feeds everyone the same list of popular posts as candidates, regardless of the user.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-the-global-popular-posts-candidate-source-was-turned-on-by-default--x"><span class="num">1</span>The global popular posts candidate source was turned on by default — X</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#source-check-notes">Source check notes</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-the-global-popular-posts-candidate-source-was-turned-on-by-default--x"><span class="num">1</span>The global popular posts candidate source was turned on by default — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/78460ca8b65c57ddd3a05f9217c8aaeba214b628" target="_blank" rel="noopener">xai-org/x-algorithm@78460ca</a> — xai-org, 2026-10-07T03:05:56Z, code. 22 files, +775/−681. These notes number X commits in order after the Gen4 release, and this commit is Gen4+37. The previous commit is <a href="https://github.com/xai-org/x-algorithm/commit/e62790c" target="_blank" rel="noopener">e62790c</a> (Gen4+36) from 2026-10-06.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In X&#39;s For You feed, several candidate sources collect posts, Phoenix (a Grok-based Transformer ranker) predicts action probabilities, and the value model then orders posts by a weighted sum. Candidate sources fall broadly into in-network sources, which collect posts from followed accounts, and OON (out-of-network) sources, which collect posts from accounts the user does not follow; Thunder is in-network, and Phoenix retrieval and SimClusters are among the OON sources. <code>PopularPostsSource</code>, introduced on 2026-10-03, feeds everyone the same list of &quot;500 recent popular posts&quot; as OON candidates regardless of the user, and until now it was off by default. This commit turns this source on by default and lowers the new-author boost weight; these two default changes matter more than the code structure.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The popular posts source entered the default path, and per user it only removes posts already seen</span></p></div>
+<ul>
+<li><p>The flag that turns on the popular posts source in the home-mixer (the service that serves the For You feed) mirror changed from false to <strong>true</strong> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:944-948</code></a>.</p>
+<ul>
+<li>The flag name is <code>EnablePopularPostsSource</code>.</li>
+<li>The mirror sync time is <code>2026-10-06T16:00:58Z</code>.</li>
+<li><code>home-mixer/params/param.rs</code> is a file that mirrors X&#39;s internal feature switch defaults daily. So we read a value change in this file as a signal that the production default changed.</li>
+</ul>
+</li>
+<li><p>The source turns on under three conditions <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/home-mixer/sources/popular_posts_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/popular_posts_source.rs:27-31</code></a>.</p>
+<ul>
+<li>The request must not be one that reuses cached posts.</li>
+<li>The request must not be follow-only (<code>in_network_only</code>).</li>
+<li>The flag must be on.</li>
+</ul>
+</li>
+<li><p>The only per-user information used is a single list of already seen posts, and posts on this list are removed <span class="badge ok">verified</span> (same file, line 50).</p>
+<ul>
+<li>The list is named <code>seen_ids</code>.</li>
+</ul>
+</li>
+<li><p>The README also lists this source for the first time as an OON source <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/README.md" target="_blank" rel="noopener"><code>README.md</code></a>.</p>
+<blockquote>
+<p>&quot;<code><code>popular_posts_source</code></code> adds a shared list of popular recent posts.&quot;</p>
+</blockquote>
+<blockquote>
+<p>&quot;A shared list of popular recent posts, initially from the most-followed active accounts.&quot;</p>
+</blockquote>
+<ul>
+<li>The qualifier &quot;initially&quot; reads as meaning that for now posts are drawn only from top-follower authors but the scope may be widened <span class="badge est">inferred</span>. The basis is that the job code in the 2026-10-06 commit (Gen4+36) picks the author set from a BigQuery snapshot, so it is easy to swap.</li>
+</ul>
+</li>
+<li><p>The way the list is built is the same as yesterday.</p>
+<ul>
+<li>It collects original posts from the top 0.005% of authors by followers among authors active in the last 7 days <span class="badge ok">verified</span> (2026-10-06 commit Gen4+36, <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/home-mixer/popular_posts_job.rs" target="_blank" rel="noopener"><code>home-mixer/popular_posts_job.rs</code></a>).</li>
+<li>It extrapolates views within 24 hours to cumulative 24-hour views assuming an 8-hour half-life, and picks the top 500 <span class="badge ok">verified</span> (same file).</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The new-author boost weight in the home-mixer mirror dropped from 0.02 to 0.015</span></p></div>
+<ul>
+<li>The new-author boost weight in the home-mixer mirror went from 0.02 → <strong>0.015</strong> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:384-388</code></a>.<ul>
+<li>The new-author boost (<code>post_unexplored</code>) is a cold start mechanism that adds to the score of in-network posts from authors with fewer than 1,000 impressions.</li>
+<li>The weight name is <code>PostUnexploredWeight</code>.</li>
+</ul>
+</li>
+<li>A parameter of the same name also exists in the mirror of VM-Ranker (a separate service to which home-mixer delegates score refinement), but there it stays at 0.02 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs:91-95</code></a>.</li>
+<li>Since the 2026-09-24 commit (Gen4+28), home-mixer first computes a local weighted sum and refines the score through a VM-Ranker RPC, and serves the local score if the RPC fails <span class="badge ok">verified</span> (canon Gen4+28 entry).<ul>
+<li>So 0.015 is the value of at least the RPC failure path, and we cannot tell from this commit alone which value is final on the normal path <span class="badge est">inferred</span>. We have not yet checked whether the two mirrors read different feature switch keys, so we leave it as an inference.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Code was added to correct lexical match features of negative samples in search ranking training</span></p></div>
+<p>Phoenix trains search result ranking as well as For You. During training, actual impression logs alone lack &quot;irrelevant results&quot;, so it borrows data from other users in the batch to create fake negatives. This is called in-batch negative sampling.</p>
+<ul>
+<li>In batches that have a search query, two kinds of negatives are made <span class="badge ok">verified</span> — <code>apply_negative_sampling</code> in <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/phoenix/xrex/data/recsys/recsys_batch.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/recsys_batch.py</code></a>.<ol>
+<li>A post seen by another user is paired with my query.</li>
+<li>A post I saw is paired with another user&#39;s query.</li>
+</ol>
+<ul>
+<li>If the cosine similarity of the two query embeddings is 0.9 or higher, the queries are treated as similar and discarded.</li>
+<li>Negatives get a &quot;passed without reading&quot; label (<code>ClientTweetRecapNotDwelled</code>).</li>
+</ul>
+</li>
+<li>The problem is that post features are all copied unchanged from the original slot. The two lexical match features added in the 2026-09-18 commit (Gen4+24) are <strong>values based on the original query</strong>, and they remained as they were even in negatives paired with the new query <span class="badge ok">verified</span> (copy code, lines 1391-1425).<ul>
+<li><code>exactPhraseSeq</code> indicates whether the query phrase appears in the post verbatim.</li>
+<li><code>matchedWordFractionSeq</code> is the fraction of query words that appear in the post.</li>
+</ul>
+</li>
+<li>This commit fixes this with one new file <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/phoenix/xrex/data/recsys/negative_word_match.py" target="_blank" rel="noopener"><code>negative_word_match.py</code></a> (51 lines).<ul>
+<li>The call site is <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/phoenix/xrex/data/recsys/recsys_batch.py" target="_blank" rel="noopener"><code>recsys_batch.py:1476-1488</code></a>.</li>
+<li>When <code>search_negative_clear_word_match</code> is on, it clears the two features of the negative slot to 0 (no value). This flag is False by default.</li>
+<li>If the training data has three new columns, it <strong>recomputes the values based on the newly paired query</strong> using the external library <code>xai_search_lexical_match</code>.<ul>
+<li><code>lexicalTextSeq</code>: post body</li>
+<li><code>lexicalQuerySeq</code>: query</li>
+<li><code>lexicalAuthorSeq</code>: author</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Before the correction, negatives of type 2 in particular received an irrelevant label while carrying a feature saying &quot;the phrase matches the query exactly&quot;. The model was likely trained to trust the lexical match features less than it should <span class="badge est">inferred</span>. The basis is that the features and labels were systematically mismatched.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A regularization option was added that adds the output magnitude of each Transformer layer to the loss, and its default is 0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>recsys_model.py:664, 3827-3830</code></a>.<ul>
+<li>The option name is <code>per_layer_l2_weight</code>. It adds the magnitudes (mean squares) of the attention output and the FFN output.</li>
+<li>It appears to be a mechanism to keep activations from growing as they pass through layers <span class="badge est">inferred</span>.</li>
+<li>There was also a refactor that merged four functions that build loss inputs into one.</li>
+</ul>
+</li>
+<li>VF (visibility filtering, the safety layer that decides whether content may be shown) now treats posts that the post store could not find as failures instead of judging them <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/78460ca/visibility-filtering/evaluate_tweets.rs" target="_blank" rel="noopener"><code>visibility-filtering/evaluate_tweets.rs</code></a>.<ul>
+<li>The post store is tweetypie, and the target is posts for which this store returned &quot;not found&quot;.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> and the pipeline diagram were updated.</p></div>
+<ul>
+<li>In the <code>PopularPostsSource</code> row of the source table in the candidate generation section, changed the gate from &quot;off by default&quot; to &quot;on by default in Gen4+37&quot; and added the activation conditions.</li>
+<li>In the new-author boost table and weight table of the ranking section and in the cold start section, wrote the <code>PostUnexploredWeight</code> value together as home-mixer 0.015 and VM-Ranker 0.02.</li>
+<li>Created a <code>### Gen4+37</code> section and added the reference commit <code>78460ca</code> to the sources section.</li>
+<li><code>assets/x-pipeline.svg</code>: added &quot;popular list on (10-07)&quot; to the subtitle of the SimClusters box.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span></p></div>
+<ul>
+<li>Since the Gen4 release, all of X&#39;s OON candidates came from personalized inputs such as user embeddings or clusters. For the first time, a source that gives <strong>the same list to all users</strong> entered the default path <span class="badge ok">verified</span>.<ul>
+<li>However, this source only supplies candidates, and actual impressions are decided by Phoenix ranking <span class="badge est">inferred</span>. The basis is that the source creates only <code>PostCandidate</code>s without scores.</li>
+</ul>
+</li>
+<li>On the same day, candidates from popular authors were increased and the new-author boost weight in the home-mixer mirror was lowered by 25% (the VM-Ranker mirror is unchanged). We cannot confirm from the code whether the two changes are one experiment <span class="badge est">inferred</span>.</li>
+<li>The search negative correction does not affect training for now because its flag is off by default <span class="badge ok">verified</span>.<ul>
+<li>However, the fact that a defect on the training data side surfaced only 3 weeks after the lexical features were added in the 2026-09-18 commit (Gen4+24) means the search ranker may not yet have been using these features properly <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check the problem of the two mirrors having different new-author boost weights — see which of home-mixer 0.015 and VM-Ranker 0.02 is final on the normal path, and whether the vm_ranker RPC overwrites the local weight.<ul>
+<li>The weight name is <code>PostUnexploredWeight</code>.</li>
+</ul>
+</li>
+<li>Track performance signals of <code>PopularPostsSource</code> — see whether this source shows up in the <code>Phoenix.RetrievalContribution</code> family of metrics introduced in the 2026-09-24 commit (Gen4+28), and whether served_type is separated out. The current label is <code>ForYouPhoenixRetrieval</code>.</li>
+<li>Watch whether the default of <code>search_negative_clear_word_match</code> changes — if it is turned on, the search ranker training data changes.</li>
+<li>Do a deep dive on the <code>NOTICE</code> grade in X VF — this item carried over from 10-07 and is not yet resolved.</li>
+</ul></div>
+<h2 id="source-check-notes">Source check notes</h2>
+<p>No new material to fold in was found from any of the three sources checked in this run.</p>
+<ul>
+<li>Meta: the latest post on engineering.fb.com is &quot;NTS: Authenticated Time at Meta&quot; (time synchronization infrastructure) from 2026-10-06, which is unrelated to feeds and was skipped. ai.meta.com/blog had no new posts on feeds or recommendations.</li>
+<li>Netflix: the latest post on netflixtechblog.com is from 2026-09-25, so there is nothing new. On research.netflix.com, <code>/publications</code> still returns 404, but the first page and <a href="https://research.netflix.com/research-area/recommendations" target="_blank" rel="noopener"><code>/research-area/recommendations</code></a> open. The latest publication date on the first page is 2026-02-24, and we confirmed 0 new items. From now on we check these two paths.</li>
+<li>arXiv cs.IR: 30 papers were parsed, and 0 passed the acceptance criteria. There were several studies on generative retrieval with Semantic IDs (token sequences that represent an item as a hierarchical code): <a href="https://arxiv.org/abs/2610.08732" target="_blank" rel="noopener">2610.08732</a>, <a href="https://arxiv.org/abs/2610.07402" target="_blank" rel="noopener">2610.07402</a>, <a href="https://arxiv.org/abs/2610.06590" target="_blank" rel="noopener">2610.06590</a>. However, all lack platform company authors or production evidence.</li>
+</ul>
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-07.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-07</span></a><a class="pg-next" href="daily-2026-10-09.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-09</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-08.html" data-title="일일 리포트 2026-10-08"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

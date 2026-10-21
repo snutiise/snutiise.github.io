@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-15 — feed-research</title>
+<meta name="description" content="In one line: X released the training code for a re-ranker that fills one page of an immersive surface using reinforcement learning. The reward is based on…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-15.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-15.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-15.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-15.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-15 — feed-research">
+<meta property="og:description" content="In one line: X released the training code for a re-ranker that fills one page of an immersive surface using reinforcement learning. The reward is based on…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-15.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-15.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-15">2026-10-15</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>11 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-15.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X released the training code for a re-ranker that fills one page of an immersive surface using reinforcement learning. The reward is based on dwell time, and the serving switch is off by default.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">5</span></summary><ol><li><a href="#1-training-code-released-for-a-re-ranker-that-fills-a-page-with-reinforcement-learning--x"><span class="num">1</span>Training code released for a re-ranker that fills a page with reinforcement learning — X</a></li><li><a href="#2-wechat-said-it-deployed-sid-generative-retrieval-on-several-search-surfaces--radar"><span class="num">2</span>WeChat said it deployed SID generative retrieval on several search surfaces — Radar</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#sources-checked">Sources checked</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same commit, X raised two home-mixer mirror weights, like and not interested, by the same 1.1×.</li>
+<li>X cut the account list of its Brazil election filter to 25 accounts related to the runoff.</li>
+<li>A paper reported that WeGR, WeChat Search&#39;s generative retrieval, has been deployed on several search surfaces.</li>
+</ul>
+<h2 id="1-training-code-released-for-a-re-ranker-that-fills-a-page-with-reinforcement-learning--x"><span class="num">1</span>Training code released for a re-ranker that fills a page with reinforcement learning — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/17c96bf346df3d62b90f1bb01830d432dba74485" target="_blank" rel="noopener">xai-org/x-algorithm@17c96bf</a> — xAI public repository, commit of 2026-10-14 03:41 UTC, code. These notes number the X commits after the Gen4 release in order, and this commit is Gen4+41. It changed 53 files, about +7,745/−6,964 lines by diff.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In X&#39;s For You feed, the ranking model Phoenix predicts the probability of actions such as like, reply, and report for each candidate, and candidates are sorted by the weighted sum of those probabilities. Then a separate service called VM-Ranker re-adjusts the order with DPP. DPP (determinantal point process) is a diversity technique that selects at the set level, cutting the score when similar items are picked together. Because this approach scores each item separately, it cannot directly address the question &quot;at which position should this item go so that the user views the page to the end?&quot;</p></div>
+<p>Slate (a bundle of items shown at once) level reinforcement learning is a way to address this question. The policy (actor) fills slots one at a time. The value function (critic) improves the policy by predicting &quot;the sum of rewards from the remaining slots from this point on.&quot; This commit is code showing that X is actually training this structure.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The re-ranker consists of a page decoder trained on a dwell-time reward and a twin critic</span></p></div>
+<ul>
+<li><p>A new page-level RL training config for the immersive surface was added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>configs/xrecsys.py:388-417, 477-483</code></a>.</p>
+<ul>
+<li>In the code, this re-ranker is named <code>page_rl</code>.</li>
+<li>The config name is <code>immersive_page_rl</code>. It turns on <code>page_rl=PageRlConfig(enabled=True)</code> on the home ranker base.</li>
+<li>A separate Kafka topic for training data, <code>user_action_sequence_immersive_page_rl</code>, was also created.</li>
+</ul>
+</li>
+<li><p>Re-ranking proceeds in three stages <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_rl.py" target="_blank" rel="noopener"><code>page_rl.py:340-391</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_decoder.py" target="_blank" rel="noopener"><code>page_decoder.py:22-34</code></a>.</p>
+<ol>
+<li>Build a weighted-sum score (behavior score) from the Phoenix head probabilities.</li>
+<li>Cut the top 48 at most into the candidate pool (<code>max_steps=48</code>).</li>
+<li>The page decoder picks one at a time, starting from the first slot (autoregressive decoding). Serving fills 12 slots (<code>serve_steps=12</code>).</li>
+</ol>
+</li>
+<li><p>The logit the decoder assigns to a candidate at each step is the sum of three terms <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_decoder.py" target="_blank" rel="noopener"><code>page_decoder.py:85-119, 233-247</code></a>.</p>
+<ul>
+<li>The dot product of the candidate embedding and a state that summarizes the items chosen so far with attention</li>
+<li>The behavior score standardized within the pool (weight 1.0)</li>
+<li>A penalty: a negative weight times whether the author matches an already chosen item and how many levels of the SID (semantic ID: an item represented as a hierarchical code) prefix overlap</li>
+</ul>
+</li>
+<li><p>The reward is based on per-slot dwell time <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_rl.py" target="_blank" rel="noopener"><code>page_rl.py:51-59, 100-158</code></a>.</p>
+<ul>
+<li>A slot viewed for 3 seconds or more gets <code>0.1 × min(dwell seconds, 300) × (1 + min(engagement count, 3))</code>.</li>
+<li>If a slot has any of not interested, report, block, mute, or see less, its reward is 0.</li>
+<li>If all slots of the page are impressed and the last slot has a video quality view (VQV), a completion bonus of 1.0 is added.</li>
+<li>A discount rate of γ=0.8 pulls later slot rewards forward to build the return.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">rewarded = impressed_mask &amp; (dwell &gt;= config.min_dwell_s)
+reward = jnp.where(rewarded, dwell_weight * dwell * mult, 0.0).astype(jnp.float32)
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_rl.py" target="_blank" rel="noopener"><code>page_rl.py:121-122</code></a> (code), 2026-10-14</p>
+</blockquote>
+</li>
+<li><p>Two critics are used, and the smaller of the two values is taken <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_critic.py" target="_blank" rel="noopener"><code>page_critic.py:18-25, 121-139, 174-193</code></a>.</p>
+<ul>
+<li>This setup is called a twin critic, a common practice to prevent overestimation.</li>
+<li>The target is TD(λ=0.9), and the loss of pages from exploration traffic gets weight 9.0.</li>
+<li>A continuation head that predicts whether the page continues to the next slot is also trained.</li>
+</ul>
+</li>
+<li><p>The actor loss has four terms <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_decoder.py" target="_blank" rel="noopener"><code>page_decoder.py:37-48, 495-592</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_rl.py" target="_blank" rel="noopener"><code>page_rl.py:80-88</code></a>.</p>
+<ul>
+<li>An advantage term based on critic Q values. It targets only candidates within 0.6 of the top behavior score.</li>
+<li>A KL term that keeps the policy from drifting too far from the existing ordering policy. The existing ordering policy is a softmax (τ=0.2) of the behavior score. It sets a target KL of 0.35 and automatically adjusts the coefficient β between 0.1–3.0.</li>
+<li>A penalty term applied when the same author or similar SIDs are placed consecutively (weight 0.5).</li>
+<li>A behavior cloning loss that imitates the logged actual impression order (weight 0.25).</li>
+</ul>
+</li>
+<li><p>Serving decoding splits into two approaches depending on the temperature value <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_decoder.py" target="_blank" rel="noopener"><code>page_decoder.py:427-477</code></a>.</p>
+<ul>
+<li>If temperature is 0, it builds 4 beams and picks the beam with the largest sum of critic values.</li>
+<li>If temperature is above 0, it explores with Gumbel sampling.</li>
+</ul>
+</li>
+<li><p>The behavior score computation has its own weights as config defaults, different from the home-mixer mirror <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/models/page_rl.py" target="_blank" rel="noopener"><code>page_rl.py:62-77</code></a>.</p>
+<ul>
+<li>The home-mixer mirror is a file that transcribes by cron the production defaults of the home-mixer service, which assembles the For You feed.</li>
+<li>Values such as share 40.0, not_interested −500, and report −1000 differ greatly in magnitude from the home-mixer mirror (share 2.0, not_interested −52.272, report −234).</li>
+<li>Because the mirror has no comment, we cannot tell whether they are serving values <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><p>The switch for using the decoder in serving is off by default, and no code in home-mixer uses the decoder output <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/inference/model_runner.py" target="_blank" rel="noopener"><code>inference/model_runner.py:3984</code></a>.</p>
+<ul>
+<li>The switch added to the serving runner is <code>serve_page_decoder: bool = False</code>.</li>
+</ul>
+</li>
+<li><p>However, because the training data already has logged probability fields such as <code>rl_rerank_prob</code> and <code>rl_decode_prob</code>, we infer that probabilistic re-ranking is already running on some traffic and leaving logs <span class="badge est">inferred</span>.</p>
+<ul>
+<li>Log probabilities used for off-policy training (training a different policy from the logs of the served policy) come only from the policy that was actually served.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Two home-mixer mirror weights, like and not interested, were both raised by exactly 1.1×</span></p></div>
+<ul>
+<li>The like and not-interested weights changed in the home-mixer mirror <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:320, 414-419</code></a>.<ul>
+<li>Like (<code>FavoriteWeight</code>): 0.6 → <strong>0.66</strong></li>
+<li>Not interested (<code>NotInterestedWeight</code>): −47.52 → <strong>−52.272</strong></li>
+<li>The mirror sync time is <code>2026-10-13T16:00:30Z</code>.</li>
+</ul>
+</li>
+<li>Both new values are exactly 1.1× the previous values. The <code>NotInterestedWeight</code> change from −43.2 to −47.52 in the 09-29 commit (Gen4+31) was also 1.1×.</li>
+<li>This appears to be a rollout practice of raising weights by 10% in steps <span class="badge est">inferred</span>. There is no evidence beyond the same ratio appearing three times.</li>
+<li>The two values in the VM-Ranker mirror did not change <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs:3, 108-113</code></a>.<ul>
+<li>favorite stays at 0.5 and not_interested at −47.52.</li>
+<li>The number of weights on which the two mirrors diverge is now 5.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The Brazil election filter was reduced to 25 runoff-related accounts</span></p></div>
+<ul>
+<li><p>The account list the filter references was reduced to 25 accounts related to the runoff <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>brazil_2026_election_filter.rs:17-74</code></a>.</p>
+<ul>
+<li>The filter is named <code>Brazil2026ElectionFilter</code>. It removes posts related to accounts on the list from the feed unless the viewer follows that account.</li>
+<li>The comment cites an official letter from the Brazilian electoral court (TSE) as the basis.</li>
+</ul>
+<blockquote>
+<p>&quot;Following the TSE’s Ofício GAB-PRES No. 4720/2026 and Despacho 3814449 (SEI proceeding No. 2026.00.000013846-8), on Oct 13, 2026 the list was reduced to the candidates in the Oct 25 runoff.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>brazil_2026_election_filter.rs:17</code></a> (code comment), 2026-10-14</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The user-installed-apps feature was turned off in the home ranker base <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>configs/xrecsys.py:300</code></a>.<ul>
+<li>The setting value <code>enable_user_installed_apps</code> went from True to False.</li>
+<li>After turning it off yesterday in two-tower retrieval (a structure that finds candidates by the dot product of a user vector and a post vector), it was turned off in the ranker as well.</li>
+</ul>
+</li>
+<li>VM-Ranker skips DPP by default for topic requests (topic feeds) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/mod.rs:85-87</code></a>.<ul>
+<li>The default of the new switch <code>TopicDppEnabled</code> is false.</li>
+</ul>
+</li>
+<li>It started recording, as a per-request metric, the candidate count of one retrieval channel introduced yesterday <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/17c96bf/home-mixer/sources/phoenix_source.rs" target="_blank" rel="noopener"><code>sources/phoenix_source.rs</code></a>.<ul>
+<li>The channel is named <code>ZERO_FAV</code>, and we presume it collects posts with zero likes.</li>
+</ul>
+</li>
+<li>We did not read the following three changes, judging them not directly related to feed behavior <span class="badge est">inferred</span>.<ul>
+<li>An abuse-enforcement (account enforcement service) refactor. The diff is about 7,900 lines.</li>
+<li>A hydration cleanup of VF (visibility-filtering, a service that decides per post whether it may be shown to this viewer).</li>
+<li>An FA4 attention kernel change.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span></p></div>
+<ul>
+<li><a href="x.html">services/x.md</a>: Introduced a Gen4+41 section. Updated the favorite and not_interested rows of the weight table and added the reduction to the Brazil election filter entry in the filter section. Linked the training-side substance to the reward head item in open questions and added a deep-dive-needed item. Added the reference sha <code>17c96bf</code> to the sources section.</li>
+<li><a href="feed-diversity.html">topics/feed-diversity.md</a>: Introduced a section &quot;5. A learned slate decoder&quot; in the X case. Added to the DPP section that DPP is skipped for topic requests, and updated the Who uses it section.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This release confirms that the next step exists as training code: generating slates with RL and learning the size of the diversity penalty together with the dwell reward <span class="badge ok">verified</span>. The previous understanding was &quot;X&#39;s re-ranking is score sort + author decay + DPP&quot;. Because the serving switch is off by default, it does not overturn the existing understanding.</p></div>
+<ul>
+<li>The reward is dwell time multiplied by an engagement multiplier, not an engagement probability <span class="badge ok">verified</span>. Following the CREAD dwell loss on 10-08 and the retrieval <code>ld</code> head on 10-13, the trend of putting dwell time at the center of the objective has extended to the re-ranking stage <span class="badge est">inferred</span>.<ul>
+<li>CREAD trains, as a binary classification, whether dwell time exceeded each of several thresholds.</li>
+</ul>
+</li>
+<li>The purpose of <code>RewardOutputs</code> and <code>rewardRerankSlotProb</code>, which had appeared only as proto in the 08-19 commit (Gen4+4), was revealed as training code two months later <span class="badge est">inferred</span>. The evidence is circumstantial: the names and log fields match.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-wechat-said-it-deployed-sid-generative-retrieval-on-several-search-surfaces--radar"><span class="num">2</span>WeChat said it deployed SID generative retrieval on several search surfaces — Radar</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2610.16979" target="_blank" rel="noopener">WeGR: Unified Generative Retrieval for Industrial Search Systems in WeChat</a> — arXiv, 2026-10-12 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Generative retrieval represents an item as a sequence of SID tokens, and a model retrieves candidates by generating those tokens in order. This repository collects production claims of this family in the radar&#39;s generative retrieval / semantic ID thread. X also released an SID retrieval service on 10-02. This paper covers WeGR, the generative retrieval used in WeChat&#39;s industrial search system.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span></p></div>
+<ul>
+<li>WeGR combines an SID tokenizer and an RL method <span class="badge ok">verified</span>(abstract).<ul>
+<li>The SID tokenizer CoCo-VAE incorporates collaborative signals and prevents codebook collapse (only some codes being used).</li>
+<li>The RL method DHPO solves the problem of sparse reward, which arises because reward is given only on an exact SID match, by widening the reward range per SID layer.</li>
+</ul>
+</li>
+<li>The abstract reports 2-month online A/B results and states that WeGR was deployed on several search surfaces <span class="badge ok">verified</span>(abstract).<ul>
+<li>In WeChat e-commerce search, orders were +2.539%, CTR +1.508%, and conversion rate +1.381%, and CPU and GPU usage were −25.5% and −26.1%.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Not folded into the canon. Added one line as additional evidence to the generative retrieval / semantic ID thread of <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> It is the second SID production claim from WeChat/Tencent, following Tlow (a flow-based item tokenizer). It also adds an RL design axis, &quot;partial reward per SID layer&quot;. However, it is a search surface, so it is far from feeds. We did not read the body.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li>WeGR (WeChat, <a href="https://arxiv.org/abs/2610.16979" target="_blank" rel="noopener">arXiv 2610.16979</a>) combined SID generative retrieval with layer-wise partial-reward RL and reported orders +2.5% in a 2-month A/B. Added to the SID thread of radar.md.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Find the serving path with <code>serve_page_decoder</code> on and the home-mixer stage that consumes the decoder output — whether it is deployed remains <span class="badge est">inferred</span>.</li>
+<li>Find the behavior policy that produced <code>rl_rerank_prob</code> and <code>rl_decode_prob</code> — we need to check whether it is the same as <code>rewardRerankSlotProb</code> in the 08-19 commit (Gen4+4).</li>
+<li>Check whether the 1.1× ratio repeats in the next mirror change — it would give grounds to confirm or discard the <span class="badge est">inferred</span> that it is a rollout practice.</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources-checked">Sources checked</h2>
+<ul>
+<li>X: One commit after 2026-10-14, <code>17c96bf</code> (2026-10-14 03:41 UTC). There is no release.</li>
+<li>Meta: The latest post in the engineering.fb.com RSS is the 2026-10-13 GEM post, and there is nothing new. The latest post on ai.meta.com/blog is from 2026-07.</li>
+<li>Netflix: The latest post in the netflixtechblog.com RSS is from 2026-09-25, and there is nothing new.</li>
+<li>The WebSearch cross-check (&quot;X For You algorithm update October 2026&quot;) found no new announcement with a primary source.</li>
+<li>arXiv cs.IR: 30 parsed, 1 passed (WeGR). Two narrowly missed.<ul>
+<li><a href="https://arxiv.org/abs/2610.18654" target="_blank" rel="noopener">Kwai Summary Attention V2</a> is from Kuaishou but concerns LLM KV cache compression, so it is unrelated to recommendation.</li>
+<li><a href="https://arxiv.org/abs/2610.17368" target="_blank" rel="noopener">HASTE</a> deals with SID hierarchical loss and has only public benchmarks.</li>
+</ul>
+</li>
+<li>Because it was Thursday, we skipped the industry blog sweep.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-14.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-14</span></a><a class="pg-next" href="daily-2026-10-16.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-16</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-15.html" data-title="일일 리포트 2026-10-15"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

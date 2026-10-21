@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-19 — feed-research</title>
+<meta name="description" content="In one line: X merged the flag set that handled delayed feedback in ads ranking training into one, and split training samples into three streams: fresh,…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-19.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-19.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-19.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-19.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-19 — feed-research">
+<meta property="og:description" content="In one line: X merged the flag set that handled delayed feedback in ads ranking training into one, and split training samples into three streams: fresh,…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-19.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-19.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-19">2026-09-19</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>23 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-19.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X merged the flag set that handled delayed feedback in ads ranking training into one, and split training samples into three streams: fresh, early-relabel, and late-split.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">10</span></summary><ol><li><a href="#1-ads-ranking-training-splits-delayed-feedback-into-three-streams--x"><span class="num">1</span>Ads ranking training splits delayed feedback into three streams — X</a><ol><li><a href="#a-the-delayed-feedback-flag-set-is-merged-into-one-and-training-samples-are-split-into-three-streams">A. The delayed feedback flag set is merged into one, and training samples are split into three streams</a></li><li><a href="#b-the-purchase-value-loss-now-trains-only-on-samples-from-the-early-relabel-stream">B. The purchase value loss now trains only on samples from the early-relabel stream</a></li><li><a href="#c-phoenix-requests-got-fields-that-carry-ads-engagement-counts-by-time-window">C. Phoenix requests got fields that carry ads engagement counts by time window</a></li><li><a href="#d-phoenixs-post-info-message-got-a-search-term-match-signal">D. Phoenix&#39;s post info message got a search-term match signal</a></li><li><a href="#e-grox-added-spam-clone-detection-that-compares-confirmed-violating-videos-with-candidate-videos-using-a-vlm">E. grox added spam-clone detection that compares confirmed violating videos with candidate videos using a VLM</a></li><li><a href="#f-other-minor-changes">F. Other minor changes</a></li></ol></li><li><a href="#corrections">Corrections</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#radar">Radar</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-ads-ranking-training-splits-delayed-feedback-into-three-streams--x"><span class="num">1</span>Ads ranking training splits delayed feedback into three streams — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/c279172" target="_blank" rel="noopener">xai-org/x-algorithm@c279172</a> — GitHub commit, code, 2026-09-18. The commit message is <code>Open-source X Recommendation Algorithm</code>, and it is the regular daily mirror release. 30 files changed, with +1491/−154 lines. These notes number the commits that came after the Gen4 release of the X recommendation code in order and call them Gen4+1, Gen4+2 …; this commit is Gen4+24.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X&#39;s open-source mirror publishes one reorganized commit of the x.com production snapshot every night. Gen4+24 is the release after Gen4+23 (2026-09-17, which introduced <code>FavHoldoutFilter</code> among other changes).</p></div>
+<p>Delayed feedback refers to the condition where training labels arrive late in time. It arises when conversions observed over several days after an ad impression (purchase, install, lead form completion, etc.) are treated as training labels. In Gen4+6 (2026-08-21), X expanded ad conversion actions by 20 and first added three config flags that address this problem. The three flags are <code>condition_conversion_on_click</code>, <code>train_view_through_heads</code>, and <code>split_head_training_by_source</code>. In Gen4+23 (2026-09-17), the delay window was subdivided into 3 tiers (original, tier 2, tier 3). This commit (Gen4+24) unified these three flags into a single <code>ads_head_masking</code> flag and three sample-source stream IDs.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span> This commit packs in changes in roughly three directions.</p></div>
+<ul>
+<li>The ads ranking training pipeline redefined delayed feedback as 3 streams along the sample-source axis.</li>
+<li>Phoenix (the ranking Transformer of the X For You feed) got two new channels in its wire proto: time-window counts of the user&#39;s ads engagement history, and a search lexical match.</li>
+<li>The safety pipeline of grox (a Grok-based nearline classifier) got a new spam-clone detection flow. It compares a reference video bundle with candidate videos using a VLM (a model that takes images and text together as input).</li>
+</ul>
+<p>Many small cleanups also came with it.</p>
+<h3 id="a-the-delayed-feedback-flag-set-is-merged-into-one-and-training-samples-are-split-into-three-streams">A. The delayed feedback flag set is merged into one, and training samples are split into three streams</h3>
+<p>Three flags that handled delayed feedback in the ads ranking training config were removed, and one flag took their place. Turning this flag on determines, per head, which stream&#39;s samples it trains on.</p>
+<ul>
+<li><p>This change is in the following files <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a> (+50/−55), new <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/xrex/models/ads_head_masking.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/ads_head_masking.py</code></a> (67 lines), <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/xrex/data/recsys/constants.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/constants.py</code></a>.</p>
+</li>
+<li><p>In the model config, all three delayed-feedback fields were deleted and one field, off by default, was added <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The three fields <code>condition_conversion_on_click</code>, <code>train_view_through_heads</code>, and <code>split_head_training_by_source</code> were deleted from <code>RecsysAggregatedModelConfig</code>.</li>
+<li>The field that took their place is the single <code>ads_head_masking</code>, declared as <code>ads_head_masking: bool = False</code>.</li>
+</ul>
+</li>
+<li><p>Three stream ID constants indicating the sample origin were newly added <span class="badge ok">verified</span>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">FRESH_STREAM_ID = 0
+EARLY_RELABEL_STREAM_ID = 1
+LATE_SPLIT_STREAM_ID = 2
+</code></pre></figure>
+</li>
+<li><p>When the flag is on, a new function assembles a per-head loss mask <span class="badge ok">verified</span>.</p>
+<ul>
+<li>When <code>ads_head_masking=True</code>, the loss mask is assembled by the function <code>ads_head_masking_factor(targets, source_id, num_actions)</code>.</li>
+<li>The function returns a real-valued tensor of size (batch, seq, num_actions). Each action index is turned on by the rules below.</li>
+</ul>
+</li>
+<li><p>The stream used for training differs by head type <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Engagement heads are <code>num_actions</code> minus the CT, VT, and twin indices, and are 1 only on <code>FRESH_STREAM_ID</code> samples.</li>
+<li>CT heads (click-conditioned, <code>CLICK_CONDITIONED_ACTION_INDICES</code>) are 1 if there was a click in <code>EARLY_RELABEL_STREAM_ID</code> samples.</li>
+<li>VT heads (view-through, <code>VIEW_THROUGH_ACTION_INDICES</code>) are 1 if there was no click in <code>EARLY_RELABEL_STREAM_ID</code> samples.</li>
+<li>Twin heads (late-window delayed, new list <code>ADS_LATE_WINDOW_TWIN_HEAD_INDICES</code>) are 1 only for <code>LATE_SPLIT_STREAM_ID</code> samples that had a click and <strong>have no early counterpart</strong>.</li>
+</ul>
+</li>
+<li><p>Twin heads are the 10 base tier delayed conversions introduced in Gen4+6 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/xrex/data/recsys/ads_late_window.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/ads_late_window.py</code></a> (29 lines, new).</p>
+<ul>
+<li>The 10 names are <code>ADS_ATTRIBUTED_KEY_CLICK_CONVERSION_DELAYED</code>, <code>ADS_ATTRIBUTED_CLICK_CONVERSION_DELAYED</code>, <code>ADS_PURCHASE_CONVERSION_DELAYED</code>, <code>ADS_MID_FUNNEL_CONVERSION_DELAYED</code>, <code>ADS_ADD_TO_CART_CONVERSION_DELAYED</code>, <code>ADS_UPPER_FUNNEL_CONVERSION_DELAYED</code>, <code>ADS_WEB_CONVERSION_DELAYED</code>, <code>ADS_SEARCH_CONVERSION_DELAYED</code>, <code>ADS_SIGN_UP_CONVERSION_DELAYED</code>, and <code>ADS_CHECKOUT_INITIATED_CONVERSION_DELAYED</code> (action index 204-213, introduced in Gen4+6).</li>
+</ul>
+</li>
+<li><p>This commit attached the twin logic to <strong>only these 10 base tier types</strong> <span class="badge ok">verified</span>. Tier 2 (214-223) and tier 3 (224-233), introduced yesterday (2026-09-17) in Gen4+23, have not yet been added to this list.</p>
+</li>
+<li><p>For each twin head, a fresh-stream counterpart that suppresses it was defined together <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>The <code>ADS_LATE_WINDOW_TWIN_SUPPRESSOR</code> dictionary, introduced at the same time, maps each twin head to the index of its suppressor, the fresh-stream counterpart.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">ADS_LATE_WINDOW_TWIN_SUPPRESSOR = {
+    ADS_ATTRIBUTED_KEY_CLICK_CONVERSION_DELAYED: ADS_ATTRIBUTED_KEY_CLICK_CONVERSION,
+    ADS_ATTRIBUTED_CLICK_CONVERSION_DELAYED:     ADS_ATTRIBUTED_CLICK_CONVERSION,
+    ADS_PURCHASE_CONVERSION_DELAYED:             ADS_PURCHASE_CONVERSION,
+    ADS_MID_FUNNEL_CONVERSION_DELAYED:           ADS_MID_FUNNEL_CONVERSION,
+    ADS_ADD_TO_CART_CONVERSION_DELAYED:          ADS_ADD_TO_CART_CONVERSION,
+    ADS_UPPER_FUNNEL_CONVERSION_DELAYED:         ADS_UPPER_FUNNEL_CONVERSION,
+    ADS_WEB_CONVERSION_DELAYED:                  ADS_ATTRIBUTED_CLICK_CONVERSION,
+    ADS_SEARCH_CONVERSION_DELAYED:               ADS_SEARCH_CONVERSION,
+    ADS_SIGN_UP_CONVERSION_DELAYED:              ADS_SIGN_UP_CONVERSION,
+    ADS_CHECKOUT_INITIATED_CONVERSION_DELAYED:   ADS_CHECKOUT_INITIATED_CONVERSION,
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/xrex/data/recsys/ads_late_window.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/ads_late_window.py</code></a>, 2026-09-18</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>If the fresh stream&#39;s counterpart conversion is already captured for the same (user, ad) sample, the late-split twin head is excluded from training to avoid double counting <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Inside <code>ads_head_masking_factor</code>, it looks up this suppressor with <code>no_early_counterpart = 1 - targets[:, :, suppressor_index]</code> and multiplies the late-split twin head mask by it.</li>
+</ul>
+</li>
+<li><p>The delayed head for web conversion uses the attributed-click conversion as its suppressor, not the web conversion <span class="badge ok">verified</span>. This appears to mean that a web conversion is treated as a delayed observation of an attributed-click conversion <span class="badge est">inferred</span>.</p>
+<ul>
+<li>The counterpart of <code>ADS_WEB_CONVERSION_DELAYED</code> is mapped to <code>ADS_ATTRIBUTED_CLICK_CONVERSION</code>, not <code>ADS_WEB_CONVERSION</code>.</li>
+</ul>
+</li>
+<li><p>The metric slices were also redefined <span class="badge ok">verified</span>. A new slice looks at samples in the late-split stream that have a click and no early counterpart.</p>
+<ul>
+<li><code>build_metric_masks</code> lost the two parameters <code>condition_conversion_on_click</code> and <code>split_head_training_by_source</code> and now takes only <code>ads_head_masking</code>.</li>
+<li>The new slice is <code>late_split_no_early</code> (= <code>mask × late × click × no_early</code>). The existing <code>fresh</code>, <code>delayed_clicked</code>, and <code>delayed_non_clicked</code> are kept.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Why it matters.</strong> This is a decision to handle delayed feedback labeling explicitly as three streams in the production training pipeline. The delayed feedback literature since Chapelle 2014 has mostly been discussed along the axis of &quot;wait for the label observation window vs. keep updating the prediction&quot;. X is closer to the latter: it names three observation points, &quot;fresh (immediate), early (short window), late (long window)&quot;, each as a sample source.</p>
+<p>The earlier practice of turning off view-through heads by default with <code>train_view_through_heads=False</code> is gone. The 8 VT heads introduced in Gen4+6 are now automatically included in training in the EARLY_RELABEL slice when there is no click, if <code>ads_head_masking=True</code>. The deployment point can be confirmed in the commit where this config is set to <code>&quot;ads_head_masking&quot;: True</code> in mparams (the model parameters passed to the training config).</p>
+<h3 id="b-the-purchase-value-loss-now-trains-only-on-samples-from-the-early-relabel-stream">B. The purchase value loss now trains only on samples from the early-relabel stream</h3>
+<p>The range of samples that the loss predicting ad purchase value by regression treats as valid has narrowed. In Gen4+22, all non-fresh samples were valid, and now only samples from the early-relabel stream are valid.</p>
+<ul>
+<li><p>This change is in <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/xrex/models/loss_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/loss_recsys.py</code></a> (+75/−10) <span class="badge ok">verified</span>.</p>
+</li>
+<li><p>The condition of the valid mask narrowed to the early-relabel stream <span class="badge ok">verified</span>. That is, the late-split stream does not train purchase value regression and trains only the twin head classification.</p>
+<ul>
+<li>The condition of <code>purchase_value_valid_mask</code> narrowed from <code>sample_source &gt; 0</code> to <code>sample_source == EARLY_RELABEL_STREAM_ID</code>.</li>
+<li>When the purchase value loss was formally wired in Gen4+22 (2026-09-16), all &quot;delayed (= not fresh) samples&quot; counted as valid, but now only the early-relabel stream is treated as valid.</li>
+</ul>
+</li>
+<li><p>Most loss stat names were also changed to new names (the sum key <code>_purchase-value-sums</code> is unchanged) <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>They changed from <code>purchase-value-*</code> to <code>purchase-value_delayed_clicked-*</code>.</p>
+</li>
+<li><p>This aligns the names with the mask condition above. The stat name itself says that the effective slice on which this head is trained is the subset &quot;clicked among delayed samples&quot;.</p>
+<blockquote>
+<p>&quot;purchase-value_delayed_clicked-loss&quot;: loss,
+...
+&quot;_purchase-value-sums&quot;: sums,
+— <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/xrex/models/loss_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/loss_recsys.py</code></a>, 2026-09-18</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>A new function publishes purchase value metrics smoothed with an exponential moving average (EMA) <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The new function <code>purchase_value_smoothed_stats</code> publishes EMA-smoothed loss, ratio-mae, target-ratio, baseline-mean-usd, usd-mae, and calib.</li>
+<li>The default smoothing windows are <code>(1 &lt;&lt; 28, 1 &lt;&lt; 30)</code>. They are exponential moving averages over sample sizes of 2^28 ≈ 268 million and 2^30 ≈ 1.07 billion samples, respectively.</li>
+<li><code>trainer_recsys.py</code> added the hook <code>_purchase_value_ema_keys</code> to keep a shape=(10,) tensor as the EMA state for these two windows. If a shape mismatch occurs when a checkpoint is reloaded, it is reinitialized to zeros.</li>
+</ul>
+</li>
+<li><p>USD MAE and calibration metrics are also newly published <span class="badge ok">verified</span>.</p>
+<ul>
+<li>USD MAE is <code>purchase-value_delayed_clicked-usd-mae</code>.</li>
+<li>Calibration is <code>purchase-value_delayed_clicked-calib</code>, the total actual ratio versus the total predicted ratio.</li>
+</ul>
+</li>
+<li><p>This commit has no actual wiring for how the ads revenue prediction is re-adjusted in the auction <span class="badge ok">verified</span>. The default <code>purchase_value_loss_weight=0.0</code> is also kept.</p>
+</li>
+</ul>
+<p><strong>Why it matters.</strong> The training scope of the ads revenue regression loss attached in Gen4+22 has narrowed. Previously, anything &quot;inside the delayed observation window&quot; went into training unconditionally; now only &quot;the slice where a delayed observation occurred slightly (early)&quot; does. The late-split slice now trains only the twin classification heads and no purchase value regression.</p>
+<p>In effect, X&#39;s ads ranking is settling into a two-branch training stack. Short-lag observations train purchase value by regression, and long-lag observations train only whether a conversion occurred, by classification.</p>
+<h3 id="c-phoenix-requests-got-fields-that-carry-ads-engagement-counts-by-time-window">C. Phoenix requests got fields that carry ads engagement counts by time window</h3>
+<p>The Phoenix serving request format now has room for a table of per-action engagement counts over several time windows. The same format is used in two places: the user&#39;s ads engagement history and the candidate ad&#39;s own engagement history. This commit has no training or batch encoding that consumes this value.</p>
+<ul>
+<li><p>This change is in two proto files <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a> (+22), <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a> (+22).</p>
+<ul>
+<li>The new message is <code>EngagementCounts</code>.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">message EngagementCountRow {
+  int32 action = 1;
+  repeated uint32 counts = 2;
+}
+
+message EngagementCounts {
+  bool present = 1;
+  repeated uint32 window_secs = 2;
+  repeated EngagementCountRow rows = 3;
+  int64 updated_at_ms = 4;
+  int64 window_end_ms = 5;
+}
+</code></pre></figure>
+</li>
+<li><p>The count table is connected to two slots of the request <span class="badge ok">verified</span>.</p>
+<ul>
+<li><code>PredictNextActionsRequest.user_ads_engagement_counts = 24</code>: a time-window count matrix of the ads engagement history carried in the user context.</li>
+<li><code>AdInfo.engagement_counts = 23</code>: time-window counts of the engagement history that each candidate ad itself has.</li>
+</ul>
+</li>
+<li><p>This matrix is a two-dimensional (action × time window) count table, carried in the request payload into the serving ranker <span class="badge ok">verified</span>.</p>
+<ul>
+<li><code>window_secs</code> is a list of time window lengths, and each element of <code>rows</code> lists the counts observed in those windows for a particular action index.</li>
+<li><code>updated_at_ms</code> and <code>window_end_ms</code> are the time reference points of this matrix.</li>
+</ul>
+</li>
+<li><p>Server-side training and batch encoding that consume this field are not reflected in this commit <span class="badge ok">verified</span>. Only the proto layer was opened, and there is no related parsing in <code>xrex/data/recsys/*</code>.</p>
+</li>
+</ul>
+<p><strong>Why it matters.</strong> This field follows up on Gen4+9 (2026-08-26), where <code>ConvAssetIds</code> carried the user&#39;s recent ad creative impression history in the request. This time the target is <strong>per-action time-window counts</strong>, not creative assets. A distinguishing point is that each ad candidate&#39;s own engagement history and the user&#39;s ads engagement history were opened symmetrically. As a signal that recent engagement statistics of user–item pairs are entering ads ranking as explicit features, the direction matches the standard &quot;user × item time-window count&quot; features of the YouTube/Meta family <span class="badge est">inferred</span>.</p>
+<h3 id="d-phoenixs-post-info-message-got-a-search-term-match-signal">D. Phoenix&#39;s post info message got a search-term match signal</h3>
+<p>A search lexical match field (whether the query words appear in the post verbatim) was newly added to the post info message in the Phoenix wire proto. This commit has no point that uses this value in training or serving.</p>
+<ul>
+<li><p>A new field was added to <code>TweetInfo</code> in the same two proto files.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">message TweetInfo {
+  // ... 37 existing fields ...
+  SearchLexicalMatch searchLexicalMatch = 38;
+}
+
+message SearchLexicalMatch {
+  float matchedWordFraction = 1;
+  bool exactPhrase = 2;
+}
+</code></pre></figure>
+</li>
+<li><p>The field type is <code>SearchLexicalMatch</code>, made of two values: the matched word fraction and whether there is an exact match.</p>
+<ul>
+<li><code>matchedWordFraction</code> is the fraction of search query words that appear in the tweet.</li>
+<li><code>exactPhrase</code> is whether the query string appeared as an exact match.</li>
+</ul>
+</li>
+<li><p>It appears it will be consumed in the search ranking config, but this commit has no training or serving consumption point.</p>
+<ul>
+<li>That config is <code>xrecsys_search</code>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Why it matters.</strong> A channel has opened through which a lexical match can pass from a candidate generation signal to a ranking signal. Since Gen4 of X&#39;s open-source mirror, two practices have largely been maintained on the search ranking line: the <code>xrecsys_search</code> config runs separately, and EarlyBird-style lexical matching is absorbed at the candidate generation stage. This time the lexical match was promoted to a <strong>wire field of the candidate itself</strong>.</p>
+<p>Instead of Elasticsearch/Lucene-family BM25 (a classic search score based on term frequency) scores, it passes simple statistics on two axes, (fraction, exact_phrase). In X&#39;s query domain, which mixes short text, hashtags, and handles, these two axes may actually be more robust to noise.</p>
+<h3 id="e-grox-added-spam-clone-detection-that-compares-confirmed-violating-videos-with-candidate-videos-using-a-vlm">E. grox added spam-clone detection that compares confirmed violating videos with candidate videos using a VLM</h3>
+<p>grox&#39;s safety pipeline got a new detection flow. It picks high-engagement video posts and passes them to a VLM together with storyboards (sequences of frames in time order) of confirmed violating videos for comparison.</p>
+<ul>
+<li>This flow is in the following files <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c279172/grox/flows/ptos/plan_safety_ptos_media_injected_adult_infrared_video_spam_detection.py" target="_blank" rel="noopener"><code>grox/flows/ptos/plan_safety_ptos_media_injected_adult_infrared_video_spam_detection.py</code></a> (44 lines, new), <a href="https://github.com/xai-org/x-algorithm/blob/c279172/grox/flows/ptos/task_safety_ptos_media_injected_adult_infrared_video_spam_detection.py" target="_blank" rel="noopener"><code>task_safety_ptos_media_injected_adult_infrared_video_spam_detection.py</code></a> (188 lines), <a href="https://github.com/xai-org/x-algorithm/blob/c279172/grox/flows/ptos/task_safety_ptos_media_injected_adult_infrared_video_spam_detection_filter.py" target="_blank" rel="noopener"><code>task_safety_ptos_media_injected_adult_infrared_video_spam_detection_filter.py</code></a> (55 lines), <a href="https://github.com/xai-org/x-algorithm/blob/c279172/grox/core/data_loaders/media_reference_bundle.py" target="_blank" rel="noopener"><code>grox/core/data_loaders/media_reference_bundle.py</code></a> (146 lines, new).</li>
+<li>The flow is attached to grox&#39;s PTOS (policy-based violation category verdict), and one Kafka topic triggers it <span class="badge ok">verified</span>.<ul>
+<li>The flow name is long: <code>safety_ptos_media_injected_adult_infrared_video_spam_detection</code>.</li>
+<li>A streaming task generator sourced from the Kafka topic <code>safety-ptos-media-injected-adult-infrared-video-spam-detection</code> triggers this flow.</li>
+</ul>
+</li>
+<li>Targets are high-engagement video posts not already flagged NSFW <span class="badge ok">verified</span>. The eligibility filter requires all of the following conditions.<ul>
+<li>There is a user.</li>
+<li>The post or the quoted post has a video.</li>
+<li>The fav count is at least <code>media_hydration.deluxe_fav_count_threshold</code> (a high-engagement post).</li>
+<li>It is not a post already flagged NSFW.</li>
+<li>The filter name is <code>TaskSafetyPtosMediaInjectedAdultInfraredVideoSpamDetectionFilter</code>.</li>
+</ul>
+</li>
+<li>Posts that pass go to the VLM together with a reference video bundle <span class="badge ok">verified</span>.<ul>
+<li><code>MediaReferenceBundleLoader.current(&quot;media_injected_adult_infrared_video_spam&quot;)</code> fetches the reference video bundle from the blobstore.</li>
+<li>Then the reference video storyboards and the candidate video storyboard are passed to the VLM together.</li>
+</ul>
+</li>
+<li>The reference bundle holds up to 10 reference videos and is reloaded every 15 minutes <span class="badge ok">verified</span>. The bundle loader&#39;s specification is as follows.<ul>
+<li>It reads <code>manifest.json</code> from a Blobstore URI (format <code>blobstore://&lt;namespace&gt;/&lt;subpath&gt;</code>) and loads up to 10 reference video specs.</li>
+<li>Each video has at most 10 frames, and each frame is at most 2 MiB.</li>
+<li>It refreshes every 15 minutes (<code>refresh_interval_s=900</code> default), and retries every 60 seconds if the initial load fails.</li>
+<li>It keeps a 12-character SHA-256 digest of the manifest and frame bytes for bundle identity.</li>
+</ul>
+</li>
+<li>One vision sampler config is called as the VLM with a 60-second timeout <span class="badge ok">verified</span>.<ul>
+<li>That config is <code>GROK_4_1_FAST_HEDGEHOG_CRITICAL</code>, looked up with <code>grox_config.get_model</code>.</li>
+</ul>
+</li>
+<li>The prompt puts the reference video frames first, then the post to be judged, and instructs a comparison <span class="badge ok">verified</span>.<ul>
+<li>The system message is the new template <code>media_injected_adult_infrared_video_spam_detection.j2</code> (body undisclosed).</li>
+<li>The user message starts with <code>Reference storyboards from N confirmed violating videos (frames in chronological order):</code> and interleaves the reference video frames in order.</li>
+<li>After that it renders the candidate post (descendants removed) with <code>Post under review:</code>.</li>
+<li>Finally it instructs: <code>Compare the video storyboard(s) of post {post.id} against the reference storyboards and provide the requested JSON object.</code></li>
+<li>The assistant seed is <code>THINKING_CONTROL_END</code>. That is, it opens with a thinking control token.</li>
+</ul>
+</li>
+<li>If the response is a violation, a violation policy is attached to the safety state, and the result goes to the safety pipeline sink <span class="badge ok">verified</span>.<ul>
+<li>It extracts the pattern <code>&lt;json&gt;{&quot;violation&quot;: bool, &quot;reason&quot;: &quot;...&quot;}&lt;/json&gt;</code> from the response and parses it into <code>MediaInjectedAdultInfraredVideoSpamVerdict</code>.</li>
+<li>If <code>violation=True</code>, it attaches a violation policy to <code>SafetyPtosState</code> in the form <code>SafetyPolicy(category=..., type=..., ...)</code>.</li>
+<li>Then <code>TaskWriteSafetyPostAnnotationsResultSink</code> passes the result on to the safety pipeline sink.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Why it matters.</strong> X&#39;s grox pipeline expanded in the form of &quot;visual comparison against a set of confirmed violating video storyboards&quot;. In the literature, near-duplicate video detection (finding nearly identical videos) is standardly embedding-based, but instead of embedding matching, X chose an approach that <strong>puts storyboard frames directly into the VLM prompt and leaves the visual matching verdict to it</strong>. Because the reference bundle is refreshed from the blobstore every 15 minutes, when the operations team adds newly confirmed clone candidate videos to the bundle, they are reflected in verdicts without a separate redeployment. The <code>infrared</code> in the flow name appears to refer to a particular capture mode (e.g., adult video clones shot with night vision), but the exact category definition cannot be confirmed without the text being released <span class="badge est">inferred</span>.</p>
+<h3 id="f-other-minor-changes">F. Other minor changes</h3>
+<ul>
+<li>The Kafka consumers and producers of abuse-enforcement-service (a service that takes account actions based on model scores) can now set cluster/zone per topic. The changed files are <a href="https://github.com/xai-org/x-algorithm/blob/c279172/abuse-enforcement-service/service-lib/src/lib.rs" target="_blank" rel="noopener"><code>abuse-enforcement-service/service-lib/src/lib.rs</code></a> (+390/−56) and <code>growthbook.rs</code> (+35/−6).<ul>
+<li>Consumer and producer config can now be overridden per topic instead of using the service-wide mTLS cluster/zone.</li>
+<li>The new metric <code>abuse_enforcement_kafka_consumer_start_total{topic,cluster,result}</code> records the consumer start result at boot time as labels.</li>
+<li>A filter was also added so that <code>consumer_error_total</code> is scoped only to the set of watched topics.</li>
+</ul>
+</li>
+<li>The order in which grox collects URLs changed, and the domain set now preserves insertion order. The changed file is <a href="https://github.com/xai-org/x-algorithm/blob/c279172/grox/core/data_loaders/data_types.py" target="_blank" rel="noopener"><code>grox/core/data_loaders/data_types.py</code></a>.<ul>
+<li>In <code>_collect_urls</code>, user URLs moved behind card URLs.</li>
+<li>Domain dedup uses <code>dict[str, None]</code> instead of <code>set</code>, so insertion order is preserved. A side effect is that the order in which domains are exposed to downstream verdicts becomes stable.</li>
+</ul>
+</li>
+<li>The allowed domains grox passes to the web search tool are now truncated to at most 5. Previously the full list was passed as is. The changed file is <a href="https://github.com/xai-org/x-algorithm/blob/c279172/grox/libs/grok_sampler/eapi_sampler.py" target="_blank" rel="noopener"><code>grox/libs/grok_sampler/eapi_sampler.py</code></a>.<ul>
+<li>The <code>allowed_domains</code> that <code>eapi_sampler</code> passes to the <code>web_search</code> tool is truncated to <code>search_allowed_domains[:MAX_SEARCH_DOMAINS]</code> (<code>MAX_SEARCH_DOMAINS = 5</code>).</li>
+</ul>
+</li>
+<li>The log label name in the grox reply spam verdict changed. The changed file is <a href="https://github.com/xai-org/x-algorithm/blob/c279172/grox/flows/reply_spam/task_spam_detection.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_spam_detection.py</code></a>.<ul>
+<li>&quot;lower than 1000 follower bucket&quot; became &quot;Gemma bucket&quot;. The label was unified as the term for the Gemma score = 0 verdict after the follower branch in Gen4+22.</li>
+</ul>
+</li>
+<li>The parameter mirror of home-mixer (the service that assembles the For You feed) changed only its sync time, with no actual default change. The changed file is <a href="https://github.com/xai-org/x-algorithm/blob/c279172/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.<ul>
+<li>This file is a cron mirror that syncs the production values of weights and constants every day.</li>
+<li>The sync time changed to <code>2026-09-16T16:23:12Z → 2026-09-17T20:46:44Z</code>.</li>
+</ul>
+</li>
+<li>The account list of the Brazil2026 election filter (a filter that hardcodes accounts acted on by the Brazilian electoral court and removes them) was updated. The changed file is <a href="https://github.com/xai-org/x-algorithm/blob/c279172/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs</code></a> (+143/−4).<ul>
+<li>It hardcoded 12 new accounts and updated 4 &quot;no live account found&quot; comments. The practice of regular updates continues.</li>
+</ul>
+</li>
+<li>Phoenix&#39;s Cargo config moved the thrift crate source from a git tag to the crates.io registry. The changed file is <a href="https://github.com/xai-org/x-algorithm/blob/c279172/phoenix/Cargo.toml" target="_blank" rel="noopener"><code>phoenix/Cargo.toml</code></a>.<ul>
+<li>The version is the same, <code>0.24.0</code>, but a checksum lock was added, which strengthens supply-chain reproducibility.</li>
+</ul>
+</li>
+<li>When exporting a Phoenix serving bundle, fields to fill from the request are now separated from fields fixed to template values. The code is Phoenix <code>xrex/train/recsys_bundle_export.py</code>.<ul>
+<li>A new constant <code>REQUEST_BATCH_KEYS</code> (a set of about 30 batch keys) was defined.</li>
+<li>At serving bundle export time, fields belonging to these keys are marked <code>source: &quot;request&quot;</code> and filled from the request payload.</li>
+<li>The rest are marked <code>source: &quot;template&quot;</code>, and the uniform values of example_data are fixed as fill and included in the bundle. A non-uniform template raises an error.</li>
+<li>In other words, with the request schema now explicitly defined, which fields come from the client at serving time and which are fixed constants is locked as a contract.</li>
+</ul>
+</li>
+<li>A default-fill syntax was added to one test in visibility-filtering (the service that decides, post by post, whether a post may be shown to this viewer). It appears to be a side change because a struct gained a field elsewhere.<ul>
+<li><code>..Default::default()</code> was added to the <code>gizmoduck_hydrator</code> test.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a>, added a new subsection <code>### Gen4+24 (2026-09-18, c279172)</code> under the <code>## Ads</code> section. Added a short cross-link, &quot;These three fields were unified in Gen4+24&quot;, to the Gen4+22 ads conversion action section (the <code>condition_conversion_on_click</code>, <code>train_view_through_heads</code> and <code>split_head_training_by_source</code> statements). In the Gen4+22 purchase value loss statement, the stat name was also cross-linked to the new naming.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> ⚠ Claim changed: The three delayed-feedback options the canon described are gone from the code, and the statement of the effective scope of the Gen4+22 purchase value loss was also overturned.</p></div>
+<ul>
+<li class="warn"><strong>⚠ Claim changed #1.</strong> The three config options that split delayed-feedback training were deleted and unified into one flag.<ul>
+<li>The &quot;three delayed-feedback training branch config options (<code>condition_conversion_on_click</code>, <code>train_view_through_heads</code>, <code>split_head_training_by_source</code>)&quot; that the canon has described since Gen4+6 were all deleted in Gen4+24 and unified into the single <code>ads_head_masking</code>.</li>
+<li>The three options in the earlier table no longer exist in the code. However, the 3-stream masking itself strengthens the combination of the earlier three options, so the conceptual core remains.</li>
+</ul>
+</li>
+<li class="warn"><strong>⚠ Claim changed #2.</strong> The effective scope of the Gen4+22 purchase value loss narrowed to the early-relabel stream.<ul>
+<li>The statement that the Gen4+22 purchase value loss is &quot;valid for all delayed samples (<code>sample_source &gt; 0</code>)&quot; was overturned. It is now valid only on <code>EARLY_RELABEL_STREAM_ID</code> (the early-relabel stream).</li>
+<li>On the late-split stream, purchase value regression is not trained and only the twin classification head is trained.</li>
+</ul>
+</li>
+<li class="warn"><strong>⚠ Partial claim change #3.</strong> The tier 2/3 question left open by Gen4+23 was not resolved in Gen4+24 either.<ul>
+<li>The Gen4+23 statement &quot;the lag window definition and training loss weight of delayed conversion tier 2/3 are not stated in this commit&quot; is still open in Gen4+24.</li>
+<li>Gen4+24 added twin masking, but its target is the base tier (204-213), and tier 2 (214-223) and tier 3 (224-233) are still not connected. That is, the tier 2/3 actions introduced yesterday have not been incorporated into today&#39;s training pipeline.</li>
+</ul>
+</li>
+<li>Since Gen4+9 (<code>ConvAssetIds</code>), a second channel has opened through which the ads request payload explicitly carries the user&#39;s ads history. This time it differs in that it is an (action × time-window) count matrix rather than creative asset IDs.</li>
+<li>A lexical match signal appeared for the first time as a wire field in the search ranking line. This opens the possibility that lexical matching, which had been absorbed only into candidate generation, expands to ranking.</li>
+</ul>
+<h2 id="corrections">Corrections</h2>
+<ul>
+<li>The three delayed-feedback options the canon described were deleted, and the validity condition of the purchase value loss narrowed. See subsections A and B of <code>## 1</code> above.<ul>
+<li>The three options <code>condition_conversion_on_click</code>, <code>train_view_through_heads</code> and <code>split_head_training_by_source</code> were deleted.</li>
+<li>The condition changed from <code>sample_source &gt; 0</code> to <code>sample_source == EARLY_RELABEL_STREAM_ID</code>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li><strong>When <code>ads_head_masking</code> turns on in the mirror</strong> — Check which training config carries <code>mparams[&quot;ads_head_masking&quot;] = True</code>. In particular, where it is activated first, in the home ranking lineage <code>_home_direct_packed_base</code> or in the ads ranking lineage <code>_ads_*</code>, determines the actual deployment axis of the 3-stream masking.</li>
+<li><strong>Incorporation of tier 2/3 delayed actions into twin masking</strong> — Check when tier 2 and 3 (214-233), introduced in Gen4+23, are incorporated into <code>ADS_LATE_WINDOW_TWIN_HEAD_INDICES</code> and <code>ADS_LATE_WINDOW_TWIN_SUPPRESSOR</code>. If they are, the per-tier suppressor mapping, that is, which fresh counterpart is taken as the suppression axis, gives a hint about the tier definition itself.</li>
+<li><strong>Where <code>EngagementCounts</code> is consumed</strong> — Check which layer of Phoenix training and serving consumes this (action × window_secs) matrix. It can be confirmed in the commit that adds parsing under <code>xrex/data/recsys/</code>.</li>
+<li><strong>Where <code>SearchLexicalMatch</code> enters ranking</strong> — Check in which layer the <code>xrecsys_search</code> config consumes these two signals. Also check whether they are combined with the candidate generation score or attached as a separate head.</li>
+<li><strong>Actual deployment of the <code>media_injected_adult_infrared_video_spam_detection</code> flow</strong> — Check when the blobstore URI of the reference bundle appears in dynamic config. Also check when VLM verdict rate and false-positive observation get attached to a dashboard. Also check whether the definition of the <code>infrared</code> category in the flow name is published.</li>
+<li><strong>Result of the purchase value loss dropping out of the late-split stream</strong> — Check how the reduced training slice of the revenue prediction head shows up in the measured revenue prediction metrics (usd-mae, calib). Also check when the stats for the two newly issued smoothing window axes (2^28, 2^30) appear in the training logs.</li>
+</ul></div>
+<h2 id="radar">Radar</h2>
+<ul>
+<li>Today we screened 30 arXiv cs.IR papers, and 0 passed. The number of parsed <code>&lt;entry&gt;</code> elements is 30.<ul>
+<li>Yesterday (2026-09-18 daily, Gen4+23), four papers (LIGE-GR, SARA, ANGLE and PCap) were already folded in.</li>
+<li>None of the 30 papers that appeared today meets the acceptance criteria. The criteria are platform-company authors, production deployment or A/B result claims, and novelty in ranking or retrieval mechanisms.</li>
+<li>Most are academic increments limited to RAG, LLM re-ranking, retrieval benchmarks, and medical, legal and science domains.</li>
+</ul>
+</li>
+<li>Industry blogs are scanned only on Mondays. Today is Saturday, so they were skipped.</li>
+</ul>
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-18.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-18</span></a><a class="pg-next" href="daily-2026-09-20.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-20</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-19.html" data-title="일일 리포트 2026-09-19"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

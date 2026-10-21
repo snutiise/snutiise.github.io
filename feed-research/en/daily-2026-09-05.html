@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-05 — feed-research</title>
+<meta name="description" content="In one line: X added a new reply spam verdict path to grox, its LLM annotation pipeline. It judges a chain in which one author keeps replying to their own…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-05.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-05.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-05.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-05.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-05 — feed-research">
+<meta property="og:description" content="In one line: X added a new reply spam verdict path to grox, its LLM annotation pipeline. It judges a chain in which one author keeps replying to their own…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-05.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-05.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-05">2026-09-05</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>30 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-05.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added a new reply spam verdict path to grox, its LLM annotation pipeline. It judges a chain in which one author keeps replying to their own replies as a whole thread, and the root follower threshold is 1,000.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">9</span></summary><ol><li><a href="#1-a-fourth-grox-path-for-thread-chain-reply-spam-verdicts-is-wired-in--x"><span class="num">1</span>A fourth grox path for thread-chain reply spam verdicts is wired in — X</a></li><li><a href="#2-the-first-concrete-case-of-ptos-judge-models-diverging-by-category-is-confirmed--x"><span class="num">2</span>The first concrete case of PTOS judge models diverging by category is confirmed — X</a></li><li><a href="#3-the-sid-lookup-sidecar-was-removed-entirely-from-the-phoenix-serving-engine--x"><span class="num">3</span>The SID lookup sidecar was removed entirely from the Phoenix serving engine — X</a></li><li><a href="#4-first-code-signal-that-phoenix-training-also-runs-on-h100-besides-gb300--x"><span class="num">4</span>First code signal that Phoenix training also runs on H100, besides GB300 — X</a></li><li><a href="#5-visibility-filtering-code-shrank-by-more-than-800-lines-net-overview-only--x"><span class="num">5</span>visibility-filtering code shrank by more than 800 lines net (overview only) — X</a></li><li><a href="#6-the-brazil-election-filter-got-its-regular-update-and-external-pr-88-was-merged--x"><span class="num">6</span>The Brazil election filter got its regular update, and external PR #88 was merged — X</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>The 9b0dc31 commit that introduced this path also made large changes to the grox PTOS (policy-based violation category verdict) judge stack and to the serving and training stack of Phoenix, the For You ranking model. Multi-step reply spam is today&#39;s headline, but the matching canon (the services/ notes holding the current understanding of each service) received five more updates, so each got its own section. Other changes reviewed today are as follows:</p>
+<ul>
+<li>The first concrete case of per-category models in the PTOS judge stack was confirmed. Only the judge for the illegal and regulated behavior category moved to Grok 4.1-fast.</li>
+<li>The SID (discrete code representing a post) lookup sidecar was removed entirely from the Phoenix serving engine. History SIDs now arrive in the request.</li>
+<li>A new rematerialization policy for H100 appeared in the Phoenix training code. It is the first code signal that training also runs on H100.</li>
+</ul>
+<h2 id="1-a-fourth-grox-path-for-thread-chain-reply-spam-verdicts-is-wired-in--x"><span class="num">1</span>A fourth grox path for thread-chain reply spam verdicts is wired in — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">xai-org/x-algorithm@9b0dc31</a> — public source code, 2026-09-04 00:37 UTC, X.AI Corp. These notes number X commits after the Gen4 release in order, and this commit is Gen4+15.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> grox is X&#39;s nearline LLM annotation pipeline. On the reply-quality axis, grox had three verdict flows so far <span class="badge ok">verified</span> — <code>PLANS_TO_INJECT</code> in <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/generators.py" target="_blank" rel="noopener"><code>generators.py</code></a>. <code>PlanReplyRanking</code> scores a single reply, <code>PlanSpamComment</code> judges whether a single reply is spam, and <code>PlanCoordinatedSpam</code> catches repeated replies coordinated by multiple accounts. All three flows have a long unification history in Gen4.</p></div>
+<ul>
+<li>In Gen4+3 (2026-08-18, <a href="https://github.com/xai-org/x-algorithm/commit/11a71f8" target="_blank" rel="noopener">11a71f8</a>), the separate spam, comment, and reply-ranking generators were merged into a single <code>ReplyRankingTaskGenerator</code>.</li>
+<li>The follower gating threshold for the reply spam and reply ranking tasks rose six times from 2026-08-13 to 08-25: 15k → 30k → 40k → 60k → 80k → 100k → 120k <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py</code></a>.<ul>
+<li>The commits that raised it were, in order, c65aa17, b089ce6, 11a71f8, 28e414f, d011592, and 0d3cdd8, and the value as of this commit is 120k.</li>
+<li>The comparison is against the follower count of the root and reply-target accounts, not the reply author.</li>
+</ul>
+</li>
+<li>Reliability mechanisms such as Kafka-first storage order, Manhattan monotone-only write, and an option to put follower count and bio in the LM prompt were added in Gen4+9 (45b48ba) and +10 (24c6094).</li>
+</ul>
+<p>This commit attached a fourth verdict path, <code>PlanMultiStepReplySpam</code>, to these flows. The &quot;Multi-step&quot; in the name means that the verdict unit is not an individual reply but several reply chains.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Only chains where one author replies again to their own reply enter the verdict</span></p></div>
+<ul>
+<li><p>The entry filter passes only replies that satisfy all 8 conditions below <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/task_multi_step_reply_spam.py" target="_blank" rel="noopener"><code>task_multi_step_reply_spam.py</code></a>. The filter class is <code>TaskMultiStepReplySpamFilter</code>.</p>
+<ol>
+<li><code>post.ancestors</code> exists and none of them is deleted (None). That is, it is a reply and the thread is intact.</li>
+<li>The users of the target post, the direct parent, and the thread root are all alive.</li>
+<li>The reply author differs from the thread root author. Replies that the original poster adds to their own thread are skipped.</li>
+<li><code>GROK_USER_ID</code> and <code>GORK_USER_ID</code> are skipped. Replies posted by Grok and Gork themselves are not targets.</li>
+<li>Thread depth is 2 or more. A one-step &quot;root → first reply&quot; does not enter.</li>
+<li><strong>The direct parent&#39;s author is the same as the target post&#39;s author.</strong> Only chains where the same person replies again to their own reply enter.</li>
+<li><strong>The root author has at least 1,000 followers (&quot;blast radius&quot;).</strong> Only threads with meaningful root impressions are admitted.</li>
+<li>If the reply author is a high page-rank v2 user or a grey badge user, the reply is skipped. Established accounts are not targets. Both checks run in parallel by calling <code>UserStratoLoader.is_high_page_rank_v2_user</code> and <code>is_grey_badge_user</code> through <code>asyncio.gather</code>.</li>
+</ol>
+<p>Of the 8 conditions, number 6 in particular defines the domain of this pipeline. That domain is reply spam chains that steal root impressions through self-conversation chains. For example, A replies to a famous person&#39;s tweet, A replies to that reply, and A replies again, extending the chain. The target is the pattern that pulls the root tweet&#39;s impressions toward the author&#39;s own ads or lures.</p>
+<p>The threshold of 1,000 in condition 7 is two orders of magnitude lower than the 120k of the single-reply verdict. This pipeline runs broadly over threads whose root impressions are substantial.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">class TaskMultiStepReplySpamFilter(TaskFilterWithPost):
+    FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION = 1000
+    ...
+    if post.ancestors[-1].user.id != post.user.id:
+        Metrics.counter(&quot;task.filter.skipped.count&quot;).add(
+            1, attributes={&quot;filter&quot;: cls.FILTER_NAME, &quot;reason&quot;: &quot;parent_not_same_author&quot;},
+        )
+        return False
+    root_user_follower_count = post.ancestors[0].user.follower_count or 0
+    if root_user_follower_count &lt; cls.FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION:
+        Metrics.counter(&quot;task.filter.skipped.count&quot;).add(
+            1, attributes={&quot;filter&quot;: cls.FILTER_NAME, &quot;reason&quot;: &quot;low_blast_radius&quot;},
+        )
+        return False
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/task_multi_step_reply_spam.py" target="_blank" rel="noopener"><code>task_multi_step_reply_spam.py</code></a>, 2026-09-04</p>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Gemma 2 reads the whole thread and picks the post numbers that are spam</span></p></div>
+<ul>
+<li><p>The structure of the human message sent to the LM is visible directly in the code <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/classifier_multi_step_reply_spam.py" target="_blank" rel="noopener"><code>classifier_multi_step_reply_spam.py</code></a>.</p>
+<ul>
+<li>The function that builds the message is <code>MultiStepReplySpamScorer._to_convo</code>.</li>
+<li>The system prompt was left out of the export under the README policy (gaming prevention).</li>
+<li>The &quot;Reply Author Info&quot; section renders the reply author&#39;s user profile (handle, follower count, name, bio).</li>
+<li>The &quot;Thread&quot; section lists all posts in the thread with index numbers in the <code>#### Post N</code> format. The root gets the tag &quot;(root post — never flag)&quot; and the last post gets the tag &quot;(the reply being evaluated)&quot;.</li>
+<li>If the thread exceeds <code>MAX_THREAD_SIZE = 10</code>, only the first 5 and last 5 posts are kept and the middle is cut out.</li>
+<li><code>include_follower_count=True</code> and <code>max_media=2</code> are applied to each post, and <code>include_bio=True</code> is applied only to the root.</li>
+</ul>
+<p>That is, this pipeline does not ask the LM whether each post is spam. It gives the LM a task of looking at the whole thread and extracting a set of spam indexes. The response is the JSON <code>{&quot;spam_post_indexes&quot;: [1, 2, 3], &quot;reason&quot;: &quot;...&quot;}</code>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">content.append(
+    &quot;\n\n# Thread\n\nThe reply thread is listed below; each post is labeled with a `#### Post N` index. &quot;
+    &quot;Post 0 is the original (root) post and the highest-numbered post is the reply being evaluated. &quot;
+    &quot;Refer to posts only by their integer index.\n\n&quot;
+)
+for i, p in enumerate(posts):
+    if i == 0:
+        tag = &quot; (root post — never flag)&quot;
+    elif i == last:
+        tag = &quot; (the reply being evaluated)&quot;
+    else:
+        tag = &quot;&quot;
+    content.append(f&quot;\n\n#### Post {i}{tag}\n\n&quot;)
+    content.extend(
+        PostRenderer.render(
+            p,
+            max_media=MAX_MEDIA_PER_POST,
+            include_follower_count=True,
+            include_bio=i == 0,
+        )
+    )
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/classifier_multi_step_reply_spam.py" target="_blank" rel="noopener"><code>classifier_multi_step_reply_spam.py</code></a>, 2026-09-04</p>
+</blockquote>
+</li>
+<li><p>The verdict LM is Gemma 2 <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The code has <code>model_name = GEMMA_2</code> and calls it through <code>OaiSampler</code>.</li>
+<li>Since Gen4+9 (45b48ba) added Spam to grox&#39;s <code>USE_GEMMA_CATEGORIES</code>, grox has been pushing Gemma, and this choice extends that trend.</li>
+<li>That Multi-step reply spam is Gemma-only from the start fits the direction of saving grok API budget <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The LM&#39;s answer is filtered in three stages, then stored with a spam label and a score of 0</span></p></div>
+<ul>
+<li>LM output is not trusted as is; it is filtered by a 3-stage safeguard <span class="badge ok">verified</span>.<ol>
+<li><code>_drop_if_newest_reply_not_flagged</code> discards the entire result if the index set the LM flagged does not include the verdict target (the last post of the thread). The task entry condition is that this reaction may be spam for the pipeline to run, so a result that treats the last reaction as not spam violates consistency.</li>
+<li><code>_drop_other_author_posts</code> removes a post if the LM flags another author&#39;s post in the thread as spam. This pipeline targets chains where &quot;the same author replies to their own reply&quot;, so posts by other authors that appear in the result are ignored.</li>
+<li><code>_drop_singleton</code> discards the result if it contains exactly 1 post. Chain spam by definition targets &quot;several follow-up replies&quot;, so a result with only one is not valid.</li>
+</ol>
+</li>
+<li>The storage task attaches a spam label to each post flagged in the filtered result and forces the reply ranking score to 0.0 when saving <span class="badge ok">verified</span>.<ul>
+<li>The task name is <code>TaskWriteMultiStepReplySpamReplyRanking</code>.</li>
+<li><code>_apply_reply_spam_label(post_id, author_id)</code> is applied to each flagged post. It is the same helper as in the single-reply verdict.</li>
+<li><code>save_reply_ranking_score(..., ReplyRankingScore(score=0.0, reasoning=reasoning[-500:]))</code> forces the score to 0.0, which means the lowest trust. Only the last 500 characters of reasoning are kept.</li>
+<li>It emits to v2 Kafka with <code>save_reply_ranking_kafka_v2(...)</code>.</li>
+<li><code>DISABLE_RULES = [DisableTaskForNonProd]</code> means no real label is attached in dev and staging.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The new pipeline consists of 4 new files and 2 modified existing files, and runs alongside the existing verdicts from the same event source</span></p></div>
+<ul>
+<li><p>4 new files (474 lines) were created and 2 existing files were modified <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/9b0dc31/grox/flows/reply_spam" target="_blank" rel="noopener"><code>grox/flows/reply_spam/</code></a>.</p>
+<ul>
+<li>The pipeline name is <code>PlanMultiStepReplySpam</code>.</li>
+<li><code>task_multi_step_reply_spam.py</code> (206 lines)</li>
+<li><code>plan_multi_step_reply_spam.py</code> (29 lines)</li>
+<li><code>classifier_multi_step_reply_spam.py</code> (226 lines)</li>
+<li><code>state_multi_step_reply_spam.py</code> (13 lines)</li>
+<li><code>prompts.py</code> +5 lines: added <code>multi_step_reply_spam_system_prompt</code>.</li>
+<li><code>generators.py</code> +7 lines: put this plan key into <code>PLANS_TO_INJECT</code> of the two stream generators.</li>
+</ul>
+</li>
+<li><p>The Plan DAG runs in the order filter, media hydration, verdict, storage <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/plan_multi_step_reply_spam.py" target="_blank" rel="noopener"><code>plan_multi_step_reply_spam.py</code></a>.</p>
+<pre tabindex="0"><code>task_multi_step_reply_spam_filter →
+  task_media_hydration →
+    task_multi_step_reply_spam_detection →
+      task_write_multi_step_reply_spam_reply_ranking
+</code></pre>
+<p>It stands out that <code>TaskMediaHydration</code> runs only after the filter. Media hydration is costly, so it runs only after the filter has cut out a substantial share.</p>
+</li>
+<li><p>Two reply ranking stream generators add the new Plan to their injection list <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/reply_spam/generators.py" target="_blank" rel="noopener"><code>generators.py</code></a>.</p>
+<ul>
+<li>The two generators are <code>ReplyRankingTaskGenerator</code> (kafka <code>TOPIC_UNIFIED_POSTS_V3</code>) and <code>ReplyRankingRecoveryTaskGenerator</code>, and the injection list is <code>PLANS_TO_INJECT</code>.</li>
+<li>That is, the three existing verdicts (single-reply reply_spam, coordinated_spam, spam_comment) and this multi-step verdict run in parallel from the same v3 event source.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Created a new section &quot;Resolved by the Gen4+15 release / new (2026-09-04)&quot; in <a href="x.html">services/x.md</a>. Under &quot;Grox (LLM annotation)&quot; it added a new subsection <code>### Gen4+15 (2026-09-04, 9b0dc31) — grox thread-level multi-step reply spam classifier introduced + PTOS ...</code>. It raised <code>Last updated</code> in the header from 2026-09-04 to 2026-09-05 and added links to the 6 new files in the sources section as well.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> A third axis was added to grox&#39;s reply spam verdicts: time-axis coordinated spam in which one author steals root impressions through their own reply chain.</p></div>
+<ul>
+<li>The previous canon knew two flows. The reply spam verdict targets individual replies, and coordinated_spam targets &quot;repeated replies coordinated by multiple accounts&quot;. If coordinated_spam is the account-collusion axis, multi-step is the time-axis chain collusion.</li>
+<li>Because the gating threshold is set low at 1k root followers, this pipeline appears to run broadly over threads where the root author&#39;s impression assets are substantial. And leaving the verdict to Gemma fits the direction of saving grok API budget.</li>
+<li>It does not conflict with the canon&#39;s existing understanding of grox reply_spam. Rather, it can be understood as widening into a two-layer structure: the 120k follower threshold of the single-reply verdict that the canon has covered is kept, and a chain verdict with a much lower threshold (≥ 1k) is added as a new layer.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-the-first-concrete-case-of-ptos-judge-models-diverging-by-category-is-confirmed--x"><span class="num">2</span>The first concrete case of PTOS judge models diverging by category is confirmed — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">xai-org/x-algorithm@9b0dc31</a> — <code>grox/flows/ptos/classifier.py</code> and <code>grox/flows/ptos/task_safety_ptos_policy.py</code> in the same commit (Gen4+15).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In grox&#39;s PTOS (layer that judges violation categories based on policy) stack, a judge (cross-validator) layer was gradually added above the first-pass classifier during Gen4.</p></div>
+<ul>
+<li>Gen4+2 (2026-08-17, <a href="https://github.com/xai-org/x-algorithm/commit/b089ce6" target="_blank" rel="noopener">b089ce6</a>) introduced an adult content disagreement judge. Its name is <code>SafetyPtosAdultContentCrossValidationJudge</code>, and its model was <code>EAPI_GROK_4_5_X_ALGO</code> (<a href="https://github.com/xai-org/x-algorithm/blob/b089ce6/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>classifier.py:557-561</code></a>).</li>
+<li>In Gen4+4–+6 (2026-08-19–21), the rate (dial) at which child safety cross-validation and deluxe reclassification call Grok 4.6 internal rose 10% → 30% → 100%. It replaced 4.5 internal within two days, and 4.5 internal was deleted from the code entirely (<a href="https://github.com/xai-org/x-algorithm/blob/aad7179/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>classifier.py:114, 281, 477</code></a>).</li>
+<li>Gen4+7 (2026-08-24, <a href="https://github.com/xai-org/x-algorithm/commit/d011592" target="_blank" rel="noopener">d011592</a>) introduced <code>SafetyPtosPolicyCrossValidator</code>, which shares the <code>EAPI_GROK_4_5_X_ALGO</code> used by the adult content judge. This judge handled all 3 categories, ChildSafety, ViolentMedia, and IllegalAndRegulatedBehaviors, with a single model (4.5-X_ALGO).</li>
+<li>The canon summarized this state as &quot;a dual stack in which X keeps the primary (4.6-internal) and the judge (4.5-X_ALGO) on different model generations and tuning&quot;. It also noted that per-category model divergence in the judge stack would be the next checkpoint to watch.</li>
+</ul>
+<p>This commit confirmed that divergence as the first concrete case.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Only the IllegalAndRegulatedBehaviors judge moved from Grok 4.5 to 4.1-fast</span></p></div>
+<ul>
+<li><p>Grok 4.1-fast-X_ALGO was newly registered as a model for the judge <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py</code></a>.</p>
+<ul>
+<li>The model name is <code>EAPI_GROK_4_1_FAST_X_ALGO</code>.</li>
+<li><code>SafetyPtosPolicyCrossValidator.__init__</code> initializes a 4.1-fast-X_ALGO sampler next to the 4.5-X_ALGO sampler.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">eapi_4_1 = grox_config.get_eapi_model(ModelName.EAPI_GROK_4_1_FAST_X_ALGO)
+self.eapi_4_1_x_algo = EapiSampler(EapiModelConfig(**eapi_4_1.model_dump()))
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py</code></a>, 2026-09-04</p>
+</blockquote>
+</li>
+<li><p>Only the judge for the IllegalAndRegulatedBehaviors category moved to 4.1-fast <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The changed function is <code>_validate_illegal_and_regulated_behaviors</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">-        metric = &quot;safety_ptos.illegal_and_regulated_behaviors_cross_model_validate_with_grok_4_5&quot;
++        metric = &quot;safety_ptos.illegal_and_regulated_behaviors_cross_model_validate_with_grok_4_1&quot;
+         ...
+-            async with _eapi_4_5_x_algo_breaker.guard():
+-                raw = await self.eapi_4_5_x_algo.sample(
+-                    convo.interleaveToEapi(), conversation_id=convo.conversation_id
+-                )
++            raw = await self.eapi_4_1_x_algo.sample(
++                convo.interleaveToEapi(), conversation_id=convo.conversation_id
++            )
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py</code></a>, 2026-09-04</p>
+</blockquote>
+<ul>
+<li>The circuit-breaker guard is also gone. 4.5-X_ALGO was called wrapped in <code>_eapi_4_5_x_algo_breaker</code>, but 4.1-fast is called directly without a breaker.</li>
+<li>ChildSafety and ViolentMedia still call 4.5-X_ALGO with the breaker. That is, judge models are now assigned differently per category.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. First-pass for the same category now goes to Gemma without a probability gate</span></p></div>
+<ul>
+<li><p>IllegalAndRegulatedBehaviors was added to the list of categories whose first-pass is judged by Gemma <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The list is <code>USE_GEMMA_CATEGORIES</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python"> USE_GEMMA_CATEGORIES = {
+     SafetyPolicyCategory.Spam,
++    SafetyPolicyCategory.IllegalAndRegulatedBehaviors,
+ }
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>All gates that decided by probability whether first-pass routing sends a request to Gemma were removed <span class="badge ok">verified</span>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">-        if (
+-            sample_for_gemma
+-            and not self.deluxe
+-            and self.use_gemma
+-            and random.random() &lt; self.use_oai_gemma4_dial
+-        ):
++        if sample_for_gemma:
+             try:
+                 return await self.oai_gemma4.sample(
+                     convo.to_openai_messages(), conversation_id=convo.conversation_id
+                 )
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py</code></a>, 2026-09-04</p>
+</blockquote>
+<ul>
+<li>That is, for the two categories Spam and IllegalAndRegulatedBehaviors, first-pass is routed 100% to Gemma, and grok handles only the fallback.</li>
+<li>The constant initialization <code>self.use_oai_gemma4_dial = 1.0</code> was also deleted.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. IllegalAndRegulatedBehaviors verdicts now pass through three layers: Gemma, reclassification, and the 4.1-fast judge</span></p></div>
+<ul>
+<li><p>IllegalAndRegulatedBehaviors was added to the categories that get reclassification <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/grox/flows/ptos/task_safety_ptos_policy.py" target="_blank" rel="noopener"><code>task_safety_ptos_policy.py</code></a>.</p>
+<ul>
+<li>The changed place is the reclassification trigger in <code>task_safety_ptos_policy.py</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">-            elif violation.category == SafetyPolicyCategory.ViolentMedia:
++            elif violation.category in (
++                SafetyPolicyCategory.ViolentMedia,
++                SafetyPolicyCategory.IllegalAndRegulatedBehaviors,
++            ):
+                 policy = await active_classifier.classify_policy_for_violation(
+                     post, violation
+                 )
+</code></pre></figure>
+</blockquote>
+<ul>
+<li>Previously only ViolentMedia took this reclassification path (re-checking the category verdict with deluxe 4.3).</li>
+<li>That is, with this commit the IllegalAndRegulatedBehaviors flow became a three-layer stack: first-pass Gemma → deluxe cross-model reclassification (expensive) → Grok 4.1-fast judge.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added these 3 items to the &quot;Resolved by the Gen4+15 release / new&quot; section of <a href="x.html">services/x.md</a>. The fact that per-category judge model divergence was confirmed as a first concrete case updates the &quot;next category for judge expansion&quot; checkpoint to watch under the Gen4+7 canon cleanup.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> It is now confirmed that judge models are tuned separately per category inside the PTOS judge layer. The previous canon knew only that &quot;X keeps the primary and the judge on different models&quot;.</p></div>
+<ul>
+<li>The judge model choice appears to be set by three factors: the verdict difficulty of each category, the judge latency requirement, and the disagreement characteristics between primary and judge <span class="badge est">inferred</span>.</li>
+<li>Given that the <code>fast</code> suffix is on the 4.1 judge and that it is called without a breaker, the judgment is that IllegalAndRegulatedBehaviors verdicts are relatively clear (for example drugs, weapons, and child exposure, where the label itself carries a strong signal), so a fast, cheap judge suffices <span class="badge est">inferred</span>.</li>
+<li>In contrast, ChildSafety and ViolentMedia verdicts are subtle (for example, telling cartoons and games from real footage in violent media), so the policy is that a 4.5 judge is needed.</li>
+<li>The promotion of first-pass Gemma to 100% for Spam and IllegalAndRegulatedBehaviors fits the direction of saving grok API budget. Violent and hateful speech appear to remain as the next promotion candidates.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="3-the-sid-lookup-sidecar-was-removed-entirely-from-the-phoenix-serving-engine--x"><span class="num">3</span>The SID lookup sidecar was removed entirely from the Phoenix serving engine — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">xai-org/x-algorithm@9b0dc31</a> — the <code>phoenix/crates/serving/xai-recsys-engine/</code> subtree and <code>phoenix/xrex/inference/</code> in the same commit (Gen4+15).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Semantic ID (SID) is a technique that represents post embeddings as discrete codewords with a hierarchical codebook of the RQ-VAE family.</p></div>
+<ul>
+<li>At X, Gen4+3 (2026-08-18, <a href="https://github.com/xai-org/x-algorithm/commit/11a71f8" target="_blank" rel="noopener">11a71f8</a>) wired 7 SID fields into VMRanker requests, which first confirmed that a 3-level hierarchical codebook exists.<ul>
+<li>VMRanker is the stage that reorders, by diversity criteria, the candidate bundle to put in the feed.</li>
+<li>The fields are <code>sid_known</code>, <code>sid_k_l1/l2/l3</code>, and <code>sid_gap_l1/l2/l3</code>.</li>
+</ul>
+</li>
+<li>Gen4+13 (2026-09-01, <a href="https://github.com/xai-org/x-algorithm/commit/7ba7768" target="_blank" rel="noopener">7ba7768</a>) released code that adds dense reconstruction to the ranker post tower, only wired and switched off (wired-but-off).<ul>
+<li>This code loads an RQ-VAE-style stacked residual codebook from an offline <code>.safetensors</code>.</li>
+<li>The file is <code>phoenix/xrex/models/recsys_sid.py</code> (72 lines, new), and the default is <code>sid_embedding_mode=&quot;learned&quot;</code>.</li>
+</ul>
+</li>
+<li>And the Phoenix serving engine had a sidecar gRPC client, <code>sid_client.rs</code>. It was an optional path that filled in codewords by querying the SID service separately for each post_id in the user history. In the Gen4+3 canon cleanup this sidecar was recorded only as &quot;optional&quot;.</li>
+</ul>
+<p>This commit removed this sidecar entirely.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The SID client and its wiring code were deleted from Rust, Python, and the CLI</span></p></div>
+<ul>
+<li><p>Both the Rust implementation and the Python binding of the SID lookup client were deleted <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">xai-org/x-algorithm@9b0dc31</a>.</p>
+<ul>
+<li>The deleted files are <code>sid_client.rs</code> (189 lines) and <code>sid_retrieval_runner.py</code> (17 lines).</li>
+<li>What disappeared is the <code>SemanticIdClient</code> Rust client and the Python binding <code>PySemanticIdClient</code>.</li>
+<li>The <code>xai-recsys-sid-proto</code> dependency was removed from <code>Cargo.toml</code> and <code>pyproject.toml</code>, and the <code>pub mod sid_client;</code> declaration in <code>src/lib.rs</code> was deleted too.</li>
+</ul>
+</li>
+<li><p>The SID client field was dropped from the Python structs and the server macro <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/crates/serving/xai-recsys-engine/src/python.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/python.rs</code></a>.</p>
+<ul>
+<li>The field <code>sid_client: Option&lt;Arc&lt;crate::sid_client::SemanticIdClient&gt;&gt;</code> was removed from the two structs <code>RecsysPredictorImpl</code> and <code>RecsysRetrievalPredictorImpl</code>.</li>
+<li>The <code>sid_client: Option&lt;&amp;crate::sid_client::PySemanticIdClient&gt;</code> argument that the <code>server_impl</code> macro accepted and the <code>add_class::&lt;PySemanticIdClient&gt;()</code> registration were deleted as well.</li>
+</ul>
+</li>
+<li><p>The SID endpoint setting (<code>--sid_endpoint</code>) disappeared from the inference CLI and the model runner <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/inference/launch_inference.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/launch_inference.py</code></a>.</p>
+<ul>
+<li>In the CLI, the <code>--sid_endpoint</code> argparse argument and the assignment <code>runner.sid_endpoint = args.sid_endpoint</code> were removed.</li>
+<li>In <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/inference/model_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/model_runner.py</code></a>, the field <code>sid_endpoint: str | None = None</code> was removed, and 12 lines of SID client assembly code in <code>create_server</code> disappeared.</li>
+<li>The two deleted branches and the newly added <code>sid_num_levels</code> line reveal the new contract.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">-        if _use_post_sid and self.sid_endpoint and sid_num_levels &gt; 0:
+-            sid_client = xai_recsys_engine.PySemanticIdClient(
+-                self.sid_endpoint,
+-                sid_num_levels,
+-            )
+-            logger.info(
+-                &quot;SID client connected: endpoint=%s, sid_num_levels=%d&quot;,
+-                self.sid_endpoint,
+-                sid_num_levels,
+-            )
+-        elif _use_post_sid:
+-            logger.info(
+-                &quot;Parsing history SIDs from the request (sid_num_levels=%d); no sid_endpoint&quot;,
+-                sid_num_levels,
+-            )
++        user_tower = self.model_config.user_tower_config
++        sid_num_levels = user_tower.sid_num_levels if user_tower.use_post_sid else 0
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/inference/model_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/model_runner.py</code></a>, 2026-09-04</p>
+</blockquote>
+<p>That is, of the two execution modes (SID client attached, or parsed from the request), the former is gone and only the latter remains. The new contract is that history SID arrives in the request.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A flag that uses CUDA pinned host memory for D2H transfer is now on by default <span class="badge ok">verified</span>.<ul>
+<li>The flag is <code>use_pinned_d2h</code>, and its default changed from False → True. It changed incidentally in the file covered by the last bullet of card A.</li>
+<li>This option was already there at the Gen4 release (2026-08-13), off by default, and it became the default after 22 days <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/phoenix/xrex/inference/model_runner.py" target="_blank" rel="noopener"><code>model_runner.py:492</code></a>.</li>
+<li>The help text says: <em>&quot;Use CUDA pinned host memory for D2H transfer (~50 GB/s vs JAX&#39;s ~3 GB/s). Saves ~29ms/inference. Default True; pass False to opt out.&quot;</em></li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added this fact to &quot;Resolved by the Gen4+15 release / new&quot; in <a href="x.html">services/x.md</a>. The Gen4+3 record &quot;Phoenix serving SID sidecar is optional&quot; is updated to &quot;the option is removed entirely; SID is a request contract&quot;.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The architecture of the Phoenix retrieval SID pipeline was tidied up considerably. The responsibility for SID codeword lookup moved out of online serving.</p></div>
+<ul>
+<li>The previous canon knew three things:<ul>
+<li>phoenix-rankall manages the SID index window (<code>video_14day</code> and others).</li>
+<li>Seven SID fields are wired into VMRanker.</li>
+<li>The serving engine has an optional SID sidecar.</li>
+</ul>
+</li>
+<li>With this commit, it is confirmed that the SID sidecar is gone from the serving engine entirely and that SID is carried directly in the request.</li>
+<li>The home-mixer (or candidate hydration layer) that handles For You feed requests extracts SID in advance at the candidate hydration stage and puts it in the request, and phoenix-rankall consumes it as is. One extra gRPC call per request is gone, and the fault domain of the SID infrastructure narrows.</li>
+<li>However, this diff does not yet confirm the specification of the SID hydrator on the home-mixer side. The name and source of the hydrator that fills in SID and the storage backend (Manhattan? Strato? phoenix-rankall itself?) are follow-up checkpoints to watch.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="4-first-code-signal-that-phoenix-training-also-runs-on-h100-besides-gb300--x"><span class="num">4</span>First code signal that Phoenix training also runs on H100, besides GB300 — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">xai-org/x-algorithm@9b0dc31</a> — <code>phoenix/xrex/models/remat.py</code> (+17 lines) and <code>phoenix/xrex/cutedsl/ranker_attention_fa4.py</code> (+139/−75) in the same commit (Gen4+15).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The canon on Phoenix training hardware had already confirmed that &quot;Phoenix production training runs on GB300&quot;. That confirmation came with Gen4+6 (2026-08-21, <a href="https://github.com/xai-org/x-algorithm/commit/28e414f" target="_blank" rel="noopener">28e414f</a>), where <code>_GB300_OVERRIDES</code> appeared.</p></div>
+<ul>
+<li>The rematerialization policy (a technique that saves memory by recomputing some activations during backpropagation instead of storing them) was only <code>SAVE_GB300_RECSYS = 29</code>.</li>
+<li>The GB300 override assigned a preset tuned to GB300 hardware. The values are <code>bs_per_device=512</code>, <code>attn_impl=&quot;cutedsl_ranker_varlen_attn&quot;</code>, and <code>remat_policy=RematType.SAVE_GB300_RECSYS</code>.</li>
+<li>The FA4 (flash attention v4 based on NVIDIA CUTLASS/CUTe DSL) kernel assumed that the history tile is always padded to a multiple of the tile size (128). Under this assumption, the layout was built in advance on the python host and stored in a cache (<code>_DENSE_BS_LAYOUT_CACHE</code>).</li>
+</ul>
+<p>This commit registers a new remat policy for H100 and changes the FA4 kernel to handle variable-length history directly.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. An H100 remat policy now exists, but this commit has no H100-specific config bundle yet</span></p></div>
+<ul>
+<li><p>A new remat policy for H100 was registered <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/models/remat.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/remat.py</code></a>.</p>
+<ul>
+<li>The new value is <code>SAVE_H100_RECSYS = 32</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">class RematType(enum.IntEnum):
+    WHOLE = 0
+    SAVE_GB300_RECSYS = 29
++    SAVE_H100_RECSYS = 32
+</code></pre></figure>
+</blockquote>
+<ul>
+<li>A new branch was added to <code>custom_remat_policy(policy)</code>. This branch saves the same name list as GB300 as rematerialization checkpoint targets.<ul>
+<li>Name list: <code>attn_outputs</code>, <code>dense_outputs</code>, <code>dense_outputs_individual</code>, <code>attn</code>, <code>gate_up_proj</code>, <code>dense_up_proj</code>, <code>query_heads_rope</code>, <code>key_heads_rope</code>, <code>cutedsl_attn_outputs</code>, <code>query_heads</code>, <code>key_heads</code>, <code>value_heads</code>, <code>scalar_stats</code></li>
+</ul>
+</li>
+<li>The two policies share the name list but have separate enum values; this structure leaves room for different tuning (for example, a saved-tensor priority preset) to be attached to GB300 and H100 later.</li>
+<li>A hardware-specific config block such as <code>_H100_OVERRIDES</code> is not in this commit yet.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The FA4 attention kernel takes a different effective history length per item and masks accordingly</span></p></div>
+<ul>
+<li><p>The FA4 attention kernel was changed to support variable-length history directly <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/phoenix/xrex/cutedsl/ranker_attention_fa4.py" target="_blank" rel="noopener"><code>phoenix/xrex/cutedsl/ranker_attention_fa4.py</code></a>.</p>
+<ul>
+<li>The <code>build_dense_block_sparse_layout</code> signature changed as follows.</li>
+</ul>
+<blockquote>
+<pre tabindex="0"><code>-def build_dense_block_sparse_layout(batch_size, seq_len, hist_len, num_q_heads):
++def build_dense_block_sparse_layout(seq_len, hist_len, num_q_heads, hist_valid_len):
+</code></pre>
+</blockquote>
+<ul>
+<li>The new argument <code>hist_valid_len</code> receives the actual number of valid history tokens for each item in the batch.</li>
+<li>The computation moved from host-side precomputation based on <code>import numpy as np</code> to JIT-friendly code based on <code>jnp.where</code>, <code>jnp.arange</code>, and <code>jnp.broadcast_to</code>. The <code>_DENSE_BS_LAYOUT_CACHE</code> cache was removed entirely.</li>
+<li>The reason for removing the cache is clear. Because <code>hist_valid_len</code> differs per batch, the layout became a function of batch data rather than a deterministic function, and caching became meaningless.</li>
+<li>The new fields <code>valid_block_upper</code> and <code>valid_block_lower</code> pass the upper and lower bounds of the attention mask per batch. With these values, the kernel masks partial-history blocks (where the actual valid tokens in a history tile number at most the tile size) exactly.</li>
+<li><code>is_partial = is_hist &amp; (t == n_full) &amp; (has_partial == 1)</code> marks the position of the partial block.</li>
+<li>The <code>ranker_attention_fa4</code> signature was widened to accept the optional arguments <code>valid_block_upper=None</code> and <code>valid_block_lower=None</code>.</li>
+<li><code>custom_vjp</code> packs and unpacks the new arguments through <code>bs_args</code> so that they are included in the gradient computation.</li>
+<li><code>input_output_aliases</code> shifted from <code>{12: 0, 13: 1, 14: 2}</code> to <code>{14: 0, 15: 1, 16: 2}</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added these two facts to &quot;Resolved by the Gen4+15 release / new&quot; in <a href="x.html">services/x.md</a>. Below the canon entry that confirmed at Gen4+6 that &quot;Phoenix production training runs on GB300&quot;, we append &quot;first signal that it also runs on H100&quot;.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The code now confirms that X&#39;s training hardware is not only GB300.</p></div>
+<ul>
+<li>GB300 may be used for flagship training, and H100 for secondary, backfill, and research work <span class="badge est">inferred</span>.</li>
+<li>If <code>_H100_OVERRIDES</code> appears in a later commit, the differences in batch, attention, and remat tuning between H100 and GB300 will become visible.</li>
+<li>FA4 attention&#39;s support for variable-length history can be understood as extending the <code>cutedsl_ranker_varlen_attn</code> varlen semantics of Gen4+6 to the history axis.</li>
+<li>Training and inference accuracy improve for new users and short sessions. Previously, short history was padded up to the tile size, which may have increased the attend targets or polluted the attention semantics.</li>
+<li>This observation attaches to the attn kernel axis of the <code>sequence-transformer-ranking</code> canon note.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="5-visibility-filtering-code-shrank-by-more-than-800-lines-net-overview-only--x"><span class="num">5</span>visibility-filtering code shrank by more than 800 lines net (overview only) — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">xai-org/x-algorithm@9b0dc31</a> — several files in the <code>visibility-filtering/</code> subtree of the same commit (Gen4+15).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> visibility-filtering (VF) is X&#39;s fail-close filter stack. During Gen4, this subtree has changed in two main directions.</p></div>
+<ul>
+<li>Rule refactoring moves policy into a data-oriented representation. The <code>RuleContext</code> split in Gen4+11 and the removal of <code>Box&lt;dyn Rule&gt;</code> in +14 belong here.</li>
+<li>Safety-net removal strips out safety code from the early rewrite after it has been proven unnecessary. The deletion of 128 lines of VMRanker in Gen4+8 and 292 lines of the media fallback cache in +9 belong here.</li>
+</ul>
+<p>This commit continues the safety-net removal direction at large scale.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Hydration and safety-label code shrank substantially, while the regression safety net got thicker</span></p></div>
+<p>Per-file changes in the VF subtree are as follows <span class="badge ok">verified</span> — file delta of <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">xai-org/x-algorithm@9b0dc31</a>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="grow"><col class="w8"></colgroup>
+<thead>
+<tr>
+<th>File</th>
+<th>+/−</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>visibility-filtering/config.rs</code></td>
+<td>+7/−118</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/rules/registry.rs</code></td>
+<td>+8/−378</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/rules/tweet_rules.rs</code></td>
+<td>+50/−129</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/mod.rs</code></td>
+<td>+11/−90</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/fallback_cache.rs</code></td>
+<td>+25/−87</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/batch.rs</code></td>
+<td>0/−19</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></td>
+<td>+36/−42</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/hydration/tes_hydrator.rs</code></td>
+<td>+3/−33</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/get_safety_labels.rs</code></td>
+<td>0/−40</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/safety_label_source/codec.rs</code></td>
+<td>+15/−206</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/safety_label_source/manhattan.rs</code></td>
+<td>0/−10</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/models/safety_labels.rs</code></td>
+<td>+13/−19</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/filter_tweets.rs</code></td>
+<td>+17/−65</td>
+</tr>
+<tr>
+<td><code>visibility-filtering/rules/author_rules.rs</code></td>
+<td>+3/−27</td>
+</tr>
+</tbody></table></div>
+<p>The regression safety net got thicker <span class="badge ok">verified</span> — same commit. Lines increased in <code>visibility-filtering/rules/fixtures.rs</code> (+81) and <code>golden_corpus.rs</code> (+102). The balance between simplification and regression defense was maintained.</p>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added only an overview to &quot;Resolved by the Gen4+15 release / new&quot; in <a href="x.html">services/x.md</a>. The semantics of each deletion point remain as a deep-dive item: which wire format and label source were removed, and which hydrator entries were deleted.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The pattern of stripping out safety nets once the rewrite has stabilized is now firmly established. Across five commits, Gen4+8, +9, +11, +14, and +15, visibility-filtering has been getting thinner through controlled net deletions.</p></div>
+<ul>
+<li>The previous version of the canon held that &quot;Gen4 VF has many safety nets because the Rust rewrite is early&quot;. This observation updates that judgment to &quot;a stage where the rewrite has matured and safety nets are being removed&quot;.</li>
+<li>The 206-line deletion in <code>safety_label_source/codec.rs</code> suggests unification on the wire format axis, so it is a target for a later deep dive.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="6-the-brazil-election-filter-got-its-regular-update-and-external-pr-88-was-merged--x"><span class="num">6</span>The Brazil election filter got its regular update, and external PR #88 was merged — X</h2>
+<div class="blk src"><p><span class="lbl">Source A</span> <a href="https://github.com/xai-org/x-algorithm/commit/9b0dc31" target="_blank" rel="noopener">xai-org/x-algorithm@9b0dc31</a> — <code>home-mixer/filters/brazil_2026_election_filter.rs</code> in the same commit (Gen4+15).</p></div>
+<div class="blk src"><p><span class="lbl">Source B</span> <a href="https://github.com/xai-org/x-algorithm/commit/e4dcedd" target="_blank" rel="noopener">xai-org/x-algorithm@e4dcedd</a> — PR #88 merged, external contribution (joshs1017dev), 2026-09-03 20:28 UTC.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Brazil2026ElectionFilter is a political and regulatory-compliance filter that removes accounts reported to the Brazilian electoral court (TSE) from the home feed. This filter is the basis for the observation that X&#39;s regular maintenance continues every week. The canon records the history of this filter as follows.</p></div>
+<ul>
+<li>Gen4+1 (2026-08-14): filter introduced (665 accounts)</li>
+<li>Gen4+8 (2026-08-25): folded in the TSE dadosabertos 2026-08-25 edition (+3,379 lines)</li>
+<li>Gen4+10 (2026-08-28): comments reorganized</li>
+</ul>
+<p>This commit updated the account list of this filter again.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The candidate account list was verified again, and the file&#39;s behavior is unchanged</span></p></div>
+<ul>
+<li>The hardcoded account list grew from 2,388 to 2,554, a net increase of 166 <span class="badge ok">verified</span> — test assert in <a href="https://github.com/xai-org/x-algorithm/blob/9b0dc31/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>brazil_2026_election_filter.rs</code></a>.<ul>
+<li>The patch added 167 <code>// @handle</code> entries and removed 1. The newly added accounts include @nanacachen, @AecioNeves, @lgmbrasilia, @crismonteirosp, @rodrigolimamdh, @samiabomfim, and @gabrielmagno_13.</li>
+<li>Each account appears with an obfuscated user_id and the @username in a comment.</li>
+</ul>
+</li>
+<li>Two new &quot;not the candidate&#39;s actual account&quot; verdicts appeared: @BENICIODIAS and @CARLOSSAMPAIO <span class="badge ok">verified</span> — same patch.<ul>
+<li>This is the result of X&#39;s internal verification that the account owners were judged not to be candidates.</li>
+</ul>
+</li>
+<li>Two entries were removed from the &quot;no live account found&quot; list and three were added <span class="badge ok">verified</span> — same patch. A removed entry means the account came back to life, and an added entry means the account disappeared.</li>
+<li>The file&#39;s behavior (the follow exception kept, obfuscated user_id exposed, @username comments published) is unchanged.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. External contributor PR #88 was actually merged</span></p></div>
+<ul>
+<li>A PR (e4dcedd) from the external contributor joshs1017dev added two lines that dedup before the VF lookup.<ul>
+<li>The location is just before the <code>in_network_ids</code> VF lookup in <code>home-mixer/candidate_hydrators/vf_candidate_hydrator.rs</code>.</li>
+</ul>
+</li>
+<li>This is evidence that Gen4&#39;s open-source stance does accept external PRs.</li>
+<li>It is a single performance optimization, so there is no change to canon semantics.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added both items to &quot;Resolved by the Gen4+15 release / new&quot; in <a href="x.html">services/x.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The practice of continuously verifying the mapping of politicians&#39; X accounts every week continues. This regular-update practice itself confirms that the filter is an active production code path. Merging external PRs reconfirms that Gen4 is maintained open source that accepts real external contributions, not &quot;throw the code over the wall and abandon it&quot;.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="corrections">Corrections</h2>
+<p>None. Today&#39;s commits extend the canon and do not overturn it. However, the canon entry from Gen4+3 saying &quot;the Phoenix serving SID sidecar is optional&quot; is updated to &quot;the option was removed entirely; SID is part of the request contract&quot;. This is a change that came with time rather than an overturning.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<p>None. The 30 arXiv cs.IR items were parsed successfully, and industry blogs were skipped because it was Saturday. Meta and Netflix had no new sources. Triage of the 30 items passed 0.</p>
+<ul>
+<li>Eight items were recommendation or CTR related: CORE, EPIC, LLM4AIGQ, HypRQ-VAE, UniCon CTR, Slow-Fast Thinkers Rec, SelfDR, and DoPR. However, all were mostly by academic institution authors and had no production deployment or A/B claims, so they were dropped.</li>
+<li>The other 22 items were dropped in three groups.<ul>
+<li>Benchmark and evaluation methodology: SHELF, MultiGhostBench, Incremental Pooled Eval, Training seeds stability</li>
+<li>Domain-restricted: POI, legal, medical, science, baseball</li>
+<li>LLM usage methodology: RAG, private retrieval, essay grading</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check when the new reply spam pipeline was switched on and what its verdict metrics look like — no experiment gating is visible in this diff.<ul>
+<li>Confirm whether <code>PlanMultiStepReplySpam</code> runs on 100% of production traffic.</li>
+<li>The actual allocation of the counters, that is, how often each filter fires, is the next checkpoint to watch. The target counters are <code>multi_step_reply_spam.scored.count</code>, <code>newest_not_flagged_dropped.count</code>, <code>other_author_dropped.count</code>, <code>singleton_dropped.count</code>, <code>json_repaired.count</code>, and <code>invalid.count</code>.</li>
+<li>How often the three post-processing stages fire will reveal the gap between the LM&#39;s raw accuracy and the final accuracy after post-processing.</li>
+</ul>
+</li>
+<li>Find the name and source of the hydrator in home-mixer (or the candidate hydration layer) that fills SID — look for where SID is placed in the request after <code>sid_client</code> was removed.<ul>
+<li>Check what the SID codeword storage backend is (Manhattan? Strato? phoenix-rankall itself?).</li>
+<li>Check the history for whether the migration had a dual-write period.</li>
+</ul>
+</li>
+<li>Check when the H100-specific config bundle (<code>_H100_OVERRIDES</code>) appears and how H100 tuning differs from GB300 — only the remat policy was registered this time.<ul>
+<li>How batch size, attention impl, checkpoint interval, LR, and so on are assigned differently for H100 will appear in the next commit.</li>
+</ul>
+</li>
+<li>Check how the Grok 4.1-fast judge differs from 4.5 X_ALGO — the thing to watch is the latency, cost, and accuracy trade-off.<ul>
+<li>The model name of the 4.1-fast judge is <code>EAPI_GROK_4_1_FAST_X_ALGO</code>.</li>
+<li>Look for the policy rationale for moving only IllegalAndRegulatedBehaviors to 4.1-fast.</li>
+<li>Watch for when the ChildSafety and ViolentMedia judges also move to 4.1-fast.</li>
+</ul>
+</li>
+<li>Confirm what the 206 deleted lines in safety_label_source/codec.rs actually were — check which wire format and label source were removed. Settling the safety_labels codec unification direction in the canon needs the next observation.</li>
+<li>Check which category moves to Gemma next — the question is whether violent speech, hate speech, and adult content follow Spam and IllegalAndRegulatedBehaviors in that order. How far the Gemma replacement extends will reveal the trade-off between grok API budget and verdict accuracy.</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-04.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-04</span></a><a class="pg-next" href="daily-2026-09-06.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-06</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-05.html" data-title="일일 리포트 2026-09-05"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-26 — feed-research</title>
+<meta name="description" content="In one line: X rewrote the data lookup stage of its visibility-filtering service (VF) in a single day. It removed the per-data-type lookup functions and…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-26.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-26.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-26.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-26.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-26 — feed-research">
+<meta property="og:description" content="In one line: X rewrote the data lookup stage of its visibility-filtering service (VF) in a single day. It removed the per-data-type lookup functions and…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-26.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-26.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-26">2026-09-26</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>19 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-26.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X rewrote the data lookup stage of its visibility-filtering service (VF) in a single day. It removed the per-data-type lookup functions and moved them to a data table and a scheduler.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-vf-rewrote-its-verdict-data-lookups-around-a-data-table-and-a-scheduler--x"><span class="num">1</span>VF rewrote its verdict data lookups around a data table and a scheduler — X</a></li><li><a href="#2-onetrans-v2-merged-three-recommendation-cascade-stages-into-one-transformer--radar"><span class="num">2</span>OneTrans-V2 merged three recommendation cascade stages into one Transformer — radar</a></li><li><a href="#industry-blogs-are-not-scanned-today-saturday">Industry blogs are not scanned today (Saturday)</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same X commit, VF began looking up the viewer&#39;s country directly from About This Account data.</li>
+<li>The same commit split the rule golden tests into 15 files by policy category and added a catalog that groups country codes into 9 regions.</li>
+<li>OneTrans-V2 merged three recommendation cascade stages into one Transformer and reported GMV +9.74% and 3.2× throughput in a production A/B test.</li>
+</ul>
+<h2 id="1-vf-rewrote-its-verdict-data-lookups-around-a-data-table-and-a-scheduler--x"><span class="num">1</span>VF rewrote its verdict data lookups around a data table and a scheduler — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/bf7db1becb6590152fba79b8c3bf0555752f7b14" target="_blank" rel="noopener">xai-org/x-algorithm@bf7db1b</a> — xai-org/x-algorithm public repository, 2026-09-25 UTC 01:56, commit. 87 files changed, with +7,780/−5,759 lines. These notes number the X commits after the Gen4 release in order, and this commit is Gen4+29.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> visibility-filtering (VF) is a service that decides whether a candidate can be shown. Hydration is the stage that fills in the raw data needed for verdicts by batch lookups from backend services, and the unit responsible for the lookup of each data type is called a hydrator. Through the 2026-09-24 commit (Gen4+28), VF had each rule declare the hydrators it needs and ran this stage with a separate function for each hydrator variant. This commit removed that function layer at the root and rewrote hydration to be expressed as a data table and a scheduler.</p></div>
+<ul>
+<li>The structure introduced in the 2026-09-23 commit (Gen4+27) and kept through Gen4+28 ran in this order:<ul>
+<li>A rule/predicate declares the set of hydrators it needs with <code>const fn hydrators()</code>.</li>
+<li><code>RuleEngine::hydrators_for(safety_level)</code> inspects the active rule set.</li>
+<li>The result is unioned into a <code>Hydrators</code> bitset.</li>
+<li>Each hydrator variant runs through its own function/file.</li>
+</ul>
+</li>
+<li><code>conversation_control_hydrator.rs</code> (310 lines), introduced in the same 2026-09-23 commit, was the peak of this approach.</li>
+<li>This commit deleted the hydrator function files (<code>conversation_control_hydrator.rs</code>, <code>exclusive_content_hydrator.rs</code>, <code>socialgraph_hydrator.rs</code>) entirely. <code>hydration/mod.rs</code> was also cut by 787 lines, leaving only 169.</li>
+<li>Three files took their place: <code>plan.rs</code> (471 lines, new), <code>execute.rs</code> (1,280 lines, new), and <code>sources.rs</code> (445 lines, new).</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. There are more hydrator kinds, and each is registered as a table row instead of a function</span></p></div>
+<ul>
+<li><p>The number of hydrator kinds grew from 7 to 17 variants <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs:44-62</code></a>.</p>
+<ul>
+<li><p>The enum listing the kinds is <code>Hydrator</code>, and 10 entries that were not in yesterday&#39;s list were wired in this time.</p>
+</li>
+<li><p>The code block below is the variant list.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub enum Hydrator {
+    PureCore, Tweet, ConversationControl,          // TES family
+    TweetSafetyLabels,                              // safety_label
+    ViewerProfile,                                  // gizmoduck viewer
+    AuthorSafety, AuthorLabels,                     // gizmoduck author (SAFETY / LABELS fields split)
+    Follows, Blocks, Mutes, MuteRetweets,          // socialgraph forward edges
+    BlockedByAuthor, BlockedByReplyRoot,           // socialgraph reverse
+    SuperFollowsExclusive,                          // exclusive_content
+    RootFollowsViewer, SuperFollowsRoot,           // conversation_control
+    ViewerCountry,                                  // about_this_account (new client)
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>Each variant is registered as a row in one table rather than having its own function <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:32-45</code></a>.</p>
+<ul>
+<li>The row format of the table is <code>NodeSpec { source, part, key, label }</code>.</li>
+</ul>
+</li>
+<li><p>One table row (<code>NodeSpec</code>) represents one hydrator as data on 4 axes <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:82-192</code></a>.</p>
+<ul>
+<li><code>Source</code> is which backend is called.</li>
+<li><code>Part</code> is what is fetched within the backend. Columns, field sets, and edge queries count as this.</li>
+<li><code>KeyOrigin</code> is where the input key comes from. Examples are the request tweet id, the viewer id, and the author id filled in by PureCore (tweet core metadata).</li>
+<li><code>label</code> is a client·method string pair for metrics.</li>
+<li>For example, <code>Hydrator::AuthorSafety</code> is <code>NodeSpec { source: GizmoduckAuthor, part: Fields([SAFETY]), key: PureCoreAuthor, label: (&quot;gizmoduck&quot;, &quot;get_users&quot;) }</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Lookups to the same backend with the same input are merged automatically into one RPC</span></p></div>
+<ul>
+<li>Among the requested hydrators, those with the same backend and input dependency are planned to be bundled into one RPC <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:274-305</code></a>.<ul>
+<li><code>HydrationPlan</code> makes the plan. <code>HydrationPlan::new(level, hydrators)</code> groups the requested hydrators into <code>(source, input)</code> pairs.</li>
+<li>The same source with a different dependency becomes a different group. A hydrator that needs pure_core and one whose input is already in the request are such a case.</li>
+</ul>
+</li>
+<li>For example, an author&#39;s SAFETY field and LABELS field fetched from gizmoduck (X&#39;s user information service) are looked up together in a single call <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:316-353</code></a>.<ul>
+<li><code>Hydrator::AuthorSafety</code> (SAFETY field) and <code>Hydrator::AuthorLabels</code> (LABELS field) both require the <code>PureCoreAuthor</code> input from the <code>GizmoduckAuthor</code> source, so they become one group.</li>
+<li><code>Group::fields()</code> builds the union of the two field sets and handles them with a single <code>gizmoduck.get_users(fields=[SAFETY|LABELS])</code> call.</li>
+<li><code>Follows·Blocks·Mutes·MuteRetweets</code> also share the <code>Flock</code> source, the <code>PureCoreAuthor</code> input, and the forward direction, so they are bundled into a single <code>socialgraph/batch_check_relationships</code> call.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The per-surface lookup plan is pinned by golden tests</span></p></div>
+<ul>
+<li><p>The lookup plan is set for each SafetyLevel (a per-surface policy bundle), and a golden test pins that plan as a string <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:422-460</code></a>.</p>
+<ul>
+<li><code>RuleEngine::plan(level)</code> locks the plan it builds for each SafetyLevel into a 5-safety-level golden string.</li>
+<li>The number of calls per SafetyLevel is fixed as follows:<ul>
+<li><code>filter_all</code>: 1 call</li>
+<li><code>timeline_home</code>: 7 calls</li>
+<li><code>timeline_home_recommendations</code>: 7 calls</li>
+<li><code>timeline_home_hydration</code>: 10 calls</li>
+<li><code>immersive_expanded_recommendations</code>: 7 calls</li>
+</ul>
+</li>
+<li>The string records, for each plan, which client·method runs against which input as which hydrator node. It even includes whether a call is skipped when logged out because it needs a viewer.</li>
+</ul>
+<blockquote>
+<p>&quot;filter_all: 1 calls\n tes/get_tweet_core_datas after: - nodes: pure_core\n timeline_home_hydration: 10 calls\n tes/get_tweet_core_datas after: - nodes: pure_core\n tes/get_tweets_for_visibility after: - nodes: tweet\n conversation_control/get_conversation_controls after: - nodes: conversation_control\n safety_labels/get after: - nodes: tweet_safety_labels\n gizmoduck/get_viewer_data after: - nodes: viewer_profile fields: ACCOUNT|EXTENDED_PROFILE|SAFETY (skipped logged out)\n gizmoduck/get_users after: pure_core nodes: author_safety fields: SAFETY|LABELS\n blocked_by/batch_check_blocked_by after: pure_core nodes: blocked_by_author,blocked_by_reply_root blocks-rev[author,reply_root] (skipped logged out)\n exclusive_content/batch_check_super_follows after: tweet nodes: super_follows_exclusive super_follows-fwd[exclusive_author] (skipped logged out)\n conversation_control/batch_check_followed_by+batch_check_super_follows after: conversation_control nodes: root_follows_viewer,super_follows_root follows-rev[root:Community|MyNetwork] super_follows-fwd[root:Subscribers] (skipped logged out)\n conversation_control/tfe_top_country after: conversation_control nodes: viewer_country (skipped logged out)&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/plan.rs:422-451</code></a></p>
+</blockquote>
+<ul>
+<li>That is, the service itself sees the <code>timeline_home_hydration</code> lookups as a 4-stage graph.<ol>
+<li>Five lookups start immediately with only the request tweet id and viewer id. tes/get_tweet_core_datas, tes/get_tweets_for_visibility, conversation_control, safety_labels, and gizmoduck/get_viewer_data count as these.</li>
+<li>gizmoduck/get_users (author_safety and labels) and blocked_by depend on the author id filled in by pure_core.</li>
+<li>exclusive_content depends on the result of the tweet node (tes/get_tweets_for_visibility).</li>
+<li>The conversation_control sub-lookups (followed_by and super_follows) and tfe_top_country depend on the conversation_control result. Conversation control is X&#39;s conversation setting that decides who can reply.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Each time a group finishes, the executor runs the groups that were waiting on its result</span></p></div>
+<ul>
+<li>The execution stage schedules the dependency graph between groups with FuturesUnordered (a Rust data structure that runs several async tasks together and returns results in completion order) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/hydration/execute.rs" target="_blank" rel="noopener"><code>execute.rs:80-100</code></a>.<ul>
+<li>The scheduler is in <code>execute.rs</code> and repeats the following sequence:<ul>
+<li>First, it initializes the <code>ready</code> queue with the groups where <code>input.is_none()</code> (groups with no external dependency).</li>
+<li>It spawns the RPC of each ready group and puts it into the <code>running</code> FuturesUnordered.</li>
+<li>When any one finishes, it stores that result in the <code>Store</code>.</li>
+<li>With <code>waiting_on(group)</code>, it moves the subgroups that were waiting on this group back to ready.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. The viewer&#39;s country is looked up directly from About This Account data</span></p></div>
+<ul>
+<li>A new client looks up the user&#39;s weighted top country and supplies it to the country hydrator <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/clients/about_this_account_client.rs" target="_blank" rel="noopener"><code>visibility-filtering/clients/about_this_account_client.rs:1-42</code></a>.<ul>
+<li>The new client is <code>about_this_account_client.rs</code> (166 lines).</li>
+<li>It reads the Strato (X&#39;s internal system that code goes through to read or store data) column <code>about_this_account/tfe_top_country.User</code>, and the hydrator that receives the result is <code>ViewerCountry</code>.</li>
+<li>This client&#39;s result is used in the country filter of the <code>conversation_control</code> allowed-list verdict.</li>
+<li>&quot;About This Account&quot; itself is a transparency UI at the bottom of the account profile in the X app, showing the account creation date, top country, and name change history. VF now consumes that data source directly.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>VF&#39;s rules layer was also reorganized <span class="badge ok">verified</span>.<ul>
+<li><code>visibility-filtering/rules/tweet_rules.rs</code> is −575 lines, <code>author_rules.rs</code> is −160 lines, <code>registry.rs</code> is +226/−58, and <code>rule_spec.rs</code> is +141/−161.</li>
+<li>The two-way Verdict tree (Withheld/Shown) structure introduced in the 2026-09-22 commit (Gen4+26) is kept, and the direction of moving the rule catalog itself into data continues. The detail needs more tracking.</li>
+</ul>
+</li>
+<li>A single 1,493-line file of golden rule cases was split into 15 files by policy category <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/bf7db1be/visibility-filtering/rules/golden_corpus" target="_blank" rel="noopener"><code>visibility-filtering/rules/golden_corpus/</code></a>.<ul>
+<li>The original file is <code>rules/golden_corpus.rs</code>.</li>
+<li>The new files and line counts are as follows:<ul>
+<li><code>age_gating.rs</code> 267 lines · <code>author_state.rs</code> 119 lines · <code>baseline.rs</code> 56 lines · <code>builders.rs</code> 63 lines · <code>conversation_control.rs</code> 257 lines</li>
+<li><code>exclusive_content.rs</code> 61 lines · <code>interstitial.rs</code> 334 lines · <code>mod.rs</code> 173 lines · <code>oon_media.rs</code> 218 lines · <code>oon_tweet_label.rs</code> 133 lines</li>
+<li><code>oon_user_label.rs</code> 234 lines · <code>relationship.rs</code> 122 lines · <code>takedown.rs</code> 224 lines · <code>tweet_label.rs</code> 195 lines · <code>tweet_state.rs</code> 90 lines</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>A catalog that groups country codes into regions was newly added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/bf7db1be/visibility-filtering/models/region.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/region.rs:1-97</code></a>.<ul>
+<li>The new file is <code>models/region.rs</code> (97 lines), and it maps ISO country codes to 9 regions (AFR·AUS·CAS·EAS·EUR·NAM·SAM·SAS·SEA).</li>
+<li>For example, AFR covers 57 countries including AO·BF·BI·BJ·BW·CD, EUR covers 51 countries including AD·AL·AT, and SEA covers 11 countries: BN·ID·KH·LA·MM·MY·PH·SG·TH·TL·VN.</li>
+<li>If the NSFW gating list of 16 countries in Gen4+12 (2026-09-01) was country-level, rules can now also be expressed at the region level.</li>
+</ul>
+</li>
+<li>A new 34-line field was added to the proto of Phoenix (X&#39;s Grok-based Transformer ranker) <span class="badge ok">verified</span>.<ul>
+<li>The same 34 lines were added to both <code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code> and <code>phoenix/python/common/xai-proto/proto/recsys.proto</code>, and lib.rs gained +58 lines.</li>
+<li>This batch does not track which field was added. When a consumer appears in a follow-up commit, we will fold it into the canon.</li>
+<li>Phoenix <code>transformer.py</code> is +42/−5, and <code>recsys_model.py</code> is +5/−1.</li>
+</ul>
+</li>
+<li>The key-frame pipeline of grox (a Grok-based nearline classifier) was reworked <span class="badge ok">verified</span>.<ul>
+<li>The new files <code>frame_sampler.py</code> (124 lines) and <code>embedding_ranked_key_frames.py</code> (193 lines) were added.</li>
+<li><code>key_frames.py</code> was reorganized at −53/+14, <code>media_loader.py</code> is +62/−34, and <code>convo.py</code> is +112/−61.</li>
+<li>The 32×32 grayscale scene-cut·shot midframe pipeline that was open through the 2026-09-24 commit (Gen4+28) appears to be expanding into embedding-based ranking, but we did not track the detail.</li>
+</ul>
+</li>
+<li>A filter in home-mixer (the service that assembles the For You feed) that hardcodes a list of Brazil 2026 election-related accounts received a small update <span class="badge ok">verified</span>.<ul>
+<li>The file is <code>home-mixer/filters/brazil_2026_election_filter.rs</code> (+22/−2), and the filter was introduced in the 2026-08-14 commit.</li>
+<li>A code comment states Electoral Resolution No. 23.610 Art. 28 §1º-A of the Brazilian Superior Electoral Court (TSE) as the regulatory basis.</li>
+<li>The following exception is kept.</li>
+</ul>
+</li>
+<li>About 600 lines of new observability UI code were added <span class="badge ok">verified</span>.<ul>
+<li>It is located in <code>under-the-hood/jetfuel/</code>, and 8 files were added: <code>routes/index.tsx</code>, <code>report.tsx</code>, <code>download.tsx</code>, and <code>_lib/{load,mock,report,ui}</code>.</li>
+<li>The frontend code of the account-level label transparency tool (mentioned as a pilot in Gen4) appears to have been opened.</li>
+<li>It is not directly tied to ranking or retrieval mechanisms, so we do not fold it into the canon.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Created a Gen4+29 section in <a href="x.html"><code>services/x.md</code></a> and added <code>bf7db1b</code> (2026-09-25) to the commit list in <code>## Sources</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This confirms another short-cycle refactor: the VF hydration structure was torn up within two days. The 2026-09-23 commit (Gen4+27) introduced the pattern that held until yesterday (&quot;run only the hydrators the active rules need, via <code>RuleEngine::hydrators_for(safety_level)</code>&quot;). Today&#39;s commit (Gen4+29) rewrote it with a data table and a FuturesUnordered scheduler. <code>conversation_control_hydrator.rs</code> (introduced 2026-09-23, 310 lines) lived about two days.</p></div>
+<p>The practical meaning of this rewrite is threefold:</p>
+<ul>
+<li>First, the hydration interface moved from functions to data.<ul>
+<li>The previous structure had each rule declare a <code>hydrators()</code> list, but execution itself was still a function layer (a <code>.rs</code> file per hydrator variant).</li>
+<li>Today execution became data too. With just one <code>NodeSpec</code> table, the scheduler automatically plans RPC groups for whatever combination of hydrators is requested.</li>
+<li>Adding a rule no longer requires writing a new hydrator function; adding one line to the table is enough.</li>
+</ul>
+</li>
+<li>Second, RPC group merging was automated.<ul>
+<li>Until yesterday, gizmoduck&#39;s SAFETY lookup and LABELS lookup went through different hydrator functions. Today <code>Group::fields()</code> automatically merges the field sets of hydrators with the same source and the same input and bundles them into one RPC.</li>
+<li>This is not a micro-optimization. In X&#39;s structure, where the hydration budget concentrates on fan-out services such as gizmoduck and socialgraph, it directly affects P99.</li>
+</ul>
+</li>
+<li>Third, connecting the <code>ViewerCountry</code> hydrator brought the conversation-control country allowed-list formally into the hydration budget.<ul>
+<li>Previously, country information arrived in the request context, but now hydration fills it by querying the <code>about_this_account/tfe_top_country.User</code> Strato column directly.</li>
+<li>This means the backend of the About This Account transparency UI is now attached to the VF verdict path. The regulatory-response axis (e.g., per-country content restrictions) has formally entered the hydration layer.</li>
+</ul>
+</li>
+</ul>
+<p>Splitting <code>golden_corpus</code> into 15 files reads as preparation for two things. One is to divide corpus ownership by policy category, and the other is to let the verdict matrix of each category be locked independently in the two-way Verdict tree opened in the 2026-09-22 commit (Gen4+26).</p>
+<h2 id="2-onetrans-v2-merged-three-recommendation-cascade-stages-into-one-transformer--radar"><span class="num">2</span>OneTrans-V2 merged three recommendation cascade stages into one Transformer — radar</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2609.28589" target="_blank" rel="noopener">arXiv 2609.28589</a> — arXiv, 2026-09-23 v1, paper. The title is &quot;OneTrans-V2: Unifying Retrieval, Pre-rank, and Fine-rank with One Transformer in Industrial Recommender&quot;. There are 15 authors (Hannan Cao·Jun Guo·Haolei Pei et al.), and their affiliation is not explicitly confirmed in the arXiv metadata. No HTML version was published, so email domains or affiliation footnotes cannot be checked directly, and the Semantic Scholar API also returns no author affiliation (checked 2026-09-26). From the name &quot;OneTrans&quot;, the &quot;GMV&quot; metric, and the scale of the MoE (mixture-of-experts structure that computes only some expert layers per input) backbone, we infer this is material from a production team at an e-commerce platform <span class="badge est">inferred</span>.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Industrial recommender systems are mostly served as a 3-stage cascade of candidate generation (retrieval), coarse ranking (pre-rank), and fine ranking (fine-rank). However, because the three stages are trained and served as different models, user sequence encoding is repeated, optimization across stages is isolated, and engineering is duplicated. OneTrans (v1) is an earlier source that attempted model-level unification. The paper states that this V2 adds three things on top of it.</p></div>
+<ol>
+<li>It expanded the MoE backbone.</li>
+<li>It merged per-objective retrieval channels into one generative process with DCGR (Decision-Conditioned Generative Retrieval).</li>
+<li>It amortized lifelong user sequence encoding per impression with SNT (Sequence-Native Training).</li>
+</ol>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Three stages were merged into one Transformer, with three mechanisms added on top</span></p></div>
+<ul>
+<li>All three cascade stages were unified into a single Transformer <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2609.28589" target="_blank" rel="noopener">abstract</a>.<ul>
+<li>The user behavior sequence is encoded only once as shared context, while stage-specific candidate features and computation are kept.</li>
+<li>Joint training lets the three stages reinforce each other, and in-model knowledge distillation flows from fine-rank to pre-rank.</li>
+</ul>
+</li>
+<li>The backbone was expanded to sparse MoE, and scaling was stabilized with μP-style parameterization <span class="badge ok">verified</span>.<ul>
+<li>This is the standard recipe of increasing capacity while holding the activated compute fixed.</li>
+<li>However, this is the first statement in an industrial stack that explicitly adopts μP (parameterization that lets hyperparameters carry over unchanged when model width changes) style hyperparameter transfer.</li>
+</ul>
+</li>
+<li>DCGR (Decision-Conditioned Generative Retrieval) first predicts the type of the upcoming interaction and generates items conditioned on that prediction <span class="badge ok">verified</span>.<ul>
+<li>What it predicts first is the decision prefix, a short token describing the type of the upcoming interaction.</li>
+<li>Instead of keeping several separate per-objective retrieval channels, it unifies them into one generative process, and the business objective steers it through the decision prefix.</li>
+</ul>
+</li>
+<li>SNT (Sequence-Native Training) organizes training around the user&#39;s lifelong behavior sequence, amortizing sequence encoding per impression <span class="badge ok">verified</span>.<ul>
+<li>Instead of recomputing the user representation for every request, it reuses it along the session and impression axes.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The paper states that GMV and throughput rose together in a production A/B test</span></p></div>
+<ul>
+<li><p>In the production A/B test, GMV was up +9.74%, and under the same hardware budget throughput was 3.2× that of the previous cascade <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p>&quot;Deployed across all three stages of a large-scale industrial recommendation system, OneTrans-V2 improves gross merchandise value (GMV) by 9.74% and, with a co-designed serving stack, delivers 3.2× the throughput of the cascade it replaces under the same hardware budget.&quot;
+— <a href="https://arxiv.org/abs/2609.28589" target="_blank" rel="noopener">arXiv 2609.28589 abstract</a></p>
+</blockquote>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added OneTrans-V2 to &quot;New this month&quot; in <a href="radar.html"><code>radar.md</code></a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> An industrial statement that unifies the three cascade stages into one Transformer is rare in itself. This repository&#39;s corpus has two recent production statements on cross-stage unification, and OneTrans-V2 adds a third angle: unifying all three stages into one Transformer. However, which company and which surface it covers is not confirmed.</p></div>
+<ul>
+<li>The earlier two each took a different angle:<ul>
+<li><a href="radar.html#unique-baidu--beihang--cityu--unified-retrieval--ranking-with-single-layer-flat-quantization-in-an-industrial-mobile-feed-recsys-2026-accepted">UNIQUE (Baidu, RecSys 2026)</a> took the angle of combining generative retrieval and target-aware ranking into an early-fusion single architecture.</li>
+<li><a href="radar.html#unirec-kuaishou--aligns-cascade-pre-ranking--ranking-fusion-with-two-stage-joint-learning-app-usage-duration-0616">UniRec (Kuaishou)</a> took the angle of aligning fusion agents for the two stages, pre-rank and rank, through joint learning.</li>
+</ul>
+</li>
+<li>Moreover, the A/B figures, GMV +9.74% and throughput 3.2×, are much larger than in the other two.<ul>
+<li>UniRec reported app usage duration +0.616%, and UNIQUE did not publish A/B figures in its abstract.</li>
+</ul>
+</li>
+<li>There is no HTML version and Semantic Scholar returns no affiliation, so we defer judgment in this batch.</li>
+<li>E-commerce platforms that use the GMV metric (Taobao·JD·Meituan·Pinduoduo·Shopee, etc.) are the most likely candidates <span class="badge est">inferred</span>.</li>
+<li>If an affiliation is confirmed in a later v2 or a conference acceptance notice, we will revisit the canon update.</li>
+</ul>
+<p><strong>The remaining arXiv sources were dropped from the watch list.</strong> Of the 30 items in this arXiv triage, the other 29 did not pass, for the following reasons:</p>
+<ul>
+<li>AgentX (2609.30001, Meituan): a model research framework, that is, a source about a research agent architecture, not a new angle on ranking or retrieval mechanisms themselves.<ul>
+<li>The abstract claims &quot;560 of 636 completed model-changing experiments recorded AUC above their business baselines&quot; and production A/B results of &quot;10-15% acquisition efficiency, 15-20% target-segment advertising spend, 0.3-0.8% watch time&quot;.</li>
+<li>Meituan is not a service this repository tracks as canon.</li>
+<li>It is closer to &quot;how the teams that build real services do research&quot; than to &quot;what real services do,&quot; which is what this repository asks, so it belongs to a different thread.</li>
+</ul>
+</li>
+<li>X-Rec(2609.29180): an academic GR (generative retrieval) source that learns the recommendation distribution in a continuous item embedding space with flow matching. It was dropped because the abstract has no production deployment claim.</li>
+<li>From Interests to Semantic IDs(2609.29983) and Learning Better Reasoning for GR with SIDs(2609.29973): two papers from the same group of authors (Mengdan Zhu·Yufan Zhao et al.). They are academic methods that improve reasoning-trace training for GR based on SIDs (semantic IDs, which represent items as hierarchical codes) and have no production A/B test.</li>
+<li>ScalarLens(2609.29182): a numerical embedding method using the Criteo dataset. It has only academic benchmarks.</li>
+<li>Fair Feed Ranking for Participatory Budgeting(2609.29819): deals with the order in which proposals are shown on the Consul Democracy platform (a participatory budgeting tool). It is outside this repository&#39;s watch scope.</li>
+<li>Cross-Country Code-Mixing for GR(2609.28972): an academic method on cross-country e-commerce GR.</li>
+<li>SEEK(2609.29803): an industrial search evaluation framework. It is a search evaluation tool, not a ranking mechanism itself.</li>
+<li>Decoupled Learning and Selection in Slate Rec(2609.29453): academic theory on slate (a bundle of items shown together on one screen) recommendation with a DP guarantee.</li>
+<li>The other 20 items fall outside this repository&#39;s domain (feed, ranking, retrieval), covering RAG, LLM eval, document search, QA, video search benchmarks, quantum GitHub, and knowledge graphs.</li>
+</ul>
+<h2 id="industry-blogs-are-not-scanned-today-saturday">Industry blogs are not scanned today (Saturday)</h2>
+<p>Under the batch rules, industry blogs are scanned only on Mondays. The latest posts on the Meta and Netflix blogs are unchanged from what was checked yesterday.</p>
+<ul>
+<li>The latest post on engineering.fb.com is 2026-09-23 Private Processing to Meta AI Glasses. It is a security-topic post and was skipped.</li>
+<li>The latest post on netflixtechblog.com is 2026-09-18 Class Path. It is a JVM infrastructure post and was skipped.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check how the verdict matrix is locked per file in the rule golden corpus split into 15 files — the locked verdict matrix is the substance of the policy axis.<ul>
+<li>This is because interstitial (handling that shows content behind a warning screen) and age-gating are new slots in the verdict tree in this generation.</li>
+<li>In particular, look at the case lists of <code>interstitial.rs</code> (334 lines, the largest file) and <code>age_gating.rs</code> (267 lines) in <code>golden_corpus</code>.</li>
+</ul>
+</li>
+<li>Check whether the <code>Hydrator</code> enum grows again — it grew to 17 variants today. Watch whether the next commit attaches a new prediction axis (e.g., an LLM-based content classification hydrator).</li>
+<li>Confirm which field the 34 lines added to the Phoenix proto today are — check the <code>recsys.proto</code> diff in the next batch, and fold it into the canon when a consumer appears.</li>
+<li>Check the OneTrans-V2 author affiliation — if the affiliation is confirmed in a conference acceptance notice or v2, revisit the tracked services list.</li>
+<li>Do a deep dive on Meta VDD Model-Based Retrieval and EvoPilot — they remain in the radar as &quot;Watching (deep dive needed)&quot;. The next batch is a candidate for reading the original text closely.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-25.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-25</span></a><a class="pg-next" href="daily-2026-09-27.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-27</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-26.html" data-title="일일 리포트 2026-09-26"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

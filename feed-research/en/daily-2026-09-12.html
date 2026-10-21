@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-12 — feed-research</title>
+<meta name="description" content="In one line: X's visibility-filtering safety filter raised its backend lookup timeout to 390 ms and now evaluates author-based rules with a cached author id…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-12.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-12.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-12.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-12.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-12 — feed-research">
+<meta property="og:description" content="In one line: X's visibility-filtering safety filter raised its backend lookup timeout to 390 ms and now evaluates author-based rules with a cached author id…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-12.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-12.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-12">2026-09-12</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>31 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-12.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X&#39;s visibility-filtering safety filter raised its backend lookup timeout to 390 ms and now evaluates author-based rules with a cached author id even when the tweet lookup fails.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-safety-filter-waits-longer-on-backends-and-caches-authors-for-failed-lookups--x"><span class="num">1</span>Safety filter waits longer on backends and caches authors for failed lookups — X</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-safety-filter-waits-longer-on-backends-and-caches-authors-for-failed-lookups--x"><span class="num">1</span>Safety filter waits longer on backends and caches authors for failed lookups — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/fee1d0f" target="_blank" rel="noopener">xai-org/x-algorithm@fee1d0f</a> — public source code, 2026-09-10, 33 files, +1587/−391. These notes number X commits after the Gen4 release in sequence; this commit (2026-09-10, fee1d0f) is Gen4+19.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Since the Gen4 release on 2026-08-13, X has mirrored the For You pipeline source code to <a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> about twice a day. visibility-filtering (VF, code in <code>visibility-filtering/</code>) is the gRPC safety filter service of the X home timeline and a Gen3 stack rewritten in Rust. When home-mixer (the service that assembles the For You feed) builds the candidate list, VF fetches tweet metadata and author labels for each candidate from two backends, fills them in, and feeds them to the rule engine. This commit is a medium-sized diff focused on VF; it fixes the time budget and failure handling of the backend lookups and shrinks the author label data structure.</p></div>
+<p>The step in which VF fetches data from the backends and fills it in is called hydration. Tweet metadata comes from TES (Tweet Entity Service, X&#39;s core tweet lookup service). Author labels come from Gizmoduck (the user profile service). Hydration involves three intertwined decisions: how long to wait for the two backends, how far to proceed with verdicts when a lookup fails, and where latency is spent. This commit touched all three.</p>
+<p>The changes fall on two main axes.</p>
+<ul>
+<li>Axis 1 is the hydration time budget and failure handling. The wait time was increased, a path was opened to evaluate author-based rules from the cache even on failure, and recording of where latency is spent began.</li>
+<li>Axis 2 is author label reduction and preparation of a cache primitive. Only the 11 labels the rules use remain, and the new cache is not yet used.</li>
+<li>There are also side changes outside axis 2. The proto constants and model code of the recommendation model, an ads log field, a batch job of the label transparency tool, and the image builder changed.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Unified the wait time for both backends into one 390 ms constant, raising it substantially</span></p></div>
+<ul>
+<li><p>VF&#39;s hydration timeout was replaced by one unified constant, and the timeout of Strato (the X internal system that code goes through to look up or store data) calls rose from 100 ms for TES and 80 ms for Gizmoduck to 390 ms <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs</code></a></p>
+<ul>
+<li><p>Other files covered by the same change: <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/server_deps.rs" target="_blank" rel="noopener"><code>visibility-filtering/server_deps.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/gizmoduck_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/tes_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/tes_hydrator.rs</code></a></p>
+</li>
+<li><p>A new crate-internal constant was added to <code>visibility-filtering/hydration/mod.rs</code>:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) const HYDRATION_TIMEOUT: Duration = Duration::from_millis(390);
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>This constant is used in two layers. The first is the hydrator layer. The client timeout of the TES and Gizmoduck hydrators had been a local constant of 150 ms each since the Gen4 release; both now reference this constant <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>The <code>CLIENT_TIMEOUT</code> of the two hydrators was previously a local constant of 150 ms each, and now both reference <code>crate::hydration::HYDRATION_TIMEOUT</code>.</li>
+</ul>
+</li>
+<li><p>The second is the Strato client layer. The timeout constants hardcoded per service were both replaced by the value of this constant <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>Before: TES 100 ms (<code>TES_STRATO_REQUEST_TIMEOUT_MS: u64 = 100</code>), Gizmoduck 80 ms (<code>GIZMODUCK_STRATO_REQUEST_TIMEOUT_MS: u64 = 80</code>)</li>
+<li>After: both <code>HYDRATION_TIMEOUT.as_millis() as u64</code></li>
+</ul>
+</li>
+<li><p>That is, the timeout that Strato callers actually wait for rose 3.9× and 4.9× for the two services respectively <span class="badge ok">verified</span> (same commit). It is a decision to give the VF service a much more generous latency budget for hydration.</p>
+</li>
+<li><p>Timeout-induced disagreements were possibly observed in the verdict-comparison canary introduced by Gen4+7 (<code>reference_compare.rs</code>, 2026-08-24) <span class="badge est">inferred</span>, and this increase reads as the response to that.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Even when the TES lookup fails, author-based rules are evaluated with the author id left in the cache</span></p></div>
+<ul>
+<li><p>A tweet whose TES lookup fails can now also have its author found through the author id previously recorded in the cache; this fallback is on by default and the default capacity is 1 M entries <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/tes_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/tes_hydrator.rs</code></a> (+234/−42)</p>
+<ul>
+<li>Other files changed with it: <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/mod.rs</code></a> (+49/−9), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/config.rs" target="_blank" rel="noopener"><code>visibility-filtering/config.rs</code></a> (+14)</li>
+</ul>
+</li>
+<li><p>Previously, when a tweet was not found in TES or the lookup failed and the request also carried no author id, that candidate skipped verdict evaluation entirely <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>A TES lookup of one tweet has three outcomes: <code>Found(core_data)</code>, <code>NotFound</code>, <code>Failed(error)</code>.</li>
+<li>In the earlier code, if the result was not <code>Found</code>, there was no <code>PureCoreData</code> for that tweet. If <code>resolve_candidate</code> then could not find <code>raw.request_author_id</code> (the author id home-mixer put in the request, which may be absent), that candidate dropped out of the candidate list altogether.</li>
+</ul>
+</li>
+<li><p>This commit reinforced that case with a cache fallback. An author-id fallback cache field was added to <code>TesHydrator</code> <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>New field definition:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) type AuthorIdFallbackCache = FallbackCache&lt;TweetId, u64&gt;;
+
+pub struct TesHydrator {
+    pub tes_client: Arc&lt;dyn TESClient + Send + Sync&gt;,
+    author_id_cache: Option&lt;AuthorIdFallbackCache&gt;,
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p><code>fetch_pure_core</code> now returns a struct holding both the core data and the author ids recovered from the cache, instead of a <code>HashMap&lt;TweetId, PureCoreData&gt;</code> <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>New return type:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) struct PureCoreHydration {
+    pub(crate) core: HashMap&lt;TweetId, PureCoreData&gt;,
+    pub(crate) recovered_authors: HashMap&lt;TweetId, u64&gt;,
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>If the lookup result is <code>Found</code>, it records (tweet_id, author_id) in the cache and also fills in the core. For <code>NotFound</code> and <code>Failed</code>, it looks up the previous author_id of this tweet in the cache <span class="badge ok">verified</span> (same commit).</p>
+</li>
+<li><p>The priority in which <code>resolve_candidate</code> picks the author id is request, TES core, then cache <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>If the request carries the author id directly, that is used; otherwise it is taken from the TES core if present; otherwise the cache fallback is used. If no author id is obtained from any of the three paths, that candidate skips verdict evaluation.</p>
+</li>
+<li><p>Code:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let author = raw
+    .request_author_id
+    .or_else(|| core.get(&amp;raw.tweet_id).map(|c| c.author_id))
+    .or_else(|| recovered_authors.get(&amp;raw.tweet_id).copied())?;
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>As a result, even if TES is down or does not respond, author-side rules are still evaluated as long as the previous author_id of this tweet is in the cache <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>Author-side rules are the user&#39;s account state (suspended/deactivated/protected/erased/offboarded) and the 11 author user_labels. The 11 are covered in C below.</li>
+</ul>
+</li>
+<li><p>Tweet-side rules cannot be evaluated without the TES core, so they are still skipped <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>Tweet-side rules are nullcast, community-only, NSFW media, takedown reason, exclusive content, and edit control.</li>
+</ul>
+</li>
+<li><p>The fallback settings are exposed through two new environment variables, and when the variables are not set the default is on <span class="badge ok">verified</span> (same commit). In a production deployment it can only be turned off by opt-out, and it is on from the moment of deployment.</p>
+<ul>
+<li><p>Using <code>is_none_or</code>, it is on if the environment variable is absent, and if a value is present, that value is parsed.</p>
+</li>
+<li><p>Code that reads the two environment variables:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn author_id_fallback_enabled() -&gt; bool {
+    std::env::var(&quot;VF_AUTHOR_ID_FALLBACK_ENABLED&quot;)
+        .ok()
+        .is_none_or(|value| parse_env_flag(Some(&amp;value)))
+}
+
+pub(crate) fn author_id_fallback_capacity() -&gt; usize {
+    std::env::var(&quot;VF_AUTHOR_ID_FALLBACK_CAPACITY&quot;)
+        .ok()
+        .and_then(|value| value.trim().parse::&lt;usize&gt;().ok())
+        .filter(|capacity| *capacity &gt; 0)
+        .unwrap_or(1_000_000)
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>At initialization, <code>server_deps.rs</code> leaves these two settings as <code>info!</code> fields <span class="badge ok">verified</span> (same commit). This log is captured per metric in the boot log, so if the actual production values differ, it is detected immediately.</p>
+<ul>
+<li><p>Initialization log:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">info!(
+    hydrator_count = 5,
+    fallback_cache_enabled,
+    author_id_fallback_enabled,
+    author_id_fallback_capacity,
+    home_rule_count,
+    recommendations_rule_count,
+    &quot;VFServer initialized with prod clients&quot;
+);
+</code></pre></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p>A and B are effectively one project. While A allows hydration to take longer by raising the timeout 2.6–4.9×, B builds an automatic fallback path for the case where it still fails.</p>
+<p>This fallback does not reverse the &quot;TesHydrator media fallback cache removed wholesale&quot; observed in Gen4+9 (2026-08-26). The media fallback cached and reused the media information TES returned; this author-id fallback revives the previous value only for tweets TES could not respond for, and makes a partial verdict that evaluates only the author-side rules. In other words, it is the revival of a partial verdict, not the reuse of a result.</p>
+<p>This change reads as narrowing the remaining robustness gaps after the large VF hydration simplification in Gen4+15 (2026-09-04) thinned the code by a net reduction of 800+ lines.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Changed author labels to a data structure that holds only the 11 labels the rules actually use</span></p></div>
+<ul>
+<li><p>The data structure that holds author labels in VF changed from a hash set to an enum representing only 11 labels plus a 64-bit bitset <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/author.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/author.rs</code></a> (+49/−13)</p>
+<ul>
+<li>Other files changed with it: <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/gizmoduck_hydrator.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/gizmoduck_hydrator.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/author_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/author_rules.rs</code></a> (+30/−27), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/context.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/context.rs</code></a></li>
+<li>Since the Gen4 release, VF&#39;s <code>AuthorFeatures</code> had held author labels in a <code>HashSet&lt;LabelValue&gt;</code> (a heap data structure holding 20+ thrift-defined labels).</li>
+<li>This commit removed the existing <code>HashSet&lt;LabelValue&gt;</code> and narrowed it to an <code>AuthorLabel</code> enum with 11 explicit variants and a 64-bit bitset.</li>
+</ul>
+</li>
+<li><p>This reduction is correct because the rules reference only these 11 labels. However, other labels coming from thrift are now explicitly discarded at the input stage and only counted by a counter.</p>
+</li>
+<li><p><code>models/author.rs</code> was rewritten entirely <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>Previous definition:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">use std::collections::HashSet;
+use xai_x_thrift::user_labels::LabelValue;
+
+#[derive(Clone, Debug, Default)]
+pub struct AuthorFeatures {
+    pub is_suspended: bool,
+    // ...
+    pub user_labels: UserLabelSet,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct UserLabelSet {
+    labels: HashSet&lt;LabelValue&gt;,
+}
+</code></pre></figure>
+</li>
+<li><p>New definition:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[derive(Clone, Copy, Debug, Default)]
+pub struct AuthorFeatures {
+    pub is_suspended: bool,
+    // ...
+    pub user_labels: AuthorLabelSet,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u8)]
+pub enum AuthorLabel {
+    NsfwHighRecall,
+    NsfwHighPrecision,
+    NsfwNearPerfect,
+    NsfwAvatarImage,
+    NsfwBannerImage,
+    SpamHighRecall,
+    AbusiveHighRecall,
+    Compromised,
+    ReadOnly,
+    ImpersonationHighPrecision,
+    DoNotAmplify,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct AuthorLabelSet(u64);
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p><code>AuthorLabelSet(u64)</code> is a single integer mapping the 11 variants to individual bits, and insert and has are handled with shift and AND operations <span class="badge ok">verified</span> (same commit).</p>
+</li>
+<li><p>Two new asserts pin the size. <code>AuthorFeatures</code> is exactly 16 bytes, and <code>Option&lt;AuthorFeatures&gt;</code> is also 16 bytes <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>One bool field is used as the <code>Option</code> niche.</p>
+</li>
+<li><p>Asserts that pin the size:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">assert_copy::&lt;AuthorFeatures&gt;();
+assert_eq!(std::mem::size_of::&lt;AuthorFeatures&gt;(), 16);
+assert_eq!(std::mem::size_of::&lt;Option&lt;AuthorFeatures&gt;&gt;(), 16);
+</code></pre></figure>
+</li>
+<li><p>In the earlier <code>HashSet&lt;LabelValue&gt;</code> days, a heap allocation and hash buckets had to be taken every time.</p>
+</li>
+</ul>
+</li>
+<li><p>The label mapping of the Gizmoduck hydrator shrank to a single explicit function <span class="badge ok">verified</span> (same commit). Each <code>LabelValue</code> coming from thrift (an enum of 20+ kinds) passes through this mapping and is narrowed to <code>Option&lt;AuthorLabel&gt;</code>, and if it is <code>None</code>, only a count is incremented.</p>
+<ul>
+<li><p>Mapping function:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn author_label(value: LabelValue) -&gt; Option&lt;AuthorLabel&gt; {
+    match value {
+        LabelValue::NSFW_HIGH_RECALL =&gt; Some(AuthorLabel::NsfwHighRecall),
+        LabelValue::NSFW_HIGH_PRECISION =&gt; Some(AuthorLabel::NsfwHighPrecision),
+        LabelValue::NSFW_NEAR_PERFECT =&gt; Some(AuthorLabel::NsfwNearPerfect),
+        LabelValue::NSFW_AVATAR_IMAGE =&gt; Some(AuthorLabel::NsfwAvatarImage),
+        LabelValue::NSFW_BANNER_IMAGE =&gt; Some(AuthorLabel::NsfwBannerImage),
+        LabelValue::SPAM_HIGH_RECALL =&gt; Some(AuthorLabel::SpamHighRecall),
+        LabelValue::ABUSIVE_HIGH_RECALL =&gt; Some(AuthorLabel::AbusiveHighRecall),
+        LabelValue::COMPROMISED =&gt; Some(AuthorLabel::Compromised),
+        LabelValue::READ_ONLY =&gt; Some(AuthorLabel::ReadOnly),
+        LabelValue::IMPERSONATION_HIGH_PRECISION =&gt; Some(AuthorLabel::ImpersonationHighPrecision),
+        LabelValue::DO_NOT_AMPLIFY =&gt; Some(AuthorLabel::DoNotAmplify),
+        _ =&gt; None,
+    }
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>A new metric <code>vf_author_labels{result=&quot;mapped&quot;|&quot;unmapped&quot;}</code> was added, along with a test that enforces at compile time that the contract does not drift <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>Test:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[test]
+fn dashboard_generator_pins_the_author_labels_metric_name() {
+    // ... asserts dashboard.py contains AUTHOR_LABELS_METRIC = &quot;vf_author_labels&quot;
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>These 11 are exactly 1:1 with the 11 <code>OON_USER_LABEL_DROPS</code> rules folded into the canon in Gen4+13 (7ba7768, 2026-09-01) <span class="badge ok">verified</span> (same commit). That is, only the labels actually referenced by the rules remain, and the rest were removed from the input.</p>
+</li>
+</ul>
+<p class="warn">⚠ Re-checked the canon content. The safety pipeline label list in services/x.md already contained these 11 before. What this commit did was fix that fact into a data structure; it did not add new labels. However, the fact that other <code>LabelValue</code>s defined in thrift (for example <code>NSFW_TEXT_HIGH_PRECISION</code>, <code>NSFW_TEXT_HIGH_RECALL</code>, <code>NSFW_NEW_USER</code>) are explicitly discarded at the hydrator layer is confirmed for the first time by this commit.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. VF now records, for the first time, whether it responded within the caller&#39;s time budget</span></p></div>
+<ul>
+<li><p>VF now records as a metric whether it responded within the gRPC deadline carried in the request, and records request time split into two phases <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/filter_tweets.rs" target="_blank" rel="noopener"><code>visibility-filtering/filter_tweets.rs</code></a> (+42)</p>
+<ul>
+<li>Other files changed with it: <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/filter.rs" target="_blank" rel="noopener"><code>visibility-filtering/filter.rs</code></a> (+6/−1), <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/rules/metrics.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/metrics.rs</code></a></li>
+<li>The deadline metric is <code>filter_tweets_deadline{outcome=within|overrun|absent}</code>, and the two phases are hydration and post_hydration.</li>
+</ul>
+</li>
+<li><p><code>filter_tweets.rs::FilterTweetsEndpoint::filter_tweets</code> parses the standard gRPC <code>grpc-timeout</code> header in the request metadata <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>It supports the unit suffixes <code>H/M/S/m/u/n</code> (hours, minutes, seconds, milli, micro, nano) of the gRPC spec. The number must be at most 8 digits, and any other format yields <code>None</code>.</p>
+</li>
+<li><p>Parsing function:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn parse_grpc_timeout(metadata: &amp;MetadataMap) -&gt; Option&lt;Duration&gt; {
+    let raw = metadata.get(&quot;grpc-timeout&quot;)?.to_str().ok()?;
+    let (digits, unit) = raw.split_at(raw.len().checked_sub(1)?);
+    if digits.is_empty() || digits.len() &gt; 8 || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    let value: u64 = digits.parse().ok()?;
+    let nanos_per_unit = match unit {
+        &quot;H&quot; =&gt; 3_600_000_000_000,
+        &quot;M&quot; =&gt; 60_000_000_000,
+        &quot;S&quot; =&gt; 1_000_000_000,
+        &quot;m&quot; =&gt; 1_000_000,
+        &quot;u&quot; =&gt; 1_000,
+        &quot;n&quot; =&gt; 1,
+        _ =&gt; return None,
+    };
+    Some(Duration::from_nanos(value.checked_mul(nanos_per_unit)?))
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>At the point of a successful response, <code>RequestMetricsGuard::record_deadline(grpc_timeout)</code> is called <span class="badge ok">verified</span> (same commit). Counters count whether the response was within the deadline, exceeded it, or there was no deadline, and histograms record the remaining time and the overrun time.</p>
+<ul>
+<li><p>Recording function:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn record_deadline(&amp;self, grpc_timeout: Option&lt;Duration&gt;) {
+    let Some(deadline) = grpc_timeout else {
+        incr(DEADLINE, &amp;[(&quot;outcome&quot;, &quot;absent&quot;)], 1);
+        return;
+    };
+    let elapsed = self.start.elapsed();
+    if elapsed &lt;= deadline {
+        incr(DEADLINE, &amp;[(&quot;outcome&quot;, &quot;within&quot;)], 1);
+        observe_vm(DEADLINE_REMAINING_MS, &amp;[], millis(deadline - elapsed));
+    } else {
+        incr(DEADLINE, &amp;[(&quot;outcome&quot;, &quot;overrun&quot;)], 1);
+        observe_vm(DEADLINE_OVERRUN_MS, &amp;[], millis(elapsed - deadline));
+    }
+}
+</code></pre></figure>
+</li>
+<li><p>The three counters are <code>filter_tweets_deadline{outcome=within|overrun|absent}</code>, and the two histograms are <code>filter_tweets_deadline_remaining_ms</code> / <code>filter_tweets_deadline_overrun_ms</code>.</p>
+</li>
+</ul>
+</li>
+<li><p>VF now observes for the first time how much slack its own latency had against the deadline given by the caller (home-mixer), whether it overran, or whether it could not be measured <span class="badge ok">verified</span> (same commit).</p>
+</li>
+<li><p><code>filter.rs::FilterTweets::run</code> measures request time in two phases <span class="badge ok">verified</span> (same commit). With the new histogram <code>filter_tweets_phase_ms{stage=&quot;hydration&quot;|&quot;post_hydration&quot;}</code>, it is also possible to observe for the first time how total request latency is allocated between hydration and the rule engine.</p>
+<ul>
+<li><p>Code that measures the two phases:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let started = Instant::now();
+let hydration = self.hydration_pipeline.hydrate(...).await;
+let hydrated_at = Instant::now();
+ft_metrics::record_phase(&quot;hydration&quot;, hydrated_at - started);
+// ... rule engine
+ft_metrics::record_phase(&quot;post_hydration&quot;, hydrated_at.elapsed());
+</code></pre></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p>It is natural for A&#39;s timeout increase and this added observation to ship together. Once the timeout is raised, one needs to see how much it actually rose, and to know in which phase that latency is spent.</p>
+<p>Also, the convention so far that home-mixer puts the standard gRPC <code>grpc-timeout</code> header in the request when calling VF is confirmed in code for the first time in this commit. In earlier commits the timeout was enforced only on the caller side, and the VF service did not read that value.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. A new sharded cache primitive arrived, but nothing uses it yet</span></p></div>
+<ul>
+<li><p>A new 32-way set-associative × 64-shard CLOCK cache primitive arrived in VF, but it is not yet connected anywhere <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/clock_cache.rs" target="_blank" rel="noopener"><code>visibility-filtering/clock_cache.rs</code></a></p>
+<ul>
+<li>Other file changed with it: <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/lib.rs" target="_blank" rel="noopener"><code>visibility-filtering/lib.rs</code></a></li>
+<li><code>visibility-filtering/clock_cache.rs</code> is a new file of 446 lines, registered in <code>visibility-filtering/lib.rs</code> with the single line <code>pub(crate) mod clock_cache;</code>. No code in this commit references this file.</li>
+</ul>
+</li>
+<li><p>The 32-way × 64-shard cache that arrived as the new file <code>clock_cache.rs</code> (446 lines) carries a <code>dead_code</code> attribute that suppresses the compiler warning <span class="badge ok">verified</span> (same commit). From this we infer it has no consumer yet, and which hydrator consumes the cache in <code>clock_cache.rs</code> in the next commit is the thing to watch.</p>
+<ul>
+<li><p>File header:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#![cfg_attr(not(test), expect(dead_code, reason = &quot;TODO: no consumer wired yet&quot;))]
+</code></pre></figure>
+</li>
+<li><p>It tells the compiler explicitly: &quot;In non-test builds, we know this module is dead; do not emit a warning; the reason is that no consumer is attached yet.&quot;</p>
+</li>
+</ul>
+</li>
+<li><p>It takes capacity <code>capacity</code> as an argument, creates <code>set_count = capacity / WAYS</code> sets, and distributes them across 64 shards <span class="badge ok">verified</span> (same commit). One shard holds several sets, and one set holds 32 slots (ways).</p>
+<ul>
+<li><p>The value stored in a slot is the tuple <code>(key: u64, generation: u64, value: Option&lt;V&gt;)</code>.</p>
+</li>
+<li><p>Main definitions:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const WAYS: usize = 32;
+const SHARDS: usize = 64;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Lookup&lt;V&gt; {
+    Miss,      // key is not even registered in this cache
+    NotFound,  // registered but the value is None (e.g., the backend returned NotFound)
+    Found(V),
+}
+
+pub(crate) struct ClockCache&lt;V&gt; { /* shards, set_count, next_generation */ }
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>The CLOCK algorithm runs as follows <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>Insert (<code>insert(generation, key, value)</code>): if the same key already exists and the stored generation is larger, it is skipped. This is to keep an old value from overwriting a new one. Otherwise it overwrites in place and marks it <code>Mark::Referenced</code>. If the key is absent, the hand rotates, decaying <code>Referenced → Cold</code>, and inserts at the first <code>Cold</code> or <code>Empty</code> slot it meets.</li>
+<li>Lookup (<code>get(key)</code>): if it finds the same key, it promotes it to <code>Mark::Referenced</code> and returns <code>Lookup::Found(value)</code>. If absent it is <code>Miss</code>, and if the stored value is <code>None</code> it is <code>NotFound</code>.</li>
+<li>Generation: for each request, <code>begin_request() -&gt; u64</code> assigns a monotonic value. This value decides whether a later request may overwrite an older cache value.</li>
+</ul>
+</li>
+<li><p>This cache is a primitive separate from the existing <code>FallbackCache</code> <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>The existing <code>FallbackCache</code> is <code>hydration/fallback_cache.rs</code>, folded into the canon in Gen4, and is a TinyLFU based on <code>moka::sync::Cache</code> protected by a single mutex.</li>
+</ul>
+</li>
+<li><p>The two caches differ in locking unit, replacement policy, slot layout, value type, and concurrency <span class="badge ok">verified</span> (same commit).</p>
+</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Axis</th>
+<th>Existing FallbackCache (moka and Mutex)</th>
+<th>New ClockCache</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Locking unit</td>
+<td>One Mutex for the whole cache</td>
+<td>One Mutex per shard (64)</td>
+</tr>
+<tr>
+<td>Replacement policy</td>
+<td>TinyLFU (probabilistic frequency)</td>
+<td>CLOCK (Referenced ↔ Cold decay)</td>
+</tr>
+<tr>
+<td>Slot layout</td>
+<td>Dynamic hash map</td>
+<td>Fixed 32-way set-associative array</td>
+</tr>
+<tr>
+<td>Value type</td>
+<td>Arbitrary (Clone)</td>
+<td><code>Copy</code> constraint (suited to values around the size of u64)</td>
+</tr>
+<tr>
+<td>Concurrency</td>
+<td>Can bottleneck on one mutex</td>
+<td>Mostly non-blocking with 64-way sharding</td>
+</tr>
+</tbody></table></div>
+<p>That is, it reads as a new hot-path cache that is far more resistant to write throughput and lock contention. The main thing to watch is which hydrator (TES author_id? Gizmoduck AuthorFeatures? SafetyLabel expiring cache?) it connects to as a backend in the next commit.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. In the Phoenix ranker proto, two surface constants and one behavior aggregation type got names</span></p></div>
+<ul>
+<li><p>In the ranking wire proto of Phoenix (the Grok-based Transformer ranker), surface constants for Trend and Explore Spotlight and an aggregation constant for long-dwell immersive behavior were newly added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a></p>
+<ul>
+<li>Other file changed with it: <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/python/common/xai-proto/proto/recsys.proto</code></a></li>
+<li>The new constants are the two surface constants <code>TREND_PAGE</code> and <code>EXPLORE_SPOTLIGHT</code> and the action aggregation constant <code>IMMERSIVE_LONG_DWELL</code>.</li>
+<li>As enum values, they are two <code>ProductSurface</code> values (<code>TREND_PAGE=16</code>, <code>EXPLORE_SPOTLIGHT=17</code>) and <code>UserActionAggregationType::IMMERSIVE_LONG_DWELL=29</code>.</li>
+</ul>
+</li>
+<li><p>Numbers 16 and 17 of the <code>ProductSurface</code> enum got the names of the Trend surface and the Explore Spotlight surface respectively (previously <code>PLACEHOLDER_16</code> and <code>PLACEHOLDER_17</code>) <span class="badge ok">verified</span> (same commit). The two surfaces were added after the 15 constants folded into the canon in Gen4+3.</p>
+<ul>
+<li><p>Changed enum:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-protobuf" data-lang="protobuf">enum ProductSurface {
+  // ... 1-15 as before
+  PRODUCT_SURFACE_HOME_TIMELINE_RANKED_FOLLOWING = 15;
+  PRODUCT_SURFACE_TREND_PAGE = 16;
+  PRODUCT_SURFACE_EXPLORE_SPOTLIGHT = 17;
+  PRODUCT_SURFACE_PLACE_HOLDER_18 = 18;
+  PRODUCT_SURFACE_PLACE_HOLDER_19 = 19;
+  PRODUCT_SURFACE_PLACE_HOLDER_20 = 20;
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>There is no actual home-mixer connection yet, so no code in this commit puts these two constants into Phoenix for ranking <span class="badge ok">verified</span> (same commit). For now it is only a signal that the proto slots are ready.</p>
+</li>
+<li><p>In <code>UserActionAggregationType</code>, the previous <code>PLACEHOLDER_29</code> got the name <code>IMMERSIVE_LONG_DWELL = 29</code> <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>Changed enum:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-protobuf" data-lang="protobuf">enum UserActionAggregationType {
+  // ...
+  IMMERSIVE = 26;
+  ADS_CHAD_WITH_CONV_TYPES = 27;
+  ADS_WITH_KV_AD_HISTORY = 28;
+  IMMERSIVE_LONG_DWELL = 29;
+  PLACEHOLDER_30 = 30;
+  // ...
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>Separately from the existing <code>IMMERSIVE = 26</code> (aggregation of interaction sequences on the immersive surface), immersive interactions with long dwell time can now be split into a separate aggregation type <span class="badge ok">verified</span> (same commit).</p>
+</li>
+<li><p>Which training config consumes this new aggregation does not appear in this commit <span class="badge ok">verified</span> (same commit).</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">G. The user tower of the two-tower model now uses a separate segment ID for padding positions</span></p></div>
+<ul>
+<li><p>The user tower of the two-tower model (a retrieval model structure that embeds the user side and the candidate side separately) was changed to use a separate segment ID for padding positions <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/phoenix/xrex/models/recsys_two_tower_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_two_tower_model.py</code></a> (+15/−4)</p>
+<ul>
+<li>It uses <code>PADDING_SEGMENT_ID</code> for padding positions and <code>HISTORY_SEGMENT_ID</code> for real history positions. It changed from the earlier all-zero to one that reflects the mask.</li>
+</ul>
+</li>
+<li><p>The earlier <code>user_tower_segment_ids</code> logic had two branches <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>If <code>use_history_segment_ids=True</code>, it filled the whole array with <code>HISTORY_SEGMENT_ID</code>. This is an inaccurate approach that treats even padding as the same segment as history.</p>
+</li>
+<li><p>If <code>False</code>, it treated every position as 0 with <code>jnp.zeros</code>. RoPE (rotary position encoding) and attention bias were computed even at padding positions.</p>
+</li>
+<li><p>Earlier code:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def user_tower_segment_ids(batch: int, seq_len: int, *, use_history_segment_ids: bool) -&gt; jax.Array:
+    if use_history_segment_ids:
+        return jnp.full((batch, seq_len), HISTORY_SEGMENT_ID, dtype=jnp.int32)
+    return jnp.zeros((batch, seq_len), dtype=jnp.int32)
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>When padding_mask is passed in, the new logic mixes <code>HISTORY_SEGMENT_ID</code> and <code>PADDING_SEGMENT_ID</code> according to the mask value <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>Later code:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def user_tower_segment_ids(
+    batch: int,
+    seq_len: int,
+    *,
+    use_history_segment_ids: bool,
+    padding_mask: jax.Array | None = None,
+) -&gt; jax.Array:
+    if use_history_segment_ids:
+        return jnp.full((batch, seq_len), HISTORY_SEGMENT_ID, dtype=jnp.int32)
+    if padding_mask is None:
+        return jnp.zeros((batch, seq_len), dtype=jnp.int32)
+    return jnp.where(padding_mask, HISTORY_SEGMENT_ID, PADDING_SEGMENT_ID).astype(jnp.int32)
+</code></pre></figure>
+</li>
+<li><p>Call site:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">user_segment_ids = user_tower_segment_ids(
+    B, T,
+    use_history_segment_ids=self.config.use_history_segment_ids,
+    padding_mask=user_padding_mask,
+)
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>Now the user tower&#39;s attention, RoPE, and attention bias are computed so that padding positions are distinguished from real history <span class="badge ok">verified</span> (same commit). It is a correctness fix in the same direction as &quot;native support for variable-length history in the FA4 attention kernel&quot; folded into the canon in Gen4+15 (2026-09-04, 9b0dc31).</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">H. The ads injection log now carries an ads blender label</span></p></div>
+<ul>
+<li><p>A field that records the ads blender label was added to home-mixer&#39;s ads injection log <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/home-mixer/side_effects/ads_injection_logging_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/ads_injection_logging_side_effect.rs</code></a> (+5/−1)</p>
+<ul>
+<li><p>The field name is <code>ads_blender</code>, and the diff is short:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">ads_blender: match query.request_type {
+    RequestType::Following =&gt; &quot;following&quot;.to_string(),
+    _ =&gt; query.params.get(AdsBlenderType),
+},
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>The <code>ads_blender</code> value attached to the ads injection log payload is determined by request type. For <code>RequestType::Following</code> it uses the hardcoded <code>&quot;following&quot;</code>, and only on other surfaces does it look up the <code>AdsBlenderType</code> feature-switch param <span class="badge ok">verified</span> (same commit).</p>
+</li>
+<li><p>Following the five ads blenders introduced by Gen4+10 (2026-08-28, 24c6094), a separate blender label <code>&quot;following&quot;</code> for the Following surface formally enters the logging axis <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>The five blenders are <code>safe_gap</code>, <code>partition_organic</code>, <code>partition_organic_low_risk</code>, <code>time_gap</code>, and <code>multi_risk</code>.</li>
+</ul>
+</li>
+<li><p>Whether this is a sixth blender, or the Following surface goes through a separate pipeline outside the five blenders so that only the label is captured in logging, cannot be confirmed from this diff alone <span class="badge est">inferred</span>. The latter fits the code flow better <span class="badge est">inferred</span>. Skipping the param lookup entirely reads as a sign of different pipelines.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">I. The label transparency tool (UTH) gets a daily per-country account takedown batch, and label aggregates get a country field</span></p></div>
+<ul>
+<li><p>A daily batch job for per-country account takedowns was newly added to the Under-The-Hood (UTH, X&#39;s label transparency tool) data pipeline <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/under-the-hood/scalding/UthPctdAccountTakedownEventsJob.scala" target="_blank" rel="noopener"><code>under-the-hood/scalding/UthPctdAccountTakedownEventsJob.scala</code></a></p>
+<ul>
+<li>The job name is <code>UthPctdAccountTakedownEventsJob</code>, and the new batch job is 143 lines.</li>
+</ul>
+</li>
+<li><p>A <code>countryCodes</code> field was added to the UTH label aggregate <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/under-the-hood/thrift/uth_serving.thrift" target="_blank" rel="noopener"><code>under-the-hood/thrift/uth_serving.thrift</code></a></p>
+</li>
+<li><p><code>under-the-hood/</code> is the backend of the transparency tool for users&#39; personal account and post labels that X exposes at <a href="https://x.com/i/under_the_hood" target="_blank" rel="noopener">x.com/i/under_the_hood</a> <span class="badge ok">verified</span> (same commit).</p>
+</li>
+<li><p>The batch job joins two sources <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><code>AuditServicePctdActionsScalaDataset</code> is the PCTD (post and content takedown) action log. It keeps only entries that are of account type, were successfully taken down, and have a country: <code>.filter { a =&gt; a.type == PctdActionType.User &amp;&amp; a.takendown &amp;&amp; a.countryCode.nonEmpty }</code>.</li>
+<li><code>UsersourceScalaDataset</code> is <code>user.takedowns.takedownCountryReasons</code> of the user snapshot. The reasons are converted as <code>TakedownReason::LegalRequest → &quot;LEGAL_REQUEST&quot;</code>, <code>BystanderReport → &quot;BYSTANDER_REPORT&quot;</code>, <code>Dmca → &quot;DMCA&quot;</code> (country hardcoded as <code>&quot;xy&quot;</code>, no country information), and <code>UnspecifiedReason → &quot;UNSPECIFIED&quot;</code>.</li>
+</ul>
+</li>
+<li><p>If several reasons are captured for the same (userId, country), the one with the lower priority value is kept <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>Priority table:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">private val ReasonPriority = Map(
+  &quot;LEGAL_REQUEST&quot; -&gt; 0,
+  &quot;BYSTANDER_REPORT&quot; -&gt; 1,
+  &quot;DMCA&quot; -&gt; 2,
+  &quot;UNSPECIFIED&quot; -&gt; 3
+)
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>The result is written as <code>UthAccountTakedownEvent(userId, day, reason, country)</code> to a partitioned parquet at <code>daily_account_takedowns/YYYY/MM/DD</code> <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>Default reducers are 50, default usersourceSnapshotMaxAgeDays is 10, and cross-DC snapshot access (<code>AllowCrossDC</code>) is allowed.</li>
+<li>Test accounts are excluded by the test user filter (<code>TestUserFilter.isTestUserId</code>).</li>
+</ul>
+</li>
+<li><p>At the same time, two structs in <code>uth_serving.thrift</code> gain a country field <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li><p>Changed structs:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-thrift" data-lang="thrift">struct UthPostLabelAggregate {
+  1: optional string label (personalDataType = &#39;TweetSafetyLabels&#39;)
+  2: optional list&lt;UthDayCarriedRemoved&gt; days
+  3: optional list&lt;string&gt; countryCodes  // NEW
+}
+
+struct UthAccountLabelAggregate {
+  1: optional string label (personalDataType = &#39;UserSafetyLabels&#39;)
+  2: optional list&lt;i32&gt; activeDays
+  3: optional list&lt;string&gt; countryCodes  // NEW
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>In sum, the UTH transparency tool gains two new things <span class="badge ok">verified</span> (same commit).</p>
+<ul>
+<li>It now has its own dataset of daily event logs of when, in which country, and for which reason each account was taken down.</li>
+<li>It is ready to expose a country code list in the label aggregate.</li>
+</ul>
+</li>
+<li><p>This change pairs with Gen4+12 (2026-09-01, 6384ca7), where the 16 countries subject to NSFW gating were stated explicitly in code for the first time. It reads as a plan to let users see in UTH which label was active in which country. We are watching whether per-country filters or displays appear on the UTH screen.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The Safety-label expiring cache reserves the capacity to use in advance at initialization, avoiding reallocation on the first insert <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/safety_label_source/expiring_cache.rs" target="_blank" rel="noopener"><code>visibility-filtering/safety_label_source/expiring_cache.rs</code></a><ul>
+<li><code>ExpiringCache::with_clock</code> calls <code>cache.reserve(capacity)</code> at initialization.</li>
+</ul>
+</li>
+<li>The dead keyed-result path was removed from the hydration metrics code, and a new author label aggregation helper was added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/metrics.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/metrics.rs</code></a><ul>
+<li><code>hydration/metrics.rs</code> +21/−154: <code>timed_keyed_rpc</code>, <code>KeyedResultCounts::from_results</code>, and <code>outer_timeout</code> were removed.</li>
+<li>After the batch unification in Gen4+15 (9b0dc31, 2026-09-04), this keyed-result path was dead code.</li>
+<li>The new helper is <code>record_author_labels(mapped, unmapped)</code>.</li>
+</ul>
+</li>
+<li>The motion-reveal thumbnail generation in grox (the Grok-based nearline classifier sub-repo) was refined to take more frames and pass them through alignment, denoise, and color verification stage by stage <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/grox/libs/video_tools/image.py" target="_blank" rel="noopener"><code>grox/libs/video_tools/image.py</code></a> (+288/−25)<ul>
+<li>Thumbnail generation creates a single-frame highlight from a video. Two stages, ECC affine alignment and Farneback optical flow refinement, were added to the motion-reveal image builder (the video → highlight frame generator) that handles this.</li>
+<li>In sum, the changes are a 32 → 48 frame cap, ECC affine alignment, Farneback optical flow refinement, weighted median, and an LAB skin color plausibility gate.</li>
+<li><code>_MOTION_REVEAL_MAX_INPUT_FRAMES</code> changed from 32 to 48, and six new helpers were added.<ul>
+<li><code>_ecc_align</code>: aligns the affine transform with <code>cv2.findTransformECC</code>.</li>
+<li><code>_is_static</code>: decides whether a frame is static with <code>cv2.phaseCorrelate</code>. A frame is static if both the shift magnitude and the phase correlation response are at or below the threshold.</li>
+<li><code>_dense_align_residual</code>: finely aligns the residual with Farneback dense optical flow.</li>
+<li><code>_weighted_median</code>: computes the per-pixel weighted median of the overlay shifted after alignment.</li>
+<li><code>_native_chroma</code>: computes the median chroma coordinate of the brightest 30% of pixels in the LAB color space.</li>
+<li><code>_skin_plausible</code>: a gate that checks whether the overlay&#39;s chroma median is within a distance of 12 on the skin-color axis. If false, it prevents the false positive of a skin overlay.</li>
+</ul>
+</li>
+<li>The <code>PlanSafetyPtosSpecialVideo</code> DAG, which was folded into the canon in Gen4+12 (2026-09-01), consumes these motion-reveal frames, so this refinement likely directly affects the verdict quality of that DAG <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>The feature-switch defaults mirror in <code>home-mixer/params/param.rs</code> has no substantive change other than its timestamp being updated from <code>2026-09-09T16:23:17Z</code> to <code>2026-09-10T16:21:03Z</code>.</li>
+</ul>
+<blockquote>
+<p>&quot;pub(crate) const HYDRATION_TIMEOUT: Duration = Duration::from_millis(390);&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener">visibility-filtering/hydration/mod.rs:28</a>, 2026-09-10</p>
+</blockquote>
+<blockquote>
+<p>&quot;let author = raw.request_author_id.or_else(|| core.get(&amp;raw.tweet_id).map(|c| c.author_id)).or_else(|| recovered_authors.get(&amp;raw.tweet_id).copied())?;&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/fee1d0f/visibility-filtering/models/mod.rs" target="_blank" rel="noopener">visibility-filtering/models/mod.rs:45-49</a>, 2026-09-10</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a>, a new <code>### Gen4+19</code> subsection was created under the <code>## Safety</code> section listing ten axes, A–J, and the last updated date at the top of the document was moved from 2026-09-11 to 2026-09-12. B (AuthorId fallback) and D (gRPC deadline observation) are new data points for the safety pipeline, so they were explicitly folded into the canon. F (TREND_PAGE, EXPLORE_SPOTLIGHT, IMMERSIVE_LONG_DWELL) and G (padding segment ID) are changes to the ranking wire and training configuration, so they were folded in as well. E (the <code>clock_cache</code> primitive) is not yet connected, but a consumer is expected to attach in the next commit, so it was documented explicitly.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This commit raises the verdict success rate by extending the timeout and opens a partial-verdict path, gaining robustness through partial-open instead of fail-open (passing content through when a verdict fails). It continues the line of visibility-filtering robustness improvements that has run since the Gen4 release, and Gen4+19 adds a higher timeout budget, a fallback cache, a smaller label data structure, and phase observation on top of it.</p></div>
+<p>The main milestones of this line so far are as follows:</p>
+<ul>
+<li>Shadow deployment mirroring in Gen4+4 (2026-08-19, <code>dark_traffic_setup.rs</code>)</li>
+<li>A verdict-comparison canary in Gen4+7 (2026-08-24, <code>reference_compare.rs</code>)</li>
+<li>The rules restructuring in Gen4+13 (2026-09-01, 7ba7768)</li>
+<li>The hydration simplification with a net reduction of 800 lines in Gen4+15 (2026-09-04, 9b0dc31)</li>
+</ul>
+<p class="warn">⚠ Claim changed: none to update. This diff overturns no earlier canon statement, and caveat list #1 in the canon (this repository&#39;s canon document), that VF is fail-closed, is still valid. A tweet that could not be judged because hydration failed is still skipped, and the author fallback only turns what used to be skipped into a partial verdict.</p>
+<h2 id="radar">Radar</h2>
+<p>Added one Kuaishou cascade recommendation paper to &quot;New this month&quot; in <a href="radar.html">radar.md</a>. The UniRec proposed in the paper is a method that aligns the fusion of the pre-ranking and ranking stages of a cascade recommender through joint learning of the two stages, and in the Kuaishou production A/B it raised app usage duration by +0.616% <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2609.11052" target="_blank" rel="noopener">arXiv 2609.11052</a>, submitted 2026-09-10.</p>
+<ul>
+<li>The problem it addresses is that the cascade stages of industrial recommendation (pre-ranking, ranking) are optimized separately under different objectives, feature spaces, and latency constraints <span class="badge ok">verified</span> (same paper). The upstream filters out items the downstream prefers, and the downstream fusion offsets upstream improvements.</li>
+<li>The two fusion agents share part of the input embedding and are trained together in a single computation graph, so gradients flow between stages <span class="badge ok">verified</span> (same paper).</li>
+<li>Dual-axis preference alignment works in two directions <span class="badge ok">verified</span> (same paper).<ul>
+<li>Vertical: transfers downstream pairwise preference to the upstream fusion score.</li>
+<li>Horizontal: recasts dozens of pairwise objectives over heterogeneous prior signals as bidirectional preference evidence.</li>
+</ul>
+</li>
+<li>In addition, attribute group-relative regularization suppresses the side effect of unconstrained end-to-end fusion over-concentrating on particular attribute groups <span class="badge ok">verified</span> (same paper).</li>
+<li>In a 21-day production A/B, app usage time showed a +0.616% relative gain, and the model was fully deployed on the Kuaishou platform <span class="badge ok">verified</span> (same paper).</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><p>In the next commit, we look at how the new cache and the longer timeout are actually used, and where the new proto constants and the country field of the transparency tool get connected.</p>
+<ul>
+<li>Check where <code>clock_cache</code> is actually used: the next commit should show which of the TES author_id, Gizmoduck AuthorFeatures, and SafetyLabel expiring cache three is replaced by this new primitive. Whether <code>fallback_cache.rs</code> is replaced by clock_cache or attached to a separate hot path is also something to watch.</li>
+<li>See how the <code>HYDRATION_TIMEOUT</code> of 390 ms actually behaves: once the new <code>filter_tweets_phase_ms{stage=&quot;hydration&quot;}</code> histogram and <code>filter_tweets_deadline_overrun_ms</code> appear on production dashboards, the real P50 and P99 latency distributions and the overrun rate become known. It would help to confirm in code the gRPC deadline value that home-mixer passes to VF. For now only the code that parses the <code>grpc-timeout</code> header has been confirmed, and the actual value is not public.</li>
+<li>See where the <code>TREND_PAGE</code> and <code>EXPLORE_SPOTLIGHT</code> surfaces get connected: the proto slots are open, so gRPC endpoints or candidate pipelines for these surfaces may appear in home-mixer in the next commit. The relationship to <code>xrecsys_search</code> (the search ranking config introduced in Gen4+4) is also something to watch.</li>
+<li>See where the <code>IMMERSIVE_LONG_DWELL</code> event is defined: check where code that builds this aggregation from a dwell time threshold on immersive surfaces appears in grox or home-mixer. Also check whether the training config consumes this aggregation.</li>
+<li>See whether country-level takedown information appears on the UTH screen: watch whether a country filter or a country display on labels appears at <a href="https://x.com/i/under_the_hood" target="_blank" rel="noopener">x.com/i/under_the_hood</a>. How the explicit 16-country NSFW codes in Gen4+12 and this UTH country field expansion combine on the user screen is the next thing to watch.</li>
+<li>Keep looking for the actual use of <code>Action::Downrank</code>: it is an open question left by the Gen4+18 commit, and it still does not appear in this commit.</li>
+<li>See whether header-image-prompt-ad enters the ads blender: this is an open question left by the Gen4+18 commit. The <code>ads_blender</code> labeling expansion (H) in this commit is a related piece. The fact that the <code>following</code> label explicitly takes a special path suggests that the new ad format may also take a per-surface blender branch <span class="badge est">inferred</span>.</li>
+</ul>
+<p>Lookup failed: none.</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-11.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-11</span></a><a class="pg-next" href="daily-2026-09-13.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-13</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-12.html" data-title="일일 리포트 2026-09-12"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

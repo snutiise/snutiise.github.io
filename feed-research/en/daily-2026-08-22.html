@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-08-22 — feed-research</title>
+<meta name="description" content="In one line: The X For You ranking stage can now consume the re-ranking slate context that the Phoenix ranking model computes at serving time. The gate that…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-08-22.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-08-22.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-08-22.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-08-22.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-08-22 — feed-research">
+<meta property="og:description" content="In one line: The X For You ranking stage can now consume the re-ranking slate context that the Phoenix ranking model computes at serving time. The gate that…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-08-22.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-08-22.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-08-22">2026-08-22</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>25 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-08-22.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b> (services/x.md, radar.md)</li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>The X For You ranking stage can now consume the re-ranking slate context that the Phoenix ranking model computes at serving time. The gate that turns on this path is false by default.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">12</span></summary><ol><li><a href="#1-for-you-ranking-can-receive-slate-context-from-phoenix-serving--x"><span class="num">1</span>For You ranking can receive slate context from Phoenix serving — X</a><ol><li><a href="#a-hydrator-that-attaches-ai-trend-labels-to-original-posts-in-for-you-was-added">A hydrator that attaches AI trend labels to original posts in For You was added</a></li><li><a href="#the-ranking-stage-consumes-the-slate-context-that-phoenix-computed-at-serving">The ranking stage consumes the slate context that Phoenix computed at serving</a></li><li><a href="#the-core-logic-of-the-embedding-table-loader-was-separated-from-the-python-bindings">The core logic of the embedding table loader was separated from the Python bindings</a></li><li><a href="#the-share-of-calls-sent-to-grok-46-at-two-judge-call-sites-rose-from-01-to-03">The share of calls sent to Grok 4.6 at two judge call sites rose from 0.1 to 0.3</a></li><li><a href="#grok-streaming-responses-can-now-be-cut-off-midway-when-a-condition-is-met">Grok streaming responses can now be cut off midway when a condition is met</a></li><li><a href="#grok-classifiers-can-now-reference-the-authors-profile-image">Grok classifiers can now reference the author&#39;s profile image</a></li><li><a href="#summary-of-the-six-directions-in-this-commit-gen45-d0cef2f">Summary of the six directions in this commit (Gen4+5, d0cef2f)</a></li></ol></li><li><a href="#2-onemodel-unified-ranking-across-three-surfaces-organic-ads-and-merchant--xiaohongshu"><span class="num">2</span>OneModel unified ranking across three surfaces: organic, ads, and merchant — Xiaohongshu</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>X added a path in the same commit that attaches an AI trend label to original posts in For You. It is off by default.</li>
+<li>In the same commit, the share of child-safety cross-model validation and deluxe 4.3 category reclassification calls sent to Grok 4.6 rose from 0.1 to 0.3.</li>
+<li>The Xiaohongshu OneModel paper, which unifies three surfaces (organic recommendation, ads, and store) into one ranker, was added to the radar with production A/B results.</li>
+</ul>
+<h2 id="1-for-you-ranking-can-receive-slate-context-from-phoenix-serving--x"><span class="num">1</span>For You ranking can receive slate context from Phoenix serving — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/d0cef2f" target="_blank" rel="noopener">xai-org/x-algorithm @ d0cef2f — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-20 20:22 UTC, public source code. These notes number X commits after the Gen4 release in order, and this commit is Gen4+5. It changed 14 files, at a scale of +479/−200, which is about 1/7 the scale of Gen4+4 (2026-08-19, aad7179, 79 files +3.3k/−0.7k).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> After the Gen4 release, follow-up releases have continued in the X repository on a daily commit rhythm. The order is 8/14 Gen4+1 (c65aa17) → 8/17 Gen4+2 (b089ce6) → 8/18 Gen4+3 (11a71f8) → 8/19 Gen4+4 (aad7179, large). What the canon (this repository&#39;s canon documents) had folded in from Gen4 through Gen4+4 went only as far as &quot;proto and config are ready.&quot; The 8/20 commit is small because it follows the large expansion of Gen4+4, but it is the first commit in which two scaffoldings that Gen4+4 had only prepared in proto and config reach the actual serving and ranking pipeline.</p></div>
+<ul>
+<li>What Gen4+4 prepared: the new <code>SlateContext.sid*</code> fields in the Phoenix (X For You&#39;s ranking model) proto, the new <code>RewardOutputs</code>, and the <code>xrecsys_search</code> config.</li>
+<li>This commit is the first place in the code where <code>SlateContext</code> is confirmed to flow along the Phoenix prediction response into home-mixer (the service that assembles the For You feed).</li>
+</ul>
+<p>Three concepts are new in this commit:</p>
+<ul>
+<li>AI trend is an item that appears on X&#39;s &quot;Trending&quot; surface (events many people are talking about).<ul>
+<li>Before this commit, the home-mixer pipeline had no logic that attached an &quot;AI trend&quot; label to tweets.</li>
+<li>Strato is the internal system that X code goes through to look up or store data.</li>
+<li>An upstream pipeline in which Grok looks at a tweet, decides which AI trend it belongs to, and stores the result in Strato likely existed (the <code>batch_get_tweet_ai_trend</code> API), but that pipeline is outside this repository <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>SlateContext is the context vector that each slot holds in a DPP (a diversity technique that selects items as a set so that the score drops when similar items are picked together) re-ranking slate.<ul>
+<li><code>k</code> is the slot index, <code>pool_rank</code> is the rank in the original score ordering, and <code>pool_rank_gap</code> is the pool rank difference from the slot above.</li>
+<li><code>fatigue</code>, <code>pre_diversity_score</code>, and <code>sid_known</code> are added to these.</li>
+<li><code>sid_k_l1/l2/l3</code> hold the slot index for each of the three SID (semantic ID, a token sequence that represents an item as hierarchical codes) layers.</li>
+<li><code>sid_gap_l1/l2/l3</code> hold the inter-slot gap for each SID layer.</li>
+<li>It is the same field set as when seven SID fields were added to VMRanker (the service that handles DPP slate reordering) in the 8/18 commit, Gen4+3.</li>
+</ul>
+</li>
+<li>The served slate context is a schema field in which the Phoenix serving response returns, for each candidate, the material used for re-ranking.<ul>
+<li>The material is the pool rank, fatigue, pre-diversity score, three SID layers, and three SID gap layers.</li>
+<li>In the Gen4+4 proto it was only defined; this commit connected the consumption path.</li>
+</ul>
+</li>
+</ul>
+<h3 id="a-hydrator-that-attaches-ai-trend-labels-to-original-posts-in-for-you-was-added">A hydrator that attaches AI trend labels to original posts in For You was added</h3>
+<p>This commit adds a new stage that selects standalone original posts among For You candidates and attaches AI trend labels <span class="badge ok">verified</span>. At most 2 labels are attached per page, and the gate that turns on this stage is false by default <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>A hydrator that fills AI trend information into candidate posts was added as a new 157-line file <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs</code></a>.</p>
+<ul>
+<li>The pipeline wiring is at <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:424-428</code></a>.</li>
+<li>It was added right after the existing <code>TopicFeedbackContextHydrator</code>, side by side. Topic feedback context is a context label used to infer the user&#39;s topics of interest.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">Box::new(TopicFeedbackContextHydrator { strato_client: strato_client.clone() }),
+Box::new(AiTrendFeedbackContextHydrator { strato_client: strato_client.clone() }),
+</code></pre></figure>
+</li>
+<li><p>This hydrator runs only when all three gate conditions are met <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs#L59-L63" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:59-63</code></a>.</p>
+<ul>
+<li>The gate parameter <code>rust_home_mixer_enable_ai_trend_feedback_context</code> must be on. It is false by default.</li>
+<li>The request must not be a topic request (so that it does not overlap the topic surface).</li>
+<li>The request must not be for the Following surface (requests that receive only posts from followed accounts). This condition applies per request and does not check whether a candidate is from a followed account.</li>
+<li>The hydrate loop (L65-75) also filters only by the original-post condition below, so candidates from followed accounts that are mixed into a For You request are also targets.</li>
+<li>It is not wired into the Following pipeline.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">query.params.get(EnableAiTrendFeedbackContext)
+    &amp;&amp; !query.is_topic_request()
+    &amp;&amp; !query.in_network_only
+</code></pre></figure>
+</li>
+<li><p>Candidates pass a four-part condition that keeps only the &quot;standalone original post&quot; <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs#L19-L24" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:19-24</code></a>.</p>
+<ul>
+<li>A candidate is dropped if it is a reply, is a retweet, has a conversation ancestor, or is a post that a followed user replied to. Meeting any one of the four drops it.</li>
+<li>In effect, AI trend labels can be attached only to original posts that are not replies, reposts, posts with conversation ancestors, or posts that followed users replied to. Whether a post is a quote post is not checked.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn is_eligible_original_post(candidate: &amp;PostCandidate) -&gt; bool {
+    candidate.in_reply_to_tweet_id.is_none()
+        &amp;&amp; candidate.retweeted_tweet_id.is_none()
+        &amp;&amp; candidate.ancestors.is_empty()
+        &amp;&amp; candidate.following_replied_user_ids.is_empty()
+}
+</code></pre></figure>
+</li>
+<li><p>The Top-2 trends are chosen by candidate frequency, and one candidate is picked at random per trend to receive the label <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>ai_trend_feedback_context_hydrator.rs:24-52</code></a>.</p>
+<ul>
+<li>The procedure has five steps.<ol>
+<li>For each candidate that meets the conditions, look up the trend_id with Strato <code>batch_get_tweet_ai_trend</code>.</li>
+<li>Build a frequency histogram of the candidates&#39; trend_ids.</li>
+<li>Pick the top 2 trends. On a tie, the smaller trend_id takes priority.</li>
+<li>For each trend, pick one candidate at random.</li>
+<li>Look up the display name of that trend with Strato <code>batch_get_ai_trend_name</code>.</li>
+</ol>
+</li>
+<li>In effect, at most 2 AI trend labels are attached per page, and each trend&#39;s label goes on only one candidate.</li>
+<li>It is a suppression mechanism that prevents the same label from being attached repeatedly to multiple candidates in the same trend.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const TOP_TREND_COUNT: usize = 2;
+
+fn select_feedback_targets(candidate_trends: &amp;[(usize, i64)]) -&gt; HashMap&lt;usize, i64&gt; {
+    let mut frequency: HashMap&lt;i64, usize&gt; = HashMap::new();
+    for (_, trend_id) in candidate_trends {
+        *frequency.entry(*trend_id).or_default() += 1;
+    }
+    let mut ranked: Vec&lt;(i64, usize)&gt; = frequency.into_iter().collect();
+    ranked.sort_by(|a, b| b.1.cmp(&amp;a.1).then_with(|| a.0.cmp(&amp;b.0)));
+    ranked.truncate(TOP_TREND_COUNT);
+
+    let mut rng = rand::rng();
+    let mut selected: HashMap&lt;usize, i64&gt; = HashMap::new();
+    let mut used_indices = std::collections::HashSet::new();
+    for (trend_id, _) in ranked {
+        let candidates_for_trend: Vec&lt;usize&gt; = candidate_trends
+            .iter()
+            .filter(|(idx, id)| !used_indices.contains(idx) &amp;&amp; *id == trend_id)
+            .map(|(idx, _)| *idx)
+            .collect();
+        let Some(&amp;idx) = candidates_for_trend.choose(&amp;mut rng) else { continue };
+        used_indices.insert(idx);
+        selected.insert(idx, trend_id);
+    }
+    selected
+}
+</code></pre></figure>
+</li>
+<li><p>On screen it goes out in the same form as a topic label, and AI trend is used only when there is no topic feedback <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/util/urt/post_marshaller.rs" target="_blank" rel="noopener"><code>home-mixer/util/urt/post_marshaller.rs:72-110</code></a>.</p>
+<ul>
+<li>At the render stage it joins the topic path of the URT (X&#39;s response rendering schema) <code>TweetContext</code> as a fallback.</li>
+<li>Both go out in URT as the same context type, <code>ContextType::TOPIC</code>.</li>
+<li>The AI trend path differs from the topic path in two ways: <code>landing_url</code> is filled, and <code>TopicFeedbackContext.topic_id</code> is <code>None</code>.</li>
+<li>So when a user taps the topic-style chip attached above this tweet, it goes to <code>x.com/i/trending/{trend_id}</code>, the trend surface, rather than the topic feedback page.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if let Some(topic) = post.topic_feedback_topic.as_ref().filter(|t| !t.is_empty()) {
+    return Some(TweetContext {
+        context_type: ContextType::TOPIC,
+        text: topic.clone(),
+        landing_url: None,
+        context: Some(TweetContextDetails::TopicFeedbackContext(TopicFeedbackContext {
+            topic: Some(topic.clone()),
+            url: None,
+            topic_id: post.topic_feedback_topic_id.clone(),
+        })),
+        ..
+    });
+}
+let trend = post.ai_trend_name.as_ref().filter(|t| !t.is_empty())?;
+let trend_id = post.ai_trend_id.as_ref().filter(|id| !id.is_empty())?;
+let landing_url = Url {
+    url_type: UrlType::EXTERNAL_URL,
+    url: format!(&quot;https://x.com/i/trending/{trend_id}&quot;),
+    urt_endpoint_options: None,
+};
+Some(TweetContext {
+    context_type: ContextType::TOPIC,
+    text: trend.clone(),
+    landing_url: Some(landing_url.clone()),
+    context: Some(TweetContextDetails::TopicFeedbackContext(TopicFeedbackContext {
+        topic: Some(trend.clone()),
+        url: Some(landing_url),
+        topic_id: None,
+    })),
+    ..
+})
+</code></pre></figure>
+<blockquote>
+<p>&quot;<code>https://x.com/i/trending/{trend_id}</code>&quot; — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/util/urt/post_marshaller.rs" target="_blank" rel="noopener"><code>post_marshaller.rs:92</code></a></p>
+</blockquote>
+</li>
+</ul>
+<p>The following four items are not public:</p>
+<ul>
+<li>The definition of <code>AI trend</code> (who creates trend ids and how, and whether tweets are clustered with Grok or curated by people)</li>
+<li>The upstream pipeline of <code>batch_get_tweet_ai_trend</code></li>
+<li>Whether <code>EnableAiTrendFeedbackContext</code> is actually deployed</li>
+<li>The tuning history of <code>TOP_TREND_COUNT = 2</code></li>
+</ul>
+<p>Because the <code>rust_home_mixer_</code> prefix in the gate name follows the same convention as other rust-migration gates in this repository, an A/B experiment may be in progress <span class="badge est">inferred</span>.</p>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X opened a second context channel alongside the topic feedback context it has used so far. It is a fallback structure in which topic wins if it already exists and AI trend enters only when it does not, so the two do not overlap.</p></div>
+<ul>
+<li>The observation signals widen as well. A user&#39;s reaction of tapping, dismissing, or ignoring this chip becomes a label source for judging whether this user is interested in this AI trend.</li>
+<li>This is a different direction from the &quot;layer expansion of the safety pipeline&quot; folded in from Gen4 through Gen4+4. It confirms a trend of widening the signal source upstream of ranking itself.</li>
+</ul>
+<h3 id="the-ranking-stage-consumes-the-slate-context-that-phoenix-computed-at-serving">The ranking stage consumes the slate context that Phoenix computed at serving</h3>
+<p>The SID fields created in the Phoenix proto in the 8/19 Gen4+4 commit (three SID layers and three gap layers for each slot) were connected to an actual pipeline consumption path in this commit. The proto field name is <code>SlateContext.sid*</code>. Four places opened at the same time:</p>
+<ul>
+<li><p>The candidate struct gained one more slot for slate context, so it now has two <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs:26-27, 76-77</code></a>.</p>
+<ul>
+<li>The struct is named <code>PostCandidate</code>, and the new field is <code>served_slate_context</code>.</li>
+<li>The existing <code>slate_context</code> is a value that home-mixer computed and cached.</li>
+<li>The new <code>served_slate_context</code> is a value that Phoenix computed at serving and sent in the response.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub struct PostCandidate {
+    pub score: Option&lt;f64&gt;,
+    pub slate_context: Option&lt;SlateContext&gt;,
+    #[serde(default)]
+    pub served_slate_context: Option&lt;SlateContext&gt;,  // ← new
+    ...
+    pub ai_trend_name: Option&lt;String&gt;,   // ← new in the section above
+    pub ai_trend_id: Option&lt;String&gt;,     // ← new in the section above
+}
+</code></pre></figure>
+</li>
+<li><p>The conversion impl between proto and Rust renames the proto&#39;s short field names to home-mixer names <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>candidate.rs:99-118</code></a>.</p>
+<ul>
+<li>It renames the proto&#39;s <code>sid_k1/2/3</code> and <code>sid_gap1/2/3</code> to the home-mixer naming convention <code>sid_k_l1/l2/l3</code> and <code>sid_gap_l1/l2/l3</code>.</li>
+<li>Here &quot;l&quot; stands for level.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">impl From&lt;xai_recsys_proto::SlateContext&gt; for SlateContext {
+    fn from(c: xai_recsys_proto::SlateContext) -&gt; Self {
+        Self {
+            k: c.k,
+            pool_rank: c.pool_rank,
+            pool_rank_gap: c.pool_rank_gap,
+            fatigue: c.fatigue,
+            pre_diversity_score: c.pre_diversity_score,
+            sid_known: c.sid_known,
+            sid_k_l1: c.sid_k1,
+            sid_k_l2: c.sid_k2,
+            sid_k_l3: c.sid_k3,
+            sid_gap_l1: c.sid_gap1,
+            sid_gap_l2: c.sid_gap2,
+            sid_gap_l3: c.sid_gap3,
+        }
+    }
+}
+</code></pre></figure>
+</li>
+<li><p>PhoenixScorer extracts the slate context from the Phoenix prediction response and fills the new field <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/scorers/phoenix_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/phoenix_scorer.rs:107-125</code></a>.</p>
+<ul>
+<li>When the Phoenix prediction response carries <code>SlateContext</code> alongside the 24 candidate scores (engagement probability heads), PhoenixScorer sets that value in <code>served_slate_context</code> and passes it down the pipeline.</li>
+<li>The value is taken from <code>candidate_slate_context()</code> of the prediction response.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">.map(|c| PostCandidate {
+    phoenix_scores: predictions.candidate_scores(&amp;c.get_original_tweet_id()),
+    served_slate_context: predictions
+        .candidate_slate_context(&amp;c.get_original_tweet_id())
+        .map(Into::into),
+    prediction_request_id: Some(query.prediction_id),
+    last_scored_at_ms,
+    ..Default::default()
+})
+</code></pre></figure>
+</li>
+<li><p>RankingScorer decides the slate context with a three-way fallback <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs:700-710, 806-825, 875-895</code></a>.</p>
+<ol>
+<li>If the <code>UseServedSlateContext</code> gate is on and Phoenix sent slate context for all candidates, that value is used as is.</li>
+<li>If the gate is off or the data is incomplete, and the Redis warming cache hits, the slate context stored for a previous request is reused.</li>
+<li>Otherwise, it is computed locally with <code>compute_slate_contexts(candidates, weighted_scores)</code>.</li>
+</ol>
+<ul>
+<li>This order applies identically to both ranking branches.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn served_slate_contexts(
+    query: &amp;ScoredPostsQuery,
+    candidates: &amp;[PostCandidate],
+) -&gt; Option&lt;Vec&lt;SlateContext&gt;&gt; {
+    if !query.params.get(UseServedSlateContext) {
+        return None;
+    }
+    candidates.iter().map(|c| c.served_slate_context).collect()
+}
+
+// ... in each of the two ranking paths (the mpn_scoring branch and the diversity branch):
+let persisted_contexts: Option&lt;Vec&lt;SlateContext&gt;&gt; =
+    match Self::served_slate_contexts(query, candidates) {
+        Some(served) =&gt; Some(served),
+        None if query.has_cached_posts =&gt; Self::stored_slate_contexts(candidates),
+        None =&gt; Some(Self::compute_slate_contexts(candidates, &amp;weighted_scores)),
+    };
+</code></pre></figure>
+</li>
+<li><p>The gate that turns on this path came in with a default of false. Only the gate has been created, and the actual rollout is deferred to a later parameter change.</p>
+<ul>
+<li>The gate name is <code>UseServedSlateContext</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This is the first step of a migration in which the point that computes slate context moves from home-mixer locally to Phoenix serving. Phoenix already knows each candidate&#39;s pool rank, fatigue, pre-diversity, and three SID layers at the moment it produces predictions, so it can send them in the serving response instead of home-mixer recomputing them.</p></div>
+<ul>
+<li>That saves ranker CPU.</li>
+<li>The richer context that Phoenix holds can be reflected in re-ranking. For example, the three SID layers cannot be computed without Phoenix.</li>
+<li>The direction is for home-mixer to keep shrinking into a thin layer that handles only candidate allocation and re-ranking.</li>
+<li>The direction is the same as SID being connected to VMRanker in the 8/18 commit (Gen4+3). By definition SID is a Phoenix training output, so home-mixer cannot compute it locally, and this commit resolved that problem at serving time.</li>
+<li>The point at which a commit promotes <code>UseServedSlateContext</code> to true is the point at which Phoenix serving&#39;s slate context output reaches production traffic.</li>
+</ul>
+<h3 id="the-core-logic-of-the-embedding-table-loader-was-separated-from-the-python-bindings">The core logic of the embedding table loader was separated from the Python bindings</h3>
+<p>The embedding table loader of the Phoenix serving engine was split into a Python-side wrapper and a core that does not depend on pyo3 <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>The core logic was split out of <code>emb_table.rs</code> as <code>load_tensor_into</code>, and the existing <code>load_tensor</code> was redefined as a thin wrapper around that core <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs</code></a>.</p>
+<ul>
+<li>The file overhaul is +189/−169, and it is essentially an equivalent refactor.</li>
+<li>The existing <code>load_tensor</code> was tied to pyo3 types and pyo3 errors, so it could not be reused in non-Python contexts.</li>
+<li>The tied types were <code>Bound&lt;&#39;py, PyString&gt;</code>, <code>PyReadwriteArray1&lt;&#39;py, u8&gt;</code>, and <code>Bound&lt;&#39;py, PyList&gt;</code>, and the errors were <code>PyValueError</code>, <code>PyOSError</code>, and <code>PyTypeError</code>.</li>
+<li>The new core does not depend on pyo3; it takes a <code>&amp;mut [u8]</code> interface and returns <code>Result&lt;(), String&gt;</code>.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub fn load_tensor_into(
+    path: &amp;str,
+    urls: &amp;str,
+    shard_sources: &amp;[(String, String, usize, usize)],
+    tensor: &amp;mut [u8],
+    row_size: usize,
+    num_row_segments: usize,
+) -&gt; Result&lt;(), String&gt; { ... }
+
+#[pyfunction]
+pub fn load_tensor&lt;&#39;py&gt;(
+    py: Python&lt;&#39;py&gt;,
+    path: Bound&lt;&#39;py, PyString&gt;,
+    urls: Bound&lt;&#39;py, PyString&gt;,
+    shard_sources: Bound&lt;&#39;py, PyList&gt;,
+    mut tensor: PyReadwriteArray1&lt;&#39;py, u8&gt;,
+    row_size: usize,
+    num_row_segments: usize,
+) -&gt; PyResult&lt;()&gt; {
+    let mut parsed = ...;  // PyList → Vec&lt;(String, String, usize, usize)&gt;
+    let path = path.to_string();
+    let urls = urls.to_string();
+    let tensor_slice = tensor.as_slice_mut()?;
+    py.detach(|| {
+        load_tensor_into(&amp;path, &amp;urls, &amp;parsed, tensor_slice, row_size, num_row_segments)
+            .map_err(PyOSError::new_err)
+    })
+}
+</code></pre></figure>
+</li>
+<li><p>Safety was also tightened.</p>
+<ul>
+<li>Replaced the <code>unwrap()</code> on tokio runtime creation with <code>map_err</code>. The changed code is <code>map_err(|e| format!(&quot;tokio runtime: {e}&quot;))</code>.</li>
+<li>Added a <code>checkpoint path too short</code> guard. The condition is <code>prefix.len() &lt; 3</code>, and the message is <code>checkpoint path too short: {path}</code>.</li>
+<li>Unified modulo checks such as <code>row_segment_size % num_row_segments != 0</code> to the <code>is_multiple_of</code> API.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> By exposing the embedding table loader core through a pure Rust interface, this change prepares it for reuse without the pyo3 stack in training pipelines or other paths of Rust-native serving code. The direction is the same as the Phoenix <code>xrecsys_search</code> vocab growing to 100M/100M/30M in the 8/19 commit (Gen4+4). It suggests a growing need to load large embedding tables in multiple serving and training contexts.</p></div>
+<h3 id="the-share-of-calls-sent-to-grok-46-at-two-judge-call-sites-rose-from-01-to-03">The share of calls sent to Grok 4.6 at two judge call sites rose from 0.1 to 0.3</h3>
+<p>In grox (the Grok-based nearline classifier sub-repo), the Grok 4.6 dial introduced by Gen4+4 on 2026-08-19 rose 3× in a day, from 10% to 30% <span class="badge ok">verified</span>. This dial is the probability of sending calls to 4.6 instead of Grok 4.5 at two judge call sites (child-safety cross-model validation and deluxe 4.3 category reclassification). Because the 4.6 response is used for verdicts just like 4.5&#39;s, it is a dial that splits live traffic, not a shadow that discards results <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/grox/flows/ptos/classifier.py#L281-L290" target="_blank" rel="noopener"><code>classifier.py:281-290</code>@aad7179</a>.</p>
+<ul>
+<li><p>What changed is one constant line <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py:114</code></a>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">-_GROK_4_6_INTERNAL_DIAL = 0.1
++_GROK_4_6_INTERNAL_DIAL = 0.3
+</code></pre></figure>
+</li>
+<li><p>The circuit breaker configuration and the places where the dial applies are unchanged.</p>
+<ul>
+<li>The parameters of the <code>_EAPI_4_6_INTERNAL_BREAKER_CONFIG</code> circuit breaker (failure rate 50%, window 600 seconds, recovery 600 seconds, half-open 5 calls) did not change.</li>
+<li>The two places where the dial applies, child-safety cross-model validation and deluxe 4.3 category reclassification, are also unchanged.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This increase supports the view that, in the gradual rollout from 4.5 to 4.6, 4.6 did not trip the circuit breaker with 10% of live traffic and that verdict quality was within the acceptable range <span class="badge est">inferred</span>. Otherwise the dial could not have been raised 3×.</p></div>
+<ul>
+<li>The Grok 4.5 judge layer introduced by Gen4+2 is being refined daily, and this commit is the fourth in that flow. The flow is +2 introduction → +3 finer logging → +4 4.6 dial 10% → +5 30%.</li>
+<li>If the next commit jumps to 50% or 100%, the full switch to 4.6 is close; if the dial drops again, a regression was observed.</li>
+</ul>
+<h3 id="grok-streaming-responses-can-now-be-cut-off-midway-when-a-condition-is-met">Grok streaming responses can now be cut off midway when a condition is met</h3>
+<p>The grox Grok sampler gained a callback that ends a streaming response early, and it increments a counter each time it cuts one off <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>A <code>stop_predicate</code> callback was added to <code>grox/libs/grok_sampler/llm.py</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/d0cef2f/grox/libs/grok_sampler/llm.py" target="_blank" rel="noopener">that file</a>.</p>
+<ul>
+<li>The scale is +27/−13.</li>
+<li>The existing <code>_sample_streaming</code> kept consuming tokens from the raw stream as they arrived.</li>
+<li>Now it wraps the raw stream in an explicit context with <code>async with aclosing(...)</code>, which guarantees cleanup even on early termination. Tokens are received inside this <code>async with aclosing</code> block.</li>
+<li>After each token is yielded, it checks <code>stop_predicate(resp)</code>; if True, it breaks immediately and increments the counter <code>llm.sample.early_stop.count</code>.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">stop_predicate: Callable[[str], bool] | None = kwargs.get(&quot;stop_predicate&quot;)
+...
+async with aclosing(self._sample_streaming_raw(request, **kwargs)) as raw_stream:
+    async for tok in raw_stream:
+        ...
+        yield tok.text
+        if stop_predicate is not None and stop_predicate(resp):
+            logger.info(f&quot;Response complete after {tokens_received} tokens, cancelling the stream&quot;)
+            Metrics.counter(&quot;llm.sample.early_stop.count&quot;).add(1, attributes=attributes)
+            break
+</code></pre></figure>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This change can be read as a sampling infrastructure optimization to handle the traffic increased by the Grok 4.6 dial introduced in Gen4+4 <span class="badge est">inferred</span>. The basis is the circumstance that it is in the same commit as the change raising the dial to 30%.</p></div>
+<ul>
+<li>Safety verdict responses often arrive wrapped in a JSON tag (<code>&lt;json&gt;...&lt;/json&gt;</code>), and once the tag closes, the tokens that follow are meaningless.</li>
+<li>Cutting off early with a callback such as <code>stop_predicate=lambda r: &quot;&lt;/json&gt;&quot; in r</code> reduces token cost and also the latency after TTFT.</li>
+</ul>
+<h3 id="grok-classifiers-can-now-reference-the-authors-profile-image">Grok classifiers can now reference the author&#39;s profile image</h3>
+<p>A profile image field was added to the User schema of the grox data loader <span class="badge ok">verified</span>. The field is filled when the author metadata has a profile image URL <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>The Grox <code>User</code> data loader gained a <code>profile_image</code> field <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The type is <code>profile_image: Image | None</code>.</li>
+<li>The changed files are <code>grox/core/data_loaders/data_types.py</code> and <code>post_mapper.py</code>.</li>
+<li>If <code>AuthorMetadata.profileImageUrl</code> exists, it is filled with <code>Image(url=...)</code>.</li>
+<li>Previously the User schema held only the URLs, the affiliated business, and recent posts, with no profile image.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">class User(BaseModel):
+    urls: list[str] | None = None
+    affiliated_business: AffiliatedBusiness | None = None
+    recent_posts: list[&quot;Post&quot;] | None = None
+    profile_image: &quot;Image | None&quot; = None   # ← new
+</code></pre></figure>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Grok classifiers can now reference the profile image as verdict context. For example, one can imagine ads brand-safety verdicts checking whether a profile image contains adult content. This may be upstream data wiring prepared for the adult content cross-validation judge introduced in Gen4+2 or for later expansions of the verdict layer <span class="badge est">inferred</span>.</p></div>
+<h3 id="summary-of-the-six-directions-in-this-commit-gen45-d0cef2f">Summary of the six directions in this commit (Gen4+5, d0cef2f)</h3>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col><col class="w10"><col></colgroup>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Files</th>
+<th align="right">Scale</th>
+<th>Nature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI trend feedback context</td>
+<td><code>ai_trend_feedback_context_hydrator.rs</code>, <code>post_marshaller.rs</code>, <code>candidate.rs</code>, <code>param.rs</code></td>
+<td align="right">+157/+29+ ...</td>
+<td>New feature: adds one For You context label channel</td>
+</tr>
+<tr>
+<td>served_slate_context</td>
+<td><code>phoenix_scorer.rs</code>, <code>ranking_scorer.rs</code>, <code>candidate.rs</code>, <code>param.rs</code></td>
+<td align="right">+22/−10, etc.</td>
+<td>Wiring starts: consumption path for the Gen4+4 proto</td>
+</tr>
+<tr>
+<td>emb_table refactor</td>
+<td><code>emb_table.rs</code></td>
+<td align="right">+189/−169</td>
+<td>Refactor (equivalent): core made pyo3-free</td>
+</tr>
+<tr>
+<td>Grok 4.6 dial 3×</td>
+<td><code>classifier.py</code></td>
+<td align="right">+1/−1</td>
+<td>Parameter change: live traffic 10% → 30%</td>
+</tr>
+<tr>
+<td>grok_sampler stop_predicate</td>
+<td><code>llm.py</code></td>
+<td align="right">+27/−13</td>
+<td>Infrastructure: early-termination callback</td>
+</tr>
+<tr>
+<td>profile_image field</td>
+<td><code>data_types.py</code>, <code>post_mapper.py</code></td>
+<td align="right">+7/+0</td>
+<td>Schema extension: image field on User</td>
+</tr>
+</tbody></table></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Changed the following parts of <a href="x.html">services/x.md</a>:</p></div>
+<ul>
+<li>Added a Gen4+5 (d0cef2f, 2026-08-20) row to the generation table (+479/−200, 14 files).</li>
+<li>Folded the following six items into the one-line summary:<ol>
+<li>AI trend feedback context hydrator</li>
+<li>served_slate_context wiring starts</li>
+<li>emb_table core separation</li>
+<li>Grok 4.6 dial 0.3</li>
+<li>grok_sampler stop_predicate</li>
+<li>profile_image</li>
+</ol>
+</li>
+<li>Rather than placing it under &quot;Candidate generation&quot;, added a new subsection &quot;AI trend feedback context — new in Gen4+5&quot; between ranking and filters. It is positioned as a channel alongside topic feedback.</li>
+<li>After the Gen4+4 subsection of the &quot;Phoenix training and index&quot; section, created a new subsection &quot;Gen4+5 (2026-08-20) — home-mixer starts consuming the slate context produced by Phoenix serving&quot;.</li>
+<li>After the Gen4+4 item in the &quot;Grox → PtOS Adult Content Cross-Validation&quot; section, added one line &quot;Gen4+5 (2026-08-20) Grok 4.6 internal dial 0.1 → 0.3 (raised 3×)&quot;.</li>
+<li>Added a subsection &quot;Resolved by the Gen4+5 release / New (2026-08-22)&quot; to the open questions section. It lists 5 resolved items and 5 that need a deep dive.</li>
+<li>Added links to 6 files related to d0cef2f in the sources section.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The pattern folded into the canon from Gen4 through Gen4+4 was confirmed again this time. Within the daily commit rhythm, the proto scaffolding and the actual consumption wiring arrive in succession, a day or two apart. Taken together with the new AI trend context channel, this reinforces the observation that X&#39;s ranking and candidate pipelines are expanding in two directions at once.</p></div>
+<ul>
+<li>Gen4+4&#39;s <code>SlateContext</code> proto starting to be consumed in Gen4+5 is the third instance of this rhythm.<ul>
+<li>The first is Gen4+2&#39;s V2 label leading to the dual-write redesign in +3.</li>
+<li>The second is Gen4+3&#39;s VMRanker SID wiring leading to the formalization of the <code>sid*</code> fields in the +4 proto.</li>
+<li>The third is Gen4+4&#39;s SlateContext proto leading to the phoenix_scorer wiring in +5.</li>
+</ul>
+</li>
+<li>The two directions are the axis that widens upstream signal sources (AI trend) and the axis along which home-mixer consumes Phoenix serving outputs in a thinner way.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-onemodel-unified-ranking-across-three-surfaces-organic-ads-and-merchant--xiaohongshu"><span class="num">2</span>OneModel unified ranking across three surfaces: organic, ads, and merchant — Xiaohongshu</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2608.18606" target="_blank" rel="noopener">OneModel: A Unified Foundation for Platform-Scale Multi-Scenario Ranking (arXiv 2608.18606)</a> — submitted to arXiv on 2026-08-19 (v2; v1 was the initial submission), paper. It has 14 authors (Yinqi Zhang, Peiyu Hu, Yuntian Tang, Siying Gu, Jiahao Liang, Longxin Kou, Haiqing Hu, Shuman Zhuang, and others). The abstract states that the deployed service is Xiaohongshu (小红书, a Chinese lifestyle social platform).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Xiaohongshu is a service the canon does not yet track. Even so, serving multiple business streams (organic recommendation, ads, merchant products) in one app through a unified system is unusual compared with the per-service fragmented rankers at X, Meta, and Netflix. This paper is a production deployment claim that three surfaces were unified into one ranker, and it adds a new angle to the following three lines of production claims:</p></div>
+<ul>
+<li>Netflix Foundation Model (FM) placed per-service heads on top of a single FM.</li>
+<li>Meta GEM built a backbone that unifies IG and FB within the ads domain.</li>
+<li>Yandex Music Gryphon-v2/Sona unified retrieval and ranking.</li>
+</ul>
+<p>OneModel moves to a different angle: one backbone serves different business streams (organic, ads, merchant) at the same time.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Final ranking for three streams is unified in one framework based on shared event sequences</span></p></div>
+<ul>
+<li><p>The abstract points out that keeping a separate ranking system per stream fragments user representations and raises engineering cost, and it proposes OneModel, which merges final ranking into one.</p>
+<blockquote>
+<p>&quot;Platform-scale recommender systems often span multiple business streams such as organic recommendation, advertising, and merchant services, where user behaviors form a continuous cross-stream trajectory. Maintaining separate ranking systems fragments user representations and increases engineering cost. We propose OneModel, a unified framework for multi-stream final ranking. OneModel maps heterogeneous behaviors into shared event sequences, learns long-context user representations with an action-oriented backbone, and introduces Scenario-aware Information Modulation to balance cross-stream transfer and stream-specific specialization.&quot;</p>
+<p>— <a href="https://arxiv.org/abs/2608.18606" target="_blank" rel="noopener">OneModel (arXiv 2608.18606)</a> abstract (paper)</p>
+</blockquote>
+</li>
+<li><p>There are three core architecture elements:</p>
+<ul>
+<li>The shared event sequence unifies user behavior from the three streams (organic, ads, merchant) into one event sequence schema.</li>
+<li>The action-oriented backbone is the part that learns long-context user representations. The abstract does not give the specific architecture.</li>
+<li>Scenario-aware Information Modulation balances cross-stream transfer and stream-specific specialization through switching and gating. The former corresponds to sharing, the latter to dedicated handling.</li>
+</ul>
+</li>
+<li><p>The abstract lists six optimization elements for production deployment.</p>
+<ul>
+<li>stratified user representation</li>
+<li>multi-objective training</li>
+<li>feature decomposition</li>
+<li>user feature prefetching</li>
+<li>shared user-tower computation</li>
+<li>graph-level inference optimization</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. In Xiaohongshu production A/B tests, metrics rose on all three surfaces</span></p></div>
+<ul>
+<li>The A/B results came from the Xiaohongshu production deployment.</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="grow"><col><col class="w8"></colgroup>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Metric</th>
+<th align="right">Result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Explore Feed (organic recommendation)</td>
+<td>Time Spent</td>
+<td align="right"><strong>+0.33%</strong></td>
+</tr>
+<tr>
+<td>Explore Feed (organic recommendation)</td>
+<td>Engagement</td>
+<td align="right"><strong>+1.25%</strong></td>
+</tr>
+<tr>
+<td>Feed Advertising (ads)</td>
+<td>advertising value</td>
+<td align="right"><strong>+3.43%</strong></td>
+</tr>
+<tr>
+<td>Feed Advertising (ads)</td>
+<td>CTR</td>
+<td align="right"><strong>+8.18%</strong></td>
+</tr>
+<tr>
+<td>Merchant Recommendation (merchant)</td>
+<td>DGMV (Daily GMV)</td>
+<td align="right"><strong>+1.1867%</strong></td>
+</tr>
+<tr>
+<td>Merchant Recommendation (merchant)</td>
+<td>GPM (GMV Per Mille)</td>
+<td align="right"><strong>+2.1585%</strong></td>
+</tr>
+</tbody></table></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added an OneModel entry (a 2–4 line pointer) to the &quot;new this month&quot; section of <a href="radar.html">radar.md</a> <code>[radar promotion]</code>. OneModel passed the radar acceptance criteria on arXiv. It is not yet promoted to a service canon (a new services/xiaohongshu.md), because the canon does not track it as a service. If a second company outside China makes a similar claim on a platform, it becomes a promotion candidate for a topic (multi-task-ranking.md or a newly created unified-multi-scenario topic).</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> OneModel is the third production claim of a company-level architecture decision that &quot;a single ranker serves multiple business streams in a unified way.&quot; Its direction differs somewhat from the <a href="radar.html#spread-of-llm-native-ranking--who-follows-after-genrec">LLM-native ranking thread</a>. Meta GEM expanded to ads, IG, and FB but is still centered on the ads domain, whereas Xiaohongshu OneModel is new in unifying ads, organic, and merchant on equal footing.</p></div>
+<ul>
+<li>The first is Netflix FM (service diversity, from foundation to head).</li>
+<li>The second is Meta GEM (surface diversity within the ads domain).</li>
+<li>The third is Xiaohongshu OneModel (business stream diversity).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="corrections">Corrections</h2>
+<p>None.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li>OneModel (Xiaohongshu, <a href="https://arxiv.org/abs/2608.18606" target="_blank" rel="noopener">arXiv 2608.18606</a>, 2026-08-19) is covered in section 2 above and was added to &quot;new this month&quot; in radar.md.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check three things in the follow-up commits to X d0cef2f — if the daily commit rhythm holds, they can be observed in the next commit.<ul>
+<li>Watch for when the <code>UseServedSlateContext</code> gate is promoted to true in production. That is the point when the slate context produced by Phoenix serving is reflected in real traffic.</li>
+<li>Watch whether the <code>EnableAiTrendFeedbackContext</code> gate is enabled.</li>
+<li>Watch the next move of the Grok 4.6 dial. The question is whether it rises from 30% to 50% or 100%, or falls.</li>
+</ul>
+</li>
+<li>Track the upstream of the X <code>AiTrend</code> definition — the Strato columns read by <code>batch_get_tweet_ai_trend</code> and <code>batch_get_ai_trend_name</code> are outside this repository. If related documents appear (for example, a new md file under <code>docs/</code> or a README update), fold them in.</li>
+<li>Check follow-ups to Xiaohongshu OneModel — v2 was submitted on 8/19, so the paper itself is still a preprint.<ul>
+<li>Check whether it is published at a conference (RecSys/KDD/WWW 2026·2027).</li>
+<li>Watch for follow-up releases from the authors, in particular details of the &quot;action-oriented backbone&quot; architecture and the cross-stream transfer gating mechanism.</li>
+<li>Watch for statements that Xiaohongshu has also deployed it to other surfaces (such as search).</li>
+</ul>
+</li>
+<li>The X Gen4+4 (aad7179) deep dive is deferred — it starts when a person requests it.<ul>
+<li>The trace of <code>phoenix/xrex/models/recsys_model.py</code> (+265/−25) in aad7179 is still unfinished.</li>
+<li>We need to confirm in which training loop <code>RewardOutputs</code> is filled and consumed, and whether the link-open 5-quantile is quantile regression.</li>
+</ul>
+</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-08-21.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-08-21</span></a><a class="pg-next" href="daily-2026-08-23.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-08-23</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-08-22.html" data-title="일일 리포트 2026-08-22"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-08-21 — feed-research</title>
+<meta name="description" content="In one line: X's ranking model Phoenix switched its training from Adam to the Muon optimizer. This is the first case where the code confirms Muon adoption…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-08-21.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-08-21.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-08-21.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-08-21.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-08-21 — feed-research">
+<meta property="og:description" content="In one line: X's ranking model Phoenix switched its training from Adam to the Muon optimizer. This is the first case where the code confirms Muon adoption…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-08-21.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-08-21.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-08-21">2026-08-21</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>22 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-08-21.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b> (services/x.md, services/netflix.md)</li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X&#39;s ranking model Phoenix switched its training from Adam to the Muon optimizer. This is the first case where the code confirms Muon adoption in a production recsys training pipeline that this repository has tracked.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">10</span></summary><ol><li><a href="#1-phoenixs-training-optimizer-changed-from-adam-to-muon--x"><span class="num">1</span>Phoenix&#39;s training optimizer changed from Adam to Muon — X</a><ol><li><a href="#1-phoenixs-dense-parameter-optimizer-changed-from-adam-to-muon">(1) Phoenix&#39;s dense-parameter optimizer changed from Adam to Muon</a></li><li><a href="#2-phoenix-expanded-to-search-ranking-and-a-search-specific-training-config-was-added">(2) Phoenix expanded to search ranking, and a search-specific training config was added</a></li><li><a href="#3-phoenix-proto-gained-a-reward-head-and-a-link-open-5-quantile-head">(3) Phoenix proto gained a reward head and a link-open 5-quantile head</a></li></ol></li><li><a href="#2-artwork-and-preview-personalization-moved-to-clip-two-tower-and-mediafm--netflix"><span class="num">2</span>Artwork and preview personalization moved to CLIP two-tower and MediaFM — Netflix</a><ol><li><a href="#the-clip-based-unified-two-tower-merged-five-canvases-into-a-single-model">The CLIP-based unified two-tower merged five canvases into a single model</a></li><li><a href="#mediafm-is-a-tri-modal-foundation-model-that-netflix-trained-in-house">MediaFM is a tri-modal foundation model that Netflix trained in-house</a></li><li><a href="#new-mediafm-checkpoints-are-gated-by-an-offline-proxy-task">New MediaFM checkpoints are gated by an offline proxy task</a></li><li><a href="#the-netflix-embedding-store-caches-in-three-tiers-at-the-platform-layer">The Netflix Embedding Store caches in three tiers at the platform layer</a></li></ol></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same X commit, Phoenix expanded to search ranking, and the Phoenix proto gained a reward head and a link-open probability 5-quantile head.</li>
+<li>The same commit also includes a Following-only filter, a dial that sends 10% of live traffic to Grok 4.6, shadow mirroring for impression verdicts, and the promotion of four flags to train-default ON.</li>
+<li>Netflix published a paper with production results on personalizing artwork with a CLIP two-tower and video previews with its own tri-modal model, MediaFM.</li>
+</ul>
+<h2 id="1-phoenixs-training-optimizer-changed-from-adam-to-muon--x"><span class="num">1</span>Phoenix&#39;s training optimizer changed from Adam to Muon — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/aad7179" target="_blank" rel="noopener">xai-org/x-algorithm @ aad7179 — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-19 21:25 UTC, public source code. These notes number the X commits after the Gen4 release in sequence, and this commit is Gen4+4. It touches 79 files with <strong>+3,303/−651</strong>, 5.6× the 14 files of Gen4+3 (8/18), and its character changed from the &quot;small-scale refinement&quot; that ran from Gen4+1 through +3 to a large expansion of infrastructure and the training pipeline. Notably, the README&#39;s <code>#latest-updates</code> section still lists the August 14th entry from 8/14 as the latest; this commit&#39;s changes were reflected only in code, without a documentation update.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> This repository has tracked follow-up commits daily since the very large Gen4 release (2026-08-13, 47c1bcd). The canon (this repository&#39;s canon documents) has observed this flow with a &quot;daily commit&quot; cadence.</p></div>
+<ul>
+<li>On 8/14 (c65aa17, Gen4+1), we confirmed the weight interpretation rules, the Brazil filter, Thompson sampling, and three Phoenix bools.</li>
+<li>On 8/17 (b089ce6, Gen4+2), we confirmed ads safety V2, cross-validation, and the indexing gate.</li>
+<li>On 8/18 (11a71f8, Gen4+3), we confirmed the redesign of the V2 helper within a day, the Following VF hydrator, and Phoenix Kafka v3.<ul>
+<li>VF (visibility-filtering) is a service that decides, for each post, whether it may be shown to this viewer.</li>
+</ul>
+</li>
+</ul>
+<p>This commit, which came out the day after Gen4+3 (8/19), is a large expansion that goes beyond follow-up small cleanups in both scale (79 files, +3.3k lines) and character. The commit&#39;s scale is 79 files with +3,303/−651. Compared with Gen4+3 (14 files, +208/−70), the file count is 5.6× and the number of changed lines is about 14×. In character, it includes a major overhaul of the training pipeline, an expansion of the retrieval surface, and a safety-infrastructure shadow setup.</p>
+<p>The Muon optimizer is a dense-parameter optimizer proposed by Keller Jordan et al. in 2024. Unlike the existing momentum-Adam family, it approximately orthogonalizes the gradient momentum with Newton-Schulz iteration. It has been adopted in large-scale LLM training such as Kimi K2 and Moonshot, and a hybrid setup that still uses Adam for embeddings, norms, and logits is standard. That this is the <strong>first case</strong> where the code confirms Muon adoption among the production recsys training pipelines this repository has tracked is the most important signal in today&#39;s sources.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span></p></div>
+<h3 id="1-phoenixs-dense-parameter-optimizer-changed-from-adam-to-muon">(1) Phoenix&#39;s dense-parameter optimizer changed from Adam to Muon</h3>
+<p>Phoenix training moved the dense parameters to Muon, which uses Newton-Schulz orthogonalization, and became a hybrid that leaves embedding, logits, and norm on Adam. Two files were newly added.</p>
+<ul>
+<li>A new optimizer implementation was added as a 240-line file <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/xrex/optimizers/recsys/muon.py" target="_blank" rel="noopener"><code>phoenix/xrex/optimizers/recsys/muon.py</code></a>.<ul>
+<li>It is a thin adapter around <code>orthogonalize_via_newton_schulz</code> and <code>MuonDimensionNumbers</code> from <code>optax.contrib._muon</code>.</li>
+<li>It performs labeling and masking to fit the xrex parameter tree.</li>
+</ul>
+</li>
+<li>A 47-line file that exposes this optimizer through config was also added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/xrex/optimizers/recsys/dense_optim.py" target="_blank" rel="noopener"><code>phoenix/xrex/optimizers/recsys/dense_optim.py</code></a>.</li>
+</ul>
+<p>The core pattern of the hybrid is that only matrix-shaped parameters are handled by Muon, while parameters matching the name patterns below stay on Adam.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">muon_adam_patterns: str = &quot;embed,_emb,logits,vocab,norm,table&quot;
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/xrex/optimizers/recsys/dense_optim.py" target="_blank" rel="noopener"><code>phoenix/xrex/optimizers/recsys/dense_optim.py:14</code></a></p>
+</blockquote>
+<p>That is, the embedding table, the output logits head, vocab, and layernorm/rmsnorm stay on Adam, and only the attention and FFN weight matrices in the Transformer body are trained with Muon. This matches the standard pattern used by Keller Jordan&#39;s 2024 original and the Kimi K2 family.</p>
+<p>The optim-related values in the default config <code>_home_direct_packed_base()</code> were replaced across the board <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py:302-330</code></a>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">&quot;optim_config&quot;: RecsysDenseOptimConfig(
+    optim=&quot;muon&quot;,
+    muon_consistent_rms=0.2,
+    muon_matrix_weight_decay=0.014,
+    muon_split_fused=&quot;qkv:128&quot;,
+    adam_embedding_weight_decay=0.014,
+    b1=0.95,
+    b2=0.98,
+),
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py:309-317</code></a></p>
+</blockquote>
+<p>Side by side with the previous values, the changed values are as follows:</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Gen3~Gen4+3</th>
+<th>Gen4+4 (aad7179)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>optim</code></td>
+<td>Adam (default)</td>
+<td><strong><code>&quot;muon&quot;</code></strong></td>
+</tr>
+<tr>
+<td><code>learning_rate</code> (dense)</td>
+<td>1e-3</td>
+<td><strong>7.1e-4</strong></td>
+</tr>
+<tr>
+<td><code>emb_learning_rate</code></td>
+<td>0.2 (stated explicitly in config)</td>
+<td>(moved to the embedding config)</td>
+</tr>
+<tr>
+<td><code>muon_consistent_rms</code></td>
+<td>—</td>
+<td>0.2</td>
+</tr>
+<tr>
+<td><code>muon_matrix_weight_decay</code></td>
+<td>—</td>
+<td>0.014</td>
+</tr>
+<tr>
+<td><code>muon_split_fused</code></td>
+<td>—</td>
+<td><code>&quot;qkv:128&quot;</code> (splits the fused QKV projection into 128-dim blocks and orthogonalizes each)</td>
+</tr>
+<tr>
+<td><code>adam_embedding_weight_decay</code></td>
+<td>—</td>
+<td>0.014</td>
+</tr>
+<tr>
+<td><code>b1</code>, <code>b2</code></td>
+<td>—</td>
+<td>0.95, 0.98</td>
+</tr>
+<tr>
+<td>embedding optim</td>
+<td><code>rowwise_adagrad</code> (LR 0.2)</td>
+<td><code>RecsysRowwiseAdagradConfig(learning_rate=0.28, half_life_steps=2500, lazy_decay=True, weight_decay=2.8e-4)</code></td>
+</tr>
+</tbody></table></div>
+<p>The GB300 override also adopted Muon in the same direction. The settings are LR 5e-4, <code>half_life_steps=5000</code>, and <code>weight_decay=0.01</code>.</p>
+<ul>
+<li><p><code>muon_split_fused=&quot;qkv:128&quot;</code> means that the output axis of the fused QKV projection is cut into 128-dim blocks, and each block is treated as an independent unit of orthogonalization.</p>
+<ul>
+<li><code>scale_by_muon_shaped</code> recomputes <code>dim_nums</code> per block and runs Newton-Schulz in parallel.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">if block is not None and x.shape[-1] &gt; block:
+    n_blocks = x.shape[-1] // block
+    xs = x.reshape(x.shape[:-1] + (n_blocks, block))
+    dn = optax_contrib.MuonDimensionNumbers(reduction_axis=-3, output_axis=-1)
+    o = orthogonalize_via_newton_schulz(xs, ns_coeffs, ns_steps, preconditioning, 1e-8, dn)
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/xrex/optimizers/recsys/muon.py" target="_blank" rel="noopener"><code>phoenix/xrex/optimizers/recsys/muon.py:135-141</code></a></p>
+</blockquote>
+</li>
+<li><p>The <code>muon_consistent_rms=0.2</code> option applies a <code>sqrt(max(fan_in, fan_out)) × consistent_rms</code> scale to the Muon update, which is a control value that keeps the update magnitude consistent across layers.</p>
+<ul>
+<li>It is also a stabilization parameter that can be used in place of the original Muon&#39;s fan-in/fan-out scaling.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> A new observation item appeared: Muon, an optimizer established in LLM training, has moved over to ranker and retrieval training. It is the first case where the <strong>code</strong> confirms Muon adoption among the production recsys training pipelines this repository has tracked (Netflix FM, Meta HSTU/GEM, Kuaishou OneRec, etc.), so it is the first item to cover among today&#39;s sources. Whether other companies follow needs to be checked over the next 3–6 months.</p></div>
+<h3 id="2-phoenix-expanded-to-search-ranking-and-a-search-specific-training-config-was-added">(2) Phoenix expanded to search ranking, and a search-specific training config was added</h3>
+<p>Phoenix expanded to search ranking. <code>xrecsys_search</code> was added alongside <code>xrecsys</code>, the For You feed training config <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py:435-473</code></a>. The new config <code>xrecsys_search</code> has its own vocab along with <code>use_product_surface</code> and <code>condition_search_relevance_on_prompt</code>. The main differences are as follows:</p>
+<ul>
+<li>The vocab was expanded substantially. It is much larger than the For You config&#39;s vocab, because the search query and click corpus has greater diversity of users and items and so needs a wider vocab.<ul>
+<li>The values are <code>user_vocab_size=100_000_000</code>, <code>item_vocab_size=100_000_000</code>, <code>author_vocab_size=30_000_000</code>, and <code>ip_vocab_size=10_000_000</code>.</li>
+</ul>
+</li>
+<li>The architecture is a GQA setup with fewer KV heads than query heads.<ul>
+<li>The values are <code>num_layers=8</code>, <code>emb_size=2560</code>, <code>emb_table_width=1024</code>, <code>query_heads=20</code>, <code>kv_heads=4</code> (GQA), <code>history_seq_len=1022</code>, and <code>candidate_seq_len=64</code>.</li>
+</ul>
+</li>
+<li>In the distributed setup, expert-parallel is 512, so the EP axis is much larger than in the For You base config, and therefore MoE routing in the search config is also much larger.<ul>
+<li>The values are <code>ep=512</code>, <code>dp=2</code>, <code>fsdp=1</code>, and <code>tp=1</code>.</li>
+</ul>
+</li>
+<li>Search-specific flags were added.<ul>
+<li><code>use_product_surface=True</code> turns on product-surface conditioning.</li>
+<li><code>output_vocab_size=128</code> expands actions to 128 kinds.</li>
+<li>The rest are <code>condition_search_relevance_on_prompt=True</code>, <code>use_dense_action_table=True</code>, and <code>metric_group=&quot;search&quot;</code>.</li>
+</ul>
+</li>
+<li>For the training signal, a separate group is set with <code>group_id=&quot;user_action_sequence_xrecsys&quot;</code>, and <code>log_q_correction=True</code> is turned on.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">&quot;xrecsys_search&quot;: _make_cfg(
+    {
+        &quot;history_seq_len&quot;: 1022,
+        &quot;candidate_seq_len&quot;: 64,
+        ...
+        &quot;num_layers&quot;: 8,
+        &quot;emb_size&quot;: 2560,
+        &quot;emb_table_width&quot;: 1024,
+        &quot;query_heads&quot;: 20,
+        &quot;kv_heads&quot;: 4,
+        ...
+        &quot;ep&quot;: 512,
+        &quot;fsdp&quot;: 1,
+        &quot;dp&quot;: 2,
+        ...
+        &quot;use_product_surface&quot;: True,
+        &quot;output_vocab_size&quot;: 128,
+        &quot;metric_group&quot;: &quot;search&quot;,
+        &quot;use_dense_action_table&quot;: True,
+        &quot;condition_search_relevance_on_prompt&quot;: True,
+    },
+    user_vocab_size=100_000_000,
+    item_vocab_size=100_000_000,
+    author_vocab_size=30_000_000,
+    ip_vocab_size=10_000_000,
+),
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py:436-472</code></a></p>
+</blockquote>
+<p>This config pairs with two new action enums in the proto. Two <code>CLIENT_TWEET_(NOT_)RELEVANT_TO_SEARCH</code> actions were defined in the proto with new numbers.</p>
+<ul>
+<li><p>The new numbers are <code>CLIENT_TWEET_RELEVANT_TO_SEARCH = 105</code> and <code>CLIENT_TWEET_NOT_RELEVANT_TO_SEARCH = 106</code>.</p>
+</li>
+<li><p>The existing slots 161 and 162 remain as <code>*_DEPRECATED</code>.</p>
+<blockquote>
+<pre tabindex="0"><code>CLIENT_TWEET_RELEVANT_TO_SEARCH_DEPRECATED = 161;
+CLIENT_TWEET_NOT_RELEVANT_TO_SEARCH_DEPRECATED = 162;
+</code></pre>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto:379-380</code></a></p>
+</blockquote>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> We newly confirmed that consolidation is under way toward the same Phoenix Transformer architecture serving both search and feed by swapping only the per-surface config. Until now, the canon understood each surface (For You, Following, search) as a separate codebase. This consolidation goes in the same direction as the &quot;single contextual ranker for search, pre-query, and More Like This&quot; put forward by Netflix UniCoRn (2024) and the &quot;single scorer based on verbalization&quot; of GenRec (2026). Which surfaces X attaches here (tweet search, user search, media search) and when it reaches production deployment are the next points to check.</p></div>
+<h3 id="3-phoenix-proto-gained-a-reward-head-and-a-link-open-5-quantile-head">(3) Phoenix proto gained a reward head and a link-open 5-quantile head</h3>
+<p>The Phoenix proto defined a reward head and a link-open probability 5-quantile head. Phoenix&#39;s prediction output schema expanded in two directions <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>.</p>
+<p><strong>(a) The <code>RewardOutputs</code> message was introduced.</strong> A <code>RewardOutputs rewardOutputs = 8</code> field was added to <code>NextActionDistribution</code>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">message RewardOutputs {
+  repeated float values = 1;
+  repeated float policyLogits = 2;
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto:229-234</code></a></p>
+</blockquote>
+<p><code>ScoreInfo</code> also gained a new <code>rewardRerankSlotProb</code> field, declared as <code>optional double rewardRerankSlotProb = 5</code>. In other words, scaffolding is in place for Phoenix to emit a <strong>reward value head and a policy logits head</strong> alongside its 24 probability prediction heads. An actor-critic keeps a value and a policy together. It appears intended for an actor-critic approach or for reward-model-guided re-ranking slate decisions, but the field is not yet connected to any scorer <span class="badge est">inferred</span> (it is only defined in the proto, and this commit contains no code in <code>home-mixer/scorers/</code> that consumes it).</p>
+<p><strong>(b) A link-open probability quintile head was added.</strong> Names were assigned to each of the five slots <code>PLACE_HOLDER_167/168/169/170/253</code>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">P_OPEN_LINK_P10 = 167;
+P_OPEN_LINK_P25 = 168;
+P_OPEN_LINK_P50 = 169;
+P_OPEN_LINK_P75 = 170;
+...
+P_OPEN_LINK_P90 = 253;
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto:385-388, 442</code></a></p>
+</blockquote>
+<p>This means the link-open probability is predicted not as a single scalar but as a <strong>distribution made of five quantiles</strong>. Until now, X&#39;s prediction heads were single probabilities or scalars, so this head is the first case of an approach that predicts a distribution shape being introduced in the ranker. Whether it is actually quantile regression or a categorical mixture head must be confirmed by a deep dive into <code>recsys_model.py</code>. That file was heavily reworked at +265/−25.</p>
+<p><strong>(c) Seven SID (semantic ID) fields were added to <code>SlateContext</code>.</strong> <code>sidKnown</code>, <code>sidK1/2/3</code>, and <code>sidGap1/2/3</code> are new. At the proto level, these fields match the SID fields connected to VMRanker in Gen4+3 (8/18). An SID is an ID that represents a post as a sequence of codewords from coarse to fine layers. VMRanker is a slate reordering service.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A Following-pipeline-only muted-keyword filter and a quoted text hydrator were added. This change continues the Following pipeline hardening.<ul>
+<li><code>FollowingViewerMutedKeywordFilter</code> (65 new lines) matches against quoted text and ancestors as well.</li>
+<li><code>QuotedPostTextHydrator</code> (106 new lines) fetches quoted text from TES.</li>
+<li>TES (Tweet Entity Service) is X&#39;s internal tweet metadata lookup service.</li>
+</ul>
+</li>
+<li>Added a Grok 4.6 internal 10% dial to grox PTOS, which began sending 10% of calls to 4.6 instead of 4.5 in child-safety cross-validation and deluxe 4.3 category reclassification <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/aad7179/grox/flows/ptos/classifier.py#L276-L300" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py:276-300</code></a>.<ul>
+<li>The 4.6 response is parsed with <code>self._parse_policy(raw)</code> exactly like 4.5&#39;s and used in the verdict. It is a gradual rollout that splits live traffic, not a shadow that discards the results (L281-290, L477-482).</li>
+<li>grox is a Grok-based nearline annotation pipeline. PTOS is the layer in the grox safety pipeline that judges violation categories on a policy basis.</li>
+<li>The dial is <code>_GROK_4_6_INTERNAL_DIAL = 0.1</code> in grox PTOS <code>classifier.py</code>.</li>
+<li><code>prior_nsfw.py</code> (34 new lines) separates the Manhattan lookup cache.</li>
+</ul>
+</li>
+<li>An env-gated shadow deployment mirroring infrastructure was set up in VF.<ul>
+<li>The setup code is <code>visibility-filtering/dark_traffic_setup.rs</code> (109 new lines).</li>
+<li>The shadow deployment name is <code>xai-vf-shadow.prod.visibility</code>.</li>
+</ul>
+</li>
+<li>In the Phoenix default config, three bools and the engagement counts flag were <strong>promoted to train-default ON</strong>.<ul>
+<li>The default config is <code>_home_direct_packed_base()</code>.</li>
+<li>The three bools are <code>enable_stale_post</code>, <code>enable_is_author_followed_by_viewer</code>, and <code>enable_is_author_following_viewer</code>, whose values began to be filled in Gen4+1 (8/14).</li>
+<li>The engagement counts flag is <code>enable_engagement_counts</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> was revised as follows:</p></div>
+<ul>
+<li>Added a Gen4+4 (aad7179, 2026-08-19) row to the generation table.</li>
+<li>The one-line summary covers 8 items: Muon, xrecsys_search, RewardOutputs, link-open 5-quantile, Following filter, Grok 4.6 dial, dark_traffic, and the train-default promotion.</li>
+<li>Greatly expanded the &quot;Phoenix training and index&quot; section and created 3 new subsections. The subsections are &quot;Gen4+4 Phoenix dense-parameter optimizer switch from Adam → Muon&quot;, &quot;Phoenix expanded to search ranking&quot;, and &quot;New reward head + link-open 5-quantile head in Phoenix proto&quot;.</li>
+<li>Added a train-default ON promotion item below the bool feature table.</li>
+<li>Added a subsection &quot;Gen4+4 new — Following-pipeline-only muted-keyword filter + quoted-text hydrator&quot; to the filter section.</li>
+<li>Added a subsection &quot;Gen4+4 Grok 4.6 internal 10% traffic dial + NSFW reclassification skip cache&quot; to the Grox → PtOS section.</li>
+<li>Introduced &quot;Gen4+4 visibility-filtering shadow deployment (<code>xai-vf-shadow</code>) wiring&quot; in the safety section.</li>
+<li>Introduced a &quot;Resolved by the Gen4+4 release&quot; subsection in the open questions section, summarizing eight resolved items and six that need a deep dive.</li>
+<li>Added 10 links to files related to aad7179 in the sources section.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The character of the follow-up commits that have continued for three days in a row from 8/17 changed substantially today. From 8/14 through 8/18 (Gen4+1 through +3), the commits were &quot;small daily refinements,&quot; such as brand safety wording adjustments, new filters, hydrator branching, and flow unification. Gen4+4 expanded substantively along the following three axes:</p></div>
+<ul>
+<li>Overhauled the training pipeline (Muon).</li>
+<li>Expanded the retrieval surface (search).</li>
+<li>Introduced safety infrastructure (dark traffic).</li>
+</ul>
+<p>The next four points about Phoenix are new axes that were not in what the canon understood from Gen3 through Gen4+3:</p>
+<ul>
+<li>Phoenix is trained with Muon, an LLM optimizer.</li>
+<li>Phoenix also covers the search surface.</li>
+<li>Phoenix has a reward head.</li>
+<li>Phoenix predicts link-click probability as a distribution.</li>
+</ul>
+<p>In particular, the Muon adoption is the first case confirmed in code among the large-scale production recsys training pipelines this repository has tracked. It is also the first data point for the observation that an optimizer that started in LLM training is spreading to ranker and retrieval training, so <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a> gains one new axis to check. The search-surface expansion is a candidate for the second company statement following the &quot;single search and recommendation ranker&quot; trend pioneered by Netflix UniCoRn and GenRec, so the next commits should show whether production deployment is confirmed. Muon adoption and the Phoenix search expansion are the first two facts confirmed in the large-scale production recsys training pipelines this repository has tracked, so we marked them as deep-dive targets.</p>
+<h2 id="2-artwork-and-preview-personalization-moved-to-clip-two-tower-and-mediafm--netflix"><span class="num">2</span>Artwork and preview personalization moved to CLIP two-tower and MediaFM — Netflix</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">Multimedia Asset Personalization via Multimodal Embeddings at Netflix (arXiv 2608.18322)</a> — arXiv, submitted 2026-08-18, paper. All eight authors are affiliated with Netflix. The authors are Emma Yanyang Kong, Aditya Deshpande, Bowei Yan, Asad Abbasi, Santiago Castro, Avneesh Saluja, David Fagnan, and Ashish Rastogi, and the affiliations were confirmed from the title and affiliation listing.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Since the <a href="https://netflixtechblog.com/artwork-personalization-c589f074ad76" target="_blank" rel="noopener">full-deployment statement in a blog post</a> in 2017, the canon has kept Netflix&#39;s artwork personalization at the level of a one-line mention under &quot;re-ranking and diversity&quot;, without major updates. The 2017 bandit approach used a <strong>separate model per canvas</strong>, so it trained and served differently for each of five canvases (billboard / vertical box / horizontal panel / short panel / landscape panel). Also, the content of the image itself was handled outside the model, so cold start for new titles and assets was fundamentally difficult. This paper is the first source to formalize, with quantitative A/B figures, that the 2017 architecture changed generations to a <strong>CLIP-based unified two-tower and MediaFM, Netflix&#39;s own tri-modal foundation model</strong>.</p></div>
+<p>The new concepts are as follows:</p>
+<ul>
+<li>CLIP is a vision-language model OpenAI released in 2021. It maps images and text into the same embedding space, which enabled zero-shot image classification and search. Here the 768-dimensional embeddings produced by pretraining the image encoder are reused as they are.</li>
+<li>A two-tower model is a retrieval/ranking architecture in which a user tower and an item tower each produce a representation and a dot product gives the matching score. In this paper, the CLIP image embedding is concatenated to the item tower.</li>
+<li>SeqCLIP is a CLIP-style frame sequence encoder. It processes the shots of a video preview in order and produces a visual representation per shot.</li>
+<li>wav2vec 2.0 is a self-supervised speech representation learning model (Facebook, 2020). Here it handles the representation of the audio track of a preview shot.</li>
+<li>text-embedding-3-large is a text embedding model OpenAI released in 2024. Here it processes the timed-text of a shot. Timed-text is text in which subtitles and dialogue carry timestamps.</li>
+<li>Masked Shot Modeling is a self-supervised objective that moves BERT&#39;s Masked Language Modeling to the shot level. It masks 20% of the shots and reconstructs them with a cosine distance loss.</li>
+<li>IPS (Inverse Propensity Scoring) lift is an offline metric often used in off-policy evaluation. It estimates the counterfactual performance of a new model from logged random impression data.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span></p></div>
+<h3 id="the-clip-based-unified-two-tower-merged-five-canvases-into-a-single-model">The CLIP-based unified two-tower merged five canvases into a single model</h3>
+<p>Five per-canvas models were unified into a single two-tower that concatenates the CLIP image embedding (768-d) into the item tower <span class="badge ok">verified</span> §3.</p>
+<ul>
+<li>Training is reward-weighted. Per-canvas training examples are balanced by reward weights so that training does not skew toward a particular canvas.</li>
+<li>On cold start, new titles and assets can be served on &quot;day zero&quot; from the CLIP embedding alone, without interaction history. This removes a fundamental limitation of ID-only models.</li>
+</ul>
+<blockquote>
+<p>&quot;Augmenting a two-tower model with CLIP image embeddings lets a single model serve all five Netflix artwork canvas types, replacing five separately trained per-canvas models and substantially improving cold-start performance.&quot;
+— <a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">arXiv 2608.18322 abstract</a></p>
+</blockquote>
+<p>There are four online A/B results:</p>
+<ul>
+<li>The core discovery metric rose by <strong>+0.127%</strong> in relative terms (p&lt;0.005) <span class="badge ok">verified</span> §5.1.</li>
+<li>Compared with the Eclipse UI holdback, discovery rose <strong>+0.233%</strong> and streaming hours rose <strong>+0.184%</strong> <span class="badge ok">verified</span> §5.1.<ul>
+<li>A holdback is a comparison group left without the change applied.</li>
+</ul>
+</li>
+<li>The authors estimate that <strong>≈350M streaming hours</strong> are added per year <span class="badge ok">verified</span> §5.1.</li>
+<li>By reusing CLIP&#39;s joint text-image space, <strong>query-aware artwork</strong> was applied to the search canvas, and playthrough rate rose <strong>+0.36%</strong> (p&lt;0.05) <span class="badge ok">verified</span> §5.1.</li>
+</ul>
+<h3 id="mediafm-is-a-tri-modal-foundation-model-that-netflix-trained-in-house">MediaFM is a tri-modal foundation model that Netflix trained in-house</h3>
+<ul>
+<li>MediaFM is an in-house tri-modal FM for video preview personalization <span class="badge ok">verified</span> §4.<ul>
+<li>It uses three modalities, visual, audio and timed-text, handled by SeqCLIP, wav2vec 2.0 and text-embedding-3-large respectively.</li>
+<li>For each shot, it concatenates them into a <strong>2,304-d unit-normed</strong> vector.</li>
+<li>The encoder is a BERT-style 3-layer / 8-head transformer.</li>
+<li>It performs self-supervised pretraining with <strong>Masked Shot Modeling</strong> (20% of shots are masked) and a <strong>cosine distance loss</strong>.</li>
+<li>The preview representation is obtained by <strong>mean-pooling</strong> the contextualized shot embeddings.</li>
+<li>The training corpus is a large-scale shot corpus drawn from the Netflix show catalog. The exact scale is not public.</li>
+<li>It is applied to video preview personalization on all device platforms. Previews are 30–90 seconds long.</li>
+<li>The gain is largest on TV UI surfaces.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;MediaFM, our in-house tri-modal foundation model trained on a large-scale corpus of shots from the Netflix show catalog, fusing visual (SeqCLIP), audio (wav2vec 2.0), and timed-text signals; adopted for video preview personalization, it outperforms strong visual-only baselines both offline and in online A/B tests.&quot;
+— <a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">arXiv 2608.18322 abstract</a></p>
+</blockquote>
+<ul>
+<li>In the online A/B test, the streaming metric rose by a relative <strong>+0.193%</strong> (p&lt;0.02) <span class="badge ok">verified</span> §5.2.</li>
+<li>The offline IPS lift is 0.380% <span class="badge ok">verified</span> §5.2.</li>
+<li>Both offline and online results confirmed that the tri-modal model beats the visual-only baseline <span class="badge ok">verified</span> §5.2.<ul>
+<li>In other words, the gain only holds when all three modalities are attached.</li>
+</ul>
+</li>
+</ul>
+<h3 id="new-mediafm-checkpoints-are-gated-by-an-offline-proxy-task">New MediaFM checkpoints are gated by an offline proxy task</h3>
+<p>Netflix deployed a new offline proxy called Popularity-Based Winner to gate the release of MediaFM checkpoints <span class="badge ok">verified</span> §5.4.</p>
+<ul>
+<li>The proxy predicts &quot;which asset would have won if it had been shown under an unpersonalized, uniform serving policy&quot;, <strong>taking only the asset content embedding as input</strong>.<ul>
+<li>The approach is linear probe binary classification. A linear probe measures representation quality by training only a linear classifier on top of fixed embeddings.</li>
+</ul>
+</li>
+<li>The proxy is useful because it can rank embedding quality without end-to-end integration or an A/B test.<ul>
+<li>A correlation with online results was also observed. The ranking by probe accuracy matched the ranking by offline IPS and by online A/B results across all three signals.</li>
+</ul>
+</li>
+<li>MediaFM&#39;s probe accuracy is <strong>+25.90 percentage points</strong> higher than picking at random.<ul>
+<li>SeqCLIP alone is <strong>+18.75 pp</strong>.</li>
+<li>The tri-modal uplift reproduces on the shot-level proxy as well.</li>
+</ul>
+</li>
+<li><strong>Every new MediaFM checkpoint is gated by this proxy.</strong> Only after the candidate space is pruned does it move on to an A/B test.<ul>
+<li>This is a case where Netflix partly worked around its long-standing problem, that offline metrics do not predict A/B results, with a single task that addresses only embedding quality.</li>
+</ul>
+</li>
+</ul>
+<h3 id="the-netflix-embedding-store-caches-in-three-tiers-at-the-platform-layer">The Netflix Embedding Store caches in three tiers at the platform layer</h3>
+<p>The Netflix Embedding Store caches in three tiers at the platform layer <span class="badge ok">verified</span> §4.3.</p>
+<ol>
+<li><strong>Content embeddings</strong> are precomputed at the moment an asset enters the catalog (ingestion time).</li>
+<li><strong>Item-tower projections</strong> are cached per asset.</li>
+<li><strong>Daily materialization</strong> precomputes the top roughly 500 titles per profile.</li>
+</ol>
+<p>This three-tier caching enables low-latency serving and cheap screening at the same time. As the netflix.md candidate generation section notes, producing member embeddings in batch was already in production in the FM era. FM is Netflix&#39;s foundation model, trained by turning a member&#39;s interaction history into a token sequence. MediaFM established the <strong>item-side embedding pipeline</strong> in the same way. It is the counterpart of the member side.</p>
+<div class="blk app"><p><span class="lbl">Canon update</span> We revised <a href="netflix.html">services/netflix.md</a> as follows.</p></div>
+<ul>
+<li>We updated the artwork line in the re-ranking, diversity and filter section to state explicitly that the generation changed from the 2017 bandit to the 2026 MediaFM.</li>
+<li>We introduced the section &quot;Artwork and video preview personalization — MediaFM tri-modal FM (2026-08 production)&quot;. Its five subsections cover the CLIP-based unified two-tower, the MediaFM tri-modal FM, the Popularity-Based Winner offline proxy, the Netflix Embedding Store infrastructure, and the implications.</li>
+<li>We changed the last updated date to 2026-08-21.</li>
+<li>We added the arXiv 2608.18322 entry to the sources section.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This paper established the artwork personalization axis as a <strong>separate production system</strong>. Until now, the canon covered artwork personalization only with a one-line mention under &quot;re-ranking and diversity&quot;, because there had been no major update since the 2017 bandit. Four things changed.</p></div>
+<ol>
+<li>The architecture was unified from per-canvas models into a single model (from 5 to 1).</li>
+<li>The modality expanded from visual only to tri-modal, and the uplift from audio and timed-text was quantitatively verified.</li>
+<li>The place that handles cold start moved from inside the ranker to pretrained embeddings (day-zero CLIP embeddings).</li>
+<li>Offline gating was built into the production process as a precondition for A/B tests (popularity-based winner).</li>
+</ol>
+<p>This can be seen as the <strong>item-side counterpart</strong> of Netflix&#39;s ongoing effort to &quot;centralize member representations with FM&quot;. FM (2025) handles members and MediaFM (2026) handles items. The two embeddings are being combined into a common substructure for the ranker, retrieval, artwork and previews. In effect, Netflix has released its four-part FM stack, Foundation Model, GenRec, MediaFM and GenPage, in both code and papers. Item centralization, the axis that corresponds to member centralization, is now folded into this repository&#39;s canon as well.</p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Deep dive into X aad7179 (needed): trace the Phoenix model code and check three things. The file to trace is <code>phoenix/xrex/models/recsys_model.py</code> (+265/−25).<ul>
+<li>See which training loop fills <code>RewardOutputs</code> and which scorer consumes it.</li>
+<li>See whether the actor-critic head is trained separately.</li>
+<li>See whether the link-open 5-quantiles are quantile regression or a categorical mixture.</li>
+</ul>
+</li>
+<li>Watch follow-up commits to X aad7179 (watching): check two things.<ul>
+<li>See how the Muon LR and the <code>muon_split_fused</code> and <code>muon_consistent_rms</code> tuning move in the next commit. This movement is a metric that shows up with a delay relative to A/B results.</li>
+<li>See whether a production deployment claim for the <code>xrecsys_search</code> config appears.</li>
+</ul>
+</li>
+<li>Wait for Netflix&#39;s follow-up announcements on MediaFM: the interest is in how Netflix merges MediaFM into the ranker (FM/GenRec).<ul>
+<li>See whether item embeddings are verbalized in the GenRec context, or stored separately from FM&#39;s item-sequence embeddings and combined later.</li>
+</ul>
+</li>
+<li>Look for a second company statement on Muon adoption: check which of Netflix FM, Meta HSTU/GEM and Kuaishou OneRec publishes a Muon-family optimizer next.<ul>
+<li>This is a new axis to check in <a href="sequence-transformer-ranking.html">topics/sequence-transformer-ranking.md</a>.</li>
+</ul>
+</li>
+<li>Check the authors and affiliations of candidates that passed the arXiv cs.IR triage: the targets are today&#39;s 3–4 candidates, such as OneModel (Xiaohongshu?), UniDot and SIDScope.<ul>
+<li>Decide in the next sweep whether to read the original text closely.</li>
+</ul>
+</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-08-20.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-08-20</span></a><a class="pg-next" href="daily-2026-08-22.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-08-22</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-08-21.html" data-title="일일 리포트 2026-08-21"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

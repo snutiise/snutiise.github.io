@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-08-29 — feed-research</title>
+<meta name="description" content="In one line: X added a new ads blender that decides ad slots by looking at both post risk and ad tier. It is not yet the default blender and sits behind an…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-08-29.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-08-29.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-08-29.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-08-29.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-08-29 — feed-research">
+<meta property="og:description" content="In one line: X added a new ads blender that decides ad slots by looking at both post risk and ad tier. It is not yet the default blender and sits behind an…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-08-29.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-08-29.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-08-29">2026-08-29</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>28 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-08-29.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added a new ads blender that decides ad slots by looking at both post risk and ad tier. It is not yet the default blender and sits behind an experiment gate.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">9</span></summary><ol><li><a href="#1-a-blender-that-sets-ad-slots-from-post-risk-and-ad-tier-was-added--x"><span class="num">1</span>A blender that sets ad slots from post risk and ad tier was added — X</a><ol><li><a href="#1-a-ad-slots-next-to-medium-risk-posts-go-only-to-bsr-high-ads-and-no-ads-are-placed-next-to-high-risk-posts">1-A. Ad slots next to medium-risk posts go only to BSR-high ads, and no ads are placed next to high-risk posts</a></li><li><a href="#1-b-vf-samples-items-missed-by-the-safety-label-cache-and-fills-them-asynchronously-ahead-of-time">1-B. VF samples items missed by the safety-label cache and fills them asynchronously ahead of time</a></li><li><a href="#1-c-phoenix-training-code-actually-calls-streaming-checkpoint-restore">1-C. Phoenix training code actually calls streaming checkpoint restore</a></li><li><a href="#1-d-fixed-a-bug-where-grpc-response-compression-lost-status-trailers-and-began-measuring-compression-time">1-D. Fixed a bug where gRPC response compression lost status trailers, and began measuring compression time</a></li><li><a href="#1-e-spread-peer-load-evenly-by-giving-each-pod-a-different-shard-order">1-E. Spread peer load evenly by giving each pod a different shard order</a></li><li><a href="#1-f-the-remaining-6-changes-added-observability-metrics-and-adjusted-storage-order-tests-and-batch-fallback">1-F. The remaining 6 changes added observability metrics and adjusted storage order, tests, and batch fallback</a></li></ol></li><li><a href="#2-a-paper-scaled-a-friend-recommendation-gnn-to-production-social-graph-size--arxiv"><span class="num">2</span>A paper scaled a friend-recommendation GNN to production social graph size — arXiv</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same commit, X added a warmer that samples the items the safety-label cache of the impression-verdict service missed and fills them in ahead of time.</li>
+<li>The training code of X&#39;s ranking model now actually calls streaming checkpoint restore, and serving fixed a gRPC trailer loss bug.</li>
+<li>Meta and Netflix had no new blog posts, and one friend-recommendation GNN paper on arXiv passed the radar.</li>
+</ul>
+<h2 id="1-a-blender-that-sets-ad-slots-from-post-risk-and-ad-tier-was-added--x"><span class="num">1</span>A blender that sets ad slots from post risk and ad tier was added — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/24c60942c5c5fdad3a6addffb4c6e6d2f228f04f" target="_blank" rel="noopener">xai-org/x-algorithm@24c6094</a> — xAI public repository, commit of 2026-08-28T01:00:41Z (41 files, +2071/−265), code. These notes number X commits after the Gen4 release in order, and this commit is Gen4+10.</p></div>
+<ul>
+<li>The commit message is a single line, <code>&quot;Open-source X Recommendation Algorithm&quot;</code>, as is the convention of the generation series. So the actual content can be read only from the file diff.</li>
+<li>By line count (+2071/−265, 41 files), it is larger than Gen4+7 (+1,418) and +6 (+856).</li>
+<li>It touched six subsystems, a wide range.<ul>
+<li>ads, filters, and util in home-mixer (the service that assembles the For You feed)</li>
+<li>the safety-label lookup infrastructure of visibility-filtering (VF, the service that decides per post whether it may be shown to this viewer)</li>
+<li>training and serving of Phoenix (the ranking model of X For You)</li>
+<li>reply_spam in grox (the content classification service)</li>
+<li>abuse-enforcement</li>
+<li>simclusters batch job</li>
+</ul>
+</li>
+</ul>
+<div class="blk ctx"><p><span class="lbl">Background</span> The <a href="x.html#released-source-up-to-gen4--read-this-first-to-keep-the-rest-straight">Gen4 open-source release</a> of the X For You timeline has been followed by commits one to three days apart since the 2026-08-13 headline release (47c1bcd, +363,246/−11,640). The immediately preceding commit, <a href="daily-2026-08-28.html">Gen4+9 (2026-08-26, 45b48ba)</a>, was a broad commit that bundled several infrastructure cleanups. These were the save/restore cleanup of the Phoenix checkpoint stack, unifying <code>trainer_recsys</code> valid_step lock-step, expanding the grox reply_spam LM prompt, and removing the VF media fallback cache. This Gen4+10 commit (<a href="https://github.com/xai-org/x-algorithm/commit/24c6094" target="_blank" rel="noopener">24c6094</a>) has three aspects:</p></div>
+<ul>
+<li>Phoenix streamed restore and grox monotone-only, which came in with the 2026-08-26 commit (Gen4+9), are now wired through to their consumers.</li>
+<li>A tier×tier blender option, the last piece of the ads safety stack, is new.</li>
+<li>Warmer infrastructure was added to lower the twemcache miss rate, which drives P99 latency on the VF request path.</li>
+</ul>
+<p>The pattern in which the symmetric reinforcement of the 2026-08-26 commit (Gen4+9) connects to an actual consumption path in this commit keeps repeating.</p>
+<h3 id="1-a-ad-slots-next-to-medium-risk-posts-go-only-to-bsr-high-ads-and-no-ads-are-placed-next-to-high-risk-posts">1-A. Ad slots next to medium-risk posts go only to BSR-high ads, and no ads are placed next to high-risk posts</h3>
+<p>A fourth ads blender option was added to home-mixer. The ads blender is the stage that places ads between posts in the feed, and the new blender decides ad slots with a combination table of three post risk tiers and two ad tiers (BSR, brand safety risk).</p>
+<ul>
+<li>The new blender <code>MultiRiskAdsBlender</code> was wired in as the fourth ads blender option <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/multi_risk_blender.rs" target="_blank" rel="noopener"><code>home-mixer/ads/multi_risk_blender.rs</code></a>.<ul>
+<li>The implementation is <code>home-mixer/ads/multi_risk_blender.rs</code> (332 lines, new), and the tests are <code>home-mixer/ads/tests/multi_risk_blender_tests.rs</code> (215 lines, new).</li>
+<li><code>home-mixer/selectors/blender_selector.rs</code> (+8/−4), which selects the blender, also changed (<a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/selectors/blender_selector.rs" target="_blank" rel="noopener"><code>home-mixer/selectors/blender_selector.rs</code></a>).</li>
+</ul>
+</li>
+<li>The three existing blenders <code>safe_gap</code>, <code>partition_organic</code>, and <code>time_gap</code> enforced a symmetric policy: &quot;all ads → placed only next to Safe posts.&quot;</li>
+<li>The new option <code>multi_risk</code> splits posts into three tiers and ads into two, and decides slots with an adjacency matrix.<ul>
+<li>The post tiers are <code>Safe</code>, <code>MediumRisk</code>, and <code>HighRisk</code>; the ad tiers are <code>BsrNormal</code> and <code>BsrHigh</code>.</li>
+</ul>
+</li>
+<li>The three-tier classification of posts depends on the <a href="x.html#ads"><code>BrandSafetyVerdict::HighRisk</code> tier introduced in Gen4+7 (2026-08-24)</a>.<ul>
+<li>With the introduction of <code>HighRisk</code>, the five kinds previously in medium and the new <code>SOFT_NSFW</code> were promoted.</li>
+<li>The five kinds are <code>NSFW_HIGH_PRECISION</code>, <code>NSFW_HIGH_RECALL</code>, <code>GORE_AND_VIOLENCE_HIGH_PRECISION</code>, <code>PDNA</code>, and <code>EGREGIOUS_NSFW</code>.</li>
+</ul>
+</li>
+<li>The two-tier classification of ads follows the BSR field value, which appears to be an opt-in signal by which an advertiser states it accepts having its ads shown in medium-risk contexts <span class="badge est">inferred</span> (the code has only the field definition; the advertiser UI flow is not public).<ul>
+<li>The field is <code>AdIndexInfo.ad_adjacency_control.brand_safety_risk</code>, and the values are <code>BsrNormal|BsrHigh</code>.</li>
+</ul>
+</li>
+</ul>
+<p>The slots each ad tier can occupy are as follows:</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col class="w10"><col><col></colgroup>
+<thead>
+<tr>
+<th>Ad tier</th>
+<th align="center">Next to Safe</th>
+<th align="center">Next to MediumRisk</th>
+<th align="center">Next to HighRisk</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>BsrNormal</code> (default)</td>
+<td align="center">Placed</td>
+<td align="center">Not placed</td>
+<td align="center">Not placed</td>
+</tr>
+<tr>
+<td><code>BsrHigh</code> (advertiser opt-in)</td>
+<td align="center">Placed</td>
+<td align="center"><strong>Placed</strong></td>
+<td align="center">Not placed</td>
+</tr>
+</tbody></table></div>
+<p>That is, a <code>BsrHigh</code> ad gets a medium-medium slot first, and if it fails the overlap check it moves on to a remaining safe slot <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/multi_risk_blender.rs" target="_blank" rel="noopener"><code>multi_risk_blender.rs:96-130</code></a>. However, it is still excluded if the advertiser handle is mentioned in a neighboring post or an ad keyword overlaps the neighboring text. A <code>HighRisk</code> post cannot be adjacent to any ad.</p>
+<ul>
+<li>Why a slot is empty and which constraint was binding are observed with three new metrics.<ul>
+<li>The three are <code>MultiRisk.enforcement</code>, <code>slot_outcome</code>, and <code>serving_limitation</code>.</li>
+</ul>
+</li>
+<li>The safe slot budget is the smallest of the number of ads, the spacing cap, and half the number of safe posts.<ul>
+<li>The formula is <code>safe_budget = min(num_ads, spacing_cap, safe_count / 2)</code>.</li>
+<li>Which of the three caps was binding is observed with the <code>MultiRisk.serving_limitation{factor=ads_supply|spacing|safe_posts}</code> counter.</li>
+<li>For example, if ad supply is sufficient but slots are not filled, <code>safe_posts</code> shows up as the factor. This is a signal that the viewer&#39;s feed lacked safe posts.</li>
+</ul>
+</li>
+<li>For each slot, it separately records whether it was filled with an ad or left empty, and which safety filter caught it.<ul>
+<li>The counter is <code>MultiRisk.slot_outcome{outcome=filled|unfilled_bsr_low|unfilled_handle|unfilled_keyword|unfilled_no_ads}</code>.</li>
+<li><code>SlotRejections::stuck_outcome()</code> picks the most frequent of the three rejection reasons (bsr_low, handle, keyword) as the representative cause for that slot.</li>
+<li>So the A/B dashboard can directly show &quot;the safety filter that blocked most often when a slot was empty.&quot;</li>
+</ul>
+</li>
+<li>In the same commit, an alias pointing to an existing blender was added, bringing the blender options to five in total.<ul>
+<li>The <code>&quot;partition_organic_low_risk&quot;</code> alias was added to the <code>AdsBlenderType</code> param. This alias routes to the existing <code>PartitionOrganicAdsBlender</code>.</li>
+<li>The options are <code>safe_gap</code> / <code>partition_organic</code> / <code>partition_organic_low_risk</code> / <code>time_gap</code> / <code>multi_risk</code>.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;if any_bsr_high &amp;&amp; max_medium_slots &gt; 0 &amp;&amp; spacing_cap &gt; 0 { ... } else if safe_budget == 0 { return posts_to_feed_items(scored_posts); }&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/ads/multi_risk_blender.rs" target="_blank" rel="noopener"><code>home-mixer/ads/multi_risk_blender.rs</code></a>, 2026-08-28</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a &quot;Gen4+10 (2026-08-28, 24c6094) — <code>MultiRiskAdsBlender</code> introduced&quot; subsection to the ads section of <a href="x.html#gen410-2026-08-28-24c6094--multiriskadsblender-introduced-bsr-high-ads-tier--medium-risk-fallback-slot">services/x.md</a>. The subsection contains the adjacency matrix table, the slot budget formula, and the definitions of the three metrics.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The five-day thread that began with the introduction of the HighRisk tier in Gen4+7 was completed by this tier×tier matrix blender. The sequence is <a href="x.html#ads">Gen4+7 HighRisk tier introduction</a> → <a href="x.html#ads-conversion-action-expansion--gen46-2026-08-21-28e414f">Gen4+9 ads pixel and <code>conv_asset_ids</code> wiring</a> → Gen4+10 matrix blender.</p></div>
+<ul>
+<li>With HighRisk split out as a tier and the ads pixel conversion head attached, a blender option that lets advertisers opt in to their exposure range along the tier axis is, in effect, now in place as well.</li>
+<li>From the advertiser&#39;s perspective, it is also a signal that the incentive structure of BSR-high opt-in has been put explicitly into the code. An advertiser that accepts medium-risk contexts gets medium-risk slots, which increases total impressions.</li>
+<li>However, <code>AdsBlenderType</code> is not yet the default and sits behind an experiment gate. The next checkpoint to watch is when this param&#39;s default is promoted to <code>multi_risk</code>.</li>
+</ul>
+<h3 id="1-b-vf-samples-items-missed-by-the-safety-label-cache-and-fills-them-asynchronously-ahead-of-time">1-B. VF samples items missed by the safety-label cache and fills them asynchronously ahead of time</h3>
+<p>A warmer was added that picks some of the items the cache missed during VF safety-label lookups and fills the cache ahead of time, separately from the request. The warmer does not make requests wait and does not change the verdict rules.</p>
+<ul>
+<li>The warmer was added as a new file, and the existing lookup code was wired to hand cache-miss IDs to the warmer in a fire-and-forget manner <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/visibility-filtering/safety_label_source/warmer.rs" target="_blank" rel="noopener"><code>visibility-filtering/safety_label_source/warmer.rs</code></a>.<ul>
+<li>A new file <code>warmer.rs</code> (203 lines) was created in <code>visibility-filtering/safety_label_source/</code>.</li>
+<li>The side that passes the miss IDs is <code>lookup.rs</code> next to it (<a href="https://github.com/xai-org/x-algorithm/blob/24c6094/visibility-filtering/safety_label_source/lookup.rs" target="_blank" rel="noopener"><code>visibility-filtering/safety_label_source/lookup.rs</code></a>).</li>
+</ul>
+</li>
+</ul>
+<p>For each request, VF looks up the safety labels of dozens to hundreds of candidate posts and decides Allow / Interstitial / Drop. Twemcache sits in front of the label lookup as a look-aside cache, and on a miss it falls back to Manhattan (a KV store). The hit rate of this lookup is the key variable that drives VF P99 latency.</p>
+<ul>
+<li>Labels are read from the <code>visibility/baseTweetSafetyLabelMap</code> column of Strato (the internal system X code goes through to read or store data).</li>
+<li>Verdicts follow a 3-tier policy, and the rules are <a href="x.html#4-stage-labeling-path-verified--readmemd-labeling-path">28 from <code>base_home_rules()</code> plus 26 extra for OON = 54 rules</a>. OON (out-of-network) means posts from accounts the viewer does not follow.</li>
+</ul>
+<p>The warmer works in four steps:</p>
+<ol>
+<li>It sorts cache results into four kinds and collects only the cases where the cache does not know the key as warmer targets.<ul>
+<li><code>RemoteSource::get(ids)</code> sorts the twemcache result into <code>Hit</code>, <code>NotFound</code>, <code>Miss</code>, and <code>FallThrough(reason)</code>.</li>
+<li>Only <code>Miss</code> (the cache does not know this key) is collected into a separate vector, <code>warm_ids</code>.</li>
+<li><code>NotFound</code> (does not exist) is a tweet that has no label by definition, so it is not a warmer target.</li>
+<li><code>FallThrough</code> (cache error or timeout) is a cache infrastructure problem, so it is not something the warmer can resolve.</li>
+<li>This three-way split is the principle behind introducing the warmer. The warmer resolves only the &quot;cache not yet filled&quot; state.</li>
+</ul>
+</li>
+<li>Before the Manhattan fallback request goes out, it calls <code>warmer.warm(warm_ids)</code> fire-and-forget. This does not affect request response latency.</li>
+<li>It picks a sample with a probability set by an environment variable and puts it in a bounded queue; if the queue is full, it only increments a counter and continues handling the request.<ul>
+<li><code>SampledWarmer</code> does probability sampling with the <code>VF_CACHE_WARM_SAMPLE_PCT</code> environment variable (0–100, panic on out-of-range).</li>
+<li>Only the IDs that pass are sent with <code>try_send</code> to a tokio <code>mpsc::channel</code> bounded queue (capacity 1024).</li>
+<li>If the channel is full and the send fails, it only increments the <code>WarmKeyResult::DroppedChannelFull</code> counter.</li>
+<li>It was designed so that no backpressure ever hits the request path even if the warmer channel saturates.</li>
+</ul>
+</li>
+<li>A background drain task gathers IDs and sends a bulk lookup to Strato.<ul>
+<li>After popping a vector from the queue, the task merges vectors that follow during a 500ms linger and bundles them into one batch of up to 50 IDs.</li>
+<li>The bundled batch sends a <code>batch_call</code> to Strato with <code>StratoWarmFetcher::fetch(chunk)</code> (<code>WARM_COLUMN_PATH = &quot;visibility/baseTweetSafetyLabelMap&quot;</code>).</li>
+<li>The result written back by Strato fills twemcache. However, the warmer code does not write the fetch response to twemcache directly, so we infer that a separate read-through cache layer exists <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>The pass rate and bottleneck at each warmer stage are observed with six outcome counters.<ul>
+<li><code>record_cache_warm_keys(result, count)</code> records <code>EligibleMiss</code>, <code>SampledOut</code>, <code>Enqueued</code>, <code>DroppedChannelFull</code>, <code>FetchIssued</code>, and <code>FetchFailed</code>.</li>
+<li><code>EligibleMiss</code> is the total that became warmer targets as misses, a figure before sampling.</li>
+<li>For example, a high <code>FetchFailed / FetchIssued</code> indicates a Strato infrastructure problem, and persistent <code>DroppedChannelFull</code> means the channel capacity (1024) is insufficient.</li>
+</ul>
+</li>
+<li>The same file tidies configuration by adding three new environment variables.<ul>
+<li>The new envs are <code>VF_GIZMODUCK_CLIENT_ID</code>, <code>VF_TWEMCACHE_CLIENT_NAME</code>, and <code>APP_ENV</code>.</li>
+<li>If no value is set, <code>gizmoduck_client_id()</code> assembles the value automatically from the template <code>visibility-filtering-service.{APP_ENV|prod}</code>.</li>
+<li>We presume the purpose is to separate the staging gizmoduck (X&#39;s user information service) quota and rate limit from production when VF <a href="x.html#gen44-2026-08-19--visibility-filtering-shadow-deployment-xai-vf-shadow-wiring">runs on staging with dark_traffic</a> <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a Gen4+10 subsection to the safety/visibility-filtering section of <a href="x.html#gen410-2026-08-28--sampled-async-warmer-wiring-for-safety-label-twemcache-misses">services/x.md</a>. The subsection covers the warmer flow, the bounded channel principle, the six metrics, and the config cleanup.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This warmer does not open a new layer in the VF request path; it optimizes the underlying infrastructure. The rule verdicts (3-tier / 54 rules) are unchanged.</p></div>
+<ul>
+<li>A twemcache miss occurs in two cases.<ul>
+<li>The tweet is fresh and has not yet received any labeling, so neither the cache nor a label exists.</li>
+<li>The TTL expired or the entry was evicted, so only the cache is empty.</li>
+</ul>
+</li>
+<li>This warmer addresses the second case in particular: Manhattan has the label but the cache missed it, so every request wastes a Manhattan lookup.</li>
+<li>With the sample-pct gate, it was designed so that the warmer itself does not cause a Strato overload even if traffic surges.</li>
+<li>A dial-up rollout that starts with a low <code>VF_CACHE_WARM_SAMPLE_PCT</code> and raises it gradually is also possible. It resembles other Gen4 dial-up patterns (Grok 4.6 10%→30%→100%, <a href="x.html#grox--ptos-adult-content-cross-validation-gen42-new-2026-08-17">Gen4+4→+5→+6</a>).</li>
+</ul>
+<h3 id="1-c-phoenix-training-code-actually-calls-streaming-checkpoint-restore">1-C. Phoenix training code actually calls streaming checkpoint restore</h3>
+<p>Streaming checkpoint restore, which came in only as scaffolding in Gen4+9 (2026-08-26), is actually called by the trainer starting with this commit. The core of this path is that it does not make a pinned-host copy of the optimizer state, but moves tensors to the device one at a time and inserts them into their original reference slots.</p>
+<ul>
+<li>The trainer&#39;s checkpoint load function became the actual consumer of streaming restore <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer.py:1177-1330</code></a>.<ul>
+<li><a href="x.html#phoenix-checkpoint-stack-saverestore-double-hardening--gen47-restore-2026-08-24--gen49-save-streamed-restore-warm-start-staging-2026-08-26"><code>load_checkpoint_streamed</code>, introduced in Gen4+9 (2026-08-26)</a>, had been only scaffolding wired up until now, and this commit connects it to <code>maybe_load_checkpoint</code>.</li>
+<li>The full name of the consumer is <code>Trainer.maybe_load_checkpoint</code>. The restore-side code is in <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py</code></a>.</li>
+</ul>
+</li>
+<li>The new path turns on only when all three conditions hold, and if any one fails it returns to the existing restore path.<ul>
+<li>The config flag that turns on the new path is <code>restore_streamed</code>.</li>
+<li>The three conditions are <code>restore_streamed=True</code>, <code>format == &quot;orbax&quot;</code>, and <code>save_method != &quot;tensorstore&quot;</code>.</li>
+<li>If any one fails, it logs and falls back to the existing <code>load_checkpoint</code> path (full pinned-host staging).</li>
+<li>In other words, if the config is wrong or a non-orbax checkpoint (such as tensorstore) is encountered, it falls through to the safe default path, so backward compatibility is preserved.</li>
+</ul>
+</li>
+<li>Loaded tensors are inserted in place into their slots in the original state tree (grafting).<ul>
+<li>The <code>use_streamed_restore=True</code> path itself calls <code>checkpointing_load.copy_aliased_arrays(self.state)</code> to separate aliased state leaves beforehand.</li>
+<li>The grafting is handled by the new function <code>_graft_replaced(pairs)</code>.</li>
+<li>If an aliased leaf spans two slots, it is ambiguous which slot to place it in, so <code>_graft_replaced</code> blocks this case early with an assertion.</li>
+<li>The assertion message is <code>restore_streamed does not support aliased state leaves: multiple loaded tensors share one device array</code>.</li>
+</ul>
+</li>
+<li>Two new arguments that the streaming restore function receives were also routed in this commit.<ul>
+<li>The function is <code>load_checkpoint_streamed</code>, and <code>window_gb</code> is the pinned-host budget for that batch. If None, it runs with auto-window.</li>
+<li>The <code>on_replaced</code> callback receives a list of old/new device array pairs for a completed batch and has the caller insert them into the state tree.</li>
+<li><code>window_cap_gb</code> is a safety belt set to the <code>restore_concurrent_gb</code> value only when <code>window_gb</code> is not specified. It reuses the concurrent_gb of the previous API as the window cap upper limit on the streamed path.</li>
+</ul>
+</li>
+<li>The benefit of this flow is especially large in the <code>warm_start</code> case. Warm start loads pretrained params and creates the opt state fresh.<ul>
+<li>The existing <code>do_not_load_opt_state=True</code> path trims the opt state fields beforehand with <code>warm_purge(self.state)</code>, and the streamed path leaves host_state as None and inserts only the loaded params. So no pinned-host copy of the opt state is created at all.</li>
+<li>The standard flow in which the Muon and GB300 combination flagship of Gen4+6 and +7 starts by attaching a new optimizer to pretrained parameters is now supported atomically by the checkpoint stack.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added as the first branch of the &quot;Gen4+10 (2026-08-28, 24c6094)&quot; subsection in the Phoenix training/index section of <a href="x.html#gen410-2026-08-28-24c6094--trainer-actually-consumes-streamed-restore--grpc-trailer-preservation-bugfix--copy_port-shard-schedule-shuffle">services/x.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The two-day flow from Gen4+9 to +10 was completed as &quot;scaffolding → consumer wiring.&quot; It is not clear from the code alone whether <code>restore_streamed</code> is currently the default or behind an experiment flag, but since only one line was added to the config, we infer that the default is still false <span class="badge est">inferred</span>. The next checkpoint to watch is the commit in which this flag is promoted to True in the flagship config.</p></div>
+<h3 id="1-d-fixed-a-bug-where-grpc-response-compression-lost-status-trailers-and-began-measuring-compression-time">1-D. Fixed a bug where gRPC response compression lost status trailers, and began measuring compression time</h3>
+<p>A bug where the trailer carrying the gRPC status code disappeared when Phoenix serving compressed responses with zstd was fixed. A histogram that measures compression time per method was also added in the same file.</p>
+<ul>
+<li>The previous logic lost all gRPC trailers during compression <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/grpc_compression.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/grpc_compression.rs</code></a>.<ul>
+<li>When <code>GrpcCompressionService</code> compressed the response body with zstd, it extracted only the body with <code>collected.to_bytes()</code> and wrapped it again in a new <code>axum::body::Body::from(data)</code>.</li>
+<li>In this process, <code>grpc-status</code> and <code>grpc-message</code> in particular disappeared.</li>
+</ul>
+</li>
+<li>A gRPC frame carries the status code as a trailer after the body, and that part was discarded.</li>
+<li>On the client side, the response may have arrived normally but been handled as UNKNOWN or EOF because the status trailer was missing. If so, retry logic, error logging, and circuit breakers would all have misbehaved.</li>
+<li>The new code extracts the trailer beforehand and attaches it when rebuilding the response. It is unified so the trailer is kept whether compression succeeds or fails.<ul>
+<li>The trailer is extracted beforehand with <code>collected.trailers().cloned()</code>.</li>
+<li>The <code>rebuild_response(parts, data, trailers)</code> helper reattaches the trailers with <code>Full::new(data).with_trailers(async move { Some(Ok(tr)) })</code> and then builds the response body. In short, the trailers are restored with <code>Full::new(data).with_trailers(...)</code>.</li>
+</ul>
+</li>
+<li>Two regression tests lock in this behavior.<ul>
+<li>The tests are <code>compressed_response_forwards_trailers</code> and <code>non_compressed_response_forwards_trailers</code>.</li>
+<li>As long as these two tests remain, CI will catch it if a similar refactor leaks the trailer again later.</li>
+</ul>
+</li>
+<li>A histogram that measures compression time per method is new.<ul>
+<li>It is named <code>recsys_engine_response_compress_ms{method}</code> and was put in the same file.</li>
+<li>It stamps <code>Instant::now()</code> just before entering <code>tokio::task::spawn_blocking(compress_grpc_frame)</code> and observes with <code>elapsed().as_secs_f64() * 1000.0</code> after completion.</li>
+<li>That is, the queueing time and CPU time of zstd encoding can be viewed separately per method.</li>
+<li>The buckets are shared with the request latency buckets (<code>crate::request_metrics::latency_buckets_ms()</code>).</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added as the second branch in the Phoenix section of <a href="x.html#gen410-2026-08-28-24c6094--trainer-actually-consumes-streamed-restore--grpc-trailer-preservation-bugfix--copy_port-shard-schedule-shuffle">services/x.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Trailer loss is a serious bug that silently breaks the serving contract. This commit also attaches regression tests, which greatly lowers the chance of the same problem recurring.</p></div>
+<ul>
+<li>The <code>_compress_ms</code> histogram shows how much zstd encoding of large responses on GB300 contributes to response latency. So it gives a basis for tuning the compression level.</li>
+<li>When this bug first appeared in production and what evidence was observed (customer tickets or a retry storm) are not public.</li>
+</ul>
+<h3 id="1-e-spread-peer-load-evenly-by-giving-each-pod-a-different-shard-order">1-E. Spread peer load evenly by giving each pod a different shard order</h3>
+<p>When each pod downloads several shards of a tensor in parallel, a shuffle now gives each pod a different shard request order. The order is determined deterministically by a hash of the pod name and the tensor name, so the same pod requests the same tensor in the same order even after a restart.</p>
+<ul>
+<li>Added a new function <code>shuffle_sharded_schedule(n, tensor_name)</code> that shuffles the shard request order <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/copy_port_client.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/emb_table.rs</code></a>.</li>
+<li>When each pod downloads several shards of a tensor in parallel, previously every pod requested them in order starting from index 0. As a result, the owner peer holding the first shard was briefly overloaded.</li>
+<li>The new logic applies a deterministic shuffle based on a hash of the pod name and the tensor name so that each pod requests shards in a different order, and the spike on the shard 0 peer disappeared.<ul>
+<li>The pod name comes from <code>POD_NAME</code> (or <code>HOSTNAME</code>), and the shuffle is seeded with <code>StdRng::seed_from_u64(hash)</code>.</li>
+</ul>
+</li>
+<li>Because the seed is deterministic, the same pod keeps the same order after a restart, so logs can be reproduced.<ul>
+<li>In exchange, a <code>restore_piece_order(shuffled, schedule) -&gt; Option&lt;Vec&lt;T&gt;&gt;</code> helper puts completed results back into the original order.</li>
+</ul>
+</li>
+<li>Both consumers, <code>emb_table.rs</code> and <code>copy_port_client.rs</code>, were unified on the new helper.</li>
+<li>The shuffle applies only to <code>sharded</code> ownership, and <code>replicated</code> stays in-order. All pods receive the same data, so shuffling would gain nothing.</li>
+<li>Only the first 8 indexes are logged, so you can diagnose whether the shuffle was actually applied.<ul>
+<li>The log format is <code>copy_port: shard schedule shuffled name={tensor} n={total} first={:?}</code>.</li>
+</ul>
+</li>
+<li>On encountering <code>TRANSFER_FAILED_SENTINEL</code>, it returns early with an error before restoring.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added as the third branch in the Phoenix section of <a href="x.html#gen410-2026-08-28-24c6094--trainer-actually-consumes-streamed-restore--grpc-trailer-preservation-bugfix--copy_port-shard-schedule-shuffle">services/x.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This shuffle divides the last bottleneck remaining on the shard 0 peer in inverse proportion to the number of pods. When several pods restored large embedding tables and dense weights, traffic spikes concentrated on the peer responsible for shard 0. <a href="x.html#phoenix-checkpoint-stack-saverestore-double-hardening--gen47-restore-2026-08-24--gen49-save-streamed-restore-warm-start-staging-2026-08-26">The node-serialize and concurrent_gb changes in Gen4+7</a> mitigated this problem, but the spike on the peer side remained.</p></div>
+<ul>
+<li>Deterministic shuffling matters for two reasons.<ul>
+<li>The shuffle itself can be reproduced from logs.</li>
+<li>Even when the same pod loads the same tensor several times, the order is the same, so cache hit rate observation is stable.</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-f-the-remaining-6-changes-added-observability-metrics-and-adjusted-storage-order-tests-and-batch-fallback">1-F. The remaining 6 changes added observability metrics and adjusted storage order, tests, and batch fallback</h3>
+<p>The remaining 6 changes in Gen4+10 are independent improvements. Across home-mixer, grox, abuse-enforcement, and simclusters, they changed observability metrics, storage order, regression tests, comment cleanup, and snapshot fallback.</p>
+<ul>
+<li>home-mixer serving metrics can now separate periodic polling refreshes from initial user requests <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/util/strato_context.rs" target="_blank" rel="noopener"><code>home-mixer/util/strato_context.rs</code></a> (75 lines, new).<ul>
+<li>The new utility extracts the <code>stratocontext</code> or <code>stratocontext-bin</code> key from the tonic gRPC <code>MetadataMap</code>, decodes it from base64, and parses it as the proto <code>StratoContext { is_polling: bool }</code>.</li>
+<li>That is, it extracts the <code>is_polling</code> proto field from the <code>stratocontext</code> metadata to tell periodic refreshes apart from initial user requests.</li>
+<li>The side that increments the counters is <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/side_effects/response_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/response_stats_side_effect.rs</code></a> (+34/−0).</li>
+<li>The new function <code>stat_request_context(feed, query)</code> in <code>response_stats_side_effect.rs</code> fires three counters per request.<ul>
+<li><code>&lt;feed&gt;.request.polling{polling=true|false, client}</code></li>
+<li><code>&lt;feed&gt;.request.request_context{request_context, client}</code></li>
+<li><code>&lt;feed&gt;.request.client{client, client_version}</code></li>
+</ul>
+</li>
+<li>Polling requests have shorter sequences and a different has_cached_posts probability, so observing this axis separately matters for interpreting ranking experiments.</li>
+</ul>
+</li>
+<li>grox reply_spam tightened its Manhattan storage condition, changed the storage order to Kafka first, and added follower count to the coordinated spam verdict <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/grox/flows/reply_spam/task_write.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_write.py</code></a> (+15/−21).<ul>
+<li><code>_publish_to_reply_ranking_manhattan</code> was tightened in three ways on top of the monotone-only logic from Gen4+9: <code>&gt;=</code> idempotency, Kafka-first storage order, and fail-loud fetch.<ol>
+<li>The comparison operator changed from <code>&gt;</code> to <code>&gt;=</code>. Previously, a new score equal to the existing value was written anyway (a duplicate write). Now it is skipped when <code>score &gt;= existing.score</code>. The counter name also changed from <code>higher_than_existing</code> to <code>not_lower_than_existing</code> to state the semantics explicitly.</li>
+<li>The Kafka event was moved ahead of the Manhattan write. The previous order was <code>save_reply_ranking_score(Manhattan)</code> followed by <code>save_reply_ranking_kafka_v2(Kafka)</code>, and the new order is the reverse.<ul>
+<li>Kafka is append-only, so a failure can be retried. Manhattan, by contrast, can skip the retry itself because of the monotone-only logic, and it is heavy because it also has an upsert side effect.</li>
+<li>Kafka-first is the durability order that guarantees observability consistency across the whole system.</li>
+<li>If the Manhattan write fails after the Kafka publish succeeds, the offline reprocessing pipeline can recover. In the reverse order, downstream consumers (serving cache warm-back, other consumers) would not see the new score already reflected in Manhattan.</li>
+</ul>
+</li>
+<li>The try/except around <code>fetch_reply_ranking_score</code> was removed. Previously, when the fetch failed, it logged a warning and proceeded with <code>existing = None</code>, so it always ended up writing. Now the exception is raised straight up, so the flow task is marked as failed and retried. Defensive exception handling was removed in favor of correctness of the logic.</li>
+</ol>
+</li>
+<li>The follower count change is in a second file, <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/grox/flows/reply_spam/classifier_coordinated_spam.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/classifier_coordinated_spam.py</code></a> (+5/−1).</li>
+<li>In the same commit, an argument was added so that <code>_to_convo</code> in <code>classifier_coordinated_spam.py</code> calls <code>PostRenderer.render(p, max_media=..., include_follower_count=True)</code>.</li>
+<li><code>include_follower_count</code>, which was introduced as an option in Gen4+9, is adopted here as always on. The coordinated spam verdict now receives the follower count of each account that took part in the thread as part of the prompt.</li>
+</ul>
+</li>
+<li>abuse-enforcement gained a conformance test that checks that every action shape encodes against the real AIS (ActionIntakeService) thrift schema <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/abuse-enforcement-service/service-lib/src/service.rs" target="_blank" rel="noopener"><code>abuse-enforcement-service/service-lib/src/service.rs</code></a> (+58/−0).<ul>
+<li>The new test is <code>every_action_shape_encodes_against_the_ais_schema</code>.</li>
+<li>This test prevents regressions by encoding the 8 <code>EnforcementAction</code> shapes against the real AIS thrift schema.<ul>
+<li>The shape list is suspend_user, add_user_label, add_post_label, bounce_arkose, bounce_captcha, and spam_liveness_check.</li>
+</ul>
+</li>
+<li>The target method is <code>ActionIntakeService.intakeAction</code>.</li>
+<li>It loads the schema with <code>Transcoder::from_schema_bytes(SCHEMA_AIS)</code>, finds the method with <code>lookup_method</code>, and then performs <code>build_intake_request</code> and <code>encode_call</code> for each action.</li>
+<li>In effect, CI guarantees that the payload schema of AES (abuse-enforcement-service) does not drift from the downstream thrift service.</li>
+<li>It is a safety belt attached to the flow in which scorers can send arbitrary actions through <a href="x.html#gen48-2026-08-25--aes-generic_actions-passthrough-wiring">the <code>generic_actions</code> passthrough introduced in Gen4+8</a>.</li>
+</ul>
+</li>
+<li>A regression test now pins the behavior that the home-mixer muted-keyword filter filters CJK keywords only when they appear as whole tokens <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/filters/viewer_muted_keyword_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/viewer_muted_keyword_filter.rs</code></a> (+18/−0).<ul>
+<li>The new test is <code>test_cjk_keyword_whole_token_only</code>.</li>
+<li>Muting <code>京都</code> filters <code>I visited 京都 last week</code>. In this sentence, 京都 appears whole within whitespace boundaries.</li>
+<li><code>東京都に行くのが楽しみ</code> must not be filtered. Here 京都 is a substring of 東京都.</li>
+<li>There is no diff in the filter body. That is, the filter already handled CJK word boundaries, and this change pinned those semantics with a regression test.</li>
+<li>It prevents the incident in which a muted keyword expands to substring matching and users stop seeing posts they did not expect to miss.</li>
+</ul>
+</li>
+<li>The comments on the account list of Brazil2026ElectionFilter were reorganized again, and the filter behavior is unchanged <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs</code></a> (+63/−77).<ul>
+<li>Previously, 665 accounts were listed under a single repeated comment such as <code>no live account was found</code> or <code>deleted his account</code>.</li>
+<li>Now 10 accounts carry the verdict &quot;We believe the account @X reported by the candidate is not the candidate&#39;s actual account, so we are not currently filtering it&quot;, and most of the rest are summarized as <code>no live account found</code>.</li>
+<li>The filter semantics are unchanged and the follow exception is preserved.</li>
+<li>Separately from <a href="x.html#gen48-2026-08-25--aes-generic_actions-passthrough-wiring">the list update practice in Gen4+8</a>, this change cleans up the wording of the documentation and comments.</li>
+</ul>
+</li>
+<li>The SimClusters (embeddings built by dividing the follow graph into communities) batch job now inlines a helper so that, when reading snapshots, it uses a 28-day lookback, a data center pin, and a temporary recovery path fallback together <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/24c6094/simclusters/simclusters_v2/scalding/embedding/EntityToSimClustersEmbeddingsJob.scala" target="_blank" rel="noopener"><code>simclusters/simclusters_v2/scalding/embedding/EntityToSimClustersEmbeddingsJob.scala</code></a> (+17/−2).<ul>
+<li>The target is the <code>SimClustersInterestedIn2020</code> snapshot.</li>
+<li>The <code>InterestedInSources.simClustersInterestedIn2020Source(dateRange, timeZone)</code> helper was inlined directly with the following three settings.<ul>
+<li><code>DAL.readMostRecentSnapshot(interestedIn2020WithFallback, dateRange.prepend(Days(28)(timeZone)))</code></li>
+<li><code>.withRemoteReadPolicy(ExplicitLocation(ProcAtla))</code></li>
+<li><code>fallbackPath = Some(&quot;viewfs://.../simclusters_v2_interested_in_20M_145K_2020/_TMP_RECOVERY/{timestamp}&quot;)</code></li>
+</ul>
+</li>
+<li>That is, a 28-day lookback is combined with a pin to a specific data center (ProcAtla) and a temporary recovery path fallback.</li>
+<li>The batch job became more tolerant of missing snapshots (such as lost dataset partitions or upstream delays). The change strengthens the data reliability of the SimClusters embedding job.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> These six changes were each recorded as a single checkmark line in the <a href="x.html#resolved-by-the-gen410-release--new-2026-08-28">Gen4+10 release resolved / new</a> bucket of x.md. The items are independent of one another, so indexing them in the bucket is easier to find than pulling them out into separate sections.</p></div>
+<h2 id="2-a-paper-scaled-a-friend-recommendation-gnn-to-production-social-graph-size--arxiv"><span class="num">2</span>A paper scaled a friend-recommendation GNN to production social graph size — arXiv</h2>
+<p>Of the 30 arXiv cs.IR papers skimmed, only 1 passed the acceptance criteria (platform-company authors / production or A/B / new mechanism / scale). The other 29 were rejected because they were purely academic increments, limited to a narrow domain, or had no production claim.</p>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2608.27413" target="_blank" rel="noopener">Scaling Graph Neural Networks for Friend Recommendation: Multi-Hash User Embeddings and Temporal Neighbor Sampling</a> — arXiv 2608.27413, 2026-08-27 v1, paper, CIKM 2026 accepted. There are 3 authors (Maksim Utushkin, Andrei Ovsiannikov, Alexander D&#39;yakonov). The arXiv abstract page does not list affiliations, but taking the graph scale referenced in the body together with the Russian author names, we infer VK (a large Russian social network) <span class="badge est">inferred</span>.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In friend recommendation (features of social platforms such as People You May Know and Suggested Friends), multi-hop social context such as friends of friends and the number of mutual friends is the main relevance signal, more than user attributes such as interests, age, and location. A GNN (Graph Neural Network, a message-passing model in which a node updates its own embedding by aggregating the embeddings of its neighbors) is therefore a natural framework. However, production social graphs have hundreds of millions of users and tens of billions of edges, which creates two system problems.</p></div>
+<ul>
+<li>The user ID embedding table explodes.</li>
+<li>Neighbor traversal for supernodes (accounts with an extremely large number of follows) becomes a bottleneck at O(deg) cost.</li>
+</ul>
+<p>This paper tackles these two system problems head-on.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span></p></div>
+<ul>
+<li>Multi-hash user embeddings reduced the ID embedding table by more than 98% <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2608.27413" target="_blank" rel="noopener">original text</a>.<ul>
+<li>Each user ID is represented as a combination of embedding lookups from several hash functions.</li>
+<li>It accepts hash collisions while maintaining ranking quality.</li>
+</ul>
+</li>
+<li>Temporal neighbor sampling reduced the neighbor sampling cost to logarithmic time <span class="badge ok">verified</span>.<ul>
+<li>It combines timestamp-sorted CSR (Compressed Sparse Row, a standard graph storage data structure that compresses adjacency lists into one large array and an offset array) storage with binary search.</li>
+<li>The complexity went from <code>O(deg(v) + k)</code> to <code>O(log(deg(v)) + k)</code>.</li>
+<li>That is, even for nodes with a large follow count, the neighbor traversal cost stays at logarithmic time.</li>
+</ul>
+</li>
+<li>The scale of the production social graph is 194M users · 28B edges <span class="badge ok">verified</span>.</li>
+<li>Online metrics against a strong production baseline are friend additions from recommendations +16% and unique friend adders +11.5% <span class="badge ok">verified</span>.</li>
+</ul>
+<blockquote>
+<p>&quot;On a graph with 194M users and 28B edges, our system increases friend additions from recommendations by 16 percent and unique friend adders by 11.5 percent over a strong production baseline.&quot;
+— <a href="https://arxiv.org/abs/2608.27413" target="_blank" rel="noopener">arXiv 2608.27413</a> abstract, 2026-08-27</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Radar update</span> Added as a new entry under &quot;new this month&quot; in <a href="radar.html#vk-friend-recommendation-gnn--a-case-of-scaling-a-message-passing-gnn-on-a-production-social-graph-of-194m-users-and-28b-edges">radar.md</a>. This paper does not fit the LLM-native or scaling-law lines. Instead, as a case where GNNs still survive in an explicit graph domain, it serves as a contrast to <a href="facebook.html">Meta ConnectionMind</a> (a model that reasons over paths on a graph with an LLM).</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> A double-digit uplift (+16%) over a strong prod baseline is rare in GNN papers. It reinforces the observation that the domain where GNNs ultimately survive in practice is the fully explicit graph (friend graph, follow graph).</p></div>
+<ul>
+<li>The direction differs from Meta ConnectionMind, which tries graph path reasoning with an LLM. VK pushed a pure GNN to the scale limit of its social graph.</li>
+<li>The multi-hash embedding reduction of -98% points the same way as the X SimClusters observation that embedding table size is a key constraint on serving infrastructure.</li>
+<li>The abstract does not state that it was applied without increasing serving latency. However, that is exactly the purpose of the two optimizations (shrinking the table and making neighbor traversal logarithmic).</li>
+<li>There are two next checkpoints to watch: whether the CIKM 2026 (October) presentation discloses additional affiliation and infrastructure detail, and whether statements on GNN updates for LinkedIn People You May Know and Facebook People You May Know appear.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check for the commit that promotes the ads blender default to the new matrix blender — that is the point at which this matrix applies to ads actually shown. The param is <code>AdsBlenderType</code> and the value is <code>multi_risk</code>.</li>
+<li>Check the initial production sample rate and the dial-up commit for the VF cache warmer — see whether the same dial-up practice as the Grok 4.6 dial appears here. The environment variable is <code>VF_CACHE_WARM_SAMPLE_PCT</code>.</li>
+<li>Check the default promotion of the Phoenix streaming restore config — the commit that changes it to True in flagship is the signal that the warm_start flow is attached to production training. The flag is <code>restore_streamed</code>.</li>
+<li>Watch compression level tuning after the compression time histogram was introduced — once the share of P99 that zstd contributes in GB300 responses becomes visible, the compression parameters will presumably be adjusted in a follow-up. The histogram is <code>recsys_engine_response_compress_ms</code>.</li>
+<li>Watch how the skip rate of Manhattan writes in grox reply_spam changes over time — after applying monotone-only and <code>&gt;=</code>, check what percentage of writes are actually skipped. The observation target is the <code>not_lower_than_existing</code> counter.</li>
+<li>Watch for the first case in which the AIS conformance test actually catches a regression — there is probably a reason this test was added (drift may have actually occurred in a past scorer development cycle).</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-08-28.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-08-28</span></a><a class="pg-next" href="daily-2026-08-30.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-08-30</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-08-29.html" data-title="일일 리포트 2026-08-29"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

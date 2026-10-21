@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-08-16 — feed-research</title>
+<meta name="description" content="In one line: In a follow-up commit the day after the Gen4 release, X stated in a code comment the rule for reading weights: they multiply predicted…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-08-16.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-08-16.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-08-16.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-08-16.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-08-16 — feed-research">
+<meta property="og:description" content="In one line: In a follow-up commit the day after the Gen4 release, X stated in a code comment the rule for reading weights: they multiply predicted…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-08-16.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-08-16.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-08-16">2026-08-16</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Sunday</li>
+<li><span class="meta-k">Reading time</span>27 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-08-16.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b> (1 X Gen4+1 commit, 0 new Meta/Netflix blog posts, 1 of 30 arXiv triage items passed [DrEM])</li><li class="chip">Canon files updated: <b>1</b> (x.md, 9 sections updated, 6 sources added)</li><li class="chip">Diagrams updated: <b>1</b> (x-pipeline.svg filters 17→18)</li><li class="chip">Radar entries updated: <b>1</b> (DrEM affiliation confirmed, A/B figures folded in)</li></ul>
+<div class="lead"><span class="lb">In one line</span>In a follow-up commit the day after the Gen4 release, X stated in a code comment the rule for reading weights: they multiply predicted probabilities, not action counts.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-weight-reading-rule-stated-in-code-and-brazil-election-filter-added--x"><span class="num">1</span>Weight-reading rule stated in code and Brazil election filter added — X</a></li><li><a href="#2-drem-a-noise-robust-ensemble-ranking-paper-is-confirmed-as-kuaishous--kuaishou"><span class="num">2</span>DrEM, a noise-robust ensemble ranking paper, is confirmed as Kuaishou&#39;s — Kuaishou</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same commit, X added a filter that removes from For You the posts of accounts reported to the electoral court in connection with Brazil&#39;s 2026 election, unless the viewer follows the account.</li>
+<li>Three bool inputs of the X ranking model started receiving real values for the first time.</li>
+<li>The author affiliation confirmed that DrEM, Kuaishou&#39;s ensemble ranking paper, is a production paper.</li>
+</ul>
+<h2 id="1-weight-reading-rule-stated-in-code-and-brazil-election-filter-added--x"><span class="num">1</span>Weight-reading rule stated in code and Brazil election filter added — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/c65aa17" target="_blank" rel="noopener">xai-org/x-algorithm @ c65aa17 — &quot;Open-source X Recommendation Algorithm&quot;</a> — 2026-08-14 20:55 UTC, public source code. These notes number the commits that followed the Gen4 release of the X public source (2026-08-13, 47c1bcd) in order, and this commit is Gen4+1. 21 files changed, with +2,271/−32 lines. It is smaller than yesterday&#39;s Gen4 release but very varied in nature. One commit mixes documentation of weight interpretation, a regulatory response in the Brazil filter, Thompson sampling wired into A/B experiments, three bool inputs of the ranking model, and a labeling pipeline that creates notes for abusive-account verdicts. The related README was also updated <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/README.md#august-14th-2026" target="_blank" rel="noopener"><code>#latest-updates</code> → <code>#august-14th-2026</code></a>.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The Gen4 release covered in <a href="daily-2026-08-15.html">daily/2026-08-15.md</a> yesterday (47c1bcd, 2026-08-13) spanned more than 300 files and +363K added lines, and opened everything: parameter mirroring, visibility-filtering (the impression-verdict service), and 15 labeling sub-repos. The new README itself judges that this release moved from &quot;showing the shape of the logic&quot; to &quot;attaching values and rules in a verifiable form&quot;. This commit (Gen4+1) is a follow-up cleanup and extension of Gen4 that X added the next day; in effect, it widened Gen4&#39;s character in five directions within a day. Three of them directly affect the canon (this repository&#39;s notes holding the current understanding of each service): weight interpretation, the Brazil election filter, and the input features of the ranking model.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. X stated directly that weights multiply predicted probabilities, not action counts</span></p></div>
+<ul>
+<li><p>The header comment of the parameter file of home-mixer (the service that serves the For You feed) puts this interpretation rule first <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:281-306</code></a>.</p>
+<blockquote>
+<p>&quot;Each weight multiplies the <em>predicted</em> probability of that action (P(favorite), P(repost), …) or a continuous value e.g. watch time -- the weights do not multiply raw engagement counts. One common misinterpretation is that you can read these weight ratios as count equivalences, e.g. the incorrect statement that &#39;one report cancels 468 likes&#39; -- this is incorrect because the weights apply to the predicted probabilities rather than raw counts.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:283-292</code></a></p>
+</blockquote>
+</li>
+<li><p>The canon has used statements such as &quot;reply 13.5 vs favorite 0.5 → 27×&quot;, quoted through Gen3, in several places (e.g., <a href="multi-task-ranking.html">multi-task-ranking.md</a>). X&#39;s own comment settles that this statement is wrong in principle.</p>
+<ul>
+<li>Weights multiply predicted probabilities, so they are not ratios of raw counts.</li>
+<li>In effect, by releasing the parameter mirror in Gen4, X explicitly acknowledged that without a reading guide these values cause misunderstanding.</li>
+</ul>
+</li>
+<li><p>The same comment goes on to explain why the absolute value of the report weight looks so large.</p>
+<blockquote>
+<p>&quot;And the baseline probability of a Report is more than 1000x lower than a Like, so it&#39;s weighted more to allow the prediction to affect the final ranking at all.&quot;</p>
+</blockquote>
+<ul>
+<li>The size of the report value −234 is the product of value × 1/propensity. Propensity is the base probability that the action occurs.</li>
+<li>The absolute value appears large because the propensity of a report is 1/1000 or less of that of a like.</li>
+<li>Yesterday&#39;s canon update also noted a caveat in the same direction; this time X described it itself in the code.</li>
+</ul>
+</li>
+<li><p>The same comment also rejects the misconception about mass reporting, for two reasons.</p>
+<blockquote>
+<p>&quot;It&#39;s predicting your likelihood of the action, not summing up raw weights on counts. Also, recommendations are personalized, so reports from bad actors will primarily affect recommendations for users who are similar to the bad actors, rather than having the same effect on the post&#39;s ranking to everyone.&quot;</p>
+</blockquote>
+<ul>
+<li>In sum, even if bot accounts file reports in bulk, two things hold.<ol>
+<li>The score is <strong>your</strong> predicted probability. So mass reports primarily affect the recommendations of users similar to those bots.</li>
+<li>Only actions taken on posts served in the Home Timeline count as ranking signals. So reactions generated by sharing a link in a group chat do not affect ranking.</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>The same comment block was also inserted in <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs:415-446</code></a>, and a paragraph with the same content was inserted in the <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/README.md#scoring-and-ranking" target="_blank" rel="noopener">README <code>#scoring-and-ranking</code> section</a>.</p>
+<ul>
+<li>By placing the same statement in three places, X made sure readers are not misled whether they read the code or the documents.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. For You removes posts from accounts reported to the electoral court in connection with Brazil&#39;s 2026 election, unless the viewer follows the account</span></p></div>
+<ul>
+<li><p>X announced that, under Brazilian electoral law, it removes from For You the posts of accounts reported to Brazil&#39;s electoral court while keeping accounts the viewer follows directly <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/README.md#august-14th-2026" target="_blank" rel="noopener">README.md <code>#august-14th-2026</code></a>.</p>
+<blockquote>
+<p>&quot;As announced by X, in accordance with Brazilian electoral law, For You now runs Brazil2026ElectionFilter, which removes posts from accounts reported to Brazil&#39;s Electoral Court for the 2026 election, unless the viewer explicitly follows the account. A benefit of open-source is that you can see that changes like this exist, and exactly how they work — take a look at the code.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/README.md#august-14th-2026" target="_blank" rel="noopener">README.md</a>, announcement link <a href="https://x.com/XBR/status/2088341967864320507" target="_blank" rel="noopener">@XBR</a></p>
+</blockquote>
+</li>
+<li><p>This is the first case in which a jurisdictional filter can be observed directly in code. Until now, responses to regulations such as the DSA, GDPR, and NetzDG could mostly be confirmed only through regulatory filings (the EU transparency report).</p>
+</li>
+<li><p>The filter is named <code>Brazil2026ElectionFilter</code>. It hardcodes 665 accounts reported to Brazil&#39;s electoral court (TSE) as a code constant and leaves the account name in a comment next to each ID <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/filters/brazil_2026_election_filter.rs#L9-L20" target="_blank" rel="noopener"><code>brazil_2026_election_filter.rs:9-20</code></a>.</p>
+<ul>
+<li>The comment above the constant reads &quot;User ids reported to the Electoral Court for the Brazil 2026 election&quot;, and it links the TSE candidate dataset (<code>candidatos-2026</code>) as the underlying data.</li>
+<li>The constant&#39;s type is <code>FxHashSet&lt;u64&gt;</code>, and the comments take the form <code>@username</code>.</li>
+<li>If the viewer follows the account, it is treated as an exception (applied symmetrically, regardless of political orientation).</li>
+</ul>
+</li>
+<li><p>The filter body, <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs</code></a>, is 1,573 lines, most of which are the account ID constants and the usernames noted in comments.</p>
+<ul>
+<li><p>The core logic is a little over 10 lines.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">static BRAZIL_2026_ELECTION_USER_IDS: LazyLock&lt;FxHashSet&lt;u64&gt;&gt; = ...;  // 665 accounts
+
+impl Brazil2026ElectionFilter {
+    fn is_excluded_author(user_id: u64, followed_user_ids: &amp;FxHashSet&lt;u64&gt;) -&gt; bool {
+        BRAZIL_2026_ELECTION_USER_IDS.contains(&amp;user_id) &amp;&amp; !followed_user_ids.contains(&amp;user_id)
+    }
+    fn should_remove(candidate: &amp;PostCandidate, followed_user_ids: &amp;FxHashSet&lt;u64&gt;) -&gt; bool {
+        let is_excluded = |user_id: u64| Self::is_excluded_author(user_id, followed_user_ids);
+        if is_excluded(candidate.author_id) { return true; }
+        if candidate.retweeted_user_id.is_some_and(is_excluded) { return true; }
+        if candidate.quoted_user_id.is_some_and(is_excluded) { return true; }
+        candidate.ancestor_users.iter().copied().any(is_excluded)
+    }
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>If any of the candidate&#39;s author, retweet original author, quote original author, or reply-thread ancestor authors is on the list and the viewer does not follow that account, the filter removes the candidate.</p>
+<ul>
+<li>The follow exception is based on the user&#39;s own follow graph, so it works symmetrically regardless of the political spectrum.</li>
+</ul>
+</li>
+<li><p>The file header comment states the legal basis <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p>&quot;Application providers that use a recommendation system for users must exclude from the results the channels and profiles reported to the Electoral Court under the terms of § 1º of this article and, except in cases of paid boosting, the content posted on them.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs:9-11</code></a></p>
+</blockquote>
+</li>
+<li><p>The dataset behind the list is also noted in a comment <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p>&quot;<a href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026" target="_blank" rel="noopener">https://dadosabertos.tse.jus.br/dataset/candidatos-2026</a>&quot;</p>
+</blockquote>
+</li>
+<li><p>This jurisdictional filter is applied right after the social graph filter handles mutes and blocks. The connection point is <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:356-368</code></a>.</p>
+<ul>
+<li>It sits right after <code>AuthorSocialgraphFilter</code> and right before <code>VideoFilter</code>.</li>
+</ul>
+</li>
+<li><p>The list includes people from several parties. A few excerpts from the code:</p>
+<ul>
+<li><code>40053694 // @FlavioBolsonaro</code> (Flavio Bolsonaro, Liberal Party senator)</li>
+<li><code>21069302 // @marcelvanhattem</code> (Marcel van Hattem, New Party member of the lower house)</li>
+<li><code>48298703 // @eduardopaes</code> (Eduardo Paes, Social Democratic Party, mayor of Rio de Janeiro)</li>
+<li><code>25858078 // @ManuelaDavila</code> (Manuela D&#39;Avila, Communist Party)</li>
+<li><code>33374761 // @cirogomes</code> (Ciro Gomes, Democratic Labour Party)</li>
+</ul>
+</li>
+<li><p>There is one unusual comment at the top of the code <span class="badge ok">verified</span>.</p>
+<blockquote>
+<p>&quot;OmarAzizSenador deleted his account at the time this code was written.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs:15</code></a></p>
+</blockquote>
+<ul>
+<li>The documentation is detailed enough to separately note, in a comment, a person who is on the TSE list but whose X account was deleted.</li>
+</ul>
+</li>
+<li><p>If this practice continues, similar filters will be visible in code for each country&#39;s election cycle. It is also a signal that the following phrase X stressed in the README of the 2026-08-14 commit (Gen4+1) applies to regulatory responses too: &quot;a benefit of open-source is that you can see that changes like this exist, and exactly how they work&quot;.</p>
+</li>
+<li><p>Three things to watch next:</p>
+<ol>
+<li>How the filter is cleaned up after the election cycle ends. The Brazil 2026 election is an event that ends at a specific point, so this filter is also temporary. Whether X removes the filter, empties only the constant and keeps the code, or moves it to a separate archive will be an indicator of how long the open-source practice lasts.</li>
+<li>Whether filters responding to other countries&#39; elections and regulations are added in the same way. Whether similar filters appear in the code for EU parliamentary elections, Indian general elections, or US presidential elections is what to check over the next six months.</li>
+<li>How this connects to the diff-documentation practice announced by <code>docs/BIDIRECTIONAL_BOOST_CHANGE.md</code>. That document, covered yesterday, was a model for documenting parameter changes as code diffs from now on. How later commits document additions to or deletions from the Brazil filter&#39;s 665-account list will also show the maturity of this practice.</li>
+</ol>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A path that picks cold start candidates with Thompson sampling appeared, but it is off by default</span></p></div>
+<ul>
+<li><p>The cold start slot selector was updated <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs:151-190</code></a>. Now the way of choosing &quot;which candidate fills the slot&quot; from the cold start candidate set splits into two branches: greedy max-score and Beta reward Thompson sampling.</p>
+<ul>
+<li>The changed file is <code>author_cold_start.rs</code>.</li>
+<li>Thompson sampling draws one sample per candidate from its Bayesian posterior and selects by that value; it is a standard bandit technique that induces exploration probabilistically.</li>
+</ul>
+</li>
+<li><p>Six parameters were newly added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:687-724</code></a>.</p>
+<ul>
+<li><code>EnableColdStartThompsonSampling = false</code>: the default is off. Actual production still runs greedy.</li>
+<li><code>ColdStartBetaAlpha0 = 0.75</code>: the α of the Beta(α₀, β₀) prior; it counts as the prior observation of likes.</li>
+<li><code>ColdStartBetaBeta0 = 49.25</code>: β₀; it counts as the prior observation of non-likes. Since α₀ + β₀ = 50 is the effective sample size of the prior, it roughly means the prior knowledge &quot;0.75 likes out of 50 impressions&quot;.</li>
+<li><code>ColdStartTsTopK = 5</code>: take the top K by Beta sampling, then break ties with the actual score.</li>
+<li><code>ColdStartImpressionScale = 1.0</code>: the scale multiplied into view_count.</li>
+<li><code>ColdStartTrackedIds = &quot;&quot;</code>: a comma-separated list of account and post IDs that specifies the targets for which serving statistics are instrumented.</li>
+</ul>
+</li>
+<li><p>The sampling rule is written in the same file <span class="badge ok">verified</span>.</p>
+<ul>
+<li><p>For each candidate i, one sample is drawn from the posterior <code>Beta(α₀ + likes, β₀ + max(views − likes, 0))</code>. The top K are chosen by that value, and within them the candidate with the highest original score is selected.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn sample_reward&lt;R: Rng + ?Sized&gt;(candidate: &amp;PostCandidate, alpha0: f64, beta0: f64, scale: f64, rng: &amp;mut R) -&gt; f64 {
+    let n = scale * candidate.view_count.unwrap_or(0) as f64;
+    let x = (candidate.fav_count.unwrap_or(0).max(0) as f64).min(n);
+    let alpha = alpha0 + x;
+    let beta = beta0 + (n - x).max(0.0);
+    Beta::new(alpha, beta).map(|d| d.sample(rng)).unwrap_or(0.5)
+}
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>The fact that the default is off matters. As of this release, the cold start applied to real users is still max-score greedy.</p>
+<ul>
+<li>Thompson sampling is only wired into the A/B infrastructure, and whether it is actually adopted will be decided by upcoming A/B results.</li>
+</ul>
+</li>
+<li><p>If a specific account or post ID is registered in <code>ColdStartTrackedIds</code>, a counter tracks how many times that account appeared from which source in the cold start pipeline. It is a per-item observation hook that lets a specific account be observed directly in A/B experiments.</p>
+<ul>
+<li>The counter name is <code>home_mixer.cold_start_tracked_ids_total{id, source}</code>.</li>
+<li>For example, if one politician&#39;s account is registered, one can count how many times that account&#39;s posts were shown through which cold start path.</li>
+<li>The existence of this instrumentation hook points the same way as Gen4&#39;s under-the-hood transparency approach, which opened account-level label lookup. However, this is X-internal instrumentation, not material released externally.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Three bool inputs of the ranking model receive real values for the first time</span></p></div>
+<ul>
+<li>The input features of Phoenix (the Transformer ranking model of X For You) were populated for the first time. This input field had been classified as a &quot;dead field&quot; in the canon and remained on the caveat list.<ul>
+<li>Through early Gen4, the field observed in code was <code>bool_features: vec![false; ...]</code>.</li>
+<li>This &quot;dead field&quot; <code>bool_features</code> was entirely filled with <code>vec![false; ...]</code> from Gen3 through early Gen4, so it had no effect as an input.</li>
+</ul>
+</li>
+<li>In this commit (Gen4+1), three of them were populated for the first time <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/phoenix/crates/common/xai-recsys/src/util.rs" target="_blank" rel="noopener"><code>phoenix/crates/common/xai-recsys/src/util.rs:456-540, 728-900</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/phoenix/crates/common/xai-recsys/src/model_config.rs" target="_blank" rel="noopener"><code>phoenix/crates/common/xai-recsys/src/model_config.rs:40</code></a>.<ul>
+<li>The newly populated ones are <code>IS_STALE_POST14D</code> and <code>IS_AUTHOR_FOLLOWED/FOLLOWING_BY_VIEWER_SEQ</code>, three bool sequences in all. They indicate whether a post is stale at 14 days, and the two follow directions between author and viewer.</li>
+<li>The core of the code diff is two places where <code>vec![false; candidate_seq_len * n_post_bool]</code> was replaced with <code>candidate_bool_features</code>. It applies to both the candidate sequence and the history sequence.</li>
+</ul>
+</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>bool feature</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>IS_STALE_POST14D</code></td>
+<td>When <code>enable_stale_post = true</code> and <code>now - creation_ts &gt; STALE_POST_14D_TTL_SEC</code>, it fills the fav/reply/retweet/quote/view counts with 0 and sets this bool to true. It ignores all engagement signals of posts older than 14 days and only tells the ranker the fact that the post is &quot;stale&quot;.</td>
+</tr>
+<tr>
+<td><code>IS_AUTHOR_FOLLOWED_BY_VIEWER_SEQ</code></td>
+<td>Indicates whether the viewer follows this candidate&#39;s author. It is attached to the candidate sequence and the history sequence respectively.</td>
+</tr>
+<tr>
+<td><code>IS_AUTHOR_FOLLOWING_VIEWER_SEQ</code></td>
+<td>Indicates whether the candidate&#39;s author follows the viewer; it is an input that detects bidirectional relationships.</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>Two signals that handle stale posts are inserted as a pair <span class="badge ok">verified</span>.<ul>
+<li><p>If stale, the counts are set to 0 and the bool is raised; if not stale, the actual counts are put in.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let creation_valid = candidate_post_creation_ts_sec[j] &gt; 0;
+let original_age_sec = now_sec as i64 - candidate_post_creation_ts_sec[j] as i64;
+let is_stale = stale_post_enabled &amp;&amp; creation_valid &amp;&amp; original_age_sec &gt; STALE_POST_14D_TTL_SEC;
+candidate_is_stale_post[j] = is_stale;
+if is_stale {
+    stamp_engagement_counts(..., 0, 0, 0, 0, 0);
+} else {
+    stamp_engagement_counts(..., candidate.fav_count, candidate.reply_count, ...);
+}
+</code></pre></figure>
+</li>
+<li><p>The ranker can explicitly learn a candidate with &quot;count=0 + is_stale=true&quot; and one with &quot;count=0 + is_stale=false&quot; as different cases.</p>
+</li>
+</ul>
+</li>
+<li>It is especially interesting that the stale post signal is paired with count zeroing. It attaches an explicit label to tell the ranker &quot;this count is low not because the post is unpopular but because it is old and its exposure has stopped&quot;.<ul>
+<li>This pairing is a design that lets the ranker work around, through training, the <a href="multi-task-ranking.html">snowball problem</a> (a self-reinforcing loop in which a low count on an old post leads to a low ranking, and that ranking in turn leads to a low count) that the canon has observed through Gen3.</li>
+</ul>
+</li>
+<li>It appears to be a design that lets the ranker work around, through training, the problem the canon has observed since Gen3: &quot;<strong>a low count on an old post leads to a low ranking, and that ranking in turn leads to a low count, a self-reinforcing loop</strong>&quot; <span class="badge est">inferred</span>. X did not document the purpose of this design directly, but the structure pairing count zeroing with a bool set strongly suggests that direction.</li>
+<li>The <code>is_mutual_follow</code> boost (reply +15) quoted in Gen4 was a condition hardcoded in the scorer. It also matters that the model now receives follow directions as separate input bools and can pick up a similar pattern through training.<ul>
+<li>The shift from hardcoded boosts to learned signals matches the overall direction seen in the move from Gen3 to Gen4: the weight moves from manual gating to model training.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. The gate and head-selection logic of the abusive-account verdict note generator was released, and the explanatory sentences were masked</span></p></div>
+<ul>
+<li><p>The enforcement note generator of BDSM (the scorer that detects abusive accounts from account behavior sequences) was partially released.</p>
+<ul>
+<li>From Gen3 through early Gen4, <code>build_enforcement_note</code> at <code>bdsm/runtime/score_results_sink_focal.py:78</code> was a stub containing only <code>return None</code>.</li>
+</ul>
+</li>
+<li><p>In this commit (Gen4+1), the gate logic and the dominant-head (the bot head with the highest score) selection logic were released, and only the template strings were left as sentinel values <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/bdsm/runtime/score_results_sink_focal.py" target="_blank" rel="noopener"><code>bdsm/runtime/score_results_sink_focal.py:78-128</code></a>.</p>
+<ul>
+<li><p>The sentinel value is <code>&quot;&lt;redacted&gt;&quot;</code>.</p>
+</li>
+<li><p>The released function body is as follows.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def build_enforcement_note(head_scores_list, action_hist_list):
+    if not head_scores_list: return None
+    total = sum(h[&quot;cnt&quot;] for h in (action_hist_list or ()))
+    if total &lt; 30: return None                       # MIN_ACTIONS gate
+    bot_heads = [(h[&quot;head_name&quot;], h[&quot;score&quot;]) for h in head_scores_list
+                 if h[&quot;head_name&quot;] != &quot;LegitimateUser&quot; and h[&quot;score&quot;] &gt; 0.5]
+    if not bot_heads: return None
+    bot_heads.sort(key=lambda x: x[1], reverse=True)
+    dominant_name, dominant_score = bot_heads[0]
+    note = _ENFORCEMENT_TEMPLATES.get(dominant_name, _REDACTED_TEMPLATE)
+    note += f&quot; [model: {dominant_name}={dominant_score:.2f}&quot;
+    if len(bot_heads) &gt; 1:
+        secondary = &quot;, &quot;.join(f&quot;{n}={s:.2f}&quot; for n, s in bot_heads[1:3])
+        note += f&quot;, also: {secondary}&quot;
+    note += &quot;]&quot;
+    return note
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>The names of the seven bot heads were officially released, and each head&#39;s template string is replaced with a sentinel.</p>
+<ul>
+<li>The head names are <code>FollowBot</code>, <code>LikeBot</code>, <code>EngagementAmplifier</code>, <code>ReplySpamBot</code>, <code>TweetSpamBot</code>, <code>RTBot</code>, and <code>MultiActionBot</code>.</li>
+<li>The replacement value is <code>_REDACTED_TEMPLATE = &quot;&lt;redacted&gt;&quot;</code>.</li>
+</ul>
+</li>
+<li><p>The note outputs as is which bot family was scored and how highly, but the sentences explaining why it was scored that way (which action patterns caused it) are not public.</p>
+<ul>
+<li>The final note takes a form such as <code>&quot;&lt;redacted&gt; [model: FollowBot=0.91, also: ReplySpamBot=0.60, LikeBot=0.53]&quot;</code>.</li>
+</ul>
+</li>
+<li><p>The README states the reason for releasing only half <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/bdsm/README.md" target="_blank" rel="noopener"><code>bdsm/README.md</code></a>.</p>
+<blockquote>
+<p>&quot;The public package keeps the gates (MIN_ACTIONS, dominant-head pick) and the enforcement_note proto field. The template strings and the per-head key_actions interpolator are the sentinel &#39;&lt;redacted>&#39; — same idea as the 9.99 operating points.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/bdsm/README.md" target="_blank" rel="noopener">bdsm/README.md</a></p>
+</blockquote>
+</li>
+<li><p>The principle of releasing the structure, names, and gates but not the tuned real values and prompt strings is the same as the operating point 9.99 sentinel in <code>sink_policy.yaml</code>.</p>
+<ul>
+<li>The 9.99 sentinel is a value outside the probability range, so a verdict threshold containing this value never triggers.</li>
+<li>Yesterday&#39;s canon update folded in the SafetyLevel 3-tier and 54 rules, and today the note generation logic of the upper-level account scorer that references those rules is about half open.</li>
+</ul>
+</li>
+<li><p>The description text of the proto field was also updated <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/bdsm/proto/abuse_inference.proto" target="_blank" rel="noopener"><code>bdsm/proto/abuse_inference.proto:98-102</code></a>.</p>
+<blockquote>
+<p>&quot;Optional human-readable note. In this release templates and key_actions are the sentinel &#39;&lt;redacted>&#39; (see README); production fills the real appeal paragraph. ActionName enums are unchanged.&quot;</p>
+</blockquote>
+</li>
+<li><p>In this commit (Gen4+1), X kept very consistently to the principle of &quot;release the structure, but not the prompts, strings, and tuned real values&quot;.</p>
+<ul>
+<li>The sink_policy 9.99 sentinel, the <code>&lt;redacted&gt;</code> template of the enforcement note, and the partial masking of anti-gaming parts in botmaker-rules were all laid out on the same principle.</li>
+<li>The direction is to preserve resistance to gaming while widening as much as possible the room to verify the structure, names, gates, and head combinations.</li>
+</ul>
+</li>
+<li><p>In the flow where abuse-enforcement-service receives this note and decides on actual actions (label/challenge/suspension), the part corresponding to its input was about half opened today.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>grox (the Grok-based comment pipeline) doubled the follower-count threshold it uses for reply spam verdicts and reply ranking scoring from 15,000 to 30,000 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_filter.py:17, 185</code></a>.<ul>
+<li>The changed constants are <code>TaskSpamFilter.FOLLOWER_COUNT_THRESHOLD_FOR_SPAM_DETECTION</code> and <code>TaskReplyRankingFilter.FOLLOWER_COUNT_THRESHOLD_FOR_REPLY_RANKING</code>.</li>
+<li>Replies where both the thread root and the reply target have 30k followers or fewer get a spam verdict, and replies where either exceeds 30k get reply ranking scoring (<a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py:77-92, 214-225</code></a>).</li>
+<li>So this increase widens the set subject to spam verdicts and narrows the set subject to reply ranking scoring. It is a change that adjusts grok resource allocation between the two tasks.</li>
+</ul>
+</li>
+<li>phoenix-rankall gained <code>video_14day</code>, a new video SID (semantic ID, representing an item as hierarchical codes) window with a two-week time span <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/c65aa17/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/config/mod.rs:177-180</code></a>.<ul>
+<li><code>video_14day</code> was added alongside the existing <code>video_48h</code>, <code>nsfw_video_48h/168h/14day</code>, and <code>video_96h</code>.</li>
+<li>It means that the SID-based popularity signal of Phoenix retrieval now includes videos from a two-week window.</li>
+</ul>
+</li>
+<li>The mock fixture of <code>abuse-enforcement-service</code> changed by 1 line <span class="badge ok">verified</span>. It only changed one rule field value and does not affect the actual logic.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Updated 9 sections of <a href="x.html">services/x.md</a>.</p></div>
+<ul>
+<li>In the &quot;In one line&quot; section, added a summary of the Gen4+1 follow-up release and updated the filter total from 20 to 21.</li>
+<li>Introduced a Gen4+1 row in the &quot;Public source Gen4&quot; generation table (commit c65aa17, +2,271/−32).</li>
+<li>Inserted a quote of the interpretation rule that prevents the raw-count misconception into the &quot;Weights — values released with the Gen4 release&quot; section.</li>
+<li>Added a <code>Brazil2026ElectionFilter</code> entry to the &quot;21 filters&quot; section and stated explicitly where it connects in the pipeline. The heading of this section was changed from the earlier &quot;20 filters&quot;.<ul>
+<li>This filter was folded into the <a href="x.html#21-filters-2026-08-gen41--18-before-scoring--3-after">services/x.md 21 filters section</a> as one new Gen4+1 entry.</li>
+</ul>
+</li>
+<li>Added the six Thompson sampling parameters and the sampling rule to the &quot;Cold start&quot; section.</li>
+<li>Added the three bool features and the stale post count zeroing logic to the &quot;Phoenix training and index&quot; section.</li>
+<li>Changed the heading &quot;Grox (LLM comments) — unchanged from Gen3&quot; to &quot;+ 2026-08-14 threshold increase&quot; and added the threshold adjustment.</li>
+<li>Created the section &quot;BDSM (abusive-account detection from account behavior sequences) — enforcement note generation logic partially released in Gen4+1&quot;.</li>
+<li>Introduced the subsection &quot;Resolved by the Gen4+1 release (2026-08-16)&quot; in the open question section and put in 5 items.</li>
+<li>Added 6 entries to the sources section (the c65aa17 commit, README <code>#latest-updates</code>, the Brazil filter, the TSE dataset, the @XBR announcement, the BDSM sink).</li>
+</ul>
+<p>In <code>assets/x-pipeline.svg</code>, changed the filter label to &quot;17 → 18&quot; and the new label to &quot;4 → 5 (including Brazil2026)&quot;.</p>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The character of the Gen4 release was extended right away a day later. The practice of &quot;documenting parameter changes as code diffs&quot; that we observed yesterday actually worked for the first time today. The value of tracking X&#39;s commit log every day is clearly growing.</p></div>
+<ul>
+<li>The README <code>#latest-updates</code> now has a structure of date-based subsections. It is in reverse chronological order, with August 13 following August 14.</li>
+<li>Each subsection contains three elements.<ol>
+<li>Summary of the change</li>
+<li>Links to related files</li>
+<li>Links to supporting documents and announcements</li>
+</ol>
+</li>
+<li>If a param changes in the next commit, that change itself becomes an indicator that reveals an A/B result after the fact.</li>
+<li>If a filter is newly attached or removed, it becomes an indicator for observing regulatory responses in real time.</li>
+</ul>
+<p>Deep-dive items left unprocessed today:</p>
+<ul>
+<li>Keep watching when the Thompson sampling A/B experiment is actually activated and what the result metrics look like.</li>
+<li>Separately track in the commit history how the Brazil election filter&#39;s 665-account list is updated.</li>
+<li>Check whether bot heads other than the seven, such as <code>FollowBot</code>, are later added to BDSM <code>_ENFORCEMENT_TEMPLATES</code>.</li>
+<li>Check when the rest of the Phoenix bool feature slots are filled.</li>
+</ul>
+<h2 id="2-drem-a-noise-robust-ensemble-ranking-paper-is-confirmed-as-kuaishous--kuaishou"><span class="num">2</span>DrEM, a noise-robust ensemble ranking paper, is confirmed as Kuaishou&#39;s — Kuaishou</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2608.12778" target="_blank" rel="noopener">DrEM: Dual-Side Robust Ensemble Ranking from Noisy User Preference Predictions in Video Recommendation — arXiv:2608.12778</a> — arXiv, submitted 2026-08-13, paper. It has eight authors (Canwei Huang, Tiantian He, Xiaoxiao Xu, Jun Zhang, Ziran Deng, Weike Pan, Chunjie Chen, Kaiqiao Zhan).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Yesterday I registered this paper in <a href="radar.html#drem-kuaishou-short-video--ensemble-ranking-with-dual-correction-of-pxtr-noise">radar.md</a> with its affiliation unconfirmed, noting only a statistical likelihood of a Kuaishou link at the <span class="badge est">inferred</span> grade. Today I opened the arXiv HTML version and checked the author affiliations: five authors use a Kuaishou email domain, which confirms this as a production paper from that company. The paper addresses how to correct noise in upstream model predictions at the ensemble ranking stage, on both the label side and the input side.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. DrEM is Kuaishou&#39;s second production paper this month</span></p></div>
+<ul>
+<li>The HTML version confirms that this paper is a collaboration between Kuaishou Technology Beijing and Shenzhen University.<ul>
+<li>Kaiqiao Zhan, Xiaoxiao Xu, Tiantian He, Jun Zhang, and Chunjie Chen use a Kuaishou email domain.</li>
+<li>Weike Pan, Canwei Huang, and Ziran Deng are affiliated with Shenzhen University.</li>
+</ul>
+</li>
+<li>Kuaishou researchers already published two papers this month (HD-Rec 2026-08-11 <a href="radar.html#generative-retrieval--semantic-id">radar.md</a>, PushDualGen 2026-08-12). This paper is the third.</li>
+<li>Of these, PushDualGen is the one that states a production deployment, while HD-Rec reports only public benchmark results <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2608.06997" target="_blank" rel="noopener">arXiv 2608.06997</a>.<ul>
+<li>The HD-Rec abstract&#39;s experiments cover only &quot;three public cross-domain recommendation benchmarks&quot;, and it has no deployment or A/B statement.</li>
+</ul>
+</li>
+<li>The three papers share one trait: they all belong to different algorithm families. They address SID cross-domain, push notifications combining SID and CoT, and noise robustness of ensemble ranking, respectively.<ul>
+<li>In effect, this confirms that the company has the resources for several teams and several research lines to publish production SOTA papers at the same time.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. DrEM corrects noise in upstream model predictions on both the label side and the input side</span></p></div>
+<ul>
+<li>The paper addresses a problem specific to the ensemble ranking stage. In the multi-stage pipeline of industrial video recommendation, it assumes that a downstream ensemble ranker uses the predictions of the upstream multi-task ranker both as input features and as the source of proxy preference labels.<ul>
+<li>Here the predicted probabilities that multiple tasks output, such as pctr, pvtr, pcmtr, and pftr, are collectively called pxtr.</li>
+</ul>
+</li>
+<li>Because pxtr is the output of an upstream model, it inevitably contains noise. This noise acts in two ways.<ul>
+<li>It flips the proxy preference labels (supervision-side noise).</li>
+<li>It flows into the feature-side input and shakes the ranking score (feature-side noise).</li>
+</ul>
+</li>
+<li>Existing ensemble ranking methods treated pxtr as a reliable signal and ignored the noise. DrEM corrects this noise on both sides at the same time.<ul>
+<li>On the label side, it estimates the probability that the true preference of each pair was flipped (pairwise flip probability, shortened below to flip probability) and introduces a risk-denoising robust loss that corrects the empirical risk with that probability. It proves theoretically that this loss is superior to the basic pairwise loss even when the flip probability estimate has errors (Theorem 1).</li>
+<li>On the input side, it samples perturbations from the prediction noise distribution of pxtr and trains the output to stay stable under perturbation with a preference-preserving ranking consistency regularizer.</li>
+</ul>
+</li>
+<li>The key point is that both corrections are derived from a shared noise model. Because the correction targets of supervision and features are aligned to the same noise source, parameters can be shared to perform synchronized corrections.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. In the production A/B, the gains on sparse behaviors were larger than on dense behaviors</span></p></div>
+<ul>
+<li><p>The experiment used two groups, with DrEM attached to the production backbones EMER and EASQ respectively; each group was randomly assigned 5.1% of the main traffic at the user level for 7 days <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2608.12778" target="_blank" rel="noopener">HTML version</a> section 5.4 (RQ3).</p>
+<blockquote>
+<p>&quot;To answer RQ3 and validate real-world performance, we conduct online A/B tests on the industrial short-video platform. We set up two parallel experiment groups to verify the generalization of our DrEM on both representative backbones, applying our DrEM on top of production-grade EMER and EASQ backbone. The experiment runs for 7 days with 5.1% of the main traffic randomly split at the user level via hash-based assignment to each group.&quot;
+— <a href="https://arxiv.org/html/2608.12778" target="_blank" rel="noopener">arXiv 2608.12778</a>, section 5.4</p>
+</blockquote>
+</li>
+</ul>
+<p>The main A/B results are in the following table (section 5.4, Table 2, all metrics p &lt; 0.005) <span class="badge ok">verified</span>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th align="right">EMER w/ DrEM</th>
+<th align="right">EASQ w/ DrEM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Comment</strong></td>
+<td align="right"><strong>+1.388%</strong></td>
+<td align="right">+0.178%</td>
+</tr>
+<tr>
+<td><strong>Follow</strong></td>
+<td align="right"><strong>+1.197%</strong></td>
+<td align="right">+0.460%</td>
+</tr>
+<tr>
+<td>Video View</td>
+<td align="right">+0.691%</td>
+<td align="right">+0.117%</td>
+</tr>
+<tr>
+<td>Forward</td>
+<td align="right">+0.683%</td>
+<td align="right">+0.181%</td>
+</tr>
+<tr>
+<td>Like</td>
+<td align="right">+0.625%</td>
+<td align="right">+0.048%</td>
+</tr>
+<tr>
+<td>Long View</td>
+<td align="right">+0.401%</td>
+<td align="right">+0.043%</td>
+</tr>
+<tr>
+<td>App Stay Time</td>
+<td align="right">+0.116%</td>
+<td align="right">+0.124%</td>
+</tr>
+<tr>
+<td>LT7</td>
+<td align="right">+0.017%</td>
+<td align="right">+0.020%</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>Summarizing what the authors observe in the same section, the gain on sparse behaviors is larger than on dense behaviors. The improvements of +1.20% for follow and +1.39% for comment are far larger than +0.69% for view and +0.40% for long view.</li>
+<li>This is consistent with the theory. The pxtr of sparse tasks (pcmtr, pftr) has high prediction variance, so the flip probability is also high, and the robust correction has correspondingly more room to improve.</li>
+<li>The heatmap stratified by flip probability in section 5.5 (RQ4) shows the same conclusion. In the low flip-probability range, the improvement for dense tasks (pctr, pvtr) is zero or slightly negative, while in the high range the gain rises sharply to positive values.</li>
+<li>The authors also explain why EASQ&#39;s gain is smaller than EMER&#39;s. EASQ already partially mitigates supervision-side noise with its own questionnaire-signal alignment, so there is less room for DrEM&#39;s supervision correction to improve.<ul>
+<li>In other words, this can be understood hierarchically: supervision correction yields much larger gains, and on a backbone that already handles that part, only the feature-side correction remains.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In the <a href="radar.html#drem-kuaishou-short-video--ensemble-ranking-with-dual-correction-of-pxtr-noise">radar.md DrEM section</a>, I confirmed the affiliation and updated the grade from <span class="badge est">inferred</span> to <span class="badge ok">verified</span>. I added the A/B experiment setup (5.1% of traffic, 7 days) and the measured values of the eight metrics, and also recorded the theoretical observation that sparse &gt; dense. Because Kuaishou services are not tracked in the canon, I have not yet folded this into the canon in the services folder.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This paper is the closest to the canon among the three papers Kuaishou published this month. Other services face the same noise problem. X&#39;s 26-head weighted sum, Meta&#39;s multi-objective ranking, and Netflix&#39;s multi-task FM (recommendation foundation model) all have a structure in which upstream pxtr serves as both the input and the label for downstream scorers.</p></div>
+<p>However, the literature does not confirm whether the specific problem DrEM addresses, pxtr noise at the ensemble ranking stage, exists as a separate component at X, Meta, and Netflix, or is mitigated in another way. If a similar statement appears from a second company, it becomes a promotion candidate for a new section in <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a>.</p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li><strong>Follow-up commits after c65aa17</strong> — If X has established a one-commit-per-day rhythm, the daily batch should keep producing passing items. First look at the Thompson sampling A/B results, the diff of the Brazil filter account list, and the progress of filling in the Phoenix bool features.</li>
+<li><strong>Keep watching the Kuaishou line</strong> — The three papers this month belong to different algorithm families, so they can be read as a sign of growing company-level resources. The remaining arXiv triage in August may produce more passing items from the Kuaishou line.</li>
+<li><strong>A second case of a jurisdiction filter</strong> — Over the next six months, watch whether filters responding to elections and regulations in other countries are added under the same open-source practice.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-08-15.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-08-15</span></a><a class="pg-next" href="daily-2026-08-19.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-08-19</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-08-16.html" data-title="일일 리포트 2026-08-16"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

@@ -64,7 +64,7 @@
 </ul>
 <h2 id="1-scorers-can-now-request-account-actions-directly--x"><span class="num">1</span>Scorers can now request account actions directly — X</h2>
 <div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/0d3cdd806c405f04db7030f720b48687aa304061" target="_blank" rel="noopener">xai-org/x-algorithm@0d3cdd8</a> — xai-org public repository, commit of 2026-08-25T23:20:04Z (47 files, +5,850/−586), public source code. These notes number the X commits after the Gen4 release in sequence, and this commit is Gen4+8. The commit message is only the single line <code>&quot;Open-source X Recommendation Algorithm&quot;</code>, as is the convention of the generation series, so the commit content was read only from the file diffs.</p></div>
-<div class="blk ctx"><p><span class="lbl">Background</span> The <a href="../x.html#%EA%B3%B5%EA%B0%9C-%EC%86%8C%EC%8A%A4-4%EC%84%B8%EB%8C%80--%EC%9D%B4%EA%B1%B8-%EB%A8%BC%EC%A0%80-%EC%95%8C%EC%95%84%EC%95%BC-%EB%82%98%EB%A8%B8%EC%A7%80%EA%B0%80-%EC%95%88-%ED%97%B7%EA%B0%88%EB%A6%B0%EB%8B%A4" hreflang="ko">Gen4 open-source release</a> of the X For You timeline has had follow-up commits at one- to three-day intervals since the first release on 2026-08-13 (47c1bcd, +363,246/−11,640). This commit landed at 08-25 23:20 UTC; yesterday&#39;s (08-26) batch missed it, and today&#39;s 27th batch caught up. Whereas the previous commit, Gen4+7 (d011592), deepened the safety stack vertically, Gen4+8 touches six areas side by side.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The <a href="x.html#released-source-up-to-gen4--read-this-first-to-keep-the-rest-straight">Gen4 open-source release</a> of the X For You timeline has had follow-up commits at one- to three-day intervals since the first release on 2026-08-13 (47c1bcd, +363,246/−11,640). This commit landed at 08-25 23:20 UTC; yesterday&#39;s (08-26) batch missed it, and today&#39;s 27th batch caught up. Whereas the previous commit, Gen4+7 (d011592), deepened the safety stack vertically, Gen4+8 touches six areas side by side.</p></div>
 <ul>
 <li>Gen4+7 deepened the safety stack in three ways:<ul>
 <li>The VF (visibility filtering, a safety layer that decides whether content can be shown) verification reference_compare</li>
@@ -211,20 +211,20 @@ pub const MAX_REQUESTED_ACTIONS_PER_MESSAGE: usize = 16;
 <li>The action is a temporary (perm: false) suspend with the PlatformManipulation policy.</li>
 <li>In other words, this detector is embedding-based, and its version has reached v10. It can be seen as a continually retrained pipeline.</li>
 </ul>
-<div class="blk app"><p><span class="lbl">Canon update</span> Three places in <a href="../x.html" hreflang="ko">services/x.md</a> were edited.</p></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Three places in <a href="x.html">services/x.md</a> were edited.</p></div>
 <ol>
 <li>Added a Gen4+8 row to the Gen4 table.</li>
 <li>Expanded the one-line summary paragraph to describe the Gen4+8 commit.</li>
-<li>Added a subsection &quot;Gen4+8 (2026-08-25) — AES <code>generic_actions</code> passthrough wiring&quot; after the <a href="../x.html#bdsm-%EA%B3%84%EC%A0%95-%ED%96%89%EB%8F%99-%EC%8B%9C%ED%80%80%EC%8A%A4-%EB%B6%80%EC%A0%95-%EA%B3%84%EC%A0%95-%ED%83%90%EC%A7%80--4%EC%84%B8%EB%8C%801%EC%97%90%EC%84%9C-enforcement-note-%EC%83%9D%EC%84%B1-%EB%A1%9C%EC%A7%81-%EB%B6%80%EB%B6%84-%EA%B3%B5%EA%B0%9C" hreflang="ko">BDSM section</a>.</li>
+<li>Added a subsection &quot;Gen4+8 (2026-08-25) — AES <code>generic_actions</code> passthrough wiring&quot; after the <a href="x.html#bdsm-abusive-account-detection-from-account-behavior-sequences--enforcement-note-generation-logic-partially-released-in-gen41">BDSM section</a>.</li>
 </ol>
 <div class="blk why"><p><span class="lbl">Why it matters</span> The meaning of this change is summarized at the end of 1-7, together with the three axes of the whole Gen4+8 release.</p></div>
 <h3 id="1-2-vm-ranker-drops-local-computation-and-uses-the-scores-the-server-returns-as-they-are">1-2. VM Ranker drops local computation and uses the scores the server returns as they are</h3>
 <p>In the VM Ranker path, the local computation layer that home-mixer (the service that serves X home timeline feed requests such as For You and Following) used to run is gone. Now home-mixer uses the scores returned by the rank server as they are, and diversity is handled by the server-side DPP (a diversity re-ranking technique).</p>
-<div class="blk ctx"><p><span class="lbl">Background</span> VMRanker is a remote gRPC service that acts as the slate reranker in home-mixer. It performs <a href="../x.html#%EB%8B%A4%EC%96%91%EC%84%B1" hreflang="ko">DPP (Determinantal Point Process)-based diversity re-ranking</a> over the candidate scores that Phoenix produced, with parameters θ=0.65, K=150. Until now, <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a> supported two value models.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> VMRanker is a remote gRPC service that acts as the slate reranker in home-mixer. It performs <a href="x.html#diversity">DPP (Determinantal Point Process)-based diversity re-ranking</a> over the candidate scores that Phoenix produced, with parameters θ=0.65, K=150. Until now, <a href="https://github.com/xai-org/x-algorithm/blob/28e414f/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a> supported two value models.</p></div>
 <ul>
 <li>For <code>author_diversity</code>, home-mixer computed locally a value that applies author-diversity decay based on the MPN fold-back and passed it to the rank server.</li>
 <li>For default, the score returned by the rank server was used as it was.</li>
-<li>The <a href="../x.html#phoenix-2026-%ED%98%84%ED%96%89--4%EC%84%B8%EB%8C%80-%EA%B3%B5%EA%B0%9C-%EB%B0%98%EC%98%81" hreflang="ko">7 SID field connections</a> of Gen4+3 (2026-08-18) were attached to this vm_ranker. SID (semantic ID) represents an item as a sequence of discrete token IDs.</li>
+<li>The <a href="x.html#phoenix-2026-current--gen4-release-update">7 SID field connections</a> of Gen4+3 (2026-08-18) were attached to this vm_ranker. SID (semantic ID) represents an item as a sequence of discrete token IDs.</li>
 </ul>
 <p>Gen4+8 greatly simplified this path. It removed the 88 lines of <code>ranking_scorer::effective_head_weights</code> and the 128 lines of MPN fold-back.</p>
 <ul>
@@ -276,7 +276,7 @@ let fold_weights = (query.params.get(EnableMpnScoring)
 </ul>
 </li>
 <li>What the rename from <code>author_diversity</code> to <code>dpp</code> actually amounts to is still unclear.<ul>
-<li>This commit alone cannot settle whether <code>dpp</code> really refers to the <a href="../x.html#%EB%8B%A4%EC%96%91%EC%84%B1" hreflang="ko">DPP of the existing re-ranking section (θ=0.65, K=150)</a> or to a different DPP instance used only inside the rank server <span class="badge est">inferred</span>.</li>
+<li>This commit alone cannot settle whether <code>dpp</code> really refers to the <a href="x.html#diversity">DPP of the existing re-ranking section (θ=0.65, K=150)</a> or to a different DPP instance used only inside the rank server <span class="badge est">inferred</span>.</li>
 <li>Traces of tidying up the VMRankerValueModelId parameter also remain in <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (a net decrease, +10/−29).</li>
 </ul>
 </li>
@@ -291,21 +291,21 @@ let fold_weights = (query.params.get(EnableMpnScoring)
 </ul>
 </li>
 </ul>
-<p>This simplification extends the main direction of Gen4, that is, the trend of stripping local computation and caches from home-mixer and preferring served outputs. It pairs with how <a href="../x.html#4%EC%84%B8%EB%8C%805-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-22" hreflang="ko">the <code>UseServedSlateContext</code> gate of Gen4+5</a> moved slate context computation from local to Phoenix serving.</p>
+<p>This simplification extends the main direction of Gen4, that is, the trend of stripping local computation and caches from home-mixer and preferring served outputs. It pairs with how <a href="x.html#resolved-or-new-in-the-gen45-release-2026-08-22">the <code>UseServedSlateContext</code> gate of Gen4+5</a> moved slate context computation from local to Phoenix serving.</p>
 <blockquote>
 <p>&quot;AUTHOR_DIVERSITY_VALUE_MODEL_ID: &amp;str = &quot;author_diversity&quot;&quot; ← deleted
 &quot;DPP_VALUE_MODEL_ID: &amp;str = &quot;dpp&quot;&quot; ← new
 — <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a></p>
 </blockquote>
-<div class="blk app"><p><span class="lbl">Canon update</span> Three places in <a href="../x.html" hreflang="ko">services/x.md</a> were edited.</p></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Three places in <a href="x.html">services/x.md</a> were edited.</p></div>
 <ol>
-<li>Reflected the value model rename and the deletion of effective_head_weights in the VMRanker description of the <a href="../x.html#%EB%9E%AD%ED%82%B9" hreflang="ko">ranking section</a>.</li>
-<li>Reflected in the <a href="../x.html#%EB%8B%A4%EC%96%91%EC%84%B1" hreflang="ko">diversity section</a> that DPP became the only value model of VMRanker.</li>
-<li>Recorded the parameter −29 lines (cleanup of MPN and author_diversity constants) in the <a href="../x.html#%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-%EB%B3%80%EA%B2%BD%EC%9D%84-%EB%AC%B8%EC%84%9C%ED%99%94%ED%95%98%EB%8A%94-%EA%B4%80%ED%96%89--4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4" hreflang="ko">parameter change practice</a>.</li>
+<li>Reflected the value model rename and the deletion of effective_head_weights in the VMRanker description of the <a href="x.html#ranking">ranking section</a>.</li>
+<li>Reflected in the <a href="x.html#diversity">diversity section</a> that DPP became the only value model of VMRanker.</li>
+<li>Recorded the parameter −29 lines (cleanup of MPN and author_diversity constants) in the <a href="x.html#practice-of-documenting-parameter-changes--introduced-in-gen4">parameter change practice</a>.</li>
 </ol>
 <h3 id="1-3-the-following-feed-also-follows-blocks-by-quoted-and-retweeted-original-authors">1-3. The Following feed also follows blocks by quoted and retweeted original authors</h3>
 <p>The Following feed extends its block-relationship check to quoted authors and retweeted authors. If the original author has blocked the viewer, the viewer does not see the post even when someone the viewer follows quotes or retweets it.</p>
-<div class="blk ctx"><p><span class="lbl">Background</span> The <a href="../x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4" hreflang="ko">Following surface</a> is a reverse-chron pipeline that shows only the latest in-network posts. Since <a href="../x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4" hreflang="ko">Following got its own VF hydrator branch in Gen4+3</a>, this pipeline has kept being refined. This time, work was added to extend block-relationship handling to quoted authors and retweeted authors.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The <a href="x.html#feed-surfaces">Following surface</a> is a reverse-chron pipeline that shows only the latest in-network posts. Since <a href="x.html#feed-surfaces">Following got its own VF hydrator branch in Gen4+3</a>, this pipeline has kept being refined. This time, work was added to extend block-relationship handling to quoted authors and retweeted authors.</p></div>
 <ul>
 <li><p>The new hydrator (a stage that fills in fields on each candidate), <code>FollowingBlockedByHydrator</code>, asks SocialGraphClient which of the quoted author and the retweeted author is blocking the viewer.</p>
 <ul>
@@ -382,10 +382,10 @@ let post_selection_filters = vec![
 </ul>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">Canon update</span> Two places in <a href="../x.html" hreflang="ko">services/x.md</a> were edited.</p></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Two places in <a href="x.html">services/x.md</a> were edited.</p></div>
 <ol>
-<li>Added a block-extension subsection to the <a href="../x.html#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4" hreflang="ko">Following surface description</a>.</li>
-<li>Updated the <code>AuthorSocialgraphFilter</code> detail in the <a href="../x.html#%ED%95%84%ED%84%B0-21%EA%B0%9C-2026-08-4%EC%84%B8%EB%8C%801--%EC%8A%A4%EC%BD%94%EC%96%B4%EB%A7%81-%EC%A0%84-18--%ED%9B%84-3" hreflang="ko">21-filter table</a>. It is a filter that already existed, but the update reflects that its meaning was extended.</li>
+<li>Added a block-extension subsection to the <a href="x.html#feed-surfaces">Following surface description</a>.</li>
+<li>Updated the <code>AuthorSocialgraphFilter</code> detail in the <a href="x.html#21-filters-2026-08-gen41--18-before-scoring--3-after">21-filter table</a>. It is a filter that already existed, but the update reflects that its meaning was extended.</li>
 </ol>
 <h3 id="1-4-the-brazil-election-filters-account-list-grew-substantially-from-the-tse-source-data">1-4. The Brazil election filter&#39;s account list grew substantially from the TSE source data</h3>
 <p>The account list of the Brazil 2026 election filter gained +3,379 lines based on public data from the Brazilian electoral authority. The filter&#39;s behavior itself did not change.</p>
@@ -419,13 +419,13 @@ let post_selection_filters = vec![
 </ul>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">Canon update</span> Updated the <code>Brazil2026ElectionFilter</code> entry in <a href="../x.html#%ED%95%84%ED%84%B0-21%EA%B0%9C-2026-08-4%EC%84%B8%EB%8C%801--%EC%8A%A4%EC%BD%94%EC%96%B4%EB%A7%81-%EC%A0%84-18--%ED%9B%84-3" hreflang="ko">services/x.md</a> to state explicitly that the account list is updated on a regular basis.</p></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Updated the <code>Brazil2026ElectionFilter</code> entry in <a href="x.html#21-filters-2026-08-gen41--18-before-scoring--3-after">services/x.md</a> to state explicitly that the account list is updated on a regular basis.</p></div>
 <h3 id="1-5-the-phoenix-index-also-loads-data-from-before-the-minimum-age-condition-is-met">1-5. The Phoenix index also loads data from before the minimum-age condition is met</h3>
 <p>For each window that has a minimum age since posting, Phoenix&#39;s offline indexing pipeline now also loads data that has not yet met that condition, as a separate snapshot. This change went into the base repository of the Phoenix rankall pipeline.</p>
 <div class="blk ctx"><p><span class="lbl">Background</span> <a href="https://github.com/xai-org/x-algorithm/tree/0d3cdd8/phoenix-rankall" target="_blank" rel="noopener"><code>phoenix-rankall/</code></a> is Phoenix&#39;s offline indexing and aggregation pipeline. It maintains the candidate pool split into several windows, for example <code>1fav_uec_1day</code>, <code>video_14day</code>, and <code>evergreen_video_1825day</code>. Gen4+8 continued the flow of the two changes below and expanded the base repository of <code>phoenix-rankall</code> itself.</p></div>
 <ul>
-<li><a href="../x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4" hreflang="ko">Gen4+1 added the <code>video_14day</code> SID window</a>.</li>
-<li><a href="../x.html#4%EC%84%B8%EB%8C%806-%EA%B3%B5%EA%B0%9C%EB%A1%9C-%ED%95%B4%EC%86%8C%EB%90%9C-%EA%B2%83--%EC%8B%A0%EA%B7%9C-2026-08-23" hreflang="ko">Gen4+6 shrank the <code>EVERGREEN</code> retrieval dataset from <code>evergreen_video_1825day</code> to <code>video_4to14day</code></a>.</li>
+<li><a href="x.html#phoenix-training-and-index-introduced-in-gen4">Gen4+1 added the <code>video_14day</code> SID window</a>.</li>
+<li><a href="x.html#resolved-by-the-gen46-release--new-2026-08-23">Gen4+6 shrank the <code>EVERGREEN</code> retrieval dataset from <code>evergreen_video_1825day</code> to <code>video_4to14day</code></a>.</li>
 </ul>
 <p>The change consists of new constants and loading logic in <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/phoenix-rankall/src/store/base.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/store/base.rs</code></a> (+202/−61).</p>
 <figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const PREFLOOR_SLACK_SECS: f64 = 6.0 * 3600.0;
@@ -449,8 +449,8 @@ if wc.min_age.is_some() {
 </li>
 <li><code>PREFLOOR_SLACK_SECS = 6 hours</code> is the slack time during which prefloor data is kept until it crosses the min_age threshold.</li>
 </ul>
-<div class="blk app"><p><span class="lbl">Canon update</span> Added the subsection &quot;Gen4+8 (2026-08-25) — rankall prefloor snapshot wiring&quot; to the <a href="../x.html" hreflang="ko">Phoenix training and index section</a> of <a href="../x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4" hreflang="ko">services/x.md</a>.</p></div>
-<div class="blk why"><p><span class="lbl">Why it matters</span> This change continues the flow of <a href="../x.html#phoenix-%ED%95%99%EC%8A%B5%EC%9D%B8%EB%8D%B1%EC%8A%A4-4%EC%84%B8%EB%8C%80%EC%97%90%EC%84%9C-%EC%8B%A0%EC%84%A4" hreflang="ko">Gen4+2 removing the <code>favoriteCount&gt;=1</code> gate in <code>phoenix-rankall-strato</code></a>. Previously a candidate had to pass the condition to enter the index, but now rankall keeps candidates that have not yet passed in a separate pool so they can reach production immediately when they pass. This is an improvement for cold start and freshness, and it is likely to reduce index latency for new posts <span class="badge est">inferred</span>.</p></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added the subsection &quot;Gen4+8 (2026-08-25) — rankall prefloor snapshot wiring&quot; to the <a href="x.html">Phoenix training and index section</a> of <a href="x.html#phoenix-training-and-index-introduced-in-gen4">services/x.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This change continues the flow of <a href="x.html#phoenix-training-and-index-introduced-in-gen4">Gen4+2 removing the <code>favoriteCount&gt;=1</code> gate in <code>phoenix-rankall-strato</code></a>. Previously a candidate had to pass the condition to enter the index, but now rankall keeps candidates that have not yet passed in a separate pool so they can reach production immediately when they pass. This is an improvement for cold start and freshness, and it is likely to reduce index latency for new posts <span class="badge est">inferred</span>.</p></div>
 <h3 id="1-6-the-phoenix-download-client-now-actually-respects-its-concurrency-cap">1-6. The Phoenix download client now actually respects its concurrency cap</h3>
 <p>An issue was fixed where the actual number of concurrent downloads could exceed the configured cap when Phoenix serving downloads embedding tables and checkpoints. 2 new regression tests were also added.</p>
 <ul>
@@ -487,7 +487,7 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
 </ul>
 </li>
 </ul>
-<div class="blk why"><p><span class="lbl">Why it matters</span> This change is hardening that fixes the accuracy of parallel download throttling at serving time, and it pairs with <a href="../x.html#phoenix-%EC%B2%B4%ED%81%AC%ED%8F%AC%EC%9D%B8%ED%8A%B8-%EC%8A%A4%ED%83%9D-%EC%A0%80%EC%9E%A5%EB%B3%B5%EC%9B%90-%EC%9D%B4%EC%A4%91-%ED%95%98%EB%93%9C%EB%8B%9D--4%EC%84%B8%EB%8C%807-%EB%B3%B5%EC%9B%90-2026-08-24--4%EC%84%B8%EB%8C%809-%EC%A0%80%EC%9E%A5streamed-%EB%B3%B5%EC%9B%90warm-start-staging-2026-08-26" hreflang="ko">Gen4+7&#39;s multi-node hardening of the Phoenix checkpoint loader</a>, which fixed an OOM in the restore path. Both are an extension of the maturation cycle of training and serving infrastructure that followed Muon and GB300 training being formally included in the export in Gen4+6. The fact that such stability fixes attach to commits every day is itself evidence that X keeps devoting organizational resources to keeping the Gen4 open-source release verifiable and trustworthy in production.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This change is hardening that fixes the accuracy of parallel download throttling at serving time, and it pairs with <a href="x.html#phoenix-checkpoint-stack-saverestore-double-hardening--gen47-restore-2026-08-24--gen49-save-streamed-restore-warm-start-staging-2026-08-26">Gen4+7&#39;s multi-node hardening of the Phoenix checkpoint loader</a>, which fixed an OOM in the restore path. Both are an extension of the maturation cycle of training and serving infrastructure that followed Muon and GB300 training being formally included in the export in Gen4+6. The fact that such stability fixes attach to commits every day is itself evidence that X keeps devoting organizational resources to keeping the Gen4 open-source release verifiable and trustworthy in production.</p></div>
 <h3 id="1-7-4-minor-changes-in-grox-engagement-counts-and-urt-and-other-cleanups">1-7. 4 minor changes in grox, engagement counts, and URT, and other cleanups</h3>
 <p>The rest are small cleanups and extensions.</p>
 <div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
@@ -495,7 +495,7 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
 <li>Made minor cleanups to the reply_spam pipeline in grox (Grok-based nearline annotation pipeline).<ul>
 <li>The changed files are <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/task_rate_limit.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/task_rate_limit.py</code></a> −10 lines, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/plan_reply_ranking.py" target="_blank" rel="noopener"><code>plan_reply_ranking.py</code></a> −6, <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/plan_spam_comment.py" target="_blank" rel="noopener"><code>plan_spam_comment.py</code></a> −6, and <a href="https://github.com/xai-org/x-algorithm/blob/0d3cdd8/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py</code></a> +2/−2.</li>
 <li>Because <code>task_rate_limit</code> is −10 lines, part of the rate limit logic appears to have been removed. However, only the size of the pure deletion is visible, so the exact change must be checked separately in the diff.</li>
-<li><code>task_filter.py</code> only adjusted the execution flow slightly without changing the threshold. The <a href="../x.html#grox-llm-%EC%A3%BC%EC%84%9D--3%EC%84%B8%EB%8C%80-%EA%B7%B8%EB%8C%80%EB%A1%9C--2026-08-14-%EC%9E%84%EA%B3%84-%EC%83%81%ED%96%A5" hreflang="ko">follower threshold relaxation flow</a> that went from 15k to 100k over 11 days is still maintained in this commit.</li>
+<li><code>task_filter.py</code> only adjusted the execution flow slightly without changing the threshold. The <a href="x.html#grox-llm-annotation--unchanged-from-gen3--threshold-raise-on-2026-08-14">follower threshold relaxation flow</a> that went from 15k to 100k over 11 days is still maintained in this commit.</li>
 </ul>
 </li>
 <li>2 new constants and 1 new generator were added to grox&#39;s <code>upa/</code> (which appears to be grox&#39;s profile and user analysis pipeline <span class="badge est">inferred</span>).<ul>
@@ -564,7 +564,7 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
 <p class="totop"><a href="#toc">↑ Contents</a></p>
 <h2 id="2-tlow-raised-production-ctr-with-a-flow-based-tokenizer--wechat"><span class="num">2</span>Tlow raised production CTR with a flow-based tokenizer — WeChat</h2>
 <div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2608.24176" target="_blank" rel="noopener">Tlow: Flow-based Item Tokenizer for Recommendation</a> — arXiv 2608.24176, 2026-08-25 v1, paper. There are 6 authors (Nian Li, Chonggang Song, Jingtao Ding, Lingling Yi, Yong Li, Qingmin Liao). The HTML version of the abstract states a production A/B at <strong>China&#39;s largest social media platform WeChat</strong>, so we confirmed the affiliation.</p></div>
-<div class="blk ctx"><p><span class="lbl">Background</span> The item tokenizer, a core component of the <a href="../radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id" hreflang="ko">Semantic ID (SID)</a> line, is the module that converts each item&#39;s semantic embedding into a sequence of discrete token IDs. The de facto standard is RQ-VAE (Residual-Quantized VAE). After Google&#39;s 2023 TIGER paper, several production systems adopted it, including Netflix Foundation Model and Kuaishou PushDualGen. However, RQ-VAE has three known problems.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The item tokenizer, a core component of the <a href="radar.html#generative-retrieval--semantic-id">Semantic ID (SID)</a> line, is the module that converts each item&#39;s semantic embedding into a sequence of discrete token IDs. The de facto standard is RQ-VAE (Residual-Quantized VAE). After Google&#39;s 2023 TIGER paper, several production systems adopted it, including Netflix Foundation Model and Kuaishou PushDualGen. However, RQ-VAE has three known problems.</p></div>
 <ul>
 <li>Codebook collapse occurs, so most code slots die and only a few are used.</li>
 <li>Quantization error accumulates in the residual, so the error grows in deep quantization layers.</li>
@@ -596,7 +596,7 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
 </ul>
 </li>
 </ul>
-<div class="blk app"><p><span class="lbl">Canon update</span> Added the section <code>### Tlow (WeChat/Tencent) — flow-based item tokenizer as an RQ-VAE alternative, production CTR +10.32%</code> to &quot;new this month&quot; in <a href="../radar.html" hreflang="ko">radar.md</a>. It is placed above HEGM and links to the <a href="../radar.html#%EC%83%9D%EC%84%B1%ED%98%95-retrieval--semantic-id" hreflang="ko">SID thread</a>.</p></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added the section <code>### Tlow (WeChat/Tencent) — A flow-based item tokenizer as an RQ-VAE alternative, CTR +10.32% in production</code> to &quot;new this month&quot; in <a href="radar.html">radar.md</a>. It is placed above HEGM and links to the <a href="radar.html#generative-retrieval--semantic-id">SID thread</a>.</p></div>
 <div class="blk why"><p><span class="lbl">Why it matters</span></p></div>
 <ul>
 <li>It is a new axis for the SID/generative retrieval thread: the tokenizer architecture itself has begun to diverge in production.<ul>
@@ -606,7 +606,7 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
 </ul>
 </li>
 <li>It is Tencent WeChat&#39;s first production claim in a while.<ul>
-<li>WeChat rec has <a href="../radar.html#%EC%B6%94%EC%B2%9C-%EB%AA%A8%EB%8D%B8-%EC%8A%A4%EC%BC%80%EC%9D%BC%EB%A7%81-%EB%B2%95%EC%B9%99--%ED%9A%8C%EC%82%AC%EB%B3%84-%EB%8F%85%EB%A6%BD-%ED%99%95%EC%9D%B8%EC%9D%B4-%EC%8C%93%EC%9D%B4%EB%8A%94-%EC%A4%91" hreflang="ko">been quiet in recent years</a>.</li>
+<li>WeChat rec has <a href="radar.html#recommendation-model-scaling-laws--independent-confirmations-from-companies-are-accumulating">been quiet in recent years</a>.</li>
 <li>With Tlow, this appears to be a signal that real architecture statements for the organic content surface are resuming.</li>
 <li>It is worth watching whether a paper on the rec stack of Weixin Video Channels (WeChat&#39;s short-video surface) follows.</li>
 </ul>
@@ -642,11 +642,11 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
 <ul>
 <li>The leading candidates for Chinese e-commerce live-streaming are Kuaishou (Kwai), Alibaba (Taobao Live), Douyin/ByteDance (Douyin E-commerce), and Xiaohongshu, but the author names do not directly match any of these companies <span class="badge est">inferred</span>.</li>
 </ul>
-<div class="blk app"><p><span class="lbl">Canon update</span> Added the section <code>### TAGR — anonymous large e-commerce live-stream ads platform, revenue +16.1%</code> to &quot;new this month&quot; in <a href="../radar.html" hreflang="ko">radar.md</a>.</p></div>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added the section <code>### TAGR — Anonymous large e-commerce live-stream ads platform, revenue +16.1%</code> to &quot;new this month&quot; in <a href="radar.html">radar.md</a>.</p></div>
 <div class="blk why"><p><span class="lbl">Why it matters</span></p></div>
 <ul>
 <li>A third company joined the live-streaming ranking thread.<ul>
-<li>Following the existing <a href="../radar.html#multi-objective-ranking-for-live-streaming-twitch--delayed-feedback-window" hreflang="ko">Twitch (Amazon) Multi-Objective</a> and Netflix&#39;s <a href="../netflix.html" hreflang="ko">live cold start</a>, TAGR adds a third angle: an ads surface and Chinese e-commerce live streaming.</li>
+<li>Following the existing <a href="radar.html#multi-objective-ranking-for-live-streaming-twitch--delayed-feedback-window">Twitch (Amazon) Multi-Objective</a> and Netflix&#39;s <a href="netflix.html">live cold start</a>, TAGR adds a third angle: an ads surface and Chinese e-commerce live streaming.</li>
 </ul>
 </li>
 <li>Generative recommenders are accumulating production claims in fast-changing domains such as ads and live streaming.<ul>
@@ -691,7 +691,7 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
 <li>See whether <code>AuthorSocialgraphFilter</code> is also connected to the For You pipeline.</li>
 <li>See when v11 follows <code>panda_reports_embedding_v10</code>. This is a checkpoint for observing the retraining cycle of the embedding detector.</li>
 <li>See in which window the <code>prefloor</code> snapshot is first activated.</li>
-<li>See whether Gen4+7&#39;s <a href="../x.html#grox--ptos-adult-content-cross-validation-4%EC%84%B8%EB%8C%802-%EC%8B%A0%EA%B7%9C-2026-08-17" hreflang="ko"><code>SafetyPtosPolicyCrossValidator</code></a> expands to the spam and hate speech categories.</li>
+<li>See whether Gen4+7&#39;s <a href="x.html#grox--ptos-adult-content-cross-validation-gen42-new-2026-08-17"><code>SafetyPtosPolicyCrossValidator</code></a> expands to the spam and hate speech categories.</li>
 </ul>
 </li>
 <li><strong>Tlow follow-up</strong> — Track whether the code is released and any statements about other Tencent WeChat surfaces (Video Channels, Moments, Look).</li>
@@ -702,7 +702,7 @@ let batch_results = join_all(batch.into_iter().map(tokio::task::spawn))
 
 </div>
 <footer class="doc-foot">
-<nav class="pager" aria-label="Previous and next reports"><a class="pg-next" href="daily-2026-10-21.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-21</span></a></nav>
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-08-26.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-08-26</span></a><a class="pg-next" href="daily-2026-08-28.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-08-28</span></a></nav>
 <section class="comments" aria-labelledby="cm-h">
 <h2 class="sec-h" id="cm-h">Comments</h2>
 <p class="cm-note">Comments are shared with the Korean original.</p>

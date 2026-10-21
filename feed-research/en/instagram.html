@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self' 'sha256-y8ejfU0sarucojIHPDUMFmoo0uYdTGAH+Uu3RqLxPfs='; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instagram — feed-research</title>
+<meta name="description" content="This file covers only where Instagram differs from Facebook. The common Meta ground is in facebook.md and topics/. That includes the value model Vijt = Σ…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/instagram.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/instagram.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/instagram.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/instagram.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Instagram — feed-research">
+<meta property="og:description" content="This file covers only where Instagram differs from Facebook. The common Meta ground is in facebook.md and topics/. That includes the value model Vijt = Σ…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/instagram.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body class="svc-instagram" data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/instagram.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Service canon</p>
+<h1 id="instagram">Instagram</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Translated from</span><a href="../instagram.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc toc-long"><summary>Contents<span class="toc-n">11</span></summary><ol><li><a href="#summary">Summary</a></li><li><a href="#feed-surfaces">Feed surfaces</a></li><li><a href="#candidate-generation-retrieval">Candidate generation (retrieval)</a><ol><li><a href="#candidate-counts-by-stage--larger-than-facebook-and-monotonically-decreasing">Candidate counts by stage</a></li><li><a href="#4-source-types-and-tunable-weights">4 source types and tunable weights</a></li><li><a href="#the-reason-for-choosing-two-tower-is-the-cache">The reason for choosing two-tower is the cache</a></li><li><a href="#retraining-cadence--hourly">Retraining cadence</a></li><li><a href="#retrieval-dsl--real-queries-are-published">retrieval DSL</a></li><li><a href="#igql--ig2vec--could-not-obtain-the-primary-original-text">IGQL / IG2Vec</a></li></ol></li><li><a href="#ranking">Ranking</a><ol><li><a href="#three-combination-forms--the-biggest-difference-from-facebook">Three combination forms</a></li><li><a href="#how-weights-are-set--facebook-uses-surveys-instagram-uses-optimization">How weights are set</a></li><li><a href="#the-1st-stage-is-a-distillation-of-the-2nd-stage">The 1st stage is a distillation of the 2nd stage</a></li><li><a href="#prediction-heads--they-differ-by-surface-all-verified-verbatim">Prediction heads</a></li><li><a href="#actual-feature-names-excerpt-all-verified-verbatim">Actual feature names (excerpt, all verified verbatim)</a></li><li><a href="#mosseris-per-surface-signal-order--a-form-of-disclosure-facebook-does-not-have">Mosseri&#39;s per-surface signal order</a></li><li><a href="#ultra-long-user-history--dv365">Ultra-long user history</a></li><li><a href="#model-operating-scale--only-instagram-disclosed-it">Model operating scale</a></li><li><a href="#removal-of-follower-count-as-an-input">Removal of follower count as an input</a></li></ol></li><li><a href="#re-ranking-diversity-and-filters">Re-ranking, diversity, and filters</a><ol><li><a href="#blocking-3-in-a-row-from-the-same-account-is-wrong--myth-check">&quot;Blocking 3 in a row from the same account&quot; is wrong</a></li><li><a href="#policy-filters--two-layers-score-threshold-and-policy-document">Policy filters</a></li><li><a href="#originality--instagram-applied-it-earlier-and-more-strongly-than-facebook">Originality</a></li><li><a href="#teens--recommendation-eligibility-itself-is-restricted-by-age">Teens</a></li></ol></li><li><a href="#cold-start">Cold start</a><ol><li><a href="#new-users--a-disclosure-that-facebook-does-not-have-is-here">New users</a></li><li><a href="#new-content">New content</a></li></ol></li><li><a href="#feedback-signals">Feedback signals</a><ol><li><a href="#negatives-exist-as-prediction-heads--with-different-names-on-each-surface">Negatives exist as prediction heads</a></li><li><a href="#dm-share-send-is-a-prediction-head">DM share (send) is a prediction head</a></li><li><a href="#user-control--your-algorithm">User control</a></li></ol></li><li><a href="#regulation--ongoing-as-of-2026">Regulation</a></li><li><a href="#generalizations-from-this-service">Generalizations from this service</a></li><li><a href="#open-questions">Open questions</a></li><li><a href="#sources">Sources</a><ol><li><a href="#meta-official--engineering">Meta official</a></li><li><a href="#meta-official--productpolicy">Meta official</a></li><li><a href="#transparency-center-ai-system-card-primary-document-for-regulatory-response">Transparency Center (AI system card, primary document for regulatory response)</a></li><li><a href="#papers">Papers</a></li><li><a href="#regulator">Regulator</a></li><li><a href="#secondary-grade-downgrade-required">Secondary (grade downgrade required)</a></li></ol></li></ol></details></nav>
+<div class="prose">
+<p><strong>This file covers only where Instagram differs from Facebook.</strong> The common Meta ground is in <a href="facebook.html">facebook.md</a> and <code>topics/</code>. That includes the value model <code>Vijt = Σ wijtk·Yijtk</code>, the DLRM→GEM lineage, and the ads pixel-height patent. Dwell time normalization and MSI (meaningful social interactions) are also covered there. The DSA (EU Digital Services Act) filings are in the same place.</p>
+<p class="warn">⚠ Every claim in this file that relies on a system card is a snapshot read on 2026-08-09. A system card is the document Meta publishes on its Transparency Center for each surface to describe an AI system. The full caveat is written once, in the &quot;Validity period of system card quotes&quot; section of <a href="facebook.html">facebook.md</a>.</p>
+<p>Compared with Facebook, <strong>Instagram is published in far more detail.</strong> The only formula Facebook published is the 2021 linear combination. Instagram published <strong>3 different combination forms</strong> as formulas, each in a different post. The text also gives the actual queries of the retrieval DSL (a dedicated language for writing candidate-fetching queries), candidate counts per funnel stage, the retraining cadence, and the definition of the distillation label. Conversely, <strong>Instagram has nothing like Facebook&#39;s Widely Viewed Content Report</strong>, a measured disclosure of surface composition.</p>
+<h2 id="summary">Summary</h2>
+<p>Instagram has a multi-surface structure in which Explore, Feed, and Reels Chaining are each documented as a separate AI system. As of the system cards read on 2026-08-09, the candidate counts per stage are 1500→100 for Explore, 700→500 for Feed, and ~100 for Reels Chaining <span class="badge ok">verified</span> (<a href="#candidate-counts-by-stage--larger-than-facebook-and-monotonically-decreasing">candidate counts by stage</a>). The central point of dispute in ranking is, unlike Facebook, <strong>whether to combine positive and negative predictions by product or by sum</strong>. Instagram disclosed a multiplicative form in 2020, an additive form in 2023, and a multiplicative penalty in 2025, each used for a different problem (<a href="#three-combination-forms--the-biggest-difference-from-facebook">three combination forms</a>).</p>
+<figure class="diagram" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 528" font-family="-apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif" role="img" aria-label="Instagram Feed and Explore pipeline diagram">
+<style>
+.db{fill:var(--card,#fff);stroke:var(--line,#d9d5cd);stroke-width:1}
+.d2{fill:var(--code-bg,#f1efe9);stroke:var(--line,#d9d5cd);stroke-width:1}
+.hl{fill:color-mix(in srgb, var(--svc,#d62976) 7%, var(--card,#fff));stroke:var(--svc,#d62976);stroke-width:1.4}
+.bd{fill:none;stroke:var(--line,#d9d5cd);stroke-width:1;stroke-dasharray:4 4}
+.t{fill:var(--fg,#1a1a1a);font-size:13px;font-weight:700}
+.s{fill:var(--muted,#6b6b6b);font-size:11.5px}
+.n{fill:var(--muted,#6b6b6b);font-size:11px}
+.lane{fill:var(--svc,#d62976);font-size:12px;font-weight:800;letter-spacing:.06em}
+.a{stroke:var(--muted,#8a877f);stroke-width:1.5;fill:none;marker-end:url(#arig)}
+.af{stroke:var(--svc,#d62976);stroke-width:1.3;fill:none;stroke-dasharray:5 4;marker-end:url(#arig2)}
+</style>
+<defs>
+<marker id="arig" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted,#8a877f)"/></marker>
+<marker id="arig2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--svc,#d62976)"/></marker>
+</defs>
+
+<text class="lane" x="220" y="26" text-anchor="middle">FEED (connection-centered)</text>
+<text class="lane" x="660" y="26" text-anchor="middle">EXPLORE (unconnected)</text>
+
+<rect class="db" x="20" y="38" width="400" height="44" rx="10"/>
+<text class="t" x="220" y="57" text-anchor="middle">About 700 candidates (system card)</text>
+<text class="n" x="220" y="74" text-anchor="middle">Mixed connected + recommended inventory</text>
+<line class="a" x1="220" y1="82" x2="220" y2="106"/>
+
+<rect class="db" x="20" y="108" width="400" height="56" rx="10"/>
+<text class="t" x="220" y="129" text-anchor="middle">Ranking — about 500 · MTML multi-task</text>
+<text class="n" x="220" y="147" text-anchor="middle">Separate model per surface×component (1,000+ in production, named like ig_stories_tray_mtml)</text>
+<line class="a" x1="220" y1="164" x2="220" y2="188"/>
+
+<rect class="db" x="20" y="190" width="400" height="64" rx="10"/>
+<text class="t" x="220" y="211" text-anchor="middle">Combination — only 3 forms disclosed</text>
+<text class="n" x="220" y="229" text-anchor="middle">Multiplicative (P_like)^w×(1−P_not_int)^w (2020) · additive + negative term (2023)</text>
+<text class="n" x="220" y="245" text-anchor="middle">Multiplicative penalty Score=R×D (2025, notifications)</text>
+
+<rect class="db" x="460" y="38" width="400" height="60" rx="10"/>
+<text class="t" x="660" y="58" text-anchor="middle">IGQL retrieval (2020 public DSL)</text>
+<text class="n" x="660" y="75" text-anchor="middle">account_nn (account embedding) · ≤10 per account · diversify_by(round_robin)</text>
+<text class="n" x="660" y="90" text-anchor="middle">seed merge priority H ≫ R &gt; F</text>
+<line class="a" x1="660" y1="98" x2="660" y2="120"/>
+
+<rect class="hl" x="460" y="122" width="400" height="60" rx="10"/>
+<text class="t" x="660" y="142" text-anchor="middle">two-tower — chosen for cache, not accuracy</text>
+<text class="n" x="660" y="160" text-anchor="middle">item tower offline daily / user tower real-time per request</text>
+<text class="n" x="660" y="175" text-anchor="middle">Up to 1,500 → top 100 (15:1)</text>
+<line class="a" x1="660" y1="182" x2="660" y2="204"/>
+
+<rect class="db" x="460" y="206" width="400" height="48" rx="10"/>
+<text class="t" x="660" y="226" text-anchor="middle">Ranking — 1h fine-tuning</text>
+<text class="n" x="660" y="244" text-anchor="middle">EV = Σ W·P(action) − W_see_less·P(see less)</text>
+
+<line class="a" x1="220" y1="254" x2="380" y2="296"/>
+<line class="a" x1="660" y1="254" x2="500" y2="296"/>
+<rect class="db" x="20" y="298" width="840" height="42" rx="10"/>
+<text class="t" x="440" y="324" text-anchor="middle">Feed / Explore / Reels surfaces</text>
+
+<rect class="bd" x="20" y="376" width="840" height="92" rx="10"/>
+<text class="t" x="440" y="400" text-anchor="middle" font-size="12.5">DV365 — upstream sequence model (KDD 2025)</text>
+<text class="s" x="440" y="420" text-anchor="middle">History up to 70K (avg 40K) interactions → offline multi-slicing + pooling → 200 embeddings</text>
+<text class="s" x="440" y="440" text-anchor="middle">Feeds 15 downstream Instagram and Threads models as features — sequence model moved out of the ranker</text>
+<path class="af" d="M 220 376 V 350 L 220 350 V 342"/>
+<path class="af" d="M 660 376 V 350 L 660 350 V 342"/>
+<text class="n" x="440" y="500" text-anchor="middle">Diversity: after ranking only "too many … in a row" wording — mechanical disclosure is in retrieval (round_robin) and the notification formula (2025)</text>
+</svg>
+<figcaption>Instagram Feed·Explore pipeline — canon summary</figcaption></figure>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="feed-surfaces">Feed surfaces</h2>
+<p>There are <strong>10 types</strong> of AI system cards in the Instagram family <span class="badge ok">verified</span> <a href="https://transparency.meta.com/features/explaining-ranking/" target="_blank" rel="noopener">Our approach to explaining ranking</a> (read 2026-08-09). Mosseri himself denies a single algorithm <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/announcements/instagram-ranking-explained" target="_blank" rel="noopener">Instagram Ranking Explained</a>, 2023-05-31. He describes Instagram as having not one algorithm but a separate algorithm, classifier, and process for each surface <span class="badge ok">verified</span> same post.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Card</th>
+<th>Slug</th>
+<th>Last updated</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Feed</td>
+<td><code>ig-feed</code></td>
+<td><span class="nw">2026-06-29</span></td>
+</tr>
+<tr>
+<td>Feed Recommendations</td>
+<td><code>ig-feed-recommendations</code></td>
+<td><span class="nw">2026-06-29</span></td>
+</tr>
+<tr>
+<td>Explore</td>
+<td><code>ig-explore</code></td>
+<td><span class="nw">2026-06-22</span></td>
+</tr>
+<tr>
+<td>Reels Chaining</td>
+<td><code>ig-reels-chaining</code></td>
+<td><span class="nw">2025-11-11</span></td>
+</tr>
+<tr>
+<td>Stories</td>
+<td><code>ig-stories</code></td>
+<td><span class="nw">2025-09-18</span></td>
+</tr>
+<tr>
+<td>Suggested Accounts</td>
+<td><code>ig-suggested-accounts</code></td>
+<td><span class="nw">2025-03-07</span></td>
+</tr>
+<tr>
+<td>Search / Notifications / Comments</td>
+<td><code>ig-search</code> / <code>ig-notifications</code> / <code>ig-comments</code></td>
+<td>Not read</td>
+</tr>
+<tr>
+<td><strong>Threads Feed</strong></td>
+<td><code>ig-threads-feed</code></td>
+<td>Inside the Instagram group</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li class="warn"><strong>⚠ There is no <code>ig-reels</code> card.</strong> The address of this card <strong>returns 404 (measured 2026-08-09)</strong>.<ul>
+<li>The requested address is <code>https://transparency.meta.com/features/explaining-ranking/ig-reels/</code>.</li>
+<li>Facebook has <code>fb-reels</code>, but on the Instagram side there is <strong>only <code>ig-reels-chaining</code></strong>.</li>
+</ul>
+</li>
+<li>Instagram defines not &quot;the whole Reels tab&quot; but &quot;how the next reel is chained&quot; as the unit of an AI system <span class="badge est">inferred</span>. The card text also describes the problem as choosing the next candidate while viewing one reel.</li>
+<li>The Reels Chaining card defines this system as follows <span class="badge ok">verified</span>: <em>&quot;When you view and interact with Instagram, one of the underlying AI systems is Reels Chaining, which will give you an immersive, personalized, entertaining experience in Reels.&quot;</em></li>
+<li><strong>The Threads Feed card is inside the Instagram section</strong> <span class="badge ok">verified</span>. That is how the index groups it.</li>
+<li><strong>We could not find an Instagram document that corresponds to Facebook&#39;s WVCR (measured disclosure of surface composition)</strong> <span class="badge est">inferred</span>.<ul>
+<li>The corpus examined for this judgment is the Transparency Center report index, 15 system cards, and the about.instagram.com and engineering.fb.com posts (read 2026-08-09).</li>
+<li>The Widely Viewed Content Report is Facebook-only.</li>
+<li>So &quot;what % of the Instagram feed is recommendations&quot; relies only on statements to investors (IR). Those statements are in facebook.md.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="candidate-generation-retrieval">Candidate generation (retrieval)</h2>
+<p>As of the system cards, Explore fetches up to 1500 and passes the top 100 to the next stage, while Feed picks about 700 and scores about 500 for relevance <span class="badge ok">verified</span> (<a href="#candidate-counts-by-stage--larger-than-facebook-and-monotonically-decreasing">candidate counts by stage</a>). According to the 2023 Explore post, retrieval mixes four kinds of sources with tunable weights <span class="badge ok">verified</span> (<a href="#4-source-types-and-tunable-weights">source types</a>). The same post gives the ability to cache embeddings as its reason for choosing two-tower (a model that computes the user-side and item-side embeddings separately) <span class="badge ok">verified</span> (<a href="#the-reason-for-choosing-two-tower-is-the-cache">two-tower</a>). The 2020 post also publishes an actual query written in the retrieval DSL <span class="badge ok">verified</span> (<a href="#retrieval-dsl--real-queries-are-published">retrieval DSL</a>).</p>
+<h3 id="candidate-counts-by-stage--larger-than-facebook-and-monotonically-decreasing">Candidate counts by stage — larger than Facebook, and monotonically decreasing</h3>
+<p>According to the system card, Explore fetches up to 1500 and passes the top 100 to the next stage <span class="badge ok">verified</span>. Feed picks about 700 with a lightweight model and then scores about 500 for relevance, and Reels Chaining picks about 100 and scores about 100 <span class="badge ok">verified</span>. The wording in the table below is quoted verbatim from each system card.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>retrieval</th>
+<th>early stage</th>
+<th>late stage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>IG Explore</strong></td>
+<td><em>&quot;up to 1500 media are fetched&quot;</em></td>
+<td><em>&quot;the top 100 media are passed to the next stage&quot;</em></td>
+<td>Final list</td>
+</tr>
+<tr>
+<td><strong>IG Feed</strong></td>
+<td><em>&quot;A lightweight model is run to select approximately 700 of the most relevant posts.&quot;</em></td>
+<td>—</td>
+<td><em>&quot;calculates a relevance score for about 500 posts&quot;</em></td>
+</tr>
+<tr>
+<td><strong>IG Reels Chaining</strong></td>
+<td><em>&quot;approximately 100 of the most relevant reels&quot;</em></td>
+<td>—</td>
+<td><em>&quot;calculates a relevance score for about 100 reels&quot;</em></td>
+</tr>
+<tr>
+<td><strong>IG Feed Recommendations</strong></td>
+<td>No figure</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li class="warn"><strong>⚠ IG Feed is 700 → 500, but FB Feed is 500 → 500</strong> (see facebook.md).<ul>
+<li>For the same-named surface at the same company, the candidate count at pass 0 (the stage that narrows candidates with a lightweight model) differs.</li>
+<li><strong>FB Feed (500→500) and IG Reels Chaining (~100→~100) do not shrink.</strong></li>
+<li>The observation in facebook.md that Meta documents describe each surface at a different resolution repeats on Instagram.</li>
+</ul>
+</li>
+<li>Explore&#39;s 1500 → 100 is a <strong>15:1 reduction</strong>. No Facebook card shows a reduction ratio this aggressive.</li>
+<li>The 2023 blog post is less specific than the cards <span class="badge ok">verified</span>.<ul>
+<li>Candidates picked by one source: <em>&quot;hundreds of relevant items from a media pool of billions of items&quot;</em></li>
+<li>The start of the whole funnel: <em>&quot;starting with thousands of candidates&quot;</em></li>
+<li>Candidates received by the 1st stage ranker: <em>&quot;can recall thousands of candidates&quot;</em></li>
+<li>Candidates received by the 2nd stage ranker: <em>&quot;operates on the 100 best candidates from the first stage&quot;</em></li>
+<li>The reduction across the whole ranking: <em>&quot;from a few thousand to few hundred that are finally presented to the user&quot;</em></li>
+<li>The blog&#39;s figures are per-stage inputs, while the card&#39;s 1500 is the number retrieval fetches. The two are of the same order of magnitude, so there is no basis to call them inconsistent <span class="badge est">inferred</span>. The two descriptions are 3 years apart and differ in resolution.</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-source-types-and-tunable-weights">4 source types and tunable weights</h3>
+<p>Explore&#39;s retrieval uses four kinds of sources together and gives each source a tunable weight <span class="badge ok">verified</span> <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>, 2023-08-09.</p>
+<ul>
+<li>There are four source types <span class="badge ok">verified</span> same post.<ul>
+<li><em>&quot;heuristics (e.g., trending posts)&quot;</em></li>
+<li><em>&quot;more sophisticated ML approaches&quot;</em></li>
+<li><em>&quot;real-time (capturing most recent interactions)&quot;</em></li>
+<li><em>&quot;pre-generated (capturing long-term interests)&quot;</em></li>
+</ul>
+</li>
+<li>The four sources are used together and mixed with tunable weights <span class="badge ok">verified</span> same post: <em>&quot;we utilize all these mentioned source types together and mix them with <strong>tunable weights</strong>&quot;</em></li>
+<li>This sentence is <strong>a statement that explicitly says per-source weights exist as tuning parameters.</strong> For Facebook Feed, there is no primary source even for a per-source breakdown of candidate counts (facebook.md).</li>
+<li>The structure is the same as X listing 11 sources in code in <code>home-mixer</code> (the service that bundles candidate collection and ranking for the X For You feed); only the numbers are undisclosed <span class="badge est">inferred</span>.</li>
+</ul>
+<h3 id="the-reason-for-choosing-two-tower-is-the-cache">The reason for choosing two-tower is the cache</h3>
+<p>The 2023 Explore post gives the ability to cache user embeddings and item embeddings as the reason for using two-tower <span class="badge ok">verified</span>: <em>&quot;user and item embeddings can be cached, making inference for the Two Tower model extremely efficient&quot;</em>.</p>
+<ul>
+<li>The training objective is to predict engagement events as a similarity between the user embedding and the item embedding <span class="badge ok">verified</span> same post: <em>&quot;to predict engagement events (e.g., someone liking a post) as a similarity measure between user and item embeddings&quot;</em>.</li>
+<li>It names FAISS and HNSW as examples of ANN (approximate nearest neighbor search) libraries <span class="badge ok">verified</span> same post: <em>&quot;e.g., FAISS, HNSW, etc&quot;</em>.</li>
+</ul>
+<p><strong>Facebook&#39;s connected-content retrieval has no ANN at all.</strong> It ends with a lookup of the friend graph (facebook.md). Instagram, by contrast, has a corpus on the scale of billions because Explore is a non-connected (recommendation) surface to begin with. That is why EBR (embedding-based retrieval) is a core component. This difference is likely the root cause of the gap in retrieval literature volume between the two services <span class="badge est">inferred</span>.</p>
+<h3 id="retraining-cadence--hourly">Retraining cadence — hourly</h3>
+<p>The 2023 Explore post says models can be retrained (fine-tuned) every hour as soon as new data arrives <span class="badge ok">verified</span>: <em>&quot;we can re-train (fine-tune) our models <strong>every hour</strong> as soon as we have new data&quot;</em></p>
+<p><span class="badge est">inferred</span> The reason for choosing two-tower (the item tower can be cached) and hourly fine-tuning are two aspects of the same design. Updating only the item tower output means the index does not have to be rebuilt in full. Details are in <code>topics/model-freshness.md</code>.</p>
+<h3 id="retrieval-dsl--real-queries-are-published">retrieval DSL — real queries are published</h3>
+<p>In its 2020 post, Instagram published an actual query written in the retrieval DSL <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> (Amogh Mahapatra, 2020-12-10). The query takes accounts the user liked as seeds, expands to similar accounts, filters those accounts&#39; media by a model score, ranks them, and interleaves them seed by seed <span class="badge ok">verified</span>.</p>
+<p><strong>The same post also appears on engineering.fb.com under a different title, <a href="https://engineering.fb.com/2020/12/10/web/how-instagram-suggests-new-content/" target="_blank" rel="noopener">How Instagram suggests new content</a>.</strong> Take care not to count the same post as two citations.</p>
+<pre tabindex="0"><code>user
+.let(seed_id=user_id)
+.liked(max_num_to_retrieve=30)
+.account_nn(embedding_config=default)
+.posted_media(max_media_per_account=10)
+.filter(non_recommendable_model_threshold=0.2)
+.rank(ranking_model=default)
+.diversify_by(seed_id, method=round_robin)
+</code></pre>
+<p>Four things can be read from this one query block.</p>
+<ul>
+<li>The basic unit of retrieval is <strong>seed-based expansion</strong> <span class="badge ok">verified</span>. It takes accounts the user liked (up to 30) as seeds and expands to similar accounts with <code>account_nn</code>.</li>
+<li><strong>The per-account media cap is a parameter</strong> <span class="badge ok">verified</span>.<ul>
+<li><code>max_media_per_account=10</code></li>
+</ul>
+</li>
+<li><strong>The filter is a model threshold</strong> <span class="badge ok">verified</span>. It is the only numeric evidence that a policy filter is a score threshold rather than a rule.<ul>
+<li><code>non_recommendable_model_threshold=0.2</code></li>
+</ul>
+</li>
+<li><strong>Diversity sits in the retrieval stage</strong> <span class="badge ok">verified</span>. <strong>It is round-robin per seed account.</strong> Facebook only writes that diversity is in pass 2 (after ranking).<ul>
+<li><code>diversify_by(seed_id, method=round_robin)</code></li>
+</ul>
+</li>
+</ul>
+<p>There are 3 seed sources, and they have a priority order <span class="badge ok">verified</span>.</p>
+<ul>
+<li><strong>H</strong> is a seed from Home Feed <span class="badge ok">verified</span>.</li>
+<li><strong>R</strong> is a seed from other recommendation surfaces such as Explore, Reels, and Shopping <span class="badge ok">verified</span>.</li>
+<li><strong>F</strong> is a backup such as personalized graph exploration <span class="badge ok">verified</span>.</li>
+<li>The merge order puts H first, followed by R and F <span class="badge ok">verified</span>: <em>&quot;The final merge order is as follows: H &gt;&gt; R &gt; F.&quot;</em></li>
+<li>When training the candidate selection model, a constraint keeps the overall distribution from drifting away from Home-based sources <span class="badge ok">verified</span>: <em>&quot;the overall distribution is not skewed away from Home-based sources&quot;</em>.</li>
+</ul>
+<p><span class="badge est">inferred</span> The &quot;constrained&quot; in this post&#39;s title means <strong>a constraint that matches the Home Feed distribution</strong>, not an exploration bandit. The body never mentions Thompson sampling, bandits, or an exploration budget, and instead says it matches the media type distribution and freshness to Home Feed.</p>
+<h3 id="igql--ig2vec--could-not-obtain-the-primary-original-text">IGQL / IG2Vec — could not obtain the primary original text</h3>
+<p>The 2019 post said to have introduced IGQL and IG2Vec could not be opened as a primary original text with the 3 URLs requested directly <span class="badge obs">observed</span> 2026-08-09. However, the existence of the DSL and its form are confirmed from primary material by the <a href="#retrieval-dsl--real-queries-are-published">2020 query</a> <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Ivan Medvedev&#39;s 2019 post &quot;Powered by AI: Instagram&#39;s Explore recommender system&quot; is known as the post that introduced IGQL and IG2Vec. The two names are known to refer to a retrieval-only DSL and account embeddings, respectively.</li>
+<li><strong>As of 2026-08-09, we could not access the primary original text</strong> <span class="badge obs">observed</span> 2026-08-09. This observation is limited to the 3 URLs requested directly.<ul>
+<li><code>ai.meta.com/blog/powered-by-ai-instagrams-explore-recommender-system/</code> returned <strong>HTTP 500</strong>.</li>
+<li>The same path on <code>ai.facebook.com</code> was also <strong>HTTP 500</strong>.</li>
+<li>The <code>instagram-engineering.com</code> Medium mirror hit a <strong>connection timeout</strong>.</li>
+<li>To reproduce, send a GET request to the three URLs above.</li>
+</ul>
+</li>
+<li><strong>These notes do not use the widely cited &quot;tens of thousands → 500 → 150 → 50 → 25&quot; funnel figures as evidence.</strong> We could not read the primary text, and even if we had, they are 2019 values that conflict with the 1500 → 100 on the 2026 card <span class="badge est">inferred</span>.</li>
+<li>However, <strong>the existence and form of the DSL are confirmed from primary material by the 2020 query block above.</strong> The way it works is confirmed even without knowing the names <span class="badge ok">verified</span>.</li>
+<li>The query&#39;s <code>account_nn(embedding_config=default)</code> points to a component of the IG2Vec family that uses account embeddings and nearest neighbors <span class="badge est">inferred</span>. The method name itself is account nearest-neighbor.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="ranking">Ranking</h2>
+<p>Instagram disclosed that it uses three combination forms for different problems (<a href="#three-combination-forms--the-biggest-difference-from-facebook">three combination forms</a>). As of the system cards, prediction heads differ by surface <span class="badge ok">verified</span> (<a href="#prediction-heads--they-differ-by-surface-all-verified-verbatim">prediction heads</a>). According to the 2023 Explore post, the 1st stage ranker learns, as its label, whether an item falls in the top K ranked by the 2nd stage ranker <span class="badge ok">verified</span> (<a href="#the-1st-stage-is-a-distillation-of-the-2nd-stage">distillation</a>). As of the 2025 post, there are more than 1,000 production models, with a separate MTML (multi-task multi-label) model for each surface and component <span class="badge ok">verified</span> (<a href="#model-operating-scale--only-instagram-disclosed-it">model operating scale</a>).</p>
+<h3 id="three-combination-forms--the-biggest-difference-from-facebook">Three combination forms — the biggest difference from Facebook</h3>
+<p>Instagram <strong>disclosed that it uses three combination forms for different problems.</strong> The only combination Facebook published is linear. Facebook&#39;s formula is <code>Vijt = Σ w·Y</code>, with details in facebook.md.</p>
+<ul>
+<li><p><strong>(1) Multiplicative form</strong> (2020, Suggested Posts) <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a>, 2020-12-10.</p>
+<pre tabindex="0"><code>Value(Post) = (probability_like)^weight_like * (1- probability_not_interested)^weight_see_less
+</code></pre>
+</li>
+<li><p><strong>(2) Additive form with a negative term</strong> (2023, Explore) <span class="badge ok">verified</span> <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>, 2023-08-09.</p>
+<pre tabindex="0"><code>Expected Value = W_click * P(click) + W_like * P(like) – W_see_less * P(see less) + etc.
+</code></pre>
+</li>
+<li><p><strong>(3) Multiplicative diversity penalty</strong> (2025, Notifications). Source: <a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a>, 2025-09-02.</p>
+<pre tabindex="0"><code>Score(c) = R(c) × D(c)
+D(c) = ∏_{i=1..m} (1 - w_i · p_i(c))
+p_i(c) = max_{h ∈ H} sim_i(c, h)
+</code></pre>
+<ul>
+<li class="warn">⚠ <strong>Unlike (1) and (2), these three lines are not verbatim.</strong> In the original the formulas are rendered as LaTeX <strong>images</strong> and are not in the body text; the formulas above are a transcription of those images <span class="badge obs">observed</span> 2026-08-09.</li>
+<li>However, the components are supported by the body prose <span class="badge ok">verified</span>: <em>&quot;the product of its base ranking score and a diversity demotion multiplier&quot;</em>, <em>&quot;D(c) ∈ [0,1] is a penalty factor…&quot;</em></li>
+<li>Details are in <a href="feed-diversity.html">../topics/feed-diversity.md</a>.</li>
+<li>As for the symbols, <code>R(c)</code> is base relevance and <code>D(c) ∈ [0,1]</code> is the penalty.</li>
+<li><code>H</code> is the recent send history, <code>w_i ∈ [0,1]</code> is the per-dimension strength, and <code>τ_i</code> is the similarity threshold.</li>
+<li>In the baseline implementation, <code>p_i(c)</code> is 1 if the similarity exceeds the threshold and 0 otherwise: <em>&quot;equals 1 if the similarity exceeds a threshold τ_i and 0 otherwise&quot;</em>.</li>
+<li>There are 4 dimensions: <strong>content / author / notification type / product surface</strong>.</li>
+</ul>
+</li>
+</ul>
+<p>(1) and (2) are on different surfaces, and there is no direct evidence of a switch from multiplicative to additive. However, a structural difference between the two forms is real <span class="badge est">inferred</span>.</p>
+<ul>
+<li class="warn"><strong>⚠ (1) and (2) are on different surfaces.</strong> (1) is Suggested Posts (non-connected content shown at the end of Home Feed), and (2) is Explore.<ul>
+<li><strong>There is no direct evidence that &quot;Instagram switched from multiplicative to additive.&quot;</strong></li>
+<li>However, given the 3-year gap, the shared in-house literature lineage, and the fact that the sources in (2) include the successor system of (1), there is room to read it as a change of direction <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><strong>The structural difference is real</strong> <span class="badge est">inferred</span>. <strong>The multiplicative form gives negative signals a veto, while the additive form gives them an exchangeable cost.</strong><ul>
+<li>In the multiplicative form, value drops to 0 when <code>P(not_interested) → 1</code>. It is effectively a hard veto.</li>
+<li>In the additive form, however large the negative term is, the other terms can be larger.</li>
+</ul>
+</li>
+<li>Taking the log of the multiplicative form&#39;s exponents <code>weight_like</code> and <code>weight_see_less</code> makes it linear, so it ends up as the <strong><code>Σ w·log P</code> form</strong>. That is, it is the same as Facebook&#39;s <code>Σ w·P</code> in being a &quot;linear combination&quot;, and <strong>the only difference is whether P or log P is used</strong> <span class="badge est">inferred</span>.</li>
+<li>(3) applies diversity as a <strong>multiplicative penalty</strong>. facebook.md says &quot;Meta does not publish its diversity algorithms (MMR/DPP)&quot;.<ul>
+<li>However, <strong>on the Instagram notifications side, a max-similarity penalty of the MMR family was published as a formula.</strong> MMR is a greedy re-ranking approach that reflects the distance to already selected items in the score.</li>
+<li>It comes with the caveat that it is notifications, not the feed, but it is the most specific diversity disclosure across all of Meta.</li>
+</ul>
+</li>
+</ul>
+<p>Detailed comparisons are in <code>topics/multi-task-ranking.md</code> and <code>topics/feed-diversity.md</code>.</p>
+<h3 id="how-weights-are-set--facebook-uses-surveys-instagram-uses-optimization">How weights are set — Facebook uses surveys, Instagram uses optimization</h3>
+<p>Instagram&#39;s 2020 post says the weights are calibrated with offline session replay and online Bayesian optimization <span class="badge ok">verified</span>. The 2023 post names Bayesian optimization and offline tuning as the two popular approaches to parameter tuning <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The 2020 post&#39;s wording is as follows <span class="badge ok">verified</span>: <em>&quot;offline replay over user sessions and b) online Bayesian optimization&quot;</em></li>
+<li>The 2023 post&#39;s wording is as follows <span class="badge ok">verified</span>: <em>&quot;There are two popular approaches to parameters tuning: Bayesian optimization and offline tuning.&quot;</em><ul>
+<li>&quot;replay&quot; appears <strong>0 times</strong> in this post (full text checked 2026-08-09).</li>
+</ul>
+</li>
+</ul>
+<p><strong>For the same role, Facebook writes that weights are &quot;set by surveys&quot;</strong> (facebook.md, <code>topics/survey-signals.md</code>). <strong>The same company disclosed completely different answers to the same problem.</strong> In practice it likely uses both with only different emphasis, but at the level of published sentences they are clearly different <span class="badge est">inferred</span>.</p>
+<h3 id="the-1st-stage-is-a-distillation-of-the-2nd-stage">The 1st stage is a distillation of the 2nd stage</h3>
+<p>Explore&#39;s 1st stage ranker is trained to predict the output of the 2nd stage ranker, not user behavior <span class="badge ok">verified</span> 2023 post: <em>&quot;We train the first stage ranker to predict the output of the second stage with the label: PSelect = { media in top K results ranked by the second stage}&quot;</em></p>
+<ul>
+<li><strong>The early stage ranker&#39;s label is not user behavior but whether an item is in the late stage ranker&#39;s top K.</strong> Facebook&#39;s pass 0 says only &quot;high recall&quot; and has no label definition.</li>
+<li>By model, the early stage is a two-tower <span class="badge ok">verified</span>.</li>
+<li>The late stage is an MTML neural network that predicts the probabilities of several engagement events such as click and like <span class="badge ok">verified</span>: <em>&quot;multi-task multi label (MTML) neural network model&quot;</em>, <em>&quot;the probability of different engagement events (click, like, etc.)&quot;</em>.</li>
+</ul>
+<h3 id="prediction-heads--they-differ-by-surface-all-verified-verbatim">Prediction heads — they differ by surface (all <span class="badge ok">verified</span>, verbatim)</h3>
+<p>Instagram uses different prediction heads on each surface <span class="badge ok">verified</span>. For example, Feed has heads dedicated to the first post, Reels Chaining has an audio reuse head, and Stories has a head that predicts whether the author is family or a close friend <span class="badge ok">verified</span>.</p>
+<p class="warn"><strong>⚠ We could not settle the total count.</strong> For Feed, Stories, Reels Chaining, and Suggested Accounts, the list extracted from the card and the count the card states do not match. So the list below should be read only as a <strong>list of confirmed items</strong>, and should not be compared directly with Facebook Feed&#39;s 10.</p>
+<ul>
+<li><strong>IG Feed</strong> (<code>ig-feed</code>, 2026-06-29) <span class="badge ok">verified</span>: carousel completion / <em>&quot;How likely you are to enjoy this post&quot;</em> / skip / <strong>dwell time on the author&#39;s profile</strong> / <strong>share via DM</strong> / dwell time on the post / <strong>first-post skip</strong> / <strong>first-post dwell over 10 seconds</strong> / <strong>turn video sound on</strong> / <em>&quot;How likely the first post you see is to keep you spending time in your Feed during this session&quot;</em><ul>
+<li><strong>There are 3 heads dedicated to the first post</strong> (skip / 10 seconds / session retention). This means slot 1 of the slate (the set of posts shown at once) is treated as a separate optimization problem <span class="badge est">inferred</span>. Facebook cards have no such position-specific heads, and position appears only as a feature.</li>
+<li><strong>&quot;Session continuation&quot; is a prediction target.</strong> It is a head that directly predicts session length rather than single-item engagement.</li>
+</ul>
+</li>
+<li><strong>IG Explore</strong> (<code>ig-explore</code>, 2026-06-22) <span class="badge ok">verified</span>: follow probability / <strong>watch over 5 seconds</strong> / <strong>watch over 95% of the video</strong> / <strong>&#39;Not Interested&#39; click</strong> / comment / like / reshare / <em>&quot;How likely you click and also engage with a post&quot;</em> / save / <em>&quot;How likely you are to click one of the short, squared post in Explore to view it in full screen&quot;</em></li>
+<li><strong>IG Reels Chaining</strong> (<code>ig-reels-chaining</code>, 2025-11-11) <span class="badge ok">verified</span>: <strong>audio reuse</strong> (<em>&quot;use the audio from a reel you&#39;re viewing in one you create&quot;</em>) / <strong>watch under 3 seconds</strong> / <em>&quot;click &#39;Interested&#39;&quot;</em> / comment / <strong>watch longer than 95% of viewers of reels of the same length</strong> / click on a vertical reel in Explore / reshare / <strong>share outside Instagram</strong> / follow<ul>
+<li>The card&#39;s <code>How likely you are to watch more of a reel than 95% of users who watched reels of the same length</code> head predicts not absolute watch time but a <strong>percentile relative to the viewer distribution of reels of the same length</strong>.</li>
+<li>This removes length bias in the label definition; the problem Facebook handles with upper-bound clipping for external article dwell time (facebook.md) is solved by Instagram with <strong>quantile normalization</strong> <span class="badge est">inferred</span>.</li>
+<li><strong>Audio reuse is a prediction target.</strong> It sets <strong>inducing creation</strong>, not consumption, as a ranking goal. No other head like this appears anywhere in Meta&#39;s documents.</li>
+</ul>
+</li>
+<li><strong>IG Stories</strong> (<code>ig-stories</code>, 2025-09-18) <span class="badge ok">verified</span>: top-of-feed story click / question-response interaction / <strong><code>How likely it is that you and the story&#39;s author are family or good friends</code></strong> / reply click / like sent / profile entry from the viewer / reel effect save / swipe to next story / <strong>exit from current story</strong> / poll and slider response<ul>
+<li><strong>&quot;Whether they are family or close friends&quot; is a prediction head.</strong> The relationship classifier itself enters as a multi-task head.</li>
+<li>Facebook cards have &quot;strong intent to interact with a connection&quot;, but that is a behavior prediction, while this head is <strong>a prediction of the relationship itself</strong>.</li>
+</ul>
+</li>
+<li><strong>IG Feed Recommendations</strong> (<code>ig-feed-recommendations</code>, 2026-06-29) <span class="badge ok">verified</span>: <em>&quot;How informative a post is&quot;</em> / &#39;Interested&#39; click / <strong>Reels dwell time after clicking a reel in the home feed</strong> / <strong>feed scroll duration after viewing the top post</strong> / scroll to next post / author profile click / comment click / first-post skip / reel full-screen click / audio on<ul>
+<li>The card&#39;s <code>How long will the user spend in reels after clicking into a reels post in home feed</code> head <strong>predicts dwell time after moving to another surface.</strong> It is direct evidence that Feed ranking puts Reels consumption into its objective function.</li>
+</ul>
+</li>
+<li><strong>IG Suggested Accounts</strong> (<code>ig-suggested-accounts</code>, 2025-03-07) <span class="badge ok">verified</span>: content view after follow / <strong>follow through to follow-back</strong> / follow / profile visit after follow / <strong>follow-back</strong><ul>
+<li><strong>Follow-back probability is a separate prediction head.</strong> It sets <strong>forming a mutual connection</strong>, not a one-way follow, as the goal.</li>
+</ul>
+</li>
+</ul>
+<h3 id="actual-feature-names-excerpt-all-verified-verbatim">Actual feature names (excerpt, all <span class="badge ok">verified</span> verbatim)</h3>
+<p>The system card also states the features used in ranking in plain sentences <span class="badge ok">verified</span>. Examples are a feature that counts only behavior inside Explore, a binary feature for session state, and a negative-signal feature that lists the authors of reels watched for less than 3 seconds.</p>
+<ul>
+<li>Explore has <strong>a feature family that aggregates only behavior inside Explore</strong> <span class="badge ok">verified</span>.<ul>
+<li><em>&quot;The amount of time you&#39;ve spent on Explore viewing posts from post&#39;s author in recent past&quot;</em></li>
+<li><em>&quot;How many times you&#39;ve seen short, squared reel in Explore&quot;</em></li>
+<li><em>&quot;How many follows button clicks received on a post in Explore&quot;</em></li>
+</ul>
+</li>
+<li>Reels Chaining features include a session-state feature, a negative-signal feature, and a country-level aggregate feature <span class="badge ok">verified</span>.<ul>
+<li><strong>Session state is used as a binary feature</strong>: <em>&quot;Whether or not you&#39;ve been viewing reels for more than 15 seconds&quot;</em></li>
+<li><strong>Negative signals are kept as an author list</strong>: <em>&quot;The authors of reels you&#39;ve spent less than three seconds watching&quot;</em></li>
+<li><strong>There is a feature aggregated at the country level</strong>: <em>&quot;How much time has viewers from your country spent on this reel&quot;</em></li>
+</ul>
+</li>
+<li>Feed Recommendations has a <strong>ratio feature</strong> <span class="badge ok">verified</span>: <em>&quot;The ratio of engagement counter to vpvd&quot;</em>. We infer that vpvd belongs to the video play view duration family.<ul>
+<li>It also has device platform and app opens in the last 7 days features: <em>&quot;What is the device platform e.g. ios, android&quot;</em>, <em>&quot;How many times you&#39;ve opened the app in the last 7 days&quot;</em></li>
+</ul>
+</li>
+<li>Feed features include ones covering content type, recency window, amount of text overlaid on an image, and user segment <span class="badge ok">verified</span>.<ul>
+<li><strong>The output of a content-type classifier is used as a feature</strong>: <em>&quot;Whether the post is informative content (news, product reviews, tutorials, how-tos)&quot;</em></li>
+<li><strong>The recency window is 90 days</strong>: <em>&quot;How recently the post was created (within 90 days)&quot;</em></li>
+<li><strong>It looks at the amount of text overlaid on an image</strong>: <em>&quot;Whether it&#39;s a photo and how much text is overlaid on it&quot;</em></li>
+<li><strong>A user segment is used as a feature</strong>: <em>&quot;Which Reels-watch-time group you fall into&quot;</em></li>
+</ul>
+</li>
+<li>Stories features <strong>use both the average and the maximum</strong> <span class="badge ok">verified</span>: <em>&quot;The average and maximum amounts of time you&#39;ve spent viewing stories&quot;</em>. This appears to be used for within-user normalization <span class="badge est">inferred</span>.</li>
+</ul>
+<h3 id="mosseris-per-surface-signal-order--a-form-of-disclosure-facebook-does-not-have">Mosseri&#39;s per-surface signal order — a form of disclosure Facebook does not have</h3>
+<p>Mosseri disclosed the ranking signals for Feed, Explore, and Reels in order of importance, while for Stories he listed signals without stating an order <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/announcements/instagram-ranking-explained" target="_blank" rel="noopener">Instagram Ranking Explained</a>, 2023-05-31 (updated since). Only in Explore is information about the post itself ranked No. 1; in the others, user activity is ranked No. 1.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="w6"><col class="grow"></colgroup>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Order of importance</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Feed</strong></td>
+<td>Your activity → Information about the post → Information about the person who posted → Your history of interacting with someone</td>
+</tr>
+<tr>
+<td><strong>Explore</strong></td>
+<td><strong>Information about the post</strong> → Your activity in Explore → Your history of interacting with the person who posted → Information about the person who posted</td>
+</tr>
+<tr>
+<td><strong>Reels</strong></td>
+<td>Your activity → Your history of interacting with the person who posted → Information about the reel → Information about the person who posted</td>
+</tr>
+<tr>
+<td><strong>Stories</strong></td>
+<td>Viewing history → Engagement history → Closeness (no order stated)</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li><strong>Only in Explore is &quot;information about the post itself&quot; No. 1.</strong> In the others, user activity is No. 1.<ul>
+<li>On unconnected surfaces there is almost no (user, author) relationship history, so item features necessarily carry more weight <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><strong>In Reels, &quot;history of interacting with the author&quot; is No. 2, but in Explore it is No. 3.</strong> These are both unconnected surfaces, yet the order differs.</li>
+<li>Facebook has never disclosed this kind of per-surface signal order. Instead it presents only &quot;3 levels of usage frequency&quot; (most/occasionally/less frequently), which is covered in facebook.md. <strong>The two services disclose the same kind of information along different axes.</strong></li>
+</ul>
+<h3 id="ultra-long-user-history--dv365">Ultra-long user history — DV365</h3>
+<p>DV365 summarizes a single user&#39;s very long interaction history into offline embeddings and feeds them to multiple models in Instagram and Threads <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2506.00450" target="_blank" rel="noopener">DV365: Extremely Long User History Modeling at Instagram</a>, KDD 2025 (arXiv 2025-05-31, Meta/Instagram authors).</p>
+<ul>
+<li><strong>The encoded history is up to 70,000 interactions, 40,000 on average</strong> <span class="badge ok">verified</span>. The explicit timeline is max 35K/avg 10K, and the implicit one is max 35K/avg 30K.</li>
+<li>Instead of lengthening the sequence during training, it uses <strong>offline embedding</strong> <span class="badge ok">verified</span>.<ul>
+<li>It builds 200 pooled embeddings by pooling per subsequence (<em>&quot;multi-slicing and summarization&quot;</em>).</li>
+<li>These are compressed with the Funnel Summarization Architecture.</li>
+</ul>
+</li>
+<li><strong>A single upstream model feeds 15 product models across Instagram and Threads</strong> <span class="badge ok">verified</span>. It is used for both retrieval and ranking in Reels/Feed/Explore/Stories.</li>
+<li>The refresh interval is <strong>6 hours</strong> <span class="badge ok">verified</span>. After quantization, the stored form is 58×17 long integers, compressed from 200×256 fp32.</li>
+<li>In the online result, <strong>Instagram app-wide time spent rose +0.7%</strong> <span class="badge ok">verified</span>.<ul>
+<li>NE (normalized entropy) on Reels ranking tasks improved by 0.4% or more on average.</li>
+<li>Retrieval hit rate improved by 2–8%.</li>
+</ul>
+</li>
+<li>The paper says it has been validated in production for over 1 year since its first launch <span class="badge ok">verified</span>: <em>&quot;production battle-proven for &gt;1 year since our first launch&quot;</em>.</li>
+<li>It claims to be <strong>incremental even when applied on top of existing attention-family sequence models (including HSTU)</strong> <span class="badge ok">verified</span>. The argument is that attention shows diminishing returns at a length of 40K.</li>
+</ul>
+<p><span class="badge est">inferred</span> <strong>Instagram is the reference surface within Meta for &quot;ultra-long history.&quot;</strong> The HSTU paper anonymized the surface (facebook.md open question 5), but DV365 names Instagram in its title. Details are in <code>topics/sequence-transformer-ranking.md</code>.</p>
+<h3 id="model-operating-scale--only-instagram-disclosed-it">Model operating scale — only Instagram disclosed it</h3>
+<p>Instagram disclosed that it runs more than 1,000 ML models in production <span class="badge ok">verified</span> <a href="https://engineering.fb.com/2025/05/21/production-engineering/journey-to-1000-models-scaling-instagrams-recommendation-system/" target="_blank" rel="noopener">Journey to 1000 models: Scaling Instagram&#39;s recommendation system</a>, 2025-05-21. The model naming convention shows a separate MTML model for each surface and component <span class="badge ok">verified</span>.</p>
+<ul>
+<li>There are <strong>more than 1,000</strong> ML models in production <span class="badge ok">verified</span>. There are more than 10 launches per week: <em>&quot;more than 10 launches per week&quot;</em>.</li>
+<li>The funnel layer names are settled here <span class="badge ok">verified</span>: <strong>Sourcing → Early-stage ranking (ESR) → Late-stage ranking (LSR)</strong></li>
+<li>The model naming convention was published <span class="badge ok">verified</span>. <strong>It is direct evidence that there is a separate MTML model for each surface × component.</strong><ul>
+<li><strong><code>ig_stories_tray_mtml</code></strong> = ig (app) / stories (surface) / tray (Stories tray) / mtml (multi-task-multi-label)</li>
+</ul>
+</li>
+<li>The infrastructure the post covers is as follows <span class="badge ok">verified</span>.<ul>
+<li>Model Registry (based on Configerator)</li>
+<li>Automated launch workflow (<em>&quot;from days to hours&quot;</em>)</li>
+<li><strong>Model Stability Metric</strong>: generates SLOs from calibration and normalized entropy.</li>
+<li>Offline evaluation based on recorded-traffic replay</li>
+<li>Team-level capacity quotas</li>
+</ul>
+</li>
+</ul>
+<p><span class="badge est">inferred</span> The real subject of this post is not ranking but the organizational problem of &quot;running 1000 ranking models.&quot; Instagram is the only side where Meta has disclosed this layer.</p>
+<h3 id="removal-of-follower-count-as-an-input">Removal of follower count as an input</h3>
+<p>In a 2025-01-21 post, Instagram wrote that creators with large follower counts used to score higher in content ranking <span class="badge ok">verified</span> <a href="https://creators.instagram.com/blog/the-latest-with-instagram" target="_blank" rel="noopener">The latest with Instagram</a>.</p>
+<blockquote>
+<p>&quot;Historically, creators with large follower counts scored higher in Instagram&#39;s content ranking. However, last year we announced an update to reels recommendations. Now creators of all sizes have equal opportunity to find breakthrough moments and reach new audiences.&quot;</p>
+</blockquote>
+<ul>
+<li>The 3rd sentence of the quote was re-transcribed on 2026-08-09 from the current page. The sentence the earlier version transcribed was an old or inaccurate version, but the substance, an admission in the past tense, is the same.</li>
+<li>This sentence is <strong>Meta itself admitting, in the past tense, that follower count had been part of the ranking score.</strong> It did not disclose what form the input took or what replaced it.</li>
+<li>There is a policy lineage around <a href="https://creators.instagram.com/blog/rewarding-original-creators-on-instagram" target="_blank" rel="noopener">Rewarding original creators on Instagram</a> <span class="badge ok">verified</span>. It follows up the 2024-04-30 announcement, and the current page was updated on 2026-04-30.</li>
+<li>The &quot;new ranking input favoring small creators,&quot; &quot;originals replace reposts,&quot; and &quot;gradual audience expansion&quot; said to be in the 2024-04-30 announcement are based on Mosseri&#39;s post, and <strong>we could not obtain a primary URL, so we confirmed them only through secondary reporting</strong> <span class="badge est">inferred</span>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="re-ranking-diversity-and-filters">Re-ranking, diversity, and filters</h2>
+<p>Instagram&#39;s official sentence about trying not to show too many posts from the same person in a row has no numbers <span class="badge ok">verified</span> (<a href="#blocking-3-in-a-row-from-the-same-account-is-wrong--myth-check">myth check</a>). In contrast, diversity at the retrieval stage is disclosed concretely as round-robin per seed account <span class="badge ok">verified</span> (<a href="#retrieval-dsl--real-queries-are-published">retrieval DSL</a>). Policy filters are confirmed in two layers: a score threshold inside retrieval and the filtering described in the DSA filing <span class="badge ok">verified</span> (<a href="#policy-filters--two-layers-score-threshold-and-policy-document">policy filters</a>). Accounts that mainly repost others&#39; content do not get recommended <span class="badge ok">verified</span> (<a href="#originality--instagram-applied-it-earlier-and-more-strongly-than-facebook">originality</a>), and accounts that often share age-inappropriate content are not recommended to teens <span class="badge ok">verified</span> (<a href="#teens--recommendation-eligibility-itself-is-restricted-by-age">teens</a>).</p>
+<h3 id="blocking-3-in-a-row-from-the-same-account-is-wrong--myth-check">&quot;Blocking 3 in a row from the same account&quot; is wrong — myth check</h3>
+<p>The widely repeated claim that &quot;Instagram blocks 3 or more consecutive posts from the same account&quot; has <strong>no Meta primary source.</strong> Mosseri&#39;s actual sentence has <strong>no number.</strong> The actual sentence is as follows <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/announcements/instagram-ranking-explained" target="_blank" rel="noopener">Instagram Ranking Explained</a>, 2023.</p>
+<blockquote>
+<p><em>&quot;we try to avoid showing <strong>too many</strong> posts from the same person <strong>in a row</strong>, or <strong>too many</strong> suggested posts back to back&quot;</em></p>
+</blockquote>
+<ul>
+<li>The wording is only &quot;too many&quot; and &quot;try to avoid&quot;, so <strong>there is no threshold and it is not a hard constraint.</strong></li>
+<li>The same sentence states <strong>two separate constraints</strong>.<ul>
+<li>One is consecutive content from the same author.</li>
+<li>The other is <strong>consecutive suggested (unconnected) posts</strong>. Facebook has no corresponding statement.</li>
+</ul>
+</li>
+<li>The only diversity sentence on the IG Feed card also has no number <span class="badge obs">observed</span> 2026-08-09 (1 body passage in the ig-feed card).<ul>
+<li>Card sentence: <em>&quot;The system also tries to ensure your feed has a balanced mix of content types.&quot;</em></li>
+<li>This sentence is <strong>actually less specific</strong> than &quot;you wouldn&#39;t see multiple video posts in a row&quot; on the Facebook Feed card.</li>
+</ul>
+</li>
+<li>In contrast, <strong>diversity at the retrieval stage is disclosed concretely.</strong> It is <code>diversify_by(seed_id, method=round_robin)</code> in the 2020 query in the <a href="#retrieval-dsl--real-queries-are-published">retrieval DSL section</a>.<ul>
+<li>Instagram&#39;s diversity handling may rely mainly on <strong>seed round-robin at the candidate generation stage</strong> rather than reordering after ranking <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="policy-filters--two-layers-score-threshold-and-policy-document">Policy filters — two layers: score threshold and policy document</h3>
+<p>Instagram&#39;s policy filters are confirmed in two layers <span class="badge ok">verified</span>. Retrieval contains a model score threshold, and the DSA filing says the system typically first builds a content inventory and then filters out content that potentially violates policy <span class="badge ok">verified</span>.</p>
+<ul>
+<li>There is a model threshold filter inside retrieval <span class="badge ok">verified</span> 2020 query: <code>filter(non_recommendable_model_threshold=0.2)</code>.</li>
+<li>The DSA filing says the system typically first builds an inventory of available content and then filters out content that potentially violates policy <span class="badge ok">verified</span> <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener">Instagram Systemic Risk Assessment</a> (assessment period 2023-09–2024-08).<ul>
+<li>Original text: <em>&quot;Our systems typically first produce an inventory of available content and then filter it to remove content that potentially violates our policies.&quot;</em></li>
+<li class="warn">⚠ <strong>The URL linked here is a report hub page, not a permalink to the quoted document itself.</strong> The 4 verbatim quotes in this section cannot be re-verified without a direct link to the document (2026-08-09).</li>
+</ul>
+</li>
+<li>On sensitive topics, it reduces the role of shares and comments in distribution <span class="badge ok">verified</span> same source: <em>&quot;We reduce this risk by limiting the role of shares and comments in the distribution of sensitive topics.&quot;</em><ul>
+<li><strong>The same sentence recorded in facebook.md also appears in the Instagram report.</strong> This means that varying signal weights by topic is a policy common to Meta.</li>
+</ul>
+</li>
+<li>The same source lists measures for teens as follows <span class="badge ok">verified</span>: <em>&quot;under 18 age gating, probable violation demotions on feed, age based filtering on recommended surfaces and hashtag filtering&quot;</em>.</li>
+<li>The number of recommender system cards stated in the same source matches the number of Instagram cards in the index viewed on 2026-08-09 <span class="badge ok">verified</span>: <em>&quot;10 recommender &#39;System Cards&#39;&quot;</em>.</li>
+</ul>
+<h3 id="originality--instagram-applied-it-earlier-and-more-strongly-than-facebook">Originality — Instagram applied it earlier and more strongly than Facebook</h3>
+<p>Accounts that mainly repost others&#39; content do not get recommended <span class="badge ok">verified</span> <a href="https://creators.instagram.com/blog/rewarding-original-creators-on-instagram" target="_blank" rel="noopener">Rewarding original creators on Instagram</a>, current page last updated 2026-04-30. The scope of this policy was <strong>expanded from Reels to Photos and Carousels</strong> <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The criteria for judging originality are as follows <span class="badge ok">verified</span>.<ul>
+<li>Content the creator filmed or produced directly</li>
+<li>Their own edited compilations and guides</li>
+<li>3rd-party content with meaningful modifications (&quot;meaningful modifications&quot;)</li>
+</ul>
+</li>
+<li>An account can be recommended again if most of its posts in the last 30 days are considered original <span class="badge ok">verified</span>. This is the <strong>recovery condition</strong>.<ul>
+<li>This criterion is a rolling window, so it is based on the content composition of the last 30 days, not on a point in time such as &quot;30 days since the last violation.&quot;</li>
+<li>The status can be checked in Account Status.</li>
+</ul>
+</li>
+<li><strong>We could not confirm the specific threshold of &quot;10 or more reposts within 30 days&quot; from a primary source</strong> <span class="badge est">inferred</span>. It appears repeatedly in secondary reporting, but we could not confirm it in the body of the current Meta page. Always mark it as unconfirmed when quoting.</li>
+</ul>
+<p>This policy pairs with open question 10 in facebook.md (the 2026-03 Facebook original-creator rewards). Instagram applied it first (2024) and Facebook followed <span class="badge est">inferred</span>.</p>
+<h3 id="teens--recommendation-eligibility-itself-is-restricted-by-age">Teens — recommendation eligibility itself is restricted by age</h3>
+<p>Meta wrote that teens should not see content that goes against the updated guidelines in recommendation surfaces, Feed, and Stories, even when shared by an account they follow <span class="badge ok">verified</span> <a href="https://about.fb.com/news/2025/10/instagram-teen-accounts-pg-13-ratings/" target="_blank" rel="noopener">New PG-13 Guidelines for Instagram Teen Accounts</a>, 2025-10-14.</p>
+<blockquote>
+<p><em>&quot;Teens shouldn&#39;t see content that goes against our updated guidelines in <strong>recommendations (Explore, Reels, and in-Feed), Feed, and Stories</strong> — even when shared by someone they follow.&quot;</em></p>
+</blockquote>
+<ul>
+<li><strong>It also applies to content from accounts they follow</strong> <span class="badge ok">verified</span>. This is a filter that crosses the boundary between connected and unconnected content.</li>
+<li><strong>There is also an account-level filter</strong> <span class="badge ok">verified</span>. Teens cannot follow accounts that often share age-inappropriate content, those accounts are not recommended to teens, and they become harder to find in search.<ul>
+<li><em>&quot;Teens will no longer be able to follow accounts that we&#39;ve found regularly share age-inappropriate content&quot;</em></li>
+<li><em>&quot;We won&#39;t recommend these accounts to teens, and we&#39;ll make it harder for teens to find these accounts in Search.&quot;</em></li>
+</ul>
+</li>
+<li>It blocks teens from seeing content results for a wider range of adult search terms <span class="badge ok">verified</span>: <em>&quot;We&#39;ll block teens&#39; ability to see content results for a wider range of mature search terms, such as &#39;alcohol&#39; or &#39;gore&#39;.&quot;</em></li>
+<li>The claim that the MPA (Motion Picture Association) demanded that the use of the &quot;PG-13&quot; name stop was confirmed only through secondary reporting <span class="badge est">inferred</span>.<ul>
+<li>There are signs that the name changed to &quot;13+&quot; in a follow-up announcement in 2026-04. That announcement is <a href="https://about.fb.com/news/2026/04/instagram-expands-teen-accounts-inspired-by-13-content-ratings/" target="_blank" rel="noopener">Instagram Expands Teen Accounts Inspired by 13+ Content Ratings</a>, and we have not yet been able to read it.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="cold-start">Cold start</h2>
+<p>New-user cold start has no primary source found for Facebook and is disclosed only for Instagram (<a href="#new-users--a-disclosure-that-facebook-does-not-have-is-here">new users</a>). For users with sparse engagement history, seeds are built by expanding the graph through the accounts they liked to the accounts those accounts follow <span class="badge ok">verified</span> (<a href="#new-users--a-disclosure-that-facebook-does-not-have-is-here">new users</a>). We found no Instagram-specific primary source for new content (<a href="#new-content">new content</a>).</p>
+<h3 id="new-users--a-disclosure-that-facebook-does-not-have-is-here">New users — a disclosure that Facebook does not have is here</h3>
+<p>For users with sparse engagement history, seeds are built with <strong>one-hop and two-hop graph expansion</strong> <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a>, 2020.</p>
+<ul>
+<li>The seed path runs through the accounts user A liked, to the accounts those accounts follow <span class="badge ok">verified</span>.<ul>
+<li><code>A → Account Liked by A → Accounts followed by the accounts A likes (Seed Accounts)</code></li>
+</ul>
+</li>
+<li>facebook.md ends with &quot;Facebook new-user cold start = no primary source found&quot;. <strong>Only the Instagram side is disclosed.</strong></li>
+<li>The supporting system is Suggested Accounts <span class="badge ok">verified</span> (<code>ig-suggested-accounts</code>). The features the card discloses are <strong>all graph features</strong>, and content embeddings are not in the list.<ul>
+<li><em>&quot;How many mutual friends do you and the suggested accounts have on Instagram&quot;</em></li>
+<li><em>&quot;How many popular followers do suggested account have&quot;</em></li>
+<li><em>&quot;Whether the suggested account is following you&quot;</em></li>
+<li><em>&quot;How long the suggested account has been following you&quot;</em></li>
+<li><em>&quot;How many follows have you made in the last 28 days&quot;</em></li>
+</ul>
+</li>
+<li>Instagram <strong>replaces the new-user problem with &quot;which accounts should we get them to follow&quot; rather than &quot;which content should we show&quot;</strong> <span class="badge est">inferred</span>. This is because all 5 prediction heads on the Suggested Accounts card are follow and follow-back.</li>
+</ul>
+<h3 id="new-content">New content</h3>
+<p><strong>We found no Instagram-specific primary source.</strong> The content cold-start case Meta disclosed (Epinet and Thompson Sampling, with new defined as under 10,000 impressions) is a <strong>Facebook Reels deployment case</strong>, and details are in facebook.md.</p>
+<p><span class="badge est">inferred</span> It is quite likely that the same stack applies to Instagram Reels as well, but because the paper names the surface as Facebook, it must not be used as evidence for Instagram.</p>
+<p>Instead, Instagram has disclosed freshness infrastructure: <strong>hourly fine-tuning</strong> (2023) and the <strong>6-hour DV365 refresh</strong> (2025) <span class="badge ok">verified</span>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="feedback-signals">Feedback signals</h2>
+<p>Instagram has negative actions as prediction heads with different names on each surface, and put a negative term in the value model formula as well <span class="badge ok">verified</span> (<a href="#negatives-exist-as-prediction-heads--with-different-names-on-each-surface">negative heads</a>). DM shares and shares off Instagram are also separate prediction heads <span class="badge ok">verified</span> (<a href="#dm-share-send-is-a-prediction-head">DM share</a>). Your Algorithm, which lets users adjust recommendations by topic, applies to all of Instagram including Feed, Reels, and Explore, as of the announcement post (updated through 2026-06-10) <span class="badge ok">verified</span> (<a href="#user-control--your-algorithm">Your Algorithm</a>).</p>
+<h3 id="negatives-exist-as-prediction-heads--with-different-names-on-each-surface">Negatives exist as prediction heads — with different names on each surface</h3>
+<p>Negative actions are included as prediction heads with different names on each surface <span class="badge ok">verified</span>. Explore predicts &quot;Not Interested&quot; clicks, Reels Chaining predicts watching for less than 3 seconds, and Stories predicts exiting the current story <span class="badge ok">verified</span>. All phrases in the table below are quotes copied verbatim from each card.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Negative head</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Explore</td>
+<td><em>&quot;How likely you are to click &#39;Not Interested&#39; on a post&quot;</em></td>
+</tr>
+<tr>
+<td>Reels Chaining</td>
+<td><em>&quot;How likely you are to watch less than three seconds of a reel&quot;</em></td>
+</tr>
+<tr>
+<td>Feed</td>
+<td><em>&quot;How likely you are to skip this post&quot;</em>, <em>&quot;How likely you are to skip over the first post in feed&quot;</em></td>
+</tr>
+<tr>
+<td>Stories</td>
+<td><em>&quot;How likely you are to tap exit the current story&quot;</em></td>
+</tr>
+<tr>
+<td>Feed Recommendations</td>
+<td><em>&quot;How likely you are to skip over the first post in feed&quot;</em></td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>The value model formula itself includes negatives <span class="badge ok">verified</span>.<ul>
+<li>2020 formula: <code>(1 - P(not_interested))^w</code></li>
+<li>2023 formula: <code>– W_see_less * P(see less)</code></li>
+</ul>
+</li>
+<li><strong>Facebook discloses the existence of negative predictions only in the body text of the Transparency Center.</strong> The statement is that hide/snooze/report/angry lower the distribution. In contrast, <strong>Instagram disclosed them explicitly as terms in the formula.</strong><ul>
+<li>This is the clearest example of the difference in disclosure level between the two services <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>The way negative signals are stored is also visible <span class="badge ok">verified</span>. Reels Chaining keeps <strong>a list of authors watched for less than 3 seconds</strong> as a feature: <em>&quot;The authors of reels you&#39;ve spent less than three seconds watching&quot;</em>.</li>
+</ul>
+<h3 id="dm-share-send-is-a-prediction-head">DM share (send) is a prediction head</h3>
+<p>The Feed card has DM sharing as a prediction head, and the Reels Chaining card has sharing off Instagram and resharing as prediction heads <span class="badge ok">verified</span>.</p>
+<ul>
+<li><code>ig-feed</code>: <em>&quot;How likely you are to share a post with someone in a direct message&quot;</em></li>
+<li><code>ig-reels-chaining</code>: <em>&quot;How likely you are to share a reel off of Instagram&quot;</em>, <em>&quot;How likely you are to reshare a reel&quot;</em></li>
+<li><strong>These two sentences are the primary evidence that &quot;sends&quot; is a ranking target.</strong></li>
+<li>The widely quoted &quot;3 most important signals = watch time / sends per reach / likes per reach&quot; (2025-01 Mosseri) <strong>originates from Mosseri&#39;s Instagram video post, and we could not obtain a primary text URL</strong> <span class="badge est">inferred</span>. <strong>It rests on secondary reporting.</strong><ul>
+<li>The multiplier &quot;sends are weighted 3–5× likes&quot; <strong>does not appear in any Meta document, so it must not be cited.</strong></li>
+</ul>
+</li>
+<li>However, the direction matches the cards <span class="badge ok">verified</span>. DM shares and external shares each exist as separate prediction heads.</li>
+</ul>
+<h3 id="user-control--your-algorithm">User control — Your Algorithm</h3>
+<p>Your Algorithm shows a summary of the topics influencing recommendations and lets users tell it in free text what they want to see more or less of <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/announcements/reels-algorithm-control" target="_blank" rel="noopener">Control Your Instagram Reels Algorithm</a>. It was first released in US Reels on 2025-12-10 and later expanded on 2026-04-15 and 2026-06-10 <span class="badge ok">verified</span>.</p>
+<ul>
+<li>As of the announcement post, the scope is all of Instagram, including Feed, Reels, and Explore <span class="badge ok">verified</span>: <em>&quot;Your Algorithm is now live across all of Instagram, including Feed, Reels, and Explore.&quot;</em></li>
+<li>The dashboard shows an AI summary of the topics influencing recommendations <span class="badge ok">verified</span>: <em>&quot;View an AI-generated summary of the topics influencing the posts and recommendations you see&quot;</em>.</li>
+<li>Individual posts get an interest label <span class="badge ok">verified</span>. Example: <em>&quot;From Running&quot;</em>.</li>
+<li>Controls are <strong>entered as free text</strong> <span class="badge ok">verified</span>: <em>&quot;tell us what you want to see more or less of, or add new topics entirely&quot;</em>.</li>
+<li><strong>Update speed is not public</strong> <span class="badge obs">observed</span> 2026-08-09. The corpus inspected was 1 body passage of the announcement post above, and unlike Threads Dear Algo, it has no time-window wording.</li>
+<li><strong>The model is not public.</strong> The original text says only &quot;AI&quot;.<ul>
+<li>Because it generates a topic summary in natural language and accepts free text, it is likely an LLM, but Meta did not state this explicitly <span class="badge est">inferred</span>. See <code>topics/llm-in-recsys.md</code>.</li>
+</ul>
+</li>
+<li><strong>It differs in nature from Facebook&#39;s Show more / Show less (→ Interested / Not interested).</strong><ul>
+<li>Facebook&#39;s is per post and temporary: <em>&quot;temporarily increase/decrease the ranking score for that post and posts like it&quot;</em>.</li>
+<li>Instagram&#39;s Your Algorithm <strong>exposes and lets users edit a persistent topic-level profile.</strong></li>
+<li>The same company has productized an &quot;explainable interest profile&quot; only on Instagram <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>&quot;reset your recommendations&quot; (clearing recommendation history) appears to have been introduced between 2024 and 2025 and absorbed into Your Algorithm, but <strong>we could not obtain a primary URL for a standalone announcement</strong> <span class="badge est">inferred</span>.</li>
+<li>The re-ranking-related controls the cards state explicitly are, by surface, as follows <span class="badge ok">verified</span>.<ul>
+<li>Explore: &quot;Not Interested&quot;, &quot;Tune Your Algorithm&quot;</li>
+<li>Feed: Mute, Favorites, &quot;See Newest Content First&quot;, Following/Favorites tabs</li>
+<li>Reels: &quot;Click &#39;Following&#39; on the Reels feed&quot;</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="regulation--ongoing-as-of-2026">Regulation — ongoing as of 2026</h2>
+<p>On 2026-07-10, the EC (European Commission) preliminarily found that the addictive design of Instagram and Facebook breaches the DSA <span class="badge ok">verified</span> <a href="https://digital-strategy.ec.europa.eu/en/news/commission-preliminarily-finds-addictive-design-instagram-and-facebook-breach-digital-services-act" target="_blank" rel="noopener">Commission preliminarily finds the addictive design of Instagram and Facebook in breach of the Digital Services Act</a>, 2026-07-10. The scope of the investigation includes infinite scroll, autoplay and push notifications, together with highly personalized recommender systems <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Original text of the investigation scope: <em>&quot;features such as infinite scroll, autoplay, push notifications, and the platforms&#39; <strong>highly personalised recommender systems</strong>&quot;</em></li>
+<li>The preliminary finding is, in essence, that Meta did not adequately assess the risks of its addictive design and that its current mitigation measures did not respond effectively to those risks <span class="badge ok">verified</span>.<ul>
+<li><em>&quot;Meta did not adequately assess the risks of its addictive design on the physical and mental wellbeing of users, including minors and vulnerable adults.&quot;</em></li>
+<li><em>&quot;Meta&#39;s current mitigation measures failed to effectively tackle the risks stemming from its addictive design.&quot;</em></li>
+</ul>
+</li>
+<li>The required remedies are reported as &quot;autoplay and infinite scroll off by default, screen-time breaks, and <strong>a change to recommendations that are less engagement-focused</strong>&quot;, but we could not confirm that sentence in the body of the EC press release <span class="badge est">inferred</span>. This is based on secondary reporting.</li>
+<li>The penalty cap is 6% of global revenue <span class="badge est">inferred</span>. This too comes from secondary reporting.</li>
+</ul>
+<p><strong>The most important point in this note is that the infinite-scroll-based funnel and the session-duration prediction head described above are exactly what the EC objects to.</strong> The session-duration head is the Feed card&#39;s <code>How likely the first post you see is to keep you spending time in your Feed during this session</code>. <span class="badge est">inferred</span> Regulatory pressure could become the first case that changes a ranking objective function, so it is highly worth tracking.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="generalizations-from-this-service">Generalizations from this service</h2>
+<p>Observations from Instagram are generalized in the topics notes below.</p>
+<ul>
+<li><code>topics/multi-task-ranking.md</code> summarizes 4 combination forms within Meta: FB&#39;s additive <code>Σ w·P</code>, IG 2020&#39;s multiplicative <code>Π P^w</code>, IG 2023&#39;s <code>Σ w·P</code> with negative terms added, and IG 2025 notifications&#39; multiplicative penalty <code>R×D</code>. It also covers the hard-veto property of the multiplicative form.</li>
+<li><code>topics/candidate-allocation.md</code> compares IG Explore&#39;s 1500→100 (15:1) with FB Feed&#39;s 500→500 and covers per-source tunable weights.</li>
+<li><code>topics/embedding-retrieval.md</code> covers the case where two-tower was chosen because the &quot;item tower can be cached&quot;, FAISS/HNSW, and the first-stage distillation label <code>PSelect</code>.</li>
+<li><code>topics/feed-diversity.md</code> compares <code>diversify_by(round_robin)</code> in the retrieval stage with post-ranking pass 2, and summarizes the notification multiplicative penalty formula.</li>
+<li><code>topics/model-freshness.md</code> summarizes hourly fine-tuning, DV365&#39;s 6-hour refresh, 1000 models and 10 launches per week.</li>
+<li><code>topics/sequence-transformer-ranking.md</code> covers the point that DV365 (70K/40K) contributes additionally even on top of attention sequence models.</li>
+<li><code>topics/llm-in-recsys.md</code> covers Your Algorithm&#39;s AI-generated topic summaries and free-text input.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="open-questions">Open questions</h2>
+<p>These are questions that remained unanswered as of the last update of this file (2026-08-09).</p>
+<ol>
+<li><strong>Is the 2020 multiplicative → 2023 additive change an actual transition?</strong> The surfaces differ (Suggested Posts vs Explore), and no source compares before and after on the same surface.</li>
+<li><strong>What are the actual scales and signs of <code>W_click</code>, <code>W_like</code> and <code>W_see_less</code>?</strong> Only the symbolic formula is public.</li>
+<li><strong>Why is there no <code>ig-reels</code> card?</strong> Meta did not disclose why no system card exists that covers the whole Reels tab.</li>
+<li><strong>Exactly how many prediction heads does each card have?</strong> On some surfaces the extraction result disagrees with the count stated on the card (Feed, Stories, Reels Chaining, Suggested Accounts). A recheck is needed.</li>
+<li><strong>Where is the primary source for the 2019 post &quot;Powered by AI: Instagram&#39;s Explore recommender system&quot;?</strong> ai.meta.com returned 500 and the Medium mirror timed out, so we could not access it. Primary evidence for the names IGQL and IG2Vec is missing.</li>
+<li><strong>What is the primary source for the &quot;10 reposts within 30 days&quot; threshold?</strong></li>
+<li><strong>Where is the primary text URL for Mosseri&#39;s &quot;3 signals&quot; statement in 2025-01?</strong></li>
+<li><strong>How does Instagram handle cold start for new content?</strong> Epinet is a Facebook Reels case.</li>
+<li><strong>What is used to tune Explore&#39;s per-source weights?</strong> It says only &quot;tunable&quot; and does not disclose the objective function or the optimization method.</li>
+<li><strong>What are the topic generation model and the update latency of Your Algorithm?</strong></li>
+<li><strong>Are the models for the three surfaces Feed, Explore and Reels being unified?</strong> Zuckerberg&#39;s &quot;three giant transformers&quot; statement is at the app level (FB/IG/ads), not at the level of surfaces within Instagram. The evidence is in facebook.md.</li>
+<li><strong>How will actual ranking change after the EC preliminary finding (2026-07-10)?</strong></li>
+</ol>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<h3 id="meta-official--engineering">Meta official — engineering</h3>
+<ul>
+<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023, blog post. <strong>The primary source for the additive value model, two-tower, the distillation label and hourly retraining.</strong></li>
+<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> — 2020-12-10, blog post (Amogh Mahapatra). <strong>The primary source for the multiplicative value model, the retrieval query-language query, and one-hop/two-hop expansion.</strong> The post does not contain the name IGQL. ⚠ It is <strong>the same post as <a href="https://engineering.fb.com/2020/12/10/web/how-instagram-suggests-new-content/" target="_blank" rel="noopener">How Instagram suggests new content</a>, with only the title different.</strong></li>
+<li><a href="https://engineering.fb.com/2025/05/21/production-engineering/journey-to-1000-models-scaling-instagrams-recommendation-system/" target="_blank" rel="noopener">Journey to 1000 models: Scaling Instagram&#39;s recommendation system</a> — 2025, blog post. It covers more than 1000 models, more than 10 launches per week, Sourcing, ESR, LSR and <code>ig_stories_tray_mtml</code>.</li>
+<li><a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a> — 2025, blog post. <strong>The most concrete diversity formula Meta has published.</strong></li>
+<li class="warn">⚠ <a href="https://ai.meta.com/blog/powered-by-ai-instagrams-explore-recommender-system/" target="_blank" rel="noopener">Powered by AI: Instagram&#39;s Explore recommender system</a> — 2019, blog post. <strong>It returned HTTP 500 on 2026-08-09, so we could not open it.</strong> These notes do not use this post as evidence.</li>
+</ul>
+<h3 id="meta-official--productpolicy">Meta official — product/policy</h3>
+<ul>
+<li><a href="https://about.instagram.com/blog/announcements/instagram-ranking-explained" target="_blank" rel="noopener">Instagram Ranking Explained</a> — 2023-05-31, blog post. The per-surface signal ordering and &quot;too many ... in a row&quot; are here.</li>
+<li><a href="https://about.instagram.com/blog/announcements/reels-algorithm-control" target="_blank" rel="noopener">Control Your Instagram Reels Algorithm (Your Algorithm)</a> — blog post. It was first published on 2025-12-10 and updated through 2026-06-10.</li>
+<li><a href="https://creators.instagram.com/blog/rewarding-original-creators-on-instagram" target="_blank" rel="noopener">Rewarding original creators on Instagram</a> — blog post. The current page was updated on 2026-04-30.</li>
+<li><a href="https://creators.instagram.com/blog/the-latest-with-instagram" target="_blank" rel="noopener">The latest with Instagram</a> — 2025-01-21, blog post. <strong>It contains the past-tense admission that follower count was used as a ranking input.</strong></li>
+<li><a href="https://about.fb.com/news/2025/10/instagram-teen-accounts-pg-13-ratings/" target="_blank" rel="noopener">New PG-13 Guidelines for Instagram Teen Accounts</a> — 2025-10-14, blog post.</li>
+<li><a href="https://about.fb.com/news/2026/04/instagram-expands-teen-accounts-inspired-by-13-content-ratings/" target="_blank" rel="noopener">Instagram Expands Teen Accounts Inspired by 13+ Content Ratings</a> — 2026, blog post. We have not yet opened it.</li>
+</ul>
+<h3 id="transparency-center-ai-system-card-primary-document-for-regulatory-response">Transparency Center (AI system card, primary document for regulatory response)</h3>
+<ul>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/" target="_blank" rel="noopener">Index</a> — 10 Instagram cards</li>
+<li>Cards opened and the last-updated date of each card:<ul>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/ig-feed/" target="_blank" rel="noopener">ig-feed</a> (2026-06-29)</li>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/ig-explore/" target="_blank" rel="noopener">ig-explore</a> (2026-06-22)</li>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/ig-feed-recommendations/" target="_blank" rel="noopener">ig-feed-recommendations</a> (2026-06-29)</li>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/ig-reels-chaining/" target="_blank" rel="noopener">ig-reels-chaining</a> (2025-11-11)</li>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/ig-stories/" target="_blank" rel="noopener">ig-stories</a> (2025-09-18)</li>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/ig-suggested-accounts/" target="_blank" rel="noopener">ig-suggested-accounts</a> (2025-03-07)</li>
+</ul>
+</li>
+<li class="warn">⚠ <code>ig-reels</code> — <strong>404 measured (2026-08-09)</strong></li>
+<li><a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener">Regulatory and Other Transparency Reports</a> — Instagram DSA Systemic Risk Assessment (assessment period 2023-09–2024-08), regulatory document</li>
+</ul>
+<h3 id="papers">Papers</h3>
+<ul>
+<li><a href="https://arxiv.org/abs/2506.00450" target="_blank" rel="noopener">DV365: Extremely Long User History Modeling at Instagram</a> — KDD 2025, paper. 70K/40K history, 15 downstream models, time spent +0.7%</li>
+</ul>
+<h3 id="regulator">Regulator</h3>
+<ul>
+<li><a href="https://digital-strategy.ec.europa.eu/en/news/commission-preliminarily-finds-addictive-design-instagram-and-facebook-breach-digital-services-act" target="_blank" rel="noopener">Commission preliminarily finds the addictive design of Instagram and Facebook in breach of the DSA</a> — 2026-07-10, regulatory document</li>
+</ul>
+<h3 id="secondary-grade-downgrade-required">Secondary (grade downgrade required)</h3>
+<ul>
+<li>The 3 signals &quot;watch time / sends per reach / likes per reach&quot; that Mosseri described in 2025-01 — <strong>the original post is an Instagram video, so we could not obtain a primary text URL.</strong> The multiplier (3–5x) appears in no Meta document.</li>
+<li>Mosseri&#39;s 4 ranking changes of 2024-04-30 (small-creator input, originals replacing reposts, repost labels, excluding aggregators) — we could not obtain a primary URL.</li>
+<li>The &quot;10 or more reposts within 30 days&quot; threshold — we could not confirm it in the body of the current Meta page.</li>
+<li>The MPA&#39;s demand to stop using the &quot;PG-13&quot; name — confirmed only through secondary reporting.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/instagram.html" data-title="Instagram"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

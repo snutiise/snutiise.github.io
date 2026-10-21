@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-07 — feed-research</title>
+<meta name="description" content="In one line: X's ranking score formula (value model) gained, in code for the first time, three expected-dwell-time terms of the form &quot;probability of opening…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-07.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-07.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-07.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-07.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-07 — feed-research">
+<meta property="og:description" content="In one line: X's ranking score formula (value model) gained, in code for the first time, three expected-dwell-time terms of the form &quot;probability of opening…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-07.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-07.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-07">2026-10-07</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Wednesday</li>
+<li><span class="meta-k">Reading time</span>14 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-07.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X&#39;s ranking score formula (value model) gained, in code for the first time, three expected-dwell-time terms of the form &quot;probability of opening × seconds spent once opened.&quot; The weights are still 0, so the serving score is unchanged.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-expected-dwell-time-terms-were-added-to-the-ranking-score-formula--x"><span class="num">1</span>Expected dwell time terms were added to the ranking score formula — X</a></li><li><a href="#2-the-embedding-feature-sentence-disappeared-from-the-facebook-feed-system-card--facebook"><span class="num">2</span>The embedding feature sentence disappeared from the Facebook Feed system card — Facebook</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>X rebuilt the popular posts candidate source, introduced three days earlier in the same commit series, as an offline job based on view counts.</li>
+<li>Meta updated the Facebook Feed system card as of 2026-10-06, and the card&#39;s only embedding feature sentence disappeared.</li>
+</ul>
+<h2 id="1-expected-dwell-time-terms-were-added-to-the-ranking-score-formula--x"><span class="num">1</span>Expected dwell time terms were added to the ranking score formula — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/e62790c" target="_blank" rel="noopener">xai-org/x-algorithm@e62790c</a> — xai-org, 2026-10-06T04:59:30Z, code. These notes number X commits after the Gen4 release in order, and this commit is Gen4+36. It changed 103 files, with +6,916/−1,393 lines. The previous commit is <a href="https://github.com/xai-org/x-algorithm/commit/b412112" target="_blank" rel="noopener">b412112</a> (Gen4+35) from 2026-10-03.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In X&#39;s For You ranking, Phoenix (a Grok-based Transformer ranker) predicts dozens of action probabilities for each post, and each prediction is called a head. The value model combines those probabilities into a single score as a weighted sum. The weighted sum includes continuous-value heads such as &quot;dwell time&quot; as well as probability heads such as &quot;probability of a like.&quot; Until now, continuous-value heads multiplied the predicted value directly by a weight.</p></div>
+<p>This commit adds a different approach: it predicts &quot;the probability of opening a video&quot; and &quot;the seconds watched on after opening&quot; separately and multiplies them to get <strong>expected watch seconds</strong>. This kind of split is called a conditional expectation decomposition (total expectation = event probability × expectation given the event occurred). The same commit also completely changed the structure of the popular posts candidate source (<code>PopularPostsSource</code>), released three days earlier.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The value model gained three expected-dwell-time terms of the form &#39;probability × conditional seconds&#39;</span></p></div>
+<ul>
+<li><p>Three terms that multiply a probability by conditional seconds were added to the value model <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>xai-value-model/scoring.rs:61-63, 111-128</code></a>.</p>
+<ul>
+<li><p>The first term is &quot;probability of opening a video × seconds watched on after opening,&quot; and the third is &quot;probability of a profile click × seconds spent on the profile after the click.&quot;</p>
+</li>
+<li><p>The code that builds the three terms:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn product(probability: Option&lt;f64&gt;, conditional_value: Option&lt;f64&gt;) -&gt; Option&lt;f64&gt; {
+    Some(probability? * conditional_value?)
+}
+...
+apply(product(scores.video_open_score, scores.home_video_continuation_secs), weights.video_continuation),
+apply(product(scores.video_open_score, candidate.user_video_continuation_secs), weights.user_video_continuation),
+apply(product(scores.profile_click_score, scores.home_profile_visit_secs), weights.profile_visit_secs),
+</code></pre></figure>
+</li>
+</ul>
+</li>
+<li><p>The second term is a value of the <strong>user</strong>, not of the candidate. It takes the average watch seconds across all candidates in one request, weighted by open probability, and puts the same value into every candidate <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>scoring.rs:141-158</code></a>.</p>
+<ul>
+<li><code>set_user_video_continuation</code> computes this value as <code>Σ P(open)·secs / Σ P(open)</code>.</li>
+<li>Because the value is the same for every candidate, this term ends up as <code>weight × (user average watch seconds) × P(open)</code>. It has the effect of raising the coefficient on &quot;probability of opening a video&quot; for users who watch videos for longer <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><p>The cron mirror (a file that syncs and publishes production parameter values daily) default for all three weights is <strong>0.0</strong> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs</code></a>.</p>
+<ul>
+<li>The weights are named <code>VideoContinuationWeight</code>, <code>UserVideoContinuationWeight</code> and <code>ProfileVisitSecsWeight</code>.</li>
+</ul>
+</li>
+<li><p>The internal path (<code>weights_for</code>) in home-mixer, which handles For You feed requests, hardcodes the three values to 0.0 in code <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/home-mixer/scorers/value_model.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/value_model.rs:37-39</code></a>. Therefore the only place that can turn this term on is VM-Ranker (a separate service that computes the value model directly).</p>
+</li>
+<li><p>Phoenix&#39;s list of continuous-value heads gained &#39;profile visit seconds&#39; and &#39;video continuation seconds&#39; heads <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto:594-599</code></a>.</p>
+<ul>
+<li>The list is named <code>ContinuousActionName</code>, and the new values are <code>HOME_PROFILE_VISIT_SECS = 0</code> and <code>HOME_VIDEO_CONTINUATION_SECS = 3</code>.</li>
+<li>Number 3 was previously used by <code>ACTIVE_SECS_5M_RESIDUAL_NORM</code> (a &quot;5-minute active seconds&quot; residual head that was tied to weight 0). That head was removed from both the proto and the value model.</li>
+</ul>
+</li>
+<li><p>home-mixer&#39;s extraction of the two head values from the Phoenix response is also behind <code>EnableHomeExcursionScores</code> (default false) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/home-mixer/scorers/phoenix_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/phoenix_scorer.rs:109-117, 141-153</code></a>.</p>
+</li>
+<li><p>On the training data side, a new aggregation type was added in a previously empty slot <span class="badge ok">verified</span>.</p>
+<ul>
+<li><code>DENSE_WITH_LONG_DWELL_HOME_EXCURSION = 30</code> took the place of <code>PLACEHOLDER_30</code>.</li>
+</ul>
+</li>
+<li><p>The README&#39;s list of Phoenix predictions also changed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/README.md" target="_blank" rel="noopener"><code>README.md:341</code></a>.</p>
+<blockquote>
+<p>&quot;Attention     video quality view · dwell · dwell time · click dwell time · video continuation seconds · profile visit seconds&quot;</p>
+</blockquote>
+<p>The same line in the previous version was <code>... click dwell time · active seconds</code>.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The popular posts source now only reads a list that offline jobs built in advance</span></p></div>
+<p>This version removed the Thunder (a store of latest posts based on the follow graph) call from the request path. The version from three days earlier passed &quot;1,000 popular authors&quot; to Thunder as a fake following list on every request and fetched their latest posts.</p>
+<ul>
+<li>Now two offline jobs build the list in advance, and the serving source only reads it <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/home-mixer/sources/popular_posts_source.rs" target="_blank" rel="noopener"><code>popular_posts_source.rs</code></a>.<ul>
+<li>The related code is in <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/home-mixer/util/popular_posts.rs" target="_blank" rel="noopener"><code>util/popular_posts.rs:36-87</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/home-mixer/popular_posts_job.rs" target="_blank" rel="noopener"><code>popular_posts_job.rs:21-178</code></a> and <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/home-mixer/util/popular_authors.rs" target="_blank" rel="noopener"><code>util/popular_authors.rs:11, 25-40</code></a>.</li>
+</ul>
+</li>
+</ul>
+<p>Processing runs in this order:</p>
+<ol>
+<li>The author job runs on a default 1-hour cycle. From the follower-ranking snapshot in the BigQuery table <code>popular_posting_authors</code>, it selects <strong>the number of authors who posted in the last 7 days × 0.00005</strong> authors, that is, the top 0.005% by follower count. If the snapshot is older than 30 hours, it is treated as a failure.</li>
+<li>The post job runs on a default 5-minute cycle. It groups those authors in batches of 20, gets up to 50 posts per author from Thunder, and discards replies and retweets.</li>
+<li>It gets the view counts (<code>view_count</code>) of posts within 24 hours from the engagement counts service, 500 at a time.</li>
+<li>The scoring appears to assume that the view rate halves every 8 hours and to <strong>scale the views so far up to 24-hour cumulative views</strong> <span class="badge est">inferred</span>.<ul>
+<li>The formula is <code>quality = views × (1 − e^{−λ·24}) / (1 − e^{−λ·max(age_h, 0.5)})</code>, and <code>λ = ln2 / 8</code> (half-life 8 hours).</li>
+<li>The denominator is &quot;the fraction accumulated up to the current age,&quot; and the numerator is &quot;the fraction that will have accumulated by 24 hours.&quot;</li>
+<li>The age floor of 0.5 hours keeps the score of a just-posted post from blowing up.</li>
+</ul>
+</li>
+<li>It keeps the top 5 per author and the top 500 overall, writes them to Manhattan (a KV store), then reads them back and checks that the creation time matches.</li>
+<li>The serving source reloads the list every 60 seconds, removes only posts the user has already seen, and emits up to 500 candidates.</li>
+</ol>
+<ul>
+<li>The three parameters from the version three days earlier were deleted <span class="badge ok">verified</span>.<ul>
+<li><code>PopularPostsTopAuthors</code>(1000)·<code>PopularPostsMaxPerAuthor</code>(3)·<code>PopularPostsMaxRepliesRepostsPerAuthor</code>(0)</li>
+</ul>
+</li>
+<li>Because the only per-user input is &quot;posts already seen,&quot; this source is the same <strong>global popular list</strong> for every user <span class="badge ok">verified</span>.</li>
+<li>The source itself is still off by default (<code>EnablePopularPostsSource=false</code>).</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Visibility verdicts gained a fourth grade that &#39;shows the post with a notice attached&#39;</span></p></div>
+<p>Visibility filtering (VF) is the service that decides whether a candidate post may be shown to this viewer.</p>
+<ul>
+<li><p>VF verdicts now have four grades <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/README.md" target="_blank" rel="noopener"><code>README.md:205-232</code></a>. <code>NOTICE</code> was added to the existing three grades.</p>
+<ul>
+<li><p>Existing grades: <code>ALLOW</code> (shown as is), <code>INTERSTITIAL</code> (shown behind a warning screen), <code>DROP</code> (removed)</p>
+</li>
+<li><p>The README describes the new grade like this:</p>
+<blockquote>
+<p>&quot;NOTICE         show the post with a notice attached to it&quot;</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>The internal representation is <code>SoftIntervention { policy: AppealablePolicy, level, proactive, appeal_submitted }</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/verdict.rs</code></a>. The post stays in the feed.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. An &quot;Under the Hood&quot; request returns the pipeline processing record together with per-post scores</span></p></div>
+<ul>
+<li>When the Under the Hood flag is on in a request, the response carries both the pipeline processing record and per-post scores <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/home-mixer/util/under_the_hood.rs" target="_blank" rel="noopener"><code>home-mixer/util/under_the_hood.rs</code></a>.<ul>
+<li>The request field is <code>is_under_the_hood_request</code>.</li>
+<li>It includes per-stage latency and kept and removed counts, per-post Phoenix head scores, the final score, and the name of the value model used.</li>
+<li>Each stage carries a public code link of the form <code>github.com/xai-org/x-algorithm/blob/main/home-mixer/...</code>.</li>
+<li>The default of the flag <code>EnableUnderTheHood</code> is false.</li>
+<li>Since the response includes public repository links, it appears to be a feature for a screen that shows &quot;why this post appeared&quot; <span class="badge est">inferred</span>. Which screen it appears on is not in the repository.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The new-author boost (a bonus given to posts from authors who have not yet been shown) has so far been applied only to in-network candidates. With the switch on, it also applies to OON (accounts the user does not follow) candidates <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/e62790c/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>scoring.rs:85-90</code></a>.<ul>
+<li>The term is named <code>post_unexplored</code>, and the switch is <code>PostUnexploredIncludeOutOfNetwork</code> (default false).</li>
+</ul>
+</li>
+<li><code>RetrievalCandidatesKafkaMaxCandidates</code> changed from 200 to <strong>100,000</strong> <span class="badge ok">verified</span>. The cap on writing retrieval (candidate generation stage) candidates to Kafka has effectively been lifted <span class="badge est">inferred</span>.</li>
+<li><code>VMRankerClusterId</code> changed from <code>&quot;Experiment6&quot;</code> to <code>&quot;Experiment1&quot;</code> <span class="badge ok">verified</span>. The differences between experiment clusters are not public.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a>, we revised the following:</p></div>
+<ul>
+<li>Overwrote the <code>PopularPostsSource</code> row in the source table of the <code>Candidate generation</code> section with the new structure.</li>
+<li>In the head table of the <code>Weights</code> section, marked <code>cont_active_secs_5m_residual_norm</code> as removed and added rows for the three new terms.</li>
+<li>Updated the <code>VMRankerClusterId</code> value in the VMRanker parameter table.</li>
+<li>Created the <code>### Gen4+36</code> section. Added the reference commit <code>e62790c</code> to the Source section.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Until now, the continuous-value terms in X&#39;s value model had one form, &quot;head value × weight,&quot; and this commit adds a second form: <strong>probability head × conditional seconds head</strong>. The weights are 0, so the serving score has not yet changed <span class="badge ok">verified</span>.</p></div>
+<ul>
+<li>The weight of the profile click probability (<code>profile_click</code>) has been 0.0 since the Gen4 release. A separate path now exists that can reward <strong>dwell time after the click</strong> without rewarding the profile click probability itself <span class="badge est">inferred</span>. In this term, the probability head is used only as a factor in the product.</li>
+<li>Within three days of its release, the definition of the popular posts source (<code>PopularPostsSource</code>) changed from &quot;latest posts of popular authors&quot; to &quot;posts by popular authors whose view counts grow fast.&quot; With the per-request Thunder call gone, the request cost became constant <span class="badge ok">verified</span>.</li>
+</ul>
+<h2 id="2-the-embedding-feature-sentence-disappeared-from-the-facebook-feed-system-card--facebook"><span class="num">2</span>The embedding feature sentence disappeared from the Facebook Feed system card — Facebook</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">Facebook Feed AI system</a> — Meta Transparency Center, card label &quot;UPDATED OCT 6, 2026&quot; (2026-10-06), system card (an explanatory document for regulatory compliance). The previous version was dated 2026-06-24.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Meta publishes a &quot;system card&quot; for each surface, a document that describes in plain language the stages by which that surface&#39;s feed is built, which prediction heads exist, and which input signals go into each head. This repository read this card on 2026-08-09 and built the prediction head and feature lists of the Facebook canon from it. Today we noticed that the card date had changed, rendered the English version with headless Chrome, and reread the full text. The card has no change log.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The sentence that was the card&#39;s only embedding feature is absent from the current version</span></p></div>
+<ul>
+<li>The sentence that was the card&#39;s only embedding feature is gone <span class="badge obs">observed</span> 2026-10-07.<ul>
+<li>The version read on 2026-08-09 had this sentence: <em>&quot;An embedding to represent the viewer&quot;</em>.</li>
+<li>The word &quot;embedding&quot; does not appear even once in the full text rendered today.</li>
+<li>All 50 current signals are aggregations of counts, ratios, or time windows.</li>
+<li>The card date changed only once in the meantime, so we infer it was dropped in the 10-06 update <span class="badge est">inferred</span>. However, we did not keep the original text of the earlier version and Wayback did not respond today, so we could not compare directly.</li>
+<li>The sentence missing from the card does not mean the model stopped using a viewer embedding. The card lists only some of the &quot;significant predictions&quot;.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The card describes integrity handling in two stages</span></p></div>
+<ul>
+<li>Integrity (handling of policy violations and problematic content) is described across two stages <span class="badge obs">observed</span> 2026-10-07.<ul>
+<li><p>Posts flagged as violations are dropped when candidates are gathered. In the card, this appears under the &quot;Gather inventory&quot; stage.</p>
+<blockquote>
+<p>&quot;First, the system gathers all potential posts shared by friends, Pages you follow and groups you&#39;ve joined, which excludes posts flagged for going against our Community Standards.&quot;</p>
+</blockquote>
+</li>
+<li><p>Distribution-reducing handling is in the same paragraph as the stage where a lightweight model selects about 500 posts (pass 0). In the card, this appears under the &quot;Leverage signals&quot; stage.</p>
+<blockquote>
+<p>&quot;A lightweight model is run to select approximately 500 of the most relevant posts. The system also applies certain integrity processes to help reduce the distribution of problematic content.&quot;
+— <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">Facebook Feed AI system</a>, 2026-10-06 version</p>
+</blockquote>
+</li>
+<li><p>The canon had been saying &quot;the fb-feed card does not mention an integrity stage.&quot; We cannot determine whether the exclusion sentence in the inventory stage is new this time or was missed on 2026-08-09.</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The number and order of heads match the previous version, but the name of head 5 and the lookback windows differed from what the canon recorded</span></p></div>
+<ul>
+<li><p>There are 10 prediction heads with 5 signals each, 50 in total. The number and order of heads are the same as in the previous version <span class="badge obs">observed</span> 2026-10-07.</p>
+</li>
+<li><p>Head 5 is described as the probability of clicking &#39;Interested&#39; when the interested/not interested options are shown <span class="badge obs">observed</span> 2026-10-07.</p>
+<blockquote>
+<p>&quot;How likely you are to click &#39;Interested&#39; if the interested/not interested options are presented to you.&quot;
+— <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">Facebook Feed AI system</a>, 2026-10-06 version</p>
+</blockquote>
+<ul>
+<li>The canon had recorded this head as a &#39;Show more&#39; click.</li>
+<li>Meta already said that it renamed Show more to Interested on 2025-03-11, so it is the same head. We changed the canon wording to the current name.</li>
+</ul>
+</li>
+<li><p>The lookback windows (the past periods over which features aggregate) are 1 hour, 2 hours, 1 day, 7 days, 14 days, 28 days, 30 days and 180 days <span class="badge obs">observed</span> 2026-10-07. The &quot;3 months&quot; window that was in the canon is not in the current version.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other observations</span></p></div>
+<ul>
+<li><p>A paragraph describing the Instagram app is mixed into the &quot;How to customize&quot; section <span class="badge obs">observed</span> 2026-10-07.</p>
+<blockquote>
+<p>&quot;You can click the Instagram logo on your home screen and then click on either “Following” or “Favorites” on mobile app.&quot;</p>
+</blockquote>
+<ul>
+<li>This appears to be an editing error in which wording from the Instagram card was copied into the Facebook card <span class="badge est">inferred</span>. The same section has a separate Facebook &quot;See newest content first&quot; item.</li>
+</ul>
+</li>
+<li><p>This page is rendered with JavaScript, so curl does not return the body, and opening it without <code>/en-us/</code> returns the Korean version. To reproduce, get the DOM with headless Chrome and extract the text.</p>
+<ul>
+<li>The command is <code>&quot;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&quot; --headless=new --lang=en-US --virtual-time-budget=15000 --dump-dom https://transparency.meta.com/en-us/features/explaining-ranking/fb-feed/</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="facebook.html">services/facebook.md</a>, we revised the following:</p></div>
+<ul>
+<li>Overwrote the integrity stage bullet in the <code>Ranking</code> section with a two-sentence structure.</li>
+<li>In the <code>Prediction heads</code> section, moved the card update date up to 2026-10-06 and replaced head 5 with the &#39;Interested&#39; original text.</li>
+<li>In the <code>Actual feature names</code> section, marked the viewer embedding sentence with ⚠ and recorded the observation that it is absent from the current version. Also fixed the lookback window list and recorded the Instagram paragraph mix-in.</li>
+<li>Added item 14 (the exact diff of the 10-06 update) to <code>Open questions</code>.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span></p></div>
+<ul>
+<li class="warn">⚠ Claim changed: The canon&#39;s &quot;the viewer embedding is the only embedding feature stated on the fb-feed card&quot; does not hold as of the current version. The current card has no embedding feature at all.</li>
+<li class="warn">⚠ Claim changed: &quot;The fb-feed card does not mention an integrity stage&quot; also does not hold as of the current version. Removal-type handling is placed in the inventory-gathering stage, and penalty-type handling in the pass 0 paragraph.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>When Wayback returns, get the 2026-06-24 version of the fb-feed card and directly compare the deletion of the viewer embedding sentence and the addition of the inventory exclusion sentence — both are currently <span class="badge est">inferred</span>. From now on, we need to save the rendered original text when reading the card so the next comparison is possible.</li>
+<li>Check whether X&#39;s <code>HOME_*_SECS</code> weights move from 0 — the day the cron mirror changes <code>VideoContinuationWeight</code> and <code>ProfileVisitSecsWeight</code> is when serving actually takes effect.</li>
+<li>Keep tracking <code>EnablePopularPostsSource</code> to see whether the default of <code>PopularPostsSource</code> changes — if this source is turned on, a global popular list enters For You as OON candidates.</li>
+<li>Do a deep dive on X VF&#39;s <code>NOTICE</code> grade — we have not yet read the rules registry mapping that shows which policies (<code>AppealablePolicy</code>) go to notice. The VF changes in this commit (+4,000 lines or more) were excluded from today&#39;s scope.<ul>
+<li>Relevant files: <code>filter.rs</code>, <code>hydration/execute.rs</code>, <code>community_source.rs</code>, <code>trusted_friends_client.rs</code></li>
+</ul>
+</li>
+<li>Find the new path of the research.netflix.com publications list and fix the batch source list — <code>/publications</code> returns 404.</li>
+</ul>
+<p>Lookup failed: research.netflix.com/publications returned HTTP 404. The alternative path <code>/archive</code> opens, but its newest entry is 2026-02-24, so the list appears not to be updated.</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-04.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-04</span></a><a class="pg-next" href="daily-2026-10-08.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-08</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-07.html" data-title="일일 리포트 2026-10-07"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

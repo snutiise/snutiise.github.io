@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-12 — feed-research</title>
+<meta name="description" content="In one line: Pinterest deployed a structure that infers a user's long-term goals (journeys) with a single Qwen3-4B generation instead of keyword clustering…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-12.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-12.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-12.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-12.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-12 — feed-research">
+<meta property="og:description" content="In one line: Pinterest deployed a structure that infers a user's long-term goals (journeys) with a single Qwen3-4B generation instead of keyword clustering…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-12.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-12.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-12">2026-10-12</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Monday</li>
+<li><span class="meta-k">Reading time</span>11 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-12.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>0</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>Pinterest deployed a structure that infers a user&#39;s long-term goals (journeys) with a single Qwen3-4B generation instead of keyword clustering and uses the resulting names as notification retrieval queries.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-an-llm-names-long-term-user-goals-as-notification-queries--pinterest-radar"><span class="num">1</span>An LLM names long-term user goals as notification queries — Pinterest (radar)</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#source-check-notes">Source check notes</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-an-llm-names-long-term-user-goals-as-notification-queries--pinterest-radar"><span class="num">1</span>An LLM names long-term user goals as notification queries — Pinterest (radar)</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626" target="_blank" rel="noopener">From Activity to Intent: Generating User Journeys with LLMs</a> — Pinterest Engineering Blog, 2026-10-09, blog post. There are nine authors, and the last author, Sudarshan Lamkhede, holds the title &quot;Director, Machine Learning Engineering&quot;. The Medium web page returned 403, so I read the post through the <a href="https://medium.com/feed/pinterest-engineering" target="_blank" rel="noopener">Pinterest Engineering RSS</a>, which carries the full text of the same post.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Most recommendation systems predict the &quot;next item to tap&quot;. However, goals that span weeks to months, such as a kitchen remodel or wedding planning, are poorly captured by a single next click or by long-lived interest labels such as &quot;Home Decor&quot;. Pinterest calls such a goal a journey (a bundle of interaction in which interest, intent, and context coincide at a point in time and continue across sessions), builds a list of in-progress journeys for each user, and uses it for notifications. This post covers how it replaced the multi-stage ML pipeline that builds that list with a single LLM generation.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The previous system was a five-stage clustering pipeline, and errors accumulated at each stage</span></p></div>
+<ul>
+<li>The previous system was a five-stage clustering pipeline <span class="badge ok">verified</span>.<ul>
+<li>It extracted keywords from search queries and the annotations of saved Pins.</li>
+<li>It embedded the keywords and clustered them hierarchically.</li>
+<li>It used the top keyword of each cluster as the name.</li>
+<li>It ranked with a pointwise model (a model that scores each candidate separately) and a similarity penalty.</li>
+<li>Finally, it used heuristics to distinguish evergreen from situational journeys.</li>
+</ul>
+</li>
+<li>Journey notifications from this pipeline achieved email click-through +88%, push open +32%, and positive survey +23% over interest-based notifications <span class="badge ok">verified</span>.</li>
+<li>The problem was that errors accumulated at each stage <span class="badge ok">verified</span>. The authors list three kinds.<ul>
+<li>fragmentation: one kitchen project splits into three journeys: cabinets, countertops, and backsplash.</li>
+<li>generic bucket: when a cluster is messy, it falls back to a generic name such as &quot;Art&quot; or &quot;Shopping&quot;.</li>
+<li>incidental noise: a few clicks on memes or celebrities take the top spots.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The new system gets a list of journey names from one generation, and the prompt replaces the existing ranking and filter modules</span></p></div>
+<ul>
+<li><p>The new system is a single generation that takes the profile and a chronological activity log and returns a list of journey names as JSON <span class="badge ok">verified</span>. Keyword extraction, embedding, clustering, and the naming model are all gone.</p>
+</li>
+<li><p>The input contains up to 150 events within a 360-day lookback <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Actions were reduced to six: search, save, like, click, comment, and dislike.</li>
+<li>The prompt states the order search/save &gt; comment &gt; like &gt; click &gt; dislike explicitly.</li>
+<li>Dislike is included deliberately so that journeys supported mainly by dislikes are suppressed.</li>
+</ul>
+</li>
+<li><p>Decoding sets temperature to 0 and output to at most 300 tokens, and turns off reasoning tokens <span class="badge ok">verified</span>. This is to reproduce the same answer for the same log.</p>
+</li>
+<li><p>The output is up to about 12 names of 1–5 words each, written in the user&#39;s language <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The ranking criteria are engagement strength, repeated evidence, recency, consistency, and specificity.</li>
+<li>An empty list is allowed when there is no evidence. Inventing journeys without evidence is not allowed.</li>
+</ul>
+</li>
+<li><p>The prompt replaced the existing ranking and filter modules <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The diversity instruction in the prompt replaces the diversifier based on a similarity penalty.</li>
+<li>The dislike rule replaces the hand-built negative-signal filter.</li>
+<li>The authors therefore write that they treat a prompt change as a &quot;launch&quot;.</li>
+</ul>
+<blockquote>
+<p>&quot;once you collapse the pipeline, the prompt becomes the ranking policy and the safety policy. Everything the staged system encoded in model weights and thresholds now has to be clearly stated.&quot;
+— <a href="https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626" target="_blank" rel="noopener">From Activity to Intent</a> (blog), 2026-10-09</p>
+</blockquote>
+</li>
+<li><p>The clustering system was not removed and was kept as a fallback <span class="badge ok">verified</span>.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A frontier model served as teacher for distillation, and Qwen3 4B became the production student</span></p></div>
+<ul>
+<li>The authors distilled into a Qwen3 student using a frontier model as the teacher <span class="badge ok">verified</span>.<ul>
+<li>The teacher built synthetic training data by producing target journeys for each activity history.</li>
+<li>With this data they trained Qwen3 0.6B, 1.7B, 4B, and 8B using SFT and LoRA (fine-tuning that updates only a small adapter instead of all parameters).</li>
+<li>The name of the teacher model was not disclosed.</li>
+</ul>
+</li>
+<li>Quality rose quickly over the first few thousand examples and barely rose after that <span class="badge ok">verified</span>. Selecting hard consolidation cases and multilingual cases worked better than adding more examples of the same kind.</li>
+<li>The 4B model became the production student on the balance between quality and throughput <span class="badge ok">verified</span>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. A batch job runs on the online inference stack and skips recently inferred users</span></p></div>
+<ul>
+<li><p>Serving is batch but uses the online inference stack <span class="badge ok">verified</span>. vLLM decode workers on L40S GPUs sit behind NVIDIA Dynamo, with prefix caching and chunked prefill turned on.</p>
+</li>
+<li><p>The authors write that KV-cache-aware routing matters because every request shares a long, fixed system prompt <span class="badge ok">verified</span>.</p>
+</li>
+<li><p>In production, a cluster of about 100 GPUs handles about 775 requests per second end-to-end <span class="badge ok">verified</span>. Latency is about 1.2 seconds at the median and about 3.0 seconds at p95.</p>
+<blockquote>
+<p>&quot;In production, a cluster on the order of 100 GPUs sustains about 775 requests per second end-to-end, with a median around 1.2 seconds and p95 around 3.0 seconds.&quot;
+— <a href="https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626" target="_blank" rel="noopener">From Activity to Intent</a> (blog), 2026-10-09</p>
+</blockquote>
+</li>
+<li><p>When the algorithm changes, the whole population is rerun; normally only recently active users are run daily as an increment <span class="badge ok">verified</span>.</p>
+</li>
+<li><p>The measure with the largest effect on throughput was not adding GPUs but skipping users who had been inferred within the last few days <span class="badge ok">verified</span>.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. Journey names retrieve Pins, and the existing Pin ranking models rank them</span></p></div>
+<ul>
+<li><p>A journey name becomes a retrieval query in the notification pipeline <span class="badge ok">verified</span>. Inference results are written to storage, and notification serving reads them at send time.</p>
+</li>
+<li><p>Each journey name becomes the query of embedding-based retrieval (an approach that finds items near the query in vector space) and fetches Pins <span class="badge ok">verified</span>. The existing Pin ranking models rank the fetched Pins.</p>
+<blockquote>
+<p>&quot;each journey name then becomes a retrieval query. We built embedding-based retrieval models to pull Pins for each user journey which are further ranked by our Pin ranking models.&quot;
+— <a href="https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626" target="_blank" rel="noopener">From Activity to Intent</a> (blog), 2026-10-09</p>
+</blockquote>
+</li>
+<li><p>Journeys that were notified recently are lowered to account for fatigue, and journeys the user explicitly rejected are suppressed outright <span class="badge ok">verified</span>. After that, the notification framework decides whether to send and through which channel.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. Sensitive topics are blocked by filters and prompt instructions, and minors in some regions were excluded</span></p></div>
+<ul>
+<li>Inference of sensitive attributes is blocked in several layers <span class="badge ok">verified</span>.<ul>
+<li>Both the input keywords and the output names must pass the notification content filter. The output also goes through a generative content safety filter.</li>
+<li>The prompt instructs the model not to infer topics related to health, politics, religion, sexual orientation, gender identity, or race.</li>
+<li>Users under 18 in the EEA, Switzerland, and the UK were excluded because of local law.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">G. In an A/B test with the clustering system as control, email click-through rose 1.1% and push open rose 1.3%</span></p></div>
+<ul>
+<li><p>The control of the online A/B test is the clustering system <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The first experiment targeted users in the US and Canada, and email click-through rose 1.1% and push open rose 1.3%.</li>
+<li>Statistically significant improvements also appeared in several sitewide engagement and retention metrics.</li>
+<li>The subsequent multilingual international rollout went in the same direction, and shipping the two experiments increased the platform&#39;s DAU, WAU, and MAU.</li>
+</ul>
+<blockquote>
+<p>&quot;Initial experiment ramped to the US and Canada users, with the clustering production system as control, showed lifts of 1.1% on email click-through and 1.3% on push opens, plus multiple statistically significant sitewide engagement and retention gains. A subsequent multilingual international rollout replicated the direction, and shipping both experiments increased the daily, weekly, and monthly active users on the platform.&quot;
+— <a href="https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626" target="_blank" rel="noopener">From Activity to Intent</a> (blog), 2026-10-09</p>
+</blockquote>
+</li>
+<li><p>The sizes of the sitewide metric and DAU/WAU/MAU increases were not published as figures <span class="badge ok">verified</span>.</p>
+</li>
+<li><p>Because the task has no ground-truth labels, offline evaluation was done in two ways <span class="badge ok">verified</span>.</p>
+<ul>
+<li>They compared the outputs of the two systems for the same users qualitatively.</li>
+<li>A separate language model scored relevance, evidence, diversity, and granularity.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">H. Four extensions, including Semantic ID input and feedback-based optimization, are being tested</span></p></div>
+<ul>
+<li>The four items below are extensions under experiment, not production defaults <span class="badge ok">verified</span>. The authors state explicitly that this section is &quot;trained or rolling out, not what every user gets today&quot;.<ul>
+<li>Semantic ID (SID, a token sequence that represents an item as a hierarchical code): Pins are compressed with RQ-VAE into 5 levels × 11 bits, packed into one 64-bit integer, and unpacked into special tokens when the prompt is built. The tokenizer is extended with the SID vocabulary, followed by continued pre-training and then SFT. If fewer than 10 events carry an SID, the whole prompt is converted back to tags, and search queries always keep the original text.</li>
+<li>Offsite conversions (page visits, add to cart, sign-up, checkout) are added as an auxiliary signal only for users with little activity.</li>
+<li>A single call generates the journey together with its sub-topics, adjacent topics, and even the notification title copy.</li>
+<li>Preference optimization uses user feedback. An online A/B test is in progress.<ul>
+<li>The signals are the Yes/No answers to &quot;Are you interested in &lt;journey>?&quot; in journey emails, and the saves, clicks, and hides within a notification session.</li>
+<li>Chosen and rejected are built with a &quot;feedback-as-edit&quot; approach. The list that keeps Yes and removes No is chosen, and the opposite edit is rejected.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> None. Pinterest is not a tracked service, so I folded it into <a href="radar.html">radar.md</a>. I added a Pinterest User Journeys entry under &quot;new this month&quot; and one line of evidence to the &quot;spread of LLM-native ranking&quot; thread.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> In the Pinterest journey system, the role of the LLM is to write the user&#39;s intent in batch as natural-language names, and those names become queries for the existing retrieval and ranking stack <span class="badge est">inferred</span>. By sitting outside the synchronous serving path, it is on the same side as MetaStrategy in the radar <span class="badge est">inferred</span>. The evidence is that both posts state that the LLM output is stored nearline or in batch and then read by a deterministic downstream stack. However, MetaStrategy&#39;s output is a strategy configuration, whereas Pinterest&#39;s output is a per-user query.</p></div>
+<p>This post adds a new case to the <a href="radar.html#spread-of-llm-native-ranking--who-follows-after-genrec">radar thread</a> on &quot;where in the recommendation pipeline does the LLM go&quot;. The roles the LLM has taken in that thread so far were as follows:</p>
+<ul>
+<li>Scoring function: Netflix GenRec</li>
+<li>Generative retrieval: Yandex, Spotify GLIDE</li>
+<li>Offline policy compiler: Alibaba MetaStrategy</li>
+<li>Graph path reasoner: Meta ConnectionMind</li>
+<li>Input tokenization: Meta AMBER</li>
+<li>Embedding encoder: LinkedIn Follows</li>
+</ul>
+<p>The flow of turning a user profile into LLM text already had <a href="radar.html#comcast-technology-ai--llm-based-user-profiling-for-streaming-recommendation-offline-production-comparison">Comcast</a> and KuaFu. Comcast only ran an offline comparison, and KuaFu is a compressed-representation approach. Among these, Pinterest is the first case that uses natural-language output directly as the query and also publishes an online A/B test <span class="badge est">inferred</span> (this is a comparison within the radar corpus, not a survey of the whole industry). The lift over clustering is about 1%, whereas the lift of clustering over interest-based notifications was 88%, so the large gain appears to have come from &quot;introducing the journey as a unit&quot;, and the switch to an LLM reads as a quality improvement on top of it <span class="badge est">inferred</span>.</p>
+<p>There is not yet a link to the tracked services. This repository has no first-party statement that Meta, X, or Netflix generate user intent with an LLM on a notification surface <span class="badge est">inferred</span> (this means there is no statement, not evidence that they do not operate one).</p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="https://medium.com/pinterest-engineering/from-activity-to-intent-generating-user-journeys-with-llms-9652b9417626" target="_blank" rel="noopener">Pinterest User Journeys</a>, 2026-10-09: Given an activity log, Qwen3-4B generates journey names, and those names become notification retrieval queries. It yielded email CTR +1.1% and push open +1.3% over clustering.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Online A/B results of preference optimization for Pinterest journeys — the authors announced a follow-up post or paper. When production results of directly optimizing LLM output with user feedback appear, I will attach them to the radar thread again.</li>
+<li>A link to the post on the earlier journey system (the clustering version) — the same post mentioned it, but I could not confirm the link this time. If needed, I will look for it in the next Monday sweep.</li>
+</ul></div>
+<h2 id="source-check-notes">Source check notes</h2>
+<p>No new source passed from X, Meta, Netflix, or arXiv, and one Pinterest post passed from the Monday industry blogs.</p>
+<ul>
+<li>X: the latest commit of <code>xai-org/x-algorithm</code> is still <code>cb45b55</code> (2026-10-09), and there are no commits after it. There is no release either.</li>
+<li>Meta: the latest post on engineering.fb.com is &quot;NTS: Authenticated Time at Meta&quot; from 2026-10-06, which is unrelated to feeds. The latest post on ai.meta.com/blog is from 2026-07. Threads Dear Algo and Your Algo, which came up in the WebSearch cross-check, are already in <a href="threads.html">services/threads.md</a>.</li>
+<li>Netflix: the latest post in the netflixtechblog.com RSS is from 2026-09-25, so nothing is new.</li>
+<li>arXiv cs.IR: 30 items were parsed and 0 passed. There are two near misses.<ul>
+<li><a href="https://arxiv.org/abs/2610.10483" target="_blank" rel="noopener">2610.10483</a> corrects the cluster-size and variance bias of two-level softmax sampling. The authors come from a music streaming research line, and there is no deployment claim.</li>
+<li><a href="https://arxiv.org/abs/2610.10124" target="_blank" rel="noopener">2610.10124</a> is a loss decomposition that feeds targets missed by retrieval into reranker training in generative recommendation. It is academic research.</li>
+</ul>
+</li>
+<li>Monday industry blogs: Pinterest passed with the one post above, and the 10-06 &quot;Metrics Board&quot; was skipped because it covers metric infrastructure. The sources that did not pass are Google Research, Spotify, and LinkedIn.<ul>
+<li>Google Research: the posts from 10-02–10-07 are unrelated to recommendation.</li>
+<li>Spotify: the 10-08 post is a product announcement.</li>
+<li>LinkedIn: the 10-09 post is about a data context layer.</li>
+</ul>
+</li>
+</ul>
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-10.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-10</span></a><a class="pg-next" href="daily-2026-10-14.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-14</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-12.html" data-title="일일 리포트 2026-10-12"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

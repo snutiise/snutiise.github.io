@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-25 — feed-research</title>
+<meta name="description" content="In one line: X deleted the 1,255-line ranking scorer from home-mixer. Now home-mixer and vm-ranker compute the value model with the same code in a shared crate.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-25.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-25.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-25.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-25.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-25 — feed-research">
+<meta property="og:description" content="In one line: X deleted the 1,255-line ranking scorer from home-mixer. Now home-mixer and vm-ranker compute the value model with the same code in a shared crate.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-25.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-25.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-25">2026-09-25</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>16 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-25.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X deleted the 1,255-line ranking scorer from home-mixer. Now home-mixer and vm-ranker compute the value model with the same code in a shared crate.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-home-mixer-and-vm-ranker-ranking-scores-now-come-from-one-shared-crate--x"><span class="num">1</span>home-mixer and vm-ranker ranking scores now come from one shared crate — X</a></li><li><a href="#paper-and-blog-scan">Paper and blog scan</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-home-mixer-and-vm-ranker-ranking-scores-now-come-from-one-shared-crate--x"><span class="num">1</span>home-mixer and vm-ranker ranking scores now come from one shared crate — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/44d37ebf87f2185b949cd37b710d410c2a77d21f" target="_blank" rel="noopener">xai-org/x-algorithm@<code>44d37eb</code></a> — GitHub public source code, 2026-09-24, +2,569/−2,257 (62 files). These notes number X commits after the Gen4 release in sequence, and this commit is Gen4+28. A shared crate called <code>xai_value_model</code> began to appear in yesterday&#39;s Gen4+27 commit <a href="https://github.com/xai-org/x-algorithm/commit/1b3fec20" target="_blank" rel="noopener">1b3fec20</a>. That commit inlined <code>xai_value_model::compute_value_scores()</code> into the vm-ranker process, and today the shared crate was released as actual files.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X&#39;s For You ranking takes the weighted sum of 24 engagement probabilities (favorite, reply, retweet, dwell, report ...) predicted by the ranking model Phoenix and obtains one scalar score. That score is multiplied by author diversity, an OON (out-of-network, posts from accounts the user does not follow) multiplier, and a new-author boost. This computation, which the code calls the value model, happens in two places: home-mixer, the Rust service that assembles the For You feed, and vm-ranker, a separate gRPC service attached behind it. vm-ranker handles DPP diversity (a diversity technique that makes similar candidates less likely to be picked together) and the rank server role. When two processes implement the same formula twice, people have to catch every drift between the mirrors by hand. This commit tidies up the practice of counting which process uses which parameters and how many parameter mirrors there are. It releases the shared crate that appeared yesterday as six actual files and deletes home-mixer&#39;s 1,255-line ranking scorer (<code>ranking_scorer.rs</code>) entirely.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The home-mixer ranking scorer is gone, and the shared crate handles score computation</span></p></div>
+<ul>
+<li>The home-mixer ranking scorer of 1,255 lines was deleted entirely <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/1b3fec20/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs</code></a>.<ul>
+<li><p>We confirmed <code>ranking_scorer.rs</code> in the previous commit&#39;s tree.</p>
+</li>
+<li><p>The only thing taking its place is the new 114-line file <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/value_model.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/value_model.rs</code></a>.</p>
+</li>
+<li><p>This file does three things:</p>
+<ol>
+<li><code>weights_for(query)</code> pulls 33 values from the home-mixer FS parameters and builds <code>ValueModelWeights</code>.</li>
+<li><code>scoring_inputs(query, weights, candidate)</code> turns the candidate&#39;s Phoenix engagement probabilities and its in-network, mutual-follow and vqv conditions into <code>CandidateScoringInputs</code>.</li>
+<li><code>weighted_score(query, weights, candidate)</code> calls the shared crate&#39;s <code>fuse_heads</code> as is.</li>
+</ol>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn weighted_score(
+    query: &amp;ScoredPostsQuery,
+    weights: &amp;ValueModelWeights,
+    candidate: &amp;PostCandidate,
+) -&gt; f64 {
+    fuse_heads(weights, &amp;scoring_inputs(query, weights, candidate))
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/value_model.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/value_model.rs</code></a>, 2026-09-24. What the home-mixer ranking scorer does is now compressed into these three lines. The actual formula lives inside the shared crate&#39;s <code>fuse_heads</code>.</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>A new shared crate was released with 6 files and 807 lines in total <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/lib.rs" target="_blank" rel="noopener"><code>xai-value-model/lib.rs</code></a> (+14).<ul>
+<li>The crate name is <code>xai-value-model</code>.</li>
+<li>The other five files are <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/inputs.rs" target="_blank" rel="noopener"><code>inputs.rs</code></a> (+35), <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/phoenix_scores.rs" target="_blank" rel="noopener"><code>phoenix_scores.rs</code></a> (+28), <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/proto.rs" target="_blank" rel="noopener"><code>proto.rs</code></a> (+92), <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>scoring.rs</code></a> (+444) and <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/xai-value-model/weights.rs" target="_blank" rel="noopener"><code>weights.rs</code></a> (+194).</li>
+</ul>
+</li>
+<li>The symbols the crate exports are listed below <span class="badge ok">verified</span>. The list is exactly what <code>lib.rs</code> re-exports with <code>pub use</code>.<ul>
+<li><code>ValueModelWeights</code> (33 fields) · <code>CandidateScoringInputs</code> · <code>QueryScoringContext</code> · <code>PhoenixScores</code> (26 fields) · <code>compute_value_scores</code> · <code>compute_value_scores_with_adjustment</code> · <code>fuse_heads</code> · <code>compute_weighted_score</code> · <code>offset_score</code> · <code>post_fusion_multipliers</code> · <code>apply_cold_start_decisions</code> · <code>diversity_multiplier</code> · <code>author_pool_counts</code> · <code>PostFusionMultiplier</code> · <code>ValueScores</code> · the <code>NEGATIVE_SCORES_OFFSET</code> constant</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. 22 ranking-computation parameters were deleted from home-mixer, and value model weights remain in both mirrors, home-mixer and vm-ranker</span></p></div>
+<ul>
+<li>136 lines were deleted from the home-mixer parameter file <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (+2/−136).<ul>
+<li>Deleted parameters: <code>EnableAuthorDiversity</code>·<code>AuthorDiversityDecay</code>·<code>AuthorDiversityFloor</code>·<code>OonWeightFactor</code>·<code>MultiplierPreOffset</code>·<code>EnableOonRescoreForInNetworkRepliesRetweets</code>·<code>TopicOonWeightFactor</code>·<code>NewUserAgeThresholdSecs</code>·<code>NewUserOonWeightFactor</code>·<code>EnableMultiplicativePostUnexplored</code>·<code>MultiplicativePostUnexploredAlpha</code>·<code>PostUnexploredWeightInNetworkOnly</code>·<code>EnableCdwellOnImpr</code>·<code>ContActiveSecs5mResidualNormWeight</code>·<code>WeightPerturbationSigma</code>·<code>WeightPerturbationSalt</code>·<code>EnableVMRanker</code>·<code>VMRankerDppTheta</code>·<code>VMRankerDppMaxSelectedRank</code>·<code>VMRankerSendValueModelInputs</code>·<code>VMRankerComputeValueModel</code>·<code>CachedPostsReuseWeightedScore</code></li>
+<li>The sync time in the file header also changed from <code>2026-09-22T17:39:32Z</code> to <code>2026-09-23T16:28:43Z</code>.</li>
+</ul>
+</li>
+<li>The deleted values moved in two directions <span class="badge ok">verified</span>.<ul>
+<li>The value model weights and gating parameters were gathered into the fields of the <code>ValueModelWeights</code> struct. The weight values are defined in two places: <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs</code></a>, which vm-ranker manages (introduced yesterday, 56 parameters), and home-mixer&#39;s <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>param.rs:295-296</code></a> onward, such as <code>FavoriteWeight</code> and <code>ReplyWeight</code>.</li>
+<li>home-mixer&#39;s <code>weights_for()</code> reads the home-mixer-side values (see A above).</li>
+<li>The DPP parameters (<code>VMRankerDppTheta</code>, <code>VMRankerDppMaxSelectedRank</code>) were absorbed into the RankingConfig inside the vm-ranker process.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Even if the vm-ranker call fails, home-mixer serves the score it computed locally</span></p></div>
+<ul>
+<li>If the vm-ranker RPC fails, home-mixer now <strong>serves the locally computed weighted sum as is</strong> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/vm_ranker.rs</code></a> (+84/−76).<ul>
+<li>The previous code propagated the failure as a per-candidate Err.</li>
+<li>home-mixer&#39;s <code>vm_ranker.rs</code> was restructured from &quot;request assembly&quot; to &quot;local-first, RPC-refine&quot;.</li>
+<li>The new function <code>local_scores()</code> first computes a local weighted sum for each candidate with <code>value_model::weighted_score()</code>. It then attaches the cold start lift and author_policy_zeroed decisions with <code>AuthorColdStart::apply_with_decisions()</code>.</li>
+<li>After that it sends a refinement request to the vm-ranker gRPC.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Phoenix retrieval splits the cold pool and popular candidates at data loading time</span></p></div>
+<ul>
+<li>A popular-candidate slice was newly introduced in Phoenix retrieval (the candidate source that finds OON candidates with Phoenix) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/data/retrieval_dataset.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/retrieval_dataset.py</code></a> (+103/−8).<ul>
+<li>The new slice is named <code>HOME_HOT</code>. It was registered as <code>HOME_HOT = 14</code>, next to <code>HOME_COLD = 13</code> in the <code>RetrievalDataset</code> enum.</li>
+<li>Both slices are drawn from the same <code>1fav_1day.parquet</code> source and are split by two masks in the new <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/data/cold_pool_filter.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/cold_pool_filter.py</code></a> (+78).<ul>
+<li><code>cold_pool_mask(post_ids, meta_path, max_favs=8, max_views=500)</code></li>
+<li><code>fresh_post_mask(post_ids, max_age_seconds)</code>: computes the posting time directly from the tweet id using the Twitter Snowflake epoch.</li>
+</ul>
+</li>
+<li><code>HOME_COLD</code> is <code>cold_keep = cold_pool_mask &amp; fresh_post_mask</code>, and <code>HOME_HOT</code> is its complement.</li>
+<li>The cold pool is now cut at data loading time in the training and serving stages, and only the remaining popular candidates are managed in a separate index.</li>
+<li><code>default_cold_pool_metadata_path()</code> is <code>${PHOENIX_INDEX_BASE:-/data/phoenix_index/prod}/post_author_pairs_metadata/metadata_1day.parquet</code>.</li>
+</ul>
+</li>
+<li>When a Phoenix bundle is exported, per-target index metadata is attached <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/phoenix/xrex/train/recsys_bundle_export.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/recsys_bundle_export.py</code></a> (+170/−46).<ul>
+<li>Four fields were added to the <code>RetrievalExport</code> dataclass.<ul>
+<li><code>dataset_capacities</code></li>
+<li><code>rows_from</code>: decides, per target, which source dataset&#39;s rows to reference.</li>
+<li><code>max_age_seconds</code>: the maximum age per target.</li>
+<li><code>optional_targets</code></li>
+</ul>
+</li>
+<li>The structure in which HOME_COLD and HOME_HOT split the rows of the same source (HOME) is expressed by exactly this <code>rows_from</code>.</li>
+<li>The manifest exposes two constants, <code>POST_SCALES_KEY</code> and <code>DATASET_RANGES_KEY</code>.</li>
+<li>The new gating consists of three flags: <code>enable_int8_post_table</code>, <code>enable_bloom_filter</code> and <code>enable_topic_filter</code>. These gates decide whether to include the int8 post table (per-post absolute-max scale) in the export.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. When judging a retweet, the verdict on the original tweet is merged in</span></p></div>
+<ul>
+<li>Logic that merges the retweet verdict and the original tweet verdict was added to VF (visibility-filtering, the service that judges per post whether it may be shown to this viewer) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/verdict.rs</code></a> (+60).<ul>
+<li><p>The new function is <code>Verdict::merge_retweet_verdict(retweet, source)</code>. There are four merge rules:</p>
+<ol>
+<li>If source is <code>Withheld</code>, source is always adopted. If the original tweet is withheld, the retweet is withheld too.</li>
+<li>If retweet is <code>Withheld</code>, retweet is kept. This is the case where the rule that withholds the retweet itself won.</li>
+<li>If retweet is <code>Shown{media: None, engagement: None}</code> (no restrictions), it inherits source.</li>
+<li>Otherwise, retweet is kept.</li>
+</ol>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub fn merge_retweet_verdict(retweet: Verdict, source: &amp;Verdict) -&gt; Verdict {
+    match (&amp;retweet, source) {
+        (_, Verdict::Withheld(_)) =&gt; source.clone(),
+        (Verdict::Withheld(_), _) =&gt; retweet,
+        (
+            Verdict::Shown {
+                media: None,
+                engagement: None,
+            },
+            _,
+        ) =&gt; source.clone(),
+        _ =&gt; retweet,
+    }
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/verdict.rs</code></a>, 2026-09-24</p>
+</blockquote>
+</li>
+<li><p>The flow that actually runs this merge was implemented in <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/evaluate_tweets.rs" target="_blank" rel="noopener"><code>visibility-filtering/evaluate_tweets.rs</code></a> (+157/−18).</p>
+<ul>
+<li>It collects the evaluated retweets with <code>source_tweet_id.is_some()</code> from the first-pass evaluation results.</li>
+<li>It splits those source ids with <code>HashSet.contains()</code> into <code>in_batch</code> (already in the same batch) and <code>fetched</code>. <code>fetched</code> are those that need to be looked up again.</li>
+<li>It calls <code>filter_tweets.run(...)</code> a second time on the <code>fetched</code> list to obtain the source verdict.</li>
+<li>For each retweet, it looks up the source verdict and applies <code>merge_retweet_verdict</code>.</li>
+</ul>
+</li>
+<li><p>The new metric is <code>evaluate_tweets_retweet_sources{outcome=in_batch|fetched}</code>.</p>
+</li>
+</ul>
+</li>
+<li>As a change supporting the merge, <code>pure_cores: TweetHydrationBatch&lt;PureCore&gt;</code> was added to the hydration result tuple in <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/visibility-filtering/hydration/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/hydration/mod.rs</code></a> (+244/−18).<ul>
+<li><code>PureCore</code> is thin core information that holds the retweet&#39;s original id (<code>source_tweet_id</code>).</li>
+<li><code>PureCoreFallbackCache</code> caches ids that failed the first time so they can be retried in the next request.</li>
+<li>A <code>source_tweet_id: Option&lt;TweetId&gt;</code> field was added to <code>RawCandidate</code> (introduced after Gen4+22) and is filled in during hydration.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. A harmful-text category for age gating was added to grox&#39;s policy verdicts</span></p></div>
+<ul>
+<li>A harmful-text category for age gating was newly added to PTOS, the policy verdict stage of grox (the Grok-based nearline annotation pipeline) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/state.py" target="_blank" rel="noopener"><code>grox/flows/ptos/state.py</code></a> (+6).<ul>
+<li>PTOS is the stage that judges violation categories against policy.</li>
+<li>The new category <code>AgeGatingHarmfulText</code> was added as the <code>SafetyPolicyCategory.AgeGatingHarmfulText</code> enum.</li>
+<li>Five subtypes under it were registered in <code>SafetyPolicyType</code>: <code>AgeGatingHarmfulTextAdultContent</code>·<code>EatingDisorder</code>·<code>HarmfulSubstance</code>·<code>DangerousStunt</code>·<code>GraphicDescription</code>.</li>
+<li>In <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/classifier.py" target="_blank" rel="noopener"><code>grox/flows/ptos/classifier.py</code></a> (+5), this category is registered in the <code>USE_GEMMA_CATEGORIES</code> set, so the first-pass verdict is made in Gemma-4-26b. As of today, the only other categories in this set are <code>Spam</code> and <code>IllegalAndRegulatedBehaviors</code>.</li>
+<li>The prompt is built by <code>age_gating_harmful_text_policy_prompt()</code> in <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/ptos/prompts.py" target="_blank" rel="noopener"><code>prompts.py</code></a> (+5), which renders a separate template, <code>age_gating_harmful_text_policy.j2</code>. The template body is not included in this commit&#39;s tree.</li>
+<li>That is, a policy axis was introduced that sends text of an adult-content nature to <strong>age gating</strong> rather than deletion.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">G. The follower boundary separating reply spam and reply ranking tasks rose to 250,000</span></p></div>
+<ul>
+<li>In grox reply handling, the <code>GROK_GEMMA_FOLLOWER_SPLIT</code> follower threshold rose from 225,000 to <strong>250,000</strong> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/reply_spam/constants.py" target="_blank" rel="noopener"><code>grox/flows/reply_spam/constants.py</code></a>.<ul>
+<li>The constant&#39;s name is <code>GROK_GEMMA_FOLLOWER_SPLIT</code>.</li>
+<li>In the code, this constant splits task eligibility <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/grox/flows/reply_spam/task_filter.py" target="_blank" rel="noopener"><code>task_filter.py</code></a>. Conversations where the root or the replied-to account has more followers than this value go to the reply ranking task, and conversations where both are at or below it go to the reply spam task.</li>
+<li>The constant&#39;s name suggests a Grok and Gemma boundary, but the threshold that picks the spam verdict model is a separate one, <code>GEMMA_REPLY_SPAM_MIN_FOLLOWERS = 150_000</code> <span class="badge ok">verified</span> — same <code>constants.py</code>.</li>
+<li>This extends an upward series that has run for about 42 days since the Gen4 release (15k → 30k → 40k → 60k → 80k → 100k → 120k → 150k → 180k → 200k → 225k → <strong>250k</strong>) <span class="badge ok">verified</span> — per-commit values in <code>task_filter.py</code> and <code>constants.py</code>.</li>
+<li>As the threshold rises, the range of conversations handled by the reply spam task widens.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>home-mixer&#39;s scoring statistics now count how many of the top candidates come from SimClusters (the candidate source that finds OON candidates by cluster similarity) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/44d37eb/home-mixer/side_effects/scored_stats_side_effect.rs" target="_blank" rel="noopener"><code>home-mixer/side_effects/scored_stats_side_effect.rs</code></a> (+35/−4).<ul>
+<li>The new metric family is <code>Phoenix.RetrievalContribution.SimclustersTopK</code>. Its top-k buckets are <code>[50, 100, 200, 400, 600, 800]</code>, an axis separate from Phoenix&#39;s <code>[10, 100, 200, 500, 1000]</code>.</li>
+<li>The new <code>Phoenix.RetrievalContribution.ScoredTopK</code> measures the top-k source distribution over all selected and non-selected candidates. It observes which sources made the scoring top-k before selection.</li>
+<li>It is an aggregate metric axis that pairs with <code>retrieval_candidates_kafka_side_effect.rs</code> (raw data sampling), introduced in Gen4+26.</li>
+</ul>
+</li>
+<li>VF&#39;s <code>clock_cache.rs</code> (412 lines) was removed <span class="badge ok">verified</span>.<ul>
+<li>A primitive that had been introduced in the 2026-09-10 commit (Gen4+19) in an &quot;unwired&quot; state was deleted after 14 days.</li>
+<li>This is a signal that they do not want to bear the maintenance burden of an unconnected primitive. If it is needed again, it will likely be reintroduced then <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> A Gen4+28 row was added to the generation table in <a href="x.html">services/x.md</a>, and the last-updated date was raised. The ranking section&#39;s &quot;five caveats of weight mirrors&quot; and &quot;mirroring scope&quot; now record that 22 ranking-computation parameters left the home-mixer mirror. The value model weights remain in both mirrors, home-mixer param.rs and vm-ranker/params.rs <span class="badge ok">verified</span> — see B above. The candidate generation section now reflects the Phoenix HOME_COLD/HOME_HOT split, and the re-ranking, diversity and filter section reflects the connected VF retweet source merge.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This commit carries two architectural signals:</p></div>
+<ul>
+<li>First, X&#39;s ranking computation converged on a single library.<ul>
+<li>Previously, home-mixer and vm-ranker implemented the same formula (the sum of Phoenix probabilities × weights) twice, and so the parameters were mirrored twice as well.</li>
+<li>Even as of yesterday, how consistency between the two processes was maintained was an open question.</li>
+<li>With today&#39;s commit, home-mixer&#39;s copy is gone, and the computation lives only inside the crate.</li>
+<li>The home-mixer param.rs mirror also got thinner (22 ranking-computation parameters deleted). However, the value model weights remain in both mirrors, home-mixer and vm-ranker/params.rs.</li>
+</ul>
+</li>
+<li>Second, home-mixer now has a degraded mode for vm-ranker RPC failures.<ul>
+<li>Previously, when vm-ranker died, an Err was thrown per candidate to downstream code; now the locally computed weighted sum is served as is.</li>
+<li>This degraded mode became possible because the shared crate physically exists inside home-mixer.</li>
+</ul>
+</li>
+<li>Two other things were reflected today:<ul>
+<li>Phoenix retrieval split HOME_HOT, the popular (hot) slice, into a separate index so it no longer mixes with cold.</li>
+<li>In VF, the last unfinished connection in the rule engine rewrite that has been under way for the past two months was completed. It is a merge that makes a retweet&#39;s visibility actually follow the original tweet&#39;s visibility.</li>
+</ul>
+</li>
+</ul>
+<h2 id="paper-and-blog-scan">Paper and blog scan</h2>
+<p>Of the 14 new papers seen today, 1 passed the watching criteria, and it was added to the radar after checking the original text. The arXiv cs.IR new list had 30 entries (30 <code>&lt;entry&gt;</code> items parsed, submitted 2026-09-21–09-23). Of those, 14 were new since yesterday, submitted on 2026-09-23. These 14 were screened on three criteria: platform company authors, a production A/B claim, and novelty in mechanism or scale.</p>
+<ul>
+<li>The paper that passed is <em>When LLM-Based User Profiling Adds Value in Production Streaming Recommendation</em> by Comcast Technology AI authors <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2609.27183" target="_blank" rel="noopener">arXiv 2609.27183</a>, 2026-09-23.<ul>
+<li>In the <a href="https://arxiv.org/html/2609.27183v1" target="_blank" rel="noopener">HTML version</a> we confirmed that 3 of the 4 authors are affiliated with Comcast Technology AI. They are Neeraj Sharma, Sardar Hamidian and Shaghayegh Agah, with affiliation locations in Sunnyvale and Washington DC.</li>
+<li>The first author, Milad Sabouri, is affiliated with both DePaul University and Comcast Technology AI.</li>
+<li>Comcast owns Peacock streaming and Xfinity.</li>
+<li>The paper&#39;s content is <strong>a factorial comparison of four content-based user profile types on a production dataset</strong>. The four types are combinations of (aggregate vs LLM-generated) × (temporal disentanglement on/off).</li>
+<li>There are two kinds of profiles:<ol>
+<li>aggregate: averages the user&#39;s recent and past item embeddings.</li>
+<li>LLM: feeds the user history into an LLM to get a natural-language summary, then vectorizes it with a text encoder.</li>
+</ol>
+</li>
+<li>Because the LLM approach is much more expensive than aggregate, the paper asks &quot;when is that cost justified&quot;.</li>
+<li><strong>There are no online A/B results.</strong> It reported only offline accuracy and beyond-accuracy metrics (diversity and others).</li>
+<li>It does not state which Comcast product the production dataset comes from.</li>
+<li>It was added to <a href="radar.html">radar.md</a>. Comcast/Peacock were not previously on this repository&#39;s watch list, so it is recorded as the first signal from a production stack.</li>
+</ul>
+</li>
+</ul>
+<p>The other 13 were dropped from watching.</p>
+<ul>
+<li>MultiVENT-Raw (video retrieval benchmark, academic)</li>
+<li>Beyond a Scalar (watch-time DSI, Shanghai Jiao Tong University, Rice, academic; uses the KuaiRec/WeChat21 benchmarks but has no platform authors)</li>
+<li>Entangle (quantum GitHub collaboration, off topic)</li>
+<li>Dual-Hypergraph Indexing (RAG, academic)</li>
+<li>Turkish LLM eval (domain-specific)</li>
+<li>LLM workflow structural diff (SE tool)</li>
+<li>Flexible Rec System (group recommendation, academic)</li>
+<li>VDR TTA (document retrieval, academic)</li>
+<li>SLP verifiable LLM inference (LLM infrastructure, off topic)</li>
+<li>RoPA Vietnam (data protection automation, off topic)</li>
+<li>Large Knowledge Model (scientific knowledge graph, off topic)</li>
+<li>LatWeave (multi-hop QA, academic)</li>
+<li>BoundaryMORPH (RAG reranking, academic)</li>
+</ul>
+<p>The industry blog scan is done on Mondays only. Today (Friday) is not covered.</p>
+<p>The latest Meta engineering blog posts are two from 2026-09-21 (Rebalancer open source and Petal subsea cable), and both are infrastructure, so they are skipped. The latest Netflix Tech Blog post is &quot;Leave the Class Path in the Rearview Mirror&quot; (JVM infrastructure) from 2026-09-18, and it is skipped as well.</p>
+<h2 id="radar">Radar</h2>
+<p>The only new radar entry is 1 Comcast paper.</p>
+<ul>
+<li><a href="radar.html#comcast-technology-ai--llm-based-user-profiling-for-streaming-recommendation-offline-production-comparison">Comcast Technology AI — LLM-based user profiling for streaming recommendation (offline production comparison)</a>: 3 of the 4 authors are affiliated with @comcast.com, and it is the first public signal from the owner of Peacock/Xfinity. There is no online A/B yet.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check how the relationship between the two mirrors, home-mixer param.rs and vm-ranker/params.rs, gets documented — as of yesterday&#39;s commit (Gen4+27), how the home-mixer param.rs and vm-ranker/params.rs mirrors are synchronized with each other was undocumented. In this commit (Gen4+28), the weights again remain in both mirrors. We will watch follow-up commits for whether this change is recorded in the README or under <code>docs/</code>.</li>
+<li>Check how often home-mixer&#39;s local degraded mode actually turns on — <code>vm_ranker.rs</code> was changed to serve the local weighted sum on RPC failure, but the rate at which this path is actually triggered has not been observed. We will watch follow-up commits for whether a <code>VMRanker.local_fallback</code> metric family appears, or whether the existing <code>vm_ranker_value_model_fallback_total{reason=...}</code> is simply reused.</li>
+<li>Check when the HOME_HOT slice is loaded as an actual index in serving — for now it is only defined in the data pipeline. We will watch for when a second index publication cron that consumes <code>RetrievalDataset.HOME_HOT</code> is scheduled.</li>
+<li>Check the ratio of VF&#39;s <code>evaluate_tweets_retweet_sources{outcome=in_batch}</code> — the probability that a retweet&#39;s source is in the same batch depends on traffic patterns. On For You, the original and the retweet often show up together. If the in_batch ratio is low, the <code>fetched</code> path adds latency.</li>
+<li>Check the actual payload of the grox <code>AgeGatingHarmfulText</code> policy — confirm whether the body of the <code>age_gating_harmful_text_policy.j2</code> template is released in the next commit. The verdict criteria for each of the five subtypes are the substance of this policy axis.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-24.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-24</span></a><a class="pg-next" href="daily-2026-09-26.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-26</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-25.html" data-title="일일 리포트 2026-09-25"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

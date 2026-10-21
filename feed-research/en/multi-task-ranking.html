@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-task ranking — combining several engagement probabilities into one score — feed-research</title>
+<meta name="description" content="Multi-task ranking is a structure in which the ranker does not predict &quot;will this user like this item&quot; as a single scalar. It predicts a separate…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/multi-task-ranking.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/multi-task-ranking.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/multi-task-ranking.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/multi-task-ranking.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Multi-task ranking — combining several engagement probabilities into one score — feed-research">
+<meta property="og:description" content="Multi-task ranking is a structure in which the ranker does not predict &quot;will this user like this item&quot; as a single scalar. It predicts a separate…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/multi-task-ranking.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/multi-task-ranking.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Cross-service topics</p>
+<h1 id="multi-task-ranking--combining-several-engagement-probabilities-into-one-score">Multi-task ranking — combining several engagement probabilities into one score</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Translated from</span><a href="../multi-task-ranking.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">21</span></summary><ol><li><a href="#why-this-structure">Why this structure</a></li><li><a href="#case-meta--the-combination-form-differs-by-surface">Case: Meta</a><ol><li><a href="#how-to-read-this">How to read this</a></li><li><a href="#the-opposite-of-x--whether-negatives-are-multiplied">The opposite of X</a></li><li><a href="#where-the-weights-come-from--the-real-divergence-between-companies">Where the weights come from</a></li><li><a href="#head-counts-1922-vs-10--two-numbers-that-must-not-be-compared">Head counts 19–22 vs ~10</a></li></ol></li><li><a href="#case-x--6-design-decisions">Case: X</a><ol><li><a href="#1-weights-are-not-in-the-code">1. Weights are not in the code</a></li><li><a href="#2-whether-negative-heads-go-into-the-multiplication">2. Whether negative heads go into the multiplication</a></li><li><a href="#3-the-head-list-differs-by-generation-and-several-versions-coexist-even-within-one-repo">3. The head list differs by generation, and several versions coexist even within one repo</a></li><li><a href="#4-the-weight-injection-path-may-be-per-request">4. The weight injection path may be per request</a></li><li><a href="#5-an-ineligible-head-is-replaced-by-bias-not-0">5. An ineligible head is replaced by bias, not 0</a></li><li><a href="#6-scores-keep-changing-after-the-weighted-sum">6. Scores keep changing after the weighted sum</a></li></ol></li><li><a href="#case-netflix--leaves-the-head--weight-frame-itself">Case: Netflix</a></li><li><a href="#what-generalizes-from-this-case">What generalizes from this case</a></li><li><a href="#who-uses-this">Who uses this</a></li><li><a href="#sources">Sources</a><ol><li><a href="#public-source-code">Public source code</a></li><li><a href="#meta-engineering-blog-primary-source-for-the-combination-formulas">Meta engineering blog (primary source for the combination formulas)</a></li><li><a href="#meta-transparency-center-primary-documents-for-regulatory-compliance">Meta Transparency Center (primary documents for regulatory compliance)</a></li><li><a href="#netflix">Netflix</a></li></ol></li></ol></details></nav>
+<div class="prose">
+<p>Multi-task ranking is a structure in which the ranker does not predict &quot;will this user like this item&quot; as a single scalar. <strong>It predicts a separate probability for each kind of action, then combines them into one score</strong> and sorts by it. An output that produces one probability per action is called a head.</p>
+<pre tabindex="0"><code>score = Σ_k  w_k · P(action_k | user, item)
+</code></pre>
+<p><strong>However, this weighted sum is only one of several ways to combine them.</strong> Within the same company, Meta published a additive form, a multiplicative form, and a multiplicative penalty as formulas for different surfaces, each in a different post (<a href="#case-meta--the-combination-form-differs-by-surface">table in the Meta case</a>). &quot;Multi-task ranking = weighted sum&quot; is an assumption, not an observation.</p>
+<p>There are four design decisions that actually have to be made here.</p>
+<ul>
+<li>Which actions to use as heads</li>
+<li>Which form to combine them in</li>
+<li>How to mix in negative actions</li>
+<li>Where to get the weights w_k</li>
+</ul>
+<p class="warn">⚠ Every claim in these notes that is based on the Meta system card (a regulatory-response document in which the Transparency Center publishes the list of prediction heads per surface) comes from a snapshot read on 2026-08-09. The number of prediction heads is a typical example. The full caveats are collected in the &quot;system card citation shelf life&quot; section of <a href="facebook.html">../services/facebook.md</a>.</p>
+<h2 id="why-this-structure">Why this structure</h2>
+<p>Splitting heads per action and keeping separate weights lets you change the objective without a code deployment and also protects the training signal of sparse actions <span class="badge est">inferred</span>. The cost is that the weights become product policy directly.</p>
+<ul>
+<li>The objective can change without a code deployment. The model outputs only probabilities, and the product judgment (how many times more a retweet matters than a like) is separated into the weights <span class="badge est">inferred</span>. X separating all weights into runtime injection is consistent with this reading.</li>
+<li>Putting sparse actions (report, block) in separate heads keeps their training signal from vanishing. Merging them into one scalar lets common actions drown them out <span class="badge est">inferred</span>.</li>
+<li>There is also a cost. <strong>The weights become product policy directly, and even at X those values were not in the public source until the Gen3 release.</strong> The <a href="#case-x--6-design-decisions">X case</a> shows this problem best.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-meta--the-combination-form-differs-by-surface">Case: Meta — the combination form differs by surface</h2>
+<p>Meta published 4 combination forms within one company (counting the additive form with negative terms separately from the plain additive form). The combination form Facebook published is linear only, while Instagram published that it uses three different forms for different problems.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col><col class="grow"><col class="w6"></colgroup>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Form</th>
+<th>Formula (verbatim unless noted)</th>
+<th>Year</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Facebook Feed</td>
+<td>Additive</td>
+<td><code>Vijt = wijt1·Yijt1 + wijt2·Yijt2 + … + wijtk·Yijtk</code></td>
+<td><span class="nw">2021</span></td>
+</tr>
+<tr>
+<td>Instagram Suggested Posts</td>
+<td><strong>Multiplicative</strong></td>
+<td><code>Value(Post) = (probability_like)^weight_like * (1- probability_not_interested)^weight_see_less</code></td>
+<td><span class="nw">2020</span></td>
+</tr>
+<tr>
+<td>Instagram Explore</td>
+<td>Additive (with negative term)</td>
+<td><code>Expected Value = W_click * P(click) + W_like * P(like) – W_see_less * P(see less) + etc.</code></td>
+<td><span class="nw">2023</span></td>
+</tr>
+<tr>
+<td>Instagram Notifications</td>
+<td><strong>Multiplicative penalty</strong></td>
+<td><code>Score(c) = R(c) × D(c)</code>, <code>D(c) = ∏_{i=1..m} (1 - w_i · p_i(c))</code> ⚠ not verbatim (explained below the table)</td>
+<td><span class="nw">2025</span></td>
+</tr>
+</tbody></table></div>
+<p>The formula in the Notifications row is not verbatim. The original is a LaTeX image, and the two formulas in the table are a transcription of that image <span class="badge obs">observed</span> 2026-08-09. The multiplicative structure and the definitions of <code>R</code> and <code>D</code> are supported by the body prose <span class="badge ok">verified</span> — <a href="feed-diversity.html">feed-diversity.md</a>.</p>
+<ul>
+<li>The source of the Facebook Feed formula is the 2021 post <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/" target="_blank" rel="noopener">How machine learning powers Facebook&#39;s News Feed ranking algorithm</a>.</li>
+<li>The source of the Instagram Suggested Posts formula is the 2020 post <span class="badge ok">verified</span> — <a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a>.</li>
+<li>The source of the Instagram Explore formula is the 2023 post <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>.</li>
+<li>The source of the Instagram Notifications formula is the 2025 post <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a>.</li>
+</ul>
+<p>Context for each surface is in <a href="facebook.html">facebook.md</a> and <a href="instagram.html">instagram.md</a>. Only the form comparison is made here.</p>
+<h3 id="how-to-read-this">How to read this</h3>
+<p>Multiplicative and additive forms give negative signals different authority <span class="badge est">inferred</span>. However, the 2020 multiplicative form and the 2023 additive form are on different surfaces, and there is no source comparing before and after on the same surface <span class="badge est">inferred</span>.</p>
+<ul>
+<li>The weight <code>w</code> in the Facebook formula is indexed by <code>(i,j,t)</code>. This means the weights are personalized per post, user, and point in time <span class="badge ok">verified</span> 2021.<ul>
+<li>The original text says: <em>&quot;for each <strong>post i</strong>, we estimate Yijt&quot;</em>, <em>&quot;the characteristics of the post X_it toward <strong>viewer j</strong> at time t&quot;</em>. So <code>i</code> is the post and <code>j</code> is the viewer.</li>
+<li>However, since only the symbolic formula is available, we cannot confirm whether the actual implementation really depends on <code>i</code> (the post) <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><strong>Multiplicative and additive forms give negative signals different authority</strong> <span class="badge est">inferred</span>. This judgment follows directly from the form of the formula.<ul>
+<li>In the multiplicative form, if <code>P(not_interested) → 1</code> the value collapses to 0, so it is effectively a hard veto <span class="badge est">inferred</span>.</li>
+<li>In the additive form, no matter how large the negative term is, other terms can outweigh it, so it is an exchangeable cost <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>Taking the log of the multiplicative form also gives a linear expression <code>Σ w·log P</code> <span class="badge est">inferred</span>. That is, it is the same as Facebook&#39;s <code>Σ w·P</code> in being a &quot;linear combination&quot;, and <strong>the only difference is whether P or log P is used.</strong></li>
+<li class="warn">⚠ The 2020 multiplicative form and the 2023 additive form must not be read as a &quot;transition&quot;. The surfaces differ (Suggested Posts and Explore). There is no source comparing before and after on the same surface <span class="badge est">inferred</span>.</li>
+<li>The fourth, the Notifications formula, is a diversity penalty rather than a combination. Details are in <a href="feed-diversity.html">feed-diversity.md</a>.</li>
+</ul>
+<h3 id="the-opposite-of-x--whether-negatives-are-multiplied">The opposite of X — whether negatives are multiplied</h3>
+<p>On the question of whether to multiply negative probabilities into the score, the two companies went in opposite directions.</p>
+<ul>
+<li>Instagram 2020 multiplies in the negative probability to give a veto (<code>(1 - P_not_interested)^w</code>) <span class="badge ok">verified</span> 2020.</li>
+<li>X 2025 deliberately does not multiply. It only adds a constant penalty when a threshold is exceeded <span class="badge ok">verified</span> (<a href="#2-whether-negative-heads-go-into-the-multiplication">design decision 2</a>).</li>
+<li>X 2026 multiplies, but compresses a negative total score to a <code>0.001</code> scale so that it never mixes with positive candidates <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/config.rs" target="_blank" rel="noopener"><code>params/config.rs:40</code></a> (Gen4 <code>47c1bcd</code>).</li>
+</ul>
+<p>X spent two generations keeping negative heads from changing the ranking much, while Instagram instead uses the property that the score collapses to 0 in the multiplicative form as a feature <span class="badge est">inferred</span>. Neither the code nor the blog posts state why the two companies designed it this way.</p>
+<h3 id="where-the-weights-come-from--the-real-divergence-between-companies">Where the weights come from — the real divergence between companies</h3>
+<p>What each company has published about how it sets weights differs. Facebook published survey correlation, Instagram published offline replay/tuning and Bayesian optimization, and X did not publish a method <span class="badge ok">verified</span>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="w8"><col><col></colgroup>
+<thead>
+<tr>
+<th>Party</th>
+<th>Published method</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Facebook</td>
+<td>Set by the correlation of <strong>surveys</strong> with each event</td>
+<td><span class="badge ok">verified</span> <span class="nw">2021</span></td>
+</tr>
+<tr>
+<td>Instagram</td>
+<td><strong>Offline replay/offline tuning and Bayesian optimization</strong></td>
+<td><span class="badge ok">verified</span> <span class="nw">2020</span>, <span class="nw">2023</span></td>
+</tr>
+<tr>
+<td>X</td>
+<td><strong>Method undisclosed.</strong> The injection points (FeatureSwitch parameters / query features) and value ranges are in the code, and since Gen4 there is also a mirror of the defaults</td>
+<td><span class="badge ok">verified</span> We checked the entire public repos (<code>c54bec0</code>, xai-org/x-algorithm). Through Gen3 the values were not in the code, and <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>param.rs</code></a> in Gen4 (<code>47c1bcd</code>) mirrors the production defaults</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>The Instagram original text says the following <span class="badge ok">verified</span>.<ul>
+<li>2020 post: <em>&quot;offline replay over user sessions and b) online Bayesian optimization&quot;</em></li>
+<li>2023 post: <em>&quot;There are two popular approaches to parameters tuning: Bayesian optimization and offline tuning.&quot;</em></li>
+<li>The word &quot;replay&quot; appears 0 times in this 2023 Instagram post (full text checked 2026-08-09) <span class="badge ok">verified</span>.</li>
+</ul>
+</li>
+<li>The Facebook original text, the meaning of &quot;correlation&quot;, and why surveys do not suffer from the sparsity problem are covered in <a href="survey-signals.html">survey-signals.md</a>. They are not repeated here.</li>
+<li><strong>Meta, the same company, published different answers to the same problem.</strong> <span class="badge est">inferred</span> In practice it is likely that both are used and only the emphasis differs, but at the level of the published sentences they clearly diverge.</li>
+<li><strong>Through the Gen3 release, none of the three parties published numbers.</strong> Meta published the <em>method</em> and withheld the values, and X published the <em>injection points and ranges</em> and withheld the values. What they published differed, but the conclusion was the same.<ul>
+<li>Since the Gen4 release (2026-08-13), X publishes the default weights in the repo as a cron mirror <span class="badge ok">verified</span> — <a href="x.html#weights--values-were-released-with-the-gen4-release--mass-claim-change-2026-08-13">x.md weights section</a>.</li>
+</ul>
+</li>
+<li>Meta also has one source corresponding to X&#39;s <code>ModelWeights</code> list. The Transparency Center divides predictions into 3 tiers by how often they are used, publishing only an ordering instead of weights <span class="badge ok">verified</span> — <a href="https://transparency.meta.com/features/ranking-and-content/" target="_blank" rel="noopener">Our Approach to Facebook Feed Ranking</a> (updated 2025-06-11).<ul>
+<li>The three tiers are <em>Used most frequently</em> / <em>occasionally</em> / <em>less frequently</em>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="head-counts-1922-vs-10--two-numbers-that-must-not-be-compared">Head counts 19–22 vs ~10 — two numbers that must not be compared</h3>
+<p><strong>Do not write &quot;X has twice as many heads.&quot;</strong> The two numbers are different in nature. The X number is counted from source code, and the Meta number is from a public document, the system card <span class="badge ok">verified</span>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="grow"><col><col class="w10"></colgroup>
+<thead>
+<tr>
+<th>Source</th>
+<th>Head count</th>
+<th>Source type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>X Phoenix (Transformer ranking model) public checkpoint, Gen3</td>
+<td><strong>19</strong></td>
+<td>Source code</td>
+</tr>
+<tr>
+<td>X <span class="nw">2026</span> serving code, Gen3</td>
+<td><strong>22</strong></td>
+<td>Source code</td>
+</tr>
+<tr>
+<td>X <span class="nw">2026</span> VMRanker (DPP slate optimization) proto copy, Gen3</td>
+<td>21</td>
+<td>Source code</td>
+</tr>
+<tr>
+<td>X Gen4 README (<span class="nw">2026-08-13</span>)</td>
+<td><strong>24</strong></td>
+<td>Documentation</td>
+</tr>
+<tr>
+<td>X <span class="nw">2025</span> Navi / Phoenix</td>
+<td>15 / 13</td>
+<td>Source code</td>
+</tr>
+<tr>
+<td>Facebook Feed card</td>
+<td><strong>10</strong></td>
+<td>system card</td>
+</tr>
+<tr>
+<td>Facebook Feed Recommendations card</td>
+<td><strong>10</strong></td>
+<td>system card</td>
+</tr>
+<tr>
+<td>Threads Feed card</td>
+<td><strong>10</strong></td>
+<td>system card</td>
+</tr>
+<tr>
+<td>Each Instagram card</td>
+<td><strong>Total count not settled</strong></td>
+<td>system card</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>The X numbers are based on the files quoted in <a href="#3-the-head-list-differs-by-generation-and-several-versions-coexist-even-within-one-repo">design decision 3</a> <span class="badge ok">verified</span>.</li>
+<li>The Meta numbers are based on each system card <span class="badge ok">verified</span> — <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">fb-feed</a>, <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed-recommendations/" target="_blank" rel="noopener">fb-feed-recommendations</a>, <a href="https://transparency.meta.com/features/explaining-ranking/ig-threads-feed/" target="_blank" rel="noopener">ig-threads-feed</a> (2023 onward, regulatory-response document).</li>
+</ul>
+<p>There are reasons on both sides why the head count cannot be fixed to one value.</p>
+<ul>
+<li>A system card is a public communication product, not a model dump. For Facebook, <strong>there are heads in the same Transparency Center text that are not on the card</strong> <span class="badge ok">verified</span> — <a href="facebook.html">facebook.md</a>.<ul>
+<li>The Facebook Feed card lists 10 kinds. The same Transparency Center text separately states that hide/snooze/unsubscribe, report, and angry reaction predictions are used to lower distribution <span class="badge ok">verified</span> (same note).</li>
+</ul>
+</li>
+<li>For Instagram, there are 4 surfaces (Feed, Stories, Reels Chaining, Suggested Accounts) where the list extracted from the card does not match the count written on the card, so the total count could not be settled <span class="badge ok">verified</span> — <a href="instagram.html">instagram.md</a>.</li>
+<li>It cannot be determined whether the Threads card lists all heads or only the &quot;significant predictions&quot; <span class="badge est">inferred</span> — <a href="threads.html">threads.md</a>.</li>
+<li>The X numbers are also not fixed to one value. Within the Gen3 repo they are 19/21/22, and in earlier generations 13/15/17 appear.</li>
+</ul>
+<p>The conclusion is the same on both sides. <strong>A single &quot;head count&quot; value does not exist.</strong> You must always state which file and which card you looked at.</p>
+<p>Whether negative heads exist also differs within Meta.</p>
+<ul>
+<li>Instagram published it explicitly as a term in the formula (<code>– W_see_less·P(see less)</code>) <span class="badge obs">observed</span> 2026-08-09.</li>
+<li>Facebook stated it only in body text <span class="badge obs">observed</span> 2026-08-09.</li>
+<li>The Threads card has no negative prediction head at all <span class="badge obs">observed</span> 2026-08-09 (1 ig-threads-feed card body).</li>
+</ul>
+<p>X 2026 has 5 negative heads (not_interested/block/mute/report/not_dwelled) <span class="badge ok">verified</span>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-x--6-design-decisions">Case: X — 6 design decisions</h2>
+<p>In X&#39;s public code, the head list and the way negative heads are mixed in differ by generation <span class="badge ok">verified</span> (<a href="#2-whether-negative-heads-go-into-the-multiplication">design decision 2</a>, <a href="#3-the-head-list-differs-by-generation-and-several-versions-coexist-even-within-one-repo">design decision 3</a>). In 2026 Rust, even after the weighted sum, the author-diversity decay and the OON (out-of-network, candidates from accounts the user does not follow) multiplier change the score, and VMRanker can overwrite that score <span class="badge ok">verified</span> (<a href="#6-scores-keep-changing-after-the-weighted-sum">design decision 6</a>). The 2026 Rust descriptions and line numbers in this section are as of the Gen3 release (2026-05-15), and the 24 heads in the Gen4 README and the deletion of the ranking scorer in the 2026-09-24 commit (Gen4+28) are in the <a href="x.html#ranking">x.md ranking section</a> <span class="badge ok">verified</span>.</p>
+<h3 id="1-weights-are-not-in-the-code">1. Weights are not in the code</h3>
+<p>X separated the weights into FeatureSwitch (runtime configuration) in all three generations <span class="badge ok">verified</span>. What is in the repo for 2025 Scala and through Gen3 are default values, and the production values were outside the repo <span class="badge ok">verified</span>. Since the Gen4 release (2026-08-13), the repo has a cron mirror that carries over the production defaults <span class="badge ok">verified</span> (<a href="x.html#weights--values-were-released-with-the-gen4-release--mass-claim-change-2026-08-13">x.md weights section</a>).</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Generation</th>
+<th>Parameter count</th>
+<th>Range</th>
+<th>Default in repo</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span class="nw">2023</span> Scala</td>
+<td>17</td>
+<td>Varies: 9 are 0..100, 4 negative ones are negative-only (including Report <strong>−20000..0</strong>), GoodClick-type cap 1,000,000</td>
+<td>10 are <code>1.0</code>, 7 are <code>0.0</code></td>
+</tr>
+<tr>
+<td><span class="nw">2025</span> Scala</td>
+<td>30</td>
+<td>Same structure as <span class="nw">2023</span> (Report −20000..0 identical)</td>
+<td><strong>All <code>0.0</code></strong></td>
+</tr>
+<tr>
+<td><span class="nw">2026</span> Rust (Gen3 <code>0bfc279</code>)</td>
+<td>22</td>
+<td>Undisclosed (no <code>params</code> module at all)</td>
+<td>Undisclosed</td>
+</tr>
+<tr>
+<td><span class="nw">2026</span> Rust (Gen4 <code>47c1bcd</code>)</td>
+<td>26 (25 heads, 1 new-author boost)</td>
+<td>No range given</td>
+<td>Mirror of production defaults (e.g. favorite 0.5, reply 5.0, report −234.0)</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>The evidence for the 2023 row is <code>ScoredTweetsParam.scala:151</code> (2023) <span class="badge ok">verified</span>.</li>
+<li>The evidence for the 2025 row is <code>home-mixer/.../param/HomeGlobalParams.scala:788-978</code> (2025) <span class="badge ok">verified</span>.</li>
+<li>The evidence for the 2026 Gen3 row is <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs:43-66</code></a> <span class="badge ok">verified</span>.</li>
+<li>The evidence for the 2026 Gen4 row is <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> <span class="badge ok">verified</span>.</li>
+</ul>
+<p class="warn">⚠ An earlier version described 2023 as &quot;0.0–100.0, negatives not expressible&quot;, but checking against the original text showed this was an error. 4 negative-only ranges have existed since 2023 <code>ef4c5eb</code>. It was corrected on 2026-08-09 (weights section of <a href="x.html">x.md</a>).</p>
+<p>In 2025, the defaults being all <code>0.0</code> does <strong>not</strong> mean &quot;the like weight is 0.&quot; It means &quot;the weights are all injected at runtime and are not in the repo.&quot; Misreading this leads to the opposite conclusion.</p>
+<p>There are cases where the range itself states a policy. The parameter set for negative signals is locked to negative-only values <span class="badge ok">verified</span>. An operator cannot enter a positive value even by mistake.</p>
+<ul>
+<li><code>ReportParam</code> has min <code>-20000.0</code> / max <code>0.0</code>.</li>
+<li><code>WeakNegativeFeedbackParam</code> and <code>StrongNegativeFeedbackParam</code> have min <code>-1000.0</code> / max <code>0.0</code>.</li>
+<li>These bounds have been the same since 2023 and were not introduced in 2025 <span class="badge ok">verified</span>. We compared <code>HomeGlobalParams.scala:924-946</code> with 2023 <code>72eda9a</code>.</li>
+</ul>
+<p>The widely cited X weight table (fav 0.5, retweet 1.0, reply 13.5, report −369.0 …) has <strong>a single source, the ML repo README as of 2023-04-05, and it has never appeared in any of the 31 commits of the serving repo.</strong> The source and reliability are covered in the &quot;Weights — what was released and what was not&quot; section of <a href="x.html">x.md</a>.</p>
+<h3 id="2-whether-negative-heads-go-into-the-multiplication">2. Whether negative heads go into the multiplication</h3>
+<p>Whether to put negative heads into the multiplication is where the generations diverge most. X 2025 does not multiply and only adds a constant penalty when a threshold is exceeded <span class="badge ok">verified</span>. 2026 Rust changed the approach and multiplies negative heads in as they are. Instead, if the total score becomes negative, it compresses that whole score <span class="badge ok">verified</span>.</p>
+<p>The X 2025 aggregation code multiplies positive weights into the score and adds them, and for negative weights it adds only the weight value when a threshold is exceeded <span class="badge ok">verified</span> — <code>home-mixer/.../util/RerankerUtil.scala:106-121</code>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">// positive weight
+combinedScore + score * weight
+
+// negative weight — only a constant penalty once the threshold is exceeded
+normScore = if (maxHeadScore == 0.0) 0.0 else score / maxHeadScore
+if (normScore &gt; thresholdNormalized || score &gt; thresholdConstant)
+  combinedScore + weight     // does not multiply score
+else combinedScore
+</code></pre></figure>
+<p>The reason for not multiplying is not written in the code, so we leave it as an inference. Negative heads have small probabilities and large noise, so multiplying them in makes the score swing widely <span class="badge est">inferred</span>. Looking only at whether the threshold was exceeded makes it a step function, which is stable <span class="badge est">inferred</span>.</p>
+<p>It matters that the normalization reference is a batch-relative value within the request. Even for the same post, whether the negative penalty fires changes if the composition of the candidates scored together changes <span class="badge ok">verified</span> — <code>RerankerUtil.scala:43-65</code>.</p>
+<ul>
+<li>The normalization formula is <code>score / maxHeadScore</code>, and the denominator is the per-head maximum over all candidates in that request.</li>
+</ul>
+<p>There are also signs of a transition. When <code>EnableNegSectionRankingParam</code> is turned on, the formula changes to <code>combinedScore + weight * (1.0 min (score + 0.1))</code>. Just above it is a comment telling people to ship and clean this up as soon as possible (<code>&quot;This should be shipped and cleaned as soon as possible&quot;</code>) <span class="badge ok">verified</span> — <code>RerankerUtil.scala:115-118</code>.</p>
+<p><strong>Note that in the repo default state, negative heads produce no deduction at all.</strong> All 4 related booleans are <code>false</code> <span class="badge ok">verified</span> — <code>HomeGlobalParams.scala:545-573</code>.</p>
+<ul>
+<li>The four booleans are <code>NormalizedNegativeHead</code>, <code>ConstantNegativeHead</code>, <code>UseWeightForNegHeadParam</code>, and <code>EnableNegSectionRankingParam</code>.</li>
+</ul>
+<p>The function that compresses a negative total score in 2026 Rust is below <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs:175-183</code></a> (Gen3 <code>0bfc279</code>).</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn offset_score(combined_score: f64, w: &amp;ScoringWeights) -&gt; f64 {
+    if w.total_sum == 0.0 { combined_score.max(0.0) }
+    else if combined_score &lt; 0.0 {
+        (combined_score + w.negative_sum) / w.total_sum * NEGATIVE_SCORES_OFFSET
+    } else { combined_score + NEGATIVE_SCORES_OFFSET }
+}
+</code></pre></figure>
+<p><strong>This function is a direct port of the 2025 Scala function.</strong> The three-way branch corresponds line by line, in the same order <span class="badge ok">verified</span> — <code>RerankerUtil.scala:130-135</code>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">if (modelWeightsSum == 0) combinedScoreSum.max(0.0)
+else if (combinedScoreSum &lt; 0)
+  (combinedScoreSum + negativeModelWeightsSum) / modelWeightsSum * Epsilon
+else combinedScoreSum + Epsilon
+</code></pre></figure>
+<p>The variables correspond as follows.</p>
+<ul>
+<li><code>modelWeightsSum</code> ↔ <code>w.total_sum</code></li>
+<li><code>negativeModelWeightsSum</code> ↔ <code>w.negative_sum</code></li>
+<li><code>Epsilon</code> ↔ <code>NEGATIVE_SCORES_OFFSET</code></li>
+</ul>
+<p>The constant values are also the same in the two generations. The corresponding 2025 constant is <code>val Epsilon = 0.001</code> (<code>RerankerUtil.scala:16</code>), and <code>NEGATIVE_SCORES_OFFSET</code>, which was not public in Gen3, is confirmed as 0.001 in the Gen4 (<code>47c1bcd</code>) release <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/config.rs" target="_blank" rel="noopener"><code>params/config.rs:40</code></a>. The two repos are known to have &quot;0 code duplication&quot;, but the score aggregation formula was ported <span class="badge ok">verified</span>.</p>
+<p>In this formula, a negative total score is squashed to a <code>0.001</code> scale. Since the minimum of a positive candidate is <code>0 + 0.001 = 0.001</code>, <strong>a negative candidate always ends up below every positive candidate.</strong> The design preserves order while keeping the two groups from mixing.</p>
+<p>The same formula also remains in the file <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/weighted_scorer.rs" target="_blank" rel="noopener"><code>weighted_scorer.rs:87-89</code></a>, which is no longer used. This file reads <code>p::NEGATIVE_WEIGHTS_SUM</code> / <code>p::WEIGHTS_SUM</code> as constants. In other words, it is likely the form from the generation before the structure changed to compute the weight sum per request <span class="badge est">inferred</span>.</p>
+<h3 id="3-the-head-list-differs-by-generation-and-several-versions-coexist-even-within-one-repo">3. The head list differs by generation, and several versions coexist even within one repo</h3>
+<p>X&#39;s head list differs by generation and also by file within the same repo. In the Gen3 repo (2026-05-15), the head counts of the serving code, the public checkpoint, and the proto sent to VMRanker are all different: 22, 19, and 21 <span class="badge ok">verified</span>. In the 2025 repo, two kinds of rankers each have their own head set <span class="badge ok">verified</span>.</p>
+<p>The 2026 Gen3 Rust ranker reads <strong>22</strong> heads <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs:12-39,146-170</code></a>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Heads</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Engagement</td>
+<td>favorite, reply, retweet, quote, share, share_via_dm, share_via_copy_link</td>
+</tr>
+<tr>
+<td>Click and dwell</td>
+<td>click, profile_click, photo_expand, quoted_click, dwell</td>
+</tr>
+<tr>
+<td>Video</td>
+<td>vqv (video quality view), quoted_vqv</td>
+</tr>
+<tr>
+<td>Continuous values</td>
+<td>cont_dwell_time, cont_click_dwell_time</td>
+</tr>
+<tr>
+<td>Follow</td>
+<td>follow_author</td>
+</tr>
+<tr>
+<td>Negative</td>
+<td>not_interested, block_author, mute_author, report, not_dwelled</td>
+</tr>
+</tbody></table></div>
+<p>The <code>ACTIONS</code> of the public Phoenix checkpoint has <strong>19</strong> entries, missing <code>quoted_vqv</code>, <code>not_dwelled</code>, and <code>click_dwell_time</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/phoenix/runners.py" target="_blank" rel="noopener"><code>phoenix/runners.py:233-253</code></a>.</p>
+<p>That is, <strong>the head counts of the public model (19) and the production serving code (22) do not match.</strong> The public checkpoint appears to be an older version or to exclude some heads <span class="badge est">inferred</span>. The fields that <code>vm_ranker.rs</code> copies into the proto number 21, missing <code>quoted_vqv_score</code>, so all three places differ <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>vm_ranker.rs:69-93</code></a>.</p>
+<p>This 19/22/21 mismatch is a fact through Gen3. The Gen4 README lists 24 heads <span class="badge ok">verified</span> (<a href="x.html#phoenix-2026-current--gen4-release-update">x.md Phoenix section</a>).</p>
+<p>In 2025 Scala, <strong>two kinds of rankers each have their own head set.</strong></p>
+<ul>
+<li>Navi (the production heavy ranker) uses 15 <span class="badge ok">verified</span> — <code>home-mixer/.../model/PredictedScoreFeature.scala:294-311</code>.<ul>
+<li>Heads: fav, reply, retweet, reply_engaged_by_author, click_engaged, click_dwell, good_profile_click, vqv, vqv_immersive, bookmark, share, dwell, video_quality_watched, video_watch_time_ms, negative_feedback_v2</li>
+</ul>
+</li>
+<li>Phoenix (the Transformer rescorer) uses 13. <strong>Its weights share the same <code>ModelWeights</code> as Navi, and there is no separate set</strong> <span class="badge ok">verified</span> — <code>PhoenixPredictedScoreFeature.scala:174-189</code>.<ul>
+<li>Its heads are the Navi list with a few removed and <code>open_link</code> and <code>screenshot</code> added.</li>
+</ul>
+</li>
+</ul>
+<p>Navi has <strong>only one</strong> negative head, <code>negative_feedback_v2</code>. The split into 5 in 2026 (not_interested/block/mute/report/not_dwelled) is a change between generations <span class="badge ok">verified</span>.</p>
+<p>The 2025 repo has <strong>two files with the same name</strong>, <code>PredictedScoreFeature</code>, and their head sets differ. The one the actual scorer imports is the <code>model/</code> one, and writing &quot;X uses a report head&quot; based on the <code>scorer/</code> one would be wrong <span class="badge ok">verified</span> — the import path at <code>RerankerUtil.scala:4</code>.</p>
+<ul>
+<li>The <code>model/</code> one is a 15-element <code>Seq</code> and is actually used.</li>
+<li>The <code>product/scored_tweets/scorer/</code> one is a 17-element <code>Set</code> and includes Report, StrongNegativeFeedback, VideoPlayback50, and others.</li>
+</ul>
+<h3 id="4-the-weight-injection-path-may-be-per-request">4. The weight injection path may be per request</h3>
+<p>2025 Navi reads weights from a query feature (a feature attached per request), not from a param.</p>
+<p>The code that reads the weights is the single line below <span class="badge ok">verified</span> — <code>RerankerUtil.scala:28-29</code>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">weight = query.features.get(feature.weightQueryFeature).getOrElse(0.0)
+</code></pre></figure>
+<p>Each head has 3 such query feature names <span class="badge ok">verified</span> — <code>PredictedScoreFeature.scala:43-56</code>.</p>
+<ul>
+<li>The three names are <code>weightQueryFeatureName</code>, <code>biasQueryFeatureName</code>, and <code>debiasQueryFeatureName</code>.</li>
+</ul>
+<p><strong>That is, the objective function can differ per request.</strong> It appears to be a structure that injects different weights per user segment and per experiment, but the upstream service that fills in the values is not in the repo <span class="badge est">inferred</span>.</p>
+<p>The Phoenix side of the same repo reads directly from a param (<code>query.params(feature.modelWeightParam)</code>). The two rankers use different injection paths <span class="badge ok">verified</span> — <code>PhoenixModelRerankingScorer.scala:51</code>.</p>
+<h3 id="5-an-ineligible-head-is-replaced-by-bias-not-0">5. An ineligible head is replaced by bias, not 0</h3>
+<p>X 2025 puts a bias value, not 0, in the slot of a head that cannot be used. The vqv head of a post without video is such a case.</p>
+<p>The eligibility check code is the single line below <span class="badge ok">verified</span> — <code>RerankerUtil.scala:34-37</code>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">score = if (isEligible) predictedScoreOpt.getOrElse(0.0) else bias
+</code></pre></figure>
+<p>Putting in 0 appears to be avoided because it would structurally disadvantage posts without video <span class="badge est">inferred</span>.</p>
+<p>The eligibility conditions are also hand-set values <span class="badge ok">verified</span> — <code>PredictedScoreFeature.scala:154-164,220-232,273-279</code>.</p>
+<ul>
+<li>The video head carries a <code>duration &gt;= 10 seconds</code> condition.</li>
+<li>Turning on <code>EnableDwellOrVQVParam</code> makes Dwell and VQV mutually exclusive.</li>
+</ul>
+<p>There is also threshold clipping. A VQV score below <code>ScoreThresholdForVQVParam</code> is clipped to <code>0.0</code>, and turning on the binary scheme replaces it with a constant <span class="badge ok">verified</span> — <code>:176-188</code>.</p>
+<h3 id="6-scores-keep-changing-after-the-weighted-sum">6. Scores keep changing after the weighted sum</h3>
+<p>The weighted sum is not the end. As of the Gen3 release (2026-05-15), in 2026 Rust an offset, normalization, author-diversity decay, and an OON multiplier are applied in turn after the weighted sum, and then VMRanker can overwrite all scores <span class="badge ok">verified</span>.</p>
+<ol>
+<li>After computing the per-head weighted sum, apply <code>offset_score</code> (<a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs:146-183</code></a>).</li>
+<li>Apply <code>normalize_score(candidate, raw)</code>. In Gen3 the <strong>function body was not public</strong> (the <code>crate::util</code> module was missing). The ranking scorer in Gen4 (<code>47c1bcd</code>) does not call this function, and <code>home-mixer/util/</code> is public <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs</code></a>.</li>
+<li>Author-diversity decay: multiply the nth post of the same author by <code>(1 - floor) · decay^n + floor</code> (<code>:186-217</code>).</li>
+<li>OON multiplier: multiply only candidates that are not in-network by <code>effective_oon</code> (<code>:220-239, 272-275</code>).</li>
+<li>Then <code>VMRanker</code>, which optimizes the slate with a DPP (determinantal point process), <strong>can overwrite all scores</strong> (<code>vm_ranker.rs:47-52</code>).</li>
+</ol>
+<p>We confirmed this order in <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs:248-284</code></a> and <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:300</code></a> of Gen3 <code>0bfc279</code> <span class="badge ok">verified</span>.</p>
+<p>2025 Scala has a stage of the same nature, but its approach is <strong>additive</strong>. MMR (maximal marginal relevance) re-ranking adds the minimum distance to already selected candidates, weighted, to the relevance score, and <strong>overwrites</strong> <code>ScoreFeature</code> with that value <span class="badge ok">verified</span> — <code>DiversityRescoringFeatureHydrator.scala:70,102</code>.</p>
+<ul>
+<li>The formula is <code>score = relevance + diversityWeight · minDistance</code>, and <code>DiversityRescoringFeatureHydrator</code> performs this computation.</li>
+</ul>
+<p>The diversity layer is covered in detail in <a href="feed-diversity.html">feed-diversity.md</a>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-netflix--leaves-the-head--weight-frame-itself">Case: Netflix — leaves the head × weight frame itself</h2>
+<p>Netflix does not fit the X/Meta-style frame of multiplying per-head probabilities by weights and summing. <strong>Its published objective is a reward function, not a weighted sum.</strong> The X/Meta frame written as a formula is <code>Σ w·P(action)</code>.</p>
+<ul>
+<li>It uses a contextual bandit frame. The recommendation is the action, and the user response is the reward <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/recommending-for-long-term-member-satisfaction-at-netflix-ac15cada49ef" target="_blank" rel="noopener">Recommending for Long-Term Member Satisfaction at Netflix</a>, 2024.</li>
+<li>The north star (final goal metric) is retention, but it is not optimized directly. It is a sparse, noisy signal at the level of <em>&quot;1 time per account per month&quot;</em>, so it cannot be attributed to individual recommendations <span class="badge ok">verified</span> (same post).</li>
+<li>The published proxy reward has the form <code>r(user, item) = f(play, complete, thumb)</code>. It is a <strong>function of observed actions</strong>, not a weighted sum of per-action probability predictions. The decomposition into a prediction head list and a weight vector does not appear at all <span class="badge ok">verified</span> (same post).</li>
+<li>It supplements delayed feedback with prediction. A Delayed Feedback Prediction Model predicts <code>p(final feedback | observed feedback)</code> and feeds it into the reward <span class="badge ok">verified</span> (same post).<ul>
+<li>Thumbs can arrive several days after a view, which conflicts with real-time training, and this model addresses that problem head-on <span class="badge ok">verified</span> (same post).</li>
+<li>The X and Meta literature has no corresponding mechanism.</li>
+</ul>
+</li>
+<li>It states the problem of CTR over-optimization explicitly: <em>&quot;CTR over-optimization encourages clickbait&quot;</em> <span class="badge ok">verified</span> (same post).</li>
+<li>It approaches the problem as a reward engineering loop, not weight tuning <span class="badge ok">verified</span> (same post). Viewed as a &quot;method&quot; of setting weights, it is the third answer after Facebook (survey correlation) and Instagram (Bayesian opt).<ul>
+<li>The loop&#39;s order is hypothesis → reward revision → bandit policy training → A/B <span class="badge ok">verified</span> (same post).</li>
+</ul>
+</li>
+</ul>
+<p><strong>However, a different frame does not mean there are no heads.</strong> FM (Netflix&#39;s personalization recommendation foundation model) has multi-token and multiple prediction heads <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" rel="noopener">FM blog 2025</a>. It also uses a weighted objective (<em>&quot;a 5-minute trailer and a 2-hour finish cannot be the same&quot;</em>) <span class="badge ok">verified</span> (same post). The difference is that <strong>the weighting lives inside the training objective, and a serving-time <code>Σ w·P</code> combination layer is absent from the public literature</strong>. In GenRec (2026), an LLM trained with a reward-weighted loss ranks directly <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec blog</a>. The combination is absorbed into the model parameters.</p>
+<p>The <strong>% Match shown on screen is for display, not a ranking score</strong>. This value is computed <em>&quot;from viewing habits and behavior analysis alone&quot;</em> <span class="badge ok">verified</span> — <a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs" target="_blank" rel="noopener">2017 talk</a>. It is a case that explicitly shows a system where the number shown to users differs from the number used for sorting (<a href="netflix.html">netflix.md</a>).</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-generalizes-from-this-case">What generalizes from this case</h2>
+<p>Putting several services side by side, the combination form differs by surface, the number of heads by source, and the way negative signals are handled by company.</p>
+<ul>
+<li><strong>&quot;Weighted sum&quot; is an assumption, not an observation.</strong> Meta alone has published 4 kinds by surface: addition, multiplication, addition with negative terms, and a multiplicative penalty. When looking at a new service, do not start by taking <code>Σ w·P</code> as the default assumption.</li>
+<li><strong>Even when &quot;what the model predicts&quot; is published, &quot;what it treats as important&quot; is not.</strong> Only the items disclosed differ; what is hidden is the same.<ul>
+<li>X has the head list in code and the weights in configuration. Through Gen3 those values were not in the repo, and since the Gen4 release the defaults are mirrored in the repo <span class="badge ok">verified</span>.</li>
+<li>Meta has the head list on the card, the <em>method</em> of setting weights in blog posts, and the values nowhere.</li>
+</ul>
+</li>
+<li><strong>The direction in which negative signals are handled is opposite across companies.</strong> X avoids multiplication (2025 constant penalty, 2026 negative total score compression), while Instagram 2020 multiplies to give a veto. Opposite designs for the same problem are both in production.</li>
+<li><strong>The number of heads depends on the kind of source.</strong> Source code disagrees by file, and system cards by document. To compare numbers, first ask whether the two numbers are of the same kind.<ul>
+<li>X differs by file (19/21/22/15/13/17).</li>
+<li>Meta differs by document (10 on the card and negative predictions only in the body text).</li>
+</ul>
+</li>
+<li><strong>The weighted-sum score is not the final ranking.</strong> Diversity, OON, and slate optimization follow.<ul>
+<li>In fact, X 2026 stores both <code>weighted_score</code> and <code>score</code> as separate fields <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs:277-281</code></a> (Gen3 <code>0bfc279</code>).</li>
+<li>Meta also has a separate context pass 2 after the pointwise (scoring each candidate separately) pass 1 <span class="badge ok">verified</span> 2021.</li>
+</ul>
+</li>
+<li><strong>The <code>Σ w·P</code> frame may be a practice of ads-style surfaces, not universal.</strong> Netflix solves the same problem (unifying multiple behavior signals) with a reward function and bandits. When the business model is subscription (retention), the objective also leans toward a long-term satisfaction proxy rather than maximizing session engagement. The choice of frame may be a function of the revenue model, not of technology <span class="badge est">inferred</span>.</li>
+<li><strong>The reason the north star is not optimized directly is signal density.</strong> True goals such as retention that arrives 1 time a month or sparse surveys are pushed to the proxy reward and weight-decision layers, and the ranker handles dense behavior signals.<ul>
+<li>Facebook&#39;s survey correlation and Netflix&#39;s reward engineering are two implementations of the same structure.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="who-uses-this">Who uses this</h2>
+<p>X, Facebook, and Instagram use this structure <span class="badge ok">verified</span>. Threads published 10 heads but has no information on the combination method or weights, and Netflix uses a reward function and bandits instead of a weighted sum <span class="badge ok">verified</span>.</p>
+<ul>
+<li><strong>X</strong>: All three generations, 2023, 2025, and 2026, use this structure. The number of heads differs by generation and file (Gen3 19–22, Gen4 README 24, <a href="#3-the-head-list-differs-by-generation-and-several-versions-coexist-even-within-one-repo">Design decision 3</a>). Weights are injected through FeatureSwitch and query feature <span class="badge ok">verified</span> — <a href="x.html">x.md</a>.</li>
+<li><strong>Facebook</strong>: It uses the additive form <code>Vijt = Σ wijtk·Yijtk</code>. Pass 1 is a pointwise multi-task neural network, and weights are set by survey correlation. The Feed card has 10 heads, and there are more negative predictions only in the body text <span class="badge ok">verified</span> — <a href="facebook.html">facebook.md</a>.</li>
+<li><strong>Instagram</strong>: It has 3 combination forms (2020 multiplicative, 2023 additive with negative terms, 2025 multiplicative penalty). Weights are set by offline replay/offline tuning and Bayesian optimization. It has a <strong>separate MTML model per surface × component</strong> (<code>ig_stories_tray_mtml</code>, more than 1,000 in production) <span class="badge ok">verified</span> — <a href="instagram.html">instagram.md</a>.</li>
+<li><strong>Threads</strong>: It published 10 heads, but <strong>has 0 information on the combination method and weights, and 0 negative heads.</strong> This is the clearest evidence that the disclosure level differs by surface even within the same company <span class="badge ok">verified</span> — <a href="threads.html">threads.md</a>.</li>
+<li><strong>Netflix</strong>: Not of the <code>Σ w·P</code> form. It combines a proxy reward <code>r=f(play, complete, thumb)</code> and delayed feedback prediction in a bandit. The north star is retention <span class="badge ok">verified</span> — <a href="netflix.html">netflix.md</a>.</li>
+<li><strong>Other services</strong>: Not yet investigated. YouTube&#39;s multi-gate MoE (mixture-of-experts, 2019 RecSys) and the Pinterest family are likely in the same category, but this repository has not yet confirmed them with a primary source. <strong>This is an open question.</strong></li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<h3 id="public-source-code">Public source code</h3>
+<ul>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, public source code (Apache 2.0). <code>home-mixer/scorers/</code>, <code>phoenix/</code>. The reference commit for the 2026 Rust line number quotes in the body is <code>0bfc279</code> (Gen3), and Gen4 values were read at <code>47c1bcd</code>.</li>
+<li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — commit <code>c54bec0</code> of 2025-09-03, public source code. <code>home-mixer/</code>.</li>
+<li><a href="https://github.com/twitter/the-algorithm-ml" target="_blank" rel="noopener">twitter/the-algorithm-ml</a> — 2023-04-05 <code>projects/home/recap/README.md</code>. The primary source of the fav 0.5/retweet 1.0/reply 13.5/report −369 table.</li>
+</ul>
+<h3 id="meta-engineering-blog-primary-source-for-the-combination-formulas">Meta engineering blog (primary source for the combination formulas)</h3>
+<ul>
+<li><a href="https://engineering.fb.com/2021/01/26/ml-applications/news-feed-ranking/" target="_blank" rel="noopener">How machine learning powers Facebook&#39;s News Feed ranking algorithm</a> — 2021, blog post. Describes <code>Vijt = Σ w·Y</code> and the 3-pass structure.</li>
+<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> — 2020, blog post. Covers the multiplicative value model and Bayesian optimization. ⚠ Same post as <a href="https://engineering.fb.com/2020/12/10/web/how-instagram-suggests-new-content/" target="_blank" rel="noopener">How Instagram suggests new content</a>, with only the title different.</li>
+<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023, blog post. Covers the additive form with negative terms, Bayesian optimization, and offline tuning.</li>
+<li><a href="https://engineering.fb.com/2025/09/02/ml-applications/a-new-ranking-framework-for-better-notification-quality-on-instagram/" target="_blank" rel="noopener">A New Ranking Framework for Better Notification Quality on Instagram</a> — 2025, blog post. Covers the <code>Score = R×D</code> multiplicative penalty.</li>
+<li><a href="https://engineering.fb.com/2025/05/21/production-engineering/journey-to-1000-models-scaling-instagrams-recommendation-system/" target="_blank" rel="noopener">Journey to 1000 models: Scaling Instagram&#39;s recommendation system</a> — 2025, blog post. The <code>ig_stories_tray_mtml</code> naming convention appears.</li>
+</ul>
+<h3 id="meta-transparency-center-primary-documents-for-regulatory-compliance">Meta Transparency Center (primary documents for regulatory compliance)</h3>
+<ul>
+<li><a href="https://transparency.meta.com/features/ranking-and-content/" target="_blank" rel="noopener">Our Approach to Facebook Feed Ranking</a> — updated 2025-06-11. Describes 3 tiers of <strong>how often predictions are used</strong>.</li>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">fb-feed</a> · <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed-recommendations/" target="_blank" rel="noopener">fb-feed-recommendations</a> · <a href="https://transparency.meta.com/features/explaining-ranking/ig-threads-feed/" target="_blank" rel="noopener">ig-threads-feed</a> — AI system card, per-surface prediction head lists.</li>
+</ul>
+<h3 id="netflix">Netflix</h3>
+<ul>
+<li><a href="https://netflixtechblog.com/recommending-for-long-term-member-satisfaction-at-netflix-ac15cada49ef" target="_blank" rel="noopener">Recommending for Long-Term Member Satisfaction at Netflix</a> — 2024, blog post. <strong>The primary source for the reward function frame.</strong></li>
+<li><a href="https://netflixtechblog.com/foundation-model-for-personalized-recommendation-1a0bd8e02d39" target="_blank" rel="noopener">Foundation Model for Personalized Recommendation</a> — 2025, blog post. Covers multiple heads and a weighted objective.</li>
+<li><a href="https://netflixtechblog.com/genrec-towards-llm-native-recommendation-at-netflix-f20be6f643e3" target="_blank" rel="noopener">GenRec</a> — 2026, blog post. Covers reward-weighted loss.</li>
+<li><a href="https://about.netflix.com/en/news/goodbye-stars-hello-thumbs" target="_blank" rel="noopener">Goodbye Stars, Hello Thumbs</a> — 2017, talk. % Match is for display.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/multi-task-ranking.html" data-title="멀티태스크 랭킹 — 참여 확률 여러 개를 하나의 점수로"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-04 — feed-research</title>
+<meta name="description" content="In one line: X's feed server started requesting backbone scores from the ranking model Phoenix for all five feeds. For the first time, code shows that…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-04.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-04.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-04.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-04.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-04 — feed-research">
+<meta property="og:description" content="In one line: X's feed server started requesting backbone scores from the ranking model Phoenix for all five feeds. For the first time, code shows that…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-04.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-04.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-04">2026-09-04</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>34 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-04.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X&#39;s feed server started requesting backbone scores from the ranking model Phoenix for all five feeds. For the first time, code shows that Phoenix has a two-layer structure of a shared backbone and re-ranking heads.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">9</span></summary><ol><li><a href="#1-phoenix-rankers-backbone-and-re-ranking-head-layers-first-appear-in-code--x"><span class="num">1</span>Phoenix ranker&#39;s backbone and re-ranking head layers first appear in code — X</a></li><li><a href="#2-scarecrow-formerly-botmaker-gained-a-path-to-file-automatic-reports-with-xreview--x"><span class="num">2</span>scarecrow (formerly Botmaker) gained a path to file automatic reports with XReview — X</a></li><li><a href="#3-visibility-rule-policies-move-from-heap-assembly-to-static-tables--x"><span class="num">3</span>Visibility rule policies move from heap assembly to static tables — X</a></li><li><a href="#4-training-checkpoints-can-be-decrypted-with-a-key-from-the-file-header-without-a-sidecar-key-file--x"><span class="num">4</span>Training checkpoints can be decrypted with a key from the file header, without a sidecar key file — X</a></li><li><a href="#5-the-default-two-tower-training-config-uses-qk-norm-instead-of-a-logit-cap--x"><span class="num">5</span>The default two-tower training config uses QK-norm instead of a logit cap — X</a></li><li><a href="#6-of-30-new-papers-0-passed-the-radar-criteria--arxiv-csir"><span class="num">6</span>Of 30 new papers, 0 passed the radar criteria — arXiv cs.IR</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-phoenix-rankers-backbone-and-re-ranking-head-layers-first-appear-in-code--x"><span class="num">1</span>Phoenix ranker&#39;s backbone and re-ranking head layers first appear in code — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — public source code, 2026-09-02 19:46 UTC, X.AI Corp. These notes number X commits in order after the Gen4 release; this commit is Gen4+14.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The Gen4 release (2026-08-13) revealed that Phoenix, X&#39;s ranking model, is a Transformer that outputs 24 engagement probabilities per document, and Gen4+11 (2026-08-28, <a href="https://github.com/xai-org/x-algorithm/commit/bc8e5f0" target="_blank" rel="noopener">bc8e5f0</a>) added a <code>rerankerHeadTag</code> (re-ranking head tag) field to the response scores, which first suggested that &quot;several re-ranking heads exist.&quot; In a multi-task ranker, backbone is the standard term for the shared encoder/tower, and its output splits into several task heads (re-ranking, diversity, slate, etc.). However, the proto response did not expose backbone-layer output, so the canon (this repository&#39;s canon notes) did not say what the layer below Phoenix&#39;s heads outputs. This commit (Gen4+14) exposes that backbone output field in the response and makes home-mixer (the server that assembles X&#39;s feed responses) request it for all five feeds.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. home-mixer requires backbone scores in all five feed requests</span></p></div>
+<ul>
+<li><p>home-mixer started turning on the backbone-score request flag as a hardcoded value at all five feed endpoints <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/server.rs" target="_blank" rel="noopener"><code>home-mixer/server.rs</code></a>.</p>
+<ul>
+<li>The line that turns it on is <code>query.return_backbone_scores = true</code>.</li>
+<li>Each of the five gRPC endpoints turns on this flag right before handing the request to Phoenix.<ul>
+<li>ScoredPostsService (internal scored posts)</li>
+<li>ForYouFeedService (For You main)</li>
+<li>The polling variant of ForYouFeed</li>
+<li>RankedFollowingFeedService</li>
+<li>FollowingFeedService</li>
+</ul>
+</li>
+<li>There is no parameter gating. That is, the production default is on.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let RequestContext {
+    b3_info,
+    mut query,
+    root_span,
+} = ctx;
+query.return_backbone_scores = true;
+let output = self.get_for_you_feed(query).instrument(root_span).await?;
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/server.rs" target="_blank" rel="noopener"><code>home-mixer/server.rs</code></a>, 2026-09-02</p>
+</blockquote>
+</li>
+<li><p>A new bool field that decides whether to request backbone scores was added to the request struct <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/models/query.rs" target="_blank" rel="noopener"><code>home-mixer/models/query.rs</code></a>.</p>
+<ul>
+<li>The struct is <code>ScoredPostsQuery</code>, and the field is <code>return_backbone_scores: bool</code>.</li>
+<li>The default constructor (<code>ScoredPostsQuery::new</code>) initializes it to <code>false</code>, and only the server entry point sets it to <code>true</code>.</li>
+<li>In other words, it is off by default in internal pipeline and test paths, and only the five feed requests entering through the gRPC server require backbone scores.</li>
+</ul>
+</li>
+<li><p>The Phoenix request builder passes this flag through unchanged <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/util/phoenix_request.rs" target="_blank" rel="noopener"><code>home-mixer/util/phoenix_request.rs</code></a>.</p>
+<ul>
+<li>One line, <code>return_backbone_scores: query.return_backbone_scores</code>, carries the value from the request context to the proto field.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The Phoenix response carries backbone output separately, and a candidate carries scores from both layers</span></p></div>
+<ul>
+<li><p>The Phoenix proto added backbone fields to both the request and the response <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>.</p>
+<ul>
+<li>One request field and two response fields form a set.<ul>
+<li>Request: <code>returnBackboneScores</code> (#20)</li>
+<li>Response: <code>backboneTopLogProbs</code> (#10, <code>repeated float</code>)</li>
+<li>Response: <code>backboneContinuousValues</code> (#11, <code>repeated float</code>)</li>
+</ul>
+</li>
+<li><code>Top</code> appears to refer to the top log probabilities of the discrete head (for example, top-K logits over the action vocabulary), and <code>Continuous</code> to the dense regression output <span class="badge est">inferred</span>.</li>
+<li>The evidence is the naming convention, and that it corresponds to <code>topLogProbs</code> (the discrete values the reranker head outputs) already present in <code>NextActionDistribution</code> <span class="badge est">inferred</span>.</li>
+<li>The structure in which the reranker head is a fine-tuned head sitting on this backbone is consistent with the <code>rerankerHeadTag</code> field that the earlier canon version observed <span class="badge est">inferred</span>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-proto" data-lang="proto">message PredictNextActionsRequest {
+  ...
+  PageDecodeParams pageDecode = 19;
+  bool returnBackboneScores = 20;
+}
+
+message NextActionDistribution {
+  ...
+  SlateContext slateContext = 9;
+  repeated float backboneTopLogProbs = 10;
+  repeated float backboneContinuousValues = 11;
+}
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>A backbone score field was added to the candidate object, and the scorer parses the response in two layers and stores them <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/scorers/phoenix_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/phoenix_scorer.rs</code></a>.</p>
+<ul>
+<li>The new field is PostCandidate&#39;s <code>backbone_scores: Option&lt;PhoenixScores&gt;</code>.</li>
+<li>The scorer parses the same prediction response twice. <code>candidate_scores</code> is the reranker head output (the existing <code>phoenix_scores</code>), and <code>candidate_backbone_scores</code> is the backbone output newly exposed this time.</li>
+<li>In other words, a candidate leaves for the next stage carrying the scores of both layers from one prediction round.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">// candidate.rs
+pub struct PostCandidate {
+    ...
+    pub reranker_head_tag: Option&lt;u32&gt;,
+    #[serde(default, skip_serializing_if = &quot;Option::is_none&quot;)]
+    pub backbone_scores: Option&lt;PhoenixScores&gt;,
+    ...
+}
+
+// phoenix_scorer.rs
+.map(|c| PostCandidate {
+    phoenix_scores: predictions.candidate_scores(&amp;c.get_original_tweet_id()),
+    backbone_scores: predictions.candidate_backbone_scores(&amp;c.get_original_tweet_id()),
+    ...
+})
+</code></pre></figure>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. This commit does not yet show where backbone scores are used</span></p></div>
+<ul>
+<li>The scorer only stores them, and the downstream consumers lie outside this diff <span class="badge est">inferred</span>.</li>
+<li>However, the fact that the backbone output keeps being carried on the candidate means at least one of the following <span class="badge est">inferred</span>. The evidence is that <code>backbone_scores</code> is a field of <code>PostCandidate</code> and, judging by the scaffolding, no path drops the value.<ul>
+<li>The re-ranking and diversity stages consume backbone logits as additional features.</li>
+<li>The ads/feed mixer records backbone output as a payload for debugging/attribution.</li>
+<li>Another scorer uses backbone output as input, for example VMRanker&#39;s slate reordering or the ads blender MultiRiskAdsBlender.</li>
+<li>It is an observability channel that lets offline analysis and A/B verdicts see &quot;how much the backbone moved, not the reranker head.&quot;</li>
+</ul>
+</li>
+<li>New consumers are likely to appear in the next commits <span class="badge est">inferred</span>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The default for Phoenix retrieval&#39;s user-history aggregation changed to long dwell</span></p></div>
+<ul>
+<li><p>The default for how Phoenix retrieval aggregates user history changed from short dwell to long dwell <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+<ul>
+<li>The sync timestamp in the file header was updated from <code>2026-09-01T16:42:25Z</code> to <code>2026-09-02T16:03:45Z</code>, so the production feature switch actually changed within a day and the source mirror caught up with it.</li>
+<li>The comment at the top of the file reads: <em>&quot;mirrored from config feature-switch defaults; last sync ...&quot;</em>.</li>
+<li>Long-dwell aggregation merges only the candidates the user stayed on for a long time into the history embedding, which biases retrieval&#39;s signal further &quot;toward high-quality engagement&quot; <span class="badge est">inferred</span>. The evidence is that this is consistent with the trend since Gen4+6 (2026-08-21), when X greatly expanded the ads conversion head and shifted weight toward dwell-based positive signals.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">param!(
+    PhoenixRetrievalAggregationType,
+    String,
+    &quot;rust_home_mixer_phoenix_retrieval_aggregation_type&quot;,
+    &quot;DENSE_WITH_LONG_DWELL&quot;   // was &quot;DENSE_WITH_SHORT_DWELL&quot;
+);
+</code></pre></figure>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li><p>Phoenix serving&#39;s batch preparation code added a defense in two places that zero-initializes the buffer before filling it <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/crates/serving/xai-recsys-engine/src/python.rs" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-engine/src/python.rs</code></a>.</p>
+<ul>
+<li>The places initialized are the candidate embedding slice and the search-query embedding slice.</li>
+<li>Previously, values from the previous batch remained in the reused buffer, and when <code>copy_len &lt; embedding_row.len()</code> (the filled length is smaller than the slot size), the leftover bytes leaked.</li>
+<li>A <code>copy_len &gt; 0</code> condition is also applied, so the copy is skipped when the length to copy is 0. The commit does not state a reason.<ul>
+<li>Both sides are sliced to the same <code>copy_len</code>, so a zero-length copy does not panic either <span class="badge ok">verified</span> — <a href="https://doc.rust-lang.org/std/primitive.slice.html#method.copy_from_slice" target="_blank" rel="noopener">Rust <code>slice::copy_from_slice</code> docs</a>. This function panics only when the two slice lengths differ.</li>
+</ul>
+</li>
+<li>As a follow-up to Gen4+11 (2026-08-28, <a href="https://github.com/xai-org/x-algorithm/commit/bc8e5f0" target="_blank" rel="noopener">bc8e5f0</a>), which cleaned up the emb_table gRPC receive pipeline, it closes a potential correctness issue at the batch-reuse boundary.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">.par_chunks(chunk_size)
+.zip(candidate_embeddings_slices.par_iter_mut())
+.for_each(|(items_chunk, shard_slice)| {
+    shard_slice.fill(f16::ZERO);
+    shard_slice
+        .par_chunks_exact_mut(row_size)
+        ...
+});
+...
+if search_query_embedding_dim &gt; 0 &amp;&amp; let Some(sq_slice) = ... {
+    sq_slice.fill(0.0);
+    sq_slice
+        .par_chunks_exact_mut(candidate_seq_len * search_query_embedding_dim)
+        ...
+}
+</code></pre></figure>
+</blockquote>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In the &quot;Safety / visibility-filtering / labeling pipeline&quot; section of <a href="x.html">services/x.md</a>, a new subsection was created: &quot;Gen4+14 (2026-09-02, 85ac72a) — home-mixer requests Phoenix backbone scores + scarecrow XReview intake introduced + VF rules Box&lt;dyn> removed + checkpoint in-envelope derived master key&quot;. A Gen4+14 row was added to the &quot;One-line summary&quot; and the generation comparison header. The &quot;Phoenix training and index&quot; section now reflects the backbone scores response field and the xrecsys_two_tower hyperparameter changes. <code>85ac72a(2026-09-02, Gen4+14)</code> was added to the commit sha list in &quot;## Sources&quot;, along with 8 new citations of related files. <code>Last updated</code> was raised from 2026-09-03 to 2026-09-04, and the <code>Checked git log directly</code> line was also changed from 2026-09-03 to 2026-09-04 and from 13 commits to 14.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The layered structure of the Phoenix ranker is now confirmed in code.</p></div>
+<ul>
+<li>After the Gen4 release, the canon knew only the top-level semantics: &quot;Phoenix is a Transformer that emits 24 probabilities per candidate.&quot; The <code>rerankerHeadTag</code> field in Gen4+11 let us observe that &quot;several re-ranking heads exist,&quot; and Gen4+14 confirms that &quot;beneath those heads there is a backbone layer whose output is a separate response field.&quot; This means the standard form of a multi-task ranker (a shared bottom and task-specific heads) is present in X production as is.</li>
+<li><code>return_backbone_scores</code> is forced on in the five feeds without parameter gating. This is a strong signal that this response addition is already served as a production default, not at an A/B experiment stage. It means the Phoenix serving side is ready to compute the backbone output and put it in the response, and that the latency budget has room.</li>
+<li>&quot;Carrying the backbone score on the candidate&quot; is a reservation that lets the next layer consume it. This commit shows only the storage, but code in which downstream components such as MultiRiskAdsBlender, VMRanker, and DPP re-rank (re-ranking that reflects candidate diversity) use backbone logits as additional features is likely to follow soon. Paired with Gen4+11&#39;s <code>rerankerHeadTag</code>, this makes it something to watch whether code for &quot;switching, ensembling, and attribution among hydra heads&quot; opens up in later commits.</li>
+<li>That the Phoenix retrieval dwell default moved to long is consistent with the trend of expanding the ads conversion head since Gen4+6. In effect, in the two-layer ranker, the signal the backbone learns and the user-history aggregation retrieval consults are aligned in the same direction (long-dwell-heavy).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-scarecrow-formerly-botmaker-gained-a-path-to-file-automatic-reports-with-xreview--x"><span class="num">2</span>scarecrow (formerly Botmaker) gained a path to file automatic reports with XReview — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — public source code, 2026-09-02, X.AI Corp. The related files are 3 new and 1 modified, 333 lines in total. By the numbering of these notes it is Gen4+14, and by content it is an item entering the canon for the first time.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> scarecrow (formerly Botmaker) is X&#39;s internal &quot;rule-based automatic detection and action&quot; system. scarecrow is what X.AI has kept and expanded after the acquisition from the old Twitter&#39;s Botmaker (an engine that applies rules to traffic and takes actions), and the Scala files in this commit still carry the <code>com.twitter.botmaker</code> package legacy. XReview is the name of the report and moderation queue (X&#39;s internal name in 2025–2026); when a user presses &quot;report&quot; in the UI, the report flows to XReview and becomes a review target. Before this commit, the canon had no programmatic link between scarecrow and XReview. This commit opens a new gRPC pipeline through which scarecrow&#39;s automatic detection bots programmatically put reports into XReview &quot;as if a user had reported them.&quot;</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. scarecrow rules file reports with XReview through two functions</span></p></div>
+<ul>
+<li><p>Two new function units send reports from scarecrow to XReview <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/XReviewIntakeRegistry.scala</code></a> (179 lines, new).</p>
+<ul>
+<li>The two functions are <code>CreateXReviewReportProd</code> and <code>CreateXReviewReportStaging</code>. They can be called from scarecrow&#39;s rule DSL and send reports to production and staging XReview respectively.</li>
+<li>A scarecrow rule passes seven arguments when it calls this function.<ul>
+<li><code>entityType</code>: &quot;post&quot; or &quot;profile&quot;</li>
+<li><code>entityId</code>: tweet id or user id</li>
+<li><code>userId</code>: the reported user</li>
+<li><code>reportType</code>: an XReview allowlist value (for example, <code>bystander_impersonation</code>)</li>
+<li><code>botId</code>: the automatic detection bot that created this report</li>
+<li>Optional <code>note</code></li>
+<li>Optional <code>victimId</code>: the victim&#39;s user id</li>
+</ul>
+</li>
+<li>The self-description attached to the CreateXReviewReportProd class is the same as the quote below.</li>
+</ul>
+<blockquote>
+<p><em>&quot;Submits a report to production XReview Intake over gRPC. entityType must be post or profile. reportType must be an XReview-allowlisted value. Impersonation bots should use bystander_impersonation (lane tags key on that type, not generic impersonation). Each evaluation includes detection_timestamp_ms so intake&#39;s content-hash report id is unique; evidence rollup then applies.&quot;</em>
+— <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>, <code>description</code> of the CreateXReviewReportProd class</p>
+</blockquote>
+</li>
+<li><p>The XReview intake was registered in the downstream services list <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/DownstreamServices.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/DownstreamServices.scala</code></a>.</p>
+<ul>
+<li>The registered name is <code>XReviewIntake</code>.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">case object XReviewIntake extends DownstreamService {
+  override val name = &quot;XREVIEW_INTAKE&quot;
+}
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>A separate client exists for staging, and the staging function is marked as experimental with no real action <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>.</p>
+<ul>
+<li><code>CreateXReviewReportStaging</code> sets the action level to <code>NO_ACTION</code>.</li>
+<li>In scarecrow, the action level is metadata that indicates whether this function is a real action or a dry run. The staging version is marked <code>NO_ACTION</code>, which states explicitly that it is experimental and the rule is not applied in practice.</li>
+<li>The production version is <code>PROD_AGENT_WORKFLOW_ACTION</code>. The phrase &quot;agent workflow&quot; means it is part of an automatic action pipeline.</li>
+</ul>
+</li>
+<li><p>Developer local environments and personal-account instances do not call a real XReview server <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewIntakeRegistry.scala" target="_blank" rel="noopener"><code>XReviewIntakeRegistry.scala</code></a>.</p>
+<ul>
+<li>In <code>localMode</code> or <code>personalAccountMode</code>, it is replaced with a noop.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">if (localMode() || personalAccountMode()) {
+  XReviewReportSubmitter.noop(statsReceiver)
+} else {
+  ...
+}
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>scarecrow connects to XReview intake over mTLS <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The flag <code>xreview.tls.ca-cert</code> takes the CA certificate path, and <code>SharedXReviewIntakeClientModule.provideXReviewIntakeClient</code> consumes it to create the mTLS connection.</li>
+<li>The client comes from a shared module in the <code>com.twitter.useng.common.xreview</code> package. useng is X&#39;s internal shared-library namespace.</li>
+<li>In other words, this suggests that systems other than scarecrow also access XReview intake programmatically.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Bot reports enter through the same surface as user reports, tagged with automatic detection as the source</span></p></div>
+<ul>
+<li><p>The report payload fills in XReview&#39;s SubmitReportRequest gRPC proto as is <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewReportBuilder.scala" target="_blank" rel="noopener"><code>scarecrow/legacy/XReviewReportBuilder.scala</code></a> (59 lines, new).</p>
+<ul>
+<li>A few keys directly show the nature of this pipeline.<ul>
+<li><code>report_surface = &quot;x_app&quot;</code>: the report arrives through the same surface as user reports.</li>
+<li><code>report_source = &quot;proactive&quot;</code>: tells XReview that the report comes from automatic detection (&quot;proactive&quot;), not from a user report (&quot;user&quot;). In other words, XReview uses this field to distinguish which reports were created by a person&#39;s click and which were put in by a bot.</li>
+<li><code>subject = &quot;Botmaker report&quot;</code>: the top line of the report is fixed.</li>
+<li><code>reporter_id = &quot;0&quot;</code>: a bot report has no reporting user id. Instead, <code>detection_bot_id</code> holds which bot created the report.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-scala" data-lang="scala">val ReportSurfaceValue = &quot;x_app&quot;
+val ReportSourceValue = &quot;proactive&quot;
+val Subject = &quot;Botmaker report&quot;
+val ReporterIdValue = &quot;0&quot;
+...
+val reportFields = Seq(
+  pb(XReviewReportKeys.Subject, Subject),
+  pb(XReviewReportKeys.ReportSurface, ReportSurfaceValue),
+  pb(XReviewReportKeys.ReportType, reportType),
+  pb(XReviewReportKeys.ReportSource, ReportSourceValue),
+  pb(XReviewReportKeys.ReportedEntityType, entityType),
+  pb(XReviewReportKeys.ReportedEntityId, entityId.toString),
+  pb(XReviewReportKeys.ReportedUserId, userId.toString),
+  pb(XReviewReportKeys.DetectionBotId, botId.toString),
+  pb(XReviewReportKeys.DetectionTimestampMs, detectionTimestampMs.toString)
+) ++ note.filter(_.nonEmpty).map(n =&gt; pb(DescriptionKey, n)).toSeq
+  ++ victimId.filter(_ != null).map(id =&gt; pb(XReviewReportKeys.VictimUserId, id.toString)).toSeq
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>The entityType whitelist is limited to &quot;post&quot; and &quot;profile&quot; <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The <code>normalizeEntityType</code> function throws <code>IllegalArgumentException</code> on any other value, which keeps scarecrow rules from putting arbitrary entity types into XReview.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. XReview groups duplicate reports afterward, and the report type decides the review lane</span></p></div>
+<ul>
+<li>The uniqueness of a report id is determined by a content hash together with a timestamp <span class="badge ok">verified</span>.<ul>
+<li>The quote above reads: <em>&quot;intake&#39;s content-hash report id is unique; evidence rollup then applies&quot;</em>. It means the XReview server builds the report id from a content hash and <code>detection_timestamp_ms</code>.</li>
+<li>Even if the same bot detects the same content twice, the reports are separate if the timestamps differ, and XReview rolls up (aggregates) the evidence afterward.</li>
+<li>That is, duplicate detections naturally occur many times in bot reports, and XReview handles those duplicates.</li>
+</ul>
+</li>
+<li>Impersonation detection bots must use <code>bystander_impersonation</code> <span class="badge ok">verified</span>.<ul>
+<li>The self-description reads: <em>&quot;Impersonation bots should use bystander_impersonation (lane tags key on that type, not generic impersonation).&quot;</em></li>
+<li>The lane tag here appears to mean XReview queue routing (which human reviewer team and SLA a report goes to).</li>
+<li>That is, XReview has a &quot;lane&quot; concept that routes reports to reviewer teams, and the <code>report_type</code> value decides the lane.</li>
+<li>If a bot uses the wrong <code>report_type</code>, the report is routed to the wrong lane, and review is delayed or ignored.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>There are five observability (metrics) counters <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/scarecrow/legacy/XReviewReportSubmitter.scala" target="_blank" rel="noopener"><code>XReviewReportSubmitter.scala</code></a> (91 lines, new).<ul>
+<li><code>attempted</code>: number of calls</li>
+<li><code>submitted</code>: successes</li>
+<li><code>skipped</code>: skipped because there is no prodClient/stagingClient</li>
+<li><code>unsupported_entity</code>: entityType outside the whitelist</li>
+<li><code>rpc_failed</code>: gRPC failure</li>
+<li>Failures are logged at <code>warn</code> and the exception is rethrown.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Under the &quot;Safety / visibility-filtering / labeling pipeline&quot; section of <a href="x.html">services/x.md</a>, a new Gen4+14 subsection was created and grouped with the contents of section 1 above. The scarecrow → XReview intake pipeline is the first such item to enter the canon, so it was placed in a separate subsection, &quot;scarecrow → XReview automatic report pipeline (newly released 2026-09-02)&quot;. The three files (XReviewIntakeRegistry, XReviewReportBuilder, XReviewReportSubmitter) and the modified DownstreamServices were added to &quot;## Sources&quot;.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X&#39;s moderation pipeline expanded with this commit.</p></div>
+<ul>
+<li>The safety layers the earlier canon version knew were two.<ul>
+<li>visibility-filtering is the layer that drops candidates inline in the scoring and serving path or attaches an interstitial (an action that overlays a warning screen).</li>
+<li>grox PtOS is the content labeling layer in which the Grok LLM summarizes tweets and attaches labels.</li>
+</ul>
+</li>
+<li>This commit (Gen4+14) exposes a third layer in code: scarecrow → XReview. Automatic detection bots push reports into the XReview queue through intake as if they were user reports, and XReview then handles evidence rollup and routing to human reviewers (lane tag). This is an asynchronous report and aggregation pipeline, not an inline drop.</li>
+<li>The <code>report_source = &quot;proactive&quot;</code> field suggests that user reports (&quot;user&quot;) and bot reports (&quot;proactive&quot;) enter XReview in the same queue with the source tagged. This means the XReview dashboard or reviewer UI shows &quot;cases with user pressure&quot; and &quot;cases detected by bots&quot; separately, and presumably the evidence rollup logic also weights the two sources differently <span class="badge est">inferred</span>. Confirming this requires the XReview server-side logic to be released.</li>
+<li>The existence of the <code>bystander_impersonation</code> type means the impersonation response line is divided into finer categories. The supporting wording is: <em>&quot;bystander_impersonation (lane tags key on that type, not generic impersonation)&quot;</em>. An impersonation case found by a bot is labeled as &quot;impersonation reported by a third party&quot; and routed to a separate lane. The reason it states explicitly not to use &quot;generic impersonation&quot; is that lane tag routing uses report_type itself as the discriminator. A wrong tag routes the report to the wrong team, SLA, and severity.</li>
+<li>The XReview client scarecrow uses lives in the <code>useng.common.xreview</code> shared module, that is, the <code>com.twitter.useng.common.xreview</code> package. This means the intake is not scarecrow-only but is called in common by several X internal backends. For example, the grox PtOS pipeline could also put reports into XReview through this library <span class="badge est">inferred</span>. These usages are likely to become clearer in the next commits <span class="badge est">inferred</span>.</li>
+<li class="warn">⚠ Claim strengthened: the earlier canon understood X&#39;s handoff from automatic detection to human review as roughly &quot;grox PtOS attaches a label and the policy service takes action.&quot; This commit confirms in code that one branch of that handoff shares the XReview queue with user reports through the same channel. In other words, XReview is not a queue that handles only user reports; it is also one of the destinations of automatic detection.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="3-visibility-rule-policies-move-from-heap-assembly-to-static-tables--x"><span class="num">3</span>Visibility rule policies move from heap assembly to static tables — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — public source code, 2026-09-02. In these notes&#39; numbering, this is Gen4+14.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> visibility-filtering (VF) is the service that decides, post by post, whether a post may be shown to this viewer. In Gen4+13 (2026-09-01, <a href="https://github.com/xai-org/x-algorithm/commit/7ba776848b12d8422eb0f291ee03ea5c17ab0188" target="_blank" rel="noopener">7ba7768</a>), the VF rule representation moved from struct-per-rule to a data-driven <code>RuleSpec</code> enum. However, <code>RuleEngine</code> (then named <code>Policies</code>) still held three heap-assembled <code>Vec&lt;Box&lt;dyn Rule&gt;&gt;</code> vectors. The rules themselves had become data literals, but the policies (rule sequences per safety level) remained runtime vecs. This commit (Gen4+14) is phase 2 of the restructuring and removes that last layer.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The three policies became static tables in the program image instead of heap-assembled vectors</span></p></div>
+<ul>
+<li><p>The rule trait and the heap-allocated rule vector are gone from the code <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/mod.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/mod.rs</code></a>.</p>
+<ul>
+<li>What disappeared is the <code>Rule</code> trait and <code>Vec&lt;Box&lt;dyn Rule&gt;&gt;</code>.</li>
+<li>Three items were removed along with them, for −155 lines in mod.rs:<ul>
+<li>the <code>Rule</code> trait definition (two methods, name and evaluate)</li>
+<li>the <code>evaluate_rules</code> function, which iterated over the <code>Box&lt;dyn Rule&gt;</code> collection to build the verdict</li>
+<li>5 related unit tests</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>The three policies are now carried as static tables in the rodata section of the program image <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/registry.rs</code></a>.</p>
+<ul>
+<li>The table type is <code>&amp;&#39;static [&amp;&#39;static [RuleSpec]]</code>.</li>
+<li>All three policies (<code>FILTER_ALL_POLICY</code>, <code>TIMELINE_HOME_POLICY</code>, <code>TIMELINE_HOME_RECOMMENDATIONS_POLICY</code>) are <code>static</code>.</li>
+<li><code>RuleEngine::new()</code> no longer allocates on the heap and only wraps a <code>NsfwGatingCountries</code> reference.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(super) struct Policy {
+    rules: &amp;&#39;static [&amp;&#39;static [RuleSpec]],
+    additional_rules: &amp;&#39;static [&amp;&#39;static [RuleSpec]],
+}
+
+static TIMELINE_HOME_SHARED_RULES: [&amp;[RuleSpec]; 9] = [
+    author_rules::AUTHOR_STATE_DROPS,
+    author_rules::SOCIALGRAPH_DROPS,
+    tweet_rules::TWEET_LABEL_DROPS,
+    tweet_rules::NULLCAST_DROP,
+    tweet_rules::TES_HOME_DROPS,
+    tweet_rules::SENSITIVE_VIEWER_DROPS,
+    tweet_rules::EXCLUSIVE_TWEET_DROP,
+    tweet_rules::NSFW_MEDIA_INTERSTITIALS,
+    tweet_rules::NSFW_AUTHOR_INTERSTITIAL,
+];
+
+static TIMELINE_HOME_RECOMMENDATION_ONLY_RULES: [&amp;[RuleSpec]; 5] = [
+    tweet_rules::RECS_MEDIA_DROPS,
+    author_rules::OON_NSFW_AUTHOR_DROPS,
+    tweet_rules::OON_TWEET_FLAG_DROPS,
+    tweet_rules::OON_TWEET_LABEL_DROPS,
+    author_rules::OON_USER_LABEL_DROPS,
+  ];
+
+static TIMELINE_HOME_POLICY: Policy = Policy::new(&amp;TIMELINE_HOME_SHARED_RULES);
+static TIMELINE_HOME_RECOMMENDATIONS_POLICY: Policy = Policy {
+    rules: &amp;TIMELINE_HOME_SHARED_RULES,
+    additional_rules: &amp;TIMELINE_HOME_RECOMMENDATION_ONLY_RULES,
+};
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p><code>Policies</code> was renamed to <code>RuleEngine</code> <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The reason is that this struct no longer owns a rule vector. The old name no longer reflected its state (a collection).</li>
+<li>The new name makes explicit that it is a dispatch layer.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The rule evaluation order and verdict approach are unchanged</span></p></div>
+<ul>
+<li><p>A policy evaluates rules in order from the front <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/registry.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/registry.rs</code></a>.</p>
+<ul>
+<li>The evaluation function is <code>Policy::evaluate</code>, which iterates over the rule iterator in order.</li>
+<li>The semantics are unchanged.<ul>
+<li><code>Drop</code> short-circuits immediately.</li>
+<li>Even if <code>Interstitial</code> comes first, <code>Drop</code> wins if a later rule returns <code>Drop</code>.</li>
+<li>If <code>Allow</code> holds until the end, <code>decided_by = None</code>.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(super) fn evaluate(&amp;self, context: &amp;RuleContext&lt;&#39;_&gt;) -&gt; Verdict {
+    let mut action = VfAction::Allow;
+    let mut decided_by = None;
+    for rule in self.rules() {
+        match rule.evaluate(context) {
+            VfAction::Drop(reason) =&gt; {
+                return Verdict {
+                    action: VfAction::Drop(reason),
+                    decided_by: Some(rule.name()),
+                };
+            }
+            VfAction::Interstitial(reason) if matches!(action, VfAction::Allow) =&gt; {
+                action = VfAction::Interstitial(reason);
+                decided_by = Some(rule.name());
+            }
+            VfAction::Allow | VfAction::Interstitial(_) =&gt; {}
+        }
+    }
+    Verdict { action, decided_by }
+}
+</code></pre></figure>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>Added a new test that verifies the uniqueness of rule names across all 15 slices <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs</code></a>.<ul>
+<li><code>wired_rule_names_are_unique_and_nonempty</code> guarantees that rule names in all 15 slices, 11 tweet-axis slices and 4 author-axis slices, are non-empty and have no duplicates.</li>
+<li>This assertion matters because rule names are referenced as literals in audits, metrics and the golden corpus.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Briefly append the Gen4+14 VF refactor part after the Gen4+13 subsection of <a href="x.html">services/x.md</a>. The Gen4+13 subsection already describes restructuring phase 1 in detail, so phase 2 records only what changed.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Policies moved from the runtime heap to rodata, and the verdict semantics are unchanged.</p></div>
+<ul>
+<li>The whole rule graph can now be dispatched at program start without any allocation. The VF server can evaluate immediately after fork, and the rule list remains data that can be observed directly in the program image with <code>readelf</code>.</li>
+<li>The composition of 9 common home slices and 5 recommendation-only slices is the same as in Gen4+13, and the rule counts are also unchanged. However, <code>RuleEngine::rule_counts()</code> now calls the static <code>Policy::len()</code> instead of counting vector lengths.</li>
+<li>The <code>Policies</code> → <code>RuleEngine</code> rename makes clear the direction of this refactor, which ran across four commits from Gen4+11 to Gen4+14.<ul>
+<li>Move rules from code to data.</li>
+<li>Move policies from the heap to rodata.</li>
+<li>Name things from the dispatch viewpoint.</li>
+</ul>
+</li>
+<li>The next step is likely to load rule literals from a config file (TOML/JSON), which would allow changing rules without a code deployment <span class="badge est">inferred</span>. However, that would give up the benefits of Rust static dispatch (inlining, jump tables), so whether it actually goes this way depends on later commits.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="4-training-checkpoints-can-be-decrypted-with-a-key-from-the-file-header-without-a-sidecar-key-file--x"><span class="num">4</span>Training checkpoints can be decrypted with a key from the file header, without a sidecar key file — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — public source code, 2026-09-02. It changed 5 files (+305/−88 in total). In these notes&#39; numbering, this is Gen4+14.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The 2026-09-01 commit (Gen4+13) added an envelope-encrypting Orbax checkpoint writer to the xrex training code. It was the standard envelope pattern: a KMS-wrapped DEK (Data Encryption Key) is stored in a <code>_DEK</code> sidecar file, and that DEK symmetrically encrypts the checkpoint files. This commit (Gen4+14) lets the master key be extracted from the envelope header of the checkpoint file itself for decryption, even without the sidecar file. It also enforces required fields in encryption_context at save time and attaches a mint nonce automatically. That is, it tidies up the file format, key management and context schema one by one.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Without a sidecar key file, the key is unwrapped from the file header to read the checkpoint</span></p></div>
+<ul>
+<li><p>The function that reads the DEK uses the sidecar file if it exists and otherwise unwraps the key from the envelope header <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The function is named <code>adopt_tree_dek</code>.</li>
+<li>The same function reads both checkpoints in the <code>_DEK</code> sidecar format created in the 2026-09-01 commit (Gen4+13) and checkpoints in the future in-envelope derived format.</li>
+<li>The migration path is backward-compatible.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def adopt_tree_dek(path: pathlib.Path, kms_client) -&gt; bytes:
+    ...
+    if dek_path.exists():
+        entry = _read_wrapped_dek(dek_path) or {}
+        raw = bytes(xai_kms.nfs.unwrap_shared_dek(kms_client, dek_path))
+        key_id = entry.get(&quot;key_id&quot;)
+    else:
+        raw = _unwrap_header_master(kms_client, path)
+        key_id = &quot;header&quot;
+    rank_logger.info(&quot;KMS unwrap OK for %s (key_id=%s)&quot;, path, key_id)
+    return raw
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>The envelope header of a checkpoint file is 4096 bytes and consists of the magic <code>XAIENC01</code> and the wrapped_len/context_len fields <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py</code></a>.</p>
+<ul>
+<li>The header structure is as follows.<ul>
+<li>The first 8 bytes are the magic <code>XAIENC01</code>.</li>
+<li>At byte offset 28–32 is the length of the wrapped field (big-endian u32).</li>
+<li>At byte offset 32–36 is the context length (u32).</li>
+<li>The wrapped field and the context JSON follow within the 4096 bytes.</li>
+</ul>
+</li>
+<li>If the wrapped field has the form <code>xai-dek1:&lt;salt&gt;:&lt;master&gt;</code>, it is treated as the &quot;derived&quot; format; otherwise it is judged to be legacy per-file wrapping and an exception is raised.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">_ENVELOPE_HEADER_SIZE = 4096
+_ENVELOPE_FIXED_LEN = 36
+_DERIVED_PREFIX = &quot;xai-dek1:&quot;
+
+def _header_wrapped_master(path: pathlib.Path) -&gt; tuple[str, dict]:
+    envelope = _first_envelope(path)
+    head = envelope.read_bytes()[:_ENVELOPE_HEADER_SIZE]
+    if len(head) &lt; _ENVELOPE_FIXED_LEN or head[:8] != b&quot;XAIENC01&quot;:
+        raise ValueError(f&quot;not an envelope: {envelope}&quot;)
+    wrapped_len = int.from_bytes(head[28:32], &quot;big&quot;)
+    context_len = int.from_bytes(head[32:36], &quot;big&quot;)
+    start = _ENVELOPE_FIXED_LEN
+    field = head[start : start + wrapped_len].decode()
+    context = json.loads(head[start + wrapped_len : start + wrapped_len + context_len])
+    if not field.startswith(_DERIVED_PREFIX):
+        raise ValueError(
+            f&quot;envelope at {envelope} carries a legacy per-file wrapped key, &quot;
+            &quot;not the xai-dek1 derived form&quot;
+        )
+    _salt, master = field[len(_DERIVED_PREFIX) :].split(&quot;:&quot;, 1)
+    ...
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>The read path changed to use the tensorstore driver <code>xai_encrypted</code> directly <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py" target="_blank" rel="noopener"><code>phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py</code></a>.</p>
+<ul>
+<li>Previously (2026-09-01 commit, Gen4+13), the KMS-proxy KvStore (<code>xai_kms.KvServe</code>) called KMS on every IO. Now the DEK is unwrapped once, and the <code>xai_encrypted</code> driver performs the symmetric decryption directly.</li>
+<li>This approach removes the KMS round-trip latency from the IO path. The DEK is unwrapped only once, and symmetric decryption is then done locally.</li>
+<li>Both the previous and the next file formats are supported.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">raw = adopt_tree_dek(path, kms_client)
+kvstore_base = {
+    &quot;driver&quot;: &quot;xai_encrypted&quot;,
+    &quot;base&quot;: {&quot;driver&quot;: &quot;file&quot;, &quot;path&quot;: path.as_posix() + &quot;/&quot;},
+    &quot;dek_b64&quot;: base64.b64encode(raw).decode(),
+}
+metadata_json = json.loads(_read_encrypted_file(path, &quot;_METADATA&quot;, kvstore_base, ts_context))
+return kvstore_base, metadata_json, _names_from_tree_metadata(metadata_json), ts_context
+</code></pre></figure>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Encrypted saves require mandatory context keys and automatically insert a path hash as the nonce</span></p></div>
+<ul>
+<li><p>At save time, encryption_context requires two keys <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/train/checkpoint_write.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/checkpoint_write.py</code></a>.</p>
+<ul>
+<li>The two keys are <code>domain</code> and <code>run</code>.</li>
+<li>Judging by the names, <code>domain</code> is the system domain this checkpoint belongs to (for example &quot;recsys&quot;, &quot;grox&quot;), and <code>run</code> is the training run id.</li>
+<li>These two values are carried as the encryption_context of the KMS call, so the audit log records &quot;which run of which domain unwrapped which checkpoint, and when&quot;.</li>
+<li>In other words, this code enforces the KMS audit flow.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">missing_context = {&quot;domain&quot;, &quot;run&quot;} - self.checkpoint_config.encryption_context.keys()
+if missing_context:
+    raise ValueError(
+        &quot;encrypted checkpoint context is missing &quot; + &quot;, &quot;.join(sorted(missing_context))
+    )
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>At save time, <code>mint_nonce</code> is added to encryption_context automatically <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The value is the sha256 hash of the checkpoint path, inserted automatically as the <code>mint_nonce</code> value of <code>encryption_context</code>. As a formula, <code>mint_nonce = sha256(path)</code>.</li>
+<li>This uses the standard AWS-KMS pattern in which KMS checks the context match at unwrap time, so an attempt to unwrap a different checkpoint with the same KMS key fails.</li>
+<li>For example, if an attacker copies a checkpoint file to a different path and tries to unwrap it, the mint_nonce does not match and KMS rejects the request.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">encryption_context = dict(self.checkpoint_config.encryption_context)
+encryption_context[&quot;mint_nonce&quot;] = hashlib.sha256(os.fsencode(path)).hexdigest()
+kms_client = xai_kms.KmsClient.from_cluster_env(
+    key_id=self.checkpoint_config.encryption_key_id,
+    encryption_context=encryption_context,
+)
+</code></pre></figure>
+</blockquote>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li><p>The encryption option and the tensorstore save approach were separated <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/train/trainer.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer.py</code></a>.</p>
+<ul>
+<li><code>_uses_tensorstore_save</code> no longer forces encryption.</li>
+<li>Previously, <code>encrypt=True</code> turned on the tensorstore save approach automatically.</li>
+<li>Now <code>checkpoint_write.save_checkpoint</code> takes <code>kms_client</code> as an argument and assembles <code>orbax_encrypted.get_encrypted_checkpointer</code> by itself.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def _uses_tensorstore_save(self) -&gt; bool:
+    return self.checkpoint_config.save_method == &quot;tensorstore&quot;
+</code></pre></figure>
+</blockquote>
+</li>
+<li><p>The error message that prevents downgrading to plaintext saves became more specific <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The previous message was &quot;restored from an ENCRYPTED checkpoint but orbax writer cannot produce encrypted saves&quot;.</li>
+<li>The new message is &quot;restored from an ENCRYPTED checkpoint but checkpoint_config.encrypt is false — refusing to downgrade to plaintext saves; set checkpoint_config.encrypt=true with encryption_key_id/encryption_context&quot;.</li>
+<li>The new message states explicitly why it failed and what to do.</li>
+</ul>
+</li>
+<li><p><code>_AsyncCheckpointer</code> was extended to wait for wait_until_finished of the orbax_encrypted module as well <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/utils/checkpointing.py" target="_blank" rel="noopener"><code>phoenix/xrex/utils/checkpointing.py</code></a>.</p>
+<ul>
+<li>When the flush of a checkpoint save finishes, all encrypted IO is also guaranteed to be finished.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> After the &quot;envelope-encrypted Orbax checkpoint writer&quot; block in the Gen4+13 subsection of <a href="x.html">services/x.md</a>, append what changed in Gen4+14.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The read and write paths for encrypted checkpoints are in place, but there is not yet evidence that they were turned on as a production default.</p></div>
+<ul>
+<li>This commit completes write-path verification (enforcing <code>domain</code>/<code>run</code> and inserting <code>mint_nonce</code> automatically) and two-format support on the read path. However, whether <code>CheckpointConfig.encrypt = True</code> is on by default in the actual training config is not in this diff. This is still a checkpoint to watch.</li>
+<li>The file format is now documented. The 4096-byte header, the <code>XAIENC01</code> magic and the wrapped_len/context_len offsets remain in the code, so future external tools (checkpoint viewers, audit tools) can parse this format.</li>
+<li>The <code>xai-dek1:</code> prefix indicates a key derivation scheme <span class="badge est">inferred</span>. The phrase &quot;derived master&quot; suggests a KDF-based approach in which a master key derived from a salt is placed in the header and the wrapping is placed in the wrapped field <span class="badge est">inferred</span>. This contrasts with the legacy per-file wrapped key (a separately stored KMS-wrapped DEK for each file) <span class="badge est">inferred</span>. The details of X.AI&#39;s own KDF spec (&quot;xai-dek1&quot;) are not in the code. They are presumably in the <code>xai_kms.nfs</code> module <span class="badge est">inferred</span>.</li>
+<li>Removing the KMS-proxy KvStore matters for performance. Previously every IO (one ocdbt operation) required a KMS call, but now the DEK is unwrapped once and decrypted symmetrically in local code. KMS round trips drop from one per IO to one in total, so checkpoint restore latency is likely to fall as well <span class="badge est">inferred</span>.<ul>
+<li>The path that unwraps once is handled by <code>adopt_tree_dek</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/python/training/xai-checkpointing/xai_checkpointing/dek.py" target="_blank" rel="noopener"><code>dek.py</code></a>.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="5-the-default-two-tower-training-config-uses-qk-norm-instead-of-a-logit-cap--x"><span class="num">5</span>The default two-tower training config uses QK-norm instead of a logit cap — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/85ac72a1bba41f21615e3f0bca56da75970a6633" target="_blank" rel="noopener">xai-org/x-algorithm@85ac72a</a> — public source code, 2026-09-02. In these notes&#39; numbering, this is Gen4+14.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> A two-tower is a retrieval model structure that embeds users and items with separate encoders (towers) and finds candidates by their similarity. In Gen4+6 (2026-08-21, <a href="https://github.com/xai-org/x-algorithm/commit/28e414f" target="_blank" rel="noopener">28e414f</a>), three options, <code>qk_norm=True</code>, <code>attn_logit_cap=-1</code> and <code>right_anchored_rope=True</code>, were first introduced in the nano config of the two-tower. However, the defaults of the composite base config at that time remained <code>qk_norm=False</code> and <code>attn_logit_cap=80.0</code>. This commit (Gen4+14) flips those defaults and makes QK-norm the actual default for composite two-tower training.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The default config of the composite two-tower turns QK-norm on and the attention logit cap off</span></p></div>
+<ul>
+<li><p>Two attention-related defaults changed in the base config of the composite two-tower <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/85ac72a1bba41f21615e3f0bca56da75970a6633/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a>.</p>
+<ul>
+<li><code>qk_norm: False → True</code>: adds normalization (L2) to the attention query and key vectors. QK-norm is one of the standard techniques for stabilizing Transformer training.</li>
+<li><code>attn_logit_cap: 80.0 → -1</code>: the cap (80) that clipped logit values before the attention softmax changed to -1 (= off). With QK-norm on, the QK dot product is already bounded, so a separate logit cap becomes unnecessary.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def _xrecsys_two_tower_combined_base() -&gt; dict:
+    return {
+        ...
+        &quot;learning_rate&quot;: 2e-3,
+        &quot;emb_learning_rate&quot;: 0.1,
+        &quot;qk_norm&quot;: True,          # was False
+        &quot;attn_logit_cap&quot;: -1,     # was 80.0
+        &quot;primer_norm&quot;: True,
+        ...
+    }
+</code></pre></figure>
+</blockquote>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Briefly recorded this hyperparameter change in the Gen4+14 subsection of <a href="x.html">services/x.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The training stabilization approach of two-tower retrieval moved from logit clamping to QK-norm. The two techniques are not the same, but they serve a similar purpose (controlling the dynamic range of soft attention). The 12 days from the option&#39;s introduction in Gen4+6 (2026-08-21, 28e414f) to the default switch in this Gen4+14 were likely needed because QK-norm showed an advantage in training loss or downstream metrics in a short A/B test <span class="badge est">inferred</span>.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="6-of-30-new-papers-0-passed-the-radar-criteria--arxiv-csir"><span class="num">6</span>Of 30 new papers, 0 passed the radar criteria — arXiv cs.IR</h2>
+<p>Of 30 new arXiv cs.IR papers (parsing succeeded, lookup normal), 0 passed the radar acceptance criteria. The criteria are platform-company authors or production deployment/A/B claims, novelty in feed/ranking mechanisms, and large-scale results. There was no new material from Meta or Netflix that day.</p>
+<ul>
+<li><a href="https://arxiv.org/abs/2609.01240" target="_blank" rel="noopener">ReST</a> (<a href="https://arxiv.org/abs/2609.01240" target="_blank" rel="noopener">From Language to Behavior: Scaling Sequence Transformers for Industrial Recommendation Ranking with Rec-Native Designs</a>) fell in this triage window, but it was already added to <a href="radar.html#rest-bytedance--tiktok-shop-ads--production-deployment-of-behavior-sequence-transformer-scaling-in-ads-ranking">radar.md new this month</a> in yesterday&#39;s 2026-09-03 daily. It is not registered twice.</li>
+<li><a href="https://arxiv.org/abs/2609.01807" target="_blank" rel="noopener">hLLM</a> is an interesting decoding optimization for generative reranking, but it did not pass the radar criteria and was rejected.<ul>
+<li>The title is &quot;Single Pass Decoding for Generative Reranking&quot;, and the authors are Emil Laftchiev, Prachi Agrawal, Moe Kayali and others.</li>
+<li>It is a decoding scheme that uses LoRA fine-tuning and the Hungarian algorithm to produce a ranking of N items in an O(1) forward pass, and it claims to reach 28ms end-to-end.</li>
+<li>It is a methods paper with no production deployment claim.</li>
+<li>The author affiliation would need to be checked through the open-review author profile, but the abstract alone has no platform-company signature.</li>
+<li>It is a candidate to review again if a production claim in this direction appears from a platform company.</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2609.02..." target="_blank" rel="noopener">SPAR</a> is a Generative POI Recommendation paper. It was rejected in principle because the research is limited to POI (radar domain restriction).</li>
+<li><a href="https://arxiv.org/abs/2609.01571" target="_blank" rel="noopener">GenCAR</a> was also rejected. It is an academic experiment on OOD recommendation.</li>
+<li>All the rest were rejected as well. The reasons we confirmed fall into three groups.<ul>
+<li>benchmark/RAG methodology (no platform production claim)</li>
+<li>domain restriction (POI, legal, medical, science)</li>
+<li>author affiliations mostly academic institutions</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> None (no new radar entries).</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="corrections">Corrections</h2>
+<p>None.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<p>None.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Watch the downstream consumers of the backbone score — in this commit home-mixer only stores it on the candidate, and the code that consumes it is not yet open. Observing in later commits which of <code>MultiRiskAdsBlender</code>, <code>VMRanker</code>, DPP re-rank and the side-effect logger consumes backbone_scores will reveal the actual purpose of the two-layer backbone/head architecture.</li>
+<li>Watch which scarecrow bots call <code>CreateXReviewReportProd</code> — the function unit is new, but the actual scarecrow rule definitions that call it (such as the <code>bystander_impersonation</code> detection logic) are not yet in the repo. Once the rule DSL opens in later commits, it will show which bots file automatic reports under which conditions.</li>
+<li>Watch for other users of the <code>useng.common.xreview</code> library — check which of grox PtOS, home-mixer and phoenix files reports to XReview through this library. In particular, the key question is whether grox&#39;s adult content cross-validation results flow into the XReview lane.</li>
+<li>Watch when <code>CheckpointConfig.encrypt=True</code> appears in a production config — it was wired in Gen4+13 (2026-09-01), and this Gen4+14 put write-path verification and the read path in place. Next comes the switch of the config default. When it is turned on in the training config, the point at which X actually started encrypting training checkpoints at rest will be confirmed.</li>
+<li>Watch the lane tag routing and evidence rollup logic of the XReview server — this commit exposed only the client-side schema. The <code>report_type</code> → lane tag mapping and the evidence rollup algorithm (N reports on the same content → verdict) can be confirmed only once the XReview server code is exposed in the repo.</li>
+<li>Watch the <code>xai-dek1:</code> KDF spec — the salt→master derivation algorithm for the derived master key carried in the envelope header. It will be confirmed when the <code>xai_kms.nfs</code> module appears in the public repo.</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-03.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-03</span></a><a class="pg-next" href="daily-2026-09-05.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-05</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-04.html" data-title="일일 리포트 2026-09-04"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

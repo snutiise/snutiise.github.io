@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-09-11 — feed-research</title>
+<meta name="description" content="In one line: X's visibility filter now drops posts by an explicit action value instead of the filtering reason. Most filtering outcomes stay the same.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-09-11.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-09-11.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-09-11.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-09-11.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-09-11 — feed-research">
+<meta property="og:description" content="In one line: X's visibility filter now drops posts by an explicit action value instead of the filtering reason. Most filtering outcomes stay the same.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-09-11.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-09-11.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-09-11">2026-09-11</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>24 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-09-11.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X&#39;s visibility filter now drops posts by an explicit action value instead of the filtering reason. Most filtering outcomes stay the same.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-the-visibility-filter-drops-posts-by-action-value-instead-of-reason--x"><span class="num">1</span>The visibility filter drops posts by action value instead of reason — X</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-the-visibility-filter-drops-posts-by-action-value-instead-of-reason--x"><span class="num">1</span>The visibility filter drops posts by action value instead of reason — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/75d93d9" target="_blank" rel="noopener">xai-org/x-algorithm@75d93d9</a> — public source code, 2026-09-09, 28 files, +801/−252. These notes number X commits after the Gen4 release in sequence, and this commit (2026-09-09, 75d93d9) is Gen4+18.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X mirrors the For You pipeline source code to <a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> about twice a day (since the Gen4 release on 2026-08-13). This commit is mid-sized at 28 files, but it touched five different axes at once.</p></div>
+<ul>
+<li>The visibility verdict is now decided by the action value, not the reason. visibility-filtering (VF) is the service that decides, post by post, &quot;may this viewer see it?&quot;.<ul>
+<li>The VF client added an explicit <code>Action</code> field to <code>TweetVisibility</code>, and <code>VFFilter</code> in home-mixer (the service that assembles the For You feed) now decides drop/keep by the <code>Action</code> enum instead of <code>FilteredReason</code>.</li>
+<li>The verdict axis moved from &quot;action derived from the reason&quot; to &quot;the action decides, and the reason is an annotation for logging&quot;.</li>
+</ul>
+</li>
+<li>A new ad format made of a header image, body text, and one or two CTA (call-to-action) buttons appeared as a first-class format in the home timeline. It is the sixth variant, and it is not a promoted-tweet format that wraps a tweet.<ul>
+<li>A branch that handles ads carrying <code>header_image_prompt_ad_info</code> in a separate marshaller was introduced in <code>home-mixer/util/urt/ad_marshaller.rs</code>.</li>
+</ul>
+</li>
+<li>On the content classification side, the first frame of long videos now goes into the LLM prompt separately.<ul>
+<li>The media loader of <code>grox</code> (the Grok-based nearline classifier sub-repo) downloads and resizes a first-frame preview image for videos of 30+ seconds.</li>
+<li>This image is placed before the storyboard (an image of uniformly sampled frames tiled in a grid) in the LLM prompt, with the label <code>[Video Preview Thumbnail]</code>.</li>
+</ul>
+</li>
+<li>Live broadcast frames became formal verdict targets of two safety pipelines.<ul>
+<li><code>BroadcastLoader</code> was newly added to grox and extracts frames of live broadcasts (X&#39;s live video, the successor to Periscope).</li>
+<li>Two safety pipelines, PTOS (policy-based violation category verdict) adult-content leading-frames and the sex/nudity safemodel, accept broadcast frames as a formal payload.</li>
+</ul>
+</li>
+<li>The multimodal post embedding was dropped from the training input in both registered ranking training configs.<ul>
+<li>In the nano training config table of <code>phoenix/README.md</code>, the documentation of Phoenix (the ranking model of X For You), the line saying the multimodal post embedding is on as v5 in <code>xrecsys_seqpack</code> changed to &quot;off (<code>home_direct_packed</code> and <code>xrecsys_seqpack</code>)&quot;.</li>
+</ul>
+</li>
+<li>Incidentally, phoenix NUMA pinning was fixed to exclude isolated CPUs from the sched_setaffinity target, and six feature-gated <code>quiet-spans</code> logs in <code>candidate-pipeline</code> were deleted.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. VF verdicts gained an explicit action value, and the filter uses it to decide what to drop</span></p></div>
+<ul>
+<li>The VF verdict axis was refactored from the filtering reason to an explicit action value <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/visibility-filtering-client/vf_client.rs" target="_blank" rel="noopener"><code>visibility-filtering-client/vf_client.rs</code></a> (+130/−62).<ul>
+<li>The verdict axis moved from <code>FilteredReason</code> to <code>Action</code>.</li>
+<li>Files changed together: <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/visibility-filtering-client/models.rs" target="_blank" rel="noopener"><code>visibility-filtering-client/models.rs</code></a> (+7), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/filters/vf_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/vf_filter.rs</code></a> (+27/−69), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/candidate_hydrators/vf_candidate_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/vf_candidate_hydrator.rs</code></a> (+159/−23), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/candidate_hydrators/vf_following_candidate_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/vf_following_candidate_hydrator.rs</code></a> (+6/−11), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/models/candidate.rs" target="_blank" rel="noopener"><code>home-mixer/models/candidate.rs</code></a> (+1).</li>
+</ul>
+</li>
+<li>The verdict result the client returns is now a tuple of three values <span class="badge ok">verified</span>.<ol>
+<li>The deterministic verdict <code>Action</code> (Allow / Interstitial / Avoid / Downrank / Drop / Tombstone / NotEvaluated)</li>
+<li>The annotation <code>FilteredReason</code> for logging and downstream use</li>
+<li>The label lookup result <code>SafetyLabelMap</code></li>
+</ol>
+<ul>
+<li><code>TweetVisibility</code> now has an <code>action: Action</code> field as a formal member, in addition to the existing <code>reason: Option&lt;FilteredReason&gt;</code> and <code>safety_labels</code>.</li>
+<li>A new helper, <code>TweetVisibility::to_visibility_reason()</code>, combines the action and the reason to derive the value of the <code>visibility_reason</code> field.</li>
+</ul>
+</li>
+<li>On the Strato path (Strato is the X internal system that code goes through to look up or store data), the client computes the action from the reason it receives from Strato <span class="badge ok">verified</span>. There are three rules.<ul>
+<li><p>Strato is defined in the <a href="x.html#glossary">services/x.md glossary</a>.</p>
+</li>
+<li><p><code>StratoVfClient::get_result</code> computes the action from the <code>FilteredReason</code> received from Strato via <code>action_from_strato_reason</code>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">fn action_from_strato_reason(reason: &amp;Option&lt;FilteredReason&gt;) -&gt; Action {
+    match reason {
+        None =&gt; Action::Allow,
+        Some(FilteredReason::SafetyResult(safety_result)) =&gt; match safety_result.action {
+            Action::NotEvaluated =&gt; Action::Allow,
+            _ =&gt; safety_result.action.clone(),
+        },
+        Some(_) =&gt; Action::Drop(DropReason {}),
+    }
+}
+</code></pre></figure>
+</li>
+<li><p>If the reason Strato gave is <code>SafetyResult</code>, the action inside it is used as is, and every other non-SafetyResult reason (mute, block, null-cast, exclusive, etc.) becomes <code>Drop</code> unconditionally.</p>
+</li>
+<li><p>If Strato returns <code>NotEvaluated</code>, the client layer promotes it to <code>Allow</code>. This means Strato treats a verdict that was not run as fail-open.</p>
+</li>
+</ul>
+</li>
+<li>On the gRPC path, the action in the response is used as is <span class="badge ok">verified</span>. On the new gRPC path, the standard is for the server to decide the action and send it down.<ul>
+<li><code>result_to_visibility</code> maps <code>result.action</code> of the gRPC response directly to <code>Action</code>.</li>
+<li>If there is no <code>action</code> field, it becomes <code>Action::NotEvaluated</code>.</li>
+</ul>
+</li>
+<li>The filter layer now decides what to drop by the candidate&#39;s action value <span class="badge ok">verified</span>. Allow, Interstitial, Avoid, and Downrank are kept; Drop, Tombstone, and NotEvaluated are filtered out.<ul>
+<li><p><code>VFFilter::filter</code> is now a function of candidate.visibility_action. The verdict function is the following:</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub(crate) fn should_drop_action(action: &amp;Action) -&gt; bool {
+    match action {
+        Action::Allow | Action::Interstitial | Action::Avoid | Action::Downrank =&gt; false,
+        Action::Drop(_) | Action::Tombstone | Action::NotEvaluated =&gt; true,
+    }
+}
+</code></pre></figure>
+</li>
+<li><p>The previous version matched <code>FilteredReason</code> variants. For <code>SafetyResult</code> it filtered only when <code>action == Drop</code>, and every other non-SafetyResult reason (mute, block, null-cast, exclusive, etc.) was an unconditional drop.</p>
+</li>
+<li><p>The new version is far more readable because the verdict axis is explicit.</p>
+</li>
+</ul>
+</li>
+<li>Filtering of ancestor, quoted, and retweeted source posts also looks at the action value <span class="badge ok">verified</span>.<ul>
+<li><code>should_drop_ancillary</code> in <code>vf_candidate_hydrator.rs</code> looks at <code>visibility.action</code> of ancestor, quoted, and retweeted posts to decide whether to drop.</li>
+<li>The previous <code>should_drop_reason(reason: &amp;FilteredReason)</code> was removed, and the filter layer&#39;s <code>should_drop_action</code> is shared.</li>
+</ul>
+</li>
+<li>An action field was added to the candidate object <span class="badge ok">verified</span>.<ul>
+<li><code>PostCandidate</code> in <code>candidate.rs</code> now has <code>visibility_action: Option&lt;Action&gt;</code>, and the existing <code>visibility_reason: Option&lt;FilteredReason&gt;</code> is kept.</li>
+<li>The two hydrator update functions (<code>VFCandidateHydrator::update</code> and <code>VFFollowingCandidateHydrator::update</code>) fill this field as well.</li>
+</ul>
+</li>
+<li>A new reason name for the case where the viewer blocks the author was introduced <span class="badge ok">verified</span>.<ul>
+<li>The new <code>FilteredReason</code> variant is <code>FilteredReason::ViewerBlocksAuthor</code>. Previously only <code>AuthorBlockViewer</code> (the author blocks the viewer) existed. Now the symmetric direction, &quot;the viewer blocks the author&quot;, also has a formal reason name.</li>
+<li><code>vf_pb::FilteredReason::ViewerBlocksAuthor</code> and the proto to/from mappings were also added.</li>
+</ul>
+</li>
+</ul>
+<p class="warn">⚠ Claim changed (the &quot;fail-closed&quot; statement at services/x.md line 392): the fail-closed character is kept, but the verdict granularity is much clearer.</p>
+<ul>
+<li>The previous canon said &quot;<code>VFFilter</code> is fail-closed. Every <code>FilteredReason</code> variant other than <code>SafetyResult</code> is an unconditional drop&quot;.</li>
+<li>The new verdict function has completely different syntax, but the results are mostly identical. On the Strato path, non-SafetyResult reasons are already converted to <code>Drop</code> at the client layer, and <code>NotEvaluated</code> is also dropped.</li>
+<li>The previous filter also dropped a verdict that arrived as <code>SafetyResult</code> only when the action was <code>Drop</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/filters/vf_filter.rs" target="_blank" rel="noopener"><code>vf_filter.rs:22-30</code></a>. It kept Allow, Interstitial, Avoid, Downrank, Tombstone, and NotEvaluated.</li>
+<li>What changed is that the filter layer now drops <code>Tombstone</code> and <code>NotEvaluated</code> <span class="badge ok">verified</span> — <code>vf_filter.rs:16-21</code>, quoted below.</li>
+</ul>
+<blockquote>
+<p>&quot;match action { Action::Allow | Action::Interstitial | Action::Avoid | Action::Downrank =&gt; false, Action::Drop(_) | Action::Tombstone | Action::NotEvaluated =&gt; true, }&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/filters/vf_filter.rs" target="_blank" rel="noopener">home-mixer/filters/vf_filter.rs:16-21</a>, 2026-09-09</p>
+</blockquote>
+<div class="blk why"><p><span class="lbl">Why it matters (A)</span> This refactor narrows the verdict to a unified action value at the client layer so that only the action flows downstream.</p></div>
+<ul>
+<li>The type of the unified action value is the <code>Action</code> enum.</li>
+<li>Since the Gen4 release (2026-08-13), three paths have been entangled in VF&#39;s verdict function: a path that must read <code>SafetyResult.action</code>, a path that must read the <code>FilteredReason</code> variant, and a path that must map the gRPC action.</li>
+<li>In the shadow comparison that Gen4+7 (2026-08-24, <a href="https://github.com/xai-org/x-algorithm/commit/d011592" target="_blank" rel="noopener">d011592</a>) introduced with <code>reference_compare.rs</code>, the cause of the diffs was likely mostly &quot;reason variant matching differs slightly per pipeline&quot; <span class="badge est">inferred</span>, and this refactor reads as a follow-up that reduces those diffs.</li>
+<li>No code in this commit actually uses <code>Downrank</code> yet. The door is open for <code>Downrank</code> to appear in the <code>SafetyResult.action</code> that Strato returns, but whether it is actually wired up is something to check in the next commit.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The home timeline gained a sixth ad format that does not wrap a tweet</span></p></div>
+<ul>
+<li>A new ad format was introduced in the home timeline <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/home-mixer/util/urt/ad_marshaller.rs" target="_blank" rel="noopener"><code>home-mixer/util/urt/ad_marshaller.rs</code></a> (+258/−3).<ul>
+<li>The format name is <code>header-image-prompt-ad</code>.</li>
+</ul>
+</li>
+<li>Home timeline ads previously had five formats, and this commit added the sixth <span class="badge ok">verified</span>.<ol>
+<li>Promoted tweet (<code>promoted-tweet-&lt;post_id&gt;-&lt;impression&gt;</code>)</li>
+<li>Preroll video ad</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/util/urt/ad_marshaller.rs" target="_blank" rel="noopener">SSP tweet</a>/RTB Trend Takeover</li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/49815da/home-mixer/util/urt/ad_marshaller.rs" target="_blank" rel="noopener">RTB image ad</a> (<code>rtb-image-ad-&lt;impression&gt;</code>)</li>
+<li>Google SDK Native ad(<code>GoogleSDKNativeAd</code>)</li>
+</ol>
+<ul>
+<li>The entry name of the sixth is <code>header-image-prompt-ad-&lt;impression&gt;</code>.</li>
+</ul>
+</li>
+<li>If the ad carries information for this format, the dedicated marshaller handles it first <span class="badge ok">verified</span>. The branch is mutually exclusive with promoted tweets.<ul>
+<li><p>This branch is at the top of the <code>marshal_ad()</code> function.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if let Some(info) = &amp;ad.header_image_prompt_ad_info {
+    return marshal_header_image_prompt_ad(ad, info, sort_index, request_type, &amp;impression_string);
+}
+</code></pre></figure>
+</li>
+<li><p>The criterion is whether the <code>AdIndexInfo.header_image_prompt_ad_info: Option&lt;HeaderImagePromptAdInfo&gt;</code> field is present.</p>
+</li>
+</ul>
+</li>
+<li>The input (HeaderImagePromptAdInfo) is a proto message filled in by the ad index service, and its field composition can be reconstructed from the form the marshaller consumes <span class="badge ok">verified</span>.<ul>
+<li>Header image: <code>image_url: String</code>, <code>image_width/height</code></li>
+<li>Header and body text: <code>header_text: String</code>, <code>body_text: String</code></li>
+<li>Primary CTA: <code>button_text: String</code>, <code>landing_url: String</code></li>
+<li>Secondary CTA (not shown if empty): <code>secondary_button_text: String</code>, <code>secondary_landing_url: String</code></li>
+<li>Whether to dismiss the ad after a click: <code>dismiss_on_click: bool</code></li>
+<li>Impression tracking callbacks: <code>impression_callback_endpoints: Vec&lt;String&gt;</code></li>
+<li>Primary CTA click tracking callbacks: <code>click_callback_endpoints: Vec&lt;String&gt;</code></li>
+</ul>
+</li>
+<li>This ad is carried in URT (Universal Response Tree, X&#39;s response rendering schema) as a Message-type item, not a tweet <span class="badge ok">verified</span>. It is a separate type called &quot;message prompt&quot;.<ul>
+<li>The entry structure is <code>TimelineEntryContent::Item(TimelineItem { content: TimelineItemContent::Message(MessagePrompt { content: MessageContent::HeaderImagePrompt(HeaderImagePrompt { .. }), impression_callbacks }) })</code>.</li>
+<li><code>MessageContent::HeaderImagePrompt</code> is the content variant dedicated to this ad.</li>
+</ul>
+</li>
+<li>The prompt content (HeaderImagePrompt) carries the image, text, and button actions <span class="badge ok">verified</span>.<ul>
+<li>Image (image_variants holds the URL, width, and height): <code>header_image: MessageImage</code></li>
+<li>Header text: <code>header_text: String</code>, <code>header_rich_text: RichText</code>. Both forms are carried together: plain text and a RichText without entities.</li>
+<li>Body (only when present): <code>body_text: Option&lt;String&gt;</code>, <code>body_rich_text: Option&lt;RichText&gt;</code></li>
+<li>Primary button (required): <code>primary_button_action: MessageTextAction</code></li>
+<li>Secondary button (only when <code>secondary_button_text</code> is not empty): <code>secondary_button_action: Option&lt;MessageTextAction&gt;</code></li>
+</ul>
+</li>
+<li>Each button has its own click event information and callback list <span class="badge ok">verified</span>.<ul>
+<li>The button structure (MessageTextAction) consists of <code>text: String</code> and <code>action: MessageAction { dismiss_on_click, url, client_event_info, on_click_callbacks, on_click_reactive_trigger }</code>.</li>
+<li>In each button&#39;s <code>ClientEventInfo</code>, the action is &quot;primary_cta&quot; or &quot;secondary_cta&quot;.</li>
+</ul>
+</li>
+<li>Three tests pin down this contract <span class="badge ok">verified</span>.<ol>
+<li><code>header_image_prompt_ad_marshals_to_message_prompt_entry</code>: asserts the entry_id format (<code>&quot;header-image-prompt-ad-fa4ead01&quot;</code>), the impression callback, the HeaderImagePrompt content variant, the image URL/dimensions, the text, and the primary CTA URL/dismiss/callback.</li>
+<li><code>header_image_prompt_ad_emits_secondary_button_when_set</code>: when <code>secondary_button_text = &quot;Learn more&quot;</code> is set, secondary_button_action exists and its action is secondary_cta.</li>
+<li><code>header_image_prompt_ad_info_absent_stays_a_tweet_item</code>: when <code>header_image_prompt_ad_info: None</code>, it falls through to the existing promoted-tweet marshaller.</li>
+</ol>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters (B)</span> The X home timeline formally added a new ad format that does not wrap a tweet.</p></div>
+<ul>
+<li>RTB image ad was already an image ad separate from tweets, but header-image-prompt-ad has a much richer component composition made of a header image, body text, and up to 2 CTA buttons.</li>
+<li>This format is the first ad to use a separate content type, URT <code>MessageContent</code>. From the client rendering side, it is likely rendered as in-feed announcement/dialog UI rather than as a tweet <span class="badge est">inferred</span>.</li>
+<li>This is also the first time an ad format that supports a secondary CTA has entered the home timeline.</li>
+<li>This commit does not show when or under what conditions the ad index system (not public) fills this ad format. It also does not show which of the five ad blenders (<code>safe_gap</code>, <code>partition_organic</code>, <code>partition_organic_low_risk</code>, <code>time_gap</code>, <code>multi_risk</code>) it enters.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. grox prepends a preview image of videos over 30 seconds before the storyboard</span></p></div>
+<ul>
+<li>The grox media loader attaches a preview thumbnail to long videos <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/data_loaders/media_loader.py" target="_blank" rel="noopener"><code>grox/core/data_loaders/media_loader.py</code></a> (+100/−19).<ul>
+<li>Also changed: <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/lm/convo.py" target="_blank" rel="noopener"><code>grox/core/lm/convo.py</code></a> (+18)</li>
+</ul>
+</li>
+<li>A threshold length, an image field, and a label were newly introduced <span class="badge ok">verified</span>.<ul>
+<li>The threshold length constant is <code>_VIDEO_PREVIEW_MIN_DURATION_MS = 30_000</code> (30 seconds).</li>
+<li>A <code>preview_image: bytes | None = None</code> field was added to the <code>Video</code> pydantic model.</li>
+<li>The label constant is <code>PREVIEW_IMAGE_LABEL = &quot;[Video Preview Thumbnail]&quot;</code>.</li>
+</ul>
+</li>
+<li>The preview is attached after passing four entry conditions (a 4-way gate) when the config switch is on <span class="badge ok">verified</span>.<ul>
+<li>After the existing frame hydration, <code>hydrate_video</code> runs <code>if grox_config.media_hydration.enable_video_preview_image: await cls.hydrate_video_preview(video, is_main_post and is_high_fav)</code>.</li>
+<li>The entry conditions of <code>hydrate_video_preview</code> are the following four:<ol>
+<li><code>video.convo_video is not None</code></li>
+<li><code>video.url</code> exists</li>
+<li><code>video.videoInfo</code> exists</li>
+<li><code>(video.videoInfo.durationMillis or 0) &gt; _VIDEO_PREVIEW_MIN_DURATION_MS</code>: more than 30 seconds</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>If it is a main post with high fav, the image is resized to the deluxe-only tile size <span class="badge ok">verified</span>.<ul>
+<li>If <code>is_deluxe = is_main_post and is_high_fav</code>, <code>resize_tile(bs, tile_size)</code> uses <code>deluxe_image_tile_size</code>; otherwise it uses <code>image_tile_size</code>.</li>
+<li>If the download fails, <code>media_loader.hydrate_video_preview_failed.count</code> increases.</li>
+<li>On success, <code>media_loader.hydrate_video_preview.count</code> increases and <code>video.convo_video.preview_image = preview</code> is set.</li>
+</ul>
+</li>
+<li>In the LLM input, the label, image, and newline go before the storyboard <span class="badge ok">verified</span>.<ul>
+<li>When preview_image exists, <code>Video.interleave_storyboard</code> adds three elements, <code>[f&quot;{PREVIEW_IMAGE_LABEL} &quot;, self.preview_image, &quot;\n&quot;]</code>, to the front of the storyboard list. The label, the original image bytes, and a newline come in order before the storyboard composite.</li>
+<li>In the <code>_image_part</code>-based chat marshaling path too, a text label is attached before the image via <code>if c.preview_image: parts.append({&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: PREVIEW_IMAGE_LABEL}); parts.append(_image_part(c.preview_image))</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters (C)</span> This commit added a third media representation: one representative frame of a long video, placed before the storyboard.</p></div>
+<ul>
+<li>Since Gen4+12 (2026-09-01, <a href="https://github.com/xai-org/x-algorithm/commit/6384ca7" target="_blank" rel="noopener">6384ca7</a>), where motion-reveal frames (static/dynamic split) were added to the storyboard (from Gen4), the media representations grox passes to the LLM were these two forms.</li>
+<li>A short video already has few storyboard frames and is representative enough. For a long video of 30+ seconds, however, a frame grid can blur the first impression, so the preview thumbnail first establishes &quot;what this is&quot;.</li>
+<li>Using a larger-tile preview for the Deluxe tier (main post with high fav) is also consistent with the existing design of tying LLM verdict cost to representativeness.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Live broadcast frames became targets of two safety verdict pipelines</span></p></div>
+<ul>
+<li>grox extracts frames of live broadcasts, and two PTOS safety pipelines judge these frames <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/core/data_loaders/media_loader.py" target="_blank" rel="noopener"><code>grox/core/data_loaders/media_loader.py</code></a> (broadcast part).<ul>
+<li>Files changed together: <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_adult_content_leading_frames_filter.py</code></a> (+18/−8), <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_safemodel_sex_nudity.py</code></a> (+21/−2)</li>
+</ul>
+</li>
+<li>A broadcast loader was newly added to the media loader <span class="badge ok">verified</span>.<ul>
+<li><code>from broadcast_tools.broadcast import BroadcastLoader</code> was added to <code>media_loader.py</code>, and <code>MediaLoader._broadcast_loader: BroadcastLoader | None = None</code> is the class cache.</li>
+<li><code>_get_broadcast_loader()</code> initializes it lazily. It uses the <code>bearer_token=X_API_BEARER</code> and <code>guest_token=BROADCAST_GUEST_TOKEN</code> environment variables.</li>
+</ul>
+</li>
+<li>Frames taken from a broadcast are normalized into a Video object <span class="badge ok">verified</span>.<ul>
+<li><code>_extract_broadcast_video(broadcast_metadata: BroadcastMetadata) -&gt; Video</code> extracts frames with <code>BroadcastLoader.load_broadcast(broadcast_id, media_key=..., max_frames=config.video_max_frames, tile_size=config.video_tile_size, max_duration=broadcast_metadata.crop_seconds)</code>.</li>
+<li>The extracted frames are normalized into <code>Video(convo_video=ConvoVideo(frames=..., duration=interval, total_duration=result.video.sampled_duration))</code>.</li>
+<li>The duration is computed as <code>(frames[-1].time_sec - frames[0].time_sec) / (len(frames) - 1)</code>.</li>
+</ul>
+</li>
+<li>The entry conditions of the adult-content leading-frames filter changed in two places <span class="badge ok">verified</span>. The target is the 6-gate condition folded into the canon at Gen4+17 (2026-09-08).<ul>
+<li>The conditions are in <code>TaskSafetyPtosAdultContentLeadingFramesFilter._eligible_with_post</code>.</li>
+</ul>
+</li>
+<li>First, the Deluxe fav gate is gone. The post now enters regardless of the fav threshold <span class="badge ok">verified</span>.<ul>
+<li>The old gate #2, <code>post.get_fav_count() &lt; grox_config.media_hydration.deluxe_fav_count_threshold: return cls._skip(post, &quot;not_high_fav&quot;)</code>, was deleted entirely.</li>
+</ul>
+</li>
+<li>Second, the post enters if a broadcast exists even without a long video <span class="badge ok">verified</span>.<ul>
+<li>The old code only looked at <code>long_videos = [m for m in media if m.type == &quot;video&quot; and durationMillis &gt;= 30s]</code> and skipped with <code>no_long_video</code> if there were none.</li>
+<li>The new code also computes <code>broadcasts = [p.broadcast_metadata for p in (post, post.quoted_post) if p is not None and p.broadcast_metadata is not None and p.broadcast_metadata.broadcast_id]</code>. The post enters if either <code>long_videos</code> or <code>broadcasts</code> is non-empty.</li>
+<li><code>crop_seconds = 10.0</code> is also set for broadcasts, and a <code>media = &quot;both&quot; | &quot;broadcast&quot; | &quot;video&quot;</code> tag is attached to <code>Metrics.counter(&quot;...eligible.count&quot;)</code>.</li>
+</ul>
+</li>
+<li>The sex/nudity safemodel verdict also receives broadcast frames as payload when the config switch is on <span class="badge ok">verified</span>.<ul>
+<li>A branch <code>if grox_config.media_hydration.enable_local_broadcast_frame_extraction:</code> was added to <code>TaskSafetyPtosSafemodelSexNudity._collect_payloads</code>.</li>
+<li>This branch uniformly samples <code>_MAX_FRAMES_PER_VIDEO = 8</code> from <code>convo_video.frames</code> of broadcast videos via <code>_iter_broadcast_videos(post)</code> and appends them as <code>(&quot;broadcast_frame&quot;, frame)</code> payloads.</li>
+<li>With the constant <code>_FRAME_KINDS = {&quot;video_frame&quot;, &quot;broadcast_frame&quot;}</code>, both kinds are treated equally when computing <code>has_video</code> and <code>n_video_frames</code>.</li>
+<li><code>_iter_broadcast_videos</code> yields only those with <code>broadcast_metadata.video.convo_video.frames</code> for each of <code>post</code> and <code>post.quoted_post</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters (D)</span> With this commit, live broadcasts were promoted to a formal media payload and became verdict targets of two safety pipelines (adult-content leading-frames and safemodel sex/nudity) that were already applied to static video.</p></div>
+<ul>
+<li>X&#39;s live video (broadcast, the <a href="https://en.wikipedia.org/wiki/Periscope_(app)" target="_blank" rel="noopener">successor of Periscope</a>) was a blind spot of the grox safety pipelines until this commit. PTOS judged only the static media of tweets (photos, uploaded video), and live broadcasts were likely handed to other systems or left unjudged.</li>
+<li>The Deluxe fav threshold, one of the 6 gates introduced in Gen4+17, was deleted a day later. The conditions of the leading-frames pipeline shrank to the following 5-gate set:<ul>
+<li>(a) prior PTOS result exists</li>
+<li>(b) prior result is not NSFW</li>
+<li>(c) video of 30+ seconds or broadcast</li>
+<li>(d) prior AdultContent policy or fav ≥ 512</li>
+</ul>
+</li>
+<li>That is, the pool of candidates for re-judgment grows sharply. This decision reads as moving load control away from managing re-judgment load with the fav threshold and onto (d)&#39;s <code>ADULT_CONTENT_LEADING_FRAMES_UNCONDITIONAL_FAV = 512</code> and the prior conditions of (a)/(b) <span class="badge est">inferred</span>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. The multimodal post embedding was turned off in both registered ranking training configs</span></p></div>
+<ul>
+<li>The multimodal post embedding was turned off in all ranking training configs <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/phoenix/README.md" target="_blank" rel="noopener"><code>phoenix/README.md</code></a> (+3/−3).</li>
+<li>The &quot;Multimodal post embedding&quot; row of the nano training config table changed <span class="badge ok">verified</span>.</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col class="w10"><col><col></colgroup>
+<thead>
+<tr>
+<th></th>
+<th>Before (49815da)</th>
+<th>After (75d93d9)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ranking nano</td>
+<td>v5 on <code>xrecsys_seqpack</code>; off on <code>home_direct_packed</code></td>
+<td>off (<code>home_direct_packed</code> and <code>xrecsys_seqpack</code>)</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>The accompanying explanatory text also changed <span class="badge ok">verified</span>.</li>
+</ul>
+<blockquote>
+<p>&quot;the multimodal-embedding input is off in both, and on every registered ranking config, as the table shows&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/75d93d9/phoenix/README.md" target="_blank" rel="noopener">phoenix/README.md</a>, 2026-09-09</p>
+</blockquote>
+<ul>
+<li>The <code>on</code> in the text must be read as a grammatical ellipsis of &quot;off&quot; (&quot;off in both, and [off] on every registered ranking config&quot;) <span class="badge ok">verified</span>. Otherwise it contradicts the table.</li>
+<li>That is, the multimodal post embedding was dropped from the training input in both registered ranking training configs (<code>home_direct_packed</code> flagship, <code>xrecsys_seqpack</code> seqpack) <span class="badge ok">verified</span>.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters (E)</span> Gen4+17 (2026-09-08, 49815da) introduced a v8-search multimodal embedding stack dedicated to the grox search surface, opening a vector space next to ranking that is separate from v5 and v8.2. One day later, in this commit, the v5 input was turned off in the only ranking config that had v5 on.</p></div>
+<ul>
+<li>That config is <code>xrecsys_seqpack</code>, and v5 had been on in it since the Gen4 release <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/phoenix/README.md" target="_blank" rel="noopener"><code>phoenix/README.md</code></a> table.</li>
+<li>Combining the two events narrows the scenarios: we infer that v5 either did not deliver a meaningful improvement as a ranking input or lost out in the latency/quality tradeoff, and was temporarily removed from the training config midway through the move to v8-search <span class="badge est">inferred</span>.</li>
+<li>This commit has no code that connects v8-search to a ranking config. Whether the search surface embedding and the ranking embedding stay in separate vector spaces, or v8-search replaces v5, is something to check in the next commit.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A previous Phoenix bug that tried to schedule threads on isolated cores (isolcpus) inside a NUMA node was fixed <span class="badge ok">verified</span>.<ul>
+<li>The fix is in the NUMA CPU affinity handling in <code>phoenix/xrex/utils/gpu.py</code>. Two helpers, <code>_parse_cpulist(text: str) -&gt; set[int]</code> and <code>schedulable_cpus(*nodes: int) -&gt; set[int]</code>, were introduced.</li>
+<li><code>schedulable_cpus</code> reads the CPU set of node N from <code>/sys/devices/system/node/nodeN/cpulist</code>, subtracts <code>/sys/devices/system/cpu/isolated</code>, and returns the result.</li>
+<li><code>pin_process_to_local_numa</code> split the existing <code>numa.schedule.run_on_nodes(node) → numa.memory.set_membind_nodes(node)</code> into two steps. It runs <code>numa.memory.set_membind_nodes(node)</code> first and <code>os.sched_setaffinity(0, schedulable_cpus(node))</code> second, layering the exception handling.</li>
+<li>If the node has no non-isolated CPU, it logs a warning and keeps only membind.</li>
+<li>This appears to be the result of Phoenix training encountering an isolated-core configuration on real production hosts <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>Six feature-gated info logs that were emitted per component of the candidate pipeline were deleted <span class="badge ok">verified</span>.<ul>
+<li>These are the <code>quiet-spans</code> logs of <code>candidate-pipeline</code>. One <code>#[cfg(feature = &quot;quiet-spans&quot;)] tracing::info!(...)</code> block was removed from each of <code>filter.rs</code>, <code>hydrator.rs</code>, <code>query_hydrator.rs</code>, <code>scorer.rs</code>, <code>selector.rs</code>, and <code>source.rs</code> (−40 lines in total).</li>
+<li>They were quiet info-level logs emitted on each pipeline component execution. They appear to have been removed because they duplicate span records while the quiet-spans feature condition is always active <span class="badge est">inferred</span>.</li>
+<li>The string format of the error log also reverted from <code>error!(component = self.name(), error = %err, &quot;source_failed&quot;)</code> to <code>error!(&quot;{} Failed: {}&quot;, self.name(), err)</code>. The structured fields were removed and it regressed to a string log.</li>
+</ul>
+</li>
+<li>Phoenix inference code also changed slightly <span class="badge ok">verified</span>. This commit appears to have made a minor cleanup of the API surface.<ul>
+<li>The changed files are <code>phoenix/xrex/configs/xrecsys.py</code> (−1), <code>phoenix/xrex/inference/model_runner.py</code> (+2/−1), and <code>phoenix/xrex/models/recsys_model.py</code> (+5).</li>
+<li>This may be work to wire up consumption of the <code>ContentFeatures</code> from Gen4+17 (2026-09-08), so it is something to revisit in the next commit.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> Updated the VF fail-closed statement at line 392 of the ranking and filter section. Also created one new subsection (<a href="x.html#">introduced the &quot;Gen4+18&quot; subsection under <code>## Pipeline</code></a>). Added the 75d93d9 sources to <code>## Sources</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters (overall)</span> In this commit, the biggest code-quality improvement is the VF Action refactor, and the most visible product change is header-image-prompt-ad. Removing the multimodal embedding training config is the heaviest signal on how the input schema of X&#39;s ranking model is decided. Because the v5 input, on since the Gen4 release, was turned off one day after the v8-search stack was introduced, the follow-up on v8-search wiring needs watching.</p></div>
+<ul>
+<li>If Gen4+17 was a large commit that moved five axes at once in a single day, Gen4+18 carries cleanup, follow-up, and expansion evenly across each axis.<ul>
+<li>VF unified the verdict axis (the largest and most fundamental refactor).</li>
+<li>Ads added a new format (a new product feature).</li>
+<li>grox improved LLM input with a preview thumbnail and widened safety pipeline coverage through broadcast unification.</li>
+<li>The training config removed the multimodal embedding (a design-direction decision).</li>
+</ul>
+</li>
+</ul>
+<h2 id="corrections">Corrections</h2>
+<ul>
+<li>The canon statement &quot;VFFilter is fail-closed&quot; was not fully negated; its wording changed.<ul>
+<li>It is at line 392 of <code>services/x.md</code>.</li>
+<li>The verdict axis moved from matching on <code>FilteredReason</code> to an explicit <code>Action</code> enum.</li>
+<li>The fail-closed character is retained (NotEvaluated → drop; in the Strato path, a non-SafetyResult reason is converted to Drop). However, the filter layer now newly filters out <code>Tombstone</code> and <code>NotEvaluated</code>.</li>
+<li>Folded into the canon.</li>
+</ul>
+</li>
+</ul>
+<h2 id="radar">Radar</h2>
+<p>No items were added to the radar today. We parsed 30 arXiv cs.IR papers, and 0 passed the acceptance criteria (platform-company authors or production A/B claims). The four notable candidates are:</p>
+<ul>
+<li><code>SequenceO1: End-to-End Ultra-Long (100K) Sequence Modeling in Recommendation with Low-Rank Caching</code><ul>
+<li>Already mentioned in the daily covering Gen4+17. It still has no production A/B.</li>
+</ul>
+</li>
+<li><code>PDMR: Passage-Driven Multi-ID Document Retrieval</code><ul>
+<li>It belongs to the Generative Retrieval family. It has no platform affiliation and no production results. Rejected.</li>
+</ul>
+</li>
+<li><code>Exploring Bottom-Up Clustering for Creating Semantic IDs</code><ul>
+<li>It is a clustering methodology for the Semantic ID line. It has no platform affiliation and is a theoretical increment. Rejected.</li>
+</ul>
+</li>
+<li><code>Q2D-Web: A Large-Scale Benchmark for Retrieval in Agentic RAG Systems</code><ul>
+<li>It is an Agentic RAG benchmark, outside the domain.</li>
+</ul>
+</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Where the Downrank action is actually used — In this commit Downrank was promoted to a proper variant, but no code returns this action yet.<ul>
+<li>The promoted variant is <code>Action::Downrank</code>.</li>
+<li>We will watch whether one of the rules under VF <code>visibility-filtering/rules/</code> is changed to return Downrank, or whether the gRPC server starts returning this action under certain conditions.</li>
+</ul>
+</li>
+<li>The ads blender that header-image-prompt-ad enters — In the next commit, we will observe which of the five ads blenders (<code>safe_gap</code>, <code>partition_organic</code>, <code>partition_organic_low_risk</code>, <code>time_gap</code>, <code>multi_risk</code>) this ad format enters, and how it is counted together with promoted tweets in the slot budget calculation.</li>
+<li>When v8-search attaches to the ranking config — Since v5 was turned off in <code>xrecsys_seqpack</code>, the only config where v5 was on, v8-search is a likely candidate for the follow-up wiring. We will watch whether a consumer of the <code>grox-multimodal-embedding-v8-search</code> topic is attached in <code>phoenix/xrex/data/retrieval_dataset.py</code>, and whether v8-search is added to the table in <code>phoenix/README.md</code>.</li>
+<li>The PTOS re-judging rate for broadcast — This is the first commit where live broadcast became a proper payload. If a dashboard for <code>task.safety_ptos_adult_content_leading_frames.eligible.count{media=broadcast}</code> and the broadcast_frame counters of <code>task.safety_ptos_safemodel_sex_nudity</code> is exposed somewhere, the actual scale of re-judging could be observed. Direct observation is difficult.</li>
+<li>The rule that returns <code>FilteredReason::ViewerBlocksAuthor</code> — It is a new variant, but this commit attaches no code showing which rule will return it. We will watch the next diff of <code>visibility-filtering/rules/author_rules.rs</code>.</li>
+<li>The actual host configuration behind the NUMA isolated CPU problem — We will watch whether the real production configuration is published anywhere, and why the Phoenix training host placed isolated CPUs inside a node (RT workload? DPDK? SR-IOV VF driver?).</li>
+</ul>
+<p>Lookup failed: none.</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-10.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-10</span></a><a class="pg-next" href="daily-2026-09-12.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-09-12</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-09-11.html" data-title="일일 리포트 2026-09-11"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

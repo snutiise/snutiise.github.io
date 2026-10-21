@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-01 — feed-research</title>
+<meta name="description" content="In one line: Six cold-start parameters in the X Home feed changed. The cold-start retrieval candidate cap rose from 0 to 200, which turned this path on, and…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-01.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-01.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-01.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-01.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-01 — feed-research">
+<meta property="og:description" content="In one line: Six cold-start parameters in the X Home feed changed. The cold-start retrieval candidate cap rose from 0 to 200, which turned this path on, and…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-01.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-01.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-01">2026-10-01</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>26 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-01.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>3</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>2</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>Six cold-start parameters in the X Home feed changed. The cold-start retrieval candidate cap rose from 0 to 200, which turned this path on, and the post-age cap fell from 48 hours to 2 hours.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">5</span></summary><ol><li><a href="#1-six-home-feed-cold-start-parameters-changed-and-vf-lookup-was-rewritten--x"><span class="num">1</span>Six Home feed cold-start parameters changed and VF lookup was rewritten — X</a></li><li><a href="#2-helix-raised-gmv-per-user-by-about-6-in-a-tiktok-e-commerce-ab-test--radar"><span class="num">2</span>HELIX raised GMV per user by about 6% in a TikTok e-commerce A/B test — Radar</a></li><li><a href="#3-snaps-grp-merged-retrieval-ranking-and-reward-into-one-model--radar"><span class="num">3</span>Snap&#39;s GRP merged retrieval, ranking, and reward into one model — Radar</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>In the same X commit, the tweet filter pipeline (VF) began filling in retweet originals within a single call, without a second lookup call.</li>
+<li>In the same commit, the retrieval two-tower configuration (a structure that encodes the user and the candidate separately) was registered in the registry as a catalog of six presets.</li>
+<li>The training mask of the ads conversion head moved to the data loader and was split into two axes, web and app.</li>
+</ul>
+<h2 id="1-six-home-feed-cold-start-parameters-changed-and-vf-lookup-was-rewritten--x"><span class="num">1</span>Six Home feed cold-start parameters changed and VF lookup was rewritten — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/77d431a" target="_blank" rel="noopener">xai-org/x-algorithm@77d431a</a> — xai-org/x-algorithm public repository, 2026-09-30 03:53:42Z (UTC), commit. Line counts are +3,306/−1,489, and 69 files changed. These notes number the X commits after the Gen4 release in order, and this commit is Gen4+32. It came one day after yesterday&#39;s commit <a href="https://github.com/xai-org/x-algorithm/commit/a707cc2" target="_blank" rel="noopener">Gen4+31 a707cc2</a>.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The hydration layer of visibility-filtering (VF, X&#39;s tweet filter pipeline) flipped three times over four days, from 2026-09-25 to 09-29. Hydration is the stage that fills in the original data needed for a verdict by looking it up in batches from backend services.</p></div>
+<ul>
+<li>Gen4+29 (2026-09-25, bf7db1b) expanded the <code>Hydrator</code> enum from 7 to 17 variants and introduced three data-driven plan/execute/sources files.</li>
+<li>Gen4+30 (2026-09-26, 4c5cfe8) split the state inside it into <code>store.rs</code> and the execution into <code>execute.rs</code>.</li>
+<li>Yesterday&#39;s Gen4+31 (2026-09-29, a707cc2) extracted <code>retweet.rs</code> as a separate module and merged in-batch sources and fetched sources with a double-hydrate pattern. The double-hydrate pattern hydrates the request batch and then fills only the retweet sources with a second hydrate call.</li>
+</ul>
+<p>This commit (Gen4+32) simplified the double-hydrate pattern into a <strong>single-hydrate with in-flight expansion</strong> pattern. In-flight expansion grows the request list by looking at results that arrive first while the lookup is still in progress. It also rewrote the eight <code>Option&lt;HydrationBatch&gt;</code> fields of Store as a new <code>Fetcher&lt;V&gt;</code> trait array, so that calling the same hydrator again does not re-request keys that are already claimed.</p>
+<p>At the same time, two axes evolved separately. The <code>xrecsys_two_tower.py</code> of Phoenix (the ranking model stack of X For You, whose training code was released in Gen4) was added to the registry as a formal catalog. Along with this, the SID (semantic ID)-based candidate tower and sequence packing were locked into six presets. SID is a discrete code hashed across several codebook layers instead of a post embedding. Sequence packing concatenates several user sequences into one batch row. <code>ads_head_masking</code>, used to train the ads conversion head, moved from the JAX training graph to the numpy data loader, which made it possible to train two axes, web conversion and app (MMP, Mobile Measurement Partner) conversion, separately.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Phoenix cold-start retrieval turned on and the post-age cap fell to 2 hours</span></p></div>
+<ul>
+<li>Six cold-start parameters of home-mixer (the service that handles For You feed requests) moved in the cron mirror <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.<ul>
+<li>Cold start refers to new users or exploration targets. The cron mirror is a file that syncs and publishes production parameter values daily.</li>
+<li>The Phoenix cold retrieval channel was turned on, from 0 to 200 posts.</li>
+<li>MaxPostAge was made extreme, from 48h to 2h.</li>
+<li>FollowerCap was effectively lifted, from 1000 to 50k.</li>
+<li>Thompson sampling was also turned on. Thompson sampling picks the candidates that fill cold-start slots by drawing samples from a Beta reward distribution.</li>
+</ul>
+</li>
+</ul>
+<p>Yesterday&#39;s and today&#39;s values of the six parameters:</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col class="w10"><col class="w8"><col></colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Yesterday</th>
+<th>Today</th>
+<th>Multiplier</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PhoenixColdStartMaxResults</code></td>
+<td>0</td>
+<td>200</td>
+<td>0 → 200 (Phoenix cold-start retrieval output enabled, from 0 to 200)</td>
+</tr>
+<tr>
+<td><code>ColdStartImpressionThreshold</code></td>
+<td>1000</td>
+<td>200</td>
+<td>×0.2 (only posts with fewer than 200 Home impressions are targeted; narrower target set)</td>
+</tr>
+<tr>
+<td><code>ColdStartFollowerCap</code></td>
+<td>1000</td>
+<td>50,000</td>
+<td>×50 (author follower cap effectively lifted)</td>
+</tr>
+<tr>
+<td><code>ColdStartMaxPostAgeSecs</code></td>
+<td>172,800(48h)</td>
+<td>7,200(2h)</td>
+<td>1/24 (post freshness made extreme)</td>
+</tr>
+<tr>
+<td><code>LowImpressionsMaxPositionRatio</code></td>
+<td>0.85</td>
+<td>0.97</td>
+<td>+0.12 (position boost cap extends to the later part of the feed)</td>
+</tr>
+<tr>
+<td><code>EnableColdStartThompsonSampling</code></td>
+<td>false</td>
+<td>true</td>
+<td>newly ON</td>
+</tr>
+</tbody></table></div>
+<p>The <code>last sync</code> in the file&#39;s comment header was updated from 2026-09-28T16:00:35Z → 2026-09-29T17:02:52Z.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. VF fills retweet originals within a single call, without a second hydrate call</span></p></div>
+<ul>
+<li>The double-hydrate pattern that filled retweet sources was simplified into single-hydrate with in-flight expansion <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/retweet.rs" target="_blank" rel="noopener"><code>retweet.rs</code></a>.<ul>
+<li>The changed file is <code>retweet.rs</code> (+562/−110).</li>
+<li>Until yesterday, it filled the original batch with <code>filter_tweets.hydrate(request)</code>, picked retweet source candidates with <code>source_ids</code>, and fired a second <code>filter_tweets.hydrate(...)</code> for the sources not in the request batch.</li>
+<li>Today it calls <code>filter_tweets.hydrate_with_retweet_sources(request)</code> only <strong>once</strong>.</li>
+</ul>
+</li>
+<li>This single call attaches retweet sources to the request internally at the moment the pure_cores response lands <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/store.rs" target="_blank" rel="noopener"><code>store.rs:308-330</code></a>.<ul>
+<li>pure_cores is tweet core data containing the author id, the body, and the original tweet id.</li>
+<li>The function that runs at this point is <code>store.join_retweet_sources()</code>.</li>
+<li>This function appends those <code>source_tweet_id</code>s of pure_cores that are not in the request to <code>request_tweets</code> and returns <code>Landing::SourcesJoined</code>.</li>
+</ul>
+</li>
+<li>Once sources are attached, the executor puts the initial groups back into the ready state and fires an expanded batch only for the fetched sources <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/execute.rs" target="_blank" rel="noopener"><code>execute.rs:112-118</code></a>.<ul>
+<li>When <code>execute.rs</code> receives <code>Landing::SourcesJoined</code>, it puts the <code>inputless()</code> groups (the initial groups with no pure_core dependency) back into <code>ready</code>.</li>
+<li>Thanks to the claim dedup of Fetcher, keys that were already in the request batch are not re-requested.</li>
+</ul>
+</li>
+<li>The new <code>Fetcher&lt;V&gt;</code> trait holds a lookup state per key, picks only the keys not yet present, and returns them as the keys to send in the actual RPC <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/fetcher.rs" target="_blank" rel="noopener"><code>fetcher.rs</code></a>.<ul>
+<li>The new file <code>visibility-filtering/hydration/fetcher.rs</code> (NEW +113) contains the <code>Fetcher&lt;V&gt;</code> and <code>AnyFetcher</code> traits.</li>
+<li>Internally it is a single <code>HashMap&lt;u64, State&lt;V&gt;&gt;</code>, and the state is <code>enum State&lt;V&gt; { Pending, Landed(Hydrated&lt;V&gt;) }</code>.</li>
+<li><code>claim(keys) -&gt; Vec&lt;u64&gt;</code> marks only the keys not yet present as Pending and returns only the keys to send in the actual RPC. Dedup and the join with earlier calls happen together here.</li>
+<li><code>land(&amp;[u64], HydrationBatch)</code> fills responses into the claimed keys and fills keys without a response with <code>Hydrated::NotFound</code>.</li>
+<li><code>has_incomplete</code>/<code>is_incomplete</code>/<code>has_claimed</code>/<code>is_claimed</code> decide whether to call again.</li>
+</ul>
+</li>
+<li>All eight fields that Store held were replaced with Fetcher <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/store.rs" target="_blank" rel="noopener"><code>store.rs:54-84</code></a>.<ul>
+<li>What changed is the <code>Option&lt;...&gt;</code> fields of <code>store.rs</code>, and the new type is <code>Fetcher&lt;V&gt;</code>.</li>
+<li>Each Edge gets its own <code>Fetcher&lt;bool&gt;</code>, bundled in the array <code>edges: [Fetcher&lt;bool&gt;; Edge::VARIANTS.len()]</code>. Edge has eight variants: Follows/Blocks/Mutes/MuteRetweets/BlockedBy/SuperFollows/FollowedBy/SecondDegree.</li>
+<li>The new <code>CallRequest&lt;&#39;p&gt;</code> struct encapsulates the details of actually firing one group. Its fields are group, is_first, keys, key_count, queries, viewer_id, batch_size, and counts.</li>
+<li><code>offer(&amp;mut self, group) -&gt; Option&lt;CallRequest&gt;</code> claims the keys of the group, builds a CallRequest, and hands it to the scheduler.</li>
+<li>On the second call (is_first=false), the <code>record_expanded_batch</code> metric is emitted.</li>
+</ul>
+</li>
+<li>The edge representation in the lookup plan was unified into a single eight-variant enum <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:8-20</code></a>.<ul>
+<li><code>Part::Edge(Graph, EdgeDirection)</code> in <code>plan.rs</code> became <code>Part::Edge(Edge)</code>.</li>
+<li><code>Edge::flock()</code> returns the flock RPC parameters as <code>Option&lt;(Graph, EdgeDirection)&gt;</code>. Only <code>SecondDegree</code> is <code>None</code>, and it is routed through Wingman.</li>
+<li><code>Hydrator::RootFollowsViewerSecondDegree</code>, which was <code>Part::Column</code> yesterday, was promoted today to <code>Part::Edge(Edge::SecondDegree)</code> and is routed uniformly through the fetcher array.</li>
+</ul>
+</li>
+<li>Groups gained position and reader list fields, so the offer→land→ready schedule is computed in O(readers) per group <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/hydration/plan.rs" target="_blank" rel="noopener"><code>plan.rs:172-207</code></a>.<ul>
+<li>The new fields are <code>position: usize</code> and <code>readers: Vec&lt;usize&gt;</code> of <code>Group</code>.</li>
+</ul>
+</li>
+<li>A metric that records retweet sources in three cases was added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/filter.rs" target="_blank" rel="noopener"><code>filter.rs:62-79</code></a>.<ul>
+<li>The metric is <code>RetweetSources::{NoSource, InBatch, Fetched}</code>.</li>
+<li>The test <code>each_request_kind_labels_its_phase_samples</code> pins the three cases: [2] → NoSource, [1,2,3,5] → InBatch, [1,2,3,4] → Fetched <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/retweet.rs" target="_blank" rel="noopener"><code>retweet.rs:721-738</code></a>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The functions that convert a verdict into thrift, proto, and metric representations were isolated in one file</span></p></div>
+<ul>
+<li>The set of functions that project the pure verdict produced by rules into three kinds of downstream representations was isolated in a new file <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>treatment.rs</code></a>.<ul>
+<li>The new file is <code>visibility-filtering/treatment.rs</code> (NEW +119), and the input verdict is <code>Verdict</code> (Withheld / Shown{media, engagement}).</li>
+<li><code>thrift_action(&amp;Verdict, SafetyLevel) -&gt; Action</code> projects to thrift <code>action::Action</code> (Allow / Drop / Tombstone / ComposedMediaVisibilityResults / Interstitial / LimitedEngagements / TweetInterstitial).</li>
+<li><code>thrift_result_state(&amp;Verdict, SafetyLevel) -&gt; TweetFieldsResultState</code> projects to the tweet-service response state (Found / Filtered). Only four <code>FilteredReason::{TweetIsBounced, AuthorBlockViewer, AuthorIsProtected, AuthorIsSuspended}</code> have a separate legacy arm, and the rest are wrapped in <code>SafetyResult</code>.</li>
+<li><code>proto_action(Verdict) -&gt; (vf_pb::Action, Option&lt;vf_pb::FilteredReason&gt;)</code> projects to the three-way (Allow / Drop / Interstitial) form for the VF proto.</li>
+<li><code>metric_label(&amp;Verdict) -&gt; &amp;&#39;static str</code> emits a six-way label (<code>allow</code> / <code>drop</code> / <code>tombstone</code> / <code>interstitial</code> / <code>limited_engagement</code> / <code>tweet_interstitial</code>).</li>
+<li><code>decided_rows(&amp;Verdict)</code> is an iterator that unfolds a verdict into a sequence of (rule, phase) tuples.</li>
+<li>The test <code>dashboard_generator_pins_the_rpc_and_verdict_mix_labels</code> actually reads <code>scripts/dashboard.py</code> and asserts that <code>FT_VERDICT_ACTIONS</code> has the six labels. The metric labels and the dashboard are tied together by golden.</li>
+</ul>
+</li>
+<li>The age-verification option constant was also pinned in this file <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering/treatment.rs" target="_blank" rel="noopener"><code>treatment.rs:120-123</code></a>.<ul>
+<li>The constant is <code>AGE_VERIFICATION_OPTIONS = [SELFIE, PERSONA]</code>.</li>
+<li><code>blurred_media</code> puts these two options into the response only when the blur prompt is <code>AGE_VERIFICATION_PROMPT</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The VF client now receives a result state instead of a verdict action</span></p></div>
+<ul>
+<li>The client contract changed so that the VF response carries a result state instead of a verdict action <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering-client/evaluated.rs" target="_blank" rel="noopener"><code>evaluated.rs:22-33</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering-client/vf_client.rs" target="_blank" rel="noopener"><code>vf_client.rs:35-41</code></a>.<ul>
+<li>The response was promoted from Thrift <code>Action</code> to <code>TweetFieldsResultState</code>.</li>
+<li>The proto changed from <code>Outcome::ActionThriftCompact</code> to <code>Outcome::ResultStateThriftCompact</code>, and the constant from <code>MAX_ACTION_BYTES</code> to <code>MAX_RESULT_STATE_BYTES</code>. The value is still 64KB.</li>
+<li>VF now carries the (Found | Filtered) result state itself, so the caller can build the tweet-service response directly.</li>
+</ul>
+</li>
+<li>The check of the tweet.id order in the response is gone, and only the response length is checked <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering-client/vf_client.rs" target="_blank" rel="noopener"><code>vf_client.rs:35-46</code></a>.<ul>
+<li>Until yesterday, the <code>tweet.as_ref() == Some(expected)</code> assert verified the order and the quote context.</li>
+<li>This change is a wire format optimization.</li>
+</ul>
+</li>
+<li>A metadata parameter was added to the request header <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/visibility-filtering-client/vf_client.rs" target="_blank" rel="noopener"><code>vf_client.rs:8-25</code></a>.<ul>
+<li>The parameter is <code>metadata: &amp;tonic::metadata::MetadataMap</code>.</li>
+<li>It forwards the caller metadata (<code>twittercontext</code>, etc.) to each chunk RPC.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. The Phoenix retrieval two-tower configuration was registered in the registry as a catalog of six presets</span></p></div>
+<ul>
+<li>The two-tower configuration file was promoted to a catalog in the registry and holds six presets <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py</code></a>.<ul>
+<li>The file path is <code>phoenix/xrex/configs/xrecsys_two_tower.py</code>.</li>
+<li>The presets are in the <code>MODEL_CFGS</code> dictionary of <code>xrecsys_two_tower.py</code>.</li>
+<li>The preset names are <code>xrecsys_two_tower</code> / <code>xrecsys_two_tower_immersive_only</code> / <code>xrecsys_two_tower_immersive_only_gb300</code> / <code>xrecsys_two_tower_combined</code> / <code>xrecsys_two_tower_combined_gb300</code> / <code>xrecsys_two_tower_nano</code>.</li>
+<li>The common scale shared by several presets is in <code>_xrecsys_two_tower_combined_base</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:466-475</code></a>.<ul>
+<li>Sequence length: <code>history_seq_len=1023</code> · <code>candidate_seq_len=64</code></li>
+<li>Model size: <code>num_layers=8</code> · <code>emb_size=1024</code> · <code>emb_table_width=1024</code> · <code>query_heads=16</code> · <code>kv_heads=4</code> (GQA 4:1)</li>
+<li>Training samples: <code>num_global_negatives_per_example=64</code> · <code>total_samples=1e11</code></li>
+<li>vocab: <code>item_hash_vocab_size=100_000_000</code> · <code>author_vocab_size=30_000_000</code></li>
+</ul>
+</li>
+<li>Only SID is used, with no user or post embeddings <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:311-318</code></a>.<ul>
+<li><code>use_user_embedding=False</code> · <code>use_post_embedding=False</code> · <code>use_post_sid=True</code></li>
+<li><code>sid_num_levels=6</code> · <code>sid_codebook_size=256</code> · <code>sid_embed_dim=1024</code> · <code>sid_hash_level=True</code> · <code>sid_cross_attn=True</code></li>
+</ul>
+</li>
+<li>It uses sequence packing and right-anchored RoPE.<ul>
+<li><code>use_seqpack=True</code> · <code>effective_sequence_len=513</code> · <code>BetaLengthDistribution(min=0, max=1023, mean=511, α=β=1.0, block_size=128)</code></li>
+</ul>
+</li>
+<li>Home and Immersive share two candidate heads <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:293-302</code></a>.<ul>
+<li><code>num_candidate_heads=2</code> · <code>head_names=[&quot;home&quot;, &quot;immersive&quot;]</code></li>
+<li><code>head_dataset_mapping</code> maps HOME/HOME_COLD/HOME_HOT to head 0 and IMMERSIVE4Day/IMMERSIVE2Day/IMMERSIVENSFW to head 1.</li>
+<li>The <code>positive_actions</code> of home is only <code>[SERVER_TWEET_FAV]</code>. <code>immersive_positive_actions</code> has eight kinds: FAV / REPLY / QUOTE / RETWEET / VIDEO_QUALITY_VIEW / FOLLOW_AUTHOR / BOOKMARK / SHARE <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:283-292</code></a>.</li>
+</ul>
+</li>
+<li>The hardware presets are separate for H100 and GB300 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:409-413</code></a>.<ul>
+<li><code>_H100_OVERRIDES = {bs_per_device: 480, ep: 128, attn_impl: &quot;cutedsl_ranker_varlen_attn&quot;}</code> · <code>_GB300_OVERRIDES = {bs_per_device: 960, ep: 64, ...}</code></li>
+<li>On GB300 the per-device batch is doubled and EP is halved.</li>
+</ul>
+</li>
+<li>The optimizer is Adam, and embeddings get a separate learning rate for rowwise adagrad <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:826-831, 271</code></a>.<ul>
+<li><code>Adam(b1=0.95, b2=0.98, weight_decay=1e-3)</code> · <code>learning_rate=2e-3</code> · <code>emb_learning_rate=0.1</code>(embedding rowwise adagrad)</li>
+<li><code>apply_u2u_and_i2i_loss=False</code> (off by default) · <code>empty_history_user_dropout_rate=0.1</code></li>
+</ul>
+</li>
+<li>The candidate max_posts values differ between combined and immersive <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py:611-618</code></a>.<ul>
+<li>combined 28,672,000 · immersive 40,960,000</li>
+</ul>
+</li>
+<li>The linear projection setting differs between combined/immersive and nano <span class="badge ok">verified</span> (same source).<ul>
+<li><code>enable_linear_proj</code> is False in combined/immersive and True in nano.</li>
+</ul>
+</li>
+<li>The same line range also has an assert that keeps the two settings from being turned on together <span class="badge ok">verified</span> (same source).<ul>
+<li><code>apply_u2u_and_i2i_loss</code> and <code>enable_candidate_tower_linear_proj</code> are tied by a mutual-exclusion assert.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;Beta length distribution used for sequence packing: BetaLengthDistribution(min=0, max=1023, mean=511, alpha=1.0, beta=1.0, block_size=128).&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a>, 2026-09-30</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. The training mask of the ads conversion head moved to the data loader and was split into web and app</span></p></div>
+<ul>
+<li>The ads head masking code was rewritten from the model-side JAX implementation to a data-side numpy implementation <span class="badge ok">verified</span>.<ul>
+<li>The new file <code>phoenix/xrex/data/recsys/ads_head_masking.py</code> (NEW +87) replaces <code>phoenix/xrex/models/ads_head_masking.py</code> (−67) and rewrote <code>ads_head_masking</code> from JAX to numpy.</li>
+<li>The patch of the deleted <code>models/ads_head_masking.py</code> has <code>import jax; import jax.numpy as jnp</code>, while the new <code>data/ads_head_masking.py</code> uses only <code>numpy as np</code>.</li>
+</ul>
+</li>
+<li>The new function precomputes a numpy bool mask in the data pipe <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/data/recsys/ads_head_masking.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/ads_head_masking.py:44-88</code></a>.<ul>
+<li>The function is <code>build_trained_candidate_mask(actions, sample_source, trained_actions_bits, *, ads_head_masking: bool) -&gt; npt.NDArray[np.bool_]</code>.</li>
+<li>The argument names changed: <code>source_id</code> → <code>sample_source</code>, and <code>raw_targets</code> → the <code>trained_actions_bits: uint8</code> bitmask.</li>
+<li>The new constant <code>ADS_FAMILY_SLICE_HEADS</code> holds the representative head indexes of four slices (<code>delayed_website_clicked</code> / <code>delayed_website_non_clicked</code> / <code>delayed_app_clicked</code> / <code>delayed_app_non_clicked</code>).</li>
+<li>An MMP app-conversion axis was added, which expanded masking into a <strong>web × app × early/late × click/view</strong> grid.</li>
+</ul>
+</li>
+<li>The clicked mask of the model was split into web and app <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>recsys_model.py:1493-1520</code></a>.<ul>
+<li><code>masks[&quot;clicked&quot;]</code> in <code>recsys_model.py</code> was split four ways: <code>website_clicked</code> / <code>non_negative_website_clicked</code> / <code>app_clicked</code> / <code>non_negative_app_clicked</code>.</li>
+</ul>
+</li>
+<li>A new verification keeps ads head masking and seqpack from being turned on together <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>recsys_model.py:610-614</code></a>.<ul>
+<li>The verification function <code>validate_ads_head_masking</code> forbids <code>ads_head_masking and use_seqpack</code>.</li>
+<li>In the packed layout, the per-candidate/per-head trained_candidate_mask is not defined.</li>
+</ul>
+</li>
+<li>The column names of the training batch schema changed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/data/recsys/recsys_batch.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/recsys_batch.py:471-479</code></a>.<ul>
+<li>In <code>recsys_batch.py</code>, <code>conversionKeepMask: bool</code> changed to <code>conversionKeepBits: uint8</code>.</li>
+<li>The fallback value when null changed from <code>True</code> to <code>CONVERSION_KEEP_WEB | CONVERSION_KEEP_APP = 0b11</code>.</li>
+<li>It now takes a new <code>sample_source</code> column. If absent, it is all zero.</li>
+</ul>
+</li>
+<li>The MMP action groups, bit constants, enum, and new labels were added to the constants file <code>constants.py</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/xrex/data/recsys/constants.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/constants.py</code></a>.<ul>
+<li><code>MMP_CLICK_ACTION_INDEX = ADS_MMP_CLICK</code></li>
+<li><code>MMP_CLICK_CONDITIONED_ACTION_INDICES</code> is the seven app click-through actions.</li>
+<li><code>MMP_CLICK_VIEW_THROUGH_ACTION_INDICES</code> is the seven app view-through actions. They were separated from <code>VIEW_THROUGH_ACTION_INDICES</code>, where they were mixed in until yesterday.</li>
+<li>The bit constants are <code>CONVERSION_KEEP_WEB = 1 &lt;&lt; 0</code> · <code>CONVERSION_KEEP_APP = 1 &lt;&lt; 1</code>.</li>
+<li><code>LineItemObjective(enum.IntEnum): WEBSITE_CLICKS = 5</code> promotes to an enum what was the magic number <code>line_item_objective == 5</code> until yesterday.</li>
+<li>The new labels <code>IsCustomConversion</code> / <code>IsContentViewConversion</code> map to <code>ADS_CUSTOM_CONVERSION</code> / <code>ADS_CONTENT_VIEW_CONVERSION</code>, respectively.</li>
+</ul>
+</li>
+<li>Two MMP install actions were added to the proto <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>.<ul>
+<li>The new actions in <code>recsys.proto</code> are <code>ADS_ATTRIBUTED_MACT_MMP_CLICK_INSTALL = 194</code> and <code>ADS_ATTRIBUTED_MACT_MMP_VIEW_INSTALL = 195</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The home-mixer diversity stats helper file was deleted <span class="badge ok">verified</span>.<ul>
+<li>The deleted file is <code>home-mixer/util/composition.rs</code> (−63).</li>
+<li>Until yesterday, this file was a diversity stats helper containing the <code>Composition {size, unique, max_count, hhi, entropy_norm}</code> struct and the <code>from_keys</code> / <code>from_counts</code> / <code>unique_ratio</code> / <code>max_share</code> API.</li>
+<li>In <code>response_diversity_stats_side_effect.rs</code>, only the import path changed at the call site, to <code>use xai_candidate_pipeline::component_library::utils::Composition;</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/side_effects/response_diversity_stats_side_effect.rs" target="_blank" rel="noopener"><code>response_diversity_stats_side_effect.rs</code></a>.</li>
+<li>The shared utilities of candidate-pipeline already have a Composition of the same name, so this is dedup: deleting its own copy and using the shared one.</li>
+<li>It is unrelated to the rules/registry Policy (Gen4+30).</li>
+</ul>
+</li>
+<li>Nine handles were added to the Brazil 2026 election filter, and the list size went from 2,786 to 2,795 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/filters/brazil_2026_election_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/brazil_2026_election_filter.rs:5849-5852</code></a>.<ul>
+<li>The added handles (per the comments) are @linoaa, @LPVellozo, @erikakokay, @douglascamargoo, @Anadelso_p, @zeosmaruniao, @siandrade11777, @tiagopiaui22, and @gloriabsoares.</li>
+<li>There is no logic change.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Created a <code>### Gen4+32</code> section in <a href="x.html">services/x.md</a> that summarizes the facts above, added the commit sha <code>77d431a</code> to <code>## Sources</code>, and updated <code>Last updated</code> to 2026-10-01.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Three axes overlap.</p></div>
+<ol>
+<li><strong>The home-mixer cold start was set with production parameters.</strong> Gen4+30 added a code path to the HOME_COLD=13 channel, which was introduced in Gen4+28 (44d37eb) together with HOME_HOT=14, and today the parameters were set.<ul>
+<li>The Phoenix cold retrieval channel opened from 0 to 200 posts, and MaxPostAge was made extreme, from 48h to 2h.</li>
+<li>FollowerCap was effectively lifted from 1000 to 50k, so the author pool grew sharply.</li>
+<li>ImpressionThreshold was lowered from 1000 to 200, so only posts with fewer than 200 Home impressions became cold-start targets (narrower target set) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/77d431a/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>author_cold_start.rs:294</code></a>. Thompson sampling was also turned on.</li>
+<li>If cold start has so far been a narrow exploration aimed at tracked authors or new users, this parameter setting combines an extremely strict 2h freshness limit with a widely open author pool.</li>
+<li>Whether this tuning holds up in the A/B is the checkpoint to watch at the next cron sync.</li>
+</ul>
+</li>
+<li><strong>VF hydration gained the ability to re-expand.</strong> The four-day run from Gen4+29 (09-25) to Gen4+31 (09-29) completed the data-driven pipeline skeleton and the <code>retweet.rs</code> module extraction.<ul>
+<li>Today the <code>Fetcher&lt;V&gt;</code> trait was added on top, which made claims idempotent.</li>
+<li>This makes possible the <code>Landing::SourcesJoined</code> flow, which expands request_tweets in flight the moment pure_cores lands and re-fires the inputless groups.</li>
+<li>The double-hydrate pattern of <code>retweet.rs</code> was simplified into single-hydrate with in-flight expansion.</li>
+<li>The metric axis (NoSource / InBatch / Fetched) is set as labels, so the actual rate of expanded batches can be observed.</li>
+<li>The VF client response was also promoted from Thrift <code>Action</code> to <code>TweetFieldsResultState</code>, moving to a form where the caller can build the tweet-service response directly.</li>
+<li><code>treatment.rs</code> isolating the rules → thrift/proto/metric projection in one file and tying dashboard.py and the six metric labels together with golden tests also completes this simplification.</li>
+</ul>
+</li>
+<li><strong>Phoenix retrieval two-tower was promoted to a catalog.</strong> Until now <code>xrecsys_two_tower.py</code> existed as a file and had minor edits across several commits, but the registry catalog itself was not locked.<ul>
+<li>The minor edits were the introduction of the three options <code>qk_norm=True</code>, <code>attn_logit_cap=-1</code>, and <code>right_anchored_rope=True</code> in Gen4+6, and the switch of the H100 attn kernel from <code>pallas_ranker_varlen_attn</code> to <code>cutedsl_ranker_varlen_attn</code> in Gen4+21.</li>
+<li>Today six presets (the default, immersive-only and its GB300 version, combined and its GB300 version, and nano) were locked into <code>MODEL_CFGS</code> and migrated to connect to the production data pipe <span class="badge est">inferred</span>. The evidence is that the only in-file dataset is <code>aggregated_kafka</code> and that the presets are well defined as hardware-aware.</li>
+<li>Notably, SID-only (a 6-level codebook hash instead of post embeddings), seqpack, the H100/GB300 hardware presets, and the sharing of two heads, Home and Immersive, are organized in one file.</li>
+<li>Paired with the &quot;wiring of <code>sid_codes</code> into the DPA ads product too&quot; observed in Gen4+13, this gives the SID vocabulary a large potential to unify three uses: organic posts, ads DPA, and the retrieval two-tower.</li>
+</ul>
+</li>
+<li><strong>The ads conversion head split along web/app axes.</strong> The delayed feedback split introduced in Gen4+6 and the <code>ads_head_masking</code> knob unified in Gen4+24 moved today from a float multiplier inside the training graph to a boolean mask precomputed by the data loader.<ul>
+<li>This secures compile stability by making the graph independent of sample_source.</li>
+<li>It also trains the web conversion head and the app (MMP) conversion head separately, so that different sample subsets can be used for the <code>keep_web</code> / <code>keep_app</code> axes.</li>
+<li>The mask semantics still keep the same late-window twin suppression logic; it is an exact refactor that changes only where the computation happens.</li>
+<li>The mutual-exclusion assert with <code>use_seqpack</code> was newly added because candidate slot correspondence breaks down under seqpack.</li>
+<li>Introducing the two actions <code>ADS_ATTRIBUTED_MACT_MMP_{CLICK, VIEW}_INSTALL = 194, 195</code> in the proto creates a channel to formally fold MMP-side app-install conversion into the training head.</li>
+</ul>
+</li>
+</ol>
+<p>Adding nine handles to the Brazil 2026 election filter is list maintenance with no logic change. Deleting Composition.rs removes duplication by reusing the shared candidate-pipeline library.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-helix-raised-gmv-per-user-by-about-6-in-a-tiktok-e-commerce-ab-test--radar"><span class="num">2</span>HELIX raised GMV per user by about 6% in a TikTok e-commerce A/B test — Radar</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2609.37183" target="_blank" rel="noopener">HELIX: Purified and Unified - Rethinking Feature Interaction and Sequence Modeling for Large-Scale Recommendation</a> — arXiv 2609.37183 v1, 2026-09-29 (arXiv submission), paper. There are 21 authors. The v1 HTML renders as a 404, but the abstract contains the phrase &quot;Deployed in TikTok&#39;s e-commerce recommendation system&quot;, so we infer the affiliation is TikTok (ByteDance) <span class="badge est">inferred</span>.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Industrial recommendation ranking models generally scale along two axes.</p></div>
+<ul>
+<li>heterogeneous feature interaction: combines user / item / context / cross features and lets them interact.</li>
+<li>sequence modeling: encodes long, multi-type user behavior sequences.</li>
+</ul>
+<p>The HELIX authors observe that scaling only one axis gives a suboptimal scaling-law slope, and they propose a &quot;unified&quot; ranking architecture that expands both axes together.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Deployed in TikTok e-commerce, and online A/B raised GMV per user by about 6%</span></p></div>
+<ul>
+<li>The abstract states that HELIX was deployed in TikTok&#39;s e-commerce recommendation system and consistently improves ranking metrics such as offline CTR AUC and CVR AUC <span class="badge ok">verified</span> (direct quote from the abstract).</li>
+<li>In the online A/B test, e-commerce video GMV per user rose by about 6% <span class="badge ok">verified</span> (direct quote from the abstract).</li>
+</ul>
+<blockquote>
+<p>&quot;Deployed in TikTok&#39;s e-commerce recommendation system, HELIX consistently improves offline CTR AUC, CVR AUC, and other ranking metrics. In online A/B tests, it achieves an approximately 6% increase in e-commerce video GMV per user.&quot;
+— <a href="https://arxiv.org/abs/2609.37183" target="_blank" rel="noopener">HELIX abstract</a>, 2026-09-29</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The core view is that both axes must be scaled together for the scaling law to escape suboptimality</span></p></div>
+<ul>
+<li>HELIX is a &quot;purified and unified&quot; ranking architecture that scales the feature-interaction axis and the long/multi-type user-behavior sequence axis simultaneously <span class="badge ok">verified</span> (abstract wording).</li>
+<li>The paper&#39;s core view is the observation that the two axes must be expanded together for the scaling law to escape suboptimality <span class="badge ok">verified</span> (abstract wording).</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Service scale is not disclosed</span></p></div>
+<ul>
+<li>The paper does not state user counts or request counts.</li>
+<li>We infer that using a GMV per user metric implies large-scale e-commerce traffic <span class="badge est">inferred</span>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a 2-line pointer to &quot;new this month&quot; in <a href="radar.html">radar.md</a>. It is not directly tied to the service canon (X·Meta·Netflix).</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This is the first time TikTok has formally named and published a ranking architecture for e-commerce recommendation that scales feature interaction and long sequences together.</p></div>
+<ul>
+<li>Until now, releases in this area have continued from the EGA (Elastic Generative Auction, ads auction and ranking) family and the GreenLightning family. GreenLightning is a single inference service.</li>
+<li>The view that the scaling law requires expanding both axes at once suggests that the sequence-only expansion of the Meta HSTU (Meta&#39;s generative sequential recommendation architecture) / GEM family and the feature-interaction expansion of the DCN·xDeepFM family are each suboptimal.</li>
+<li>However, this is an abstract-based triage stage, so the detailed architecture (which interaction structure, which sequence encoder, the measured scaling-law slope) is a subject for a deep dive.</li>
+<li>It is not folded into the service canon and stays in the radar.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="3-snaps-grp-merged-retrieval-ranking-and-reward-into-one-model--radar"><span class="num">3</span>Snap&#39;s GRP merged retrieval, ranking, and reward into one model — Radar</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2609.36688" target="_blank" rel="noopener">GRP v0.1 Technical Report</a> — arXiv 2609.36688 v1, 2026-09-29 (arXiv submission), paper. The v1 HTML page renders the organization name Snap Inc., so the affiliation is Snap <span class="badge ok">verified</span>.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Industrial recommendation systems are generally built as a multi-stage cascade of retrieval → pre-ranking → fine-ranking → reward re-ranking. Because each stage is trained and deployed as a separate model, replacing the whole stack together is difficult. The GRP in this paper (presumably Generative Recommendation Platform) presents a framework that unifies these stages into a <strong>single encoder-decoder model</strong>. The model generates multimodal Semantic IDs, and a joint MHP (Multi-Head Prediction) doubles as candidate scoring and the frozen reward for RL post-training.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. View time and shares rose in an A/B comparing retrieval only and in an A/B applying bypass and source replacement together</span></p></div>
+<ul>
+<li>In the retrieval-only comparison, view time rose by 0.46% and shares by 0.77% relative to production <span class="badge ok">verified</span> (direct quote of the A/B).</li>
+<li>In a separate comparison applying bypass and source replacement together, view time rose by +0.82% and shares by +2.56%, and platform-level guardrails were neutral <span class="badge ok">verified</span> (direct quote of the A/B).</li>
+</ul>
+<blockquote>
+<p>&quot;In a retrieval-only comparison, view time increases by 0.46% and shares by 0.77% relative to production. A separate comparison combining bypass and source replacement yields increases of 0.82% in view time and 2.56% in shares, with neutral platform-level guardrails.&quot;
+— <a href="https://arxiv.org/abs/2609.36688" target="_blank" rel="noopener">GRP v0.1</a>, 2026-09-29</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. With the retrieval bypass combination, views and shares rose and view time fell</span></p></div>
+<ul>
+<li>The additional axis of the retrieval bypass combination is these figures: &quot;+0.24% views, −0.24% view time, +2.30% shares (p&lt;0.05)&quot;.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Unifies retrieval, ranking, and reward into a single encoder-decoder</span></p></div>
+<ul>
+<li>GRP is a generative recommendation framework that unifies retrieval, ranking, and reward into a single encoder-decoder.</li>
+<li>It generates multimodal Semantic IDs, and a joint multi-head prediction (MHP) doubles as candidate scoring and the frozen reward for RL post-training. The RL post-training is mGRPO (reference-anchored margin).</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Serving optimization reduced retrieval latency</span></p></div>
+<ul>
+<li>User counts and request counts are not stated.</li>
+<li>Serving optimization reduced end-to-end retrieval latency by 69%.</li>
+<li>The paper is 26 pages with 11 tables.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a 2-line pointer to &quot;new this month&quot; in <a href="radar.html">radar.md</a>. Snap is outside the tracked services, so it is not folded into the service canon.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> GRP is a new statement on the &quot;unified serving path for generative recommendation&quot; angle we have been watching since early this month.</p></div>
+<ul>
+<li>Kuaishou OneTrans-V2 bundled the 3-stage cascade of retrieval, pre-rank, and fine-rank into a single Transformer and gained GMV +9.74% (2026-09-28 radar). Tencent PCG TGR bundled ranking, retrieval, slate generation, and reason tokens into one frame and deployed it on 5 surfaces. GRP goes in the same direction as both.</li>
+<li>GRP adds two axes to this. One is the mGRPO joint MHP axis, which handles reward inside the same model, and the other is the multimodal Semantic ID generation axis.</li>
+<li>The serving latency of −69% is a large reduction relative to the multi-stage cascade, and it signals that whether the encoder-decoder unification justifies the latency budget is the key criterion for adopting industrial-scale generative recsys.</li>
+<li>It is not folded into the service canon and stays in the radar.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li>HELIX (TikTok [inferred]) is a unified ranking architecture that scales both feature-interaction and long user-behavior sequence axes together (<a href="https://arxiv.org/abs/2609.37183" target="_blank" rel="noopener">arXiv 2609.37183</a>). It was deployed in TikTok e-commerce and gained GMV per user +~6% in an A/B test. The metric is <span class="badge ok">verified</span> and the affiliation is <span class="badge est">inferred</span> (the v1 HTML rendering returned 404; based on abstract wording). Added to new this month in radar.md.</li>
+<li>GRP v0.1 (Snap) is a generative recommendation framework that unifies retrieval, ranking, and reward into a single encoder-decoder (<a href="https://arxiv.org/abs/2609.36688" target="_blank" rel="noopener">arXiv 2609.36688</a>). Its components are multimodal Semantic ID, joint MHP, and mGRPO. In the production A/B test it gained view time +0.82% and shares +2.56%, and serving latency is −69%. The affiliation and metrics are <span class="badge ok">verified</span>. Added to new this month in radar.md.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check how often VF&#39;s retweet-source expansion batches actually occur — how the metric labels appear in production shows whether this rewrite had a real effect. The targets are the occurrence-rate distribution of <code>hydrate_with_retweet_sources</code> expansion batches and the <code>RetweetSources::{NoSource, InBatch, Fetched}</code> labels. If the next commit includes a metric report, we will fold it into the canon.</li>
+<li>Check whether the Phoenix <code>xrecsys_two_tower.py</code> preset is actually adopted — which of the 6 presets is active in real training jobs, and whether it is only registered in <code>MODEL_CFGS</code> and unused, is the next checkpoint to watch. Currently only the catalog promotion is confirmed.</li>
+<li>Check whether the 6 home-mixer cold-start parameters are kept — whether PhoenixColdStartMaxResults 200 and MaxPostAgeSecs 2h remain production values or revert to experiment values will be observable at the next cron sync. We also track yesterday&#39;s (Gen4+31) home-mixer weight shift.</li>
+<li>Deep dive on HELIX — the TikTok production claim of GMV +~6% is sufficiently strong evidence, so the abstract, introduction, and architecture sections need a close read. Deep dive needed.</li>
+<li>Deep dive on GRP v0.1 — Snap&#39;s encoder-decoder unification frame is the third statement on industrial-scale generative recsys, so its 26 pages are worth a close read. Deep dive needed.</li>
+<li>arXiv cs.IR triage record — 30 items were parsed and 2 (HELIX, GRP) passed. The other 28 are academic RAG / dense retrieval / semantic ID (generative retrieval) / clinical QA / benchmark papers and similar.</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-09-30.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-09-30</span></a><a class="pg-next" href="daily-2026-10-02.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-02</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-01.html" data-title="일일 리포트 2026-10-01"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

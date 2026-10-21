@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-03 — feed-research</title>
+<meta name="description" content="In one line: X released a retrieval model that generates item semantic IDs (SID) to pick candidates, together with a For You candidate source that calls…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-03.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-03.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-03.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-03.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-03 — feed-research">
+<meta property="og:description" content="In one line: X released a retrieval model that generates item semantic IDs (SID) to pick candidates, together with a For You candidate source that calls…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-03.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-03.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-03">2026-10-03</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>31 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-03.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X released a retrieval model that generates item semantic IDs (SID) to pick candidates, together with a For You candidate source that calls that service. The source is off by default.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-retrieval-that-generates-sids-to-pick-candidates-is-wired-in-as-a-for-you-candidate-source--x"><span class="num">1</span>Retrieval that generates SIDs to pick candidates is wired in as a For You candidate source — X</a></li><li><a href="#2-no-new-recommendation-related-posts--netflix-and-meta-blogs"><span class="num">2</span>No new recommendation-related posts — Netflix and Meta blogs</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-retrieval-that-generates-sids-to-pick-candidates-is-wired-in-as-a-for-you-candidate-source--x"><span class="num">1</span>Retrieval that generates SIDs to pick candidates is wired in as a For You candidate source — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/76843a5" target="_blank" rel="noopener">xai-org/x-algorithm@76843a5</a> — xai-org, 2026-10-02T02:06:55Z, code. These notes number X commits after the Gen4 release in order, and this commit is Gen4+34. The scale is +5227/−756 across 105 files.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X&#39;s recommendation stack has been reorganized around Phoenix (the GPU ranking stack rebuilt in 2026) over the past four months. Within it, &quot;retrieval&quot; was split into two branches.</p></div>
+<ul>
+<li>One is <strong>two-tower retrieval</strong>: the traditional OON (out-of-network, posts from accounts the user does not follow) source that runs ANN search on the inner product of user-tower and item-tower embeddings. In the 2026-09-30 commit, <code>xrecsys_two_tower.py</code> was promoted to a 6-preset catalog, and SID 6-level, seqpack, and sharing of two heads (Home/Immersive) were stated explicitly.</li>
+<li>The other is <strong>generative retrieval</strong> (SID generation). Items are compressed into multi-stage token sequences (semantic ID, SID for short) with RQ-VAE or a similar quantization, and a Transformer then generates SID tokens conditioned on the user history. Lines such as Google TIGER (NeurIPS 2023, <a href="https://arxiv.org/abs/2305.05065" target="_blank" rel="noopener">arXiv 2305.05065</a>), Alibaba PailitaoGR (2025), Kuaishou OneRec (2025), Tencent BARGE (2026), and ByteDance GEAR (arXiv 2026-09-30 v1, <a href="daily-2026-10-02.html">2026-10-02 daily</a>) belong here.</li>
+</ul>
+<p>Until now X had exposed SID tokens through <code>sid_num_levels</code> in the training config. The two-tower model used them as input features of the item tower. A generative retrieval path that generates SIDs and picks candidates from them directly had never been released.</p>
+<p>On 2026-09-04 (Gen4+15) there is a record that the &quot;SID retrieval sidecar was removed entirely from the Phoenix serving engine&quot;. At the time, the sidecar was a lookup that converted each post ID in the user history of a Phoenix request into an SID, and that role was absorbed by loading SIDs into the request beforehand. Until then, X&#39;s &quot;SID retrieval&quot; had the narrow meaning of an item ID → SID token lookup.</p>
+<p>This commit completely changes that narrow meaning. Among the new files, SID-related code comes in five groups, and the following three things arrived together:</p>
+<ul>
+<li>Phoenix gained a training config, model, trainer, and inference runner for a Transformer dedicated to SID generative retrieval.</li>
+<li>home-mixer (the service that assembles the For You feed) gained a <code>SidSource</code> candidate source that calls this service.</li>
+<li>This source attaches <code>shared_prefix_depth</code> to response candidates as the score and passes them on labeled <code>ForYouPhoenixRetrievalMoe</code>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. home-mixer now has a candidate source that calls a separate SID retrieval service</span></p></div>
+<ul>
+<li>home-mixer has a new candidate source, and it calls a generative SID retrieval microservice split out as a separate service <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/sources/sid_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/sid_source.rs</code></a> (new, +112).<ul>
+<li>The source is named <code>SidSource</code>.</li>
+<li>The client that makes the call is <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/clients/sid_retrieval_client.rs" target="_blank" rel="noopener"><code>home-mixer/clients/sid_retrieval_client.rs</code></a> (new, +246).</li>
+<li>The target endpoint is <code>https://xai-recsys-sid-retrieval.prod.fou.twitter.biz:443</code>.</li>
+</ul>
+</li>
+<li>The request carries seed post IDs, a result cap, and a prefix-depth range, and the response carries a post ID and shared prefix depth for each candidate <span class="badge ok">verified</span>.<ul>
+<li>The gRPC service is <code>SidRetrievalServiceClient</code>.</li>
+<li>The request type is <code>RetrieveRequest { seed_post_ids, max_results, max_per_seed, min_prefix_depth, max_prefix_depth, caller }</code>.</li>
+<li>The response type is <code>RetrieveResponse { candidates: Vec&lt;Candidate&gt; }</code>, and each Candidate holds <code>post_id</code> and <code>shared_prefix_depth</code>.</li>
+</ul>
+</li>
+<li>These proto symbols come from outside the repo, and the repo also released a separate crate that holds only the SID lookup proto <span class="badge ok">verified</span>.<ul>
+<li>The symbols are imported by the <code>xai_recsys_sid_retrieval_proto</code> crate from outside (private or generated).</li>
+<li>The separately released crate <code>xai-recsys-sid-proto</code> contains only <code>sid_lookup.proto</code>.</li>
+<li><code>sid_lookup.proto</code> covers only the post_id → SID code array mapping. It is the return of the lookup sidecar that disappeared on 2026-09-04.<ul>
+<li>The definition is <code>SidLookupService { LookupSids(repeated int64 post_ids) → repeated PostSids { repeated int32 codes } }</code>.</li>
+</ul>
+</li>
+<li>The generative retrieval proto is not included in the repo.</li>
+</ul>
+</li>
+<li>This means that the production code visible in the repo and the proto definition dedicated to that &quot;generative retrieval&quot; are separated <span class="badge est">inferred</span>.</li>
+<li><code>SidSource</code> is enabled by the AND of five conditions, all of which must be true <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/sources/sid_source.rs" target="_blank" rel="noopener"><code>sid_source.rs:58-64</code></a>.<ul>
+<li>The <code>EnableSidSource</code> param is on (default <code>false</code>).</li>
+<li>The request is not a topic request.</li>
+<li>The request is not in-network only.</li>
+<li>There are no cached posts (cold path).</li>
+<li><code>has_post_signals(query)</code> is true.</li>
+<li>The last condition reuses exactly the same function as SimclustersSource, meaning the source runs only when the user has positive engagement signals.</li>
+<li>The design is declared so that the two sources branch from the same seed set (post IDs the user interacted with through fav/retweet/reply and so on).</li>
+</ul>
+</li>
+<li>The source calls the SID service with posts the user reacted to as seeds, and gives the returned candidates the same label as the existing Phoenix MoE (mixture-of-experts) source <span class="badge ok">verified</span>.<ul>
+<li>First it takes the user&#39;s positive engagement post IDs from <code>post_signal_ids(query)</code> and truncates them to the <code>SidSourceMaxSeeds</code> cap (default 50).</li>
+<li>It assembles a <code>RetrieveRequest</code> and calls via gRPC. The 300ms deadline is hardcoded in <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/clients/sid_retrieval_client.rs" target="_blank" rel="noopener"><code>sid_retrieval_client.rs:21</code></a>.</li>
+<li>Each response Candidate is converted to a <code>PostCandidate</code>. It is marked <code>served_type = ForYouPhoenixRetrievalMoe</code>, which is the same label as the existing <code>PhoenixMOESource</code>.</li>
+<li><code>shared_prefix_depth</code> goes into the <code>score</code> field as an f32.</li>
+<li>Finally, it fills in the author, creation time, and so on with <code>CoreDataCandidateHydrator</code>, and then removes candidates with <code>author_id == 0</code>.</li>
+</ul>
+</li>
+<li>Five parameters were introduced under the names <code>rust_home_mixer_sid_source_*</code>, and their defaults were released <span class="badge ok">verified</span> — <code>home-mixer/params/param.rs</code>. This file is a cron mirror of the production feature-switch defaults.<ul>
+<li><code>EnableSidSource=false</code></li>
+<li><code>SidSourceMaxResults=800</code></li>
+<li><code>SidSourceMaxSeeds=50</code></li>
+<li><code>SidSourceMaxPerSeed=100</code></li>
+<li><code>SidSourceMinPrefixDepth=3</code></li>
+<li><code>max_prefix_depth: 0</code> is hardcoded in <code>RetrieveRequest</code> (no cap).</li>
+<li><code>min_prefix_depth=3</code> is a request-side filter asking for only candidates whose shared prefix matches at least 3 of the 6 SID levels.</li>
+<li>There are at most 100 posts per seed and a total cap of 800. The theoretical cap is 50 × 100 = 5000, but it is tightened again to 800.</li>
+</ul>
+</li>
+<li>The gRPC client runs two paths in parallel: it sets up the xDS path first and falls back to the DNS path if that fails <span class="badge ok">verified</span>.<ul>
+<li>It first sets up the load balancer with xDS P2C. This path uses the discovery-authority-based <code>xdstp://discovery-*/envoy.config.endpoint.v3.ClusterLoadAssignment/fou-xai-recsys-sid-retrieval.prod.prod:grpc-tls</code>.</li>
+<li>If the xDS build does not finish within 10 seconds or there is no bootstrap, it falls back to the DNS path (<code>RotatingChannel</code>, refresh every 60 seconds).</li>
+<li>The response size cap is <code>MAX_DECODING_MESSAGE_BYTES = 16 MiB</code>.</li>
+<li>The metric <code>SidRetrievalClient.retrieve{result=success|timeout|failure, path=xds|dns}</code> records the call result and path as labels. Call latency goes into the <code>SidRetrievalClient.retrieve{path}</code> histogram.</li>
+<li>The service&#39;s own readiness probe is <code>GET /readyz</code> on port 29180.</li>
+<li>Keep-alive is set to a 30-second interval, a 10-second deadline, and idle=true.</li>
+</ul>
+</li>
+<li>The source-side metric measures three stages separately: the number of seeds, the number of RPC responses, and the number remaining after hydration <span class="badge ok">verified</span>.<ul>
+<li>The metric is <code>SidSource.retrieved{type=seeds|retrieved|hydrated}</code>.</li>
+<li>The seeds count is the amount sent in the RPC, the retrieved count is the RPC response, and the hydrated count is the survivors with author_id!=0.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Training and serving code for a dedicated Transformer that generates SIDs was released in Phoenix</span></p></div>
+<ul>
+<li>Phoenix gained new files for the training config, model, trainer, and inference runner of the SID generative retrieval model <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_sid_retrieval.py</code></a> (new).<ul>
+<li>The other three files are also new.<ul>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_sid_retrieval_model.py</code></a></li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/train/trainer_sid_retrieval.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_sid_retrieval.py</code></a></li>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/inference/sid_retrieval_runner.py" target="_blank" rel="noopener"><code>phoenix/xrex/inference/sid_retrieval_runner.py</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>The training config <code>xrecsys_sid_retrieval.py</code> discloses all of the model&#39;s hyperparameters <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py" target="_blank" rel="noopener"><code>xrecsys_sid_retrieval.py:11-45</code></a>.<ul>
+<li>The input sequence length is 1030: 1 user prefix token, 1023 user action history tokens, and 6 SID target tokens. The candidate sequence is 64.</li>
+<li>The SID is a 6-level hierarchy with 256 codes per level. In theory the SID space is $256^6 ≈ 2.8 \times 10^{14}$ entries.<ul>
+<li><code>sid_num_levels=6</code>, <code>sid_codebook_size=256</code></li>
+<li><code>sid_embed_dim=1024</code>(= <code>EMB_TABLE_WIDTH</code>), <code>sid_prediction_hidden_dim=512</code></li>
+<li><code>sid_level_loss_decay=1.0</code> means there is no per-level loss weight decay. In other words, all 6 levels get the same weight.</li>
+<li><code>sid_hash_level=True</code>, <code>sid_cross_attn=True</code></li>
+</ul>
+</li>
+<li>The Transformer has 8 layers and uses GQA (grouped-query attention) at a 5:1 ratio.<ul>
+<li><code>query_heads=20</code>·<code>kv_heads=4</code>, <code>key_size=128</code>, <code>emb_size=2560</code></li>
+<li><code>attn_logit_cap=80.0</code> with <code>attn_logit_cap_method=&quot;soft_sign&quot;</code>, rotary, causal</li>
+<li><code>widening_factor=2</code> with <code>gated_mlp=False</code> (plain MLP), remat <code>WHOLE</code></li>
+</ul>
+</li>
+<li>The input vocab figures exactly match those of the two-tower config released on 2026-09-30 (Gen4+32). This means the two models share the same vocab space.<ul>
+<li>User vocab=0, item raw vocab=0, item hash vocab=100M, author vocab=30M, 60 action types, 8 continuous actions.</li>
+<li>It pads to a multiple of 512 with <code>_round_up(..., 512)</code>.</li>
+<li>It applies double hashing with two pairs of hash functions (linear scale × modulus prime) for each of user/item/author.</li>
+</ul>
+</li>
+<li>Training uses the Adam optimizer and a constant learning rate, and splits with expert-parallel and no data-parallel.<ul>
+<li>Adam optimizer (b1=0.95, b2=0.98), <code>weight_decay=1e-3</code>, constant learning rate <code>2e-3</code></li>
+<li>batch size per device = 128, parallel setting is ep=128, dp=1 (128-way expert-parallel, no data-parallel)</li>
+<li><code>max_steps = (1e11 / 32) − 100 ≈ 3.125B steps</code></li>
+</ul>
+</li>
+<li>The dataset is in <code>aggregated_kafka</code> mode, and the path is a filler value.<ul>
+<li><code>PhoenixDataset</code> with <code>path=&quot;/path/to/offline_kafka_dump&quot;</code> (filler), <code>num_kafka_partitions=1024</code></li>
+<li><code>include_candidate_post_ids=True</code>, <code>use_post_sid=True</code>, <code>multimodal_embedding_type=None</code></li>
+</ul>
+</li>
+<li>The checkpoint settings were also released.<ul>
+<li><code>checkpoint_every_n=100</code>·<code>checkpoint_keep_every_nth=1000</code>·<code>checkpoint_keep_last_n=10</code>·<code>verify_checksums=True</code></li>
+<li><code>replica_axis=&quot;replica&quot;</code>·<code>checkpoint_chunked=False</code>·<code>checkpoint_compressed=False</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">HISTORY_SEQ_LEN = 1023
+CANDIDATE_SEQ_LEN = 64
+NUM_SID_TOKENS = 6
+NUM_USER_PREFIX = 1
+EMB_SIZE = 2560
+EMB_TABLE_WIDTH = 1024
+NUM_LAYERS = 8
+QUERY_HEADS = 20
+KV_HEADS = 4
+# ...
+ITEM_HASH_VOCAB_SIZE = 100_000_000
+AUTHOR_VOCAB_SIZE = 30_000_000
+# ...
+sid_codebook_size=256,
+sid_num_levels=6,
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/configs/xrecsys_sid_retrieval.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_sid_retrieval.py:11-40, 150</code></a>, 2026-10-02</p>
+</blockquote>
+<ul>
+<li>The model code appears to keep SID token embeddings in a separate table per level and raise them to 1024-dim through a projection per level <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py" target="_blank" rel="noopener"><code>recsys_sid_retrieval_model.py:72-100</code></a>.<ul>
+<li>The related names are the Haiku transformed function <code>_embed_sid_token(code, level)</code> and the per-level table <code>sid_emb_level_{level}</code> (size <code>[256, 128]</code>).</li>
+<li>The name of the projection after each level is <code>sid_emb_proj_{level}</code>.</li>
+</ul>
+</li>
+<li>The model&#39;s only positive action is <code>SERVER_TWEET_FAV</code> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/models/recsys_sid_retrieval_model.py" target="_blank" rel="noopener">line 40</a>. The positive is narrowed to fav alone.<ul>
+<li>Seven hard-negative actions are used for negative supervision.<ul>
+<li>The list is <code>CLIENT_TWEET_REPORT</code>, <code>_NOT_INTERESTED_IN</code>, <code>_SEE_FEWER</code>, <code>_UNFOLLOW_AUTHOR</code>, <code>_BLOCK_AUTHOR</code>, <code>_MUTE_AUTHOR</code>, <code>_NOT_RELEVANT</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>The evaluation settings of the serving-side beam decoder are <code>eval_num_batches=20</code>, <code>eval_beam_width=128</code>, and <code>eval_bs_per_device=8</code> <span class="badge ok">verified</span>.</li>
+<li>The inference runner separates a stage that generates SIDs with beam search from a stage that turns the generated SID prefixes back into an actual set of post_ids <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/inference/sid_retrieval_runner.py" target="_blank" rel="noopener"><code>sid_retrieval_runner.py:21-80</code></a>.<ul>
+<li>The runner file is <code>sid_retrieval_runner.py</code>, and <code>SidPostIndex</code>/<code>SidBeamResolver</code> handle the stage that turns prefixes back.</li>
+<li>Among the runner&#39;s hyperparameters, <code>beam_width</code> and <code>decode_levels</code> are flags. If <code>decode_levels &lt; 6</code>, generation stops at the prefix level and returns the prefix-sharing set (prefix retrieval).</li>
+<li>This pairs with home-mixer <code>SidSourceMinPrefixDepth=3</code>. The server generates 3–6 levels, but every post matched at level 3 can be returned with prefix depth 3 as its score.</li>
+<li>Fields such as <code>_CorpusView.sentinel_idx</code>, <code>post_ids_with_sentinel</code>, and <code>author_ids_with_sentinel</code> show that the corpus is loaded as a prebuilt index (SID → posts).</li>
+<li>That is, at serving time the corpus is &quot;an SID trie plus the set of post_ids held at the leaves&quot;, and when beam search picks the top-K paths on the trie, the posts under those paths become candidates <span class="badge est">inferred</span>. In the code, the detailed structure of <code>SidBeamResolver</code> is in another file (<code>xrex/inference/sid_post_index.py</code>), which does not appear in this commit&#39;s diff.</li>
+</ul>
+</li>
+</ul>
+<p>This design overlaps with the published generative retrieval family: Google TIGER (NeurIPS 2023), Alibaba PailitaoGR (2025), Kuaishou OneRec (2025), Tencent BARGE (2026), and ByteDance GEAR (2026-09-30). The X version differs in the following points:</p>
+<ul>
+<li>It uses a comparatively narrow 6-level × 256-codebook space (TIGER uses 3-level × 256 plus one collision-disambiguation token, and OneRec uses 3-level × 1024).</li>
+<li>It feeds the 1023-token user action history in as the condition as is (TIGER limits the user history to at most 20 items in training).</li>
+<li>It passes <code>shared_prefix_depth</code> to the upstream ranking as a score (TIGER uses the generation probability).</li>
+<li>It shares its vocab design with the two-tower model. However, the embedding tables are currently separate for each model (see the implications below).</li>
+</ul>
+<p>Two-tower runs ANN in vector space, while SID retrieval runs beam search in code space. In effect, the two are declared as a complementary structure, not a duplication.</p>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Phoenix gained a bundle of CUDA kernels that handle embedding tables sharded by row</span></p></div>
+<ul>
+<li>A new bundle of CUDA kernels handles embedding tables sharded by row <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/76843a5/phoenix/xrex/cuda/row_emb" target="_blank" rel="noopener"><code>phoenix/xrex/cuda/row_emb/</code></a>.<ul>
+<li>It is a 12-file bundle with 3,180 new lines in total.</li>
+<li><code>row_emb_api.cc</code>(+766) · <code>row_emb_comm.cc</code>(+1,104) · <code>row_emb_kernel.cu</code>(+629) · <code>row_emb.py</code>(+290) · <code>row_emb_comm.hpp</code>(+256) · <code>comm_utils.cc</code>(+146)</li>
+<li><code>row_emb_kernel.hpp</code>(+135) · <code>row_emb_common.cuh</code>(+82) · <code>cuda_error_utils.hpp</code>(+68) · <code>comm_utils.h</code>(+57) · <code>comm_utils.py</code>(+47) · <code>__init__.py</code>(+2)</li>
+</ul>
+</li>
+<li>If Phoenix&#39;s existing <code>async_emb</code> kernel handles embedding tables sharded in the column direction, the new <code>row_emb</code> handles tables sharded in the row direction <span class="badge ok">verified</span>.<ul>
+<li>With N vocab entries, N / group_size rows are loaded onto each rank.</li>
+</ul>
+</li>
+<li>This design matters when the vocab grows to hundreds of millions (item 100M, author 30M) and the embedding table has to span tens to hundreds of GPUs <span class="badge est">inferred</span>. Each token lookup only has to query the rank it belongs to, and the all-to-all occurs when sending tokens to the lookup rank <span class="badge est">inferred</span>.</li>
+<li>The Python binding <code>row_emb.py</code> registers 6 JAX FFI targets on the CUDA platform and passes the shard spec bundled in a single NamedTuple <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/xrex/cuda/row_emb/row_emb.py" target="_blank" rel="noopener"><code>row_emb.py:30-80, 100-290</code></a>.<ul>
+<li>The names of the FFI targets are below.<ul>
+<li><code>xrex_row_emb_lookup_start</code>, <code>_lookup_done</code>, <code>_stage_update</code></li>
+<li><code>_rowwise_adagrad_update_start</code>, <code>_rowwise_adagrad_lazy_update_start</code>, <code>_rowwise_adagrad_update_done</code></li>
+</ul>
+</li>
+<li>The NamedTuple is <code>RowEmbContextHandle</code>, and it bundles the values below.<ul>
+<li>context_id · group_size · flatten_replicas · tokens_per_rank · emb_width · rows_per_rank</li>
+<li>recv_capacity · num_devices_per_node · mesh · table_axis · data_axis</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>There are 3 key design decisions.</p>
+<ol>
+<li>Lookup is split into two stages. A window opens between the two FFIs in which other operations can run, and all-to-all communication overlaps with computation inside that window. This is a pattern like Pathways/MegaScale.<ul>
+<li><code>lookup_start</code> takes token_ids and the local shard table and returns <code>table_out</code> and <code>lookup_pin</code> (a float32 scalar). <code>lookup_done</code> takes the <code>pin</code> and returns <code>embeddings</code>.</li>
+<li><code>tokens_per_rank</code> is set as <code>tokens_per_batch / group_size</code>.</li>
+<li>The receive buffer cap is reserved in advance as <code>recv_capacity = min(ceil(tokens_per_rank × recv_factor), tokens_per_rank × group_size)</code>. If <code>recv_factor</code> is small, drops occur when there are many collisions, and if it is large, the buffer is wasted.</li>
+</ul>
+</li>
+<li>Rowwise Adagrad is fused into the same 2-phase structure as lookup.<ul>
+<li><code>rowwise_adagrad_update_start</code> takes the table, row_state (the accumulator of each row), and gate, and returns the table being updated itself. It updates in place with input_output_aliases={0:0, 1:1}.</li>
+<li><code>rowwise_adagrad_update_done</code> returns a completion signal.</li>
+<li><code>rowwise_adagrad_lazy_update_start</code> is a variant that takes <code>last_step</code> and <code>step</code> and lazily updates only the rows that were accessed. This is a common pattern for sparse embedding tables.</li>
+</ul>
+</li>
+<li>A gate input guarantees the XLA execution order.<ul>
+<li>Every FFI function takes <code>gate: jax.Array</code> as input and mixes a float32 scalar into its output. This explicitly creates a side-effect chain that XLA cannot freely reorder.</li>
+<li><code>attrs()</code> passes communicator identifiers such as context_id and flatten_replicas as FFI attributes. The same context_id reuses the same communication group.</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>Validation checks the following conditions:<ul>
+<li><code>vocab_rows % group_size == 0</code> (even distribution of row shards)</li>
+<li><code>tokens_per_batch % group_size == 0</code> (even distribution of token shards)</li>
+<li><code>emb_width % 8 == 0</code> (a multiple of 8). This appears to be a bf16 tiling requirement <span class="badge est">inferred</span>.</li>
+<li><code>recv_factor &gt; 0</code></li>
+<li>The <code>table_axis</code> axis must be contained in the <code>data_axis</code> axis. If it is not, a ValueError is raised saying &quot;there is not exactly one token shard per communicator rank&quot;.</li>
+</ul>
+</li>
+<li>Phoenix&#39;s async embedding utility was rewritten as an adapter layer that accepts both kernels <span class="badge ok">verified</span>. It now supports both column and row sharding strategies.<ul>
+<li>The file is <code>phoenix/xrex/utils/recsys_async_emb.py</code> (+112/−36), and the kernels it accepts are <code>async_emb</code> and <code>row_emb</code>.</li>
+<li>It distinguishes row from column with an <code>is_row_sharded(context_handle)</code> branch. If row-sharded it returns <code>table_spec</code> as <code>P(table_axis, None)</code>, and if column-sharded as <code>P(None, table_axis)</code>.</li>
+</ul>
+</li>
+<li>This kernel bundle is an extension of the general Phoenix embedding table design, not dedicated to the SID retrieval model, but in the context of being released together in this commit, the appearance of a model that needs row-sharded embeddings (that is, a model with a very large vocab) appears to be the trigger <span class="badge est">inferred</span>.<ul>
+<li>Two-tower can also run column-sharded, but for a generative model row-sharded is more natural given the lookup pattern, because each token references only a specific range of its own vocab level.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. LLM judge actions return to the Phoenix proto, and ads and retrieval request fields grow</span></p></div>
+<ul>
+<li>Phoenix&#39;s recsys proto changed, and the same change was mirrored in the Python-side proto <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto</code></a>.<ul>
+<li>The mirror file is <code>phoenix/python/common/xai-proto/proto/recsys.proto</code>, and both files are +68/−44 each.</li>
+</ul>
+</li>
+<li>Two LLM judge actions reappeared after 15 days with changed numbers <span class="badge ok">verified</span>.<ul>
+<li>The values this time are <code>LLM_JUDGE_RELEVANT_TO_SEARCH=108</code> and <code>LLM_JUDGE_NOT_RELEVANT_TO_SEARCH=109</code>.</li>
+<li>The two actions were introduced as 107/108 in Gen4+20 (2026-09-12).</li>
+<li>They were vacated after 5 days in Gen4+23 (2026-09-17). <code>CLIENT_TWEET_LIVE_STREAM_REPLY=107</code> took that slot, and 108 was preserved as a <code>RESERVED_108</code> placeholder.</li>
+<li>They reappeared today (Gen4+34, after 15 days). However, the numbers changed: the earlier 107/108 are now 108/109.</li>
+<li><code>RESERVED_108</code> is reused as LLM_JUDGE_RELEVANT_TO_SEARCH, and the new number 109 is assigned to LLM_JUDGE_NOT_RELEVANT_TO_SEARCH.</li>
+<li>In other words, the decision to bring LLM judge labels back in as actions has returned, but the numbers moved to new slots. Whether this becomes a stable state after readjustment or is vacated again has to be observed in the next commit window <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>Two new continuous actions were introduced <span class="badge ok">verified</span>.<ul>
+<li>The new ContinuousActionName values are <code>WEB_CONV_VALUE_USD=6</code> and <code>WEB_CONV_VALUE_RATIO=7</code>.</li>
+<li>Two were added to the existing six continuous actions (<code>ACTIVE_SECS</code> and others, plus <code>BRIDGE_PROBABILITY=4</code> and <code>ADS_WEB_CT_PURCHASE_VALUE=5</code>).</li>
+</ul>
+</li>
+<li>The continuous head presumably consumes the ads conversion value split into two branches, an absolute USD value and a ratio (probably relative to a baseline) <span class="badge est">inferred</span>. This commit has no code change on the continuous loss side, and only the proto has reserved the slots in advance.</li>
+<li>Two viewer × advertiser fields were added to the ad information message <code>AdInfo</code> <span class="badge ok">verified</span>.<ul>
+<li>Field 24 is <code>viewer_advertiser_engagement_counts</code> and field 25 is <code>viewer_advertiser_conversion_counts</code>.</li>
+<li>Both are the existing <code>EngagementCounts</code> message type, but semantically they are new slots holding the engagement/conversion history between the viewer and the advertiser.</li>
+<li>The ads ranking model can now receive a feature like &quot;how did this viewer react to <strong>this advertiser&#39;s</strong> earlier ads&quot;.</li>
+</ul>
+</li>
+<li>The engagement count message now also carries which kinds of actions it aggregated <span class="badge ok">verified</span>.<ul>
+<li><code>collected_actions</code> (field 6, <code>repeated int32</code>) was added to <code>EngagementCounts</code>.</li>
+<li>Downstream can now tell whether &quot;these counts aggregate fav only, or include fav+reply as well&quot;.</li>
+</ul>
+</li>
+<li>The two-tower retrieval request now also accepts seed posts and an exclusion list <span class="badge ok">verified</span>.<ul>
+<li><code>RetrieveTopKCandidatesRequest</code> expanded to three fields.</li>
+<li>Field 14 <code>seed_post_ids</code> is a different message from the existing SidRetrieval RetrieveRequest. Two-tower retrieval can now also carry seed post IDs in the request.</li>
+<li>Field 15 is <code>excluded_posts_bloom_filters</code> (repeated <code>ExcludedPostsBloomFilter { bit_array: repeated fixed64, size_cap, false_positive_rate }</code>).</li>
+<li>Field 16 is <code>excluded_post_ids</code> (repeated uint64).</li>
+<li>This means Phoenix two-tower retrieval now also accepts seed-conditioned search and bloom-filter exclusion of already seen posts. The design converges toward SidSource and two-tower retrieval sharing the same seeds.</li>
+</ul>
+</li>
+<li>A new enum <code>UnifiedCardType</code> (29 variants) enumerates the ads unified card formats at the proto level <span class="badge ok">verified</span>.<ul>
+<li>Values are things like IMAGE_WEBSITE, VIDEO_WEBSITE, IMAGE_APP, ..., VIDEO_PLAYABLE_WEBSITE, IMAGE_COLLECTION_WEBSITE.</li>
+<li>No code-side consumer appears in this diff, only the proto declaration.</li>
+</ul>
+</li>
+<li>It appears to reserve a place in advance for the ads ranking model to receive the unified card format itself as a categorical feature <span class="badge est">inferred</span>.</li>
+<li><code>FetchAggregatedUserActionRequest</code> changed position inside the proto (only a file-order rearrangement). There is no change in meaning.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">E. The visibility-judgment service (VF) records the outcome in its per-caller request metric</span></p></div>
+<ul>
+<li>A fourth label was added to VF (visibility-filtering)&#39;s per-caller request metric <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/visibility-filtering/caller_identity.rs" target="_blank" rel="noopener"><code>visibility-filtering/caller_identity.rs</code></a> +90/−15.<ul>
+<li>The changed file is VF&#39;s <code>caller_identity.rs</code>.</li>
+<li>The target metric is <code>vf_requests_by_caller{caller_identity, rpc, deadline}</code>, introduced yesterday (Gen4+33), and <code>outcome</code> was attached to it as the fourth label.</li>
+<li>The new label <code>outcome</code> holds how the request ended: success, failure, or cancellation.</li>
+<li>A 3-variant enum <code>Outcome { Success, Failure, Cancelled }</code> was introduced.</li>
+</ul>
+</li>
+<li>A request that a handler finishes without marking success or failure is counted as Cancelled <span class="badge ok">verified</span>.<ul>
+<li>The <code>record()</code> function now returns a <code>CallerRequest</code> guard struct (annotated must_use).</li>
+<li>If the handler is dropped as is without calling <code>request.mark_success()</code> or <code>.mark_failure()</code> while processing the request, it is counted as <code>Cancelled</code>.</li>
+<li>The Drop impl emits the metric. This is an RAII pattern.</li>
+</ul>
+</li>
+<li>A new test pins the dashboard-generating Python script and the Rust-side constants together <span class="badge ok">verified</span>.<ul>
+<li>The test name is <code>dashboard_generator_pins_the_requests_by_caller_metric</code>.</li>
+<li>The Rust test passes only if the script holds in its code the constants <code>REQUESTS_BY_CALLER_METRIC = &quot;vf_requests_by_caller&quot;</code>, <code>REQUESTS_BY_CALLER_NO_DEADLINE_FILTER = &#39;deadline=&quot;absent&quot;&#39;</code>, and four success/non-success filter constants.</li>
+<li>The design checks the metric definition for drift in both the Rust code and the dashboard code at the same time. It is a pattern similar to how yesterday&#39;s <code>_drift_checks</code> metric watched for UI bundle drift.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">F. home-mixer removed two cold-start branches and moved author rule evaluation into a shared crate</span></p></div>
+<ul>
+<li>Three home-mixer files changed <span class="badge ok">verified</span>.<ul>
+<li><a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/scorers/author_cold_start.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/author_cold_start.rs</code></a> +15/−38, <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/candidate_hydrators/engagement_counts_hydrator.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_hydrators/engagement_counts_hydrator.rs</code></a> +16/−48, <a href="https://github.com/xai-org/x-algorithm/blob/76843a5/home-mixer/util/author_rules.rs" target="_blank" rel="noopener"><code>home-mixer/util/author_rules.rs</code></a> deleted (-156)</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>The Control arm&#39;s cold-start boost now targets every post in the Control corpus regardless of the retrieval source <span class="badge ok">verified</span> (author_cold_start.rs).<ul>
+<li>The <code>is_arm_gated_retrieval</code> function (which identified Phoenix MoE/Cold retrieval sources) was deleted.</li>
+<li>Previously, the Control arm excluded posts from Phoenix MoE/Cold retrieval from the cold-start boost even among posts in the Control corpus.</li>
+<li>The test <code>cold_retrieval_keeps_its_score_in_every_arm</code> was deleted, and the new test <code>control_viewer_lifts_cold_retrieval_from_control_corpus</code> replaces it. The new test states explicitly that &quot;a Control viewer lifts cold retrieval candidates too if they belong to the Control corpus&quot;.</li>
+<li>The <code>is_moe</code> label of the metric <code>home_mixer.cold_started_posts_total</code> was also removed. Whether a post comes from Phoenix MoE/Cold retrieval is no longer tracked.</li>
+<li>Until yesterday, the cold-start boost treated Phoenix retrieval on three axes, arm × corpus × source, and filtered on the source axis; now it narrows to two axes, arm × corpus.</li>
+</ul>
+</li>
+<li>Engagement counts are now re-fetched unconditionally for every candidate when there are cached posts <span class="badge ok">verified</span> (engagement_counts_hydrator.rs).<ul>
+<li>Removed the cold-start eligibility branch for the cached_posts case from <code>EngagementCountsHydrator</code>.</li>
+<li>Previously, with <code>has_cached_posts</code>, only candidates that passed <code>cold_start_base_eligible</code> had their engagement counts re-fetched, and the rest kept their cached values through <code>preserve_counts</code>. Now every candidate is re-fetched unconditionally.</li>
+<li>Deleted the <code>preserve_counts</code> helper.</li>
+<li>The new test <code>cached_posts_refetch_all_candidates</code> pins that all three candidates are replaced with new counts regardless of cold-start eligibility.</li>
+<li>Both the <code>ColdStartFollowerCap</code> and <code>cold_start_base_eligible</code> dependencies were removed from the call path.</li>
+<li>The interdependence between engagement counts and cold start is gone. Cold-start logic downstream can assume the engagement counts are &quot;fresh&quot;, and the hydrator side is simpler.</li>
+</ul>
+</li>
+<li>The author-rule evaluation utility that lived inside home-mixer moved up into a shared crate <span class="badge ok">verified</span> (author_rules.rs).<ul>
+<li>Deleted <code>home-mixer/util/author_rules.rs</code> (156 lines) and moved the symbol to <code>xai_feature_switches::AuthorRulesEvaluator</code>. It is a refactor.</li>
+<li>The moka cache setup of size 500k, TTL 10 minutes, and 64 shards was likely duplicated on the shared crate side <span class="badge est">inferred</span>. That implementation is not exposed in this diff.</li>
+</ul>
+</li>
+</ol>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The VF filter code gained only two tests, and there is no policy change.<ul>
+<li>The file is <code>filter.rs</code> (+94/−2).</li>
+<li>The added tests are <code>pure_core_alone_says_a_post_is_a_retweet</code> and <code>without_a_pure_core_answer_a_post_reads_as_an_original</code>.</li>
+<li>Both pin which fallback the <code>viewer_mutes_retweets</code> rule and the <code>nullcasted_tweet</code> rule each use to reach a conclusion when PureCore (tweet core metadata) hydration fails or succeeds. They add a lock on existing fault-handling behavior.</li>
+</ul>
+</li>
+<li>The changes to three VF files appear to be a small refactor following yesterday&#39;s <code>Fetcher&lt;V&gt;</code> rewrite <span class="badge est">inferred</span>. They mostly add tests.<ul>
+<li><code>hydration/execute.rs</code>(+68/−2), <code>hydration/tweet_source.rs</code>(+8/−14), <code>safety_label_source/metrics.rs</code>(+29/−7)</li>
+</ul>
+</li>
+<li>In VF <code>visibility-filtering-client/vf_client.rs</code> (+1/−35) and <code>test_support.rs</code> (+37/−0), the test fixtures were split into a separate file. There is no logic change.</li>
+<li>Phoenix <code>python/training/xai-checkpointing/xai_checkpointing/kms_client.py</code> (+74/−0, new) is a shared wrapper for KMS access. It has no direct effect on feed ranking.</li>
+<li>Phoenix <code>trainer_recsys.py</code> (+164/−39) appears to separate the parts that a dedicated SID retrieval Trainer will inherit from the shared trainer <span class="badge est">inferred</span>.</li>
+<li>Phoenix <code>rowwise_adagrad.py</code> (+14/−9) changes the fused kernel on the row_emb side and the python-level reference adapter.</li>
+<li><code>abuse-enforcement-service/service-lib/src/overturn_hold.rs</code> (+22/−22) is a test reinforcement of the overturn hold module released yesterday <span class="badge est">inferred</span>.</li>
+<li><code>botmaker/src/java/com/twitter/botmaker/compiler/thrift/TType.java</code> (+14/−14) is thrift compiler maintenance.</li>
+<li><code>thunder/posts/post_store.rs</code> (+20/−20) is at the level of test renaming <span class="badge est">inferred</span>.</li>
+<li><code>phoenix-rankall/src/store/base.rs</code> (+12/−12) is a minor adjustment to the SID backfill store adapter <span class="badge est">inferred</span>.</li>
+<li><code>visibility-filtering-client/tweet_safety_label.rs</code> (+39/−12) expands the thrift decoder tests <span class="badge est">inferred</span>.</li>
+<li>The increment in <code>home-mixer/params/param.rs</code> (+31/−1) comes from adding the five SID source params above. Unless the cron sync time changed, there is no other meaningful change.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Created a new &quot;### Gen4+34 (2026-10-02, 76843a5)&quot; subsection in the public-source Gen4 section of <a href="x.html">services/x.md</a>. In the retrieval source table of the <code>## Candidate generation (retrieval)</code> section, added a <code>SidSource</code> row and wrote &quot;SID generative retrieval microservice. seed post ID → 6-level × 256-codebook SID beam search → shared_prefix_depth score, labeled with served_type=ForYouPhoenixRetrievalMoe, off by default with EnableSidSource=false&quot;.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> A path that generates SIDs directly and returns them as candidates has been released in X code for the first time. However, the default is off, so the checkpoint to watch for real-traffic use is the day the FeatureSwitches cron turns it on. Three facts overlap in this commit.</p></div>
+<ol>
+<li><strong>This is the first commit in which X released generative SID retrieval as three complete parts: a &quot;separate microservice + dedicated Transformer training and serving stack + home-mixer candidate source wiring&quot;.</strong><ul>
+<li>Until now, X&#39;s SID has appeared indirectly in two places. One is an input feature of the two-tower item tower (the <code>use_post_sid</code> flag in <code>xrecsys_two_tower.py</code>, released 2026-09-30). The other is the 800k backfill QPS cap in phoenix-rankall (<code>SID_BACKFILL_QPS_CAP = 800_000</code>, released yesterday).</li>
+<li>No line that generates SIDs directly and returns the result as candidates had been released.</li>
+<li>Today&#39;s commit releases the whole chain below at once.<ul>
+<li>On the Phoenix side, it introduced four files for a dedicated Transformer model (8-layer, GQA 20:4, 1030-length context, 6-level × 256-codebook): config, model, trainer, and runner.</li>
+<li>It released the gRPC client of the separate microservice <code>xai-recsys-sid-retrieval.prod.fou.twitter.biz</code> and its request shape (<code>seed_post_ids</code>, <code>shared_prefix_depth</code> scoring, prefix retrieval condition <code>min_prefix_depth=3</code>).</li>
+<li>The home-mixer <code>SidSource</code> sends candidates labeled with the same ServedType as PhoenixMOESource.</li>
+</ul>
+</li>
+<li>Had these three parts been scattered across separate commits, it would have been a &quot;work in progress&quot; signal, but the fact that they were released together in one commit means the wiring is close to complete.</li>
+<li>However, since <code>EnableSidSource=false</code> is the default (off), the checkpoint to watch for real-traffic use is the day it is turned ON in the FeatureSwitches cron.</li>
+</ul>
+</li>
+<li><strong>Two-tower retrieval and SID generative retrieval are designed as &quot;two layers over the same vocab space&quot;, not as &quot;replacements for each other&quot;.</strong><ul>
+<li>The two models share the same user, item, and author hash vocab (100M · 30M · identical double hashing scales/biases). Comparing <code>xrecsys_sid_retrieval.py:30-45</code> with the figures in <code>xrecsys_two_tower.py</code>, released 2026-09-30, shows this.</li>
+<li>Generative retrieval is costly in the two ways below, so X appears to have chosen a complementary structure in which two-tower first handles the broad recall that can run with ANN, and SID retrieval handles supplementary recall by prefix-sharing degree <span class="badge est">inferred</span>.<ul>
+<li>One is the time complexity of SID generation (beam_width × decode_levels × codebook size).</li>
+<li>The other is the cost of maintaining the SID index on the corpus side.</li>
+</ul>
+</li>
+<li>With the same vocab, both models could run on a shared embedding table. However, in the config released now, each model has its own embedding table. Whether they are unified into a shared embedding has to be observed in the next commit.</li>
+</ul>
+</li>
+<li><strong>The row-sharded embedding CUDA kernel bundle is a two-axis extension of the Phoenix embedding design itself.</strong><ul>
+<li>The 3,180-line <code>row_emb</code> was not added solely for the generative retrieval model. However, in the context of this commit bundle, it is natural to read the huge-vocab embeddings that SID generative retrieval requires (100M · 30M · 6-level × 256 codebook) as the trigger.</li>
+<li>The shared adapter <code>recsys_async_emb.py</code> lets a model choose between the existing column-sharded kernel <code>async_emb</code> and the new row-sharded kernel <code>row_emb</code>, in effect leaving room to pick the best sharding per model.</li>
+<li>Two-tower can keep the user tower and the item tower each column-sharded, but in the SID generative model each token refers only to its own vocab range during the generation stage, so row-shard likely yields a more compact communication pattern <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ol>
+<p>The return of the LLM judge actions is a separate stream. The two actions that were vacated 15 days ago reappeared under changed numbers (107/108 → 108/109), which means the direction of carrying the LLM judge on the action axis and consuming it as one of the training targets came back after readjustment. The numbers changed because slot 107 was permanently taken by <code>CLIENT_TWEET_LIVE_STREAM_REPLY</code> in the meantime, and 108 was also vacated so that it could be reused. This release shows no consumer in the model training config or on the wire, and only the proto has claimed the slots first; which head weight they enter and which config&#39;s target action list includes them should be checked in the next window.</p>
+<h2 id="2-no-new-recommendation-related-posts--netflix-and-meta-blogs"><span class="num">2</span>No new recommendation-related posts — Netflix and Meta blogs</h2>
+<p>Neither the Netflix nor the Meta engineering blog had a new recommendation-related post to fold in today.</p>
+<ul>
+<li>Of the 10 items in the Netflix tech blog feed, the latest 2 are unrelated to recommendation. They are &quot;Trading a Cloud Identity for Your Own: Workload Attestation on Managed Compute&quot; (2026-09-25, infrastructure) and &quot;Leave the Class Path in the Rearview Mirror&quot; (2026-09-18, Java packaging).</li>
+<li>The earlier &quot;MAPS&quot;, &quot;GenRec&quot;, and &quot;GenPage&quot; have already been folded in.</li>
+<li>The latest post on Meta <code>engineering.fb.com</code>, &quot;From User Sequences to Scaling Laws&quot; (2026-09-02), has already been folded in. The four posts after it (Private Processing / Rebalancer / Petal / ZGateway) are all about infrastructure, networking, or privacy, and are unrelated to recommendation.</li>
+</ul>
+<h2 id="radar">Radar</h2>
+<p>0 papers passed all the radar acceptance criteria. The criteria are the following three:</p>
+<ul>
+<li>① Platform authors or a production A/B test</li>
+<li>② Mechanism novelty</li>
+<li>③ Large-scale results</li>
+</ul>
+<p>The scope is the arXiv <code>cs.IR</code> window 2026-09-30–2026-10-01; of 30 requested, all 30 <code>&lt;entry&gt;</code> items were parsed. The three items below were borderline, but all were rejected.</p>
+<ul>
+<li><a href="https://arxiv.org/abs/2610.02057" target="_blank" rel="noopener">arXiv 2610.02057</a> <em>Optimizing Effective Training Time for Large-Scale Recommendation Systems</em>. Rejected because it is an operational case of Meta&#39;s recommendation training infrastructure.<ul>
+<li>Confirmed as a Meta affiliation. &quot;Meta Platforms, Inc.&quot;, &quot;Meta Engineering Blog&quot;, and &quot;Meta internal&quot; appear many times in the PDF strings.</li>
+<li>It is a fleet-scale operational case that raised the ETT% (Effective Training Time) of the recommendation training fleet from 80% → 90%+. It covers asynchronous checkpointing, communication removal, pipeline overlap, dynamic shapes, PyTorch 2 compile cache reuse, and more.</li>
+<li>The reason for rejection is that it is an operational win in recommendation training infrastructure. Its nature differs from the retrieval and ranking mechanism novelty of radar criterion ②. &quot;Training throughput&quot; is also not an item that enters the service canon, so it was not folded in.</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2610.01533" target="_blank" rel="noopener">arXiv 2610.01533</a> <em>Neither Black nor White: Balancing Semantic and Collaborative Signals with Graph-Informed Semantic IDs (GrIS)</em>. Rejected because it makes no production deployment claim.<ul>
+<li>Confirmed that all authors are affiliated with Huawei Ireland Research Centre.</li>
+<li>It covers a mechanism that mixes SID and collaborative signals through a graph, but makes no production deployment claim.</li>
+<li>The reason for rejection is that the platform and deployment condition of ① is empty.</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2609.39043" target="_blank" rel="noopener">arXiv 2609.39043</a> <em>Routing Between Generative and Collaborative User Profiles: A Serving-Time Gate for Controllable Novelty</em>. Rejected because it is not a tracked service.<ul>
+<li>The authors are affiliated with Comcast Technology AI and DePaul University.</li>
+<li>The paper proposes a structure in which a &quot;serving-time routing gate selectively routes users between an LLM-profile model and a collaborative sequential model&quot;. Within an NDCG loss budget of 5%, it gains Novelty@10 +6.5% and routes only 12.5% of users.</li>
+<li>The mechanism is interesting (cost-aware selective LLM use).</li>
+<li>The reason for rejection is that Comcast&#39;s Xfinity Stream is not a tracked service, and its value as a feed/ranking platform to track is low (video recommendation for streaming TV).</li>
+</ul>
+</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check when the SID source switch is turned on in the cron — the point in time when the FeatureSwitches cron flips this switch to true is when it reaches real traffic. The switch is the <code>EnableSidSource</code> param. Also check then whether the values of <code>SidSourceMaxSeeds</code>, <code>SidSourceMaxResults</code>, and <code>SidSourceMinPrefixDepth</code> change from the config defaults. The checkpoint to watch on the home-mixer side is the <code>SidSource.retrieved{type=seeds|retrieved|hydrated}</code> metric.</li>
+<li>Check where the LLM judge actions (108/109) are used in training — only the proto is declared, and no code that consumes them on the training config or target head side is visible yet. If 108/109 are added to the target action list of <code>xrecsys_search.py</code> or <code>xrecsys_two_tower.py</code> in a next commit, that is the point at which they move from a wire declaration to training consumption.</li>
+<li>Check whether two-tower and SID retrieval come to share embedding tables — the two models use the same vocab design, but each currently has its own embedding table. If a next commit introduces checkpoint sharing or embedding table reuse, it signals that the two retrievals are unified as two heads over a shared embedding.</li>
+<li>Do a deep dive on generative retrieval — all three items below are subjects for full analysis and need a deep dive.<ul>
+<li>The model&#39;s beam decoder math: the prefix retrieval stopping condition, score aggregation, and the corpus view structure for reverse-resolving SID → post</li>
+<li>Training loss: negative sampling with the positive narrowed to FAV only, and the weights of the 7 hard negative actions</li>
+<li>Training throughput: a throughput estimate for the combination ep=128 · dp=1 · bs=128 · max_steps=3.1B</li>
+</ul>
+</li>
+<li>Check which of row_emb and async_emb each model uses — which model uses row-sharded and which uses column-sharded, and where the <code>is_row_sharded(context_handle)</code> branch is actually called, are the checkpoints to watch in the next window. Both are currently supported at the adapter layer, but which model &quot;actually&quot; uses row-sharded only becomes visible by following the <code>make_context_handle</code> calls in the model config.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-02.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-02</span></a><a class="pg-next" href="daily-2026-10-04.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-04</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-03.html" data-title="일일 리포트 2026-10-03"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

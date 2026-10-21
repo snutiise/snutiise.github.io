@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-04 — feed-research</title>
+<meta name="description" content="In one line: X released the server crate for generative SID retrieval. The server only does prefix-range search over a prebuilt SID snapshot.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-04.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-04.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-04.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-04.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-04 — feed-research">
+<meta property="og:description" content="In one line: X released the server crate for generative SID retrieval. The server only does prefix-range search over a prebuilt SID snapshot.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-04.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/daily-2026-10-04.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-04">2026-10-04</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Sunday</li>
+<li><span class="meta-k">Reading time</span>20 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-04.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X released the server crate for generative SID retrieval. The server only does prefix-range search over a prebuilt SID snapshot.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-sid-retrieval-server-released-and-popular-posts-candidate-source-added--x"><span class="num">1</span>SID retrieval server released and popular posts candidate source added — X</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-sid-retrieval-server-released-and-popular-posts-candidate-source-added--x"><span class="num">1</span>SID retrieval server released and popular posts candidate source added — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/b412112" target="_blank" rel="noopener">xai-org/x-algorithm@b412112</a> — xai-org, 2026-10-03T03:26:56Z, code. These notes number the X commits after the Gen4 release in order, and this commit is Gen4+35. The whole commit is +9,128/−2,356 across 148 files.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> SID (semantic ID) is a code that compresses a post into a multi-stage token sequence using RQ-VAE-family quantization. Generative SID retrieval is an approach in which a Transformer that takes the user history as input autoregressively generates the SID tokens of the next post and returns the posts those codes point to as candidates. The Pinterest TIGER (2024), Alibaba PailitaoGR (2025), Kuaishou OneRec (2025), Tencent BARGE (2026), and ByteDance GEAR (2026-09-30 arXiv) lines use this approach. At X, this line has been built up in three stages over the last three days (2026-10-01–2026-10-03).</p></div>
+<ul>
+<li>The first stage is the 2026-10-01 commit (Gen4+33, b79b947). A sketch of the slot that extracts SIDs appeared in the retrieval wire of Phoenix (the Grok-based Transformer used for For You candidate retrieval and ranking).</li>
+<li>In the second stage, the 2026-10-02 commit (Gen4+34, 76843a5), four files for a dedicated Transformer in Phoenix (training config, model, trainer, runner) were released. home-mixer (the service that assembles the For You feed) got a <code>SidSource</code> candidate source skeleton and a <code>SidRetrievalClient</code> gRPC client.</li>
+<li>However, that commit had no server crate to receive actual requests and return responses. home-mixer sends calls to <code>xai-recsys-sid-retrieval.prod.fou.twitter.biz:443</code>, but what the Rust server behind that endpoint looks like could not be known from outside.</li>
+</ul>
+<p>This commit released that server crate and changed three other things.</p>
+<ul>
+<li>Server crate: 7 new src files under <code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code>, 1,018 lines (8 files, 1,050 lines with Cargo.toml).</li>
+<li>Popular posts candidate source: home-mixer got a new OON (posts from accounts the user does not follow) candidate source, <code>PopularPostsSource</code>. It fills the gap in OON recommendation by feeding top-K popular authors into Thunder (the in-network index holding the latest posts of followed accounts) as &quot;virtual following&quot;.</li>
+<li>Ads brand safety: the default of <code>EnableAdsBrandSafetyVerdictV2</code> changed from false → true. A new parameter, <code>EnableAdsAuthorBrandSafetyFallback</code>, which uses the author-level Grok label instead when a post label is missing, was also added (off by default).</li>
+<li>Replay and capture: a new subsystem of 6 new files, 1,334 lines, appeared under <code>visibility-filtering/staging/</code> on the VF (visibility-filtering, the service that decides whether a post may be shown to a viewer) side. Including 3 moved files, the additions total 1,636 lines.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The SID retrieval server builds an index from an SID snapshot and finds candidates by prefix range</span></p></div>
+<ul>
+<li><p>The SID retrieval server crate was newly released with 7 src files (8 including Cargo.toml) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval" target="_blank" rel="noopener"><code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code></a>.</p>
+<ul>
+<li>Component files: <code>src/service.rs:208</code>, <code>src/index.rs:223</code>, <code>src/loader.rs:170</code>, <code>src/http_api.rs:109</code>, <code>src/main.rs:115</code>, <code>src/seed_sids.rs:114</code>, <code>src/metrics.rs:79</code>.</li>
+</ul>
+</li>
+<li><p>The service interface is defined by a separate proto crate and has only one RPC <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval-proto/proto/sid_retrieval.proto" target="_blank" rel="noopener"><code>sid_retrieval.proto:46</code></a>.</p>
+<ul>
+<li>The proto crate is <code>xai-recsys-sid-retrieval-proto</code>, and the RPC is <code>rpc Retrieve(RetrieveRequest) returns (RetrieveResponse)</code>.</li>
+<li>The request fields are <code>seed_post_ids/max_results/max_per_seed/min_prefix_depth/max_prefix_depth/caller</code>.</li>
+<li>The response carries <code>candidates</code>, <code>seeds</code> (marking where each seed came from with Index/SidService/Missing labels), <code>snapshot_timestamp_secs</code>, and <code>index_posts</code>.</li>
+</ul>
+</li>
+<li><p>The index packs the SID into a single integer key and keeps two post lists sorted in different orders <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs" target="_blank" rel="noopener"><code>src/index.rs:5-110</code></a>.</p>
+<ul>
+<li><code>SID_LEVELS = 6</code>, <code>BITS_PER_LEVEL = 8</code>, <code>MAX_CODE = 255</code>. Each level has 2^8=256 codes.</li>
+<li>The full SID is packed into a 48-bit u64 key, shifting left by 8 bits per level starting from the top level. In theory the key space is 256^6 ≈ 2.8 × 10^14.</li>
+<li>It keeps two vectors of <code>IndexedPost { key, post_id, author_id }</code>. <code>by_key</code> is sorted by <code>(key ASC, post_id DESC)</code> and used for prefix-range search. <code>by_post</code> is sorted by <code>(post_id ASC)</code> and used for binary search from seed post_id to SID key.</li>
+<li><code>prefix_range(key, depth)</code> returns <code>[lo, hi)</code>, keeping only the top <code>depth</code> levels and setting the lower <code>(6-depth)*8</code> bits to 0. It calls <code>by_key.partition_point</code> with this range to pick the posts inside it. Each depth level costs O(log N) + O(result size).</li>
+</ul>
+</li>
+<li><p>Search collects candidates by descending from the deepest prefix depth to the shallowest <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs" target="_blank" rel="noopener"><code>src/index.rs:138-193</code></a>.</p>
+<ul>
+<li>Each post enters the result &quot;only once, at the deepest prefix level it shares&quot;. A post pulled at depth 6 is not pulled again at depths 5–3. This is implemented by walking the depths in reverse and subtracting the region already scanned (<code>consumed</code>).</li>
+<li>Within the same depth, posts with a larger post_id (= more recent) come first. It cuts the top K with <code>select_nth_unstable_by(post_id DESC)</code> and then sorts.</li>
+<li>The seed post itself is filtered out by a global excluded set. When requesting with multiple seeds, seed₂ does not get mixed into the results of seed₁.</li>
+</ul>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">for depth in (params.min_prefix_depth..=max_depth).rev() {
+    let (lo, hi) = prefix_range(seed.key, depth);
+    let (start, end) = self.key_range(lo, hi);
+    let mut level: Vec&lt;&amp;IndexedPost&gt; = match consumed {
+        None =&gt; self.by_key[start..end].iter().collect(),
+        Some((inner_start, inner_end)) =&gt; self.by_key[start..inner_start]
+            .iter()
+            .chain(self.by_key[inner_end..end].iter())
+            .collect(),
+    };
+    level.retain(|p| !excluded.contains(&amp;p.post_id));
+    ...
+    picked.extend(level.into_iter().map(|p| Candidate {
+        post_id: p.post_id, author_id: p.author_id,
+        seed_post_id, shared_prefix_depth: depth as u32,
+    }));
+    consumed = Some((start, end));
+}
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs" target="_blank" rel="noopener"><code>src/index.rs:138-179</code></a></p>
+</blockquote>
+</li>
+<li><p>Candidates from multiple seeds are taken alternately by round-robin <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/index.rs" target="_blank" rel="noopener"><code>src/index.rs:196-222</code></a>.</p>
+<ul>
+<li>It cycles seed 1 → seed 2 → ... → seed N → seed 1 → ..., and removes duplicates with a global <code>HashSet&lt;post_id&gt; emitted</code>.</li>
+<li>It stops when it reaches <code>max_results</code> or when nothing more can be taken.</li>
+<li>As a result, position bias is equalized so that it does not skew toward a particular seed.</li>
+</ul>
+</li>
+<li><p>The snapshot loader checks the path every 30 seconds and, if it changed, rebuilds the whole index and swaps it in atomically <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/loader.rs" target="_blank" rel="noopener"><code>src/loader.rs:1-170</code></a>.</p>
+<ul>
+<li>The input format is Arrow Parquet (<code>post_sid_snapshot.parquet</code>). It has three columns, <code>post_id: int64</code>, <code>author_id: int64</code>, and <code>post_sid: list&lt;int64&gt;</code>, and the batch size is 65,536.</li>
+<li>The timestamp is taken from the file name suffix (<code>*_&lt;unix_ts&gt;.parquet</code>), and if parsing fails, the file mtime is used instead.</li>
+<li><code>watch_snapshots(path, poll_interval=30s, index, ready_tx)</code> calls <code>canonicalize(path)</code> every 30 seconds and reloads everything if the path changed. The build runs in <code>tokio::spawn_blocking</code>, and on success it does an atomic swap with <code>ArcSwapOption&lt;SidIndex&gt;</code>. It then raises the initial ready flag of <code>/readyz</code> with <code>ready_tx.send(true)</code>.</li>
+<li>In other words, there are no real-time upserts; the pattern is to push in, in batches, a code table generated on the model side.</li>
+<li>Invalid SIDs are dropped silently. <code>pack_full_key(row_codes)</code> returns <code>None</code> if <code>len != 6</code> or any code is outside 0..=255, and the <code>skipped</code> counter goes up then.</li>
+</ul>
+</li>
+<li><p>A seed&#39;s SID is looked up first in the local trie, and if it is missing, a separate gRPC service is asked <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/seed_sids.rs" target="_blank" rel="noopener"><code>src/seed_sids.rs:1-114</code></a>.</p>
+<ul>
+<li>The external service is <code>SidLookupService</code> (<code>xai-recsys-sid-proto</code>, with the endpoint set by the <code>--sid-endpoint</code> flag). It looks up in batches and puts the results in a moka cache (2 million entries, 6-hour TTL).</li>
+<li>That is, the service receives seed SIDs from two places. One is its own parquet snapshot (= all corpus-side codes), and the other is the external service (= presumably the real-time code publishing line on the Phoenix side).</li>
+</ul>
+<blockquote>
+<p><strong>Historical context</strong>: <code>SidLookupService</code> is, in effect, the lookup service that disappeared in Gen4+15 (2026-09-04, 9b0dc31), when the &quot;SID retrieval sidecar was removed wholesale from the Phoenix serving engine&quot;, now reborn here as a <strong>separate external service</strong>. At the time, the sidecar served as a lookup that &quot;converts each post ID in the user history into an SID&quot; on Phoenix requests; after it disappeared, history SIDs were absorbed into a form that arrives preloaded in the request. Now the shape has changed so that the <strong>retrieval server calls that service when a seed → SID conversion is needed</strong>.</p>
+</blockquote>
+</li>
+<li><p>The server emits 3 kinds of metrics <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/metrics.rs" target="_blank" rel="noopener"><code>src/metrics.rs</code></a>.</p>
+<ul>
+<li><code>sid_retrieve_requests{caller, result=ok|empty|unavailable}</code> counter</li>
+<li><code>sid_retrieve_seeds{source=index|sid_service|missing}</code> counter</li>
+<li><code>sid_retrieve_candidates{caller}</code> and <code>sid_retrieve_latency_seconds{caller}</code> histograms</li>
+</ul>
+</li>
+<li><p>The server&#39;s default behavior is set by run flags. By default it returns up to 800 results and 100 per seed, and searches prefix depths 3–6 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/phoenix/crates/serving/xai-recsys-sid-retrieval/src/main.rs" target="_blank" rel="noopener"><code>src/main.rs:26-52</code></a>.</p>
+<ul>
+<li><code>--grpc-port=9090 · --http-port=8080 · --snapshot-poll-secs=30 · --sid-timeout-ms=200 · --sid-cache-size=2_000_000 · --max-seeds=200 · --default-max-results=800 · --default-max-per-seed=100 · --default-min-prefix-depth=3 · --default-max-prefix-depth=6</code></li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A source was added that takes posts of popular authors from Thunder and uses them as OON candidates</span></p></div>
+<ul>
+<li><p>The new source passes the top authors by follower count to Thunder as if the user follows them, and emits the posts Thunder returns as candidates <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/sources/popular_posts_source.rs" target="_blank" rel="noopener"><code>home-mixer/sources/popular_posts_source.rs:68-115</code></a>.</p>
+<ol>
+<li><code>PopularPostsSource</code> runs only when <code>!has_cached_posts &amp;&amp; !in_network_only &amp;&amp; EnablePopularPostsSource==true</code>.</li>
+<li>It calls <code>PopularAuthorsCache.maybe_spawn_refresh(now_ms)</code>. It starts a background refresh while preventing duplicates with a single AtomicBool.</li>
+<li><code>top_author_ids(top_k)</code> picks the author_ids of the top K (default 1,000) by follower_count in descending order.</li>
+<li>It sends Thunder <code>GetInNetworkPostsRequest { user_id, following_user_ids=[top K authors], max_results=500, per_author_limits={3, 0}, exclude_tweet_ids=seen_ids, algorithm, debug=false, is_video_request=false }</code>. Thunder treats those K authors as if the user follows them and returns posts by recency from its own in-network post store.</li>
+<li>The response posts go out in PostCandidate with the label <code>served_type=ForYouPhoenixRetrieval</code>. It is the same label as PhoenixSource.</li>
+</ol>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let authors = self.popular_authors.top_author_ids(top_k);
+...
+let request = GetInNetworkPostsRequest {
+    user_id: query.user_id,
+    following_user_ids: authors,
+    max_results: query.params.get(PopularPostsMaxResults),
+    exclude_tweet_ids: query.seen_ids.to_vec(),
+    per_author_limits: Some(PerAuthorLimits {
+        max_posts_per_author: Some(query.params.get(PopularPostsMaxPerAuthor)),
+        max_replies_reposts_per_author: Some(
+            query.params.get(PopularPostsMaxRepliesRepostsPerAuthor),
+        ),
+    }),
+    ...
+};
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/sources/popular_posts_source.rs" target="_blank" rel="noopener"><code>popular_posts_source.rs:87-101</code></a></p>
+</blockquote>
+</li>
+<li><p>The popular authors cache is stored in its own binary format v1 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/util/popular_authors.rs" target="_blank" rel="noopener"><code>util/popular_authors.rs:64-104</code></a>.</p>
+<ul>
+<li>The cache is <code>PopularAuthorsCache</code>, and the format is <code>version=1(1B) + updated_at_ms(8B BE) + count(4B BE) + [author_id(8B BE), follower_count(8B BE)] * count</code>.</li>
+<li>For 1,000 authors it is 13 + 16,000 = 16,013 bytes. The design stores everything under a single key in Manhattan (X&#39;s internal key-value store).</li>
+<li>The refresh period is 60 seconds when the cache is empty and 60 minutes when it is not. It is a common pattern of retrying aggressively only when the cache is empty.</li>
+</ul>
+</li>
+<li><p>Five parameters were added, and the source itself is off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+</li>
+</ul>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col class="w6"><col></colgroup>
+<thead>
+<tr>
+<th>Parameter</th>
+<th align="right">Default</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>EnablePopularPostsSource</code></td>
+<td align="right"><strong>false</strong></td>
+<td>Turns the source itself on</td>
+</tr>
+<tr>
+<td><code>PopularPostsTopAuthors</code></td>
+<td align="right">1000</td>
+<td>How many top authors from the KV store to feed in as &quot;virtual following&quot;</td>
+</tr>
+<tr>
+<td><code>PopularPostsMaxResults</code></td>
+<td align="right">500</td>
+<td>Cap on the Thunder response</td>
+</tr>
+<tr>
+<td><code>PopularPostsMaxPerAuthor</code></td>
+<td align="right">3</td>
+<td>Max posts for 1 author</td>
+</tr>
+<tr>
+<td><code>PopularPostsMaxRepliesRepostsPerAuthor</code></td>
+<td align="right">0</td>
+<td><strong>Replies/retweets are excluded from the source entirely</strong></td>
+</tr>
+</tbody></table></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The ads brand safety V2 verdict was turned on by default for the first time, and an author label fallback switch was added</span></p></div>
+<ul>
+<li><p>The default of the ads brand safety V2 verdict switch changed from false to true <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+<ul>
+<li>The switch is <code>EnableAdsBrandSafetyVerdictV2</code>. After the <code>BrandSafetyVerdictV2</code> logic was released in Gen4+2 (2026-08-17, b089ce6), the default stayed off until today, when it became on for the first time.</li>
+<li>This file is a cron mirror that syncs production config values daily.</li>
+<li>The value arrived at the mirror sync point (<code>last sync 2026-10-01T16:00:46Z → 2026-10-02T16:00:41Z</code>), and it appears to mirror a state pushed by a production cron at some point during 2026-10-02 <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><p>A new author label fallback switch was added, off by default <span class="badge ok">verified</span> — same file.</p>
+<ul>
+<li>The switch is <code>EnableAdsAuthorBrandSafetyFallback</code>. When an author-level Grok label (<code>GrokSfa</code>/<code>GrokNsfaLimited</code>/<code>GrokNsfa</code>) exists but a post-level label does not, it is a path that puts the author label in the post label&#39;s place as a fallback.</li>
+</ul>
+</li>
+<li><p>The verdict grades and the author fallback labels are defined as two enums <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/models/brand_safety.rs" target="_blank" rel="noopener"><code>home-mixer/models/brand_safety.rs:6-80</code></a>.</p>
+<blockquote>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">#[repr(i32)]
+pub enum BrandSafetyVerdict {
+    Unspecified = 0, Safe = 1, LowRisk = 2, MediumRisk = 3, HighRisk = 4,
+}
+pub enum AuthorBrandSafetyFallback { Sfa, NsfaLimited, Nsfa }
+</code></pre></figure>
+<p>— <a href="https://github.com/xai-org/x-algorithm/blob/b412112/home-mixer/models/brand_safety.rs" target="_blank" rel="noopener"><code>brand_safety.rs:6-21</code></a></p>
+</blockquote>
+</li>
+<li><p>The verdict has 4 levels: Safe / LowRisk / MediumRisk / HighRisk. It is consumed by the adjacency matrix (<code>MultiRiskAdsBlender</code> in Gen4+10) that pairs with <code>AdAdjacencyControl.brand_safety_risk</code> on the ads blender side.</p>
+<ul>
+<li>That is, the axis that decides &quot;post safety → whether an ad can be inserted&quot; on ads surfaces is on by default from today.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. VF got a replay and capture subsystem separate from live traffic</span></p></div>
+<ul>
+<li>A VF staging folder that did not exist until yesterday was newly created with 6 new files, 1,334 lines <span class="badge ok">verified</span>. Including 3 moved files, the additions total 1,636 lines.<ul>
+<li>The folder is <code>visibility-filtering/staging/</code>.</li>
+<li>Changes by file: <code>recording.rs</code>(+744 new), <code>replay_corpus.rs</code>(+299 new), <code>capture.rs</code>(+221 new), <code>reference/tweetypie.rs</code>(+204/-81 renamed), <code>reference_compare.rs</code>(+63/-39 renamed), <code>reference/mod.rs</code>(+35/-72 renamed), <code>main.rs</code>(+39 new), <code>serve.rs</code>(+29 new), <code>mod.rs</code>(+6 new).</li>
+</ul>
+</li>
+<li>This subsystem has its own crate entry point and is meant to run VF in a replay and capture mode fully separated from live traffic <span class="badge ok">verified</span>.<ul>
+<li>The entry point is <code>staging/main.rs</code>.</li>
+<li>The referential comparison (Tweetypie reference) code that was scattered elsewhere in the VF tree until yesterday was also moved here.</li>
+</ul>
+</li>
+<li>Three things to examine in a deep dive in the next window:<ul>
+<li>What recording.rs (744 lines) records and in what format (presumably parquet/jsonl)</li>
+<li>How capture.rs samples live traffic</li>
+<li>What the replay contract in replay_corpus.rs looks like</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The checkpoint restore side of the row-sharded embedding CUDA kernel bundle released in yesterday&#39;s commit (Gen4+34) was completed in Python.<ul>
+<li>The kernel bundle is <code>cuda/row_emb/</code>, and the restore file is <code>phoenix/xrex/train/row_embedding_restore.py</code> (+488 new). In effect, yesterday&#39;s shared adapter (<code>recsys_async_emb.py</code>) and today&#39;s restore utility have both arrived. A deep dive is needed.</li>
+</ul>
+</li>
+<li>A module for server-side latency metrics only was added to the Phoenix ranking server, separate from the inflight metrics. It widens operational observation and is not a model-side change.<ul>
+<li><code>phoenix/crates/serving/xai-recsys-engine/src/grpc_server_latency.rs</code> (+361 new)</li>
+</ul>
+</li>
+<li>There was a reorganization that cleanly detaches utilities that the SID retrieval trainer/model, split out yesterday, had shared with the common code. The common code has a net decrease (-477).<ul>
+<li><code>trainer_recsys.py</code>(+376/-853), <code>recsys_model.py</code>(+786/-431)</li>
+</ul>
+</li>
+<li>A client that fetches author-level Grok labels on the ads side was added. The fallback path in C above uses this client.<ul>
+<li><code>home-mixer/clients/author_brand_safety_client.rs</code> (+281 new)</li>
+</ul>
+</li>
+<li><code>is_arm_gated_retrieval</code>, deleted in yesterday&#39;s commit (Gen4+34), is used again on the author cold-start side. It was revived as a different branch specific to cold start.<ul>
+<li><code>home-mixer/scorers/author_cold_start.rs</code>(+53)</li>
+<li>That is, yesterday&#39;s deletion was not &quot;abandoning this axis itself&quot; but &quot;moving it out of the retrieval branch to the author cold-start side&quot;.</li>
+</ul>
+</li>
+<li>The SimClusters ANN cache client was split out from the shared crate.<ul>
+<li><code>home-mixer/clients/simclusters_ann_cache_client.rs</code> (+211 new)</li>
+</ul>
+</li>
+<li>A pacing-input axis was declared in VMRanker (the stage that reorders the candidate bundle to send to the feed). The linked param <code>VMRankerSendPacingInputs</code> is off by default.<ul>
+<li><code>vm-ranker/scoring/value_model.rs</code>(+96/-5), <code>scoring/mod.rs</code>(+85/-2)</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Three sections of <a href="x.html">services/x.md</a> were revised. In the candidate generation (retrieval) section, the <code>SidSource</code> row gained &quot;server-side algorithm (parquet 30-second polling · reverse depth order · round-robin interleave) + 5 server cap values&quot;, and a <code>PopularPostsSource</code> row was created. The safety/VF pipeline section gained a new <code>### Gen4+35 (2026-10-03, b412112)</code> section (7 steps A–G and 3 semantic stages). In the sources section, <code>b412112</code> was added at the end of the commit list.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This release reveals a design in which the SID retrieval server does no generation (beam search) and only searches, by prefix range, a code table built beforehand on the corpus side. Both new candidate sources (SID, popular posts) are off by default, so the day a cron turns one on is the checkpoint to watch for live traffic. The two ads changes move in the direction of widening brand safety labeling from post level to author level.</p></div>
+<ol>
+<li>The &quot;actual server crate&quot; was attached today to the three axes of generative SID retrieval released yesterday (home-mixer source, Phoenix model/trainer, proto). It is the third and last piece of a release spread over three days.<ul>
+<li>Until yesterday there were only the training recipe and the home-mixer source skeleton, and the server was empty.</li>
+<li>The <code>xai-recsys-sid-retrieval</code> crate released today states three things explicitly, so the server&#39;s actual query complexity can be measured from released code alone.<ul>
+<li>It is a fully static index that reloads the whole parquet snapshot every 30 seconds. There are no real-time upserts.</li>
+<li>It does range search over a 6-level trie packed into a 48-bit u64 key, based on <code>partition_point</code>.</li>
+<li>It uses an algorithm that trims recall with reverse depth order and round-robin interleave.</li>
+</ul>
+</li>
+<li>Until yesterday this slot read as &quot;the server will do generative decoding&quot;. Today&#39;s release reveals the design choice that generation is done beforehand on the corpus side (a batch code table) and the server only does prefix-range search.</li>
+<li>That is, there is no inference-time beam search on the server. Codes the model produced come in contained in the corpus, and the server is a KNN-like server that searches by seed code and shared prefix length.</li>
+<li>Since <code>EnableSidSource=false</code> is still the default, the checkpoint to watch for live traffic is the day it turns ON in the FeatureSwitches cron.</li>
+</ul>
+</li>
+<li><code>PopularPostsSource</code> reuses Thunder&#39;s in-network index for &quot;global popularity&quot;. It places the results under the <code>ForYouPhoenixRetrieval</code> label and mixes them with Phoenix two-tower retrieval (retrieval that embeds users and posts separately and matches them) responses.<ul>
+<li>It is interesting that it is designed not to be distinguishable from PhoenixSource by label. To a scorer/filter it looks like &quot;Phoenix retrieval returned K more&quot;, so it mixes in at the upper ranking stages with the same distribution as PhoenixScore.</li>
+<li>The mechanism is not embedding-based retrieval. It is a retro approach that feeds the &quot;global popularity centroid of the follow graph&quot; into Thunder as &quot;virtual following&quot;.</li>
+<li>It is a typical global popularity backfill pattern, used &quot;so that Thunder responds with something even if the user follows no one&quot; or &quot;to fill the gap when other OON sources cannot return results because user engagement signals are too few&quot; <span class="badge est">inferred</span>.</li>
+<li>Since <code>EnablePopularPostsSource=false</code> is still the default, the actual activation time is the checkpoint to watch in the next window.</li>
+</ul>
+</li>
+<li>Both ads changes expand &quot;SFA (Suitable For Advertising) labeling from post level → author level&quot;.<ul>
+<li>It is no coincidence that the switch of <code>EnableAdsBrandSafetyVerdictV2=true</code> and the introduction of <code>EnableAdsAuthorBrandSafetyFallback</code> arrived on the same day. The direction is to use the author&#39;s past label pattern as a fallback for posts that do not yet have a post-level Grok label.</li>
+<li>This is a signal that they intend to complement, with author-level aggregation, situations where Grok classifier coverage is sparse per post (especially for new posts) <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ol>
+<h2 id="radar">Radar</h2>
+<p>No papers were added to the radar today. Of the 30 requested in the arXiv <code>cs.IR</code> 2026-10-01–2026-10-02 window, all 30 <code>&lt;entry&gt;</code> items were parsed, and 0 of them cleared all three acceptance criteria.</p>
+<ul>
+<li>① Platform authors or a production A/B test</li>
+<li>② Mechanism novelty</li>
+<li>③ Large-scale results</li>
+</ul>
+<p>Three borderline items were also all rejected.</p>
+<ul>
+<li><a href="https://arxiv.org/abs/2609.39312" target="_blank" rel="noopener">arXiv 2609.39312</a> is <em>Learning Multiresolution Relevance for Hierarchical Generative Retrieval</em> by Weihao Shen and 7 others. It learns multiresolution relevance in hierarchical generative retrieval. It was rejected because the platform and deployment axis of ① is empty.<ul>
+<li>The author affiliation could not be confirmed directly from arXiv primary metadata, and the abstract has no production/deployment claim.</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2609.39319" target="_blank" rel="noopener">arXiv 2609.39319</a> is <em>Residual Trajectory Distillation for Generative Retrieval</em> by the same 7 authors. It is an approach that distills the intermediate trajectory of SID RQ (residual quantization). It was rejected for the same reason.<ul>
+<li>It is an academic line paired with 2609.39312, and neither makes an industry deployment claim.</li>
+</ul>
+</li>
+<li><a href="https://arxiv.org/abs/2609.39828" target="_blank" rel="noopener">arXiv 2609.39828</a> is <em>KUAISHOU Explorer LLM-Rec Challenge 2026: Reasoning Generative Recommendation</em> by Kuaishou authors. The body is a challenge overview with no mechanism novelty, so it was rejected on ②, mechanism novelty.<ul>
+<li>It is merely a source reconfirming that OneRec/OneRec-V2 were deployed at Kuaishou (a line already on the radar).</li>
+</ul>
+</li>
+</ul>
+<p>In the 2609.39xxx number range posted in the window after the Meta ETT% recommendation training infrastructure paper (arXiv 2610.02057) that was rejected from yesterday&#39;s radar, no new platform-affiliated mechanism worth tracking was found.</p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>When the SID source and the popular posts source turn on in cron — both were released off by default, so the point at which the FeatureSwitches cron flips either one to true is when live traffic applies.<ul>
+<li>The switches are <code>EnableSidSource</code> and <code>EnablePopularPostsSource</code>.</li>
+<li>The checkpoints to watch are the home-mixer-side <code>SidSource.retrieved{type=seeds|retrieved|hydrated}</code> and the Thunder-side <code>GetInNetworkPostsRequest</code> call pattern.</li>
+</ul>
+</li>
+<li>Call metrics of the SID retrieval server — two server-side counters reveal the live traffic distribution.<ul>
+<li>The endpoint is <code>xai-recsys-sid-retrieval.prod.fou.twitter.biz</code>.</li>
+<li>The counters are <code>sid_retrieve_requests{caller, result=ok|empty|unavailable}</code> and <code>sid_retrieve_seeds{source=index|sid_service|missing}</code>.</li>
+<li>A high share of <code>source=sid_service</code> means the real-time conversion cost for &quot;posts not yet in the corpus-side snapshot&quot; is large. A high share of <code>source=index</code> means the post corpus has stabilized.</li>
+</ul>
+</li>
+<li>Deep dive on the <code>VF staging/</code> replay and capture subsystem — three things have not yet been examined:<ul>
+<li>What format and what traffic recording.rs (744 lines) records</li>
+<li>The live sampling strategy of capture.rs</li>
+<li>The replay contract of replay_corpus.rs</li>
+</ul>
+</li>
+<li>Deep dive on the 488 lines of <code>row_embedding_restore.py</code> — the checkpoint restore side of the row-sharded embedding CUDA kernel released yesterday, paired with yesterday&#39;s shared adapter.</li>
+<li>Whether the server side of <code>SidLookupService</code> is released — whether the external service called by the SID retrieval server released today is released as a separate crate in the next commit is the checkpoint to watch in the next window.<ul>
+<li>The external service is <code>xai-recsys-sid-proto::SidLookupService</code>.</li>
+<li>Currently the default is localhost with <code>--sid-endpoint=http://localhost:50051</code>, and the name of the externally exposed endpoint is still not visible in the repo.</li>
+</ul>
+</li>
+<li>Deep dive on the generative SID retrieval model side — questions that yesterday&#39;s commit (Gen4+34) deferred to a deep dive remain.<ul>
+<li>Beam decoder math (stopping condition of prefix retrieval, score aggregation)</li>
+<li>Structure of the SID → post reverse-resolution corpus view</li>
+<li>Training loss (weights of one positive = FAV and 7 hard negative actions)</li>
+<li>training throughput</li>
+<li>These questions remain open even after today&#39;s server crate revealed that &quot;the server does not do beam search; codes are extracted beforehand on the corpus side and pushed in as a batch, and the server only does prefix-range search&quot;.</li>
+<li>In the next window we will look at which batch pipeline the model-side code extraction currently runs in. The <code>max_steps ≈ 3.1B</code> in the training config is the model-side checkpoint, and the serving side receives <code>post_sid_snapshot.parquet</code>, which that checkpoint builds by running over the whole corpus.</li>
+</ul>
+</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-03.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-03</span></a><a class="pg-next" href="daily-2026-10-07.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-07</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-04.html" data-title="일일 리포트 2026-10-04"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

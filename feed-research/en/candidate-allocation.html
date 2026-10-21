@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Candidate allocation — what to include from multiple sources, and how many — feed-research</title>
+<meta name="description" content="Candidate allocation is the layer that decides, when there are 10 or 30 candidate generation sources each, &quot;how many to take from each source and how to mix…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/candidate-allocation.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/candidate-allocation.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/candidate-allocation.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/candidate-allocation.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Candidate allocation — what to include from multiple sources, and how many — feed-research">
+<meta property="og:description" content="Candidate allocation is the layer that decides, when there are 10 or 30 candidate generation sources each, &quot;how many to take from each source and how to mix…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/candidate-allocation.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+<li class="lang"><a href="/feed-research/candidate-allocation.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)">KO</a></li>
+</ul></nav>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Cross-service topics</p>
+<h1 id="candidate-allocation--what-to-include-from-multiple-sources-and-how-many">Candidate allocation — what to include from multiple sources, and how many</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Translated from</span><a href="../candidate-allocation.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">19</span></summary><ol><li><a href="#x-mixes-in-network-and-out-of-network-5050-is-wrong">&quot;X mixes in-network and out-of-network 50:50&quot; is wrong</a></li><li><a href="#allocation-structure-by-generation--x">Allocation structure by generation</a><ol><li><a href="#2026-rust-no-allocator-only-per-source-caps">2026 Rust: no allocator, only per-source caps</a></li><li><a href="#2025-scala-cap--interleave--priority-weave">2025 Scala: cap + interleave + priority weave</a></li><li><a href="#allocating-by-slot-rather-than-by-source">Allocating by &quot;slot&quot; rather than by source</a></li></ol></li><li><a href="#case-meta--numbers-exist-but-no-allocator">Case: Meta</a><ol><li><a href="#pass-0-candidate-counts-by-surface">pass 0 candidate counts by surface</a></li><li><a href="#the-two-sets-of-numbers-differ-in-nature--this-is-the-real-structural-difference">The two sets of numbers differ in nature</a></li><li><a href="#meta-side-allocation-mechanisms--mechanical-on-only-one-surface">Meta-side allocation mechanisms</a></li></ol></li><li><a href="#case-netflix--the-allocation-unit-is-the-row-not-the-source">Case: Netflix</a></li><li><a href="#ads-vs-organic--count-slots-or-pixel-distance">Ads vs. organic</a></li><li><a href="#what-generalizes-from-this-case">What generalizes from this case</a></li><li><a href="#who-uses-this">Who uses this</a></li><li><a href="#not-yet-verified">Not yet verified</a></li><li><a href="#sources">Sources</a><ol><li><a href="#public-source-code">Public source code</a></li><li><a href="#meta-transparency-center-primary-source-for-candidate-counts">Meta Transparency Center (primary source for candidate counts)</a></li><li><a href="#meta-blog-posts-and-patent">Meta blog posts and patent</a></li><li><a href="#netflix">Netflix</a></li></ol></li></ol></details></nav>
+<div class="prose">
+<p>Candidate allocation is the layer that decides, when there are 10 or 30 candidate generation sources each, &quot;how many to take from each source and how to mix them into the final list.&quot; There are three approaches, and <strong>X changed its approach as generations changed.</strong> The 2025 Scala generation used caps, weaving, and priority merge <span class="badge ok">verified</span>(<a href="#allocation-structure-by-generation--x">Allocation structure by generation</a>). The 2026 Rust generation has no allocator and uses score multipliers <span class="badge ok">verified</span>(<a href="#2026-rust-no-allocator-only-per-source-caps">2026 Rust</a>, <a href="#x-mixes-in-network-and-out-of-network-5050-is-wrong">50:50 section</a>).</p>
+<ol>
+<li><strong>Ratio allocation (ratio)</strong>: splits slots like &quot;30% from this source.&quot; The composition of the result is guaranteed.</li>
+<li><strong>Cap allocation (cap)</strong>: takes at most N from each source and, after that, lets candidates compete by score only. The composition is not guaranteed.</li>
+<li><strong>Interleave (round-robin / weave)</strong>: picks one from each source in turn. It is used in combination with caps.</li>
+</ol>
+<p><strong>Through the Gen3 release, X and Meta published this layer in exactly opposite directions.</strong></p>
+<ul>
+<li>X published all of the allocator code. The cap <em>values</em> were outside the repo through Gen3 (<code>0bfc279</code>) and, since the Gen4 release (2026-08-13, <code>47c1bcd</code>), can be read from the parameter mirror <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</li>
+<li>Meta states the per-stage candidate <em>counts</em> as numbers for each surface, but has not published anywhere the allocator that produces those numbers.</li>
+</ul>
+<p>This asymmetry is a recurring theme across these notes.</p>
+<h2 id="x-mixes-in-network-and-out-of-network-5050-is-wrong">&quot;X mixes in-network and out-of-network 50:50&quot; is wrong</h2>
+<p>The claim that X mixes in-network (posts from followed accounts) and out-of-network posts half and half is the most widespread misconception. The two sentences used as evidence for it are <strong>both observed result ratios (&quot;on average&quot;), not quotas in code.</strong> <span class="badge ok">verified</span> — Twitter blog 2023-03-31 (checked against the archive 2026-08-09), twitter/the-algorithm <code>README.md:41</code></p>
+<ul>
+<li><p>The 2023 official blog wrote that this ratio is an average and can differ by user <span class="badge ok">verified</span> — Twitter blog.</p>
+<blockquote>
+<p>&quot;the For You timeline consists of 50% In-Network Tweets and 50% Out-of-Network Tweets <strong>on average</strong>, though this may vary from user to user&quot;</p>
+</blockquote>
+</li>
+<li><p>The README says that, in the search index row, about half of tweets come from this candidate source <span class="badge ok">verified</span> — same README.</p>
+<blockquote>
+<p>&quot;~50% of Tweets come from this candidate source&quot;</p>
+</blockquote>
+</li>
+</ul>
+<p>There is <strong>no</strong> code in the 2026 generation that enforces the ratio of in-network to OON (out-of-network, posts from accounts the user does not follow).</p>
+<ul>
+<li>As of Gen3 (<code>0bfc279</code>), in home-mixer (the service that assembles the For You feed) 11 sources run in parallel and their results are simply concatenated <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs</code></a><ul>
+<li>As of the Gen4 release, For You has 12 sources <span class="badge ok">verified</span> — <a href="x.html#current-2026-08-gen4">x.md current candidate generation section</a>.</li>
+</ul>
+</li>
+<li>The final selection is a single top-K by score <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/selectors/top_k_score_selector.rs" target="_blank" rel="noopener"><code>home-mixer/selectors/top_k_score_selector.rs</code></a></li>
+<li>The means of controlling the OON share is a <strong>score multiplier, not a quota</strong> <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/ranking_scorer.rs:220-239,272-275</code></a><ul>
+<li><p><code>effective_oon</code> is multiplied only into candidates that are not in-network.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let final_score = match c.in_network {
+    Some(false) =&gt; after_diversity * effective_oon,
+    _ =&gt; after_diversity,
+};
+</code></pre></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p>The multiplier value splits three ways <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/scorers/ranking_scorer.rs" target="_blank" rel="noopener"><code>ranking_scorer.rs:220-239</code></a>. In Gen3 (<code>0bfc279</code>) none of the three values was in the repo, and the Gen4 (<code>47c1bcd</code>) mirror has all three <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/config.rs" target="_blank" rel="noopener"><code>params/config.rs:38</code></a>.</p>
+<ul>
+<li>For a topic request it uses <code>TopicOonWeightFactor</code>. As of the Gen4 release the value is 0.5.</li>
+<li>For a new user it uses <code>NEW_USER_OON_WEIGHT_FACTOR</code>. A new user is a user whose account age is less than <code>NewUserAgeThresholdSecs</code> <strong>and</strong> whose following count is at least <code>NEW_USER_MIN_FOLLOWING</code>. As of the Gen4 release the value is 0.00001.</li>
+<li>Otherwise it uses <code>OonWeightFactor</code>. As of the Gen4 release the value is 0.75.</li>
+</ul>
+<p>In other words, <strong>&quot;how much OON to include&quot; moved from an allocation problem to a ranking problem.</strong> The resulting ratio varies per request with the multipliers and the candidate pool.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="allocation-structure-by-generation--x">Allocation structure by generation — X</h2>
+<p>X&#39;s allocation structure differs by generation. The 2025 Scala generation used caps, interleave, and priority merge by pipeline order together <span class="badge ok">verified</span>(<a href="#2025-scala-cap--interleave--priority-weave">2025 Scala</a>). The 2026 Rust generation has no allocator, has a cap per source, and its only global selection is by score order <span class="badge ok">verified</span>(<a href="#2026-rust-no-allocator-only-per-source-caps">2026 Rust</a>). In both generations, expensive sources are not run when enough cached candidates exist <span class="badge ok">verified</span>(<a href="#2026-rust-no-allocator-only-per-source-caps">2026 Rust</a>, <a href="#home-mixer-layer">home-mixer layer</a>).</p>
+<h3 id="2026-rust-no-allocator-only-per-source-caps">2026 Rust: no allocator, only per-source caps</h3>
+<p>As of the Gen3 release (2026-05-15) code, the 2026 generation has no allocator that divides shares among sources. Each source has a cap and the global selection is a single score-ordered step; effectively, the cache gate plays the allocator&#39;s role <span class="badge ok">verified</span>.</p>
+<ul>
+<li>As of Gen3 (<code>0bfc279</code>) there are 11 sources <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/0bfc279/home-mixer/sources" target="_blank" rel="noopener"><code>home-mixer/sources/</code></a><ul>
+<li><code>thunder_source</code> / <code>phoenix_source</code> / <code>phoenix_moe_source</code> / <code>phoenix_topics_source</code> / <code>tweet_mixer_source</code> / <code>cached_posts_source</code> / <code>scored_posts_source</code> / <code>ads_source</code> / <code>who_to_follow_source</code> / <code>prompts_source</code> / <code>push_to_home_source</code></li>
+</ul>
+</li>
+<li>Each source reads its own cap from a FeatureSwitch (runtime configuration). In Gen3 those values were outside the repo <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/sources/thunder_source.rs" target="_blank" rel="noopener"><code>thunder_source.rs:38</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/sources/phoenix_source.rs" target="_blank" rel="noopener"><code>phoenix_source.rs:89</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/sources/tweet_mixer_source.rs" target="_blank" rel="noopener"><code>tweet_mixer_source.rs:61</code></a><ul>
+<li>The cap names are <code>ThunderMaxResults</code>, <code>PhoenixMaxResults</code>, and <code>TweetMixerMaxResults</code>.</li>
+<li>The defaults in the Gen4 (<code>47c1bcd</code>) mirror are 1200, 1000, and 800, respectively <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs</code></a>.</li>
+</ul>
+</li>
+<li>The global selection is a single step that picks the top K by descending score <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/0bfc279/home-mixer/selectors/top_k_score_selector.rs" target="_blank" rel="noopener"><code>top_k_score_selector.rs:13</code></a><ul>
+<li>The selector is <code>TopKScoreSelector</code>, and it picks <code>TOP_K_CANDIDATES_TO_SELECT</code> candidates.</li>
+<li>This constant is also in the <code>params</code> module. The <code>params</code> module was not published in Gen3, and the value published in Gen4 (<code>47c1bcd</code>) is 50 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/47c1bcd/home-mixer/params/config.rs" target="_blank" rel="noopener"><code>params/config.rs:17</code></a>.</li>
+</ul>
+</li>
+<li><strong>The cache gate effectively plays the allocator&#39;s role.</strong> When cached posts are at or above the threshold, all sources and Phoenix (X For You&#39;s ranking model) itself are quietly switched off <span class="badge ok">verified</span>.<ul>
+<li>That is, the primary decision on &quot;how many new candidates to fetch&quot; is the cache state, not the per-source cap.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2025-scala-cap--interleave--priority-weave">2025 Scala: cap + interleave + priority weave</h3>
+<p>The 2025 generation is far more complex, and allocation happens in two layers. tweet-mixer, which produces OON candidates, uses ratio allocation only for low-signal users and uses blenders and caps for everyone else <span class="badge ok">verified</span>(<a href="#tweet-mixer-layer">tweet-mixer layer</a>). home-mixer, which assembles the feed, uses pipeline order as priority <span class="badge ok">verified</span>(<a href="#home-mixer-layer">home-mixer layer</a>).</p>
+<h4 id="tweet-mixer-layer">tweet-mixer layer</h4>
+<p>tweet-mixer handles OON candidate generation exclusively. A Home request has 34 candidate pipelines wired in <span class="badge ok">verified</span> — <code>HomeRecommendedTweetsRecommendationPipelineConfig.scala:271-332</code> (entries <code>:274-331</code>)</p>
+<p>Allocation proceeds in five steps <span class="badge ok">verified</span> <code>:362-412</code>.</p>
+<ol>
+<li>For a low-signal user (a user with a small follow graph), <strong>it ends here.</strong> It dedups to 1 per author, performs <strong>explicit ratio allocation</strong>, and then blocks all later selectors <span class="badge ok">verified</span>.<ul>
+<li>The dedup is done by <code>DropDuplicateCandidates(duplicationKey = _.features.getOrElse(AuthorIdFeature, None))</code> <code>:364</code>.</li>
+<li>The ratio allocation is done by <code>InsertAppendRatioResults</code>.</li>
+<li>The step that blocks later selectors is <code>DropAllCandidates()</code> <code>:380</code>.</li>
+<li>The whole block is gated by <code>AllowLowSignalUserGate.evaluate</code> <code>:382</code>.</li>
+<li>The default ratio values are 0.7 for Grok topics, 0.15 for SimClusters interested-in, 0.15 for popular regions, and 0.01 for all the rest <span class="badge ok">verified</span> <code>TweetMixerGlobalParams.scala:225,233,241,249</code>.</li>
+<li>It is applied in bulk to &quot;the rest&quot; via <code>filterNot</code> <code>:372-378</code>. These values are defaults, not production values.</li>
+</ul>
+</li>
+<li>If the user is not low-signal, one blender is chosen and run. <strong>3 blenders are wired</strong> into the Home pipeline, and <code>BlendingParam</code> picks one of them <span class="badge ok">verified</span> <code>:399,401,402</code>.<ul>
+<li><code>exclusiveRoundRobinSelector</code> weaves by <code>(source, signal)</code> buckets.</li>
+<li><code>signalPrioritySelector</code> adds <code>USSFeatures.getPriority</code> to the bucket criteria.</li>
+<li><code>weightedSignalPrioritySelector</code> applies weights when weaving. <strong>The seed is fixed with <code>new Random(0)</code></strong> <span class="badge ok">verified</span> <code>TweetMixerFunctionalComponents.scala:289</code>.</li>
+<li>However, these are not the only blenders. <code>TweetMixerFunctionalComponents.scala</code> defines many more selectors, and <code>BlendingEnum</code> has 6 values <span class="badge ok">verified</span> <code>TweetMixerGlobalParams.scala:23-30</code>.<ul>
+<li>The defined selectors include <code>roundRobinSelector</code> <code>:210</code> and <code>inclusiveRoundRobinSelector</code> <code>:237</code>.</li>
+<li>The correct statement is not &quot;there are 3 blender types&quot; but &quot;this surface wired up 3.&quot;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>The result is truncated at the light-ranker cap. The default value is 500 <span class="badge ok">verified</span> <code>HomeRecommendedTweetsParam.scala:9-15</code>.<ul>
+<li>The truncating step is <code>DropMaxResults(LightRankerMaxResultsParam)</code> <code>:404</code>.</li>
+</ul>
+</li>
+<li><strong>Then</strong> 7 u2i (user→post) pipelines are appended by round-robin <span class="badge ok">verified</span>.<ul>
+<li>The pipelines are at <code>:385-393</code>, and the selector that appends them is <code>inclusiveRoundRobinSelector</code> <code>:405-406</code>.</li>
+</ul>
+</li>
+<li>Finally, the result is truncated to the smaller of the requested count and the server cap <span class="badge ok">verified</span> <code>:408-411</code>.<ul>
+<li>This step is <code>DropRequestedMaxResults</code>, and it applies <code>min(requestedMaxResults, serverMaxResults)</code>.</li>
+<li>The parameter names for the two values are <code>DefaultRequestedMaxResultsParam</code> (300) and <code>ServerMaxResultsParam</code> (500) <span class="badge ok">verified</span> <code>HomeRecommendedTweetsParam.scala:18-24,27-33</code>.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Step 4 looks like preferential treatment, but it is not.</strong> It is easy to read it as &quot;it is appended after the cap, so it is exempt from slot competition,&quot; but two facts overturn that conclusion <span class="badge ok">verified</span>.</p>
+<ul>
+<li>The truncation in step 3 cuts only the result list and does not discard the remaining candidates <span class="badge ok">verified</span> <code>DropMaxResults.scala:36-38</code>. So the u2i candidates appended afterward are placed at <strong>the very end of the list</strong>.<ul>
+<li>In code, <code>DropMaxResults</code> truncates only <code>result</code> and leaves <code>remainingCandidates</code> as is.</li>
+</ul>
+</li>
+<li><strong>The number home-mixer actually requests is 400</strong> <span class="badge ok">verified</span>. It is smaller than the light-ranker cap of 500.<ul>
+<li>The evidence path is <code>ScoredTweetsParam.scala:176</code> (default 400) → <code>ScoredTweetsTweetMixerCandidatePipelineConfig.scala:77</code> → <code>HomeRecommendedTweetsProductPipelineConfig.scala:73</code>.</li>
+</ul>
+</li>
+</ul>
+<p>That is, because the final cut line of step 5 (400) is tighter than the cap of step 3 (500), <strong>if the non-u2i blend alone fills 400, none of the appended u2i candidates remains.</strong> u2i does not compete for the 500 slots; instead it is <strong>the first to be cut at 400</strong>. Being appended later in the order is lower priority, not preferential treatment.</p>
+<p><strong>The low-signal user determination has a place where the code and the comment disagree.</strong> The gate comment says &quot;&lt; 25 users&quot;, but the code is <code>SmallFollowGraphSize = 5</code>. <strong>This mismatch is duplicated identically in both tweet-mixer and home-mixer.</strong> <span class="badge ok">verified</span></p>
+<ul>
+<li>tweet-mixer: <code>SignalUtils.scala:17,20</code> vs <code>AllowLowSignalUserGate.scala:12</code>·<code>DenyLowSignalUserGate.scala:12</code></li>
+<li>home-mixer: <code>util/SignalUtil.scala:18</code> vs <code>scored_tweets/gate/DenyLowSignalUserGate.scala:13</code></li>
+</ul>
+<p>Quoting the comment gets the threshold wrong by a factor of 5. This threshold is the switch that decides &quot;whether to fall back to explicit ratio allocation,&quot; so the number of affected users differs greatly depending on whether it is 5 or 25.</p>
+<h4 id="home-mixer-layer">home-mixer layer</h4>
+<p>home-mixer has 9 candidate pipelines, and their order itself is the allocation rule <span class="badge ok">verified</span>. The list and order are in <code>ScoredTweetsRecommendationPipelineConfig.scala:446,451-459</code>.</p>
+<pre tabindex="0"><code>Static → CachedScoredTweets → EarlybirdInNetwork → DirectUteg → TweetMixer
+       → ContentExploration → Lists → Backfill → Communities
+</code></pre>
+<p>The code put this comment directly above the list: <code>&quot;Order matters. Duplicated candidates take the first occurrence in the pipelines when merger&quot;</code>. Merging is handled by <code>DropDuplicateCandidates(AllPipelines, IdAndClassDuplicationKey, PickFirstCandidateMerger)</code> <span class="badge ok">verified</span> <code>:462-469</code>.</p>
+<p>That is, <strong>this rule is neither a ratio nor a cap; it is a priority in which the earlier pipeline wins on duplicates.</strong> If the same post comes from both in-network and tweet-mixer, it is recorded as the in-network one.</p>
+<p>Here too, the cache state is the gate.</p>
+<ul>
+<li>The Frs, TweetMixer, and Uteg pipelines run only when the cached count is below <code>MinCachedTweetsParam</code> (default 30 <code>:272</code>) <span class="badge ok">verified</span> — <code>ScoredTweetsParam.scala:269-275</code><ul>
+<li>Additional evidence is <code>ScoredTweetsTweetMixerCandidatePipelineConfig.scala:51</code>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Fail-open (a policy that lets the response go out even if one pipeline fails) is the default, but there is one exception.</strong></p>
+<ul>
+<li>tweet-mixer applies fail-open mechanically to every pipeline <span class="badge ok">verified</span> <code>HomeRecommendedTweetsRecommendationPipelineConfig.scala:334-337</code>.<ul>
+<li>The applying code is <code>candidatePipelines.map { … FailOpenPolicy.Always }</code>.</li>
+</ul>
+</li>
+<li>home-mixer lists the fail-open targets <strong>by hand and registered only 8 of the 9.</strong> <code>scoredTweetsContentExplorationCandidatePipelineConfig</code> is not in the list <span class="badge ok">verified</span> <code>ScoredTweetsRecommendationPipelineConfig.scala:456</code> vs <code>:492-502</code>.</li>
+<li>A pipeline missing from the list follows the default policy <span class="badge ok">verified</span> <code>product-mixer/core/.../RecommendationPipelineConfig.scala:113</code>. So <strong>if ContentExploration dies, the whole request fails.</strong><ul>
+<li>The default policy is <code>defaultFailOpenPolicy = FailOpenPolicy(Set(ClosedGate))</code>.</li>
+<li>This contrasts with the other 8, where if one dies its share quietly disappears and is filled by the rest.</li>
+</ul>
+</li>
+</ul>
+<p>The code gives no clue whether this is intentional or an omission, but it is a form in which one pipeline is easily left out when writing 8 by hand, and it is hard to find a reason to leave only the exploration pipeline fail-closed <span class="badge est">inferred</span>.</p>
+<h3 id="allocating-by-slot-rather-than-by-source">Allocating by &quot;slot&quot; rather than by source</h3>
+<p>There are also mechanisms that fix positions instead of leaving all candidates to score competition. These are <strong>position reservations, not ranking boosts.</strong> They do not raise a score; they assign the slot in advance.</p>
+<ul>
+<li>Candidates per community are <strong>1</strong>, and the total of community candidates is <strong>3</strong> <span class="badge ok">verified</span> <code>KeepTopKCandidatesPerCommunity.scala:14-15,30,32</code><ul>
+<li>The constants are <code>MaxCandidatesPerCommunity = 1</code> and <code>MaxCommunityCandidates = 3</code>.</li>
+</ul>
+</li>
+<li>Content exploration candidates and DeepRetrieval (a candidate source that trains a user tower and an item tower separately and scores by dot product) candidates are pulled up to specific positions <span class="badge ok">verified</span> <code>ScoreAveragingPositionSelector.scala:121,137,193</code><ul>
+<li>The parameters are <code>ContentExplorationBoostPosParam</code> and <code>DeepRetrievalBoostPosParam</code>, and each has <code>getNumCandidatesToBoost = 1</code>.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-meta--numbers-exist-but-no-allocator">Case: Meta — numbers exist but no allocator</h2>
+<p>Meta published in the opposite direction from X. It states per-stage candidate counts as numbers for each surface but does not publish the allocator that produces them, and the only surface where an allocation mechanism looks mechanical is Instagram <span class="badge est">inferred</span>(<a href="#meta-side-allocation-mechanisms--mechanical-on-only-one-surface">Meta-side allocation mechanisms</a>).</p>
+<h3 id="pass-0-candidate-counts-by-surface">pass 0 candidate counts by surface</h3>
+<p>Meta lists per-surface candidate counts in the AI system card (the ranking explanation document Meta publishes for each surface). The pass 0 (the stage that reduces candidates with a lightweight model) count differs by surface, so <strong>writing &quot;Meta&#39;s pass 0 is 500&quot; in one line is right for only one of nine rows.</strong></p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col><col class="w8"><col></colgroup>
+<thead>
+<tr>
+<th>Surface</th>
+<th>pass 0 / retrieval</th>
+<th>Next stage</th>
+<th>Reduction ratio</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Facebook Feed</td>
+<td>about <strong>500</strong></td>
+<td>about <strong>500</strong></td>
+<td><strong>1:1</strong></td>
+</tr>
+<tr>
+<td>Facebook Video</td>
+<td>about <strong>1,000</strong></td>
+<td>top <strong>200</strong></td>
+<td>5:1</td>
+</tr>
+<tr>
+<td>Facebook Reels</td>
+<td>about <strong>10–100</strong></td>
+<td>(no figure)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Facebook Feed Recommendations</td>
+<td><strong>no figure</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Instagram Feed</td>
+<td>about <strong>700</strong></td>
+<td>about <strong>500</strong></td>
+<td>1.4:1</td>
+</tr>
+<tr>
+<td>Instagram Explore</td>
+<td>up to <strong>1,500</strong></td>
+<td>top <strong>100</strong></td>
+<td><strong>15:1</strong></td>
+</tr>
+<tr>
+<td>Instagram Reels Chaining</td>
+<td>about <strong>100</strong></td>
+<td>about <strong>100</strong></td>
+<td>1:1</td>
+</tr>
+<tr>
+<td>Instagram Feed Recommendations</td>
+<td>no figure</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Threads For You</td>
+<td><strong>no figure</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody></table></div>
+<p>Each figure is verbatim from the AI system card body <span class="badge ok">verified</span> <a href="https://transparency.meta.com/features/explaining-ranking/" target="_blank" rel="noopener">index</a> (2023 onward). Original quotes and surface context are in <a href="facebook.html">facebook.md</a>, <a href="instagram.html">instagram.md</a>, and <a href="threads.html">threads.md</a>.</p>
+<ul>
+<li><p><strong>Surfaces with the same name have different numbers.</strong> FB Feed does not shrink going from 500 to 500, whereas IG Feed shrinks from 700 to 500. Meta&#39;s documents describe a different funnel shape for each surface.</p>
+</li>
+<li><p><strong>Unconnected (Recommendations) cards have no figures on either FB or IG.</strong> However, the 2023 blog describing the same system says it narrows billions to thousands and then to a few hundred <span class="badge ok">verified</span> <a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">ai.meta.com, 2023</a>. <strong>Two of Meta&#39;s own documents describe it at different resolutions.</strong></p>
+<blockquote>
+<p>&quot;narrow <strong>billions</strong> of pieces of content down to <strong>thousands</strong> and then to <strong>a few hundred</strong>&quot;</p>
+</blockquote>
+</li>
+<li><p>The Threads card gives no per-stage figure at all. <span class="badge obs">observed</span> 2026-08-09 (1 instance in the ig-threads-feed card body)</p>
+</li>
+</ul>
+<h3 id="the-two-sets-of-numbers-differ-in-nature--this-is-the-real-structural-difference">The two sets of numbers differ in nature — this is the real structural difference</h3>
+<p>The candidate counts of X and Meta differ starting from where they come from. X&#39;s numbers come from source code, and Meta&#39;s from system cards <span class="badge obs">observed</span>. In practice, Meta&#39;s numbers can be used for relative comparison (Explore 15:1 vs Feed 1.4:1) but not for reproduction. X&#39;s numbers are the opposite.</p>
+<ul>
+<li><strong>X&#39;s numbers come from source code.</strong> They are exact, one can cite the file and line number, and <strong>even the inconsistencies show</strong> (the 400 cut line behind the 500 cap seen above). <span class="badge ok">verified</span><ul>
+<li>Examples: <code>LightRankerMaxResultsParam</code> 500, <code>DefaultRequestedMaxResultsParam</code> 300, <code>ServerMaxResultsParam</code> 500, the home-mixer actual request value 400, <code>MinCachedTweetsParam</code> 30</li>
+</ul>
+</li>
+<li><strong>Meta&#39;s numbers come from system cards.</strong> All are rounded values with &quot;approximately&quot;, &quot;about&quot;, or &quot;up to&quot; attached, and they disclose neither the truncation order nor who cuts where. <span class="badge obs">observed</span> 2026-08-09 (corpus inspected: the 9 system card bodies in the table above)</li>
+<li><strong>The purposes of the two publications differ</strong> <span class="badge est">inferred</span>. The X repo through Gen3 was meant to make the system readable, so the logic is 100% there and the values 0%, while the system card is a document answering the DSA (EU Digital Services Act) explanation obligation, so it gives rounded values and the logic is 0% <span class="badge est">inferred</span>. The basis is that the precision patterns of the two publications point in exactly opposite directions.<ul>
+<li>Since the Gen4 release (<code>47c1bcd</code>), the X repo has the values too <span class="badge ok">verified</span>(<a href="#2026-rust-no-allocator-only-per-source-caps">2026 Rust section</a>).</li>
+</ul>
+</li>
+</ul>
+<h3 id="meta-side-allocation-mechanisms--mechanical-on-only-one-surface">Meta-side allocation mechanisms — mechanical on only one surface</h3>
+<p>The only Meta sources where an allocation mechanism appears mechanically are Instagram&#39;s 2020 retrieval DSL and the 2023 Explore post. These two sources show per-source weights, per-account caps, round-robin by seed account, and merge priority <span class="badge ok">verified</span>. The full query is in <a href="instagram.html">instagram.md</a>.</p>
+<ul>
+<li><p>The Explore post says it mixes 4 source types (heuristics, ML, real-time, pre-generated) with tunable weights <span class="badge ok">verified</span> <a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a>, 2023.</p>
+<ul>
+<li>The original wording is: <em>&quot;mix them with <strong>tunable weights</strong>&quot;</em>.</li>
+<li><strong>This is a statement that explicitly says per-source weights exist as tuning parameters.</strong> The values are not published.</li>
+</ul>
+</li>
+<li><p>The retrieval DSL has a <strong>per-account cap</strong>. It is the same type as X&#39;s per-source cap (cap allocation), but the key is the <strong>author</strong>, not the source <span class="badge ok">verified</span> 2020.</p>
+<ul>
+<li>The Instagram-side parameter is <code>max_media_per_account=10</code>, and the X side is the <code>*MaxResults</code> family.</li>
+</ul>
+</li>
+<li><p>The retrieval stage also has <strong>round-robin</strong>. It is the same type as X&#39;s source×signal bucket weave, with only the key differing: the seed account <span class="badge ok">verified</span> 2020.</p>
+<ul>
+<li>On the Instagram side it is <code>diversify_by(seed_id, method=round_robin)</code>, and on the X side <code>exclusiveRoundRobinSelector</code>.</li>
+</ul>
+</li>
+<li><p>Seed sources have a merge priority <span class="badge ok">verified</span> 2020.</p>
+<blockquote>
+<p>&quot;The final merge order is as follows: H &gt;&gt; R &gt; F.&quot;</p>
+</blockquote>
+<ul>
+<li>H comes from Home Feed, R from other recommendation surfaces such as Explore/Reels, and F is the graph exploration backup.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Merge priority works in almost the same way as X.</strong> X home-mixer chains 9 pipelines in order and added the comment <code>&quot;Order matters. Duplicated candidates take the first occurrence in the pipelines when merger&quot;</code>. Instagram published the same rule as a single sentence, <code>H &gt;&gt; R &gt; F</code>. <strong>A priority allocation of &quot;the earlier source wins on duplicates,&quot; neither ratio nor cap, exists on both sides.</strong> <span class="badge est">inferred</span> We cannot confirm whether the implementations are the same. Instagram&#39;s code is not public.</p>
+<p>Handling of low-signal and new users also corresponds. <strong>Both fall back to an explicit distribution constraint only when score competition is meaningless.</strong></p>
+<ul>
+<li><p>X falls back to explicit ratio allocation only for low-signal users <span class="badge ok">verified</span>(<a href="#tweet-mixer-layer">2025 tweet-mixer</a>).</p>
+</li>
+<li><p>Instagram builds seeds for users with sparse history by one-hop/two-hop graph expansion, and <strong>applies as a training constraint</strong> a condition that keeps the distribution from skewing away from Home-based sources <span class="badge ok">verified</span> 2020.</p>
+<blockquote>
+<p>&quot;the overall distribution is not skewed away from Home-based sources&quot;</p>
+</blockquote>
+</li>
+</ul>
+<p>Facebook has no such mechanism.</p>
+<ul>
+<li><strong>We found no primary source for a per-source candidate count breakdown of Facebook Feed retrieval (no primary source found).</strong> <span class="badge est">inferred</span><ul>
+<li>The corpus inspected was 15 Transparency Center system cards, the bodies of engineering.fb.com, ai.meta.com, and about.fb.com, and earnings call transcripts (read 2026-08-09).</li>
+</ul>
+</li>
+<li>The likely reason is that the connected-content corpus is already limited to the friend graph, so the allocation problem itself is not large <span class="badge est">inferred</span>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="case-netflix--the-allocation-unit-is-the-row-not-the-source">Case: Netflix — the allocation unit is the row, not the source</h2>
+<p>Adding Netflix makes one premise of these notes conditional. <strong>The question &quot;how many to mix from each source&quot; only makes sense when the corpus is large.</strong> Netflix has no item-level allocation, and its allocation unit is the row <span class="badge ok">verified</span>.</p>
+<p><strong>There is no item-level allocation layer.</strong> Because the catalog has thousands to tens of thousands of titles, the PVR (the ranker that fills genre rows) &quot;sorts the whole catalog (or a genre-filtered subset) per member&quot; <span class="badge ok">verified</span> <a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">TMIS 2015</a>.</p>
+<ul>
+<li>If every item can be scored, neither a per-source cap (X&#39;s <code>*MaxResults</code>) nor a funnel figure (Meta&#39;s pass 0) is needed.</li>
+<li>There is no place for numbers like X&#39;s 500/400 to appear.</li>
+</ul>
+<p><strong>Instead, the same problem reappears one layer up, in row allocation.</strong> Each member has tens of thousands of candidate rows (&quot;tens of thousands&quot;), and the surface has about 40 rows with up to 75 titles per row <span class="badge ok">verified</span> TMIS 2015. The question &quot;how many from which source&quot; becomes &quot;how many rows of which kind (genre/BYW/Trending/CW), in what order&quot;. BYW is the Because You Watched row, and CW is the Continue Watching row.</p>
+<p>In 2015, Netflix had already <strong>abandoned ratio allocation (templates) and switched to ML-based selection</strong> <span class="badge ok">verified</span>. ML-based selection allows &quot;homes with zero BYW rows, and homes where half the rows are BYW&quot; <span class="badge ok">verified</span>. In effect, Netflix made at the row level, 10 years earlier, the switch X made in 2026 (removing quotas → score competition) <span class="badge est">inferred</span>. This means the problem structure is the same, not that there is a lineage relationship.</p>
+<p><strong>Per-row-type rankers correspond to X&#39;s candidate sources.</strong> PVR, Top-N, Trending, Continue Watching, and sims each fill row contents with a different algorithm <span class="badge ok">verified</span> TMIS 2015, and a page algorithm assembles them. This is the same role as X home-mixer merging 9 candidate pipelines. The difference is in the merge rule. X uses the priority rule &quot;on duplicates, the earlier pipeline wins&quot;, and Netflix uses an optimization, row selection.</p>
+<p><strong>GenPage (2026) unifies this entire layer into a single model.</strong> It replaces row selection and within-row ordering with autoregressive generation by one Transformer, and end-to-end latency is −20% <span class="badge ok">verified</span> <a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">arXiv 2606.31031</a> (experimental stage). This is the same direction as Meta&#39;s SilverTorch unifying the index into model tensors. <strong>Allocation logic moves from explicit rules to a learned distribution.</strong></p>
+<p>Because no ads ranking model material has been released, the allocation rules between organic and ads are also unknown <span class="badge ok">verified</span> (absence). Related statements are in <a href="netflix.html">netflix.md</a>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="ads-vs-organic--count-slots-or-pixel-distance">Ads vs. organic — count slots or pixel distance</h2>
+<p>The allocation between ads and organic is where the two companies differ most clearly in the allocation layer. X inserts ads by count after organic ranking finishes, and a Meta patent converts ads and organic to a common unit and puts them in one ranking <span class="badge ok">verified</span>.</p>
+<p><strong>X inserts ads by count after organic ranking finishes.</strong> <span class="badge ok">verified</span> 2026 source code <a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a></p>
+<ul>
+<li>To attach ads, there must be at least 5 organic posts <span class="badge ok">verified</span> <code>ads/util.rs:10</code></li>
+<li>The default spacing is <code>{requested: 3, min: 2}</code> <span class="badge ok">verified</span> <code>ads/util.rs:12-17</code></li>
+<li>It inserts only up to half of the safe gap <span class="badge ok">verified</span> <code>ads/partition_organic_blender.rs:35</code><ul>
+<li>The formula is <code>max_from_safe = safe_count / 2</code>.</li>
+</ul>
+</li>
+<li>The blender selector <strong>deliberately disables</strong> the framework&#39;s sorting, then inserts prompts, follow recommendations, and ads at designated positions <span class="badge ok">verified</span> <code>blender_selector.rs:25-114</code><ul>
+<li>The selector is <code>BlenderSelector</code>, and the way it is disabled is setting <code>score()</code> to the constant <code>0.0</code>.</li>
+</ul>
+</li>
+</ul>
+<p>That is, <strong>ads do not take part in the ranking competition.</strong> They are inserted into the already sorted list by a count rule.</p>
+<p><strong>Meta converts ads and organic to a common unit and puts them in one ranking.</strong> <span class="badge ok">verified</span> <a href="https://patents.google.com/patent/US10345993B2/en" target="_blank" rel="noopener">US 10,345,993 B2</a> &quot;Selecting content items for presentation in a feed based on heights associated with the content items&quot;, filed 2015 / granted 2019, patent</p>
+<ul>
+<li><p>The patent states that it converts organic scores and ad scores to a common unit of measurement, then ranks ads and organic stories together in one ranking <span class="badge ok">verified</span> patent.</p>
+<blockquote>
+<p>&quot;Scores associated with organic news feed stories and scores associated with advertisements are <strong>converted into a common unit of measurement</strong>, and advertisements and organic news feed stories are <strong>together ranked in a single ranking</strong>.&quot;</p>
+</blockquote>
+</li>
+<li><p>The spacing constraint is expressed <strong>in both count terms and pixel-height terms</strong> <span class="badge ok">verified</span> patent.</p>
+<ul>
+<li>Count-based: &quot;at least a threshold number of organic news feed stories are presented between advertisements&quot;</li>
+<li>Or height-based: &quot;a combination of heights of the organic feed stories exceeds a <strong>gap distance threshold</strong>&quot;</li>
+</ul>
+</li>
+<li><p>The position discount (the decrease in predicted interaction by position) depends on <strong>the sum of the predicted heights of the candidates placed above</strong> <span class="badge ok">verified</span> patent.</p>
+</li>
+<li><p><strong>Height prediction itself is an ML model.</strong> It predicts the height at which content will be displayed from content type, language, and comment count, plus client screen size, OS, resolution, and app version <span class="badge ok">verified</span> patent.</p>
+<blockquote>
+<p>&quot;the likely height of the content item when presented&quot;</p>
+</blockquote>
+</li>
+</ul>
+<p>That is, <strong>interleaving is a geometric constraint, not a slot index.</strong> Because the rule is &quot;at least pixel distance X from the previous ad&quot; rather than &quot;one in every 3&quot;, <strong>even for the same user the actual number of ads varies with screen size and content-type mix</strong> <span class="badge est">inferred</span>. Modeling it with a fixed slot ratio (ad load N%) would be wrong <span class="badge est">inferred</span>. However, the patent does not state the resulting share.</p>
+<p class="warn"><strong>⚠ Two caveats apply.</strong></p>
+<ol>
+<li>This patent was filed in 2015 and is <strong>not evidence of current production.</strong> However, it is the only mechanical primary source that remains on Meta ads interleaving.</li>
+<li>The widely circulated <code>Total Value = Bid × Estimated Action Rate × Ad Quality</code> <strong>must not be cited as a formula, because no Meta primary source was found.</strong> The same holds for ad load figures and interleaving rules <span class="badge est">inferred</span>.<ul>
+<li>The corpus checked was the Marketing API bidding and delivery docs, the Transparency Center ads pages, and about.fb.com posts (read 2026-08-09). Details are in <a href="facebook.html">facebook.md</a>.</li>
+</ul>
+</li>
+</ol>
+<p>Threads rolled out ads globally in 2025 Q3, but <strong>did not disclose the interleaving rules, and it is also unknown whether it applies the pixel-height patent.</strong> <span class="badge est">inferred</span> (same corpus, 2026-08-09). Related statements are in <a href="threads.html">threads.md</a>.</p>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-generalizes-from-this-case">What generalizes from this case</h2>
+<p>When reading allocation, look at the actual path in the code rather than the published ratio. The actual source mix depends on cache state, fail-open policy, and the order of cutoffs. Whether allocation is needed, and its unit, follow corpus size and surface structure.</p>
+<ul>
+<li><strong>Where is allocation actually decided?</strong><ul>
+<li><strong>A published &quot;ratio&quot; is usually an observed result, not a quota in the code.</strong> You have to open the source and find the allocator yourself. X eventually removed the allocator and moved to score multipliers.</li>
+<li><strong>The cache is the biggest allocator.</strong> In both X generations, the first branch is &quot;if there are enough cached candidates, skip the expensive sources&quot;. That is, the actual source mix varies with how often the user makes requests.</li>
+<li><strong>Ratio allocation is used only for new and low-signal users.</strong> It falls back to explicit quotas only when there are no signals and score competition is meaningless. X uses explicit ratios for low-signal users, and Instagram uses seed expansion and a Home distribution constraint for sparse users. <strong>The same pattern is observed on both sides.</strong></li>
+</ul>
+</li>
+<li><strong>How do caps and failure policy change allocation?</strong><ul>
+<li><strong>When fail-open is the default, allocation is a tendency, not a guarantee.</strong> In X, nearly every candidate pipeline is fail-open, so a response goes out even if one source dies, and its share is quietly replaced by other sources. However, <strong>if the policy is listed by hand, the one omitted becomes fail-closed.</strong> X home-mixer&#39;s ContentExploration is that case. The difference between mechanical blanket application (tweet-mixer) and manual listing (home-mixer) becomes directly a difference in failure blast radius.</li>
+<li><strong>When caps are layered, &quot;attached later&quot; means lower priority, not preferential treatment.</strong> In X 2025 tweet-mixer, the u2i candidates are attached after the light-ranker cap (500) cutoff and appear to be exempt from competition. But the final cutoff after that is 400, so if the earlier part is full, they disappear first. <strong>If you conclude from looking at only one cutoff, the direction comes out reversed.</strong></li>
+</ul>
+</li>
+<li><strong>How should numbers and models about allocation be read?</strong><ul>
+<li><strong>For a &quot;candidate count&quot; number, first look at the kind of source.</strong> Numbers from source code are exact, usable for reproduction, and even reveal mismatches between them. Numbers from regulatory documents are rounded and usable only for relative comparison. <strong>Precision is determined by the purpose of the release, not by the nature of the system.</strong></li>
+<li><strong>Modeling ad interleaving as a slot ratio may be wrong.</strong> X is count-based (spacing 3, at least 5 organic), so a slot model fits. The Meta patent uses <strong>a common unit of pixel height and a gap distance constraint</strong>, so results vary with screen size. The same summary &quot;one ad every N items&quot; is right for one and wrong for the other.</li>
+</ul>
+</li>
+<li><strong>What determines whether allocation is needed, and its unit?</strong><ul>
+<li><strong>The existence of an allocation layer is itself a function of corpus size.</strong> If the catalog is small enough to score every item (Netflix, thousands to tens of thousands), item-level allocation disappears and the problem moves one layer up (row composition). Before asking &quot;what is this service&#39;s candidate allocation?&quot;, ask &quot;is the scale one that needs allocation?&quot;</li>
+<li><strong>The allocation unit follows surface structure.</strong> A single stream allocates items, and a 2-dimensional page allocates rows. Netflix&#39;s row types (genre/BYW/Trending) play the same role as X&#39;s candidate sources. However, only the merge rule differs: priority (X) versus optimization (Netflix).</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="who-uses-this">Who uses this</h2>
+<p>For X, all allocation logic is in the repo, and the values were outside the repo through Gen3 and have been in the repo&#39;s parameter mirror since the Gen4 release (2026-08-13) <span class="badge ok">verified</span>. Facebook and Instagram disclose candidate counts for several surfaces, and Threads discloses none <span class="badge obs">observed</span>. Netflix allocates rows, not items <span class="badge ok">verified</span>.</p>
+<ul>
+<li><strong>X</strong> — The 2025 Scala generation uses caps, weaving, and priority merging, and the 2026 Rust generation uses score multipliers with no allocator. All logic is in the repo; the values were outside the repo in 2025 Scala and Gen3, and have been in the repo&#39;s parameter mirror since the Gen4 release (<code>47c1bcd</code>) <span class="badge ok">verified</span> — <a href="x.html">x.md</a></li>
+<li><strong>Facebook</strong> — pass 0 is about 500 (Feed), 1,000→200 (Video), and 10–100 (Reels), and unconnected cards have no figures. <strong>There is no primary source for the per-source breakdown.</strong> The evidence on the ads side is a patent that uses pixel height as a common unit <span class="badge ok">verified</span> — <a href="facebook.html">facebook.md</a></li>
+<li><strong>Instagram</strong> — Feed is 700→500, Explore is 1,500→100 (15:1), and Reels Chaining is about 100. <strong>It is the only Meta surface where the allocation mechanism looks mechanical</strong> (tunable weights, <code>max_media_per_account</code>, seed round-robin, <code>H &gt;&gt; R &gt; F</code>). <span class="badge ok">verified</span> — <a href="instagram.html">instagram.md</a></li>
+<li><strong>Threads</strong> — <strong>There are no per-stage candidate counts at all.</strong> In the inventory definition, the card states only the asymmetry that follows are <em>all</em> and public content is <em>a portion</em> <span class="badge obs">observed</span> 2026-08-09 (1 ig-threads-feed card body), <a href="threads.html">threads.md</a></li>
+<li><strong>Netflix</strong> — There is no item-level allocation (the whole catalog is scored), and the allocation unit is the row. It narrows tens of thousands of candidate rows to about 40 rows. It dropped templates (ratio allocation) in 2015 <span class="badge ok">verified</span> — <a href="netflix.html">netflix.md</a></li>
+<li><strong>Other services</strong> — Not yet investigated. <strong>They remain open questions.</strong></li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="not-yet-verified">Not yet verified</h2>
+<p>On the Meta side, we have not yet confirmed the merge rule for connected and unconnected results, how Explore weights are tuned, whether the height patent is currently in use, or Threads&#39; per-stage figures. On the Netflix side, we could not confirm the current row-selection algorithm.</p>
+<ul>
+<li><strong>By what rule does Meta interleave connected (500) and unconnected (several hundred) results?</strong> It says only that the two systems are separate and does not explain the merge rule. See: <a href="facebook.html">facebook.md</a> open question 4.</li>
+<li><strong>What is used to tune Instagram Explore&#39;s per-source tunable weights?</strong> It says only &quot;tunable&quot; and does not disclose the objective function or the optimization method.</li>
+<li><strong>Is Meta&#39;s pixel-height patent (filed 2015) still in operation in 2026?</strong> There is no primary evidence beyond the patent.</li>
+<li><strong>Threads&#39; candidate generation approach and per-stage figures.</strong> The system card gives no numbers at all.</li>
+<li><strong>What form does Netflix&#39;s row-selection algorithm take now?</strong> The 2015 paper describes row-level scoring and a greedy-type approach. There is no primary source for the 10 years between then and GenPage (2026 experiment).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<h3 id="public-source-code">Public source code</h3>
+<ul>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, public source code (Apache 2.0). <code>home-mixer/sources/</code>, <code>home-mixer/selectors/</code>, <code>home-mixer/ads/</code>. The reference commit for the line-number quotes in the body is <code>0bfc279</code> (Gen3), and the Gen4 values were read at <code>47c1bcd</code>.</li>
+<li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — commit <code>c54bec0</code> of 2025-09-03, public source code. <code>tweet-mixer/</code>, <code>home-mixer/</code>.</li>
+</ul>
+<h3 id="meta-transparency-center-primary-source-for-candidate-counts">Meta Transparency Center (primary source for candidate counts)</h3>
+<ul>
+<li><a href="https://transparency.meta.com/features/explaining-ranking/" target="_blank" rel="noopener">Our approach to explaining ranking (AI system card index)</a> — 2023 onward, regulatory document. The per-surface pass 0 figures come from here.</li>
+<li>Individual cards: <a href="https://transparency.meta.com/features/explaining-ranking/fb-feed/" target="_blank" rel="noopener">fb-feed</a> · <a href="https://transparency.meta.com/features/explaining-ranking/fb-video/" target="_blank" rel="noopener">fb-video</a> · <a href="https://transparency.meta.com/features/explaining-ranking/fb-reels/" target="_blank" rel="noopener">fb-reels</a> · <a href="https://transparency.meta.com/features/explaining-ranking/ig-feed/" target="_blank" rel="noopener">ig-feed</a> · <a href="https://transparency.meta.com/features/explaining-ranking/ig-explore/" target="_blank" rel="noopener">ig-explore</a> · <a href="https://transparency.meta.com/features/explaining-ranking/ig-reels-chaining/" target="_blank" rel="noopener">ig-reels-chaining</a> · <a href="https://transparency.meta.com/features/explaining-ranking/ig-threads-feed/" target="_blank" rel="noopener">ig-threads-feed</a></li>
+</ul>
+<h3 id="meta-blog-posts-and-patent">Meta blog posts and patent</h3>
+<ul>
+<li><a href="https://about.instagram.com/blog/engineering/designing-a-constrained-exploration-system" target="_blank" rel="noopener">Designing a Constrained Exploration System</a> — 2020, blog post. retrieval DSL, <code>max_media_per_account</code>, <code>H &gt;&gt; R &gt; F</code>.</li>
+<li><a href="https://engineering.fb.com/2023/08/09/ml-applications/scaling-instagram-explore-recommendations-system/" target="_blank" rel="noopener">Scaling the Instagram Explore recommendations system</a> — 2023, blog post. 4 source types and tunable weights.</li>
+<li><a href="https://ai.meta.com/blog/ai-unconnected-content-recommendations-facebook-instagram/" target="_blank" rel="noopener">The AI behind unconnected content recommendations</a> — 2023, blog post. billions → thousands → a few hundred.</li>
+<li><a href="https://patents.google.com/patent/US10345993B2/en" target="_blank" rel="noopener">US 10,345,993 B2 — Selecting content items for presentation in a feed based on heights</a> — granted 2019 (filed 2015), patent. <strong>The only mechanical source on the unified ranking of ads and organic, and on gap distance.</strong></li>
+</ul>
+<h3 id="netflix">Netflix</h3>
+<ul>
+<li><a href="https://dl.acm.org/doi/10.1145/2843948" target="_blank" rel="noopener">The Netflix Recommender System (TMIS)</a> — 2015, paper. Sorting of the whole catalog, tens of thousands of rows → 40 rows, templates dropped.</li>
+<li><a href="https://netflixtechblog.com/learning-a-personalized-homepage-aa8ec670359a" target="_blank" rel="noopener">Learning a Personalized Homepage</a> — 2015, blog post. Formulation of the row-selection problem.</li>
+<li><a href="https://arxiv.org/abs/2606.31031" target="_blank" rel="noopener">GenPage</a> — 2026, paper (RecSys). Single-model unification of page generation.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/candidate-allocation.html" data-title="후보 배분 — 소스가 여럿일 때 무엇을 몇 개 넣는가"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
