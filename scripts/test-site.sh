@@ -258,7 +258,7 @@ else bad "node 로 코드 예제를 검사하지 못함" "node 가 설치돼 있
 
 head_ "15. 공통 머리·꼬리 바이트 일치 (언어별)"
 # 머리글(건너뛰기 링크~</header>)·바닥글은 언어마다 블로그와 feed-research 생성기가 같은 바이트를 낸다(생성기 build-html.mjs 의
-# HEADER_KO/EN·FOOTER_KO/EN). 페이지마다 다른 것은 언어 전환 링크(<li class="lang">)의 href 하나 — 짝 페이지(없으면 다른
+# HEADER_KO/EN·FOOTER_KO/EN). 페이지마다 다른 것은 언어 전환 링크(<a class="lang-switch">)의 href 하나 — 짝 페이지(없으면 다른
 # 언어의 섹션 홈)라서다. 그 값만 비우고 비교하고, 값이 맞는지는 17번이 본다. 현재 메뉴 표시는 body[data-nav] 를 CSS 가 읽으므로
 # 그 밖에 달라질 것이 없다. 리서치 쪽은 목록·일일·정본이 서로 다른 생성 경로라 하나씩 넣는다. 영어 리서치의 일일·정본은
 # 번역 백로그 때문에 아직 없을 수 있어 있으면 넣는다(생성기 자체 검사가 1차로 전부 본다).
@@ -278,7 +278,7 @@ const sets = {
           .filter((f) => f && fs.existsSync(path.join(site, f)))],
 };
 const grab = (h, re) => (h.match(re) || [])[0];
-const norm = (s) => s.replace(/<li class=\x22lang\x22><a href=\x22[^\x22]*\x22/, '<li class="lang"><a href=""');
+const norm = (s) => s.replace(/<a class=\x22lang-switch\x22 href=\x22[^\x22]*\x22/, '<a class="lang-switch" href=""');
 let n = 0;
 for (const [lang, files] of Object.entries(sets)) {
   const seen = { head: new Map(), foot: new Map() };
@@ -291,7 +291,7 @@ for (const [lang, files] of Object.entries(sets)) {
     const head = grab(h, /<a class="skip" href="#content">[\s\S]*?<\/header>/), foot = grab(h, /<footer class="site-foot">[\s\S]*?<\/footer>/);
     if (!head) out.push(`${f}: 공통 헤더 없음`);
     else {
-      if ((head.match(/<li class="lang">/g) || []).length !== 1) out.push(`${f}: 언어 전환 링크가 하나가 아니다`);
+      if ((head.match(/<a class="lang-switch"/g) || []).length !== 1) out.push(`${f}: 언어 전환 링크가 하나가 아니다`);
       seen.head.set(norm(head), [...(seen.head.get(norm(head)) || []), f]);
     }
     if (!foot) out.push(`${f}: 공통 푸터 없음`); else seen.foot.set(foot, [...(seen.foot.get(foot) || []), f]);
@@ -391,7 +391,7 @@ for (const [f, h] of pages) {
   const en = isEn(f), lang = en ? 'en' : 'ko', other = en ? 'ko' : 'en', twin = twinOf(f);
   const hl = (h.match(/<html lang=\x22([^\x22]*)\x22/) || [])[1];
   if (hl !== lang) { out.push(`${f}: <html lang="${hl}"> — ${lang} 여야 한다`); continue; }
-  const sw = h.match(/<li class=\x22lang\x22><a href=\x22([^\x22]*)\x22 hreflang=\x22([^\x22]*)\x22 lang=\x22([^\x22]*)\x22/);
+  const sw = h.match(/<a class=\x22lang-switch\x22 href=\x22([^\x22]*)\x22 hreflang=\x22([^\x22]*)\x22 lang=\x22([^\x22]*)\x22/);
   if (!sw) { out.push(`${f}: 언어 전환 링크 없음`); continue; }
   if (sw[2] !== other || sw[3] !== other) out.push(`${f}: 전환 링크의 hreflang·lang 이 ${other} 가 아니다`);
   const a = altsOf(h), keys = Object.keys(a).sort().join();

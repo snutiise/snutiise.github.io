@@ -42,7 +42,7 @@ python3 -m http.server 4000 --bind 127.0.0.1 -d /tmp/site
   (`_includes/site-header.html`, `_includes/site-footer.html`)와 같은 바이트를 낸다.
   리서치 컴포넌트 규칙을 지우거나 헤더·푸터를 바꿀 때는 그쪽 템플릿도 같이 바꾼다.
   한국어·영어 헤더·푸터가 따로 있고(`page.lang`), 둘 다 생성기의 `HEADER_KO/EN`·`FOOTER_KO/EN` 과 같은 바이트여야 한다
-  (페이지마다 다른 것은 `<li class="lang">` 의 href 하나. 15번이 그 값만 비우고 비교한다).
+  (페이지마다 다른 것은 언어 전환 `<a class="lang-switch">` 의 href 하나. 15번이 그 값만 비우고 비교한다).
   리서치 내용 페이지에도 글과 같은 댓글 버튼이 있다. 그 페이지들의 CSP(생성기의 `withCsp`)는
   Disqus 에 `embed.js` 와 `disqus.com/embed/comments/` iframe 만 열어 두므로, site.js 의 Disqus
   코드가 다른 것을 불러오게 바꾸면 리서치 쪽에서는 막힌다.

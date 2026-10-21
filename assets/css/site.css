@@ -237,33 +237,38 @@ code, kbd, samp, pre { font-family: var(--font-mono); }
   color: var(--accent); font-weight: 650;
   background: color-mix(in srgb, var(--accent-fill) 12%, transparent);
 }
-/* language toggle, last nav item: '한 | EN' pill, the current language filled. The whole pill is one link to the
-   other language (twin page); the current segment is aria-hidden, so the link's name is the target language. */
-.site-nav .lang { align-self: center; margin-inline-start: .25rem; }
-.site-nav .lang a {
-  display: flex; padding: .125rem; border: 1px solid var(--border-strong);
+/* language toggle: its own control right of the nav, not a menu item. '한 | EN', the current language filled; the
+   whole pill links to the other language (twin page). The current segment is aria-hidden, so the link's name is the
+   target language. */
+.site-nav { margin-left: auto; }
+.lang-switch {
+  display: flex; flex: none; padding: .1875rem; border: 1px solid var(--border); border-radius: 999px;
   font: 650 .75rem/1.5 var(--font-mono); letter-spacing: .02em; color: var(--muted);
+  background: var(--glass);
 }
-.site-nav .lang a:hover { background: none; }
-.site-nav .lang span { padding: .125rem .5rem; border-radius: 999px; }
-.site-nav .lang span[aria-hidden] { background: var(--accent-fill); color: var(--on-accent); }
-.site-nav .lang a:hover span:not([aria-hidden]) { color: var(--text-strong); background: color-mix(in srgb, var(--text) 9%, transparent); }
+.lang-switch span { padding: .25rem .55rem; border-radius: 999px; }
+.lang-switch span[aria-hidden] { background: var(--accent-fill); color: var(--on-accent); }
+.lang-switch:hover span:not([aria-hidden]) { color: var(--text-strong); background: color-mix(in srgb, var(--text) 9%, transparent); }
+@media (min-width: 40em) { .lang-switch { box-shadow: var(--shadow-1); } }
+@media (max-width: 39.99em) { /* English nav takes its own row: brand + toggle on top, nav below */
+  html:lang(en) .lang-switch { order: 2; }
+  html:lang(en) .site-nav { order: 3; flex-basis: 100%; }
+}
 @media (max-width: 29.99em) {
-  .site-nav a { padding-inline: .42rem; font-size: .875rem; } /* was .55rem: room for the language toggle */
-  /* narrow: the toggle shrinks to the target language only, so the nav keeps its rows (KO one row, EN two) */
-  .site-nav .lang { margin-inline-start: 0; }
-  .site-nav .lang span { padding-inline: .375rem; }
-  .site-nav .lang span[aria-hidden] { display: none; }
-}
-@media (max-width: 22.49em) { /* keep brand + nav on one row at 320px */
   .head-in { column-gap: .5rem; }
+  .site-nav a { padding-inline: .42rem; font-size: .875rem; } /* was .55rem: room for the language toggle */
+  /* narrow: the toggle shrinks to the target language only */
+  .lang-switch { padding: .125rem; }
+  .lang-switch span { padding: .1875rem .45rem; }
+  .lang-switch span[aria-hidden] { display: none; }
+}
+@media (max-width: 22.49em) { /* keep brand + nav + toggle on one row at 320px */
   .brand { font-size: 1rem; }
   .site-nav a { padding-inline: .32rem; font-size: .8125rem; } /* was .42rem */
-  .site-nav .lang span { padding-inline: .3rem; }
+  .lang-switch span { padding-inline: .35rem; }
 }
-/* English nav is longer: below ~430px the header is brand row + nav row (about 81px), more than --head-h */
+/* English nav is longer: below 40em the header is brand + toggle row, then the nav row (about 84–90px), more than --head-h */
 @media (max-width: 39.99em) { html:lang(en) { scroll-padding-top: calc(var(--head-h) + 2.5rem); } }
-@media (max-width: 22.49em) { html:lang(en) { scroll-padding-top: calc(var(--head-h) + 3.5rem); } } /* 320px: research nav (current item bold) can take three rows, about 107px */
 
 .site-foot {
   position: relative; margin-top: 5rem;
