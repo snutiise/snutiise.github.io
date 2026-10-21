@@ -54,6 +54,17 @@ if (f) {
  });
 }
 
+// copy buttons on code blocks (Clipboard API needs a secure context; without it, no button)
+if (navigator.clipboard) for (const fig of d.querySelectorAll('figure.highlight')) {
+ const pre = fig.querySelector('pre'), c = d.createElement('button');
+ if (!pre) continue;
+ c.type = 'button'; c.className = 'copy'; c.textContent = '복사'; c.setAttribute('aria-label', '코드 복사');
+ c.addEventListener('click', () => navigator.clipboard.writeText(pre.textContent).then(
+  () => { c.textContent = '복사됨'; setTimeout(() => { c.textContent = '복사'; }, 1500); },
+  () => { c.textContent = '실패'; }));
+ fig.append(c);
+}
+
 // Disqus on click; no page.identifier. Posts and research pages. Research bodies are untrusted text: they can
 // carry an id (heading, SVG) but never a <button> or data-*, so match tag + data-url, not the id alone
 const btn = d.querySelector('button#load-comments'), th = d.querySelector('div#disqus_thread[data-url]');

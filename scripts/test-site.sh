@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 빌드된 _site 를 검사한다. 의존성은 bash/grep/find, 7·13·14·15번 검사만 node 18.17+
+# 빌드된 _site 를 검사한다. 의존성은 bash/grep/find, 7·13·14·15·16번 검사만 node 18.17+
 # (ubuntu-latest 러너에 기본 설치돼 있다).
 #   사용: scripts/test-site.sh [_site 경로]
 #
@@ -276,6 +276,39 @@ JS
 ); then
   [[ -z "$HF_BAD" ]] && ok "헤더·푸터가 모든 비교 페이지에서 같은 바이트" || bad "헤더·푸터가 페이지마다 다르다" "${HF_BAD//$'\n'/ / }"
 else bad "node 로 헤더·푸터를 비교하지 못함" "node 가 설치돼 있는지 확인"; fi
+
+head_ "16. CSS 가 부르는 파일 (웹폰트)"
+# site.css 는 첫 규칙인 @import 로 자체 호스팅 Pretendard(assets/fonts/pretendard/)를 부른다. 리서치 페이지도
+# 같은 site.css 를 쓰고 CSP 가 font-src 'self' 라, 다른 출처 URL 은 브라우저가 막는다. @import 앞에 규칙이 하나라도
+# 있으면 브라우저가 @import 를 버린다. 셋 다 빌드·html-proofer 는 통과하고 글꼴만 조용히 시스템 글꼴로 떨어진다.
+if CSS_BAD=$(node - "$SITE" <<'JS'
+const fs = require('fs'), path = require('path');
+const site = process.argv[2], out = [];
+let refs = 0;
+const strip = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '');
+const main = path.join(site, 'assets/css/site.css');
+if (!/^\s*@import\s/.test(strip(fs.readFileSync(main, 'utf8')))) out.push('site.css: 첫 규칙이 @import 가 아니다');
+const seen = new Set(), todo = [main];
+while (todo.length) {
+  const f = todo.pop();
+  if (seen.has(f)) continue;
+  seen.add(f);
+  if (!fs.existsSync(f)) { out.push(`${path.relative(site, f)}: 파일 없음`); continue; }
+  for (const [, , u] of strip(fs.readFileSync(f, 'utf8')).matchAll(/url\x28\s*([\x22\x27]?)([^\x22\x27\x29]+)\1\s*\x29/g)) {
+    if (u.startsWith('data:')) continue;
+    const v = u.replace(/[?#].*/, '');
+    refs++;
+    if (/^[a-z][a-z0-9+.-]*:|^\/\//i.test(u)) { out.push(`${path.relative(site, f)}: 다른 출처 ${u}`); continue; }
+    const p = v.startsWith('/') ? path.join(site, v) : path.join(path.dirname(f), v);
+    if (p.endsWith('.css')) todo.push(p); else if (!fs.existsSync(p)) out.push(`${path.relative(site, f)}: 없는 파일 ${u}`);
+  }
+}
+console.log(out.slice(0, 5).join('\n'));
+console.error(`  (CSS ${seen.size}개, url() ${refs}개)`);
+JS
+); then
+  [[ -z "$CSS_BAD" ]] && ok "CSS 의 @import·url() 이 전부 같은 출처이고 산출물에 있다" || bad "CSS 가 부르는 파일이 깨졌다" "${CSS_BAD//$'\n'/ / }"
+else bad "node 로 CSS 참조를 검사하지 못함" "node 가 설치돼 있는지 확인"; fi
 
 echo
 if (( FAIL )); then printf '\033[31m실패 — 위 FAIL 항목을 고칠 것\033[0m\n'; exit 1; fi
