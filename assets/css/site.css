@@ -237,18 +237,33 @@ code, kbd, samp, pre { font-family: var(--font-mono); }
   color: var(--accent); font-weight: 650;
   background: color-mix(in srgb, var(--accent-fill) 12%, transparent);
 }
-/* language switch: last nav item, a two-letter code so the nav stays on one row */
-.site-nav .lang a { font-family: var(--font-mono); font-size: .8125rem; letter-spacing: .02em; }
+/* language toggle, last nav item: '한 | EN' pill, the current language filled. The whole pill is one link to the
+   other language (twin page); the current segment is aria-hidden, so the link's name is the target language. */
+.site-nav .lang { align-self: center; margin-inline-start: .25rem; }
+.site-nav .lang a {
+  display: flex; padding: .125rem; border: 1px solid var(--border-strong);
+  font: 650 .75rem/1.5 var(--font-mono); letter-spacing: .02em; color: var(--muted);
+}
+.site-nav .lang a:hover { background: none; }
+.site-nav .lang span { padding: .125rem .5rem; border-radius: 999px; }
+.site-nav .lang span[aria-hidden] { background: var(--accent-fill); color: var(--on-accent); }
+.site-nav .lang a:hover span:not([aria-hidden]) { color: var(--text-strong); background: color-mix(in srgb, var(--text) 9%, transparent); }
 @media (max-width: 29.99em) {
-  .site-nav a { padding-inline: .42rem; font-size: .875rem; } /* was .55rem: room for the EN/KO item */
+  .site-nav a { padding-inline: .42rem; font-size: .875rem; } /* was .55rem: room for the language toggle */
+  /* narrow: the toggle shrinks to the target language only, so the nav keeps its rows (KO one row, EN two) */
+  .site-nav .lang { margin-inline-start: 0; }
+  .site-nav .lang span { padding-inline: .375rem; }
+  .site-nav .lang span[aria-hidden] { display: none; }
 }
 @media (max-width: 22.49em) { /* keep brand + nav on one row at 320px */
   .head-in { column-gap: .5rem; }
   .brand { font-size: 1rem; }
   .site-nav a { padding-inline: .32rem; font-size: .8125rem; } /* was .42rem */
+  .site-nav .lang span { padding-inline: .3rem; }
 }
 /* English nav is longer: below ~430px the header is brand row + nav row (about 81px), more than --head-h */
 @media (max-width: 39.99em) { html:lang(en) { scroll-padding-top: calc(var(--head-h) + 2.5rem); } }
+@media (max-width: 22.49em) { html:lang(en) { scroll-padding-top: calc(var(--head-h) + 3.5rem); } } /* 320px: research nav (current item bold) can take three rows, about 107px */
 
 .site-foot {
   position: relative; margin-top: 5rem;
