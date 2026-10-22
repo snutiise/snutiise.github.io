@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-23 — feed-research</title>
+<meta name="description" content="In one line: X turned on by default a filter that cuts candidates above the Phoenix scoring budget by the same ratio for each source. The filter came in off…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-23.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-23.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-23.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-23.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-23 — feed-research">
+<meta property="og:description" content="In one line: X turned on by default a filter that cuts candidates above the Phoenix scoring budget by the same ratio for each source. The filter came in off…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-23.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-10-23.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-23">2026-10-23</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>8 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-23.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X turned on by default a filter that cuts candidates above the Phoenix scoring budget by the same ratio for each source. The filter came in off by default in the previous day&#39;s commit.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-filter-that-cuts-candidates-by-the-same-ratio-per-source-is-turned-on--x"><span class="num">1</span>Filter that cuts candidates by the same ratio per source is turned on — X</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#lookup-status">Lookup status</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-filter-that-cuts-candidates-by-the-same-ratio-per-source-is-turned-on--x"><span class="num">1</span>Filter that cuts candidates by the same ratio per source is turned on — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/989fb91254d461bf4b9df53fb12d5c9a61c2b354" target="_blank" rel="noopener">xai-org/x-algorithm@989fb91</a> — xAI public repository, commit of 2026-10-22 06:49 UTC, code. In these notes&#39; numbering, this is Gen4+47. Gen4+N is the number these notes assign in sequence to X commits after the Gen4 release (2026-08-13). The cron mirror (a file that syncs production feature-switch defaults daily and publishes them) has a sync time of 2026-10-21T16:00:32Z. The commit changed 80 files, +3,436/−1,462 lines, and more than half of them are cleanup of the hydration layer in visibility-filtering.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You sends candidates gathered from several sources to Phoenix (a Grok-based ranking Transformer) for scores, and a request can score at most 2800 candidates. The previous day&#39;s commit (Gen4+46) added a filter, off by default, that cuts the same ratio from each served type (the source path a candidate came in through) when candidates exceed this budget. Before that, only the first 2800 of the concatenated candidate list were sent, so sources appended at the end of the list could be cut entirely. This commit turns this filter&#39;s switch on in the cron mirror and adds a soft NSFW filter for new users and safety rules for reaction posts.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The same-ratio-per-source filter is on by default from this commit&#39;s cron mirror</span></p></div>
+<ul>
+<li><p>The mirror default of <code>EnableFairShareRanking</code> changed from false to true <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:1206-1211</code></a>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">param!(
+    EnableFairShareRanking,
+    bool,
+    &quot;rust_home_mixer_enable_fair_share_ranking&quot;,
+    true
+);
+</code></pre></figure>
+</li>
+<li><p>The filter&#39;s position is unchanged: the very end of the pre-scoring filter list <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:443</code></a>.</p>
+</li>
+<li><p>So for requests over the budget, each source is now cut by the same ratio instead of all sources at the back of the list being cut <span class="badge est">inferred</span>. The evidence is that the filter&#39;s budget equals the 2800 cap at which the Phoenix request truncates, and that a test pins the same ratio per source (<a href="daily-2026-10-22.html">daily 2026-10-22</a>).</p>
+</li>
+<li><p>The mirror value is only the production default, and per-experiment-bucket overrides are not in the public code <span class="badge ok">verified</span> — <a href="x.html#five-caveats-of-the-weights-mirror">caveat of the x.md weight mirror</a>. So we do not assert that it is on for all traffic.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A filter that drops soft NSFW OON posts for users under one day old was introduced, off by default</span></p></div>
+<ul>
+<li>When on, it removes posts labeled soft NSFW (sexual content that is not explicit) from OON (accounts the viewer does not follow) in For You for viewers whose account age is under one day <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/filters/new_user_soft_nsfw_filter.rs" target="_blank" rel="noopener"><code>filters/new_user_soft_nsfw_filter.rs</code></a>.<ul>
+<li>The switch <code>EnableNewUserSoftNsfwFilter</code> is false, and the account age cap <code>NewUserSoftNsfwFilterMaxAccountAgeSecs</code> is 86400 — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:804-815</code></a>.</li>
+<li>Account age is computed from the creation time embedded in the user ID (snowflake). It does not apply to topic requests, Following, or score-only requests.</li>
+<li>In the list, it was placed right after <code>CoreDataHydrationFilter</code> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:416</code></a>.</li>
+</ul>
+</li>
+<li>The label comes from a new hydrator, which fetches it from the safety label service of VF (visibility-filtering, a safety layer that decides per post whether it may be shown) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/candidate_hydrators/new_user_soft_nsfw_label_hydrator.rs" target="_blank" rel="noopener"><code>candidate_hydrators/new_user_soft_nsfw_label_hydrator.rs</code></a>.<ul>
+<li>It does not look up followed accounts, the viewer&#39;s own posts, or cached candidates that already have a label.</li>
+<li>If the lookup fails or the label is unknown, the post is kept. The tests <code>lookup_failure_keeps_the_post</code> and <code>failed_call_keeps_every_post</code> pin this fail-open behavior (pass the post when there is no verdict).</li>
+</ul>
+</li>
+<li>There are now two OON filters for new users: the engagement threshold filter and this one <span class="badge ok">verified</span>. We infer it is a device to avoid showing borderline sexual content as OON recommendations in a new user&#39;s first-day feed <span class="badge est">inferred</span>. The evidence is that it targets only OON and the age cap is one day.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Reaction posts now inherit the safety label of the original post</span></p></div>
+<ul>
+<li>If the original post has an adult content or violence label, a post made in reaction to it is also blurred (hidden behind a warning screen) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs</code></a>.<ul>
+<li>For adult content it checks the <code>NSFW_HIGH_PRECISION</code> label; for violence, the <code>GORE_AND_VIOLENCE_HIGH_PRECISION</code> and <code>GORE_AND_VIOLENCE_REPORTED_HEURISTICS</code> labels.</li>
+<li>If both labels are present, the adult blur wins. Even if the reaction post itself has a violence label, the original&#39;s adult label applies first.</li>
+</ul>
+</li>
+<li>If the original author has a protected account, the reaction post is dropped <span class="badge ok">verified</span> — <code>PROTECTED_ORIGINAL_AUTHOR_DROP</code> in the same file.</li>
+<li>The three rules were added only to <code>TimelineHomeHydration</code> among the SafetyLevels (the rule bundles VF uses per surface) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/visibility-filtering/rules/levels.rs" target="_blank" rel="noopener"><code>rules/levels.rs</code></a>.<ul>
+<li>The golden corpus (a test table pinning the expected verdict per rule) also pins that the same post is allowed in <code>TimelineHome</code> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/visibility-filtering/rules/golden_corpus/reaction_video.rs" target="_blank" rel="noopener"><code>rules/golden_corpus/reaction_video.rs</code></a>.</li>
+</ul>
+</li>
+<li>If the original label or author lookup fails, the reaction post is shown as is <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/visibility-filtering/rules/rule_spec/laws.rs" target="_blank" rel="noopener"><code>rules/rule_spec/laws.rs</code></a>.</li>
+</ul>
+<blockquote>
+<p>&quot;the default shows the reaction post unblurred, as Tweetypie does on a failed lookup&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/visibility-filtering/rules/rule_spec/laws.rs" target="_blank" rel="noopener">visibility-filtering/rules/rule_spec/laws.rs</a>, 2026-10-22 (code comment)</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The video carousel does not appear in requests made by scrolling down</span></p></div>
+<ul>
+<li>The carousel is now turned off in BOTTOM cursor requests (requests to get more by scrolling the feed down) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/util/video_carousel.rs" target="_blank" rel="noopener"><code>home-mixer/util/video_carousel.rs:11-23</code></a>.<ul>
+<li><code>!query.is_bottom_request</code> was added to the condition for inserting the carousel and the condition for sorting by immersive score.</li>
+<li>The server sets <code>is_bottom_request</code> to true when the request cursor type is <code>CursorType::BOTTOM</code> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/server.rs" target="_blank" rel="noopener"><code>home-mixer/server.rs:404</code></a>.</li>
+</ul>
+</li>
+<li>The switch for the side effect (a stage that only logs without changing the response) that records carousel video positions and scores to Kafka is now on by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1162-1167</code></a>.</li>
+<li>The carousel&#39;s own switch <code>EnableVideoCarousel</code> is still false in this commit <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1120-1125</code></a>. So the two changes take effect only in experiment traffic where the carousel is on <span class="badge est">inferred</span>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>In shadow traffic (a path that also sends scoring to experimental Phoenix clusters and keeps the scores only in logs), the opt-in cluster <code>Experiment18Fou</code> now receives 0.5 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:97-102</code></a>. Because the default is named <code>ShadowTrafficDefaultPercent</code>, we take the unit to be percent <span class="badge est">inferred</span>.</li>
+<li>Added a metric that counts, per served type, the share of candidates whose weighted-sum score is negative, and splits out whether the negative comes from the not_interested term <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/side_effects/scored_stats_side_effect.rs" target="_blank" rel="noopener"><code>side_effects/scored_stats_side_effect.rs</code></a>.</li>
+<li>Added a metric that counts how many posts from authors the viewer muted or blocked Phoenix retrieval fetches <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/sources/phoenix_source.rs" target="_blank" rel="noopener"><code>sources/phoenix_source.rs</code></a>.</li>
+<li>The VF client and the safety label client are now created once in the server and shared by the For You and Following pipelines, and the label lookup batch size went from 50 to 100 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/home-mixer/server.rs" target="_blank" rel="noopener"><code>home-mixer/server.rs</code></a>.</li>
+<li>Added a training option to the Phoenix ranker that freezes history tokens in the top K Transformer layers and updates only candidate tokens <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/phoenix/xrex/models/transformer.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/transformer.py</code></a>. The default is an empty tuple, so it is off.</li>
+<li>Training of the immersive surface two-tower (a retrieval model that embeds user and post separately) gained 4-day, evergreen, and NSFW slice evaluation and per-slice recall@600 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower.py</code></a>.</li>
+<li>grox (Grok-based annotation pipeline) gained a setting to fetch all videos at the highest bitrate, false by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/989fb91254d461bf4b9df53fb12d5c9a61c2b354/grox/config/config.py" target="_blank" rel="noopener"><code>grox/config/config.py</code></a>.</li>
+<li>The hydration store and policy-pinning tests of visibility-filtering were cleaned up, and in this part the verdict rules did not change apart from C <span class="badge est">inferred</span>. The evidence is that the diff of the rule definition files is only the three rules in C.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> was revised as follows:</p></div>
+<ul>
+<li>Raised the reference commit in <code>## Summary</code> to 989fb91 and changed the pre-scoring filter count to 22.</li>
+<li>Added the filter count of 27 and a sentence saying the same-ratio filter is on by default to the intro of <code>## Re-ranking, diversity, and filters</code>.</li>
+<li>In the filter section, added <code>NewUserSoftNsfwFilter</code> to the list and changed the status of <code>FairShareRankingFilter</code> to on by default.</li>
+<li>Added a soft NSFW filter bullet to the new-users subsection of <code>## Cold start</code>.</li>
+<li>In the carousel bullet of <code>## Feed surfaces</code>, changed the Kafka log switch to on by default and added the BOTTOM request exclusion.</li>
+<li>Added a paragraph on the reaction post rules after the intro of the safety section.</li>
+<li>Raised the checked-at point and the commit table of <code>## Sources</code> to 989fb91, and added a Gen4+47 row to the change log summary table.</li>
+<li>Changed the filter box of <code>assets/x-pipeline.svg</code> to &quot;Filters 22, as of the 2026-10-22 commit&quot;.</li>
+</ul>
+<div class="blk why"><p><span class="lbl">Why it matters</span> ⚠ Claim changed: The same-ratio-per-source filter that yesterday&#39;s note called &quot;off by default&quot; has become on in the mirror default after one day. The candidate mix that Phoenix scores now follows per-source share rather than list order <span class="badge est">inferred</span>. topics and radar have no sentence about this filter, so there was nothing to fix there as well.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check whether per-served-type metrics or source caps are adjusted after the same-ratio filter is turned on — the change in per-source share is still <span class="badge est">inferred</span>.</li>
+<li>Check whether the new-user soft NSFW filter and the video carousel get turned on — both are off by default.</li>
+<li>Confirm the unit of the shadow traffic ratio from the is_sampled implementation in shadow.rs — the percent reading is <span class="badge est">inferred</span>.</li>
+</ul></div>
+<h2 id="lookup-status">Lookup status</h2>
+<ul>
+<li>X: There was 1 new commit (989fb91) in xai-org/x-algorithm. Releases were not checked.</li>
+<li>Meta: The latest post in the engineering.fb.com RSS is dated 2026-10-19 and was already checked. ai.meta.com/blog and transparency.meta.com were not checked this time.</li>
+<li>Netflix: The RSS had 1 new post dated 2026-10-22 (Single-tenant Titus); it is a container isolation infrastructure post, so it was skipped. research.netflix.com/publications was not checked.</li>
+<li>arXiv cs.IR: Parsed 30 items, and submissions of 2026-10-21 were newly included. 0 passed. Generative recommendation long-tail restoration (CAPE) and adaptive recursive sequential recommendation (LoopRec) were rejected because they use only public benchmarks, and SID pretraining for search CTR (FineSID) because it is a search surface, not a feed.</li>
+<li>WebSearch cross-checking was not done this time.</li>
+</ul>
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-22.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-22</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-23.html" data-title="일일 리포트 2026-10-23"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-22 — feed-research</title>
+<meta name="description" content="In one line: The Instagram Feed scoring formula was published for the first time. It does not use predictions as they are; it weights separately the…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-22.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-22.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-22.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-22.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-22 — feed-research">
+<meta property="og:description" content="In one line: The Instagram Feed scoring formula was published for the first time. It does not use predictions as they are; it weights separately the…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-22.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-10-22.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-22">2026-10-22</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>14 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-22.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>4</b></li><li class="chip">Canon files updated: <b>5</b></li><li class="chip">Radar entries: <b>2</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>The Instagram Feed scoring formula was published for the first time. It does not use predictions as they are; it weights separately the increment beyond viewer-habit and popularity baselines, and it has run in production for nearly a year.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">6</span></summary><ol><li><a href="#1-instagram-feed-weights-prediction-baselines-and-increments-separately--instagram"><span class="num">1</span>Instagram Feed weights prediction baselines and increments separately — Instagram</a></li><li><a href="#2-a-filter-that-shrinks-every-source-by-the-same-ratio-when-candidates-overflow--x"><span class="num">2</span>A filter that shrinks every source by the same ratio when candidates overflow — X</a></li><li><a href="#3-a-distillation-selector-shrinks-a-100000-length-history-and-raises-app-usage-time--kuaishou"><span class="num">3</span>A distillation selector shrinks a 100,000-length history and raises app usage time — Kuaishou</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#lookup-status">Lookup status</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>X added a filter, off by default, that shrinks candidates by the same ratio per source when they exceed the Phoenix scoring budget of 2800.</li>
+<li>X built a path that sends value model weights with the retrieval request, but the default is empty, so it currently sends none.</li>
+<li>Kuaishou reported +0.613% in app usage time from a ranking that shrinks a 100,000-length user history with a distillation selector.</li>
+</ul>
+<h2 id="1-instagram-feed-weights-prediction-baselines-and-increments-separately--instagram"><span class="num">1</span>Instagram Feed weights prediction baselines and increments separately — Instagram</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2610.27423" target="_blank" rel="noopener">Baseline and Incremental: User, Item, and Request Debiasing in Instagram Feed Ranking (arXiv 2610.27423)</a> — Meta, 2026-10-20 v1, paper. All 26 authors have an email domain of <code>@meta.com</code> (2 wrote that they did the work while employed at Meta).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Feed rankers order candidates with a value model (a formula that combines per-action predictions into one score), which sums per-action predictions such as like, share, and dwell time multiplied by weights. However, prediction values contain a share unrelated to the candidate. A viewer who likes often has a high like prediction for any post, and popular posts and long videos structurally get high predictions. This paper discloses Instagram Feed&#39;s production design, which keeps this share (the baseline) rather than erasing it and adds the increment beyond the baseline as a term with a separate weight.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The Feed score adds the original prediction term and the increment term, weighted separately per signal</span></p></div>
+<ul>
+<li><p>The score of Instagram Feed late-stage ranking (the final stage, which scores hundreds of candidates per request) is a weighted sum of engagement predictions <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2610.27423v1" target="_blank" rel="noopener">HTML version §1</a>.</p>
+<ul>
+<li>The target VMs are MainRank, which orders most of the feed, and TopRank, which fills the top of the session.</li>
+<li>Weights are tuned to a few north-star metrics with online Bayesian optimization (an optimization that picks weight combinations one after another while watching experiment results).</li>
+<li>Deployed VMs sometimes multiply some groups of terms, but the paper does not cover that structure.</li>
+</ul>
+</li>
+<li><p>The paper leaves the original prediction term as it is and adds the increment Δ beyond the baseline as a term with a separate weight <span class="badge ok">verified</span> — same paper §1.</p>
+<ul>
+<li>The original formula and the modified one are as follows (the original MathML was transcribed as text):</li>
+</ul>
+<pre tabindex="0"><code>s(c) = Σ_j w_j p_j(c)
+s(c) = Σ_j [ w_j^r p_j(c) + w_j^i Δ_j(c) ]
+</code></pre>
+</li>
+<li><p>There are three kinds of baselines <span class="badge ok">verified</span> — same paper §3.</p>
+<ul>
+<li>The viewer baseline is that viewer&#39;s past action rate. The Feed like prediction has a rank correlation of 0.69 with the viewer&#39;s own past like rate.</li>
+<li>The item baseline is item popularity (popularity bias) or structural attributes such as format and size.</li>
+<li>The request baseline is the prediction statistics of the candidates in the same request.</li>
+</ul>
+</li>
+<li><p>All three baselines are expressed by one operator, and the deployed forms are three <span class="badge ok">verified</span> — same paper §3.</p>
+<ul>
+<li>The general form is <code>Δ = m(p,b)[σ(k·d(p,b)) − shift]</code>, and for probabilities it uses <code>d = logit(p) − logit(b)</code>.</li>
+<li>The deployed forms are <code>p σ(logit p − logit b)</code>, <code>m σ(ŷ − b)</code>, and <code>max(0, p − b)</code>, all with shift 0.</li>
+<li>For the demotion term, it states that using <code>m=p</code> makes the penalty vanish when the prediction is at the floor, so it uses a form with a constant magnitude and the comparison direction flipped.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;The baseline is not a defect but a second signal that needs its own weight (§3). A habitual liker&#39;s likes are real engagement, and a broadly loved post deserves reach. But one coefficient w_j cannot trade the two components off, and the right trade-off is unknown a priori and differs by signal.&quot;
+— <a href="https://arxiv.org/html/2610.27423v1" target="_blank" rel="noopener">arXiv 2610.27423 (HTML)</a>, 2026-10-20</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Only format bias is removed from the training label, not from the score term</span></p></div>
+<ul>
+<li>Format bias such as video length is handled not by a VM term but by a label that counts as positive only when the item is in the top within the same format-and-size bucket <span class="badge ok">verified</span> — same paper §4.4.<ul>
+<li>Buckets are split by length for videos, by card count for carousels, and by OCR word count for photos. Exceeding the p75 of dwell time within the bucket makes the label positive.</li>
+<li>It explains that popularity bias is a single item statistic of the same signal, so a VM term suffices, whereas format bias distorts the label itself, so it is fixed in the label.</li>
+<li>The correlation between the video label and video length is r≈−0.017, smaller than the +0.216 of the original log dwell time prediction <span class="badge ok">verified</span>. It states that photo and carousel labels were not audited.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. In an experiment splitting the 6 deployed terms into four arms, the arm keeping both terms mostly won</span></p></div>
+<ul>
+<li>Each term has four arms (both terms off, original term only, incremental term only, both), compared with 3% of traffic per arm <span class="badge ok">verified</span> — same paper §6.<ul>
+<li>Measurement covers the same 7-day window in which all 6 experiments were on, and each experiment ran 12–17 days.</li>
+<li>Of the 13 (term, metric) pairs judged, in 11 the both-terms arm beat both single-term arms on point estimates. Seven pairs have both contrasts significant.</li>
+<li>Of 26 direct contrasts, 17 were significantly favorable and 1 (impressions) was significantly unfavorable.</li>
+</ul>
+</li>
+<li>The paper itself states the limitation that the single-term arms were not re-tuned <span class="badge ok">verified</span> — same section.</li>
+</ul>
+<blockquote>
+<p>&quot;Neither single-term arm was re-tuned. This favours both over incremental, whose weight was set beside the raw term. The design thus tests whether either term is redundant at the deployed point, not whether a re-tuned single-term VM could match it.&quot;
+— <a href="https://arxiv.org/html/2610.27423v1" target="_blank" rel="noopener">arXiv 2610.27423 (HTML)</a>, 2026-10-20</p>
+</blockquote>
+<ul>
+<li>The 6 deployed terms and the launch-decision metrics are listed below <span class="badge ok">verified</span> — same paper §5 Table 4.<ul>
+<li>The format bucket label launched with feed dwell time +0.447%, and the item-axis dwell gate (MainRank) with impressions +0.665%.</li>
+<li>The see-more request term launched with an unconnected-post interest ratio of +0.63% (feed dwell time −0.118%), and the external-share viewer term with sessions +0.030%.</li>
+</ul>
+</li>
+<li>The conclusion is that offline diagnostics (the correlation between prediction and baseline) should be used only to filter candidates, not to rank them <span class="badge ok">verified</span> — same paper §7. One tested term ranked 9th offline among 10 on the same axis.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The same operator also launched in Reels and Threads, and Facebook is testing it</span></p></div>
+<ul>
+<li>This structure ran in Instagram Feed production for nearly 1 year, and all 6 terms are on as of paper submission <span class="badge ok">verified</span> — same paper §5.</li>
+<li>Reels launched all three axes in both early-stage and late-stage, Threads launched in late-stage, and Facebook is testing it in ongoing experiments <span class="badge ok">verified</span> — same paper §8.<ul>
+<li>Reels launch examples include the late-stage viewer-axis like calibration (sessions +0.083%, DAU +0.042%) and content-calibrated skip demotion.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;Furthermore, Threads has launched debiased signals in late-stage ranking, and Facebook is testing debiased terms in ongoing experiments.&quot;
+— <a href="https://arxiv.org/html/2610.27423v1" target="_blank" rel="noopener">arXiv 2610.27423 (HTML)</a>, 2026-10-20</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="instagram.html">services/instagram.md</a>, rewrote <code>## Summary</code> to include the Feed scoring formula sentence, and added a Feed VM sentence to the <code>## Ranking</code> intro. In the same section, added a new <code>### Feed value model — weight the original prediction and the increment separately</code>, a bullet in <code>### Three combination forms</code> saying Feed extends the additive form, a 2026 Bayesian optimization sentence in the <code>### How weights are set</code> intro, sub-bullets under items 1 and 2 of <code>## Open questions</code>, and a source under <code>### Papers</code>. Added launch statements to the <code>## Ranking</code> intro and the &quot;0 information on weights and combination method&quot; bullet of <a href="threads.html">services/threads.md</a>, and an in-experiment statement to <code>### The only published formula</code> of <a href="facebook.html">services/facebook.md</a>. Added an Instagram Feed row to the Meta table of <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a>, an Instagram sub-bullet under <code>## Who uses this</code>, and a source.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The combination form of Instagram Feed itself was published for the first time, and it adds an &quot;increment beyond the baseline&quot; term to the additive weighted sum <span class="badge ok">verified</span>. Until now, the Instagram combination forms came only from the Suggested Posts, Explore, and notifications posts. The existing statement that the Threads card has 0 information on the combination method was also partly filled in by primary material outside the card <span class="badge ok">verified</span>.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-a-filter-that-shrinks-every-source-by-the-same-ratio-when-candidates-overflow--x"><span class="num">2</span>A filter that shrinks every source by the same ratio when candidates overflow — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/7f2ca2b914cadac591ea7fceec0c477e473d3dee" target="_blank" rel="noopener">xai-org/x-algorithm@7f2ca2b</a> — xAI public repository, commit of 2026-10-21 00:52 UTC, code. In these notes&#39; numbering, this is Gen4+46. Gen4+N is the number these notes assign in order to X commits after the Gen4 release (2026-08-13). The cron mirror (a file that syncs and publishes production config defaults daily) has a sync time of 2026-10-20T16:00:34Z, and none of the existing mirror values changed.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You concatenates candidates from several sources such as Thunder (the in-network latest-post index), Phoenix retrieval (X&#39;s Transformer-based candidate search), and SimClusters, then scores them with the Phoenix ranker. The scoring request sends at most 2800 candidates, so when the concatenated list is longer, candidates from later sources are cut first. This commit adds a filter that changes this cutting to per-source proportional allocation, and a path that passes weights to retrieval, both off by default.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The proportional-allocation filter keeps the same fraction of candidates per source and is off by default</span></p></div>
+<ul>
+<li>The new filter groups candidates by served type (the source path a candidate came in through) and, when the total exceeds the budget, sets the number to keep in proportion to group size <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/filters/fair_share_ranking_filter.rs" target="_blank" rel="noopener"><code>home-mixer/filters/fair_share_ranking_filter.rs</code></a>.<ul>
+<li>Division remainders are given out one at a time in descending order (largest remainder). Within a group, the first N in the current order are kept.</li>
+<li>The budget is <code>PhoenixScoresResultSize=2800</code> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1189-1193</code></a>.</li>
+<li>A test pins that reducing in-network 440, SimClusters 220, and Phoenix retrieval 440 candidates (total 1100) to a budget of 1000 leaves (400, 200, 400).</li>
+</ul>
+</li>
+<li>The switch <code>EnableFairShareRanking</code> is off by default (false) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1194-1199</code></a>.<ul>
+<li>Even when on, it does not act if the request is for cached posts or the Phoenix ranker kill switch is on.</li>
+<li>It was placed at the very end of the pre-scoring filter list, right after <code>FavHoldoutFilter</code> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:437</code></a>. It was also added to the score-only pipeline.</li>
+</ul>
+</li>
+<li>While it is off, the Phoenix request currently sends only the first 2800 of the list <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/util/phoenix_request.rs" target="_blank" rel="noopener"><code>util/phoenix_request.rs:20, 192</code></a>. With the filter on, the later sources in the list are likely no longer all cut; instead each source is cut by the same ratio <span class="badge est">inferred</span>. The evidence is that the budget equals this 2800 and a test is named &quot;drops_the_same_fraction_of_each_served_type&quot;.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let product = count as u128 * budget_u;
+let keep = (product / total) as usize;
+remainders.sort_by(|left, right| right.0.cmp(&amp;left.0).then(left.1.cmp(&amp;right.1)));
+</code></pre></figure>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The retrieval request can now carry value model weights, but none are sent currently</span></p></div>
+<ul>
+<li>The Phoenix retrieval request proto gained a per-name weight map field, and home-mixer parses a parameter value to fill it <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/sources/phoenix_source.rs" target="_blank" rel="noopener"><code>sources/phoenix_source.rs:137-138</code></a>.<ul>
+<li>The field is <code>RetrieveTopKCandidatesRequest.value_model_weights = 17</code> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto:298</code></a>.</li>
+<li>The parameter <code>RetrievalValueModelWeights</code> is a JSON object string whose default is an empty string — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:281-286</code></a>. If it is empty or malformed, nothing is sent.</li>
+</ul>
+</li>
+<li>This commit has no code where the retrieval server reads this field <span class="badge ok">verified</span>. Because two-tower (a retrieval model that embeds user and post separately) has had multiple heads since the 2026-10-13 commit (Gen4+40), we infer this is preparation for varying head weights per request <span class="badge est">inferred</span>. The evidence is that the field name matches the ranker&#39;s value model.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>Added a side effect (a stage that leaves only logs without changing the response) that records the position and score of carousel videos to Kafka in responses where the carousel was actually served. The switch is off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/side_effects/video_carousel_candidates_kafka_side_effect.rs" target="_blank" rel="noopener"><code>video_carousel_candidates_kafka_side_effect.rs</code></a>.<ul>
+<li>The switch is <code>EnableVideoCarouselCandidatesLogging=false</code> (<a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>param.rs:1150-1155</code></a>), and the carousel itself is off by default.</li>
+</ul>
+</li>
+<li>The topic novelty measurement introduced in the 2026-10-20 commit now also measures the share of posts in languages the viewer does not use. It is still off because the history topic switch is false by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/home-mixer/side_effects/serendipity_stats_side_effect.rs" target="_blank" rel="noopener"><code>serendipity_stats_side_effect.rs:19, 145-176</code></a>.<ul>
+<li>The viewer&#39;s languages are those that make up at least 5% of engagement history (<code>MIN_USER_LANGUAGE_SHARE = 0.05</code>) plus the app language. The new metrics are <code>CrossLanguageShare</code>, <code>CrossLanguageShareTop10</code>, and others.</li>
+</ul>
+</li>
+<li>The candidate-packing option name in Phoenix training was renamed and is turned on only in the H100 preset, and the candidate-region attention kernel also supports SM100 (the GB200/GB300 GPU generation). The model structure and loss are unchanged <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>configs/xrecsys.py:463-474</code></a>.</li>
+<li>VF (visibility-filtering, a service that decides whether each post can be shown) verdicts now carry the rule ID directly, and an account-level verdict path was added as code not yet in use <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/visibility-filtering/models/verdict.rs" target="_blank" rel="noopener"><code>models/verdict.rs:37</code></a>.<ul>
+<li>If the author-relationship lookup of a quoted post fails, both user rules and post rules now read that value as &quot;unknown&quot; — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/visibility-filtering/rules/engine.rs" target="_blank" rel="noopener"><code>rules/engine.rs:427-440, 628</code></a>. We infer the visible result is the same because the default is false <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>The backfill limit of abuse-enforcement-service moved from GrowthBook to a stored config record, and the rate is 0 until someone sets it <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7f2ca2b914cadac591ea7fceec0c477e473d3dee/abuse-enforcement-service/service-lib/src/backfill.rs" target="_blank" rel="noopener"><code>service-lib/src/backfill.rs:112-117</code></a>. It is unrelated to feed ranking.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a>, changed the reference commit in <code>## Summary</code> to 7f2ca2b and the pre-scoring filter count to 21. Updated the filter counts (26, 21) in the <code>## Re-ranking, diversity, and filters</code> intro and added <code>FairShareRankingFilter</code> to the reference commit and list of the filter section, with an explanatory bullet. Added a logging bullet and the off-by-default reference commit to the carousel item in the feed surface section, a retrieval weight bullet to the candidate generation section, a language measurement bullet to <code>### Diversity</code>, and served type and side effect rows to the <code>## Glossary</code> table. Added a Gen4+46 row to the two commit tables in <code>## Sources</code> and to the change log summary table; also fixed the filter counts (21 pre-scoring, 5 post-selection) in <code>assets/x-pipeline.svg</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This commit also did not change default behavior <span class="badge ok">verified</span>. The evidence is that the existing mirror values are unchanged and all three new switches are off. We read the proportional-allocation filter as a sign that X recognized the problem that cutting to the first 2800 disadvantages later sources as sources grow <span class="badge est">inferred</span>.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="3-a-distillation-selector-shrinks-a-100000-length-history-and-raises-app-usage-time--kuaishou"><span class="num">3</span>A distillation selector shrinks a 100,000-length history and raises app usage time — Kuaishou</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2610.28569" target="_blank" rel="noopener">ECHO: Efficient Cascade with Homogeneous Operators for Distillation-Guided 100K-Sequence Modeling (arXiv 2610.28569)</a> — Kuaishou Technology, 2026-10-20 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> A user&#39;s lifetime behavior history can exceed 100,000 entries, and applying attention over the whole history for every candidate is too costly. Existing solutions either retrieve only the records related to the candidate (the TWIN family) or compress the history into latent vectors. The paper reports deploying to production a midpoint between the two, distilling a per-user selector that keeps part of the raw records into a full-history teacher.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. App usage time rose further on top of a production system that already uses long-sequence retrieval</span></p></div>
+<ul>
+<li>A 7-day A/B (5% of traffic) on Kuaishou&#39;s largest short-video surface recorded total app usage time +0.613% and per-user app usage time +0.640% <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2610.28569v1" target="_blank" rel="noopener">HTML version §4.6</a>.<ul>
+<li>It states that this surface has more than 400 million DAU and more than 50 billion interaction logs per day.</li>
+</ul>
+</li>
+<li>The baseline system being compared already uses TWIN-family retrieval and sequence compression <span class="badge ok">verified</span> — same section.</li>
+<li>It states that it cut online sequence-branch FLOPs by about 160× relative to a representative end-to-end model at L=100K <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2610.28569" target="_blank" rel="noopener">abstract</a>.</li>
+</ul>
+<blockquote>
+<p>&quot;Notably, the existing production system already incorporates advanced long-sequence modeling techniques, including TWIN-based behavior retrieval and sequence compression mechanisms similar to C-Former and SequenceO1.&quot;
+— <a href="https://arxiv.org/html/2610.28569v1" target="_blank" rel="noopener">arXiv 2610.28569 (HTML)</a>, 2026-10-20</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Not folded into the canon because it is not a tracked service. Added an ECHO entry to <code>## New this month</code> in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Competition in long-sequence ranking appears to be shifting from &quot;how long&quot; to &quot;what to re-fetch for each candidate&quot; <span class="badge est">inferred</span>. The evidence is that this paper&#39;s increment came on top of a baseline that already uses long-sequence retrieval.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2610.28569" target="_blank" rel="noopener">ECHO (arXiv 2610.28569)</a>: Added Kuaishou&#39;s 100,000-length history ranking to <code>## New this month</code>.</li>
+<li><a href="https://arxiv.org/abs/2610.27898" target="_blank" rel="noopener">SPAR (arXiv 2610.27898)</a>: Youku retrieves long-term history matching the prefix at each SID (an ID that represents an item as a sequence of semantic tokens) decoding step and reduces branch skew, gaining watch time +3.95% in a 10% traffic A/B. Attached as additional evidence to the generative retrieval thread (only the abstract was read).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check whether to split the Instagram paper&#39;s Table 6 (Reels launch list) and the 6 Feed terms across the Reels and feedback signals sections of instagram.md — today they were folded only into the ranking section.</li>
+<li>Check whether code for the X retrieval server reading value_model_weights is released — per-request adjustment of retrieval head weights is <span class="badge est">inferred</span>.</li>
+<li>Check whether the X proportional-allocation filter is turned on — if so, per-source candidate share will change.</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="lookup-status">Lookup status</h2>
+<ul>
+<li>X: There was 1 new commit (7f2ca2b) in xai-org/x-algorithm. Releases were not checked.</li>
+<li>Meta: The latest post in the engineering.fb.com RSS is dated 2026-10-19 and was already checked in the 2026-10-21 batch. ai.meta.com/blog and transparency.meta.com were not checked this time.</li>
+<li>Netflix: The latest post in the RSS is dated 2026-10-16 and was already checked. research.netflix.com/publications was not checked.</li>
+<li>arXiv cs.IR: Parsed 30 entries. The latest submission is 2026-10-20, and 3 passed: the Instagram paper (canon update), ECHO, and SPAR. A paper designing generative retrieval SIDs with LLM evolutionary search was dropped because it has only public benchmarks.</li>
+<li>WebSearch cross-checking was not done this time.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-21.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-21</span></a><a class="pg-next" href="daily-2026-10-23.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-10-23</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-22.html" data-title="일일 리포트 2026-10-22"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
