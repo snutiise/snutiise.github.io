@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-24 — feed-research</title>
+<meta name="description" content="In one line: X made it possible to carry the embedding of the viewer's recent search queries in the For You ranker request. The switch is off by default, so…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-24.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-24.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-24.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-24.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-24 — feed-research">
+<meta property="og:description" content="In one line: X made it possible to carry the embedding of the viewer's recent search queries in the For You ranker request. The switch is off by default, so…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-24.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-10-24.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-24">2026-10-24</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>7 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-24.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X made it possible to carry the embedding of the viewer&#39;s recent search queries in the For You ranker request. The switch is off by default, so current behavior is unchanged.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">5</span></summary><ol><li><a href="#1-recent-search-queries-became-a-candidate-ranker-input--x"><span class="num">1</span>Recent search queries became a candidate ranker input — X</a></li><li><a href="#2-reasoning-of-an-llm-recommendation-model-compressed-into-latent-tokens--kuaishou"><span class="num">2</span>Reasoning of an LLM recommendation model compressed into latent tokens — Kuaishou</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#lookup-status">Lookup status</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>Kuaishou reported that it compressed the reasoning sentences of an LLM recommendation model into latent tokens and raised revenue in an ads surface A/B test.</li>
+</ul>
+<h2 id="1-recent-search-queries-became-a-candidate-ranker-input--x"><span class="num">1</span>Recent search queries became a candidate ranker input — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/07d159b69109f069c85f84d39dd38e38adc040f0" target="_blank" rel="noopener">xai-org/x-algorithm@07d159b</a> — xAI public repository, commit of 2026-10-23 04:10 UTC, code. In these notes&#39; numbering, this is Gen4+48, where Gen4+N is the number these notes assign in sequence to X commits after the Gen4 release (2026-08-13). The sync time of the cron mirror (a file that syncs and publishes the production feature-switch defaults daily) is 2026-10-22T16:00:34Z. 209 files changed, most of them cleanups in visibility-filtering and abuse-enforcement-service.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You ranking works as follows: home-mixer (the serving layer that receives requests, gathers candidates, and orders them) sends candidates and viewer information to Phoenix (a Grok-based ranking Transformer) and receives per-action probabilities. Viewer information has so far included in-feed signals such as engagement history, follow relationships, and demographics. Search is an action in which users state their interests directly outside the feed, so using it in feed ranking can capture interests not yet visible in the history. This commit adds, off by default, a path that carries the embedding of the viewer&#39;s recent search queries in the user context of the Phoenix request.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Up to 16 recent search queries reach the ranker only as embeddings, without text</span></p></div>
+<ul>
+<li><p>A new query hydrator (a stage that fills in viewer information per request) receives the viewer&#39;s list of recent search queries from the search service&#39;s store <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/home-mixer/clients/recent_search_queries_store_client.rs" target="_blank" rel="noopener"><code>recent_search_queries_store_client.rs:8-11</code></a>.</p>
+<ul>
+<li>The store is the <code>search_mixer_nash</code> app and the <code>search_recent_queries_nash</code> dataset of Manhattan (X&#39;s key-value store).</li>
+<li>The client timeout is 100ms, and it retries once.</li>
+<li>If the client cannot be created, it logs only a warning and substitutes a mock that returns empty results.</li>
+</ul>
+</li>
+<li><p>From the received list, it keeps only entries before the request time, picks up to 16 newest first, and removes the query text <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/home-mixer/query_hydrators/recent_search_queries_query_hydrator.rs" target="_blank" rel="noopener"><code>recent_search_queries_query_hydrator.rs:10-12, 45-58</code></a>.</p>
+<ul>
+<li>Entries whose embedding length is not 2048 bytes (bf16, 1024 dimensions) are discarded.</li>
+<li>The overall wait limit of the hydrator is 300ms.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">const MH_GET_TIMEOUT: Duration = Duration::from_millis(300);
+const MAX_QUERIES: usize = 16;
+const EMBEDDING_BYTES: usize = 1024 * 2;
+</code></pre></figure>
+</li>
+<li><p>The test name says this selection rule &quot;matches training&quot;. We read this to mean that the training data picks queries by the same rule <span class="badge est">inferred</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/home-mixer/query_hydrators/recent_search_queries_query_hydrator.rs" target="_blank" rel="noopener">same file, lines 73-89</a>.</p>
+<ul>
+<li>The test function name is <code>select_matches_training_and_drops_text</code>.</li>
+</ul>
+</li>
+<li><p>The selected list goes into the user context of the Phoenix request as a new field <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</p>
+<ul>
+<li>The field is <code>UserContext.recent_search_queries = 21</code>, and <code>build_user_context</code> in <code>util/phoenix_request.rs</code> fills it.</li>
+<li>The proto <code>RecentSearchQueries</code> was introduced earlier, in the 2026-10-17 commit (Gen4+44), with no code using it.</li>
+</ul>
+</li>
+<li><p>The switch is off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:727-732</code></a>.</p>
+<ul>
+<li>The switch is named <code>EnableRecentSearchQueriesHydration</code>, and for logged-out viewers (<code>user_id == 0</code>) it does not run even when on.</li>
+<li>The hydrator was added to both For You&#39;s <code>PhoenixCandidatePipeline</code> and the score-only <code>PhoenixScoresPipeline</code>.</li>
+</ul>
+</li>
+<li><p>The Phoenix training code in this commit has no change that reads the search queries in the user context. It is unknown whether the model has already been trained with this feature <span class="badge est">inferred</span>.</p>
+<ul>
+<li>The training batch originally has a <code>search_query_embeddings</code> field, but this field has been used as the query embedding of search surface requests. This was confirmed at the 2026-09-01 commit (Gen4+13).</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>In shadow traffic (requests copied to an experiment cluster without being used in the actual response), the ratio sent to the <code>Experiment18Fou</code> cluster dropped from 0.5 to 0.3 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:101</code></a>.</li>
+<li>A funnel trace side effect, which records via Kafka where in the pipeline ads were dropped, was introduced as off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/home-mixer/side_effects/funnel_trace_side_effect.rs" target="_blank" rel="noopener"><code>side_effects/funnel_trace_side_effect.rs</code></a>.<ul>
+<li>The switch is <code>EnableAdsFunnelTrace</code> (param.rs lines 867-872). The blender&#39;s non-selected list also now holds the ads actually dropped instead of a placeholder.</li>
+</ul>
+</li>
+<li>A few fields were added to the Phoenix proto, but no code in home-mixer fills them <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.<ul>
+<li>They are <code>diversityWeight</code> in the page decoding parameters, a history URL embedding request flag, the action <code>CLIENT_TWEET_VIDEO_SESSION = 111</code>, the retrieval dataset <code>IMMERSIVE_32FAV_VIDEO_14_TO_30_DAY</code>, and <code>url_domain</code> for ads.</li>
+</ul>
+</li>
+<li>The Phoenix training code gained an ads auxiliary value head (content view, add to cart) and a history URL embedding loader <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/07d159b69109f069c85f84d39dd38e38adc040f0/phoenix/xrex/models/value_heads.py" target="_blank" rel="noopener"><code>models/value_heads.py</code></a>.<ul>
+<li>The auxiliary head is off because the default is <code>aux_value_head_weights=&quot;&quot;</code>. This part was not read line by line.</li>
+</ul>
+</li>
+<li>The visibility-filtering changes are mostly a restructuring of the hydration layer and rule representation and a cleanup of notification rules <span class="badge est">inferred</span>. We found no place where what is filtered from the home timeline changed, but we did not read every hunk.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a> <code>## Summary</code>, the reference commit was raised to 07d159b. A sentence on the recent-search-queries path was added to the intro of <code>### Ranker input features and SID reconstruction</code>, and a bullet group of evidence was added to the same section. A 07d159b row was added to the git log check sentence and commit table in <code>## Sources</code> and to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X has finished preparing to use search, an off-feed action, as a user input of the feed ranker. The evidence is that the store client, hydrator, proto field, and request assembly all arrived in one commit, and only the switch remains. Whether the training side already uses this feature is not confirmed by public code, so we watch for the point when it is switched on in the cron mirror.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-reasoning-of-an-llm-recommendation-model-compressed-into-latent-tokens--kuaishou"><span class="num">2</span>Reasoning of an LLM recommendation model compressed into latent tokens — Kuaishou</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2610.30675" target="_blank" rel="noopener">OneLatent: Latent Reasoning for Efficient Foundation Recommendation Models</a> — arXiv cs.IR, 2026-10-22, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Kuaishou has used an approach (Think-then-Answer) in its OneRec (generative recommendation model) family in which an LLM backbone reasons about user interests in sentences before answering. Generating reasoning sentences every time greatly increases serving cost. This paper compresses the reasoning sentences into a few trainable latent tokens, aiming to get the benefit of reasoning without generating sentences.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. It reports better results than explicit reasoning without reasoning sentences, with at least 17× the throughput</span></p></div>
+<ul>
+<li>The abstract says SID@64 is 17.44% higher than the Think variant using explicit reasoning and 9.33% higher than the No-Think variant <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2610.30675" target="_blank" rel="noopener">arXiv 2610.30675</a>.<ul>
+<li>SID@64 reads as the share of cases where the correct answer falls within the top 64 generated Semantic IDs (identifiers that represent an item as a sequence of semantic tokens).</li>
+</ul>
+</li>
+<li>It says online inference throughput is at least 17× higher <span class="badge ok">verified</span> — same abstract.</li>
+<li>It says an online A/B test on a local-services ads surface obtained an estimated revenue of +9.6% over the OneRec and OneReason baselines <span class="badge ok">verified</span> — same abstract.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> The canon was not changed because this is not directly tied to a tracked service. One line of additional evidence was added to the <code>### Spread of LLM-native ranking — who follows after GenRec</code> thread in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This is the second statement that LLM recommendation in the serving path is shifting toward &quot;how cheaply can inference be done&quot;. The evidence is that the 2026-10-19 Spotify statement dealt with serving cost, and this paper also puts throughput forward as its main result. However, the surface is local-services ads and it is unknown whether this carries over to feeds, so it is kept in the radar.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li>Added Kuaishou OneLatent (<a href="https://arxiv.org/abs/2610.30675" target="_blank" rel="noopener">arXiv 2610.30675</a>) as additional evidence to the <a href="radar.html#spread-of-llm-native-ranking--who-follows-after-genrec">radar.md LLM-native ranking thread</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>The recent-search-queries switch in the cron mirror — if it turns on, X feed ranking starts using search behavior. Whether the training code reads this field remains <span class="badge est">inferred</span>.</li>
+<li>diversityWeight in Phoenix page decoding — we read it as a slot for giving a diversity weight to the page_rl re-ranker of the 2026-10-14 commit <span class="badge est">inferred</span>. The evidence is that the field went into the page decoding parameters, and no code fills it yet.</li>
+</ul></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="lookup-status">Lookup status</h2>
+<ul>
+<li>X: There was 1 new commit (07d159b) in xai-org/x-algorithm. Releases were not checked.</li>
+<li>Meta: The latest post in the engineering.fb.com RSS is dated 2026-10-19 and was already checked. ai.meta.com/blog and transparency.meta.com were not checked this time.</li>
+<li>Netflix: The latest post in the RSS is dated 2026-10-22 (Single-tenant Titus) and was already checked. research.netflix.com/publications was not checked.</li>
+<li>arXiv cs.IR: 30 entries were parsed, and submissions of 2026-10-22 were newly included. 1 passed (OneLatent). LinkedIn PAIR was rejected because it is Premium people-search retrieval with offline metrics only.</li>
+<li>WebSearch cross-checking was not done this time.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-23.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-23</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-24.html" data-title="일일 리포트 2026-10-24"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
