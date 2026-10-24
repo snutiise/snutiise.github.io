@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-25 — feed-research</title>
+<meta name="description" content="In one line: X made the Phoenix ranker separately learn from late conversions, such as purchases and sign-ups, that happen after a user only views an ad…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-25.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-25.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-25.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-25.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-25 — feed-research">
+<meta property="og:description" content="In one line: X made the Phoenix ranker separately learn from late conversions, such as purchases and sign-ups, that happen after a user only views an ad…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-25.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-10-25.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-25">2026-10-25</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Sunday</li>
+<li><span class="meta-k">Reading time</span>6 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-25.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X made the Phoenix ranker separately learn from late conversions, such as purchases and sign-ups, that happen after a user only views an ad without clicking.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-ad-conversions-that-happen-late-without-a-click-became-training-targets--x"><span class="num">1</span>Ad conversions that happen late without a click became training targets — X</a></li><li><a href="#what-to-check-next">What to check next</a></li><li><a href="#sources-checked">Sources checked</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-ad-conversions-that-happen-late-without-a-click-became-training-targets--x"><span class="num">1</span>Ad conversions that happen late without a click became training targets — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/6258a1549ef808be88fba83d3b2d58364b587ee0" target="_blank" rel="noopener">xai-org/x-algorithm@6258a15</a> — xAI public repository, commit of 2026-10-24 03:22 UTC, code. In these notes&#39; numbering, this is Gen4+49. Gen4+N is the number these notes assign, in order, to X commits after the Gen4 release (2026-08-13). The sync time of the cron mirror (a file that syncs and publishes production feature-switch defaults daily) is 2026-10-23T16:00:34Z. 56 files changed, and 41 of them are Phoenix training code (phoenix/xrex).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Ad conversions (actions the advertiser wants, such as purchases, adding to cart, and sign-ups) sometimes occur days after the ad was viewed; such late-arriving labels are called delayed feedback, and samples whose conversion has not yet arrived at training time are wrongly learned as negatives. Since the 2026-09-18 commit (Gen4+24), samples for X&#39;s Phoenix ranker (a Transformer that puts the user history and candidates into one sequence and predicts action probabilities) have been split into three sources: fresh stream, early relabel, and late window. The ranker also has twin heads (delayed-conversion-only prediction heads paired with the existing conversion heads) that train only on the late window. However, until now the twin heads covered only delayed conversions after a click on the ad, and this commit trains six view-through delayed conversions, which are attributed to merely viewing the ad without a click, in the same way.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Six view-through delayed conversions are trained with late-window twin heads</span></p></div>
+<ul>
+<li><p>A separate late-window twin head list was added alongside the click-based list, and it holds six view-through delayed conversions <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6258a1549ef808be88fba83d3b2d58364b587ee0/phoenix/xrex/data/recsys/ads_late_window.py" target="_blank" rel="noopener"><code>ads_late_window.py:18-25</code></a></p>
+<ul>
+<li>The list is named <code>ADS_LATE_WINDOW_VT_TWIN_HEAD_INDICES</code>.</li>
+<li>The six are the view-through delayed conversions for attributed key view, attributed view, purchase, add to cart, checkout start, and sign-up (for example, <code>ADS_PURCHASE_CONVERSION_VIEW_THROUGH_DELAYED</code>).</li>
+<li>These actions first appeared in the proto in the 2026-10-13 commit (Gen4+40) (18 entries, numbers 234-251), and this is the first time they are used in training.</li>
+</ul>
+</li>
+<li><p>The new twin heads train only on candidates that are late-window samples, have no click, and whose same conversion was not already observed in the early window <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6258a1549ef808be88fba83d3b2d58364b587ee0/phoenix/xrex/data/recsys/ads_head_masking.py" target="_blank" rel="noopener"><code>ads_head_masking.py:73-89</code></a></p>
+<ul>
+<li>One condition is reversed compared with the click-based twin: the click twin requires <code>click</code>, and the new twin requires <code>~click</code>.</li>
+<li>Only candidates with the bit that keeps web conversion training (<code>keep_web</code>) turned on are used.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">| (twins &amp; late &amp; click &amp; no_early_counterpart &amp; kept)
+| (vt_twins &amp; late &amp; keep_web &amp; ~click &amp; no_early_counterpart)
+</code></pre></figure>
+</li>
+<li><p>Each twin points to its paired fresh-stream head, and if that pair already fired in the early window, it is not trained again in the late window <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6258a1549ef808be88fba83d3b2d58364b587ee0/phoenix/xrex/data/recsys/ads_late_window.py" target="_blank" rel="noopener"><code>ads_late_window.py:27-44</code></a></p>
+<ul>
+<li>For example, the pair of <code>ADS_PURCHASE_CONVERSION_VIEW_THROUGH_DELAYED</code> is <code>ADS_PURCHASE_CONVERSION_VIEW_THROUGH</code>.</li>
+<li>We infer this is a mechanism to avoid counting the same conversion as positive twice <span class="badge est">inferred</span>. The basis is that the variable name of the pair mapping is suppressor.</li>
+</ul>
+</li>
+<li><p>This path runs only when the ads head masking option in the training config is turned on, and the option is off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6258a1549ef808be88fba83d3b2d58364b587ee0/phoenix/xrex/data/recsys/ads_head_masking.py" target="_blank" rel="noopener"><code>ads_head_masking.py:41-53</code></a></p>
+<ul>
+<li>The option is <code>ads_head_masking: bool</code>, and the default False is the value confirmed at Gen4+24.</li>
+<li>The new six were also registered in the pixel-fire mapping and the training metric group, and a metric slice <code>late_split_non_clicked_no_early</code> was added.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The credibility threshold in account enforcement rules is a mock value for public release</span></p></div>
+<ul>
+<li>In the account and post enforcement rules, the threshold for &quot;skip high-credibility accounts&quot; changed from 50.0 to 12.34, and a comment saying it is not a production value was added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6258a1549ef808be88fba83d3b2d58364b587ee0/abuse-enforcement-service/service-lib/rules/enforcement_user.yaml" target="_blank" rel="noopener"><code>enforcement_user.yaml:32-36</code></a><ul>
+<li>abuse-enforcement-service (AES) is a service that receives violation scores assigned by the scorer and carries out actions such as account suspension.</li>
+<li>The rule id is <code>pagerank_skipped</code>, and the same value was also changed in <code>safety_checks.rs</code> and <code>enforcement_post.yaml</code>.</li>
+<li>The follower-count thresholds (12.34, 12345.67) already had the same comment.</li>
+</ul>
+</li>
+<li>The line at the top of the post rule file, &quot;mirrored from the GrowthBook dynamic config, last sync 2026-08-25&quot;, was deleted <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/6258a1549ef808be88fba83d3b2d58364b587ee0" target="_blank" rel="noopener">same commit diff</a><ul>
+<li>There is no longer a basis for reading this file as a copy of the production config <span class="badge est">inferred</span>. The basis is that deleting the mirror notice and adding the mock-value comment are in the same commit.</li>
+</ul>
+</li>
+<li>The reply spam head names in tests were also changed to generic names <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/6258a1549ef808be88fba83d3b2d58364b587ee0" target="_blank" rel="noopener">same commit diff</a><ul>
+<li><code>GrokDistilledReplyAuthor</code> and <code>reply_bot_v1_2</code> became <code>ReplyHead</code> and <code>reply_model_v1</code>.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;# Prod uses a different credibility score threshold; this is a mock value to reduce gaming.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/6258a1549ef808be88fba83d3b2d58364b587ee0/abuse-enforcement-service/service-lib/rules/enforcement_user.yaml" target="_blank" rel="noopener">enforcement_user.yaml</a>, 2026-10-24</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The funnel trace that records where ads dropped out of the pipeline became on by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6258a1549ef808be88fba83d3b2d58364b587ee0/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:867-872</code></a>.<ul>
+<li>The switch <code>EnableAdsFunnelTrace</code> was introduced as off by default in the 2026-10-23 commit (Gen4+48). It only writes logs, so feed results do not change.</li>
+</ul>
+</li>
+<li>A per-pod salt can now be put into the account bucket calculation of the AES staged rollout <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/6258a1549ef808be88fba83d3b2d58364b587ee0/abuse-enforcement-service/service-lib/src/action_control/levels.rs" target="_blank" rel="noopener"><code>action_control/levels.rs</code></a>.<ul>
+<li>The environment variable is <code>ACTION_CONTROL_ROLLOUT_SALT</code>, and when it is empty the buckets are the same as before.</li>
+</ul>
+</li>
+<li>Phoenix training gained an FP8 matrix-multiply module (<code>models/fp8.py</code>), a custom backward for candidate slot extraction, and an option to share nDCG sorts (<code>metrics_ndcg_shared_sorts</code>, default False) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/6258a1549ef808be88fba83d3b2d58364b587ee0" target="_blank" rel="noopener">same commit diff</a>.<ul>
+<li>Together with the FA4 attention kernel (ranker_fa4) change, these appear to be changes for training speed and memory <span class="badge est">inferred</span>. No code changes the loss or label definitions.</li>
+</ul>
+</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> In the introduction of the conversion actions section under <code>## Ads</code>, we added a sentence that six view-through delayed conversions are trained with late-window twin heads, together with the reference commit. We added item 12 to <code>## How to read the source — caveat list</code>, stating that the AES rule thresholds are mock values. We moved the reference commit in <code>## Summary</code> and <code>## Sources</code> to 6258a15 and added one row to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Delayed-conversion training for ads has widened from the click path to the path with only an impression <span class="badge ok">verified</span> (code). However, the masking option is off by default and we could not find in this diff any public config that turns it on, so we cannot say, even at the <span class="badge est">inferred</span> grade, whether the production ads ranker already uses these heads. The AES change is xAI itself stating that enforcement thresholds in the public repository must not be quoted as production values.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Check whether any public training config has a preset with <code>ads_head_masking=True</code> — it is the basis for judging whether the view-through twin heads are used in the actual training path.</li>
+<li>The Netflix TechBlog post of 2026-10-23, &quot;Beyond API Compatibility&quot;, is an infrastructure post about a tool for measuring the impact scope of library changes, so we did not fold it into the canon — it is unrelated to recommendation.</li>
+</ul></div>
+<h2 id="sources-checked">Sources checked</h2>
+<ul>
+<li>X: One new item came in from the commit list, 6258a15 dated 2026-10-24.</li>
+<li>Meta: The latest post on engineering.fb.com is dated 2026-10-19 and was already checked. There are no new posts on ai.meta.com/blog. We did not check transparency.meta.com.</li>
+<li>Netflix: One infrastructure post dated 2026-10-23 newly arrived in the RSS. We did not check research.netflix.com/publications.</li>
+<li>arXiv cs.IR: 30 items parsed; the latest submission is 2026-10-22, the same batch as yesterday. 0 passed.</li>
+<li>WebSearch cross-check: Only reports about user algorithm adjustment features on Threads and Instagram appeared, and there was no new announcement.</li>
+</ul>
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-24.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-24</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-25.html" data-title="일일 리포트 2026-10-25"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
