@@ -46,7 +46,7 @@
 <h1 id="멀티태스크-랭킹--참여-확률-여러-개를-하나의-점수로">멀티태스크 랭킹 — 참여 확률 여러 개를 하나의 점수로</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-10-22">2026-10-22</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-28">2026-10-28</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">22</span></summary><ol><li><a href="#왜-이-구조인가">왜 이 구조인가</a></li><li><a href="#케이스-meta--결합-형태가-지면마다-다르다">케이스: Meta</a><ol><li><a href="#읽는-법">읽는 법</a></li><li><a href="#x와-정반대인-부분--음수를-곱하는가">X와 정반대인 부분</a></li><li><a href="#가중치를-어디서-가져오는가--회사-간-진짜-분기점">가중치를 어디서 가져오는가</a></li><li><a href="#헤드-수-1922-vs-10--비교하면-안-되는-두-숫자">헤드 수 19~22 vs ~10</a></li></ol></li><li><a href="#케이스-x--설계-결정-6가지">케이스: X</a><ol><li><a href="#1-가중치는-코드에-없다">1. 가중치는 코드에 없다</a></li><li><a href="#2-음수-헤드를-곱셈에-넣는가-넣지-않는가">2. 음수 헤드를 곱셈에 넣는가 넣지 않는가</a></li><li><a href="#3-헤드-목록은-세대마다-다르고-레포-안에서도-여러-벌이-함께-존재한다">3. 헤드 목록은 세대마다 다르고, 레포 안에서도 여러 벌이 함께 존재한다</a></li><li><a href="#4-가중치-주입-경로가-요청-단위일-수-있다">4. 가중치 주입 경로가 요청 단위일 수 있다</a></li><li><a href="#5-부적격-헤드는-0이-아니라-bias로-대체된다">5. 부적격 헤드는 0이 아니라 bias로 대체된다</a></li><li><a href="#6-가중합-이후에도-점수가-계속-바뀐다">6. 가중합 이후에도 점수가 계속 바뀐다</a></li></ol></li><li><a href="#케이스-netflix--헤드가중치-프레임-자체를-벗어난다">케이스: Netflix</a></li><li><a href="#이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#출처">출처</a><ol><li><a href="#공개-소스코드">공개 소스코드</a></li><li><a href="#meta-엔지니어링-블로그-결합-수식의-1차-출처">Meta 엔지니어링 블로그 (결합 수식의 1차 출처)</a></li><li><a href="#meta-논문">Meta 논문</a></li><li><a href="#meta-transparency-center-규제-대응-1차-문서">Meta Transparency Center (규제 대응 1차 문서)</a></li><li><a href="#netflix">Netflix</a></li></ol></li></ol></details></nav>
 <div class="prose">
@@ -511,7 +511,11 @@ else combinedScoreSum + Epsilon
 <h2 id="누가-이걸-쓰는가">누가 이걸 쓰는가</h2>
 <p>X, Facebook, Instagram은 이 구조를 쓴다 <span class="badge ok">확인</span>. Threads는 헤드 10종을 공개했지만 결합 방식과 가중치 정보는 없고, Netflix는 가중합 대신 보상 함수와 밴딧을 쓴다 <span class="badge ok">확인</span>.</p>
 <ul>
-<li><strong>X</strong>: 2023·2025·2026 세 세대 모두 이 구조를 쓴다. 헤드 수는 세대와 파일에 따라 다르다(3세대 19~22, 4세대 README 24, <a href="#3-%ED%97%A4%EB%93%9C-%EB%AA%A9%EB%A1%9D%EC%9D%80-%EC%84%B8%EB%8C%80%EB%A7%88%EB%8B%A4-%EB%8B%A4%EB%A5%B4%EA%B3%A0-%EB%A0%88%ED%8F%AC-%EC%95%88%EC%97%90%EC%84%9C%EB%8F%84-%EC%97%AC%EB%9F%AC-%EB%B2%8C%EC%9D%B4-%ED%95%A8%EA%BB%98-%EC%A1%B4%EC%9E%AC%ED%95%9C%EB%8B%A4">설계 결정 3</a>). 가중치는 FeatureSwitch와 query feature로 주입한다 <span class="badge ok">확인</span> — <a href="x.html">x.md</a>.</li>
+<li><strong>X</strong>: 2023·2025·2026 세 세대 모두 이 구조를 쓴다. 헤드 수는 세대와 파일에 따라 다르다(3세대 19~22, 4세대 README 24, <a href="#3-%ED%97%A4%EB%93%9C-%EB%AA%A9%EB%A1%9D%EC%9D%80-%EC%84%B8%EB%8C%80%EB%A7%88%EB%8B%A4-%EB%8B%A4%EB%A5%B4%EA%B3%A0-%EB%A0%88%ED%8F%AC-%EC%95%88%EC%97%90%EC%84%9C%EB%8F%84-%EC%97%AC%EB%9F%AC-%EB%B2%8C%EC%9D%B4-%ED%95%A8%EA%BB%98-%EC%A1%B4%EC%9E%AC%ED%95%9C%EB%8B%A4">설계 결정 3</a>). 가중치는 FeatureSwitch와 query feature로 주입한다 <span class="badge ok">확인</span> — <a href="x.html">x.md</a>.<ul>
+<li>2026-10-27 커밋(4세대+50)부터 VMRanker는 가중합 전에 확률에서 뷰어 습관의 기준선을 덜어 내는 보정을 기본 off로 갖는다 <span class="badge ok">확인</span> — <a href="x.html#phoenix-2026-%ED%98%84%ED%96%89--4%EC%84%B8%EB%8C%80-%EA%B3%B5%EA%B0%9C-%EB%B0%98%EC%98%81">x.md 랭킹 절</a>.</li>
+<li>Instagram Feed가 원래 항을 남기고 증분 항을 따로 더하는 것과 달리, X는 원래 확률과 보정 확률을 한 비율로 섞어 원래 항 자리에 넣는다 <span class="badge ok">확인</span> — <a href="daily-2026-10-28.html">daily 2026-10-28</a>.</li>
+</ul>
+</li>
 <li><strong>Facebook</strong>: <code>Vijt = Σ wijtk·Yijtk</code>라는 덧셈형을 쓴다. pass 1은 포인트와이즈 멀티태스크 신경망이고, 가중치는 설문 correlation으로 정한다. Feed 카드에 헤드 10종이 있고, 본문에만 있는 부정 예측이 더 있다 <span class="badge ok">확인</span> — <a href="facebook.html">facebook.md</a>.</li>
 <li><strong>Instagram</strong>: 결합 형태가 3종이다(2020 곱셈, 2023 음수항이 있는 덧셈, 2025 곱셈 페널티). 가중치는 offline replay/offline tuning과 Bayesian optimization으로 정한다. <strong>지면×컴포넌트마다 별도 MTML 모델</strong>을 둔다(<code>ig_stories_tray_mtml</code>, 프로덕션 1,000개 이상) <span class="badge ok">확인</span> — <a href="instagram.html">instagram.md</a>.<ul>
 <li>2026-10-20 논문 기준으로 Feed late-stage는 원래 예측 항과 기준선을 넘는 증분 항을 따로 가중하고, 같은 연산자를 Reels는 두 랭킹 단계에, Threads는 late-stage에 출시했으며 Facebook은 실험 중이다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/abs/2610.27423" target="_blank" rel="noopener">arXiv 2610.27423</a>.</li>
@@ -525,7 +529,7 @@ else combinedScoreSum + Epsilon
 <h2 id="출처">출처</h2>
 <h3 id="공개-소스코드">공개 소스코드</h3>
 <ul>
-<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). <code>home-mixer/scorers/</code>, <code>phoenix/</code>. 본문 2026 Rust 줄 번호 인용의 기준 커밋은 <code>0bfc279</code>(3세대)이고, 4세대 값은 <code>47c1bcd</code>에서 읽었다.</li>
+<li><a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener">xai-org/x-algorithm</a> — 2026, 공개 소스코드 (Apache 2.0). <code>home-mixer/scorers/</code>, <code>phoenix/</code>. 본문 2026 Rust 줄 번호 인용의 기준 커밋은 <code>0bfc279</code>(3세대)이고, 4세대 값은 <code>47c1bcd</code>에서 읽었다. VMRanker 유저별 편향 보정은 <code>2f25214</code>(2026-10-27)에서 읽었다.</li>
 <li><a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener">twitter/the-algorithm</a> — 2025-09-03 커밋 <code>c54bec0</code>, 공개 소스코드. <code>home-mixer/</code>.</li>
 <li><a href="https://github.com/twitter/the-algorithm-ml" target="_blank" rel="noopener">twitter/the-algorithm-ml</a> — 2023-04-05 <code>projects/home/recap/README.md</code>. fav 0.5/retweet 1.0/reply 13.5/report −369 표의 1차 출처다.</li>
 </ul>

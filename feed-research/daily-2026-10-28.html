@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-10-28 — feed-research</title>
+<meta name="description" content="한 줄: X가 VMRanker에 뷰어마다 다른 참여 성향을 덜어 내고 점수를 매기는 유저별 편향 보정을 넣었다. 보정은 기본 off이고 입력 전송만 켜졌다.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-10-28.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="일일 리포트 2026-10-28 — feed-research">
+<meta property="og:description" content="한 줄: X가 VMRanker에 뷰어마다 다른 참여 성향을 덜어 내고 점수를 매기는 유저별 편향 보정을 넣었다. 보정은 기본 off이고 입력 전송만 켜졌다.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-10-28.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/en/" hreflang="en" lang="en" aria-label="English (EN)"><span aria-hidden="true" lang="ko">한</span><span>EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-28">2026-10-28</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>수요일</li>
+<li><span class="meta-k">읽는 시간</span>12분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>2</b>개 파일</li><li class="chip">레이더 <b>0</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>X가 VMRanker에 뷰어마다 다른 참여 성향을 덜어 내고 점수를 매기는 유저별 편향 보정을 넣었다. 보정은 기본 off이고 입력 전송만 켜졌다.</div>
+</div>
+<div class="prose">
+<h2 id="1-랭킹-점수에서-뷰어별-참여-성향을-덜어-내는-보정이-생겼다--x"><span class="num">1</span>랭킹 점수에서 뷰어별 참여 성향을 덜어 내는 보정이 생겼다 — X</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://github.com/xai-org/x-algorithm/commit/2f252142b9284e692ac72851768c8072d045f0d5" target="_blank" rel="noopener">xai-org/x-algorithm@2f25214</a> — xAI, 2026-10-27, 코드. 이 노트들이 붙인 번호로는 4세대+50이다(4세대+N은 2026-08-13 4세대 공개 뒤의 커밋에 이 노트들이 차례로 붙인 번호다).</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> X For You의 랭킹 모델 Phoenix(Grok-1을 포팅한 트랜스포머)는 후보마다 좋아요, 답글 같은 행동 확률을 예측하고, VMRanker(가중합과 DPP 슬레이트 재정렬을 맡는 서비스)가 그 확률에 가중치를 곱해 더한다. 그런데 좋아요를 자주 누르는 뷰어는 어떤 포스트를 보든 좋아요 확률이 높게 나온다. 이 뷰어 습관이 섞인 확률을 그대로 더하면, 그 뷰어가 유독 자주 하는 행동의 가중치가 사실상 커진다. 이번 커밋은 뷰어의 기본 성향을 따로 예측해 확률에서 덜어 내는 경로를 VMRanker에 기본 off로 추가하고, 그 경로가 쓸 입력을 보내는 스위치를 켰다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. VMRanker는 이제 뷰어의 기본 성향을 예측하는 별도 모델로 Phoenix 확률을 다시 맞출 수 있다</span></p></div>
+<ul>
+<li><p>보정은 가중합 직전에 Phoenix 확률을 고쳐 쓰고, 고친 확률로 가중합을 다시 계산한다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/value_model.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/value_model.rs</code></a>.</p>
+<ul>
+<li><code>compute_or_fallback</code>이 원래 확률로 <code>compute_value_scores</code>를 한 번 부른 뒤, <code>debias::recenter</code>가 값을 돌려주면 그 입력으로 다시 부른다.</li>
+<li>캐시에 저장된 가중합 점수를 재사용하는 요청에는 보정을 적용하지 않는다(<code>cached_weighted</code>면 바로 반환한다).</li>
+</ul>
+</li>
+<li><p>보정 모델은 뷰어의 최근 노출 시퀀스와 요청 맥락으로 뷰어별 logit과 지면별 전체 logit을 헤드마다 내놓는다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/debias.rs</code></a>.</p>
+<ul>
+<li>시퀀스는 home-mixer가 VMRanker 요청의 실험 페이로드에 Arrow IPC로 실어 보내는 <code>user_sequence_arrow_ipc</code>다.</li>
+<li>테스트의 시퀀스 컬럼은 노출 시각, 체류 시간, 첫 영상 길이, 시간대, 지면, 미디어 유무, 팔로우 여부, 피드 내 위치, 미디어 종류, 행동 64종 multi-hot이다.</li>
+<li>요청 맥락은 시각, 시간대, 앱 ID, 지면이고, 지면 값이 비어 있으면 홈(1)으로 본다.</li>
+<li>모델 파일은 <code>UDB1</code> 헤더의 바이너리이고, 5분마다 다시 읽어 바뀌었으면 교체한다(<code>--user_debias_reload_secs</code> 기본 300).</li>
+</ul>
+</li>
+<li><p>보정된 확률은 원래 확률과 보정 확률을 혼합 비율 α로 섞은 값이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>debias.rs:221-235</code></a>.</p>
+<ul>
+<li>확률이 1e-7보다 작거나 1−1e-7보다 크면 건드리지 않는다.</li>
+<li>보정 함수 <code>debiased_probability</code>는 레포에 없는 crate <code>xai_user_debias</code>에 있어, 정확한 식은 공개되지 않았다.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let debiased = debiased_probability(p, user_logits[head_idx], global_logits[head_idx], strength.clip);
+((1.0 - strength.alpha) * p + strength.alpha * debiased).clamp(PROB_FLOOR, 1.0 - PROB_FLOOR)
+</code></pre></figure>
+</li>
+<li><p>보정 방향은 뷰어 성향이 지면 평균보다 높은 행동의 확률을 낮추는 쪽이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/mod.rs</code></a> 테스트.</p>
+<ul>
+<li>테스트 <code>user_debias_recenters_fav_probability_before_fusion</code>은 fav 확률 0.3, 뷰어 logit 1.5, 홈 전체 logit 0.5, clip 2.0을 넣고, 보정 점수가 원래 점수보다 낮다고 단언한다.</li>
+<li>이름의 clip은 뷰어와 전체 logit 차이의 상한일 가능성이 높다 <span class="badge est">추정</span>. 근거는 파라미터 이름이 <code>UserDebiasClipLogit</code>이고 음수를 허용하지 않는다는 점뿐이다.</li>
+</ul>
+</li>
+<li><p>기본으로 보정하는 헤드는 14개이고, 신고·차단·뮤트 같은 부정 헤드는 기본 목록에 없다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>debias.rs:17-32</code></a>.</p>
+<ul>
+<li>기본 목록은 fav, reply, quote, retweet, dwelled, not_dwelled, vqv(영상을 일정 시간 이상 실제로 본 시청), photo_expand, click, profile_click, bookmark, share, open_link, video_open이다.</li>
+<li>bookmark는 기본 목록에 있지만 점수 필드 매핑에 없어서 실제로는 보정되지 않는다.</li>
+<li>부정 헤드는 파라미터 <code>UserDebiasHeads</code>로 목록을 바꾸면 보정할 수 있다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">B. 보정 자체는 꺼져 있고, 켜진 것은 입력 전송뿐이다</span></p></div>
+<ul>
+<li><p>home-mixer 크론 미러(프로덕션 기본값을 매일 레포로 옮기는 파라미터 파일)에서 VMRanker에 보정 입력을 보내는 스위치가 켜졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+<ul>
+<li><code>VMRankerSendDebiasInputs</code>가 false에서 true가 됐다. 미러 sync 시각은 2026-10-26T16:00:39Z다.</li>
+<li>이 스위치와 페이로드 파일은 2026-09-23 커밋(4세대+27)에서 생겼고, 그때부터 기본 false였다.</li>
+</ul>
+</li>
+<li><p>vm-ranker 쪽 보정 파라미터는 전부 꺼진 기본값으로 새로 생겼다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs</code></a>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">UserDebiasEnabled = false
+UserDebiasAlpha = 0.0
+UserDebiasClipLogit = 2.0
+UserDebiasHeads = &quot;&quot;            // 비면 기본 14개 헤드
+UserDebiasHeadAlpha = &quot;&quot;        // &quot;head:값&quot; 목록으로 헤드별 α
+UserDebiasHeadClipLogit = &quot;&quot;
+UserDebiasMaxArtifactAgeSecs = 3600.0
+</code></pre></figure>
+</li>
+<li><p>학습된 지 1시간이 넘은 모델 파일은 쓰지 않는다 <span class="badge ok">확인</span> — 같은 파일과 <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>debias.rs:162-167</code></a>.</p>
+<ul>
+<li>이 기한은 보정 모델이 적어도 시간 단위로 다시 학습된다는 전제를 둔다 <span class="badge est">추정</span>. 기한 기본값이 3600초이고 리로드 주기가 5분이라는 점이 근거다.</li>
+</ul>
+</li>
+<li><p>테스트 설정은 독일(DE) 뷰어에게만 α=1.0으로 켜는 규칙을 예로 든다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>scoring/mod.rs</code></a> 테스트 YAML. 실제 실험 대상이 독일이라는 뜻은 아니다.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">C. gen-recs와 SID retrieval의 Python 학습·추론 코드가 공개본에서 빠졌다</span></p></div>
+<ul>
+<li>Phoenix 공개본에서 gen-recs(생성형 추천 모델)와 SID retrieval(포스트를 계층 codeword 시퀀스인 semantic ID로 나타내고 그 ID를 생성해 후보를 찾는 방식)의 Python 파일 14개가 삭제됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/commit/2f252142b9284e692ac72851768c8072d045f0d5" target="_blank" rel="noopener">커밋 diff</a>.<ul>
+<li>삭제된 파일은 <code>xrecsys_gen_recs.py</code>, <code>xrecsys_sid_retrieval.py</code>, <code>xrecsys_sid_variants.py</code>, <code>recsys_gen_recs_model.py</code>, <code>recsys_sid_retrieval_model.py</code>, <code>trainer_gen_recs.py</code>, <code>trainer_sid_retrieval.py</code>, <code>gen_recs_runner.py</code>, <code>sid_retrieval_runner.py</code> 등이다.</li>
+<li>Kafka 토픽 설정(<code>SID_TOPIC</code>, <code>GEN_RECS_TOPIC</code>)과 데이터셋 팩토리도 함께 빠졌고, TRAINING.md의 AdamW 사용 목록에서 gen-recs가 지워졌다.</li>
+</ul>
+</li>
+<li>SID retrieval의 Rust 서빙 crate와 home-mixer 클라이언트는 남아 있다 <span class="badge ok">확인</span> — 2f25214 트리 검색.<ul>
+<li><code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code>과 <code>home-mixer/clients/sid_retrieval_client.rs</code>가 그대로 있다.</li>
+<li>공개 범위를 줄인 것인지, 내부에서 이 학습 경로를 접은 것인지는 커밋만으로 가릴 수 없다 <span class="badge est">추정</span>. 커밋 메시지가 매번 같은 문구라 의도를 적지 않는다.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
+<ul>
+<li>combined two-tower retrieval 학습 config 기본값에 MoL(mixture-of-logits, 유저 쪽 query head 여러 개의 점수를 섞는 방식) 설정이 들어갔다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py</code></a>.<ul>
+<li><code>user_query_heads=4</code>, <code>mol_item_components=1</code>, <code>fixed_temperature=0.006</code>, <code>cold_start_max_age_seconds=7200</code>, <code>dense_params_ema_decay=0.99</code>이고, 임베딩 학습률은 0.1에서 0.2가 됐다.</li>
+<li>홈 데이터만 쓰는 <code>xrecsys_two_tower_home_only</code> config가 새로 생겼다.</li>
+</ul>
+</li>
+<li>섀도 트래픽(실험용 Phoenix 클러스터에 채점을 함께 보내고 로그로만 남기는 경로) 클러스터 목록에 <code>Experiment19Fou:0.3</code>이 더해졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>param.rs</code></a>.</li>
+<li>뷰어의 최근 검색어 조회가 파라미터와 상관없이 섀도 트래픽에서는 돈다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/home-mixer/query_hydrators/recent_search_queries_query_hydrator.rs" target="_blank" rel="noopener"><code>recent_search_queries_query_hydrator.rs</code></a>.</li>
+<li>Phoenix proto의 <code>TweetInfo</code>에 검색 작성자 일치(핸들 정확 일치, 이름 겹침)와 영상·이미지 유무 필드가 생기고, 안전 비트에 tweet NSFW high recall과 soft NSFW가 추가됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+<li>immersive page RL config에 FP8 GEMM과 후보 전용 레이어 2개가 켜지고, H100 override가 배치 512에서 1024, ep 128에서 64로 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>xrecsys.py</code></a>.</li>
+<li>광고 value 헤드에 광고 집행 단위(line item) 안에서의 상관·R² 메트릭이 추가됐고, 광고 인덱스 호출 timeout이 1200ms에서 1300ms가 됐다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/phoenix/xrex/models/value_heads.py" target="_blank" rel="noopener"><code>value_heads.py</code></a>.</li>
+<li>abuse-enforcement(계정·포스트에 정지나 스팸 라벨 같은 조치를 내리는 서비스)에서 정밀도 근거가 약한 모델 판정을 기록만 하던 하한이 없어졌다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/abuse-enforcement-service/service-lib/src/action_control/levels.rs" target="_blank" rel="noopener"><code>action_control/levels.rs</code></a>.<ul>
+<li>이제 근거가 없거나 오래된 행도 조치를 실행하고, 근거 수준은 로그로만 남긴다. 근거 예외 설정(evidence override)은 요청에서 거부된다.</li>
+<li>같은 커밋에서 운영자가 모델 헤드마다 고팔로워·고신뢰 계정 면제를 낮추거나 끌 수 있게 됐고(기본값은 그대로), 최상위 팔로워 상한은 YAML 규칙에서 코드로 옮겨 모든 판정 경로에 적용된다. 상한 값 12345.67은 모의값이다.</li>
+</ul>
+</li>
+<li>VF(포스트마다 이 뷰어에게 보여도 되는지 판정하는 visibility-filtering)는 지역 목록 AFR에 코트디부아르(CI)를 추가했고, 나머지는 리팩터와 메트릭 이름 통일이다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/visibility-filtering/models/region.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/region.rs</code></a>.</li>
+<li>포스트 길이 계산 함수가 같은 결과를 내는 한 번 순회 구현으로 바뀌었다 <span class="badge ok">확인</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/home-mixer/models/content_features.rs" target="_blank" rel="noopener"><code>content_features.rs</code></a>. 옛 구현과 결과가 같다는 테스트가 붙었다.</li>
+</ul>
+<blockquote>
+<p>&quot;User-debias requests by outcome: applied with Phoenix scores from this request (fresh), from the post cache (cached) or without a scoring time (no_hint); skipped because of model_not_loaded, stale_artifact, no_sequence, invalid_params, sequence_error or feature_mismatch&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/metrics.rs" target="_blank" rel="noopener"><code>vm-ranker/metrics.rs</code></a>, 2026-10-27 (코드)</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="x.html">services/x.md</a> <code>## 랭킹</code>의 VMRanker 표에 <code>VMRankerSendDebiasInputs</code> 행(true, 4세대+50부터)을 추가했고, 표 아래에 유저별 편향 보정 경로와 기본 off 상태를 쓴 문단을 넣었다. 같은 파일 <code>## Phoenix 학습·인덱스</code>의 AdamW 목록에서 gen-recs를 지우고 삭제 사실을 하위 불릿으로 적었다. <code>## 열린 질문</code>의 MoL 질문 아래에 이번 config 값을 불릿으로 달고, 보정 함수 미공개를 새 질문으로 넣었다. 한 줄 요약과 <code>## 출처</code>의 기준 커밋을 2f25214로 올리고, 변경 이력 요약표에 한 행을 추가했다. <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a> <code>## 누가 이걸 쓰는가</code>의 X 항목에 이 보정과 Instagram Feed 증분 항의 차이를 두 줄로 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> X도 Instagram처럼 행동 확률에 섞인 뷰어 습관을 랭킹 점수에서 분리하려 한다. 다만 Instagram Feed는 원래 항을 남기고 증분 항을 따로 가중하는데(<a href="https://arxiv.org/abs/2610.27423" target="_blank" rel="noopener">arXiv 2610.27423</a>, 2026-10-20), X는 원래 확률을 보정 확률로 섞어 바꾼다. 입력 전송부터 켜고 보정을 꺼 둔 순서는 모델 지연과 입력 누락률을 먼저 재려는 단계로 보이므로 추정으로 둔다.</p></div>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
+<div class="next"><ul>
+<li>VMRanker 크론 미러에서 <code>UserDebiasEnabled</code>와 α가 켜지는 날 — 보정이 실제 순위에 들어가는 시점이다.</li>
+<li><code>xai_user_debias</code> crate 공개 여부 — 보정 식과 clip의 의미가 <span class="badge est">추정</span>으로 남아 있다.</li>
+<li>gen-recs·SID retrieval 학습 코드 삭제 뒤 SID retrieval 서빙 crate와 home-mixer SID 소스도 정리되는지 — 내부 경로 폐기인지 공개 범위 축소인지 가릴 단서다.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-10-25.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-10-25</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">댓글</h2>
+<button type="button" class="btn" id="load-comments">댓글 보기 (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-28.html" data-title="일일 리포트 2026-10-28"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
