@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-28 — feed-research</title>
+<meta name="description" content="In one line: X added a per-user debiasing correction to VMRanker that removes each viewer's own engagement tendency before scoring. The correction is off by…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-28.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-28.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-28.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-28.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-28 — feed-research">
+<meta property="og:description" content="In one line: X added a per-user debiasing correction to VMRanker that removes each viewer's own engagement tendency before scoring. The correction is off by…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-28.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-10-28.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-28">2026-10-28</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Wednesday</li>
+<li><span class="meta-k">Reading time</span>9 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-28.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added a per-user debiasing correction to VMRanker that removes each viewer&#39;s own engagement tendency before scoring. The correction is off by default, and only the input sending is on.</div>
+</div>
+<div class="prose">
+<h2 id="1-a-correction-for-per-viewer-engagement-tendency-was-added-to-ranking-scores--x"><span class="num">1</span>A correction for per-viewer engagement tendency was added to ranking scores — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/2f252142b9284e692ac72851768c8072d045f0d5" target="_blank" rel="noopener">xai-org/x-algorithm@2f25214</a> — xAI, 2026-10-27, code. In these notes&#39; numbering, this is Gen4+Gen50.4+N is the number these notes assigned, in order, to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You&#39;s ranking model Phoenix (a Transformer ported from Grok-1) predicts action probabilities such as like and reply for each candidate, and VMRanker (the service that handles the weighted sum and DPP slate re-ranking) multiplies those probabilities by weights and adds them. However, a viewer who likes often gets a high like probability on any post. If probabilities mixed with this viewer habit are summed as they are, the weight of the actions that viewer does unusually often effectively grows. This commit added a path to VMRanker, off by default, that predicts the viewer&#39;s baseline tendency separately and removes it from the probabilities, and it turned on the switch that sends the inputs this path uses.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. VMRanker can now re-fit Phoenix probabilities with a separate model that predicts the viewer&#39;s baseline tendency</span></p></div>
+<ul>
+<li><p>The correction rewrites the Phoenix probabilities just before the weighted sum and recomputes the weighted sum from the corrected probabilities <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/value_model.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/value_model.rs</code></a>.</p>
+<ul>
+<li><code>compute_or_fallback</code> first calls <code>compute_value_scores</code> with the original probabilities, and if <code>debias::recenter</code> returns values, it calls it again with those as input.</li>
+<li>The correction is not applied to requests that reuse a weighted-sum score stored in the cache (it returns immediately when <code>cached_weighted</code> is set).</li>
+</ul>
+</li>
+<li><p>The debiasing model produces a per-viewer logit and a per-surface global logit for each head, from the viewer&#39;s recent impression sequence and the request context <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/debias.rs</code></a>.</p>
+<ul>
+<li>The sequence is <code>user_sequence_arrow_ipc</code>, which home-mixer sends in the experiment payload of the VMRanker request as Arrow IPC.</li>
+<li>The sequence columns in the test are impression time, dwell time, first video length, time zone, surface, media presence, follow status, position in the feed, media type, and a 64-action multi-hot.</li>
+<li>The request context is time, time zone, app ID, and surface, and an empty surface value is treated as Home (1).</li>
+<li>The model file is a binary with a <code>UDB1</code> header, and it is reloaded every 5 minutes and replaced if it changed (<code>--user_debias_reload_secs</code>, default 300).</li>
+</ul>
+</li>
+<li><p>The debiased probability is a mix of the original probability and the corrected probability with a blend ratio α <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>debias.rs:221-235</code></a>.</p>
+<ul>
+<li>A probability below 1e-7 or above 1−1e-7 is left untouched.</li>
+<li>The correction function <code>debiased_probability</code> lives in the crate <code>xai_user_debias</code>, which is not in the repo, so the exact formula is not public.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">let debiased = debiased_probability(p, user_logits[head_idx], global_logits[head_idx], strength.clip);
+((1.0 - strength.alpha) * p + strength.alpha * debiased).clamp(PROB_FLOOR, 1.0 - PROB_FLOOR)
+</code></pre></figure>
+</li>
+<li><p>The correction direction lowers the probability of actions whose viewer tendency is higher than the surface average <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/mod.rs</code></a> test.</p>
+<ul>
+<li>The test <code>user_debias_recenters_fav_probability_before_fusion</code> feeds a fav probability of 0.3, a viewer logit of 1.5, a Home global logit of 0.5, and a clip of 2.0, and asserts that the corrected score is lower than the original score.</li>
+<li>The clip in the name is likely the cap on the difference between the viewer and global logits <span class="badge est">inferred</span>. The only evidence is that the parameter is named <code>UserDebiasClipLogit</code> and does not allow negative values.</li>
+</ul>
+</li>
+<li><p>By default 14 heads are corrected, and negative heads such as report, block, and mute are not in the default list <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>debias.rs:17-32</code></a>.</p>
+<ul>
+<li>The default list is fav, reply, quote, retweet, dwelled, not_dwelled, vqv (a view where the video was actually watched for at least a set time), photo_expand, click, profile_click, bookmark, share, open_link, and video_open.</li>
+<li>bookmark is in the default list but is not in the score field mapping, so it is not actually corrected.</li>
+<li>Negative heads can be corrected by changing the list with the parameter <code>UserDebiasHeads</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The correction itself is off, and only the input sending is on</span></p></div>
+<ul>
+<li><p>In the home-mixer cron mirror (the parameter file that copies production defaults into the repo every day), the switch that sends debiasing inputs to VMRanker was turned on <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a>.</p>
+<ul>
+<li><code>VMRankerSendDebiasInputs</code> went from false to true. The mirror sync time is 2026-10-26T16:00:39Z.</li>
+<li>This switch and the payload file were introduced in the 2026-09-23 commit (Gen4+27), and it had been false by default since then.</li>
+</ul>
+</li>
+<li><p>The debiasing parameters on the vm-ranker side were all introduced with off defaults <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs</code></a>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">UserDebiasEnabled = false
+UserDebiasAlpha = 0.0
+UserDebiasClipLogit = 2.0
+UserDebiasHeads = &quot;&quot;            // if empty, the default 14 heads
+UserDebiasHeadAlpha = &quot;&quot;        // per-head α as a &quot;head:value&quot; list
+UserDebiasHeadClipLogit = &quot;&quot;
+UserDebiasMaxArtifactAgeSecs = 3600.0
+</code></pre></figure>
+</li>
+<li><p>A model file trained more than 1 hour ago is not used <span class="badge ok">verified</span> — same file and <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>debias.rs:162-167</code></a>.</p>
+<ul>
+<li>This age limit presupposes that the debiasing model is retrained at least hourly <span class="badge est">inferred</span>. The evidence is that the default limit is 3600 seconds and the reload interval is 5 minutes.</li>
+</ul>
+</li>
+<li><p>The test config gives as an example a rule that turns it on with α=1.0 only for viewers in Germany (DE) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>scoring/mod.rs</code></a> test YAML. This does not mean the actual experiment targets Germany.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The Python training and inference code for gen-recs and SID retrieval was removed from the public release</span></p></div>
+<ul>
+<li>14 Python files for gen-recs (a generative recommendation model) and SID retrieval (an approach that represents a post as a semantic ID, a sequence of hierarchical codewords, and finds candidates by generating that ID) were deleted from the Phoenix release <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/2f252142b9284e692ac72851768c8072d045f0d5" target="_blank" rel="noopener">commit diff</a>.<ul>
+<li>The deleted files include <code>xrecsys_gen_recs.py</code>, <code>xrecsys_sid_retrieval.py</code>, <code>xrecsys_sid_variants.py</code>, <code>recsys_gen_recs_model.py</code>, <code>recsys_sid_retrieval_model.py</code>, <code>trainer_gen_recs.py</code>, <code>trainer_sid_retrieval.py</code>, <code>gen_recs_runner.py</code>, and <code>sid_retrieval_runner.py</code>.</li>
+<li>The Kafka topic settings (<code>SID_TOPIC</code>, <code>GEN_RECS_TOPIC</code>) and the dataset factory were also removed, and gen-recs was struck from the AdamW usage list in TRAINING.md.</li>
+</ul>
+</li>
+<li>The Rust serving crate for SID retrieval and the home-mixer client remain <span class="badge ok">verified</span> — tree search at 2f25214.<ul>
+<li><code>phoenix/crates/serving/xai-recsys-sid-retrieval/</code> and <code>home-mixer/clients/sid_retrieval_client.rs</code> are still there.</li>
+<li>The commit alone cannot tell whether the public scope was narrowed or this training path was shut down internally <span class="badge est">inferred</span>. The commit message is the same boilerplate every time, so it states no intent.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>MoL (mixture-of-logits, a method that mixes the scores of several user-side query heads) settings were added to the defaults of the combined two-tower retrieval training config <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/phoenix/xrex/configs/xrecsys_two_tower.py" target="_blank" rel="noopener"><code>xrecsys_two_tower.py</code></a>.<ul>
+<li>They are <code>user_query_heads=4</code>, <code>mol_item_components=1</code>, <code>fixed_temperature=0.006</code>, <code>cold_start_max_age_seconds=7200</code>, and <code>dense_params_ema_decay=0.99</code>, and the embedding learning rate went from 0.1 to 0.2.</li>
+<li>A new config <code>xrecsys_two_tower_home_only</code> that uses only Home data was introduced.</li>
+</ul>
+</li>
+<li><code>Experiment19Fou:0.3</code> was added to the shadow traffic cluster list (a path that also sends scoring to an experimental Phoenix cluster and only logs the result) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>param.rs</code></a>.</li>
+<li>The lookup of the viewer&#39;s recent search queries runs in shadow traffic regardless of the parameter <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/home-mixer/query_hydrators/recent_search_queries_query_hydrator.rs" target="_blank" rel="noopener"><code>recent_search_queries_query_hydrator.rs</code></a>.</li>
+<li>The Phoenix proto&#39;s <code>TweetInfo</code> gained search author match fields (exact handle match, name overlap) and video/image presence fields, and tweet NSFW high recall and soft NSFW were added to the safety bits <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+<li>The immersive page RL config turned on FP8 GEMM and 2 candidate-only layers, and the H100 override changed from batch 512 to 1024 and from ep 128 to 64 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>xrecsys.py</code></a>.</li>
+<li>The ads value head gained correlation and R² metrics within an ad line item, and the ads index call timeout went from 1200ms to 1300ms <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/phoenix/xrex/models/value_heads.py" target="_blank" rel="noopener"><code>value_heads.py</code></a>.</li>
+<li>In abuse-enforcement (the service that takes actions such as suspensions or spam labels on accounts and posts), the floor that only recorded model verdicts with weak precision evidence was removed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/abuse-enforcement-service/service-lib/src/action_control/levels.rs" target="_blank" rel="noopener"><code>action_control/levels.rs</code></a>.<ul>
+<li>Rows with no evidence or stale evidence now also execute the action, and the evidence level is only logged. An evidence override setting is rejected in requests.</li>
+<li>In the same commit, operators can lower or turn off the high-follower, high-trust account exemption per model head (defaults unchanged), and the top follower cap moved from the YAML rules into code and applies to every verdict path. The cap value 12345.67 is a mock value.</li>
+</ul>
+</li>
+<li>VF (visibility-filtering, which decides per post whether it may be shown to this viewer) added Côte d&#39;Ivoire (CI) to the AFR region list, and the rest is a refactor and unified metric names <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/visibility-filtering/models/region.rs" target="_blank" rel="noopener"><code>visibility-filtering/models/region.rs</code></a>.</li>
+<li>The post length calculation function was changed to a single-pass implementation that gives the same result <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/home-mixer/models/content_features.rs" target="_blank" rel="noopener"><code>content_features.rs</code></a>. A test showing the result matches the old implementation was added.</li>
+</ul>
+<blockquote>
+<p>&quot;User-debias requests by outcome: applied with Phoenix scores from this request (fresh), from the post cache (cached) or without a scoring time (no_hint); skipped because of model_not_loaded, stale_artifact, no_sequence, invalid_params, sequence_error or feature_mismatch&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/2f25214/vm-ranker/metrics.rs" target="_blank" rel="noopener"><code>vm-ranker/metrics.rs</code></a>, 2026-10-27 (code)</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> Added a <code>VMRankerSendDebiasInputs</code> row (true, since Gen4+50) to the VMRanker table in <code>## Ranking</code>, and put a paragraph under the table describing the per-user debiasing path and its off-by-default state. In the same file&#39;s <code>## Phoenix training · index</code>, removed gen-recs from the AdamW list and noted the deletion as a sub-bullet. Under the MoL question in <code>## Open questions</code>, attached this config&#39;s values as a bullet, and added the undisclosed correction function as a new question. Moved the one-line summary and the reference commit in <code>## Sources</code> to 2f25214, and added one row to the change log summary table. In <a href="multi-task-ranking.html">topics/multi-task-ranking.md</a>, added two lines to the X entry in <code>## Who uses this</code> on the difference between this correction and Instagram Feed&#39;s incremental term.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X, like Instagram, tries to separate viewer habits mixed into action probabilities from the ranking score. However, Instagram Feed keeps the original term and weights the incremental term separately (<a href="https://arxiv.org/abs/2610.27423" target="_blank" rel="noopener">arXiv 2610.27423</a>, 2026-10-20), whereas X replaces the original probability with a mix of it and the corrected probability. Turning on input sending first while leaving the correction off appears to be a step to measure model latency and input drop rate first, so we treat this as an inference.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>The day <code>UserDebiasEnabled</code> and α are turned on in the VMRanker cron mirror — that is when the correction enters the actual ranking.</li>
+<li>Whether the <code>xai_user_debias</code> crate is released — the correction formula and the meaning of clip remain <span class="badge est">inferred</span>.</li>
+<li>Whether, after the gen-recs and SID retrieval training code deletion, the SID retrieval serving crate and the home-mixer SID source are also cleaned up — a clue to whether this is an internal path being retired or the public scope being narrowed.</li>
+</ul></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-25.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-25</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-28.html" data-title="일일 리포트 2026-10-28"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
