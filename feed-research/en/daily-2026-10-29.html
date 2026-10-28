@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-29 — feed-research</title>
+<meta name="description" content="In one line: X added page-decoder re-ranking and exploration sampling that records probabilities at the end of For You ranking. Both are off by default, so…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-29.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-29.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-29.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-29.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-29 — feed-research">
+<meta property="og:description" content="In one line: X added page-decoder re-ranking and exploration sampling that records probabilities at the end of For You ranking. Both are off by default, so…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-29.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-10-29.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-29">2026-10-29</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>10 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-29.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added page-decoder re-ranking and exploration sampling that records probabilities at the end of For You ranking. Both are off by default, so the current order is unchanged.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-page-level-re-ranking-and-exploration-were-added-at-the-end-of-ranking--x"><span class="num">1</span>Page-level re-ranking and exploration were added at the end of ranking — X</a></li><li><a href="#2-andromeda-now-scores-all-eligible-ads-on-the-gpu--facebook"><span class="num">2</span>Andromeda now scores all eligible ads on the GPU — Facebook</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>After the Brazilian runoff ended, X deleted the Brazil election filter from For You.</li>
+<li>Meta released the 2026 version of Andromeda ads retrieval and reported a 2.4% increase in Facebook conversions.</li>
+</ul>
+<h2 id="1-page-level-re-ranking-and-exploration-were-added-at-the-end-of-ranking--x"><span class="num">1</span>Page-level re-ranking and exploration were added at the end of ranking — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/5ed7963" target="_blank" rel="noopener">xai-org/x-algorithm@5ed7963</a> — xAI, 2026-10-28, code. In these notes&#39; numbering, this is Gen4+Gen51.4+N is the number these notes assigned in sequence to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In X For You, Phoenix (a Grok-based ranking Transformer) outputs action probabilities for each candidate, and VMRanker (a service that re-selects the slate with DPP) sets the order. The 2026-10-14 commit released training code for the page decoder (an RL re-ranking model that picks, slot by slot, the posts for one page from a pool of top-scored candidates), but it did not show where home-mixer (the service that handles For You requests) uses the result. To train RL re-ranking offline, the log must also contain the probability with which the serving policy chose each order, that is, the propensity (the probability that the policy that wrote the log chose that action). This commit adds a scorer that consumes the decoder result, an exploration scorer that records the probabilities, and a serving log that stores those probabilities, all off by default.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Page decoder results take the top of the ranking in the stage after VMRanker</span></p></div>
+<ul>
+<li><p>Two scorers were added at the end of the scorer chain <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/candidate_pipeline/phoenix_candidate_pipeline.rs" target="_blank" rel="noopener"><code>phoenix_candidate_pipeline.rs:466-472</code></a>.</p>
+<ul>
+<li>The order is <code>PhoenixScorer</code>, <code>ImmersiveVideoScorer</code>, <code>vm_ranker</code>, <code>PageDecodeRerankScorer</code>, <code>PageRlExplorationScorer</code>.</li>
+</ul>
+</li>
+<li><p>When decoder re-ranking is on, home-mixer sends the decoding settings and the current ranking weights together in the Phoenix request <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/scorers/page_decode_rerank_scorer.rs" target="_blank" rel="noopener"><code>page_decode_rerank_scorer.rs:22-49</code></a>.</p>
+<ul>
+<li>The 13 weights, from favorite through <code>min_video_duration_ms</code>, use the cron mirror values as they are (a parameter file that copies production defaults every day). This answers the question the 2026-10-16 commit left open about &quot;the caller that fills <code>RankingScoreWeights</code>&quot;.</li>
+<li><code>diversity_weight</code> is sent as <code>None</code>.</li>
+</ul>
+</li>
+<li><p>The picks Phoenix returns are placed at the top in slot order, and the remaining candidates follow in their original score order <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/scorers/page_decode_rerank_scorer.rs" target="_blank" rel="noopener"><code>page_decode_rerank_scorer.rs:80-110</code></a>.</p>
+<ul>
+<li>No new score values are created. The existing set of scores is reallocated in descending order, giving higher scores in pick order.</li>
+<li>If there are no picks, the scores stay as they are and the <code>fail_open</code> metric is incremented.</li>
+<li>A test fixes that candidates 1, 3, and 5, assigned slots 2, 0, and 1, receive the top scores in the order 3, 5, 1.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">param!(EnablePageDecodeRerank, bool, &quot;rust_home_mixer_enable_page_decode_rerank&quot;, false);
+param!(PageDecodePoolN, u32, &quot;rust_home_mixer_page_decode_pool_n&quot;, 200);
+param!(PageDecodeSteps, u32, &quot;rust_home_mixer_page_decode_steps&quot;, 64);
+param!(PageDecodeTemperature, f64, &quot;rust_home_mixer_page_decode_temperature&quot;, 0.0);
+param!(EnablePageRlExploration, bool, &quot;rust_home_mixer_enable_page_rl_exploration&quot;, false);
+param!(PageRlExplorationTemperature, f64, &quot;rust_home_mixer_page_rl_exploration_temperature&quot;, 0.2);
+param!(PageRlExplorationTopK, usize, &quot;rust_home_mixer_page_rl_exploration_top_k&quot;, 64);
+</code></pre></figure>
+<ul>
+<li>The block above is an abridged copy of <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:313-365</code></a>, one line each. The serving slot count in the 2026-10-14 training code was 12, while the default number of steps here is 64.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The exploration scorer shuffles the order of the top 64 at random and records per-slot probabilities</span></p></div>
+<ul>
+<li>When exploration is on, the top 64 by score are re-ordered with Plackett-Luce sampling (picking one slot at a time without replacement using softmax probabilities, to set the order) over score/temperature <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/scorers/page_rl_exploration_scorer.rs" target="_blank" rel="noopener"><code>page_rl_exploration_scorer.rs:29-110</code></a>.<ul>
+<li>The default temperature is 0.2, floored at <code>1e-6</code>. A test checks that when the temperature is close to 0, the original score order comes out unchanged.</li>
+<li>Candidates outside the top 64 keep their scores and order.</li>
+<li>Each candidate gets <code>page_rl_exploration_prob</code>, the probability of being picked at that slot.</li>
+</ul>
+</li>
+<li>Exploration is not applied to requests where decoder re-ranking is on and a decoder pick exists <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/scorers/page_rl_exploration_scorer.rs" target="_blank" rel="noopener"><code>page_rl_exploration_scorer.rs:129-142</code></a>.</li>
+<li>The new serving log writes the scores and per-slot probabilities of the first 64 posts of the feed that was actually served, per request, to Redis in two data centers <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/side_effects/phoenix_request_cache_side_effect.rs" target="_blank" rel="noopener"><code>phoenix_request_cache_side_effect.rs:201-305</code></a>.<ul>
+<li>The switch <code>EnablePageLogging</code> of this side effect (a stage that only writes logs without changing the response) is false by default, and the default TTL is 3600 seconds.</li>
+<li>The exploration probability goes into the proto field <code>rewardRerankSlotProb</code>, the decoder sampling probability into <code>pageDecodeSlotProb</code>, and whether the decoder was applied into the new field <code>pageDecoded</code>.</li>
+<li>Both the For You and Ranked Following pipelines register this side effect.</li>
+</ul>
+</li>
+<li>We infer that this probability is the source of the <code>rl_rerank_prob</code> read by the 2026-10-14 training code <span class="badge est">inferred</span>. The evidence is that the training code reads the same <code>rewardRerankSlotProb</code> field as the logged probability.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The Brazil election filter was deleted and the target of the new-user NSFW filter was widened</span></p></div>
+<ul>
+<li>The Brazil election filter file and its pipeline registration were deleted <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/README.md#october-26th-2026" target="_blank" rel="noopener">README.md <code>#october-26th-2026</code></a>.<ul>
+<li>This filter removed posts from accounts reported to the Brazilian Electoral Court from For You unless the viewer followed the account. It was deleted after the October 25 runoff.</li>
+<li>The pre-scoring filters went from 22 to 21.</li>
+</ul>
+</li>
+<li>The target of the new-user soft NSFW (non-explicit sexual content) filter, which is off by default, was widened from accounts under 1 day old to accounts under 7 days old <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:863-879</code></a>.<ul>
+<li>The account age cap changed from 86400 seconds to 604800 seconds.</li>
+<li>Instead, users whose scoring sequence length is 100 or more are excluded. A cap of 0 turns this condition off.</li>
+</ul>
+</li>
+<li>Eight reported-heuristic label rules were deleted from VF (visibility-filtering, a service that decides per post whether it may be shown to this viewer) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>rules/tweet_rules.rs</code></a>.<ul>
+<li>The deleted rules are 6 <code>NSFW_REPORTED_HEURISTICS</code> rules (blur, age-verification tombstone, app-update tombstone, and others) and 2 <code>GORE_AND_VIOLENCE_REPORTED_HEURISTICS</code> rules.</li>
+<li>Posts that carry only these labels likely no longer get blur or warning-screen treatment in VF <span class="badge est">inferred</span>. The code does not show whether the labels themselves are no longer generated.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A switch that removes brand-safety HighRisk posts from video carousel candidates was introduced, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/filters/video_carousel_filter.rs" target="_blank" rel="noopener"><code>video_carousel_filter.rs:29-39</code></a>. When on, posts with no verdict are also removed.</li>
+<li>The README added announcements for the October 8 improvement to dwell time prediction and the October 13 change that made posts read to the end a retrieval training target <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/README.md#october-13th-2026" target="_blank" rel="noopener">README.md</a>.</li>
+<li>The cluster selection parameters of the Thunder candidate source were deleted <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/sources/thunder_source.rs" target="_blank" rel="noopener"><code>sources/thunder_source.rs</code></a>.</li>
+<li>A feature that lets multiple processes stop together at the end of offline data was added to the Phoenix trainer, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/phoenix/xrex/train/follow_data_end.py" target="_blank" rel="noopener"><code>train/follow_data_end.py</code></a>.</li>
+<li>The ads conversion action <code>ADS_LEADGEN_CONVERSION = 196</code> was added to the proto <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+<li>The motion-reveal video prompt wording and the author metadata field of grox (a Grok-based annotation pipeline), and the user type lookup of abuse-enforcement, changed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/5ed7963" target="_blank" rel="noopener">5ed7963</a>.</li>
+</ul>
+<blockquote>
+<p>&quot;With the 2026 Brazilian elections over, we have removed <code>Brazil2026ElectionFilter</code> from For You. Posts from the accounts it covered are no longer filtered out because of it.&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/README.md#october-26th-2026" target="_blank" rel="noopener">xai-org/x-algorithm README</a>, 2026-10-28 commit</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a>, corrected the reference commit and the pre-scoring filter count (22→21) in <code>## Summary</code>; added the two new scorers in one sentence to the <code>## Ranking</code> introduction and updated the scorer-chain bullet in the Phoenix section to 5ed7963. Updated the filter count and list in the <code>## Re-ranking, diversity, and filters</code> introduction and the filter section, and recorded the deletion in the Brazil election filter bullet. Fixed the target condition of the new-user soft NSFW filter in two places, and added the carousel HighRisk switch to the final placement section. Added rows for the page decoder and Plackett-Luce sampling to the <code>## Glossary</code> table, and wrote the answers as bullets under open questions 1 and 2 of the 2026-10-14 commit; added rows to the reference commit in <code>## Sources</code> and the change log summary table, and corrected the filter count and re-ranking stage in <code>assets/x-pipeline.svg</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X released the last link needed to put page-level RL re-ranking into serving. The loop is now in place in code: exploration records probabilities, those logs train the decoder, and the decoder result is placed at the top. However, all three switches are off by default, so there is not yet evidence that this is applied to the actual feed.</p></div>
+<h2 id="2-andromeda-now-scores-all-eligible-ads-on-the-gpu--facebook"><span class="num">2</span>Andromeda now scores all eligible ads on the GPU — Facebook</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta Andromeda: Powering the Next Generation of Ads Retrieval Through Model-System Co-Design</a> — Meta Engineering, 2026-10-28, blog post.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Andromeda is Meta&#39;s ads retrieval engine that narrows Facebook and Instagram ad candidates within a few milliseconds. The 2024 post described organizing ads into a trained hierarchical index that outperformed two-tower and ANN (approximate nearest neighbor search). Because of cost, retrieval usually uses a simpler model than ranking, so the balance between accuracy and throughput has always been a problem. This post describes the model structure and GPU co-design of the 2026 version of Andromeda.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The retrieval model became an MoE and scores all eligible ads on one GPU</span></p></div>
+<ul>
+<li>The retrieval model changed to Mixture-of-Experts (a structure that routes each input to a subset of expert networks for computation) <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta blog post</a>.<ul>
+<li>On the user side, a single tower became an ensemble of several specialized user towers.</li>
+<li>The ad tower also encodes the real-time serving context.</li>
+<li>The interaction layer changed from a dense network to a gating network based on MoE attention.</li>
+</ul>
+</li>
+<li>The blog post says this model reaches near ranking-level performance at about 1/300 of the inference FLOPs of the 2024 model <span class="badge ok">verified</span> — same blog post.</li>
+<li>It puts targeting rule application (index matching), scoring, and top-K selection on the same GPU and scores every eligible ad in the candidate pool <span class="badge ok">verified</span> — same blog post.<ul>
+<li>The hardware is NVIDIA GH200, and one server processes more than 1 billion ads per second. The post says network traffic fell about 100×.</li>
+<li>In this post, index matching is the stage that applies advertiser-defined targeting conditions across dozens of feature categories.</li>
+</ul>
+</li>
+<li>The 2024 hierarchical index is mentioned only as a starting point, and its role in the new pipeline is not described <span class="badge ok">verified</span> — same blog post.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The online result is a 2.4% increase in Facebook conversions since 2025</span></p></div>
+<ul>
+<li>The only online result the blog post reports is a 2.4% increase in Facebook conversions <span class="badge ok">verified</span> — same blog post.</li>
+<li>Whether this figure is an effect of the 2026 version alone or a cumulative effect since 2025 cannot be determined <span class="badge est">inferred</span>. The evidence is the period phrase &quot;Since 2025&quot;.</li>
+<li>This post also does not state that the same stack is used for organic feed retrieval <span class="badge ok">verified</span> — same blog post.</li>
+</ul>
+<blockquote>
+<p>&quot;model performance approaches ranking-level in a typical retrieval-then-ranking system, at approximately 300x fewer inference-time FLOPs than the 2024 Meta Andromeda retrieval model.&quot;</p>
+<p>&quot;Since 2025, Meta Andromeda has delivered a 2.4% increase in conversions on Facebook.&quot;
+— <a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta Andromeda (blog)</a>, 2026-10-28</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="embedding-retrieval.html">topics/embedding-retrieval.md</a> <code>## Layer 4 — Andromeda + HILL/MoNN: train the index</code>, added the 2026 version&#39;s MoE structure, scoring of every ad, and performance figures as one paragraph and bullets, and added this post to <code>## Sources</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The direction of Meta ads retrieval has moved from looking at fewer candidates through an index to looking at all of them with hardware. The evidence is the phrase &quot;scoring every eligible ad&quot; and wording that refers to the hierarchical index only as past groundwork. However, no sentence says the hierarchical index was dropped, so this does not overturn the earlier claim.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>The day the page decoder, exploration, and page logging switches turn on in the X cron mirror — this is when page-level RL re-ranking enters the actual For You order.</li>
+<li>How the page decoder serving step count of 64 and the serving slots of 12 in the training config are reconciled — this can be known only once the Phoenix serving-side code is released.</li>
+<li>Whether VF reported-heuristic labels continue to be used on other paths — evidence is needed to tell whether deleting the rules is a policy relaxation or a retirement of the labels (<span class="badge est">inferred</span>).</li>
+<li>Whether Andromeda 2026 uses the hierarchical index — if a paper or follow-up post appears, update the Layer 4 section of topics.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list page is script-rendered, so no post links could be read</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-28.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-28</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-29.html" data-title="일일 리포트 2026-10-29"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

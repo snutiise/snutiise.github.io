@@ -46,12 +46,11 @@
 <h1 id="embedding-based-candidate-generation">Embedding-based candidate generation</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">Updated</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">Updated</span><time datetime="2026-10-29">2026-10-29</time></li>
 <li><span class="meta-k">Translated from</span><a href="../embedding-retrieval.html" hreflang="ko">Korean</a></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">20</span></summary><ol><li><a href="#family-1--graph-decomposition-simclusters">Family 1</a><ol><li><a href="#before-quoting-constants--code-defaults-differ-from-the-actual-production-run">Before quoting constants</a></li><li><a href="#sann--search-is-an-inverted-index-scan-not-ann">SANN</a></li></ol></li><li><a href="#family-2--graph-embedding-twhin">Family 2</a></li><li><a href="#family-3--two-tower-deepretrieval">Family 3</a></li><li><a href="#index-layer--three-kinds-coexist">Index layer</a></li><li><a href="#meta--the-interesting-part-is-in-the-index-not-the-encoder">Meta</a></li><li><a href="#layer-0--ebr-2020-ann-was-not-split-out-as-a-separate-service">Layer 0</a></li><li><a href="#layer-1--silvertorch-20252026-moved-the-index-into-tensors-inside-the-model">Layer 1</a></li><li><a href="#layer-2--mol-and-h-indexer-drop-the-dot-product-but-supplement-it-with-an-index">Layer 2</a></li><li><a href="#layer-3--rankgraph-use-a-co-engagement-graph-as-the-retrieval-index">Layer 3</a></li><li><a href="#layer-4--andromeda--hillmonn-train-the-index">Layer 4</a></li><li><a href="#layer-5--instagram-a-case-where-serving-cost-decided-the-architecture">Layer 5</a></li><li><a href="#layer--1--facebook-connected-content-has-no-ann-at-all">Layer -1</a></li><li><a href="#case-netflix--a-second-sample-of-the-no-retrieval-extreme">Case: Netflix</a></li><li><a href="#x-vs-meta--structural-contrast">X vs Meta</a></li><li><a href="#what-generalizes-from-this-case">What generalizes from this case</a></li><li><a href="#who-uses-this">Who uses this</a></li><li><a href="#not-yet-verified">Not yet verified</a></li><li><a href="#sources">Sources</a></li></ol></details></nav>
 <div class="prose">
-<p class="warn">⚠ The Korean original has changed since this translation (translated 2026-10-21). <a href="../embedding-retrieval.html" hreflang="ko">Read the Korean original</a> for the latest version.</p>
 <p>Candidate generation (retrieval) is the stage that first picks, from all content, the candidates to pass to the ranking model. Embedding-based candidate generation is summarized in one sentence: &quot;find the items closest to the user in a vector space.&quot; Behind that sentence, however, are three very different families. Each family builds its vectors differently, and X runs all 3 families <strong>at the same time</strong>.</p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
 <thead>
@@ -425,6 +424,18 @@ search        = annClient.search(collection, vector, SearchParams(limit, scoreTh
 <li>It names the Grace Hopper Superchip and MTIA as hardware <span class="badge ok">verified</span>: <em>&quot;NVIDIA Grace Hopper Superchip and <strong>Meta Training and Inference Accelerator (MTIA)</strong> hardware&quot;</em></li>
 <li>It reports gains in retrieval recall and in ad quality on some segments <span class="badge ok">verified</span>: <em>&quot;+<strong>6% recall</strong> improvement to the retrieval system, delivering +<strong>8% ads quality</strong> improvement on selected segments&quot;</em></li>
 </ul>
+<p>The 2026 version of Andromeda replaced the retrieval model with Mixture-of-Experts and said it scores all eligible ads in the candidate pool on a single GPU <span class="badge ok">verified</span> — <a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta Andromeda: Powering the Next Generation of Ads Retrieval Through Model-System Co-Design</a>, 2026-10-28, blog post. The post mentions the 2024 hierarchical index only as a starting point and does not state what role the hierarchical index plays in the new pipeline <span class="badge ok">verified</span>.</p>
+<ul>
+<li>On the user side, a single tower became an ensemble of several specialized user towers, and the interaction layer became a gating network based on MoE attention <span class="badge ok">verified</span> same blog post.</li>
+<li>In this post, index matching means the stage that applies advertiser targeting rules <span class="badge ok">verified</span> same blog post. The post says it put index matching, scoring, and top-K selection on the same GPU and cut network traffic by about 100× <span class="badge ok">verified</span>.</li>
+<li>The reported figures are about 1/300 of the inference FLOPs of the 2024 model and a 2.4% increase in Facebook conversions <span class="badge ok">verified</span> same blog post.<blockquote>
+<p>&quot;model performance approaches ranking-level in a typical retrieval-then-ranking system, at approximately 300x fewer inference-time FLOPs than the 2024 Meta Andromeda retrieval model.&quot;</p>
+<p>&quot;Since 2025, Meta Andromeda has delivered a 2.4% increase in conversions on Facebook.&quot;
+— <a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta Andromeda (blog)</a>, 2026-10-28</p>
+</blockquote>
+</li>
+<li>Whether the 2.4% is an effect of the 2026 version alone or a cumulative effect since 2025 cannot be determined from the sentence alone <span class="badge est">inferred</span>. The evidence is the period phrase &quot;Since 2025&quot;. Detail is in <a href="daily-2026-10-29.html">daily 2026-10-29</a>.</li>
+</ul>
 <p>The internal structure of the Andromeda-family index was published as a paper in 2026 <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2604.12965v1" target="_blank" rel="noopener">Efficient Retrieval Scaling with Hierarchical Indexing for Large Scale Recommendation</a>, Meta, arXiv 2026-04-14.</p>
 <ul>
 <li><strong>MoNN</strong> (Modular Neural Network) strengthens the learning of user-item interactions beyond a single dot product while maintaining efficiency <span class="badge ok">verified</span> same paper.<blockquote>
@@ -682,6 +693,7 @@ search        = annClient.search(collection, vector, SearchParams(limit, scoreTh
 <li><a href="https://arxiv.org/abs/2509.02942" target="_blank" rel="noopener">RankGraph</a> — 2025, paper. Uses a co-engagement graph for retrieval.</li>
 <li><a href="https://arxiv.org/html/2606.18379" target="_blank" rel="noopener">RankGraph-2</a> — 2026, paper. Covers the U2U2I / U2I2I paths and the 3-hour rebuild.</li>
 <li><a href="https://engineering.fb.com/2024/12/02/production-engineering/meta-andromeda-advantage-automation-next-gen-personalized-ads-retrieval-engine/" target="_blank" rel="noopener">Meta Andromeda</a> — 2024-12-02, blog post. Describes the trained hierarchical index and explicitly names two-tower and ANN as baselines.</li>
+<li><a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta Andromeda: Powering the Next Generation of Ads Retrieval Through Model-System Co-Design</a> — 2026-10-28, blog post. Describes the retrieval MoE and scoring of every eligible ad on a single GPU.</li>
 <li><a href="https://arxiv.org/html/2604.12965v1" target="_blank" rel="noopener">HILL / MoNN</a> — 2026-04-14, paper. Covers the structure of the Andromeda-family index in detail.</li>
 </ul>
 <p><strong>Netflix</strong></p>
