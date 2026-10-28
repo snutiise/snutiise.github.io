@@ -46,7 +46,7 @@
 <h1 id="임베딩-기반-후보-생성">임베딩 기반 후보 생성</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-10-29">2026-10-29</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">20</span></summary><ol><li><a href="#계열-1--그래프-분해-simclusters">계열 1</a><ol><li><a href="#상수를-인용하기-전에--코드-기본값과-실제-프로덕션-실행이-다르다">상수를 인용하기 전에</a></li><li><a href="#sann--검색은-ann이-아니라-역인덱스-스캔이다">SANN</a></li></ol></li><li><a href="#계열-2--그래프-임베딩-twhin">계열 2</a></li><li><a href="#계열-3--two-tower-deepretrieval">계열 3</a></li><li><a href="#인덱스-계층--세-종류가-공존한다">인덱스 계층</a></li><li><a href="#meta--재미있는-부분이-인코더가-아니라-인덱스에-있다">Meta</a></li><li><a href="#계층-0--ebr-2020-ann을-별도-서비스로-빼지-않았다">계층 0</a></li><li><a href="#계층-1--silvertorch-20252026-인덱스를-모델-안의-텐서로-옮겼다">계층 1</a></li><li><a href="#계층-2--mol과-h-indexer-내적을-버리되-인덱스로-보완한다">계층 2</a></li><li><a href="#계층-3--rankgraph-co-engagement-그래프를-retrieval-인덱스로-쓴다">계층 3</a></li><li><a href="#계층-4--andromeda--hillmonn-인덱스를-학습시킨다">계층 4</a></li><li><a href="#계층-5--instagram-서빙-비용이-아키텍처를-정한-사례">계층 5</a></li><li><a href="#계층--1--facebook-연결-콘텐츠에는-ann이-아예-없다">계층 -1</a></li><li><a href="#케이스-netflix--retrieval-없음-극단의-두-번째-표본">케이스: Netflix</a></li><li><a href="#x-vs-meta--구조적-대조">X vs Meta</a></li><li><a href="#이-케이스에서-일반화할-수-있는-것">이 케이스에서 일반화할 수 있는 것</a></li><li><a href="#누가-이걸-쓰는가">누가 이걸 쓰는가</a></li><li><a href="#아직-확인하지-못한-것">아직 확인하지 못한 것</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
@@ -423,6 +423,18 @@ score      = (x[:, 0, :] * translated).sum(-1)
 <li>하드웨어로는 Grace Hopper Superchip과 MTIA를 든다 <span class="badge ok">확인</span>: <em>&quot;NVIDIA Grace Hopper Superchip and <strong>Meta Training and Inference Accelerator (MTIA)</strong> hardware&quot;</em></li>
 <li>성과로는 retrieval recall과 일부 세그먼트의 광고 품질 개선을 보고했다 <span class="badge ok">확인</span>: <em>&quot;+<strong>6% recall</strong> improvement to the retrieval system, delivering +<strong>8% ads quality</strong> improvement on selected segments&quot;</em></li>
 </ul>
+<p>2026년 판 Andromeda는 retrieval 모델을 Mixture-of-Experts로 바꾸고, 후보 풀의 적격 광고를 GPU 한 대에서 전부 채점한다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta Andromeda: Powering the Next Generation of Ads Retrieval Through Model-System Co-Design</a>, 2026-10-28, 블로그. 이 글은 2024년의 계층 인덱스를 출발점으로만 언급하고, 새 파이프라인에서 계층 인덱스가 어떤 역할을 하는지는 쓰지 않는다 <span class="badge ok">확인</span>.</p>
+<ul>
+<li>유저 쪽은 단일 tower에서 전문화된 user tower 여러 개의 앙상블로 바뀌었고, 상호작용 층은 MoE attention 기반 gating 네트워크가 됐다 <span class="badge ok">확인</span> 같은 블로그.</li>
+<li>이 글에서 index matching은 광고주 타게팅 규칙을 적용하는 단계를 뜻한다 <span class="badge ok">확인</span> 같은 블로그. 블로그는 index matching, 채점, top-K 선택을 같은 GPU에 모아 네트워크 트래픽을 약 100배 줄였다고 쓴다 <span class="badge ok">확인</span>.</li>
+<li>성과 수치는 2024년 모델 대비 추론 FLOPs 약 300분의 1과 Facebook 전환 2.4% 증가다 <span class="badge ok">확인</span> 같은 블로그.<blockquote>
+<p>&quot;model performance approaches ranking-level in a typical retrieval-then-ranking system, at approximately 300x fewer inference-time FLOPs than the 2024 Meta Andromeda retrieval model.&quot;</p>
+<p>&quot;Since 2025, Meta Andromeda has delivered a 2.4% increase in conversions on Facebook.&quot;
+— <a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta Andromeda (블로그)</a>, 2026-10-28</p>
+</blockquote>
+</li>
+<li>2.4%가 2026년 판만의 효과인지, 2025년 이후 누적 효과인지는 문장만으로 가를 수 없다 <span class="badge est">추정</span>. 근거는 &quot;Since 2025&quot;라는 기간 표현이다. 세부는 <a href="daily-2026-10-29.html">daily 2026-10-29</a>에 있다.</li>
+</ul>
 <p>Andromeda 계열 인덱스의 내부 구조는 2026년에 논문으로 공개됐다 <span class="badge ok">확인</span> — <a href="https://arxiv.org/html/2604.12965v1" target="_blank" rel="noopener">Efficient Retrieval Scaling with Hierarchical Indexing for Large Scale Recommendation</a>, Meta, arXiv 2026-04-14.</p>
 <ul>
 <li><strong>MoNN</strong>(Modular Neural Network)은 효율을 유지하면서 내적 하나를 넘어서는 사용자-아이템 상호작용의 학습을 강화한다 <span class="badge ok">확인</span> 같은 논문.<blockquote>
@@ -680,6 +692,7 @@ score      = (x[:, 0, :] * translated).sum(-1)
 <li><a href="https://arxiv.org/abs/2509.02942" target="_blank" rel="noopener">RankGraph</a> — 2025, 논문. co-engagement 그래프를 retrieval에 쓴다.</li>
 <li><a href="https://arxiv.org/html/2606.18379" target="_blank" rel="noopener">RankGraph-2</a> — 2026, 논문. U2U2I / U2I2I 경로와 3시간 재구축을 다룬다.</li>
 <li><a href="https://engineering.fb.com/2024/12/02/production-engineering/meta-andromeda-advantage-automation-next-gen-personalized-ads-retrieval-engine/" target="_blank" rel="noopener">Meta Andromeda</a> — 2024-12-02, 블로그. 학습되는 계층적 인덱스를 설명하고, two-tower와 ANN을 baseline으로 명시한다.</li>
+<li><a href="https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/" target="_blank" rel="noopener">Meta Andromeda: Powering the Next Generation of Ads Retrieval Through Model-System Co-Design</a> — 2026-10-28, 블로그. retrieval MoE와 GPU 한 대에서의 전수 채점을 설명한다.</li>
 <li><a href="https://arxiv.org/html/2604.12965v1" target="_blank" rel="noopener">HILL / MoNN</a> — 2026-04-14, 논문. Andromeda 계열 인덱스의 구조를 상세히 다룬다.</li>
 </ul>
 <p><strong>Netflix</strong></p>
