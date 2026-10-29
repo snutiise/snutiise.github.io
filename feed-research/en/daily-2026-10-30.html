@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-30 — feed-research</title>
+<meta name="description" content="In one line: X For You started recording the order and scores of the feed it actually served, page by page. The serving log for training page RL re-ranking…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-30.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-30.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-30.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-30.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-30 — feed-research">
+<meta property="og:description" content="In one line: X For You started recording the order and scores of the feed it actually served, page by page. The serving log for training page RL re-ranking…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-30.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-10-30.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-30">2026-10-30</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>8 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-30.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X For You started recording the order and scores of the feed it actually served, page by page. The serving log for training page RL re-ranking is on for the first time.</div>
+</div>
+<div class="prose">
+<h2 id="1-serving-page-log-turned-on-and-ads-v2-verdict-turned-off--x"><span class="num">1</span>Serving page log turned on and ads V2 verdict turned off — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/606b254b45be798bfaecfa8c23f5a9c51bc8000c" target="_blank" rel="noopener">xai-org/x-algorithm@606b254</a> — xAI, 2026-10-29, code. In the numbering these notes use, it is Gen4+52 (Gen4+N is the number these notes assigned in order to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The previous day&#39;s commit added page decoder (an RL re-ranking model that picks, in slot order, the posts to place on a page from the top-scoring candidates) re-ranking, exploration sampling, and a serving page log to home-mixer (the service that handles For You requests), all off by default. To train RL re-ranking, data on &quot;which order was served and how users reacted&quot; must accumulate first. The defaults in this commit are the values from the 2026-10-28T16:00 sync of the cron mirror (a parameter file that copies production feature-switch defaults every day). This commit turns on only the log of those three switches, and on the ads side it turns off the brand safety verdict switch and adds two new kinds of ads blenders (the stage that decides ad slots among organic posts).</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. For You started recording the order and scores of the feed it actually served, page by page</span></p></div>
+<ul>
+<li>The serving page log switch changed from false to true by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:312-317</code></a>.<ul>
+<li>The switch is named <code>EnablePageLogging</code> (<code>rust_home_mixer_enable_page_logging</code>), and the default TTL of 3600 seconds is unchanged.</li>
+<li>This log is used only in the production environment. The condition is <code>is_prod() &amp;&amp; EnablePageLogging</code> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/side_effects/phoenix_request_cache_side_effect.rs" target="_blank" rel="noopener"><code>phoenix_request_cache_side_effect.rs:304-306</code></a>.</li>
+</ul>
+</li>
+<li>The log contains the first posts of the feed actually served, in the order served, with their weighted-sum scores and final scores <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/side_effects/phoenix_request_cache_side_effect.rs" target="_blank" rel="noopener">same file:201-277</a>.<ul>
+<li>The two slot probability fields (<code>reward_rerank_slot_prob</code>, <code>page_decode_slot_prob</code>) are filled only when the exploration or decoder switch is on.</li>
+<li>The two switches (<code>EnablePageRlExploration</code>, <code>EnablePageDecodeRerank</code>) are still false by default in this commit. So the logs accumulating now hold only the order and scores, without probabilities.</li>
+</ul>
+</li>
+<li>X appears to have started by recording the pages served by the existing policy before turning on RL re-ranking <span class="badge est">inferred</span>. The evidence is that, of the three switches, only the log was turned on first.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The ads brand safety V2 verdict was turned off for the third time</span></p></div>
+<ul>
+<li>The switch that judges the risk level of posts next to ads under V2 rules changed from true to false <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:938-943</code></a>.<ul>
+<li>The switch is named <code>EnableAdsBrandSafetyVerdictV2</code> (<code>rust_home_mixer_ads_bs_v2_exp_enabled</code>).</li>
+<li>Its history: introduced off on 2026-08-17, on 08-25, off 09-16, on 10-03, off 10-29.</li>
+</ul>
+</li>
+<li>The fallback switch that fills gaps with an author-level safety label did not change <span class="badge ok">verified</span> — the same diff has no line for it.</li>
+<li>The reason for turning it off is not in the code <span class="badge est">inferred</span>. The switch key contains <code>exp</code>, so it appears to be a value that opens and closes an experiment bucket, and four changes in two months fit that reading.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Two ads blenders that follow the same safety rules were introduced as options</span></p></div>
+<ul>
+<li><p><code>slot_spread</code> and <code>least_movement</code> were added to the ads blender choices, and the default is still multi-risk <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/selectors/blender_selector.rs" target="_blank" rel="noopener"><code>selectors/blender_selector.rs:62-67</code></a>.</p>
+<ul>
+<li>The <code>param.rs</code> diff of this commit has no <code>AdsBlenderType</code> line.</li>
+</ul>
+</li>
+<li><p>Both blenders find two organic posts that can sit above and below each ad <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/ads/neighbours.rs" target="_blank" rel="noopener"><code>ads/neighbours.rs</code></a>.</p>
+<ul>
+<li>Posts fall into four grades: Safe, Low, Medium, and High. A High post cannot sit next to any ad, and a Medium post can sit only next to an ad whose advertiser allows that context (BSR-high).</li>
+<li>A post containing a handle or an excluded keyword specified by the advertiser also cannot be a neighbor.</li>
+</ul>
+</li>
+<li><p><code>slot_spread</code> first sets ad slots evenly across the whole page, then pulls the nearest safe posts above and below each slot <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/ads/slot_spread_blender.rs" target="_blank" rel="noopener"><code>ads/slot_spread_blender.rs:1293-1303</code></a>.</p>
+<ul>
+<li>It keeps the minimum gap and divides the remaining positions equally between slots.</li>
+<li>If sensitive ads remain for later, it uses Low posts first to save Safe posts.</li>
+</ul>
+</li>
+<li><p><code>least_movement</code> picks the placement that disturbs the original order of organic posts the least <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/ads/least_movement_blender.rs" target="_blank" rel="noopener"><code>ads/least_movement_blender.rs</code></a>.</p>
+<ul>
+<li>When deciding whether to accept an ad, it checks by bipartite matching (augmenting path) whether every ad, including those already chosen, can be given two non-overlapping neighbors.</li>
+<li>When comparing slot candidates, it uses a slack weight of 50 (<code>FIRST_AD_SLACK_WEIGHT</code>) for the first ad and 2 (<code>SLACK_WEIGHT</code>) for later ads. This appears to be a value meant to strongly avoid placements that delay the first ad <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li><p>The tests pin that both blenders keep the same safety conditions as multi-risk and do not serve fewer ads than multi-risk <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/ads/tests/blender_comparison_test.rs" target="_blank" rel="noopener"><code>ads/tests/blender_comparison_test.rs</code></a>.</p>
+<ul>
+<li>On the same mixed feed, both serve 7 ads and drop 3 for the gap limit, so the results are the same. The number of organic posts moved is 6 for <code>least_movement</code> and 8 for <code>slot_spread</code>.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">assert!(
+    total &gt;= baseline_total,
+    &quot;{name} served {total} ads vs multi_risk {baseline_total}&quot;
+);
+</code></pre></figure>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Phoenix trains the lead-generation conversion in the window right after the click</span></p></div>
+<ul>
+<li>The ads lead-generation conversion (<code>ADS_LEADGEN_CONVERSION</code>) entered a new head group that trains &quot;only on clicks, in the fresh window&quot; <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/phoenix/xrex/data/recsys/ads_head_masking.py" target="_blank" rel="noopener"><code>ads_head_masking.py</code></a>.<ul>
+<li>This action was added to the proto in the previous day&#39;s commit. The existing web and app conversion heads train in the delayed window (the window that waits for late-arriving conversions).</li>
+<li>The training mask is <code>fresh_ct &amp; fresh &amp; kept &amp; click</code>.</li>
+</ul>
+</li>
+<li>The page RL training config gained a variant that switches the dwell loss to CREAD (a method that trains binary classifiers for whether dwell time exceeded several thresholds, then recovers the expectation) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>configs/xrecsys.py</code></a>.<ul>
+<li>It is named <code>immersive_page_rl_cread</code>. It sets the Tweedie and MAE weights to 0, sets the two CREAD losses to 0.1 each, and turns on the dwell bucket table.</li>
+<li>The default home config already switched to CREAD on 2026-10-08. Now the page RL side can use the same loss.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The video carousel ranking score gained a &quot;probability of opening the video × expected dwell time on the immersive surface&quot; term, with a weight defaulting to 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/util/video_carousel.rs" target="_blank" rel="noopener"><code>util/video_carousel.rs:178-190</code></a>.</li>
+<li>Carousel module items were removed from the recent impression history, so carousel videos are not counted as &quot;already seen posts&quot; of the main feed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/query_hydrators/served_history_query_hydrator.rs" target="_blank" rel="noopener"><code>served_history_query_hydrator.rs:94-110</code></a>. The carousel is off by default, so default behavior is unchanged.</li>
+<li>An option that also updates the user token in the candidate-only layer (the last Transformer layer that updates only candidate tokens) was introduced, off by default, so that page RL can run with that layer <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/phoenix/xrex/models/transformer.py" target="_blank" rel="noopener"><code>models/transformer.py</code></a>.</li>
+<li>An option that restricts ads head metrics to the window each head trains on was introduced, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>models/recsys_model.py</code></a>.</li>
+<li>Metrics that count ad placement results and supply limits were attached to the two new blenders <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/ads/health_metrics.rs" target="_blank" rel="noopener"><code>ads/health_metrics.rs</code></a>.</li>
+<li>VF (visibility-filtering, a service that decides for each post whether this viewer may see it) is a refactor. The rules, the per-safety-level rule lists, and the client switch defaults did not change <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/606b254b45be798bfaecfa8c23f5a9c51bc8000c" target="_blank" rel="noopener">606b254</a>.<ul>
+<li>It merged quote-relationship lookup into the Flock source, fixing a problem where answers got mixed when the viewer was the quote author.</li>
+<li>It returns posts it cannot find as <code>NotFound</code> instead of <code>Failed</code>. Either way, the post is not served.</li>
+<li>The golden corpus (tests of expected verdicts per rule) gained cases for the For You recommendation and immersive recommendation surfaces.</li>
+</ul>
+</li>
+<li>The ranker cluster label was removed from training statistics, and the multimodal embedding lookup uses only the O2 store with no fallback path <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/606b254b45be798bfaecfa8c23f5a9c51bc8000c" target="_blank" rel="noopener">606b254</a>.</li>
+<li>grox (the Grok-based annotation pipeline) gained an affiliate-company badge image field and a helper that extracts JSON from LLM output <span class="badge ok">verified</span> — same commit.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> raised the reference commit in <code>## Summary</code> and <code>## Sources</code> to 606b254. In the scorer chain bullet of the Phoenix section under <code>## Ranking</code>, it corrected &quot;the serving page log, off by default&quot; and added a bullet for the switch to on by default. It corrected the V2 verdict sentence in the <code>## Ads</code> introduction to off by default, and added a sentence on the new blenders and a list of &quot;this section&#39;s change log&quot;. It added bullets to the blender choice list in the The final placement is not score order subsection, to the carousel ranking score in the Feed surfaces section, and to question 2 on the 2026-10-14 commit in <code>## Open questions</code>, and it added a Gen4+52 row to the Commit summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The serving log, the first of the three steps toward page-level RL re-ranking, is now on as a production default. Because the log currently has no probabilities, the exploration switch must also be turned on to use it for offline RL <span class="badge est">inferred</span>. On the ads side, X turned off the V2 verdict again and widened the blender candidates, so brand safety placement still appears to be under experiment <span class="badge est">inferred</span>.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>The day the exploration switch turns on in the X cron mirror — from then on probabilities accumulate in the page log, making offline RL training possible.</li>
+<li>Whether the <code>AdsBlenderType</code> default changes to slot_spread or least_movement — a direct signal of an ads placement policy change.</li>
+<li>Whether the V2 verdict switch turns on again — a fifth flip would further firm up the experiment bucket reading (<span class="badge est">inferred</span>).</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts
+Lookup failed: research.netflix.com/publications — HTTP 404</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-29.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-29</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-30.html" data-title="일일 리포트 2026-10-30"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
