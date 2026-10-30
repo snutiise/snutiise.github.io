@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-10-31 — feed-research</title>
+<meta name="description" content="In one line: X added options to the Phoenix ranker training code that feed ads engagement aggregates and history elapsed time into the model as inputs. Both…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-10-31.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-10-31.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-10-31.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-10-31.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-10-31 — feed-research">
+<meta property="og:description" content="In one line: X added options to the Phoenix ranker training code that feed ads engagement aggregates and history elapsed time into the model as inputs. Both…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-10-31.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-10-31.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-10-31">2026-10-31</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>8 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-10-31.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added options to the Phoenix ranker training code that feed ads engagement aggregates and history elapsed time into the model as inputs. Both are off by default, so the current training setup is unchanged.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-ranker-training-gained-ads-aggregate-and-time-inputs--x"><span class="num">1</span>Ranker training gained ads aggregate and time inputs — X</a></li><li><a href="#2-a-follow-up-to-generative-ads-recommendation-raised-revenue-further--kuaishou-radar"><span class="num">2</span>A follow-up to generative ads recommendation raised revenue further — Kuaishou (radar)</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>The sort score of the X For You video carousel gained a main ranking score term, but its weight is 0.0, so the order is unchanged.</li>
+<li>Kuaishou reported +3.07% ads revenue over the deployed baseline for the follow-up to its generative ads recommendation system GR4AD.</li>
+</ul>
+<h2 id="1-ranker-training-gained-ads-aggregate-and-time-inputs--x"><span class="num">1</span>Ranker training gained ads aggregate and time inputs — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/7fef3ba19d82d1f76dec65f31b981ca817a2ea06" target="_blank" rel="noopener">xai-org/x-algorithm@7fef3ba</a> — xAI, 2026-10-30, code. In these notes&#39; numbering, this is Gen4+Gen53.4+N is the number these notes attached in order to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Phoenix (a Grok-based Transformer ranker that predicts per-action engagement probabilities for each candidate in X For You) reads the user history and the candidate as one sequence. Until now, the tokens of this sequence did not take aggregate values such as &quot;how many minutes ago was this history item&quot; or &quot;how many times was this ad clicked recently&quot; as explicit inputs. The 2026-09-18 commit (Gen4+24) added a path for carrying ads engagement aggregates (EngagementCounts) in the request, but where the model uses those values remained an open question. This commit added training options, off by default, that turn those aggregates and the history elapsed time into embeddings and add them to the ranker input.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Ads engagement aggregates become bucket embeddings added to the candidate embedding</span></p></div>
+<ul>
+<li><p>For each ads candidate, three groups of aggregates are built: the ad itself, the viewer–advertiser pair, and the viewer overall <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/crates/common/xai-recsys/src/util.rs" target="_blank" rel="noopener"><code>xai-recsys/src/util.rs:177-214</code></a>.</p>
+<ul>
+<li>Each group counts 7 actions over 8 time windows (from 1 hour to 28 days), so 3 × 7 × 8 = 168 features are attached to one candidate.</li>
+<li>Counts are converted to log2 buckets (the binary digit length of the count, 33 slots from 0 to 32).</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">pub const COUNTERS: [i32; 7] = [1, 2, 14, 3, 4, 5, 8];
+pub const WINDOWS_SECS: [u32; 8] = [
+    3_600, 10_800, 43_200, 86_400, 259_200, 604_800, 1_209_600, 2_419_200,
+];
+pub const NUM_BUCKETS: usize = 33;
+pub fn bucket(count: u32) -&gt; u8 { (u32::BITS - count.leading_zeros()) as u8 }
+</code></pre></figure>
+</li>
+<li><p>The training model looks up a small embedding for each bucket, concatenates them, and adds them to the candidate embedding after a linear projection to its width <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>recsys_model.py:3674-3695</code></a>.</p>
+<ul>
+<li>The switch to turn it on is <code>ads_counts_emb_dim</code> (default 0), and the data-side <code>read_ads_engagement_counts</code> (default False) must also be turned on — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener">same file:1245</a>.</li>
+<li>The projection matrix is initialized to zero. So right after the option is turned on, the model output is the same as when it is off.</li>
+<li>The data loader rejects this option for candidate sequences that mix in negative samples.</li>
+</ul>
+</li>
+<li><p>A function that fills the same buckets was also added on the serving side, but nothing in this commit diff calls it, so we cannot tell whether serving already uses it <span class="badge est">inferred</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/crates/common/xai-recsys/src/util.rs" target="_blank" rel="noopener"><code>util.rs:547</code></a>.</p>
+<ul>
+<li>The serving model config also gained an <code>ads_count_features</code> field, whose default is false.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. History elapsed time and session activity enter as time inputs</span></p></div>
+<ul>
+<li>For each history item, &quot;how many seconds before the request time&quot; is log-compressed, sine and cosine components are attached, and the result is added to the history embedding <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>recsys_model.py:3697-3722</code></a>.<ul>
+<li>The formula is <code>x = log1p(dt) / 15</code>, and it uses 8 Fourier frequencies (<code>RECENCY_FOURIER = 8</code>) — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener">same file:176-186</a>.</li>
+<li>The request time is taken as the maximum of the candidate impression times.</li>
+</ul>
+</li>
+<li>A session summary is added to the candidate embedding <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener">same file:3724-3753</a>.<ul>
+<li>It includes the time elapsed since the last activity, and since the last external link open and the last long link dwell.</li>
+<li>It also includes the log-compressed number of history items in the last 5 minutes, 1 hour, and 1 day.</li>
+</ul>
+</li>
+<li>The switch to turn it on is <code>wallclock_recency</code> (default False). It cannot be turned on together with the existing feature prep path <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener">same file:1217-1223</a>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The video carousel score gained a main ranking score term, but its weight is 0.0</span></p></div>
+<ul>
+<li>The sort score of the For You vertical video carousel (a module that bundles 3–5 vertical videos into the 6th slot of the feed, off by default) gained the main ranking weighted-sum score as a fourth term <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/home-mixer/util/video_carousel.rs" target="_blank" rel="noopener"><code>util/video_carousel.rs:28-65</code></a>.<ul>
+<li>The default of the new weight <code>VideoCarouselWeightedScoreWeight</code> is 0.0 — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1263-1268</code></a>.</li>
+<li>When scores are equal, the video with the higher probability of being opened (<code>video_open</code>) goes first.</li>
+</ul>
+</li>
+<li>The number of extra candidates for the carousel, 30, changed from a constant to an adjustable parameter, and the value is still 30 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1281-1286</code></a>.</li>
+<li>Model scores for the immersive surface (the immersive video viewer) are now computed even for requests that reuse cached posts, and candidates that already have a score are not queried again <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/home-mixer/scorers/immersive_video_scorer.rs" target="_blank" rel="noopener"><code>scorers/immersive_video_scorer.rs:28-63</code></a>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The action react_with_video, introduced in the 2026-10-13 commit (Gen4+40), was renamed post_video, and its weight stays 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:471-476</code></a>.<ul>
+<li>Proto action 44 became <code>SERVER_TWEET_POST_VIDEO</code>, and this score was added to the re-ranking log and the shadow traffic log.</li>
+</ul>
+</li>
+<li>The dwell time regression head excludes ground truth below 0 seconds or above 1 day from the loss and metrics, and records the number excluded as a metric <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>recsys_model.py</code></a>.</li>
+<li>The embedding table optimizer (rowwise Adagrad) gained options, off by default, for a weight decay exemption window for recently updated rows and bf16 stochastic rounding <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/xrex/optimizers/recsys/rowwise_adagrad.py" target="_blank" rel="noopener"><code>optimizers/recsys/rowwise_adagrad.py</code></a>.</li>
+<li>The ads proto gained info messages for interest category, language, gender, and OS targeting <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+<li>The notification verdict of VF (visibility-filtering, a layer that decides per post whether it may be shown to this viewer) now receives per-post verdicts for mention, reply, and media-tag posts in addition to the account-level verdict <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/visibility-filtering/filter_notifications.rs" target="_blank" rel="noopener"><code>visibility-filtering/filter_notifications.rs</code></a>.</li>
+<li>The abuse-enforcement service gained suspension policy categories (platform manipulation, CSE) and changes to rollback and backfill paths. It is unrelated to feed ranking <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/abuse-enforcement-service/types/src/action_control.rs" target="_blank" rel="noopener"><code>types/src/action_control.rs</code></a>.</li>
+<li>Several daily batch jobs of UTH (Under the Hood, a transparency tool where users look up the impression-influence labels attached to their account) were modified. We did not read the contents <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/tree/7fef3ba19d82d1f76dec65f31b981ca817a2ea06/under-the-hood/scalding" target="_blank" rel="noopener"><code>under-the-hood/scalding/</code></a>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> raised the reference commit in <code>## Summary</code> to 7fef3ba. Added two auxiliary-input sentences to the introduction of <code>### Ranker input features and SID reconstruction</code> and added an evidence paragraph. Added a sub-bullet for the weighted-sum score term to the carousel item in <code>## Feed surfaces</code>, and fixed the react_with_video row in the weight table to post_video. Attached an answer bullet under the EngagementCounts consumption-point question in the Gen4+24 undisclosed list, and added one row each to the source sha table and the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The training code answered the question open since 2026-09-18, &quot;where does the model use the ads engagement aggregates&quot;: it adds them to the candidate token embedding. However, both the training and serving switches are off by default and the serving call site is not visible in the diff, so whether the production ranker was trained with this input remains an inference. The time inputs separately count the time elapsed since external-exit actions such as link opens, so this appears to be an experiment to bring session context into ranking <span class="badge est">inferred</span>.</p></div>
+<h2 id="2-a-follow-up-to-generative-ads-recommendation-raised-revenue-further--kuaishou-radar"><span class="num">2</span>A follow-up to generative ads recommendation raised revenue further — Kuaishou (radar)</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2610.38378" target="_blank" rel="noopener">Towards Reliable, Scalable, and Value-Aligned Generative Recommendation for Large-Scale Advertising</a> — Kuaishou, 2026-10-28 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Generative recommendation represents an item as a SID (semantic ID, a code sequence built so that semantically similar items share leading positions), and the model generates that code one position at a time to pick candidates. Kuaishou has already deployed GR4AD, an ads recommendation system using this approach, and writes that in operation it ran into a problem sensitive to SID boundaries and a problem where beam search prunes high-revenue candidates early. This paper reports that its follow-up, GR4AD-X, fixed three things and raised revenue further.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Cumulative ads revenue rose 3.07% over the deployed baseline</span></p></div>
+<ul>
+<li>It writes that a large-scale A/B test on the Kuaishou ads platform achieved cumulative revenue +3.07% over the deployed GR4AD within latency and throughput constraints <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2610.38378" target="_blank" rel="noopener">arXiv abstract</a>.<ul>
+<li>Multiple SID paths are assigned to one item to reduce boundary sensitivity.</li>
+<li>Capacity is expanded along several axes instead of widening or deepening the backbone.</li>
+<li>Prefix-level rewards, value-based beam pruning, and discriminative re-ranking are combined in one model.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;Large-scale online A/B tests on the Kuaishou advertising platform demonstrate that GR4AD-X achieves a cumulative revenue improvement of 3.07% over the deployed GR4AD baseline while satisfying strict latency and throughput constraints.&quot;
+— <a href="https://arxiv.org/abs/2610.38378" target="_blank" rel="noopener">GR4AD-X (paper)</a>, 2026-10-28</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Not folded into the canon. Added one additional-evidence line and a detail bullet to the <code>### Generative retrieval / semantic ID</code> thread in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Another follow-up report has appeared from a company that deployed SID generative recommendation and fixed problems that surfaced in operation. It follows the same trend as the Alibaba paper of 2026-10-21 (the SID reassignment problem). We did not read the body, and the evidence is the abstract only.</p></div>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2610.38378" target="_blank" rel="noopener">Kuaishou GR4AD-X</a> — additional evidence for the SID thread (<a href="radar.html#generative-retrieval--semantic-id">radar.md</a>).</li>
+<li>Triaged 30 arXiv cs.IR papers. Taobao UGR, e-commerce ads PFA, and food delivery ads PALATE claim production A/B tests, but we left them out because they are incremental work limited to their domains.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Meta Q3 2026 earnings call transcript — a search result summary says Instagram Reels changed to a model that &quot;ranks multiple reels at once in sequence&quot; and that Facebook Reels ranking doubled the history it looks at. We could not open the original transcript in this session, so we did not fold it into the canon. If confirmed from the original text, it would go into the ranking sections of instagram.md and facebook.md.</li>
+<li>Whether X serving calls the ads aggregate bucket function — if a call site appears in the next commit, the <span class="badge est">inferred</span> can be lifted.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts
+Lookup failed: research.netflix.com/publications — could not read the post list from the list page
+Lookup failed: Meta Q3 2026 earnings call transcript — could not access the original host</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-30.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-30</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-10-31.html" data-title="일일 리포트 2026-10-31"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
