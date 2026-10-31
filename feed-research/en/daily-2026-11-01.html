@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-01 — feed-research</title>
+<meta name="description" content="In one line: X changed the default ads blender for For You from multi-risk to slot-spread. The safety conditions are the same; the new approach first fixes…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-01.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-01.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-01.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-01.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-01 — feed-research">
+<meta property="og:description" content="In one line: X changed the default ads blender for For You from multi-risk to slot-spread. The safety conditions are the same; the new approach first fixes…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-01.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-01.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-01">2026-11-01</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Sunday</li>
+<li><span class="meta-k">Reading time</span>9 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-01.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>3</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X changed the default ads blender for For You from multi-risk to slot-spread. The safety conditions are the same; the new approach first fixes ad slots evenly across the whole page.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-the-default-ads-blender-changed-to-slot-spread--x"><span class="num">1</span>The default ads blender changed to slot-spread — X</a></li><li><a href="#2-meta-authors-released-the-long-history-ranker-lwr--radar"><span class="num">2</span>Meta authors released the long-history ranker LWR — radar</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>The filter that removes brand-safety HighRisk posts from the X video carousel became on by default.</li>
+<li>X added an option, off by default, to separately train late conversions of ad link opens and long dwell.</li>
+<li>Meta authors posted LWR, a ranker that scales history length and reasoning depth separately, on arXiv.</li>
+</ul>
+<h2 id="1-the-default-ads-blender-changed-to-slot-spread--x"><span class="num">1</span>The default ads blender changed to slot-spread — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/9106e9f33ee9cc6a92929fc798ae6c566e2841cb" target="_blank" rel="noopener">xai-org/x-algorithm 9106e9f</a> — X (xAI), 2026-10-31, code. In these notes&#39; numbering this is Gen4+54 (Gen4+N is the number these notes assign, in order, to commits after the Gen4 release on 2026-08-13).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You (a recommendation timeline that also mixes in posts from accounts the user does not follow) places ads between organic posts and decides their positions by looking at the brand-safety grade (Safe, Low, Medium, High) of the posts directly above and below each ad. The component that does this is the ads blender; the 2026-10-29 commit introduced two new blenders that follow the same safety rules (slot_spread, least_movement), but only as options. At that time the default was still multi_risk, in use since 2026-09-01. This commit changes the default blender to slot_spread, turns on the HighRisk filter for the video carousel, and adds off-by-default options to ads training and the transparency report.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The default ads blender changed to slot_spread</span></p></div>
+<ul>
+<li><p>The default of the switch that selects the ads blender changed from multi_risk to slot_spread <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:937-942</code></a>.</p>
+<ul>
+<li>The switch name is <code>AdsBlenderType</code> (<code>rust_home_mixer_ads_blender</code>).</li>
+<li>The mirror sync time on the first line of the file is 2026-10-30T22:59:56Z. This file is a mirror that copies the defaults of X&#39;s internal feature switches.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">param!(
+    AdsBlenderType,
+    String,
+    &quot;rust_home_mixer_ads_blender&quot;,
+    &quot;slot_spread&quot;
+);
+</code></pre></figure>
+</li>
+<li><p>slot_spread first fixes ad slots evenly across the whole page, then pulls the nearest safe post above and below from each slot <span class="badge ok">verified</span> — <a href="daily-2026-10-30.html">daily 2026-10-30</a>.</p>
+<ul>
+<li>High posts cannot appear next to any ad, and Medium posts appear only next to ads whose advertiser allows sensitive context (BSR-high). These conditions are the same as in multi_risk.</li>
+<li>The comparison test in the 2026-10-29 commit pinned that slot_spread does not serve fewer ads than multi_risk <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/606b254b45be798bfaecfa8c23f5a9c51bc8000c/home-mixer/ads/tests/blender_comparison_test.rs" target="_blank" rel="noopener"><code>ads/tests/blender_comparison_test.rs</code></a>.</li>
+</ul>
+</li>
+<li><p>The blender was promoted to the default two days after it was created <span class="badge ok">verified</span>. Whether it went through an experiment stage cannot be known from public code <span class="badge est">inferred</span>. The basis is that this mirror holds only defaults, not experiment assignments.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The filter that removes HighRisk posts from the video carousel was turned on</span></p></div>
+<ul>
+<li>The switch that removes brand-safety HighRisk posts from the candidates of the vertical video carousel (a module in For You for swiping horizontally through several videos) became on by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:1245-1250</code></a>.<ul>
+<li>The switch name is <code>EnableVideoCarouselHighRiskFilter</code>. It was introduced as off by default in the 2026-10-28 commit (Gen4+51).</li>
+<li>This filter also removes posts that have no safety verdict <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/5ed7963/home-mixer/filters/video_carousel_filter.rs" target="_blank" rel="noopener"><code>filters/video_carousel_filter.rs:29-39</code></a>.</li>
+</ul>
+</li>
+<li>The carousel module itself is still off by default, so the user-facing screen currently does not change <span class="badge est">inferred</span>. The basis is that this diff has no change to the carousel enable switch.</li>
+<li>Made the embedding version used for carousel dedup selectable with a switch <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/home-mixer/clients/post_v8_search_embedding_client.rs" target="_blank" rel="noopener"><code>home-mixer/clients/post_v8_search_embedding_client.rs</code></a>.<ul>
+<li>The default is <code>v8_search_1</code>, the same as the previous constant, so behavior is the same.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. An option to separately train late conversions of ad link opens and long dwell was added</span></p></div>
+<ul>
+<li><p>An option to add two &quot;late window&quot; heads, for ad link opens and link long dwell, to Phoenix (X&#39;s Grok-based ranking model) training was introduced, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/phoenix/xrex/data/recsys/ads_late_window.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/ads_late_window.py:48-97</code></a>.</p>
+<ul>
+<li>A late-window head is a twin head that predicts only behavior that is not visible in the short observation window right after the impression but arrives later. X has used the same structure for ad conversions since 2026-09-01 and for view-through conversions since 2026-10-24.</li>
+<li>The new actions are <code>ADS_OPEN_LINK_LATE_WINDOW</code> (112) and <code>ADS_LONG_DWELL_LATE_WINDOW</code> (113), and their twins are the existing <code>CLIENT_TWEET_OPEN_LINK</code> and <code>CLIENT_TWEET_EXTERNAL_LINK_LONG_DWELLED</code>.</li>
+<li>The training option is <code>ads_late_window_heads</code> and the serving composition option is <code>serve_late_window_composed</code>; both default to False. The former requires <code>ads_head_masking</code>, and the latter requires the former.</li>
+</ul>
+</li>
+<li><p>Turning on serving composition adds the late-window probability to the existing head&#39;s probability and outputs the sum as the &quot;probability that it happens at some point&quot; <span class="badge ok">verified</span> — same file.</p>
+<ul>
+<li>The raw late-window output is clipped at 0.5 and then converted to b/(1−b). This appears to be a correction that undoes the difference in training sample construction, but no comment states the reason <span class="badge est">inferred</span>.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-python" data-lang="python">def late_engagement_probability(raw):
+    b = raw.clip(0.0, 0.5)
+    return b / (1.0 - b)
+
+def compose_late_engagement(p_early, raw_late):
+    return p_early + (1.0 - p_early) * late_engagement_probability(raw_late)
+</code></pre></figure>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. The Under the Hood report prepared to list labeled posts</span></p></div>
+<ul>
+<li>A feature in the Under the Hood report (an X transparency tool where users look up the visibility-limiting labels applied to their account and posts) that lists the post IDs for each label was introduced, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/under-the-hood/strato/lib/params.strato" target="_blank" rel="noopener"><code>under-the-hood/strato/lib/params.strato:30-37</code></a>.<ul>
+<li>If a label has 3 or fewer posts, all of them are shown.</li>
+<li>A label that covers more than 5% of that month&#39;s posts shows only a notice instead of a list.</li>
+<li>Otherwise it shows up to the latest 50, and country-specific takedown labels show the latest 50 regardless of the ratio.</li>
+</ul>
+</li>
+<li>From the same commit, the report no longer carries the appeal notice for account labels <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/under-the-hood/strato/columns/underTheHoodReport.User.strato" target="_blank" rel="noopener"><code>under-the-hood/strato/columns/underTheHoodReport.User.strato</code></a>.<ul>
+<li>The country-specific appeal links changed from Brazil to a list of Japan and EU countries.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A switch that passes a reward head number to the page-decode re-ranking (a re-ranker that picks the whole page at once) was added; the default is 0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/home-mixer/scorers/page_decode_rerank_scorer.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/page_decode_rerank_scorer.rs</code></a>.</li>
+<li>DM share and copy-link share were added to the debias target head names of VMRanker (X&#39;s ranking service that computes the weighted sum of scores and diversity) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/vm-ranker/scoring/debias.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/debias.rs</code></a>.</li>
+<li>A field for the ad classification ID was added to the AdInfo proto <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+<li>Writes to the SID (Semantic ID, which represents an item as a short sequence of semantic tokens) lookup cache moved to an asynchronous queue <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/phoenix/crates/serving/xai-recsys-engine/src/sid_client.rs" target="_blank" rel="noopener"><code>sid_client.rs</code></a>.</li>
+<li>The safety label lookup module of VF (the visibility-filtering service that decides post visibility) was split into a separate crate <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/safety-label-source/lib.rs" target="_blank" rel="noopener"><code>safety-label-source/lib.rs</code></a>.</li>
+<li>The candidate pipeline gained a hook that lets each request set a different number of results <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/candidate-pipeline/candidate_pipeline.rs" target="_blank" rel="noopener"><code>candidate_pipeline.rs</code></a>.</li>
+<li>The sentence &quot;this video was selected because it shows signs of a hidden layer&quot; was removed from the video hidden-layer detection prompt of grox (a Grok-based content safety pipeline) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9106e9f33ee9cc6a92929fc798ae6c566e2841cb/grox/core/lm/convo.py" target="_blank" rel="noopener"><code>grox/core/lm/convo.py</code></a>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In the blender bullet of <code>## Re-ranking, diversity, and filters</code> in <a href="x.html">services/x.md</a>, corrected the default to slot_spread and the reference commit, and changed the carousel HighRisk filter bullet to on by default. Rewrote the default-blender sentence in the <code>## Ads</code> intro and added a default-blender line to that section&#39;s change log; added a late-window engagement head sentence to the ads conversion section intro and a post-ID listing bullet to the Under the Hood section. Raised the reference commit in <code>## Summary</code> and <code>## Sources</code> to 9106e9f and added one row to the change-log summary table. In the brand-safety bullet of <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>, corrected the default-blender claim.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> ⚠ Claim changed: the claim &quot;X&#39;s default ads blender is multi-risk&quot; no longer holds since the 2026-10-31 commit. The safety conditions are unchanged; only the placement approach changed, to spreading ad slots evenly across the whole page <span class="badge ok">verified</span>. Whether the number of ad impressions increased cannot be known because the test pins only &quot;does not decrease&quot; <span class="badge est">inferred</span>.</p></div>
+<h2 id="2-meta-authors-released-the-long-history-ranker-lwr--radar"><span class="num">2</span>Meta authors released the long-history ranker LWR — radar</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2610.39188" target="_blank" rel="noopener">Read More, Reason Deeper: Latent Workspaces for Long-Sequence Recommendation</a> — Meta-affiliated authors, 2026-10-29 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> A sequence ranker that uses long user histories spends more computation in every layer as the history grows, so it is hard to scale history length and model depth separately. HSTU (Meta&#39;s generative-recommendation sequence Transformer) carries the same coupling. This paper proposes a structure that keeps the history in a store that each layer can reread and passes only a fixed-size workspace per candidate along the layers.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Meta authors reported a long-history ranker that is cheaper and better than HSTU offline</span></p></div>
+<ul>
+<li>At a history length of 10K, they write that it improves NE (normalized entropy, a prediction loss where lower is better) by 0.19% over HSTU and cuts forward GFLOP per request by 69.6% <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2610.39188" target="_blank" rel="noopener">arXiv abstract</a>.<ul>
+<li>The author email domain is <code>@meta.com</code> (confirmed in the <a href="https://arxiv.org/html/2610.39188v1" target="_blank" rel="noopener">HTML version</a>).</li>
+<li>It also reports results on two billion-scale ranking surfaces (anonymized as Surface 1 and 2), but these are offline metrics <span class="badge ok">verified</span>.</li>
+</ul>
+</li>
+<li>We found no online A/B test or deployment claim <span class="badge ok">verified</span>. Whether it is used in Meta feeds (Facebook, Instagram) is unknown, so we keep it on the radar <span class="badge est">inferred</span>.</li>
+</ul>
+<blockquote>
+<p>&quot;At 10K history, it improves NE by 0.19% over HSTU while using 69.6% fewer forward GFLOP/request. It also outperforms existing baselines on two billion-scale ranking surfaces.&quot;
+— <a href="https://arxiv.org/abs/2610.39188" target="_blank" rel="noopener">Read More, Reason Deeper</a>, 2026-10-29</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Not folded into the canon. Added an entry to <code>## New this month</code> in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> There is one more piece of evidence in the Meta sequence ranking lineage on &quot;which structure is better at the same compute&quot;. Without a deployment claim, it is not raised to the canon.</p></div>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="radar.html#meta-lwr--a-ranker-that-scales-history-length-and-reasoning-depth-separately">Meta LWR — a ranker that scales history length and reasoning depth separately</a> — <a href="https://arxiv.org/abs/2610.39188" target="_blank" rel="noopener">arXiv 2610.39188</a>. PRISM by the same authors (<a href="https://arxiv.org/abs/2610.39175" target="_blank" rel="noopener">arXiv 2610.39175</a>) is described in the detail.</li>
+<li>In the start-of-month cleanup, moved October&#39;s 6 &quot;new this month&quot; entries (ECHO, TransX, Pinterest User Journeys, GEAR, HELIX, GRP) to the <code>## Earlier additions (2026-10)</code> section.</li>
+<li>Triaged 30 arXiv cs.IR papers. Most were on yesterday&#39;s list, and ads offline evaluation (Beyond IPS) and advertiser subsidy allocation (CASH) were left out because they are far from feed mechanisms.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Whether the video carousel enable switch gets turned on — the HighRisk filter was turned on today, so what remains off by default is the module itself.</li>
+<li>Whether <code>serve_late_window_composed</code> gets turned on — if it does, the link-open probability changes to a value that includes late conversions, and ad scores change.</li>
+<li>The radar <code>## Earlier additions (2026-08~09)</code> entries are approaching the 3-month lifespan — the next run needs to settle graduation or promotion.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts
+Lookup failed: research.netflix.com/publications — the page returned HTTP 404
+Lookup failed: Meta Q3 2026 earnings call transcript — could not find the original transcript text</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-10-31.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-10-31</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-01.html" data-title="일일 리포트 2026-11-01"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
