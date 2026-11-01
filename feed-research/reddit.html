@@ -1,0 +1,1337 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self' 'sha256-H+TNqQsJYlv10jMffAFUV7rVKBvxfr/jzAOH5Bm+fOY='; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reddit — feed-research</title>
+<meta name="description" content="Reddit 도움말은 2026-10-28 수정본 기준으로 홈 피드 추천을 후보 생성, 필터, 예측 모델 채점, 다양성을 고려한 정렬의 네 단계로 설명한다 [확인](후보 생성 절, 홈 피드 필터 절). 2026-09 엔지니어링 글 기준으로 후보 생성에는 홈 피드와 알림이 함께 쓰는…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/reddit.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/reddit.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/reddit.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/reddit.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="Reddit — feed-research">
+<meta property="og:description" content="Reddit 도움말은 2026-10-28 수정본 기준으로 홈 피드 추천을 후보 생성, 필터, 예측 모델 채점, 다양성을 고려한 정렬의 네 단계로 설명한다 [확인](후보 생성 절, 홈 피드 필터 절). 2026-09 엔지니어링 글 기준으로 후보 생성에는 홈 피드와 알림이 함께 쓰는…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/reddit.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body class="svc-reddit" data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/en/reddit.html" hreflang="en" lang="en" aria-label="English (EN)"><span aria-hidden="true" lang="ko">한</span><span>EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / 서비스 정본</p>
+<h1 id="reddit">Reddit</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">갱신</span><time datetime="2026-11-01">2026-11-01</time></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc toc-long"><summary>목차<span class="toc-n">12</span></summary><ol><li><a href="#한-줄-요약">한 줄 요약</a></li><li><a href="#피드-지면">피드 지면</a><ol><li><a href="#for-you와-following">For You와 Following</a></li><li><a href="#댓글-정렬">댓글 정렬</a></li></ol></li><li><a href="#후보-생성-retrieval">후보 생성 (retrieval)</a><ol><li><a href="#홈-피드-후보">홈 피드 후보</a></li><li><a href="#snoorec">SnooRec</a></li><li><a href="#알림-후보">알림 후보</a></li><li><a href="#커뮤니티-추천">커뮤니티 추천</a></li></ol></li><li><a href="#랭킹">랭킹</a><ol><li><a href="#홈-피드-랭커">홈 피드 랭커</a></li><li><a href="#개인화-입력">개인화 입력</a></li><li><a href="#알림-랭킹과-발송량">알림 랭킹과 발송량</a></li><li><a href="#속보-푸시와-trending-판정">속보 푸시와 trending 판정</a></li></ol></li><li><a href="#재순위다양성필터">재순위·다양성·필터</a><ol><li><a href="#홈-피드-필터와-다양성">홈 피드 필터와 다양성</a></li><li><a href="#알림-재순위와-snoorec-탐색">알림 재순위와 SnooRec 탐색</a></li></ol></li><li><a href="#콜드스타트">콜드스타트</a><ol><li><a href="#신규-사용자">신규 사용자</a></li><li><a href="#로그아웃-사용자">로그아웃 사용자</a></li></ol></li><li><a href="#피드백-신호">피드백 신호</a><ol><li><a href="#명시-신호와-제어">명시 신호와 제어</a></li><li><a href="#체류와-암묵-신호">체류와 암묵 신호</a></li></ol></li><li><a href="#광고">광고</a><ol><li><a href="#광고-퍼널">광고 퍼널</a></li><li><a href="#공시와-자동화-캠페인">공시와 자동화 캠페인</a></li></ol></li><li><a href="#인프라플랫폼">인프라·플랫폼</a><ol><li><a href="#ranking-platform">Ranking Platform</a></li><li><a href="#모델-서빙과-벡터-검색">모델 서빙과 벡터 검색</a></li><li><a href="#검색-랭킹과의-접점">검색 랭킹과의 접점</a></li><li><a href="#규제와-실험">규제와 실험</a></li></ol></li><li><a href="#역사">역사</a><ol><li><a href="#공개-코드와-아카이브">공개 코드와 아카이브</a></li><li><a href="#2017-코드의-정렬식">2017 코드의 정렬식</a></li><li><a href="#2017-코드의-홈-구성과-추천">2017 코드의 홈 구성과 추천</a></li><li><a href="#2017년-listing-저장-구조">2017년 listing 저장 구조</a></li><li><a href="#개인화로-넘어간-과정">개인화로 넘어간 과정</a></li></ol></li><li><a href="#열린-질문">열린 질문</a></li><li><a href="#출처">출처</a><ol><li><a href="#reddit-엔지니어링-블로그-rredditeng">Reddit 엔지니어링 블로그 (r/RedditEng)</a></li><li><a href="#광고-엔지니어링-블로그-rredditeng">광고 엔지니어링 블로그 (r/RedditEng)</a></li><li><a href="#공개-소스코드">공개 소스코드</a></li><li><a href="#rchangelog-rblog-옛-공식-블로그-wayback-사본">r/changelog, r/blog, 옛 공식 블로그 (Wayback 사본)</a></li><li><a href="#help-center-supportreddithelpcom-businessreddithelpcom">Help Center (support.reddithelp.com, business.reddithelp.com)</a></li><li><a href="#reddit-뉴스룸-redditinccom">Reddit 뉴스룸 (redditinc.com)</a></li><li><a href="#규제-제출-문서-sec-edgar">규제 제출 문서 (SEC EDGAR)</a></li><li><a href="#eu-규제">EU 규제</a></li><li><a href="#발표">발표</a></li></ol></li></ol></details></nav>
+<div class="prose">
+<h2 id="한-줄-요약">한 줄 요약</h2>
+<p>Reddit 도움말은 2026-10-28 수정본 기준으로 홈 피드 추천을 후보 생성, 필터, 예측 모델 채점, 다양성을 고려한 정렬의 네 단계로 설명한다 <span class="badge ok">확인</span>(<a href="#%ED%9B%84%EB%B3%B4-%EC%83%9D%EC%84%B1-retrieval">후보 생성 절</a>, <a href="#%ED%99%88-%ED%94%BC%EB%93%9C-%ED%95%84%ED%84%B0%EC%99%80-%EB%8B%A4%EC%96%91%EC%84%B1">홈 피드 필터 절</a>). 2026-09 엔지니어링 글 기준으로 후보 생성에는 홈 피드와 알림이 함께 쓰는 멀티태스크 two-tower 모델(사용자와 게시물을 따로 임베딩해 맞춰 보는 구조) SnooRec이 들어가지만, 홈 랭커의 현재 예측 대상과 가중치는 공개되지 않았다 <span class="badge obs">관찰</span> 2026-11-01(<a href="#%EB%9E%AD%ED%82%B9">랭킹 절</a>). Hot과 댓글 Best(confidence) 같은 정렬식은 2017 공개 코드로만 확인되고, 2018-01 도입된 홈 피드 Best와 2026-10-28 발표한 For You·Following의 랭킹 방식은 공개되지 않았다 <span class="badge obs">관찰</span> 2026-11-01(<a href="#%EC%97%AD%EC%82%AC">역사 절</a>, <a href="#for-you%EC%99%80-following">For You와 Following 절</a>).</p>
+<figure class="diagram" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 628" font-family="-apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif" role="img" aria-label="Reddit 홈 피드 파이프라인 다이어그램 (공개 범위 표시)">
+<style>
+.db{fill:var(--card,#fff);stroke:var(--line,#d9d5cd);stroke-width:1}
+.d2{fill:var(--code-bg,#f1efe9);stroke:var(--line,#d9d5cd);stroke-width:1}
+.hl{fill:color-mix(in srgb, var(--svc,#ff4500) 8%, var(--card,#fff));stroke:var(--svc,#ff4500);stroke-width:1.4}
+.bd{fill:none;stroke:var(--line,#d9d5cd);stroke-width:1;stroke-dasharray:4 4}
+.t{fill:var(--fg,#1a1a1a);font-size:13.5px;font-weight:700}
+.s{fill:var(--muted,#6b6b6b);font-size:11.5px}
+.n{fill:var(--muted,#6b6b6b);font-size:11px}
+.a{stroke:var(--muted,#8a877f);stroke-width:1.5;fill:none;marker-end:url(#arrd)}
+.af{stroke:var(--svc,#ff4500);stroke-width:1.3;fill:none;stroke-dasharray:5 4;marker-end:url(#arrd2)}
+</style>
+<defs>
+<marker id="arrd" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted,#8a877f)"/></marker>
+<marker id="arrd2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--svc,#ff4500)"/></marker>
+</defs>
+
+<rect class="hl" x="20" y="14" width="530" height="78" rx="10"/>
+<text class="t" x="285" y="38" text-anchor="middle">후보 생성: SnooRec 멀티태스크 two-tower (2025 초~)</text>
+<text class="s" x="285" y="58" text-anchor="middle">태스크별 유저 타워 · 공유 아이템 타워 · ANN 인덱스 하나</text>
+<text class="s" x="285" y="78" text-anchor="middle">지면별 task weight로 쿼리 한 번 · 온도 샘플링으로 탐색</text>
+
+<rect class="bd" x="570" y="14" width="290" height="78" rx="10"/>
+<text class="t" x="715" y="38" text-anchor="middle" fill="var(--muted,#6b6b6b)">그 밖의 후보 소스</text>
+<text class="s" x="715" y="58" text-anchor="middle">지금의 소스 목록·단계별 후보 수 미공개</text>
+<text class="s" x="715" y="78" text-anchor="middle">소스 목록(2021) · "수천 개"(2025)만 공개</text>
+
+<line class="a" x1="285" y1="92" x2="285" y2="118"/>
+<line class="a" x1="715" y1="92" x2="715" y2="118"/>
+
+<rect class="db" x="20" y="120" width="840" height="58" rx="10"/>
+<text class="t" x="440" y="144" text-anchor="middle">필터: 스팸 · 이미 본 글 · 차단한 콘텐츠 (도움말 2026-10)</text>
+<text class="s" x="440" y="164" text-anchor="middle">성인·민감 주제는 가입이나 관심 표시가 없으면 추천에서 빼려 한다 · 인증 미완료 계정 글 제외 (2026-09~)</text>
+<line class="a" x1="440" y1="178" x2="440" y2="202"/>
+
+<rect class="hl" x="20" y="204" width="840" height="84" rx="10"/>
+<text class="t" x="440" y="228" text-anchor="middle">랭킹: PyTorch DNN, GPU(Triton)에서 서빙</text>
+<text class="s" x="440" y="248" text-anchor="middle">DCNv2 계열 · 서빙 비용 10배 절감 (2025-11) · 모델 신선도 9일에서 4일로 (2026 Q3)</text>
+<text class="s" x="440" y="268" text-anchor="middle">예측 대상(2021 글 뒤로) · 목적 함수 · 가중치는 미공개 (도움말은 입력 범주만 나열)</text>
+<line class="a" x1="440" y1="288" x2="440" y2="312"/>
+
+<rect class="bd" x="20" y="314" width="840" height="46" rx="10"/>
+<text class="t" x="440" y="333" text-anchor="middle" fill="var(--muted,#6b6b6b)">정렬: 비슷한 글이 너무 많이 연달아 나오지 않게 하려 한다</text>
+<text class="s" x="440" y="351" text-anchor="middle">다양성 알고리즘의 이름과 지금의 방식은 미공개 (2021 글은 점수 가중 샘플링)</text>
+<line class="a" x1="440" y1="360" x2="440" y2="384"/>
+
+<rect class="db" x="20" y="386" width="840" height="58" rx="10"/>
+<text class="t" x="440" y="410" text-anchor="middle">홈 피드 → For You / Following (2026-10-28 발표, 정렬 미공개)</text>
+<text class="s" x="440" y="430" text-anchor="middle">로그아웃 기본은 Popular(순 upvote, 일부 국가 위치 맞춤) · r/all은 2026-04 폐지</text>
+
+<rect class="db" x="20" y="476" width="410" height="96" rx="10"/>
+<text class="t" x="225" y="500" text-anchor="middle" font-size="12.5">알림 파이프라인 (2025-05 공개)</text>
+<text class="n" x="225" y="520" text-anchor="middle">Budgeter → Retrieval → Ranking → Reranking</text>
+<text class="n" x="225" y="538" text-anchor="middle">점수 = Σ W × P(행동) 가중합 · light ranker에 SnooRec 임베딩</text>
+<text class="n" x="225" y="556" text-anchor="middle">발송 예산: S-learner 인과 모델 (trending 푸시, 2026-10)</text>
+
+<rect class="db" x="450" y="476" width="410" height="96" rx="10"/>
+<text class="t" x="655" y="500" text-anchor="middle" font-size="12.5">광고 퍼널 (공개)</text>
+<text class="n" x="655" y="520" text-anchor="middle">적격성 필터 → trimmer → heavy ranker → 경매</text>
+<text class="n" x="655" y="538" text-anchor="middle">trimmer: two-tower(2024-05 멀티태스크)와 NLB 탐색 (2025-02)</text>
+<text class="n" x="655" y="556" text-anchor="middle">eCPM = 입찰가 × P(과금 이벤트) (2023) · heavy는 CTR·전환 예측</text>
+
+<path class="af" d="M 120 92 V 106 H 8 V 466 H 120 V 476"/>
+<path class="af" d="M 450 92 V 106 H 872 V 466 H 760 V 476"/>
+
+<rect class="d2" x="20" y="584" width="410" height="34" rx="8"/>
+<text class="n" x="225" y="605" text-anchor="middle">Hot · 댓글 Best 식은 2017 공개 코드뿐 · 홈 Best 식은 미공개</text>
+<rect class="d2" x="450" y="584" width="410" height="34" rx="8"/>
+<text class="n" x="655" y="605" text-anchor="middle">실선: 1차 출처로 공개 · 회색 점선: 방식 미공개 · 색 점선: SnooRec 공유</text>
+</svg>
+<figcaption>Reddit 홈 피드 파이프라인 (공개 범위 표시)</figcaption></figure>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="피드-지면">피드 지면</h2>
+<p>2026-10-28 도움말 기준으로 로그인 사용자의 기본 피드는 가입한 커뮤니티 글과 추천을 개인화된 순서로 섞는 홈 피드이고, 로그아웃 사용자의 기본 피드는 순 upvote로 고른 Popular다 <span class="badge ok">확인</span>(아래 표). Reddit은 2026-10-28 For You와 Following 두 피드 중 고르는 새 피드 경험을 발표했고, 몇 주에 걸쳐 전 세계에 롤아웃한다 <span class="badge ok">확인</span>(<a href="#for-you%EC%99%80-following">For You와 Following 절</a>). r/all은 2026-04-02 시행된 폐지로 홈 피드에 리다이렉트된다 <span class="badge ok">확인</span>(아래 표).</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table>
+<thead>
+<tr>
+<th>지면</th>
+<th>보여 주는 것</th>
+<th>순서를 정하는 방식</th>
+<th>기준</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>홈 피드 (로그인 기본)</td>
+<td>가입한 커뮤니티 글과 비가입 콘텐츠·커뮤니티 추천</td>
+<td>개인화 정렬 Best</td>
+<td>추천 도움말 <span class="nw">2026-10-28</span>, 홈 추천 도움말 <span class="nw">2026-10-05</span></td>
+</tr>
+<tr>
+<td>For You</td>
+<td>가입한 커뮤니티 글과 관심사 기반 추천</td>
+<td>공개되지 않았다</td>
+<td>뉴스룸 <span class="nw">2026-10-28</span></td>
+</tr>
+<tr>
+<td>Following</td>
+<td>가입한 커뮤니티 글</td>
+<td>공개되지 않았다</td>
+<td>뉴스룸 <span class="nw">2026-10-28</span></td>
+</tr>
+<tr>
+<td>Popular (로그아웃 기본)</td>
+<td>최근 인기 글</td>
+<td>순 upvote, 일부 국가는 위치 맞춤</td>
+<td>추천 도움말 <span class="nw">2026-10-28</span></td>
+</tr>
+<tr>
+<td>r/all</td>
+<td>홈 피드로 리다이렉트 (old.reddit은 유지)</td>
+<td>해당 없음</td>
+<td>변경 이력 <span class="nw">2026-04-02</span></td>
+</tr>
+<tr>
+<td>커뮤니티 페이지</td>
+<td>그 커뮤니티의 글</td>
+<td>기본 정렬은 <a href="#%EC%97%B4%EB%A6%B0-%EC%A7%88%EB%AC%B8">열린 질문</a></td>
+<td>도움말 두 문서</td>
+</tr>
+<tr>
+<td>Trending 알림</td>
+<td>최근 방문한 커뮤니티의 인기 글</td>
+<td><a href="#%EC%95%8C%EB%A6%BC-%EB%9E%AD%ED%82%B9%EA%B3%BC-%EB%B0%9C%EC%86%A1%EB%9F%89">알림 추천 파이프라인</a></td>
+<td>도움말 <span class="nw">2026-02-26</span>, 블로그 <span class="nw">2026-10</span></td>
+</tr>
+</tbody></table></div>
+<ul>
+<li><p>로그인 사용자의 기본 피드는 홈 피드이고, 기본값으로 비가입 콘텐츠와 커뮤니티 추천이 섞이며 가입 커뮤니티 글도 개인화된 순서로 나온다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+<ul>
+<li>이 문서는 2024-02-06 작성됐고, For You·Following 발표와 같은 날(2026-10-28) 수정됐지만 본문은 홈 피드 기준으로 쓰여 있다.</li>
+</ul>
+<blockquote>
+<p>&quot;The main, default feed on Reddit for logged-in users is the home feed&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, 2026-10-28 수정</p>
+</blockquote>
+</li>
+<li><p>홈 피드의 Best 정렬은 개인화 정렬이고, 홈 피드 추천은 ML로 Best 정렬을 개인화하고 랭킹하려는 노력의 일부다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">홈 추천 도움말 2026</a>.</p>
+<ul>
+<li>문서는 2021-06-15 작성됐고 2026-10-05에 마지막으로 수정돼, 2026-10-28 개편 전의 서술이다.</li>
+<li>추천 게시물은 커뮤니티가 아니라 게시물 자체를 앞세워 보여 준다(→ <a href="#%EA%B0%9C%EC%9D%B8%ED%99%94-%EC%9E%85%EB%A0%A5">개인화 입력 절</a>).</li>
+</ul>
+</li>
+<li><p>로그아웃 사용자의 기본 피드는 Popular이고, 최근 인기 글을 순 upvote로 정한다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+<ul>
+<li>일부 국가에서는 Popular를 위치에 맞춰 바꾼다. 로그아웃이면 IP를, 로그인이면 Location Setting을 쓴다.</li>
+</ul>
+</li>
+<li><p>r/all 폐지의 마지막 단계가 2026-04-02 시행돼, r/all 링크는 모두 홈 피드로 리다이렉트된다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/47822249050132-Changelog-April-2-2026" target="_blank" rel="noopener">변경 이력 2026-04-02</a>.</p>
+<ul>
+<li>앱에는 바로 적용됐고, 데스크톱은 그 주에 롤아웃한다고 적었다. 트렌딩 콘텐츠는 r/popular에 남는다.</li>
+<li>old.reddit.com이나 old Reddit 기본 설정을 쓰는 사용자는 계속 r/all에 들어갈 수 있다.</li>
+</ul>
+</li>
+<li><p>2025-03-06 변경 이력은 모더레이터 대상 수정 목록에서, 커뮤니티에서 바꾼 정렬이 Best로 돌아가지 않고 데스크톱과 모바일에서 유지되게 고쳤다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/35343974642452-Changelog-March-6-2025" target="_blank" rel="noopener">변경 이력 2025-03-06</a>.</p>
+<ul>
+<li>항목은 커뮤니티에서 정렬을 바꾸는 경우를 말하고 &quot;the feed you intended&quot;로 끝나며, 댓글 정렬이라는 말은 없다.</li>
+</ul>
+</li>
+<li><p>Trending 알림은 최근 방문한 커뮤니티의 인기 글을 알리는 알림이다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/360043033972-How-do-I-turn-off-trending-notifications" target="_blank" rel="noopener">Trending 알림 도움말 2026</a>.</p>
+<ul>
+<li>알림 설정의 Trending posts 토글로 전체를 끌 수 있지만 특정 커뮤니티만 끌 수는 없다. 이 문서는 2026-02-26에 마지막으로 수정됐다.</li>
+</ul>
+</li>
+<li><p>2026-10-08 변경 이력은 피드 게시물에 trending 라벨을 붙이는 소규모 실험을 10월에 시작한다고 알렸다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">변경 이력 2026-10-08</a>.</p>
+<ul>
+<li>라벨을 누르면 트렌드의 AI 요약과 관련 커뮤니티·대화를 모은 상세 페이지로 간다.</li>
+<li>대상은 reddit.com, iOS, Android의 일부 사용자이고, 라벨을 붙일 글을 고르는 방식은 적지 않았다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="for-you와-following">For You와 Following</h3>
+<p>2026-10-28 Reddit 뉴스룸은 For You와 Following 두 피드 중 고르는 새 피드 경험을 발표했다 <span class="badge ok">확인</span> — <a href="https://redditinc.com/news/explore-more-communities-with-reddits-new-feed-updates" target="_blank" rel="noopener">피드 개편 발표 2026</a>.</p>
+<ul>
+<li><p>For You는 가입한 커뮤니티 글과 관심사 기반 추천을 섞고, Following은 가입한 커뮤니티 글만 보여 준다 <span class="badge ok">확인</span> — <a href="https://redditinc.com/news/explore-more-communities-with-reddits-new-feed-updates" target="_blank" rel="noopener">피드 개편 발표 2026</a>.</p>
+<blockquote>
+<p>&quot;For You combines posts from communities you have joined with recommendations related to your interests.&quot;
+— <a href="https://redditinc.com/news/explore-more-communities-with-reddits-new-feed-updates" target="_blank" rel="noopener">Explore More Communities with Reddit’s New Feed Updates</a>, 2026-10-28</p>
+</blockquote>
+</li>
+<li><p>전 세계 롤아웃은 몇 주에 걸쳐 진행되고, 다음 실행 때 마지막으로 본 피드를 다시 연다 <span class="badge ok">확인</span> — 같은 발표.</p>
+<ul>
+<li>같은 발표는 게시물 숨기기와 덜 보기 같은 제어를 계속 실험하겠다고 밝혔다.</li>
+</ul>
+</li>
+<li><p>발표문은 &#39;홈 피드&#39;라는 말을 쓰지 않고, 두 피드의 정렬 방식도 밝히지 않는다 <span class="badge ok">확인</span> — 같은 발표.</p>
+</li>
+<li><p>홈 피드를 둘로 나눈다는 서술은 Help Center 변경 이력에 있고, 이 실험은 2026-09-02부터 소수 사용자에게 다시 열렸다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/53416317564820-Changelog-September-10-2026" target="_blank" rel="noopener">변경 이력 2026-09-10</a>.</p>
+<ul>
+<li>변경 이력은 첫 실험이 있었다고만 하고 그 시점은 적지 않는다.</li>
+<li>변경 이력은 Following에 팔로우한 사용자의 글도 들어간다고 적어, 뉴스룸 정의(가입한 커뮤니티 글만)와 다르다.</li>
+<li>2026-10-08 변경 이력은 이 실험에서 swiping과 sorting 옵션을 시험하고 있다고 적었다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">변경 이력 2026-10-08</a>.</li>
+</ul>
+</li>
+<li><p>2026-10-28 수정된 추천 도움말 본문은 For You와 Following을 언급하지 않는다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+</li>
+</ul>
+<h3 id="댓글-정렬">댓글 정렬</h3>
+<p>2026-09-30 수정된 AutoModerator 문서 기준으로 댓글 suggested sort 값은 best, new, qa, top, controversial, old이고, confidence는 best의 별칭으로 받는다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/52866343172500-Full-automoderator-documentation" target="_blank" rel="noopener">AutoModerator 문서 2026</a>. 모더레이터 권한 도움말(2026-04-02 수정)은 Top 대신 Live를 들어 두 문서의 목록이 다르다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/15484498369428-User-Management-moderators-and-permissions" target="_blank" rel="noopener">모더레이터 권한 도움말 2026</a>.</p>
+<ul>
+<li>AutoModerator 문서는 <code>set_suggested_sort</code> 값으로 위 여섯 개와 blank를 든다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/52866343172500-Full-automoderator-documentation" target="_blank" rel="noopener">AutoModerator 문서 2026</a>.<ul>
+<li>문서는 2026-09-30에 마지막으로 수정됐다.</li>
+</ul>
+</li>
+<li>모더레이터 권한 도움말은 커뮤니티 suggested sort로 Best, New, Controversial, Old, Q&amp;A, Live를 든다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/15484498369428-User-Management-moderators-and-permissions" target="_blank" rel="noopener">모더레이터 권한 도움말 2026</a>.<ul>
+<li>문서는 2026-04-02에 마지막으로 수정됐고, 이 목록에는 Top이 없다.</li>
+<li>2017 코드의 댓글 정렬 선택지에는 live가 없고, 2018-01·02 Wayback 사본의 댓글 정렬 메뉴 HTML에는 live (beta)가 random과 같은 숨김 선택지로 들어 있다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/menus.py#L579-L588" target="_blank" rel="noopener"><code>r2/r2/lib/menus.py:579-588</code></a>, <a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">Wayback 2018-01-25</a>, <a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">Wayback 2018-02-02</a>.</li>
+</ul>
+</li>
+<li>이 선택지들의 계산 방식은 도움말에 없고, 공개된 식은 2017 코드뿐이다 <span class="badge obs">관찰</span> 2026-11-01(<a href="#%EC%97%B4%EB%A6%B0-%EC%A7%88%EB%AC%B8">열린 질문</a>, <a href="#2017-%EC%BD%94%EB%93%9C%EC%9D%98-%EC%A0%95%EB%A0%AC%EC%8B%9D">2017 정렬식 절</a>).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="후보-생성-retrieval">후보 생성 (retrieval)</h2>
+<p>Reddit 도움말은 2026-10-28 수정본 기준으로 추천의 첫 단계를 후보 생성이라고 설명하지만, 후보 소스의 종류와 수는 밝히지 않는다 <span class="badge ok">확인</span>(<a href="#%ED%99%88-%ED%94%BC%EB%93%9C-%ED%9B%84%EB%B3%B4">홈 피드 후보 절</a>). 2025-11 엔지니어링 글 기준으로 홈 피드는 수천 개 후보를 모으고, 2026-09 글 기준으로 그 후보 생성에는 2025년 초부터 전체 프로덕션 트래픽을 처리해 온 SnooRec이 쓰인다 <span class="badge ok">확인</span>(<a href="#%ED%99%88-%ED%94%BC%EB%93%9C-%ED%9B%84%EB%B3%B4">홈 피드 후보 절</a>, <a href="#snoorec">SnooRec 절</a>). 2025 엔지니어링 글 기준으로 알림은 규칙 기반과 모델 기반 후보 소스를 함께 쓰고, 속보 푸시는 게시물을 먼저 고르는 content-first 방식을 쓴다 <span class="badge ok">확인</span>(<a href="#%EC%95%8C%EB%A6%BC-%ED%9B%84%EB%B3%B4">알림 후보 절</a>).</p>
+<h3 id="홈-피드-후보">홈 피드 후보</h3>
+<p>홈 피드 후보 소스는 2021 글이 목록으로 공개했고, 그 뒤 공개된 것은 수천 개를 모은다는 2025 글과 SnooRec이며, 지금의 소스 목록과 단계별 후보 수는 찾지 못했다 <span class="badge obs">관찰</span> 2026-11-01 — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU 블로그 2025</a>.</p>
+<ul>
+<li><p>사용자가 Reddit을 열면 수천 개 후보 게시물을 모으고, 휴리스틱으로 거른 뒤, 모델이 참여 가능성을 점수화해 상위를 홈 피드로 보낸다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU 블로그 2025</a>.</p>
+<blockquote>
+<p>&quot;we gather thousands of candidate posts, filter them using heuristics, and use a model to score potential engagement&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">Reddit&#39;s Home Feed on GPU</a> (블로그), 2025-11-10</p>
+</blockquote>
+</li>
+<li><p>2021-06 글 기준으로 홈을 열면 여러 소스에서 후보 게시물 목록을 만들고, 여러 필터 단계를 거친 뒤, 고른 정렬 방식으로 랭킹한다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>.</p>
+<ul>
+<li>같은 글은 지난 24시간 게시물에서 구독, 비슷한 커뮤니티, 온보딩 카테고리, 최근 방문 커뮤니티, 인기·지역 인기 글을 후보 소스로 들었다. 글은 Wayback 사본으로 읽었다.</li>
+</ul>
+<blockquote>
+<p>&quot;Reddit’s systems build a list of potential candidate posts from multiple sources, pass the posts through multiple filtering steps&quot;
+— <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">Evolving the Best Sort for Reddit’s Home Feed</a> (r/blog, Wayback 사본), 2021-06-22</p>
+</blockquote>
+</li>
+<li><p>도움말은 첫 단계를 관심 가질 만한 콘텐츠의 초기 목록을 만드는 후보 생성이라고 부르지만, 소스의 종류와 개수, 방식은 적지 않는다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+</li>
+<li><p>추천 게시물에는 추천 이유가 붙고, 도움말은 그 이유로 &#39;지금 Reddit에서 인기&#39;와 &#39;상호작용한 콘텐츠와 비슷함&#39;을 예로 든다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+<ul>
+<li>후보 소스가 이 둘뿐인지는 문서에 없다.</li>
+</ul>
+</li>
+<li><p>10-K FY2025는 AI가 검색어, 게시물 주제, 비슷한 사용자의 참여 같은 요인으로 게시물과 커뮤니티를 추천한다고 적는다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025, 2026-02-06 제출</a>.</p>
+</li>
+</ul>
+<h3 id="snoorec">SnooRec</h3>
+<p>SnooRec은 Reddit의 멀티태스크 retrieval 모델이고, 2025년 초부터 전체 프로덕션 트래픽을 처리하며 홈 피드와 알림의 후보 생성에 쓰인다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec 블로그 2026</a>.</p>
+<ul>
+<li><p>유저 타워에는 클릭, upvote, good visit 같은 태스크별 expert(태스크마다 따로 두는 하위 네트워크)를 두고, 아이템 타워는 하나를 공유한다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec 블로그 2026</a>.</p>
+<ul>
+<li>아이템 타워가 하나라서 모든 후보를 ANN(근사 최근접 이웃 검색) 인덱스 하나에 올린다.</li>
+</ul>
+<blockquote>
+<p>&quot;task-specific capacity lives in the user tower, while the item tower remains shared&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec: A Shared Retrieval Foundation</a> (블로그), 2026-09-15</p>
+</blockquote>
+</li>
+<li><p>서빙할 때는 지면이 정한 task weight로 태스크별 유저 임베딩을 가중합하고 정규화해, 공유 인덱스에 쿼리를 한 번만 보낸다 <span class="badge ok">확인</span> — SnooRec 블로그.</p>
+<ul>
+<li>그래서 retrieval 목표를 바꿀 때 모델 재학습이나 인덱스 재구축이 필요 없다.</li>
+</ul>
+</li>
+<li><p>학습은 in-batch negatives를 쓰는 InfoNCE 손실(정답 쌍을 배치 안의 다른 쌍과 구분하게 하는 대조 손실)과 dot product 유사도로 한다 <span class="badge ok">확인</span> — SnooRec 블로그.</p>
+<ul>
+<li>입력 피처의 10%를 무작위로 dropout한다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="알림-후보">알림 후보</h3>
+<p>알림 추천의 후보 소스는 규칙 기반과 모델 기반으로 나뉘고, 속보 푸시는 이와 별도로 게시물을 먼저 고른다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">속보 푸시 블로그 2025</a>.</p>
+<ul>
+<li>규칙 기반 소스 Subscribed는 구독 subreddit 상위 X개를 고르고, subreddit마다 최근 며칠 글 가운데 점수 상위 Y개를 뽑아 라운드로빈으로 채운다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>.<ul>
+<li>점수는 upvote, downvote, 작성 시각으로 매긴다.</li>
+</ul>
+</li>
+<li>모델 기반 소스인 user-post two-tower는 푸시 알림(PN) 클릭 같은 라벨로 학습한다 <span class="badge ok">확인</span> — 알림 추천 블로그.<ul>
+<li>최근 게시물 수십만 건의 post 임베딩은 인덱싱 잡이 미리 계산하고, 유저 임베딩만 실시간으로 계산해 nearest-neighbour search를 한다.</li>
+</ul>
+</li>
+<li>속보 푸시는 게시물을 먼저 고르고 관심 있을 유저를 나중에 정하는 content-first 방식으로 후보를 고른다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">속보 푸시 블로그 2025</a>.<ul>
+<li>기존 user-first 추천은 참여 신호가 쌓인 오래된 글을 고르기 쉽고 지연이 생겨서, 이를 보완하려고 도입했다.</li>
+<li>2025-11-25 글 기준으로 Breaking News 푸시에 쓰인다(→ <a href="#%EC%86%8D%EB%B3%B4-%ED%91%B8%EC%8B%9C%EC%99%80-trending-%ED%8C%90%EC%A0%95">속보 푸시 절</a>).</li>
+</ul>
+</li>
+</ul>
+<h3 id="커뮤니티-추천">커뮤니티 추천</h3>
+<p>커뮤니티 추천은 2026-10-28 도움말 기준으로 지역과 전역의 활성도, 트렌딩 주제와의 관련성으로 정한다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+<ul>
+<li>이 서술의 지면은 모바일 Explore Communities 페이지와 검색의 트렌딩 등이다 <span class="badge ok">확인</span> — 추천 도움말.</li>
+<li>로그인 사용자에게는 이미 가입했거나 상호작용한 커뮤니티와의 유사도도 쓴다 <span class="badge ok">확인</span> — 추천 도움말.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="랭킹">랭킹</h2>
+<p>2025-11 엔지니어링 글 기준으로 홈 피드 랭커는 PyTorch로 만들어 GPU에서 서빙하는 DNN이지만, 이 랭커의 예측 대상과 목적 함수, 가중치는 공개되지 않았다 <span class="badge obs">관찰</span> 2026-11-01(<a href="#%ED%99%88-%ED%94%BC%EB%93%9C-%EB%9E%AD%EC%BB%A4">홈 피드 랭커 절</a>). 도움말은 개인화 입력을 범주 수준으로만 나열하고, 요인의 중요도가 사용자 활동에 따라 동적으로 바뀐다고 적는다 <span class="badge ok">확인</span>(<a href="#%EA%B0%9C%EC%9D%B8%ED%99%94-%EC%9E%85%EB%A0%A5">개인화 입력 절</a>). 반대로 알림 랭커는 행동별 예측 확률의 가중합으로 최종 점수를 낸다고 공개했다 <span class="badge ok">확인</span>(<a href="#%EC%95%8C%EB%A6%BC-%EB%9E%AD%ED%82%B9%EA%B3%BC-%EB%B0%9C%EC%86%A1%EB%9F%89">알림 랭킹 절</a>).</p>
+<h3 id="홈-피드-랭커">홈 피드 랭커</h3>
+<p>홈 피드 랭킹 모델은 2025-11 글 기준으로 PyTorch로 작성해 ONNX Runtime으로 서빙하는 DNN이다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU 블로그 2025</a>.</p>
+<ul>
+<li><p>string 피처는 토큰화하고 categorical 피처는 임베딩해 이어 붙인 뒤, shared 레이어와 target 레이어에 통과시킨다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU 블로그 2025</a>.</p>
+</li>
+<li><p>DCNv2(피처 교차를 명시적으로 학습하는 추천 모델 구조) 같은 아키텍처로 레이어가 커져 CPU 서빙이 한계에 닿았고, GPU로 옮겨 서빙 비용을 10배 줄였다 <span class="badge ok">확인</span> — GPU 블로그(→ <a href="#%EB%AA%A8%EB%8D%B8-%EC%84%9C%EB%B9%99%EA%B3%BC-%EB%B2%A1%ED%84%B0-%EA%B2%80%EC%83%89">모델 서빙 절</a>).</p>
+<blockquote>
+<p>&quot;Outcomes include a 10x reduction in serving costs.&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">Reddit&#39;s Home Feed on GPU</a> (블로그), 2025-11-10</p>
+</blockquote>
+</li>
+<li><p>2026 Q3 주주서한은 랭킹 개선과 Reddit 데이터를 20배 더 써서 학습한 새 모델 아키텍처를 Q3에 출시했다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 주주서한</a>.</p>
+<ul>
+<li>서한은 이 변경이 개인화에 쓰는 신호를 넓히고 모델 릴리스 속도를 높였다고 적었다.</li>
+<li>같은 서한은 피드 모델 신선도가 9일에서 4일로 줄었다고 밝혔다.</li>
+<li>서한은 동영상 경험을 다루는 문단에서 vertical chaining과 modernized ranking pipeline을 Q3에 출시했다고 적었지만, 두 용어의 뜻은 설명하지 않았다.</li>
+<li>그 파이프라인이 홈 피드 랭커를 가리키는지 동영상 지면에 한정되는지는 서한에 없다.</li>
+</ul>
+</li>
+<li><p>S-1은 New Home Feed ranking을 훨씬 많은 데이터와 사용자 신호로 재학습했다고 밝히고, 성과로 Good Visits(게시물을 30초 넘게 소비한 방문)가 30% 넘게 늘었다고 적었다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.</p>
+<ul>
+<li>비교 기간은 2023-12-31 종료 분기 대 2023-06-30 종료 분기다.</li>
+<li>S-1은 재학습 시점을 적지 않았고, 재학습과 수치를 &#39;For example&#39;로 나란히 놓았을 뿐 인과를 명시하지 않는다.</li>
+<li>10-K FY2024는 같은 문장을 유지하며 수치를 2024-Q4 대 2023-Q4 +30%로 바꿨다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000018/rddt-20241231.htm" target="_blank" rel="noopener">10-K FY2024</a>.</li>
+<li>10-K FY2025의 같은 문단에는 이 예시와 수치가 없다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</li>
+</ul>
+</li>
+<li><p>S-1은 AI 기반 recommendation engine이 홈 피드, 게시물 상세, 커뮤니티 안, 알림과 이메일의 콘텐츠를 선별하고 랭킹한다고 서술했다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.</p>
+<ul>
+<li>이 문장은 S-1 Business 절에만 있고 10-K FY2024·FY2025 본문에는 없다.</li>
+<li>단일 모델인지 여러 시스템의 총칭인지는 서술에 없다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="개인화-입력">개인화 입력</h3>
+<p>Reddit 도움말은 2026-10-28 수정본 기준으로 개인화 입력을 게시물 정보, 사용자 활동, 계정 나이, 위치 설정의 범주로 나열하고, 모델 구조와 가중치는 밝히지 않는다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+<ul>
+<li><p>게시물 쪽 입력은 upvote와 downvote, 게시된 커뮤니티, 댓글 이력, 게시물 유형, 게시물 나이, flair(커뮤니티가 게시물에 다는 태그)다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+</li>
+<li><p>사용자 활동 쪽 입력은 방문 중 상호작용한 콘텐츠와 커뮤니티, 투표, 체류 시간, 구독, 관심 주제, 덜 보기 요청이다 <span class="badge ok">확인</span> — 추천 도움말.</p>
+<ul>
+<li>상호작용 기록은 현재 방문과 과거 방문을 함께 본다.</li>
+<li>체류 시간은 커뮤니티별로 재고, 최근 방문한 커뮤니티도 따로 본다.</li>
+<li>관심 주제는 가입 때 고른 것이고, 덜 보기는 &quot;show less&quot;를 요청한 게시물 유형이다.</li>
+</ul>
+<blockquote>
+<p>&quot;the time you’ve spent on specific communities, the communities you’ve visited recently, your community subscriptions&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, 2026-10-28 수정</p>
+</blockquote>
+</li>
+<li><p>필터 단계 뒤에 predictive models가 사용자가 좋아할지 아닐지를 예측하고, 그 예측으로 콘텐츠를 정렬한다 <span class="badge ok">확인</span> — 추천 도움말.</p>
+<ul>
+<li>모델 종류와 예측 대상, 곧 무엇을 positive로 보는지는 문서에 없다.</li>
+</ul>
+</li>
+<li><p>각 요인의 중요도는 사용자의 활동, 추천 콘텐츠에 대한 반응, 피드백에 따라 동적으로 바뀐다고 한다 <span class="badge ok">확인</span> — 추천 도움말.</p>
+<ul>
+<li>가중치가 전역 상수가 아니라 사람마다 다르다는 뜻으로 읽힌다 <span class="badge est">추정</span>. 근거는 문서가 &#39;your activity&#39;에 따라 바뀐다고 쓴 점이고, 구현은 공개되지 않았다.</li>
+</ul>
+</li>
+<li><p>홈 피드의 Best는 새 커뮤니티를 좋아하는 성향, 계정 나이, 과거에 upvote하거나 댓글을 단 게시물 유형을 고려한다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">홈 추천 도움말 2026</a>.</p>
+</li>
+<li><p>위치 개인화의 기본값은 IP 기반 대략 위치이고, No location specified를 고르면 피드와 추천의 위치 맞춤만 꺼진다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/360062429491-Managing-your-Location-Customization-setting" target="_blank" rel="noopener">위치 설정 도움말 2026</a>.</p>
+<ul>
+<li>광고와 적용 약관 판단에는 IP로 추정한 위치를 계속 쓴다. 이 문서는 2026-03-29에 마지막으로 수정됐다.</li>
+<li>정밀 위치인 위도와 경도는 수집, 저장, 사용하지 않는다고 별도 문서가 적는다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/360049845011-How-Reddit-Uses-Location-Data" target="_blank" rel="noopener">위치 데이터 도움말 2026</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="알림-랭킹과-발송량">알림 랭킹과 발송량</h3>
+<p>알림 게시물 추천은 2025-05 글 기준으로 유저별 발송 수를 정하는 Budgeter, Retrieval, ML 점수화, 규칙을 적용하는 Reranking 순서로 후보를 좁힌다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>.</p>
+<ul>
+<li>매일 수천만 유저에게 수백만 게시물 중에서 추천하고, 큐와 비동기 워커로 도는 준실시간 파이프라인이다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>.</li>
+<li>랭킹 모델은 shared 레이어 블록과 라벨별 target 레이어를 둔 멀티태스크 DNN이고, 최종 점수는 행동별 예측 확률에 가중을 곱해 더한 값이다 <span class="badge ok">확인</span> — 알림 추천 블로그.<ul>
+<li><p>글은 이 모델을 SPR model이라고 부른다.</p>
+</li>
+<li><p>학습 데이터는 train-serve skew(학습 때와 서빙 때 피처 값이 어긋나는 문제)를 없애려고 prediction log로 모으고, 최근 몇 주치만 쓴다.</p>
+<pre tabindex="0"><code>score = Wclick×P(click) + Wupvote×P(upvote) + … + Wdownvote×P(downvote)
+</code></pre>
+</li>
+</ul>
+</li>
+<li>SnooRec의 유저·아이템 임베딩은 알림 light ranker(가벼운 모델로 후보를 먼저 줄이는 앞단 랭커)와 광고 랭킹 모델의 입력 피처로도 쓰인다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec 블로그 2026</a>.<ul>
+<li>알림에서는 dense feature로도 쓰고, 태스크별 dot product 같은 파생 유사도를 넣는다.</li>
+<li>Matryoshka 학습(임베딩 앞부분만 잘라 써도 쓸 만하게 하는 학습) 덕분에 ANN 인덱스는 256차원 전체를, ranker는 32 또는 64차원 prefix를 쓸 수 있다.</li>
+<li>홈 피드 최종 랭커에 이 임베딩을 쓰는지는 글의 지면 표에 없다.</li>
+</ul>
+</li>
+<li>Budgeter는 유저별 일일 예산을 인과 모델링으로 정한다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1wyhkcf/how_reddit_uses_causal_ml_to_personalise/" target="_blank" rel="noopener">인과 예산 블로그 2026</a>.<ul>
+<li>2026-10 글은 그 방식을 trending 추천 푸시의 예산을 정하는 Trending Budgeting system에 한정해 설명한다. 아래 세부는 이 글의 것이다.</li>
+<li>유저를 고정 일일 예산에 무작위로 배정한 실험 데이터로 S-learner(처치 변수를 피처로 넣은 모델 하나로 효과를 추정하는 방식) 모델을 학습한다.</li>
+<li>모델은 예산을 입력으로 받아 미래 활성 일수와 알림 끄기 확률을 예측한다.</li>
+<li>정책 점수는 activity weight × E[active days] − disable weight × P(disable)의 단순화된 형태다.</li>
+</ul>
+</li>
+<li>예산 모델은 일 배치로 추론해 유저별 예측을 KV store에 두고, 알림 기회가 오면 랭킹 서비스가 정책을 요청 시점에 적용한다 <span class="badge ok">확인</span> — 인과 예산 블로그.<ul>
+<li>그래서 정책 가중치와 임계값은 모델 재학습 없이 바꿀 수 있다.</li>
+<li>새 정책은 off-policy evaluation(기존 정책의 로그로 새 정책의 성과를 추정하는 평가)으로 먼저 본다. 방식은 direct matching과 doubly robust다.</li>
+<li>그다음 온라인 실험과 장기 holdout(변경을 적용하지 않고 남겨 둔 대조군)으로 확인한다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="속보-푸시와-trending-판정">속보 푸시와 trending 판정</h3>
+<p>속보 푸시는 2025-11 글 기준으로 첫 1시간 참여로 예측한 Engagement Score와 LLM이 매긴 Breakingness Score를 곱한 점수로 게시물을 고른다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">속보 푸시 블로그 2025</a>.</p>
+<ul>
+<li><p>XGBoost가 게시물 첫 1시간의 댓글, 공유, upvote, consume으로 24시간 consume을 예측한 값이 Engagement Score다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">속보 푸시 블로그 2025</a>.</p>
+</li>
+<li><p>LLM은 편집 기준표로 긴급성, 출처 신뢰도, 뉴스 가치를 매기고, 민감한 콘텐츠에는 0점을 준다 <span class="badge ok">확인</span> — 속보 푸시 블로그.</p>
+<ul>
+<li>최근 24시간의 고득점 게시물과 같은 스토리면 의미 중복으로 감점한다.</li>
+<li>최근 7일 후보 점수의 99.8 백분위 이상만 보낸다.</li>
+</ul>
+</li>
+<li><p>COPTER v1(Reddit의 trending 콘텐츠 탐지 시스템)은 게시물 참여량을 비교 연령으로 투영한 값이 같은 맥락의 최근 글보다 예외적이면 trending으로 본다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wo8pjw/contextual_popularity_trending_content_detection/" target="_blank" rel="noopener">COPTER 블로그 2026</a>.</p>
+<ul>
+<li>맥락은 subreddit 또는 연결된 Wikidata 토픽, 연령 구간, 지표, 성장궤적 구간으로 나눈다.</li>
+<li>views, upvotes, comments가 판정을 촉발하고 downvotes는 진단에만 쓴다.</li>
+<li>시간 단위 관측, 일 단위 모델링, 시간 단위 탐지의 세 주기로 돈다.</li>
+</ul>
+<blockquote>
+<p>&quot;trendingness measures whether attention to a post is unusual for its context and moment&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1wo8pjw/contextual_popularity_trending_content_detection/" target="_blank" rel="noopener">Contextual Popularity Trending Content Detection</a> (블로그), 2026-09-23</p>
+</blockquote>
+</li>
+<li><p>COPTER의 첫 소비자는 검색이고, 글은 이 신호를 피드 후보 생성과 랭킹, 알림에도 쓸 수 있는 공통 레이어로 의도한다고만 적었다 <span class="badge ok">확인</span> — COPTER 블로그.</p>
+<ul>
+<li>검색에서는 trending_level을 Milvus 코퍼스 필드로 색인해 의미 검색의 필터로 쓴다. 의미 검색 모델은 LLM에서 증류한 query-to-post two-tower다.</li>
+<li>Redis에서 최신 값을 다시 확인하고, value model(여러 예측을 가중해 합친 점수식)에 trendingness 차원을 더한다.</li>
+<li>피드에 적용했는지는 서술하지 않았다.</li>
+<li>2026-10-08 변경 이력의 피드 trending 라벨 실험(→ <a href="#%ED%94%BC%EB%93%9C-%EC%A7%80%EB%A9%B4">피드 지면</a>)도 어떤 탐지 신호를 쓰는지 적지 않았다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">변경 이력 2026-10-08</a>.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="재순위다양성필터">재순위·다양성·필터</h2>
+<p>Reddit 도움말은 2026-10-28 수정본 기준으로 후보 생성 뒤 스팸, 이미 본 콘텐츠, 차단한 콘텐츠를 거르고, 마지막 정렬에서 비슷한 게시물이 너무 많이 연달아 나오지 않게 하려 한다고 설명한다 <span class="badge ok">확인</span>(<a href="#%ED%99%88-%ED%94%BC%EB%93%9C-%ED%95%84%ED%84%B0%EC%99%80-%EB%8B%A4%EC%96%91%EC%84%B1">홈 피드 필터 절</a>). 지금 쓰는 다양성 알고리즘의 이름과 방식은 공개되지 않았다 <span class="badge obs">관찰</span> 2026-11-01(<a href="#%ED%99%88-%ED%94%BC%EB%93%9C-%ED%95%84%ED%84%B0%EC%99%80-%EB%8B%A4%EC%96%91%EC%84%B1">홈 피드 필터 절</a>). 알림은 재순위 단계에서 규칙으로 모델 점수를 조정하고, SnooRec은 retrieval 뒤에 온도 샘플링으로 탐색한다 <span class="badge ok">확인</span>(<a href="#%EC%95%8C%EB%A6%BC-%EC%9E%AC%EC%88%9C%EC%9C%84%EC%99%80-snoorec-%ED%83%90%EC%83%89">알림 재순위 절</a>).</p>
+<h3 id="홈-피드-필터와-다양성">홈 피드 필터와 다양성</h3>
+<p>홈 피드의 필터와 다양성 규칙은 도움말과 엔지니어링 글의 문장 수준으로만 공개됐다 <span class="badge obs">관찰</span> 2026-11-01 — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+<ul>
+<li><p>후보 생성 뒤에 스팸, 이미 본 콘텐츠, 차단한 콘텐츠를 걸러내는 필터 단계가 있다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+</li>
+<li><p>마지막 정렬 단계에서 다양성을 확보해 비슷한 게시물이 너무 많이 연달아 나오지 않게 하려 한다고 하며, 방식은 밝히지 않았다 <span class="badge ok">확인</span> — 추천 도움말.</p>
+<blockquote>
+<p>&quot;we aim to avoid showing you too many similar posts in a row in the feed&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, 2026-10-28 수정</p>
+</blockquote>
+</li>
+<li><p>성인물과 민감한 주제의 콘텐츠는 그 커뮤니티를 구독했거나 관심을 표시하지 않았으면 추천에 들어가지 않게 하려 한다 <span class="badge ok">확인</span> — 추천 도움말.</p>
+<ul>
+<li>구독한 경우에도 이런 유형의 추천은 제한될 수 있다고 적었다.</li>
+</ul>
+</li>
+<li><p>community muting은 알림, 홈 피드(추천 포함), Popular에서 해당 커뮤니티를 빼고, 최대 1,000개까지 뮤트할 수 있다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/9810475384084-What-is-community-muting" target="_blank" rel="noopener">뮤트 도움말 2026</a>.</p>
+<ul>
+<li>다른 mixed feed와 추천으로 범위를 넓힐 예정이라는 문장도 있지만, 그 문장을 언제 썼는지는 알 수 없다.</li>
+</ul>
+</li>
+<li><p>2026-09부터 사람 인증이나 자동화 등록 요구를 받고 둘 다 끝내지 않은 계정의 글과 댓글을 추천에서 뺀다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/53416317564820-Changelog-September-10-2026" target="_blank" rel="noopener">변경 이력 2026-09-10</a>.</p>
+<ul>
+<li>우선 확신도가 높은 일부 규칙 위반 콘텐츠와 계정에 적용하고 점차 넓힌다.</li>
+</ul>
+</li>
+<li><p>Reddit Safety팀의 실시간 규칙 엔진 REV2는 Flink 기반 Signals-Joiner로 느린 ML 신호를 받지만, 피드 필터와 이어지는지는 밝히지 않았다 <span class="badge ok">확인</span> — <a href="https://current.confluent.io/archive/2025/new-orleans-sessions" target="_blank" rel="noopener">Current 2025 세션 초록</a>.</p>
+<ul>
+<li>2025-10-29 발표이고, 발표자는 Reddit, Inc. 소속이다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="알림-재순위와-snoorec-탐색">알림 재순위와 SnooRec 탐색</h3>
+<p>알림은 재순위에서 규칙으로 점수를 조정하고, SnooRec은 ANN 검색 뒤 온도 샘플링으로 탐색 폭을 넓힌다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec 블로그 2026</a>.</p>
+<ul>
+<li><p>알림의 Reranking 단계는 규칙으로 모델의 최종 확률 점수를 조정하고, 예로 구독 기반 추천을 비개인화 콘텐츠보다 앞세운다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>.</p>
+<ul>
+<li>글은 다양성을 더 넣는 것을 재순위로 할 수 있는 일의 예로 들었다.</li>
+<li>실험 중이라고 밝힌 것은 제품 인사이트에 따라 head별 가중을 동적으로 바꾸는 방식이다.</li>
+<li>댓글에 반응할 유저에게 댓글이 적은 글의 comment head 점수를 올리는 것은 그 방식으로 가능한 예로 든 것이다.</li>
+</ul>
+</li>
+<li><p>SnooRec은 ANN 검색 뒤 top-k 후보에서 temperature softmax(점수를 온도로 나눈 softmax 확률)로 샘플링하는 탐색 장치를 둔다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec 블로그 2026</a>.</p>
+<ul>
+<li>온도는 검색 점수의 표준편차로 보정하고, 요청별 보정이 전역 보정보다 낫지 않아 프로덕션은 전역 보정을 쓴다.</li>
+<li>온도 샘플링은 Days Active +0.236%, subreddit 다양성 +1.066%를 냈지만, 부정 피드백인 Show Less 클릭도 +6.145% 늘었다.</li>
+<li>이 표는 행 이름과 머리글까지 모두 굵게 써서 유의 여부를 구분하지 않는다. 두 온도(τ=0.0022, τ=0.0032) 중 어느 쪽 값인지도 구분되지 않는다.</li>
+</ul>
+<blockquote>
+<p>&quot;exploration can improve discovery, but the temperature needs to be tuned per surface and monitored with guardrail metrics.&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec: A Shared Retrieval Foundation</a> (블로그), 2026-09-15</p>
+</blockquote>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="콜드스타트">콜드스타트</h2>
+<p>Reddit 도움말은 2026-10-28 수정본 기준으로 계정이 새롭거나 구독이 적은 사용자에게 모델이 구독 콘텐츠보다 추천을 더 강조할 수 있다고 적는다 <span class="badge ok">확인</span>(<a href="#%EC%8B%A0%EA%B7%9C-%EC%82%AC%EC%9A%A9%EC%9E%90">신규 사용자 절</a>). 알림에서는 신호가 적은 유저가 더 일반적인 콘텐츠를 받고 있다고 2025-05 글이 밝혔다 <span class="badge ok">확인</span>(<a href="#%EC%8B%A0%EA%B7%9C-%EC%82%AC%EC%9A%A9%EC%9E%90">신규 사용자 절</a>). 2026 Q3 기준 로그아웃 DAUq는 전체 130.3M 가운데 76.8M이고, Reddit은 2026 Q4부터 미국 밖 일부 시장에서 로그인 전용 경험을 시험한다 <span class="badge ok">확인</span>(<a href="#%EB%A1%9C%EA%B7%B8%EC%95%84%EC%9B%83-%EC%82%AC%EC%9A%A9%EC%9E%90">로그아웃 사용자 절</a>).</p>
+<h3 id="신규-사용자">신규 사용자</h3>
+<p>신규 사용자 쪽 공개 자료로는 추천 비중을 높일 수 있다는 도움말 문장, 신호가 적은 유저가 알림에서 더 일반적인 콘텐츠를 받는다는 2025-05 엔지니어링 글, 온보딩과 개인화에 AI를 쓴다는 공시 문장이 있다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>, <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000020/exhibit992q425.htm" target="_blank" rel="noopener">Q4 2025 주주서한</a>, <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</p>
+<ul>
+<li><p>계정이 새롭거나 구독한 커뮤니티가 적은 사용자에게는 모델이 구독 콘텐츠보다 추천을 더 강조할 수 있다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+<ul>
+<li>가입 때 고른 관심 주제도 추천 요인으로 쓴다.</li>
+<li>신규 유저용 별도 모델이 있다는 서술은 아니다.</li>
+</ul>
+<blockquote>
+<p>&quot;For users with newer accounts or fewer community subscriptions, our models may emphasize recommendations over subscriptions.&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, 2026-10-28 수정</p>
+</blockquote>
+</li>
+<li><p>2025-05 글 기준으로 알림에서는 신호가 적은 유저가 더 일반적인 콘텐츠를 받고 있고, 이를 개선하는 것이 앞으로의 계획이다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">알림 추천 블로그 2025</a>.</p>
+<ul>
+<li>어떤 방식으로 개선하는지는 서술하지 않았다.</li>
+</ul>
+</li>
+<li><p>Q4 2025 주주서한은 LLM 사용을 늘려 콘텐츠 이해를 높이고 개인화를 앞당긴다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000020/exhibit992q425.htm" target="_blank" rel="noopener">Q4 2025 주주서한</a>.</p>
+<ul>
+<li>CEO는 앱을 여는 순간부터 Reddit이 개인화되고 유용하게 느껴지도록 AI와 ML을 쓴다고 적었다.</li>
+</ul>
+</li>
+<li><p>10-K FY2025는 AI 투자가 신규 사용자 온보딩을 개선하고 기존 사용자의 참여를 이끌었다고 믿는다고 적었다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</p>
+</li>
+</ul>
+<h3 id="로그아웃-사용자">로그아웃 사용자</h3>
+<p>2026 Q3 기준 로그아웃 DAUq는 전체 130.3M 가운데 76.8M(약 59%)이고, Reddit은 2026 Q4부터 로그인 전용 경험을 시험한다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 주주서한</a>.</p>
+<ul>
+<li><p>2026 Q3 로그아웃 DAUq(Reddit이 실적에 쓰는 일간 순 방문자 지표)는 76.8M, 로그인 DAUq는 53.5M, 전체 DAUq는 130.3M이다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 주주서한</a>.</p>
+<ul>
+<li>수치는 서한 부록의 지역별 핵심 지표 표에 있다. 전년 동기 대비 로그아웃은 65.8M에서 17%, 로그인은 50.2M에서 7% 늘었다.</li>
+<li>서한은 Q3 검색 유입이 크게 줄었고 그 영향이 로그아웃과 웹 트래픽에 가장 컸다고 적었다.</li>
+</ul>
+</li>
+<li><p>10-Q Q3 2026은 검색 엔진으로 들어오는 방문자가 대체로 로그인하지 않은 상태이고, 이들의 수익화가 주로 대화 페이지와 피드 광고로 이뤄진다고 적는다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 2026</a>.</p>
+<ul>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>도 같은 문장을 썼다.</li>
+</ul>
+</li>
+<li><p>10-K FY2025는 2026-09-30 마감 분기부터 로그인·로그아웃 DAUq를 따로 보고하지 않겠다고 밝혔지만, 10-Q Q3 2026이 이 계획을 번복했다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 2026</a>.</p>
+<ul>
+<li>중단 공지는 <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>의 사용자 지표 설명에 있다.</li>
+<li>10-Q는 AI 요약 확산 등으로 검색 유입의 변동성이 커져 두 지표가 사용자 추세를 이해하는 데 유용하다고 이유를 들었다.</li>
+</ul>
+<blockquote>
+<p>&quot;Accordingly, we are continuing to report these metrics for the quarter ended September 30, 2026.&quot;
+— <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 2026</a>, 2026-10-30</p>
+</blockquote>
+</li>
+<li><p>2024-Q4에는 로그아웃 DAUq가 전체 DAUq의 55%였다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000018/rddt-20241231.htm" target="_blank" rel="noopener">10-K FY2024</a>.</p>
+<ul>
+<li>10-K FY2024는 로그아웃 사용자가 주로 검색 엔진으로 들어오고, 체류가 짧으며, 수익화 비율이 낮다고 적었다.</li>
+</ul>
+</li>
+<li><p>Q3 2026 주주서한의 CEO 편지는 로그인 전용 경험으로의 전환을 밝히고, 2026 Q4부터 미국 밖 일부 시장에서 본격적으로 시험한다고 적었다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 주주서한</a>.</p>
+<ul>
+<li>시장 이름은 밝히지 않았고, 시험 결과는 전 세계 로그인 전용 버전 설계에 쓴다.</li>
+<li>CEO는 광고 타기팅 신호가 늘고 로그인하면 참여가 대체로 높다는 점을 사업상 이유로 들었다.</li>
+</ul>
+<blockquote>
+<p>&quot;In Q4 we’ll begin fully testing this in select markets outside the U.S.&quot;
+— <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 주주서한</a>, 2026-10-29</p>
+</blockquote>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="피드백-신호">피드백 신호</h2>
+<p>Reddit 도움말은 upvote와 downvote를 커뮤니티와 대화에서 무엇을 보일지 정하는 기본 신호로 설명한다 <span class="badge ok">확인</span>(<a href="#%EB%AA%85%EC%8B%9C-%EC%8B%A0%ED%98%B8%EC%99%80-%EC%A0%9C%EC%96%B4">명시 신호 절</a>). 추천 게시물에서 덜 보기를 누르면 그 효과가 게시물이 아니라 커뮤니티 단위로 미친다고 2026-10-28 도움말이 적는다 <span class="badge ok">확인</span>(<a href="#%EB%AA%85%EC%8B%9C-%EC%8B%A0%ED%98%B8%EC%99%80-%EC%A0%9C%EC%96%B4">명시 신호 절</a>). 체류 기반 지표는 문서마다 정의가 달라, S-1의 Good Visits는 30초 초과 소비이고 SnooRec 글의 good visit은 15초 초과 체류다 <span class="badge ok">확인</span>(<a href="#%EC%B2%B4%EB%A5%98%EC%99%80-%EC%95%94%EB%AC%B5-%EC%8B%A0%ED%98%B8">체류 신호 절</a>).</p>
+<h3 id="명시-신호와-제어">명시 신호와 제어</h3>
+<p>명시 신호와 제어로는 투표, 커뮤니티 단위의 덜 보기, 2026-08-10 시작한 X 아이콘 실험, 개인화에서 빠지는 incognito 세션 등이 공개돼 있다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/7419626610708-What-are-upvotes-and-downvotes" target="_blank" rel="noopener">투표 도움말 2026</a>.</p>
+<ul>
+<li><p>upvote와 downvote는 커뮤니티와 대화 전반에서 무엇이 노출될지 정하는 기본 신호라고 Reddit이 설명한다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/7419626610708-What-are-upvotes-and-downvotes" target="_blank" rel="noopener">투표 도움말 2026</a>.</p>
+<ul>
+<li>이 문서는 2026-10-05에 마지막으로 수정됐다.</li>
+</ul>
+</li>
+<li><p>추천 게시물에서 show fewer posts like this를 누르면 그 커뮤니티의 추천을 멈추고, 비슷한 커뮤니티의 글도 덜 보여 주려 한다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>.</p>
+<blockquote>
+<p>&quot;Once we receive this feedback, we’ll stop showing you recommendations from the community that the post came from&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, 2026-10-28 수정</p>
+</blockquote>
+</li>
+<li><p>2026-08-10부터 소수 사용자 실험으로 홈 피드의 모든 글과 일부 광고에 X 아이콘을 달고, 누르면 비슷한 콘텐츠를 덜 보여 달라는 신호로도 쓴다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/52393330268436-Changelog-August-12-2026" target="_blank" rel="noopener">변경 이력 2026-08-12</a>.</p>
+<ul>
+<li>실험군에서는 기존 Hide 옵션을 없애고, show fewer posts like this는 그대로 둔다.</li>
+</ul>
+</li>
+<li><p>incognito 세션의 활동은 피드, 추천, 알림, 광고 개인화에 반영되지 않는다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/360045622611-What-is-incognito-and-how-does-it-work" target="_blank" rel="noopener">incognito 도움말 2026</a>.</p>
+<ul>
+<li>앱에서만 쓸 수 있고 로그인 홈 피드는 쓸 수 없다.</li>
+<li>5분 동안 활동이 없으면 끝나지만, 일부 사용자는 실험 때문에 이 시간이 다르다.</li>
+<li>연령 확인 요건이 있는 일부 지역에서는 제공하지 않는다. 이 문서는 2026-10-27에 마지막으로 수정됐다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="체류와-암묵-신호">체류와 암묵 신호</h3>
+<p>체류 기반 신호는 공시와 엔지니어링 글에 나오지만 정의가 서로 다르고, 홈 랭커의 학습 라벨인지는 어느 쪽도 밝히지 않는다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec 블로그 2026</a>.</p>
+<ul>
+<li><p>S-1은 Good Visits를 게시물을 30초 넘게 소비한 방문으로 정의하고, 홈 피드 랭킹 개선의 성과 지표로 썼다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.</p>
+<ul>
+<li>10-K FY2024도 같은 정의를 썼고, 10-K FY2025에서는 이 지표가 빠졌다.</li>
+</ul>
+<blockquote>
+<p>&quot;“Good Visits,” defined as a user consuming a post for more than 30 seconds&quot;
+— <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1</a>, 2024-02-22</p>
+</blockquote>
+</li>
+<li><p>SnooRec 글의 A/B 표는 good visit을 게시물 체류 15초 초과로 정의한다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec 블로그 2026</a>.</p>
+<ul>
+<li>이 good visit이 홈 피드 랭커의 학습 라벨인지는 글에 없다.</li>
+</ul>
+</li>
+<li><p>SnooRec의 홈 피드 A/B에서 good visit expert만 켠 설정은 유저 세션 +0.28%, 15초 초과 방문 +1.21%를 냈다 <span class="badge ok">확인</span> — SnooRec 블로그.</p>
+<ul>
+<li>비교 대상은 태스크 구분이 없는 shared encoder를 쓴 이전 멀티태스크 기준이다.</li>
+<li>upvote expert는 upvote +0.91%, click expert는 클릭 +0.74%를 냈다.</li>
+<li>글은 켠 태스크와 오른 지표가 맞아떨어진다고 해석하지만, 같은 표에서 클릭은 good visit expert(+0.90%, 유의)가 click expert보다 더 올랐다.</li>
+<li>표에서 굵게 표시한 값(p&lt;0.05)만 유의하다.</li>
+</ul>
+</li>
+<li><p>2024-04 글 기준 클라이언트 텔레메트리는 게시물이 화면에 2초 이상 머물면 post-consume 이벤트를 남겨, 빠르게 스크롤한 경우와 구분한다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1c6cn8w/instrumenting_home_feed_on_android_ios/" target="_blank" rel="noopener">홈 피드 계측 블로그 2024</a>.</p>
+<ul>
+<li>화면에 뜨면 <code>post-view</code>, 탭하면 <code>post-click</code>, 투표하면 <code>post-vote</code>, 피드 로드는 <code>feed-load-success</code>와 <code>feed-load-fail</code>을 남긴다.</li>
+<li>글은 이 이벤트를 피드 리라이트 실험의 건강도와 가드레일 지표로 설명하고, 랭킹 학습 라벨로 쓰는지는 서술하지 않는다.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="광고">광고</h2>
+<p>Reddit 광고 퍼널은 2023-08·2024-05 글 기준으로 적격성 필터, 광고 수를 줄이는 trimmer, heavy 예측 모델, 경매의 순서로 돌고, 2023-08 글은 경매 점수를 입찰가와 과금 이벤트 확률의 곱으로 적었다 <span class="badge ok">확인</span>(<a href="#%EA%B4%91%EA%B3%A0-%ED%8D%BC%EB%84%90">광고 퍼널 절</a>). 2025-02 글 기준 trimmer는 2024-05 글이 멀티태스크라고 적은 two-tower 위에 Neural Linear Bandit(임베딩 위에 선형 밴딧을 두어 불확실성만큼 탐색하는 방법) 층을 더한 구조다 <span class="badge ok">확인</span>(<a href="#%EA%B4%91%EA%B3%A0-%ED%8D%BC%EB%84%90">광고 퍼널 절</a>). Reddit은 Max campaigns를 노출마다 가치를 예측하는 AI로 타기팅과 예산 배분을 자동화한다고 설명하며, 2026-09-03 모든 광고주에게 열었다 <span class="badge ok">확인</span>(<a href="#%EA%B3%B5%EC%8B%9C%EC%99%80-%EC%9E%90%EB%8F%99%ED%99%94-%EC%BA%A0%ED%8E%98%EC%9D%B8">공시 절</a>).</p>
+<h3 id="광고-퍼널">광고 퍼널</h3>
+<p>광고 퍼널의 단계와 trimmer 구조는 2023~2026년 엔지니어링 글로 공개됐다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/15lkrd2/first_pass_ranker_and_ad_retrieval/" target="_blank" rel="noopener">FPR 블로그 2023</a>. 2026-02 글은 heavy ranker를 CTR·전환율의 보정된 확률을 예측하는 단계로 설명하며 2023-09 클릭 예측 DNN 글을 그 예로 링크했고, 그 피처 일부는 2024-02와 2026-02 글이 다룬다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1r0hyfu/contextual_relevance_of_ads_reddit/" target="_blank" rel="noopener">광고 문맥 관련성 블로그 2026</a>.</p>
+<ul>
+<li><p>2023-08 글 기준 광고 랭킹은 적격성 필터, First Pass Ranker, heavy 예측 모델, 경매의 4단계다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/15lkrd2/first_pass_ranker_and_ad_retrieval/" target="_blank" rel="noopener">FPR 블로그 2023</a>.</p>
+<ul>
+<li>적격성 필터는 타기팅, 브랜드 세이프티, 예산 pacing(예산을 기간에 고르게 쓰도록 지출 속도를 조절하는 것) 등을 본다.</li>
+<li>First Pass Ranker는 경량 ML로 후보를 수백만에서 수백 개로 줄인다.</li>
+<li>경매 점수 eCPM(노출당 기대 수익으로 환산한 점수)은 입찰가 × P(charging event | user)이고, 입찰가는 pacing과 캠페인 유형에 따라 조정될 수 있다.</li>
+</ul>
+<blockquote>
+<p>&quot;Compute the final ad ranking score (eCPM) by multiplying bid value and P(Charging Event|user).&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/15lkrd2/first_pass_ranker_and_ad_retrieval/" target="_blank" rel="noopener">First Pass Ranker and Ad Retrieval</a> (블로그), 2023-08-08</p>
+</blockquote>
+</li>
+<li><p>2023-08 First Pass Ranker는 사용자와 광고 flight 임베딩의 코사인 유사도를 입력으로 받는 utility 함수로 top K를 골랐다 <span class="badge ok">확인</span> — FPR 블로그.</p>
+<ul>
+<li>임베딩 모델로 시험한 여러 모델 가운데 하나가 two-tower sparse network(TTSN)였다.</li>
+</ul>
+</li>
+<li><p>2024-05 글 기준 Global Auction Trimmer는 멀티태스크 two-tower sparse network로 수백만 광고를 수천 개로 줄이고, 그 뒤 heavy ranker가 순위를 매긴다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1d2wfsd/introducing_a_global_retrieval_ranking_model_in/" target="_blank" rel="noopener">광고 retrieval 블로그 2024</a>.</p>
+<ul>
+<li>캠페인 목표(클릭, 비디오 조회, 전환)별 광고 임베딩과 단일 사용자 임베딩을 둔다.</li>
+<li>모델은 매일 갱신하고, 사용자 임베딩은 24시간 캐시하며, 광고 임베딩은 약 5분마다 갱신한다.</li>
+<li>두 타워는 Gazette 모델 서버에 따로 배포한다. 2023 글이 수백 개로 적은 것과 규모 표현이 다르다.</li>
+</ul>
+</li>
+<li><p>2025-02 글은 trimmer 점수를 two-tower 코사인 유사도에 입찰가를 곱한 eCPM이라고 적는다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1itlrtk/adding_exploration_in_ads_retrieval_ranking/" target="_blank" rel="noopener">광고 탐색 블로그 2025</a>.</p>
+<ul>
+<li>전환·설치 지향 flight에는 별도 bid modifier를 적용한다.</li>
+</ul>
+</li>
+<li><p>같은 글은 two-tower 위에 Neural Linear Bandit 층을 더해 trimming 단계에서 탐색한다고 밝혔다 <span class="badge ok">확인</span> — 광고 탐색 블로그.</p>
+<ul>
+<li>불확실성에 비례한 노이즈를 코사인 유사도에 더해, 신규이거나 노출이 적은 광고가 일찍 탈락하지 않게 한다.</li>
+<li>하류에서 탐색을 맡던 ALO(Ad Level Optimization)는 폐기한다.</li>
+<li>온라인 실험에서 CTR과 전환율이 유의하게 개선됐다고 했고, 개선폭은 본문 텍스트가 아니라 이미지 표로 실렸다.</li>
+</ul>
+</li>
+<li><p>광고 클릭 확률(pCTR) 예측 모델은 로지스틱 회귀와 GBDT에서 DNN으로 옮겼고, 2023-09 글 기준 온라인 실험에서 CTR +2~4%, CPC −2~3%를 냈다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/16bovfo/our_journey_to_developing_a_deep_neural_network/" target="_blank" rel="noopener">광고 CTR DNN 블로그 2023</a>.</p>
+<ul>
+<li>글은 광고 랭킹이 실시간 참여 예측과 실시간 입찰가에 크게 의존한다고 적는다.</li>
+<li>DNN은 sparse한 string과 ID 피처를 임베딩으로 다루는 장점이 있다.</li>
+<li>서빙 지연이 50~100% 늘었지만, 추론 서비스의 다른 병목을 고쳐 GBDT보다 낮은 지연과 비용으로 서빙했다.</li>
+</ul>
+</li>
+<li><p>2024-02 글 기준 CTR 예측 DNN은 Knowledge Graph 엔티티 임베딩을 풀링한 사용자·광고 임베딩과 사용자-광고 유사도 피처를 입력으로 쓴다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1b1i3bl/why_do_we_need_content_understanding_in_ads/" target="_blank" rel="noopener">광고 콘텐츠 이해 블로그 2024</a>.</p>
+<ul>
+<li>v2에서는 이 임베딩을 학습할 수 있게 했다.</li>
+</ul>
+</li>
+<li><p>2026-02 글은 게시물과 광고의 문맥 관련성을 LLM 라벨로 정의하고, 이 라벨로 미세조정한 임베딩을 퍼널의 주요 단계에 통합했다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1r0hyfu/contextual_relevance_of_ads_reddit/" target="_blank" rel="noopener">광고 문맥 관련성 블로그 2026</a>.</p>
+<ul>
+<li>라벨 모델은 Gemini 1.5 Flash였고 글 게시 시점에는 Gemini 2.5 Flash Lite이며, golden data로 SFT(정답 예시로 하는 지도 미세조정)도 했다.</li>
+<li>미세조정 임베딩은 정규화한 PR AUC 기준 IAB 카테고리(광고 업계 표준 콘텐츠 분류) 일치의 3.2배였고, 사전학습 Stella는 2.08배였다.</li>
+<li>통합 대상은 타기팅과 retrieval, light ranker와 heavy ranker의 피처다.</li>
+</ul>
+</li>
+<li><p>2024-07 글 기준 페이싱은 캠페인별 예산, 남은 기간, 과거 지출로 지출 속도 제어 신호를 계산하고, 모든 캠페인의 신호를 최소 분당 한 번 다시 계산한다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1e5mhs3/scaling_ads_pacing_from_singleton_to_sharded/" target="_blank" rel="noopener">광고 페이싱 블로그 2024</a>.</p>
+<ul>
+<li>대표적인 제어 수단으로 확률 임계값과 입찰가 수정을 든다.</li>
+</ul>
+</li>
+<li><p>2024-11 글 기준 Dynamic Product Ads 퍼널은 Targeting, 상품 후보 생성, 상품 선택(light ranking), 경매 순이다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1gug4x9/product_candidate_generation_for_reddit_dynamic/" target="_blank" rel="noopener">DPA 블로그 2024</a>.</p>
+<ul>
+<li>경매는 입찰가, 광고 관련성, 기타 요인으로 노출 상품을 정한다.</li>
+<li>인기·트렌딩 같은 규칙 기반 후보를 섞어 콜드스타트를 완화한다.</li>
+<li>행동 기반 two-tower는 과거 전환 이벤트로 학습하고 Ray에서 매일 재학습한다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="공시와-자동화-캠페인">공시와 자동화 캠페인</h3>
+<p>SEC 공시는 광고 경매와 ML 랭킹을 모델 구조 없이 서술하고, 2025~2026 주주서한은 모델 개선을 광고 성과 수치와 함께 보고한다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</p>
+<ul>
+<li>S-1은 Ad Server가 second price auction을 돌리며 bid type, 입찰가, 잔여 예산, 참여 확률, 사용자 경험 품질 요인 등을 반영한다고 서술했다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.<ul>
+<li>2023-Q4 광고 매출의 약 88%가 경매로 구매된 것이다.</li>
+<li>second price auction 서술은 10-K FY2024·FY2025에는 없다.</li>
+</ul>
+</li>
+<li>S-1은 ad ranking과 click prediction 모델이 deep learning으로 클릭과 전환을 최대화하고 광고주 비용을 줄인다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.<ul>
+<li>이 deep learning 문장은 10-K FY2024·FY2025에는 없다.</li>
+</ul>
+</li>
+<li>10-K FY2025는 광고를 브랜드 적합성과 ML이 예측한 사용자 참여로 랭킹한다고 적고, 같은 문구가 2024-02 S-1에도 있다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</li>
+<li>10-K FY2025는 ML과 예측 모델로 수급을 맞추는 일이 초기 단계라고 적는다 <span class="badge ok">확인</span> — 10-K FY2025.<ul>
+<li>지금은 예측 모델을 캠페인 목표, 게재 위치, 포맷 전반에서 작동시키는 데 집중하며, 이것이 설치나 구매 같은 광고 전환율을 더 잘 예측하게 돕는다고 적었다.</li>
+</ul>
+</li>
+<li>광고주 도움말은 Reddit Ads를 광고끼리 경쟁하는 경매 기반 플랫폼으로 설명하고, 기본 입찰 전략은 Lowest cost라고 적는다 <span class="badge obs">관찰</span> 2026-11-01 — <a href="https://business.reddithelp.com/articles/Knowledge/How-much-do-Reddit-Ads-cost" target="_blank" rel="noopener">광고 비용 도움말</a>.<ul>
+<li>광고 그룹 지출이 예산을 최대 20% 넘길 수 있다고 적었다. 페이지에 날짜가 없어 열람일로 등급을 단다.</li>
+<li>second price 같은 낙찰·가격 규칙은 이 페이지에 없다.</li>
+</ul>
+</li>
+<li>Reddit은 Max campaigns를 노출마다 가치를 예측하는 AI로 타기팅, 소재 선택과 회전, 게재 위치, 예산 배분을 자동화하는 캠페인 유형이라고 설명한다 <span class="badge ok">확인</span> — <a href="https://redditinc.com/news/performance-unlocked-reddit-max-campaigns-are-now-available-to-all-advertisers" target="_blank" rel="noopener">Max 전체 공개 2026</a>.<ul>
+<li>2026-01-05 트래픽·전환 목표의 일부 광고주 대상 베타로 시작했다 <span class="badge ok">확인</span> — <a href="https://redditinc.com/news/now-in-beta-max-campaigns-for-ai-powered-ad-performance-and-unique-audience-insights" target="_blank" rel="noopener">Max 베타 2026</a>.</li>
+<li>2026-09-03 모든 광고주에게 열렸고, 10-K FY2025도 2026-01 베타를 같은 표현으로 서술한다.</li>
+<li>광고주 도움말은 노출마다 최적 소재 조합을 예측하고 CPA를 최소화하도록 예산과 입찰을 조정한다고 적는다 <span class="badge obs">관찰</span> 2026-11-01 — <a href="https://business.reddithelp.com/articles/Knowledge/max-campaigns" target="_blank" rel="noopener">Max 도움말</a>.</li>
+<li>같은 도움말은 오디언스 힌트를 하나 이상 정해야 하고 생성·수정 뒤 보정 기간이 있다고 적으며, 모델 구조는 밝히지 않는다.</li>
+</ul>
+</li>
+<li>광고 개인화를 켜면 Reddit 내 활동, 추론한 관심사와 인구 정보, 광고주가 공유한 외부 활동, 이메일로 맞춘 고객 목록을 쓸 수 있다고 적는다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/12731820767764-Control-the-ads-you-see-on-Reddit" target="_blank" rel="noopener">광고 제어 도움말 2026</a>.<ul>
+<li>쓸 수 있는 정보는 지역별 설정 범위 안이다. 인구 정보는 연령대, 성별, 언어 추론이고, 외부 활동은 Reddit Pixel 같은 Business Tools로 받는다.</li>
+<li>꺼도 현재 세션에서 보는 콘텐츠와 같은 세션의 광고 클릭, 가입 커뮤니티, 계정 정보, IP 기반 일반 위치로 광고가 나간다.</li>
+</ul>
+</li>
+<li>Reddit은 CAPI(광고주 서버가 전환 이벤트를 직접 보내는 연동)가 커버하는 전환 매출이 2024 하반기에 전년 대비 3배가 됐다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000016/exhibit992q424.htm" target="_blank" rel="noopener">Q4 2024 주주서한</a>.</li>
+</ul>
+<p>주주서한이 모델 개선과 함께 보고한 광고 지표와 10-Q가 모델 언급 없이 보고한 단가·노출 지표는 다음과 같다 <span class="badge ok">확인</span>. 2026 Q3 10-Q는 단가 상승을 전 퍼널 광고 목표의 성과 개선과 광고주 수요 증가로, 노출 증가의 일부를 새 광고 지면을 포함한 광고 로드 최적화로 설명한다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 2026</a>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table><colgroup><col><col><col class="w8"><col class="w8"></colgroup>
+<thead>
+<tr>
+<th>자료</th>
+<th>지표</th>
+<th>변화</th>
+<th>비교 기준</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000225/exhibit992q325.htm" target="_blank" rel="noopener">Q3 <span class="nw">2025</span> 주주서한</a></td>
+<td>하위 퍼널 전환 목표 성과</td>
+<td>+20% 이상</td>
+<td>밝히지 않음</td>
+</tr>
+<tr>
+<td><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000098/exhibit992q226.htm" target="_blank" rel="noopener">Q2 <span class="nw">2026</span> 주주서한</a></td>
+<td>6초 Engaged Video View-through</td>
+<td>+130%</td>
+<td>밝히지 않음</td>
+</tr>
+<tr>
+<td>같은 서한</td>
+<td>동영상 완료율</td>
+<td>+71%</td>
+<td>밝히지 않음</td>
+</tr>
+<tr>
+<td>같은 서한</td>
+<td>CTR</td>
+<td>+40% 이상</td>
+<td>전년 대비</td>
+</tr>
+<tr>
+<td><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 <span class="nw">2026</span></a></td>
+<td>광고 단가</td>
+<td>약 +34%</td>
+<td>전년 동기</td>
+</tr>
+<tr>
+<td>같은 10-Q</td>
+<td>노출 수</td>
+<td>약 +15%</td>
+<td>전년 동기</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>Q3 2025 서한은 20% 개선을 최적화한 ML 모델 덕분이라고 적었고, App Ads 목표도 모델과 최적화 개선으로 두 자릿수 퍼센트 개선했다고 보고했다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000225/exhibit992q325.htm" target="_blank" rel="noopener">Q3 2025 주주서한</a>.</li>
+<li>Q2 2026 서한은 130%와 71%를 개선된 모델 덕분이라고 적었지만, CTR 40%를 모델 기여로 정량화하지는 않았다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000098/exhibit992q226.htm" target="_blank" rel="noopener">Q2 2026 주주서한</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="인프라플랫폼">인프라·플랫폼</h2>
+<p>2026-06 엔지니어링 글 기준으로 Ranking Platform은 홈 피드, 검색 랭킹, 알림의 개인화를 서빙하는 gRPC 서비스 묶음이고 초당 수만 요청을 처리한다 <span class="badge ok">확인</span>(<a href="#ranking-platform">Ranking Platform 절</a>). 홈 피드 랭커는 2025-11 글 기준으로 GPU의 Triton에서 서빙한다 <span class="badge ok">확인</span>(<a href="#%EB%AA%A8%EB%8D%B8-%EC%84%9C%EB%B9%99%EA%B3%BC-%EB%B2%A1%ED%84%B0-%EA%B2%80%EC%83%89">모델 서빙 절</a>). 2026-08-31 EU 집행위가 Reddit을 디지털서비스법(DSA)의 초대형 온라인 플랫폼 VLOP로 지정해, Reddit은 2027-01까지 체계적 위험 평가 같은 추가 의무를 지켜야 한다 <span class="badge ok">확인</span>(<a href="#%EA%B7%9C%EC%A0%9C%EC%99%80-%EC%8B%A4%ED%97%98">규제 절</a>).</p>
+<h3 id="ranking-platform">Ranking Platform</h3>
+<p>Ranking Platform은 2026-06 글 기준으로 홈 피드, 검색 랭킹, 알림을 함께 서빙하고, 2022년 글은 ML Ranking Platform을 stage 그래프 서비스 Pipedream으로 소개했다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1ttwqaj/from_proxy_to_proxyless_removing_envoy_from/" target="_blank" rel="noopener">Proxyless 블로그 2026</a>.</p>
+<ul>
+<li>Ranking Platform은 여러 Kubernetes 네임스페이스와 클러스터에서 초당 수만 요청을 처리하는 gRPC 서비스 묶음이다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1ttwqaj/from_proxy_to_proxyless_removing_envoy_from/" target="_blank" rel="noopener">Proxyless 블로그 2026</a>.<ul>
+<li>트래픽은 GraphQL, Notification Platform, Answers 등에서 온다.</li>
+<li>2026-06-01 글 기준으로 앞단 Envoy Gateway를 걷어내고 xDS 기반 proxyless 서비스 메시로 옮겼다.</li>
+<li>서버가 CPU 사용률을 응답 trailer로 알려 클라이언트가 가중치를 조절하는 ORCA를 적용해, CPU 코어 수백 개를 아꼈다.</li>
+</ul>
+</li>
+<li>2022년 글 기준 ML Ranking Platform(프로토타입 이름 Pipedream)은 랭킹을 stage의 비순환 그래프로 표현하는 Go 서비스였다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/z137m3/from_service_to_platform_a_ranking_system_in_go/" target="_blank" rel="noopener">Pipedream 블로그 2022</a>.<ul>
+<li>stage는 후보 추가, 피처 추가, 후보 필터, 점수화 같은 한 가지 동작만 하고, series와 parallel 메타 stage로 묶는다.</li>
+<li>글은 랭킹 시스템을 후보 생성, 필터링, 스코어링의 세 단계로 설명했고, RPAN 라이브 스트림 피드가 첫 프로토타입이었다.</li>
+<li>같은 해 다른 글은 이 플랫폼이 discover 탭, 신규 유저 온보딩, 비디오 지면의 랭킹을 맡았다고 적었다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/xoqzgk/ml_ranking_platform_dynamic_pipeline_generator/" target="_blank" rel="noopener">MLRP 블로그 2022</a>.</li>
+</ul>
+</li>
+<li>Reddit은 TWIMLcon 2022에서 추천과 개인화를 Ranking Platform으로 확장하는 &#39;플랫폼 우선&#39; 방식을 소개했다 <span class="badge ok">확인</span> — <a href="https://twimlai.com/conf/twimlcon/2022/session/platform-first-scaling-recommendation-and-personalization-at-reddit" target="_blank" rel="noopener">TWIMLcon 2022 세션</a>.<ul>
+<li>세션 페이지에 약 30분짜리 발표 영상이 있지만 이 노트는 영상을 보지 않아, 구조와 모델은 이 자료로 말하지 않는다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="모델-서빙과-벡터-검색">모델 서빙과 벡터 검색</h3>
+<p>홈 피드 모델은 2025-11 글 기준으로 GPU에서 서빙하고, 2021년 글은 피드 모델을 서빙하던 Gazette를 별도 추론 서비스로 재설계했다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU 블로그 2025</a>.</p>
+<ul>
+<li>홈 피드 모델을 GPU로 옮기면서 서빙 경로 전체를 손봤다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU 블로그 2025</a>.<ul>
+<li>CPU 때는 수천 개 pod가 약 80 GB/s의 피처 데이터를 받았다.</li>
+<li>대형 임베딩 피처를 FP64에서 FP32로 줄이고, 유저 피처는 후보마다 보내지 않고 한 번만 보내 모델 서버가 배치에 퍼뜨리게 했다.</li>
+<li>메시지 크기가 5배, Inference Service 지연이 2배 넘게 줄었다. Triton의 dynamic batching과 queue policy로 과부하를 제어한다.</li>
+</ul>
+</li>
+<li>2021년 글 기준 ML 추론은 Minsky 안의 Gazette가 Popular, Home Feed, Video, Push Notifications, Email에 서빙했고, 모든 모델이 앱 서버에 내장돼 있었다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/q14tsw/evolving_reddits_ml_model_deployment_and_serving/" target="_blank" rel="noopener">GIS 블로그 2021</a>.<ul>
+<li>이를 단일 Predict 엔드포인트를 둔 Go(baseplate.go) 서비스인 Gazette Inference Service로 재설계했다.</li>
+<li>모델은 모델마다 독립된 model server pool에서 돈다. pool은 TensorFlow SavedModel을 감싼 baseplate.py 서비스이고 Kubernetes에 배포한다.</li>
+<li>2024-05 광고 글도 이 서비스를 Reddit의 ML 모델 호스팅 플랫폼이라고 부른다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1d2wfsd/introducing_a_global_retrieval_ranking_model_in/" target="_blank" rel="noopener">광고 retrieval 블로그 2024</a>.</li>
+</ul>
+</li>
+<li>2024년에 Reddit 팀들은 ANN 검색에 Vertex AI Vector Search, Solr ANN, FAISS를 제각각 썼다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1ozxnjc/choosing_a_vector_database_for_ann_search_at/" target="_blank" rel="noopener">벡터 DB 블로그 2025</a>.<ul>
+<li>Solr ANN은 대형 데이터셋용으로 실험 중이었고, FAISS는 소형 데이터셋에 사이드카로 썼다.</li>
+<li>2025년에 Qdrant와 Milvus를 384차원 게시물 벡터 약 3.4억 개와 HNSW(그래프 기반 ANN 인덱스)로 비교한 뒤 Milvus가 조직에 더 맞는다고 판단했다.</li>
+<li>이 글에는 배포 완료 문장이 없고, 2026-09 COPTER 글에서 검색의 의미 검색이 Milvus 코퍼스를 쓴다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wo8pjw/contextual_popularity_trending_content_detection/" target="_blank" rel="noopener">COPTER 블로그 2026</a>.</li>
+</ul>
+</li>
+<li>2023-07 글 기준 Reddit은 SDUI(서버가 화면 요소의 종류와 순서를 정해 보내는 방식) 기반의 새 feeds 플랫폼으로 Home과 Popular를 다시 썼다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/158f8o3/evolving_reddits_feed_architecture/" target="_blank" rel="noopener">피드 아키텍처 블로그 2023</a>.<ul>
+<li>Watch와 Latest 피드를 새로 냈고, 서버가 보내는 post unit은 Cell 배열을 가진 Group 객체다.</li>
+<li>홈 피드 로딩이 12% 빨라졌다.</li>
+<li>2024-04-02 글은 새 Home, Popular, News, Watch, Latest 피드를 전 세계 Android와 iOS에 롤아웃했다고 밝혔다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1btowiw/rewriting_home_feed_on_android_ios/" target="_blank" rel="noopener">홈 피드 리라이트 블로그 2024</a>.</li>
+<li>실험은 8개월 돌렸고, TTI(스플래시 화면부터 홈 피드가 렌더링될 때까지 걸린 시간)가 10~12% 개선됐다.</li>
+</ul>
+</li>
+<li>2026-11-01 조회 기준 github.com/reddit 조직의 공개 저장소 178개에는 추천, 랭킹, 피처 스토어, ML 서빙 코드가 없다 <span class="badge obs">관찰</span> 2026-11-01 — <a href="https://github.com/reddit" target="_blank" rel="noopener">github.com/reddit</a>.<ul>
+<li>저장소는 baseplate, experiments.py, decider 같은 서비스 프레임워크, Devvit 템플릿과 게임, 튜토리얼 등이다.</li>
+<li>milvus, knowhere, VectorDBBench는 Zilliz 프로젝트의 포크일 뿐 운영 사용 근거는 아니다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="검색-랭킹과의-접점">검색 랭킹과의 접점</h3>
+<p>검색은 2026-06 글 기준으로 피드·알림과 같은 Ranking Platform에서 서빙되지만, 2024년 검색 LTR(학습으로 결과 순서를 정하는 방법)은 Solr 위에서 돌았다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1ttwqaj/from_proxy_to_proxyless_removing_envoy_from/" target="_blank" rel="noopener">Proxyless 블로그 2026</a>, <a href="https://program.berlinbuzzwords.de/bbuzz24/talk/WKMGWH/" target="_blank" rel="noopener">BBuzz 2024 초록</a>.</p>
+<ul>
+<li>2024년 사이트 검색팀은 Solr LTR 플러그인으로 피처를 계산해 top-N을 재랭킹했고, 이를 초당 수천 쿼리로 확장한 교훈을 발표했다 <span class="badge ok">확인</span> — <a href="https://program.berlinbuzzwords.de/bbuzz24/talk/WKMGWH/" target="_blank" rel="noopener">BBuzz 2024 초록</a>.<ul>
+<li>top-N 재랭킹은 슬라이드 34에 있다. 같은 내용의 발표 &quot;Learning to Rank at Reddit: A Project Retro&quot;를 <a href="https://haystackconf.com/2024/" target="_blank" rel="noopener">Haystack US 2024</a>(2024-04)에서도 했다.</li>
+</ul>
+</li>
+<li>검색 LTR은 손실로 LambdaMART loss(순위 지표를 직접 겨냥하는 학습 손실)를, 모델로 deep learning 모델을 골랐다 <span class="badge ok">확인</span> — <a href="https://softwaredoug.com/assets/slidedecks/Learning%20to%20Rank%20at%20Reddit%20-%20Project%20Retro%20-%20BBuzz%202024%20-%20PUBLIC.pdf" target="_blank" rel="noopener">BBuzz 2024 슬라이드</a>.<ul>
+<li>첫 학습 데이터는 head와 tail 쿼리 약 1000개에 쿼리당 결과 20개를 사람이 라벨링한 것이다.</li>
+</ul>
+</li>
+<li>클릭 로그로 만든 engagement 판정은 위치, 클릭, 클릭 뒤 체류에 상대 가중을 주고 30일·60일 합에 적용했다 <span class="badge ok">확인</span> — BBuzz 2024 슬라이드.<ul>
+<li>가중은 <code>Position 0.05</code>, <code>Click 0.05</code>, <code>Click+dwell 0.9</code>다. 사람 라벨러의 판정이 클릭 뒤 체류와 일치한다는 점을 좋은 신호로 들었다.</li>
+<li>무관한 문서도 쿼리와 어느 정도 관련이 있어 진짜 부정 예시가 없었고, 그래서 다른 쿼리의 문서를 무작위로 골라 부정 라벨로 넣었다.</li>
+</ul>
+</li>
+<li>슬라이드의 비교표는 다루는 콘텐츠 기간을 Solr LTR 약 19년, Reddit의 기존 ML 인프라 90일로 적는다 <span class="badge ok">확인</span> — BBuzz 2024 슬라이드.<ul>
+<li>기존 인프라는 피처와 모델 종류가 풍부하지만, 네트워크 홉이 여러 번이고 쿼리 의존 피처가 쉽지 않다고 적었다.</li>
+<li>이 기존 인프라가 피드용 Ranking Platform일 수 있다 <span class="badge est">추정</span>. 근거는 비교표가 이름 없이 &#39;existing ML infra&#39;라고만 썼다는 점이고, 90일이 피드 후보 창이라는 근거는 없다.</li>
+</ul>
+</li>
+<li>2024년 검색 로드맵은 lexical 후보 위에서 LTR과 임베딩 벡터 검색을 함께 돌리고, 두 결과를 interleaving이나 rank fusion으로 합치는 hybrid 구조다 <span class="badge ok">확인</span> — BBuzz 2024 슬라이드.<ul>
+<li>검색팀은 쿼리별로 최근 참여가 높은 글에 boost를 주는 signals가 검색 트래픽을 예상보다 훨씬 많이 덮는다고 보고 이를 LTR 피처로 넣어야 한다고 했고, 마지막 갱신 슬라이드는 signals를 더한 변형을 보여 준다.</li>
+</ul>
+</li>
+<li>도움말이 정의를 적어 둔 Hot, Top, New, Relevance는 검색 정렬이다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/19695706914196-What-filters-and-sorts-are-available" target="_blank" rel="noopener">검색 정렬 도움말 2026</a>.<ul>
+<li>Hot은 최근 upvote와 댓글이 붙는 글을 우선하고, 기본인 Relevance는 단어 희소성, 글 나이, 투표, 댓글을 반영한다.</li>
+<li>피드의 Hot이 같은 정의인지는 문서에 없다. 이 문서는 2026-03-27에 마지막으로 수정됐다.</li>
+<li>2017 코드의 Hot은 순득표와 게시 시각만 썼으므로, 현재 Hot이 댓글 활동도 반영하도록 달라졌을 수 있다 <span class="badge est">추정</span>. 근거는 이 한 줄 설명뿐이고, 같은 문서가 Top도 느슨하게 적어 약하다.</li>
+</ul>
+</li>
+<li>Reddit Answers는 2026-05-26 Reddit 검색에 통합됐다 <span class="badge ok">확인</span> — <a href="https://redditinc.com/news/introducing-reddit-answers" target="_blank" rel="noopener">Reddit Answers 뉴스룸 2026</a>.<ul>
+<li>Q4 2025 서한은 Q4에 Reddit에서 직접 검색하는 사람이 매주 8천만 명을 넘었다고 적었고, 1년 전은 6천만 명이었다 <span class="badge ok">확인</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000020/exhibit992q425.htm" target="_blank" rel="noopener">Q4 2025 주주서한</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="규제와-실험">규제와 실험</h3>
+<p>Reddit은 2026-08-31부터 DSA의 VLOP이다 <span class="badge ok">확인</span> — <a href="https://digital-strategy.ec.europa.eu/en/news/commission-designates-chatgpt-reddit-roblox-under-digital-services-act" target="_blank" rel="noopener">EU 지정 보도자료 2026</a>. 추천 시스템 설명은 DSA 정보 페이지가 &#39;기타 정보&#39;로 연결한 추천 도움말이 맡는 것으로 보인다 <span class="badge est">추정</span>. 근거는 그 연결뿐이며, 페이지는 이를 추천 시스템 공시라고 부르지 않고 도움말도 DSA를 언급하지 않는다.</p>
+<ul>
+<li>2026-08-31 EU 집행위가 Reddit을 DSA의 VLOP로 지정했다 <span class="badge ok">확인</span> — <a href="https://digital-strategy.ec.europa.eu/en/news/commission-designates-chatgpt-reddit-roblox-under-digital-services-act" target="_blank" rel="noopener">EU 지정 보도자료 2026</a>.<ul>
+<li>VLOP는 DSA가 지정해 별도 의무를 지우는 초대형 온라인 플랫폼이다.</li>
+<li>Reddit은 2027-01까지 체계적 위험 평가와 완화 같은 추가 의무를 지켜야 한다. 보도자료는 2026-09-04에 수정됐다.</li>
+<li>지정 목록은 EU 월 사용자 57.2M, 주 사업장 Reddit Netherlands B.V., 감독 DSC 네덜란드로 적고, 결정문은 아직 공개되지 않았다고 표시한다 <span class="badge ok">확인</span> — <a href="https://digital-strategy.ec.europa.eu/en/policies/list-designated-vlops-and-vloses" target="_blank" rel="noopener">VLOP 지정 목록 2026</a>.</li>
+</ul>
+</li>
+<li>Reddit의 DSA 정보 페이지는 연례 투명성 보고서가 EU 콘텐츠 중재 범위라고 설명하고, &#39;Other Information&#39; 목록에서 추천 도움말(Reddit&#39;s Approach to Content Recommendations)을 연결한다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23595536875796-Digital-Services-Act-DSA-Information-for-EU-users" target="_blank" rel="noopener">DSA 정보 도움말 2026</a>.<ul>
+<li>그 추천 도움말은 DSA 조항 번호를 적지 않는다.</li>
+</ul>
+</li>
+<li>Reddit은 실험에 속하면 평소와 다르거나 alt 계정에서 보는 것과 다르게 보일 수 있고, 실험은 옵트아웃할 수 없다고 밝힌다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/40516897731220-Why-am-I-experiencing-changes-to-the-app-or-desktop-site" target="_blank" rel="noopener">실험 도움말 2026</a>.<ul>
+<li>그래서 한 계정에서 관찰한 동작을 일반화하기 어렵다.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="역사">역사</h2>
+<p>Reddit은 2008-06-17 사이트 코드를 공개했고, 2017-09-01 공지 뒤 저장소를 아카이브해 2017-10-14 커밋이 공개 코드의 마지막이다 <span class="badge ok">확인</span>(<a href="#%EA%B3%B5%EA%B0%9C-%EC%BD%94%EB%93%9C%EC%99%80-%EC%95%84%EC%B9%B4%EC%9D%B4%EB%B8%8C">공개 코드 절</a>). 그 코드의 Hot은 순득표의 로그에 게시 시각 항을 더한 점수이고 개인화 신호가 없었다 <span class="badge ok">확인</span>(<a href="#2017-%EC%BD%94%EB%93%9C%EC%9D%98-%EC%A0%95%EB%A0%AC%EC%8B%9D">정렬식 절</a>). 홈 피드는 2017-12 개인화 실험을 거쳐 2018-01-24 새 기본 정렬 Best를 도입했고, 개인화와 이미 본 글 제거는 Best 롤아웃 뒤 다시 켜기로 했다 <span class="badge ok">확인</span>(<a href="#%EA%B0%9C%EC%9D%B8%ED%99%94%EB%A1%9C-%EB%84%98%EC%96%B4%EA%B0%84-%EA%B3%BC%EC%A0%95">개인화 연표 절</a>).</p>
+<h3 id="공개-코드와-아카이브">공개 코드와 아카이브</h3>
+<p>공개 코드는 2008-06-18 UTC(미 서부 06-17) 첫 커밋부터 2017-10-14 커밋까지이고, 이 정본은 마지막 커밋 753b174를 기준으로 인용한다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/commit/753b17407e9a9dca09558526805922de24133d53" target="_blank" rel="noopener">reddit-archive/reddit@753b174</a>.</p>
+<ul>
+<li>Reddit은 2008-06-17 블로그로 코드를 공개했고, 저장소 최초 커밋은 2008-06-18 UTC(미 서부 06-17)다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20140209092549/http://blog.reddit.com/2008/06/reddit-goes-open-source.html" target="_blank" rel="noopener">오픈소스 공지 2008</a>, <a href="https://github.com/reddit-archive/reddit/commit/4778b17e939e119417cc5ec25b82c4e9a65621b2" target="_blank" rel="noopener">커밋 4778b17e</a>.<ul>
+<li>라이선스는 CPAL이고, 반스팸 일부는 공개하지 않았다. 블로그는 Wayback 사본으로 읽었다.</li>
+<li>서브레딧별 hot을 1위 점수로 나눠 합치는 코드와 Rising 코드는 최초 커밋부터 있다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/4778b17e939e119417cc5ec25b82c4e9a65621b2/r2/r2/lib/normalized_hot.py" target="_blank" rel="noopener"><code>normalized_hot.py@4778b17e</code></a>, <a href="https://github.com/reddit-archive/reddit/blob/4778b17e939e119417cc5ec25b82c4e9a65621b2/r2/r2/lib/rising.py" target="_blank" rel="noopener"><code>rising.py@4778b17e</code></a>.</li>
+<li>다만 2008년 Rising 식은 <code>ups/(count*hours)</code>였고, count가 상위 10개 평균의 절반 이상인 글을 뺐다는 점에서 2017년 식과 다르다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/4778b17e939e119417cc5ec25b82c4e9a65621b2/r2/r2/lib/rising.py#L31-L51" target="_blank" rel="noopener"><code>r2/r2/lib/rising.py:31-51</code></a>.</li>
+</ul>
+</li>
+<li>2017-09-01 r/changelog 공지는 reddit과 reddit-mobile 저장소를 아카이브한다고 밝혔다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20260503231807/https://www.reddit.com/r/changelog/comments/6xfyfg/an_update_on_the_state_of_the_redditreddit_and/" target="_blank" rel="noopener">아카이브 공지 2017</a>.<ul>
+<li>이유는 사내 브랜치가 공개 저장소에서 멀어졌고, 서비스 지향 구조로 옮기는 중이라 더는 단독 실행 가능한 Reddit이 아니라는 점이다.</li>
+</ul>
+</li>
+<li>공개 저장소의 마지막 커밋은 2017-10-14 작성된 &#39;Update README for archival&#39;이고, 저장소는 archived 상태다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/commit/753b17407e9a9dca09558526805922de24133d53" target="_blank" rel="noopener">커밋 753b174</a>.<ul>
+<li>committer date는 2017-10-16, GitHub pushed_at은 2017-10-17이다. 태그와 릴리스는 없다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2017-코드의-정렬식">2017 코드의 정렬식</h3>
+<p>2017 아카이브 코드의 정렬식은 주로 투표 수와 게시 시각을 쓰고(Q&amp;A는 댓글 길이와 OP 답글, Rising은 count도 쓴다) 개인화 신호가 없으며, 2017년 이후 프로덕션 식은 1차 출처를 찾지 못했다 <span class="badge obs">관찰</span> 2026-11-01 — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L44-L58" target="_blank" rel="noopener">정렬 코드 2017</a>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="표"><table>
+<thead>
+<tr>
+<th>정렬</th>
+<th><span class="nw">2017</span> 코드(753b174)의 식</th>
+<th>753b174 식이 들어간 커밋 작성일</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hot</td>
+<td>sign(s) × log10(max(abs(s), 1)) + (t − 1134028003) / 45000, s는 순득표</td>
+<td><span class="nw">2014-01-12</span></td>
+</tr>
+<tr>
+<td>댓글 Best (confidence)</td>
+<td>Wilson 구간 하한(표본이 적을수록 보수적으로 깎은 비율 추정치), z = 1.281551565545</td>
+<td><span class="nw">2011-04-14</span></td>
+</tr>
+<tr>
+<td>Controversial</td>
+<td>(ups + downs) ^ (작은 쪽 / 큰 쪽), 한쪽이 0 이하면 0</td>
+<td><span class="nw">2014-05-08</span></td>
+</tr>
+<tr>
+<td>Top</td>
+<td>ups − downs 내림차순</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Rising</td>
+<td>ups / max(count, 1), ups ≤ 1 제외</td>
+<td>—</td>
+</tr>
+<tr>
+<td>댓글 Q&amp;A</td>
+<td>confidence와 OP 답글 최고 confidence의 합, log10(길이 합) / 5 가산</td>
+<td><span class="nw">2015-02-10</span></td>
+</tr>
+</tbody></table></div>
+<p>Top과 Rising은 그 식이 들어간 커밋을 추적하지 않아 날짜 칸을 비웠다.</p>
+<ul>
+<li><p>Hot은 순득표가 10배가 되는 것을 12.5시간 더 최근에 올라온 것과 같게 치는 점수다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L44-L58" target="_blank" rel="noopener"><code>_sorts.pyx:44-58</code></a>.</p>
+<ul>
+<li>45000초가 12.5시간이다. 투표수 말고 댓글 수나 개인화 신호는 들어 있지 않다.</li>
+<li>Reddit 직원은 2017-12-11 이 감쇠율이 사이트가 하루 두 번쯤 바뀌도록 고른 값이고 10년 동안 그대로였다고 밝혔다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">r/changelog 2017-12-11</a>.</li>
+<li>같은 글은 감쇠를 키우거나 나이 상한을 두는 실험의 결과가 엇갈렸다고 적었다.</li>
+</ul>
+<blockquote>
+<p>&quot;ranks posts roughly by vote score decaying over time at a rate we chose to turn the site over roughly twice a day&quot;
+— <a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">Keeping the home feed fresh</a> (r/changelog, Wayback 사본), 2017-12-11</p>
+</blockquote>
+</li>
+<li><p>2014-01-12 커밋이 Hot 식을 order + sign·seconds/45000에서 sign·order + seconds/45000으로 바꿔 연속식으로 만들었다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/commit/50d35de04b928836b7ee955c8a26f197e24ab01e" target="_blank" rel="noopener">커밋 50d35de0</a>.</p>
+<ul>
+<li>diff에서 유도하면 이전 식은 점수가 0일 때 시간 항이 사라지고, 음수 점수는 크기가 클수록 오히려 올라가는 불연속이 있었다.</li>
+<li>이 커밋은 2014-01-13에 공개(committer date)됐다.</li>
+</ul>
+</li>
+<li><p>댓글 Best(confidence)는 추천 비율의 Wilson 구간 하한이다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L70-L99" target="_blank" rel="noopener"><code>_sorts.pyx:70-99</code></a>.</p>
+<ul>
+<li>z는 1.281551565545이고, 코드 주석은 80% 신뢰라고 적는다. 투표가 0이면 0점이다.</li>
+<li>ups가 400 미만이고 downs가 100 미만이면 미리 계산한 표를 쓴다.</li>
+</ul>
+</li>
+<li><p>2009-10-15 Reddit 블로그는 Best를 댓글에만 적용되는 새 기본 정렬로 소개했다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20131115031059/http://blog.reddit.com/2009/10/reddits-new-comment-sorting-system.html" target="_blank" rel="noopener">Best 댓글 정렬 공지 2009</a>.</p>
+<ul>
+<li>글은 &#39;95% 신뢰 점수&#39;라고 설명하지만, 공개 코드의 z는 2009-12 도입 때 1.0이었고 2011-04부터 1.281551565545다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/commit/bf9f43ccacc4ee7933629c621f97d6ff0ddd11b8" target="_blank" rel="noopener">커밋 bf9f43cc</a>, <a href="https://github.com/reddit-archive/reddit/commit/68a06c568b0ef4adf8664a5626a81c4b1554a77c" target="_blank" rel="noopener">커밋 68a06c56</a>.</li>
+<li>2009-12-01 병합(bf9f43cc)의 식은 sqrt가 분자 전체를 감싸는 틀린 형태였고, 2011-04-14 작성된 &#39;April 2011 Merge&#39;(68a06c56, 공개 2011-04-18)가 이를 고쳤다.</li>
+</ul>
+</li>
+<li><p>Controversial은 ups나 downs가 0 이하이면 0점이고, 아니면 총 투표수를 작은 쪽/큰 쪽 비율만큼 거듭제곱한다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L60-L68" target="_blank" rel="noopener"><code>_sorts.pyx:60-68</code></a>.</p>
+<ul>
+<li>찬반이 비슷하고 총 투표가 많을수록 점수가 커진다.</li>
+<li>이 식은 2014-05-08 작성 커밋이 <code>(ups+downs)/max(abs(score),1)</code> 대신 넣었다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/commit/6ced69c7628a49948ac7248e3eb7fcd0bdb81286" target="_blank" rel="noopener">커밋 6ced69c7</a>. 공개는 2014-06-18이다.</li>
+<li>처음에는 한쪽이 0일 때만 0점이었고, 0 이하로 넓힌 방어는 2014-05-31 작성 커밋이 더했다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/commit/95be3639032e9989d1ce5ed678d76c8130516bed" target="_blank" rel="noopener">커밋 95be3639</a>.</li>
+</ul>
+</li>
+<li><p>Top은 순득표 내림차순이고, top과 controversial의 시간 창은 오프라인 MapReduce 작업이 계산한다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/queries.py#L81-L103" target="_blank" rel="noopener"><code>r2/r2/lib/db/queries.py:81-103</code></a>.</p>
+<ul>
+<li>시간 창은 hour, day, week, month, year이고 작업 이름은 <code>mr_top</code>이다. 예제 설치의 cron은 15분마다 돈다.</li>
+<li>hot, new, top, controversial 목록은 상위 1000개(<code>precompute_limit</code>)까지 미리 계산해 캐시한다.</li>
+<li>&#39;all&#39; 목록은 투표나 복구 때 증분 갱신되는 캐시 쿼리다.</li>
+</ul>
+</li>
+<li><p>Rising 점수는 ups를 count로 나눈 값이고 ups가 1 이하인 글은 뺀다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/rising.py#L33-L48" target="_blank" rel="noopener"><code>r2/r2/lib/rising.py:33-48</code></a>.</p>
+<ul>
+<li>공개 스텁 기준 후보는 <code>rising_period</code>(예제 설정 12시간) 안의 글이다.</li>
+<li>홈과 멀티레딧에서는 서브레딧별 1위 점수로 정규화해 합치고, 단일 서브레딧은 전체 rising 목록을 그 서브레딧으로 거른다.</li>
+<li>공개 저장소의 <code>get_link_counts</code>는 count 0을 돌려주는 스텁이고 실제 구현은 비공개 r2admin에 있다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/count.py#L37-L49" target="_blank" rel="noopener"><code>r2/r2/lib/count.py:37-49</code></a>.</li>
+<li>그래서 공개 코드의 rising은 사실상 득표순이고, 2017년 프로덕션 rising이 노출 수로 정규화했는지는 코드로 확인할 수 없다.</li>
+</ul>
+</li>
+<li><p>Q&amp;A 정렬은 댓글의 confidence에 OP 답글 가운데 최고 confidence를 더하고, 댓글과 답변 길이 합의 log10을 5로 나눠 보탠다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L101-L132" target="_blank" rel="noopener"><code>_sorts.pyx:101-132</code></a>.</p>
+<ul>
+<li>OP 답글이 없으면 답변 길이를 1로 친다.</li>
+<li>OP가 쓴 댓글에 OP 답글이 없으면 점수를 2배로 친다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/link.py#L1572-L1577" target="_blank" rel="noopener"><code>r2/r2/models/link.py:1572-1577</code></a>.</li>
+<li>2017 코드의 응답자는 OP 한 명뿐이다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/link.py#L1009-L1016" target="_blank" rel="noopener"><code>r2/r2/models/link.py:1009-1016</code></a>.</li>
+<li>이 정렬은 2015-02-10 작성 커밋으로 들어왔고, 공개는 2015-03-17이다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/commit/62db2373f2555df17ebeb13968e243fccfbeff5f" target="_blank" rel="noopener">커밋 62db2373</a>.</li>
+</ul>
+</li>
+<li><p>2017 코드의 댓글 기본 정렬은 계정 설정이고 기본값은 confidence(화면 이름 best)다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/controllers/front.py#L249-L253" target="_blank" rel="noopener"><code>r2/r2/controllers/front.py:249-253</code></a>.</p>
+<ul>
+<li>예전 hot 댓글 정렬은 사라져 confidence로 대체된다.</li>
+<li>contest_mode 글은 모더레이터가 아닌 사용자에게 random을 강제하고, 모더레이터에게는 top을 기본으로 준다.</li>
+<li>글이나 서브레딧이 suggested sort를 지정할 수 있고, 사용자는 이를 무시하도록 설정할 수 있다.</li>
+</ul>
+</li>
+<li><p>작성자가 자기 글에 자동으로 거는 업보트는 이미 점수 1로 만들어지므로 점수에 다시 반영하지 않는다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/vote.py#L235-L241" target="_blank" rel="noopener"><code>r2/r2/models/vote.py:235-241</code></a>.</p>
+<ul>
+<li>그 밖의 표가 점수에 반영될지는 <code>vote.get_validator</code> 훅이 정할 수 있는데, 그 구현은 공개 저장소에 없다.</li>
+</ul>
+</li>
+<li><p>예제 설정은 180일이 지난 글과 댓글을 archived로 바꿔 투표, 답글, 신고를 받지 않게 한다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/example.ini#L453-L458" target="_blank" rel="noopener"><code>r2/example.ini:453-458</code></a>.</p>
+<ul>
+<li>예제 설정 값이라 운영 값과 같다는 보장은 없다. 투표 비동기 처리의 지연을 가리는 memcache 유예는 최대 1시간이다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2017-코드의-홈-구성과-추천">2017 코드의 홈 구성과 추천</h3>
+<p>2017 코드의 홈은 구독 서브레딧마다 hot 상위 글을 가져와 각 서브레딧 1위 점수로 정규화한 뒤 섞는 방식이었다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/normalized_hot.py#L34-L103" target="_blank" rel="noopener">홈 합산 코드 2017</a>.</p>
+<ul>
+<li>서브레딧마다 hot 상위 150개를 가져와 1위 글의 hot 점수(최소 1)로 나누고, 이를 섞어 전체 최대 1000개만 남긴다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/normalized_hot.py#L34-L103" target="_blank" rel="noopener"><code>normalized_hot.py:34-103</code></a>.<ul>
+<li>섞는 함수는 <code>heapq.merge</code>다. 구독이 없으면 기본 서브레딧으로 같은 경로를 탄다.</li>
+<li>게시 연령 상한은 <code>HOT_PAGE_AGE</code>(예제 설정 1000일)다.</li>
+</ul>
+</li>
+<li>홈 후보가 되는 구독 서브레딧은 기본 50개, gold 사용자는 100개로 제한된다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/subreddit.py#L1202-L1221" target="_blank" rel="noopener"><code>r2/r2/models/subreddit.py:1202-1221</code></a>.<ul>
+<li>구독이 더 많으면 연령 상한 안에 글이 없는 서브레딧을 먼저 거르고, 나머지에서 무작위로 limit개를 뽑는다.</li>
+<li>그 선택은 30분(memoize 1800초) 캐시해 홈이 흔들리지 않게 한다. automatic_reddits는 한도에 세지 않는다.</li>
+</ul>
+</li>
+<li>r/all의 hot은 모든 서브레딧을 합친 전역 hot 정렬 쿼리를 60초 캐시해 쓰고, 서브레딧별 정규화가 없다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/subreddit.py#L1670-L1691" target="_blank" rel="noopener"><code>subreddit.py:1670-1691</code></a>.</li>
+<li>멀티레딧(커스텀 피드)은 classic과 fresh 두 가중 방식을 둔다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/subreddit.py#L1912-L1915" target="_blank" rel="noopener"><code>subreddit.py:1912-1915</code></a>.<ul>
+<li>ageweight는 classic이 0.0, fresh가 0.15다. 1위 글의 hot에 경과 시간 항을 더해 정규화 분모를 키우는 데 쓴다.</li>
+<li>기능 플래그 <code>scaled_normalized_hot</code>이 꺼져 있으면 무시된다. 멀티는 연령 상한 없이 합친다.</li>
+</ul>
+</li>
+<li>/explore 페이지는 사용자가 좋아한 서브레딧 최대 10개로 추천 서브레딧 20개를 받아, 글을 섞어 최대 20개를 무작위 순서로 내놓는다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/recommender.py#L123-L196" target="_blank" rel="noopener"><code>r2/r2/lib/recommender.py:123-196</code></a>.<ul>
+<li>이 페이지는 2013-12-04 작성 커밋이 추가했다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/commit/87aa75df59df0101eb7f0fa7f680498f036ff825" target="_blank" rel="noopener">커밋 87aa75df</a>.</li>
+<li>좋아한 서브레딧은 구독, 멀티레딧, /explore 최근 클릭에서 뽑는다.</li>
+<li>추천 서브레딧 절반에서는 hot 글과 top 댓글을, 나머지 절반에서는 hot 글을 가져온다.</li>
+<li>discovery 서브레딧 2곳의 글과 rising 글 4개를 섞고, 같은 서브레딧은 한 번만 보인다.</li>
+<li>2017 프로덕션에서 이 페이지가 살아 있었는지는 코드로 알 수 없다.</li>
+</ul>
+</li>
+<li>서브레딧 추천은 미리 계산된 SRRecommendation 행을 읽어 합친다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/recommender.py#L269-L340" target="_blank" rel="noopener"><code>recommender.py:269-340</code></a>.<ul>
+<li>출처 접두사는 <code>mr</code>(상수 이름 SRC_MULTIREDDITS)과 <code>e</code>(주석상 덜 알려진 서브레딧 선호)다.</li>
+<li>match_set이면 여러 입력에서 추천된 횟수로 정렬하고, 아니면 round-robin으로 섞는다.</li>
+<li>이 행을 만드는 배치나 모델 코드는 공개 저장소에 없다 <span class="badge obs">관찰</span> 2026-11-01. 행의 TTL이 7일 12시간이라 외부 주기 작업이 채웠다는 점만 읽힌다.</li>
+</ul>
+</li>
+<li>/explore 피드백은 서브레딧 단위로 저장하고, TTL은 노출 6시간, 클릭 30분, 닫기 60일이다 <span class="badge ok">확인</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/recommend.py#L37-L83" target="_blank" rel="noopener"><code>r2/r2/models/recommend.py:37-83</code></a>.<ul>
+<li>닫은 추천은 dislikes가 돼 likes에서 빠지고, 최근 노출한 서브레딧은 다시 추천하지 않는다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2017년-listing-저장-구조">2017년 listing 저장 구조</h3>
+<p>2017 QCon 발표 기준으로 listing은 front page와 subreddit에 보이는 링크의 정렬된 목록이고, 투표가 오면 쿼리를 다시 돌리지 않고 저장된 목록을 고쳐 쓰는 비정규화 인덱스였다 <span class="badge ok">확인</span> — <a href="https://www.infoq.com/presentations/reddit-architecture-evolution/" target="_blank" rel="noopener">QCon 2017 발표</a>.</p>
+<ul>
+<li>처음에는 DB select 결과를 ID 목록으로 memcache에 캐시했다 <span class="badge ok">확인</span> — <a href="https://www.infoq.com/presentations/reddit-architecture-evolution/" target="_blank" rel="noopener">QCon 2017 발표</a>.</li>
+<li>투표가 오면 ID와 정렬 정보를 쌍으로 저장한 listing을 읽어 고친 뒤 되쓰고, 경쟁 상태를 막으려고 락을 건다 <span class="badge ok">확인</span> — QCon 2017 발표.<ul>
+<li>이 listing은 캐시가 아니라 persisted index이고, 2017년에는 Cassandra에 저장됐다.</li>
+</ul>
+</li>
+<li>listing을 갱신하게 만드는 가장 잦은 사건은 투표라서, vote queue가 listing을 매우 자주 갱신한다 <span class="badge ok">확인</span> — QCon 2017 발표.<ul>
+<li>vote processor는 점수 반영 말고 anti-cheat 처리도 한다. anti-cheat의 내용은 발표에 없다.</li>
+</ul>
+</li>
+<li>2012년 중반 인기 subreddit listing의 락 경합으로 vote queue가 밀려 글 점수가 몇 시간 늦게 반영됐다 <span class="badge ok">확인</span> — QCon 2017 발표.<ul>
+<li>subreddit ID를 10으로 나눈 나머지로 vote queue를 10개로 나눠 완화했다.</li>
+<li>같은 해 말 domain listing에서 경합이 다시 생겼고, 나중에 투표 처리를 여러 메시지로 쪼개 해결했다.</li>
+</ul>
+</li>
+<li>댓글 트리는 스레드 전체의 부모 관계를 담은 비정규화 listing으로 따로 저장하고, 보여 줄 부분집합을 먼저 정해 그 댓글만 읽는다 <span class="badge ok">확인</span> — QCon 2017 발표.<ul>
+<li>트리 갱신은 비싸서 오프라인 job으로 미루고, 메시지를 모아 일괄 수정한다. 댓글 정렬식은 이 발표에 없다.</li>
+</ul>
+</li>
+<li>2017년에 listing을 별도 listing service로 나누기 시작했고, 데이터 분석 파이프라인과 ML, 기존 listing을 소스로 사용자에게 relevant한 listing을 만드는 것이 목표였다 <span class="badge ok">확인</span> — QCon 2017 발표.<ul>
+<li>진행 중인 작업에 대한 진술이고, 결과는 말하지 않았다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="개인화로-넘어간-과정">개인화로 넘어간 과정</h3>
+<p>Reddit 홈 피드는 2017-12 개인화 실험을 거쳐 2018-01-24 새 기본 정렬 Best를 도입했고, 2021-06-28부터 모바일 Best를 ML 개인화 정렬로 바꿨다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">r/changelog 2018-01-24</a>, <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>.</p>
+<ul>
+<li><p>Reddit은 2016년에 ML 모델이 신선하고 비슷한 사람이 좋아한 콘텐츠를 부각했다고 2021년 글에서 회고했다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/neknjg/evolving_beyond_100_billion_recommendations_a_day/" target="_blank" rel="noopener">1000억 추천 블로그 2021</a>.</p>
+<ul>
+<li>플랫폼에 올라오는 콘텐츠가 다양해지면서 이 접근이 무너지기 시작했고, 지금은 콘텐츠가 몇 분 만에 완전히 바뀐다고 적었다.</li>
+<li>2023-01 회고 글은 시스템이 hot algorithm에서 하루 1000억 건 추천 생성으로 커졌다고 요약한다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/10egj46/seeing_the_forest_in_the_trees_two_years_of/" target="_blank" rel="noopener">회고 블로그 2023</a>.</li>
+</ul>
+</li>
+<li><p>2017-12-04 Reddit 직원은 과거의 Home을 구독에서 무작위로 고른 서브레딧의 front page를 1위 글로 정규화해 섞은 것이라고 설명했다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20180125111951/https://www.reddit.com/r/changelog/comments/7hkvjn/what_we_think_about_when_we_think_about_ranking/" target="_blank" rel="noopener">r/changelog 2017-12-04</a>.</p>
+<ul>
+<li>최근 관심을 보인 커뮤니티의 글을 올리는 개인화를 시험해 며칠 안에 롤아웃한다고 밝혔다.</li>
+<li>이 변경은 로그인 사용자 Home에만 적용하고, r/popular와 r/all은 바꾸지 않았다.</li>
+</ul>
+</li>
+<li><p>2017-12-11 Reddit은 로그인 Home에서 이미 본 글을 빼 피드 회전을 높이는 변경의 롤아웃을 시작했다고 밝혔다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">r/changelog 2017-12-11</a>.</p>
+<ul>
+<li>실험에서는 체류 시간과 글·댓글 작성이 늘고 다운보트가 줄었다고 보고했다.</li>
+<li>서브레딧 목록, r/popular, r/all에는 적용하지 않았다.</li>
+</ul>
+</li>
+<li><p>2018-01-24 Reddit은 Hot의 의미를 바꾸지 않고 홈 피드의 새 기본 정렬 Best를 도입했다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">r/changelog 2018-01-24</a>.</p>
+<ul>
+<li>위 두 출시를 멈추고, 개인화와 이미 본 글 제거는 Best에서 다시 켠다고 했다.</li>
+<li>Hot을 고르면 기존 랭킹으로 돌아갈 수 있고, 글용 Best는 댓글용 best와 다른 알고리즘이라고 밝혔다.</li>
+</ul>
+<blockquote>
+<p>&quot;Rather than changing the meaning of “Hot” we are introducing a new default sort type for the home feed: Best*.&quot;
+— <a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">Best is the new hotness</a> (r/changelog, Wayback 사본), 2018-01-24</p>
+</blockquote>
+</li>
+<li><p>2021-05 글 기준 Reddit은 개인화를 지도학습 하위 태스크로 쪼개, 유저·subreddit·게시물·맥락을 함께 임베딩하는 멀티태스크 DNN으로 upvote, subscribe, comment 확률을 예측했다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/neknjg/evolving_beyond_100_billion_recommendations_a_day/" target="_blank" rel="noopener">1000억 추천 블로그 2021</a>.</p>
+<ul>
+<li>이 확률로 retention 같은 장기 지표를 추정할 수 있다고 했다.</li>
+<li>모델 토폴로지 탐색에 sequential Monte Carlo를 더했고, 실시간 피처는 Kafka와 Flink로 계산했다.</li>
+<li>피드 구성의 p99 지연은 수백 ms 초반이었다.</li>
+</ul>
+</li>
+<li><p>2021-06-22 r/blog 글은 2021-06-28부터 모바일 홈에 ML Best를 도입해도 Hot, New, Top은 바뀌지 않는다고 밝혔다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>.</p>
+<ul>
+<li>글은 Hot을 득표와 글 나이로, Controversial을 업·다운이 모두 많은 글로 설명했다.</li>
+<li>Rising은 최근 투표와 댓글이 많은 글로, 옛 Best는 득표, 글 나이, 사용자의 서브레딧 체류 시간으로 설명했다.</li>
+<li>이 Rising 설명은 댓글을 넣어 2017 코드의 식과 다르다.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="열린-질문">열린 질문</h2>
+<p>가장 크게 비어 있는 것은 2021-06 r/blog 글 이후 홈 피드 랭커의 예측 대상과 가중치이고, 그다음은 2026-10-28 개편 뒤 For You와 Following의 정렬이다 <span class="badge obs">관찰</span> 2026-11-01(<a href="#%ED%99%88-%ED%94%BC%EB%93%9C-%EB%9E%AD%EC%BB%A4">홈 피드 랭커 절</a>, <a href="#for-you%EC%99%80-following">For You와 Following 절</a>). 정렬식은 2017 코드 뒤로 1차 출처가 끊겨 있다 <span class="badge obs">관찰</span> 2026-11-01(<a href="#2017-%EC%BD%94%EB%93%9C%EC%9D%98-%EC%A0%95%EB%A0%AC%EC%8B%9D">정렬식 절</a>).</p>
+<ol>
+<li><strong>홈 피드 랭커는 지금 무엇을 예측하고 어떻게 합치는가.</strong> 2021-06 r/blog 글은 Best가 조회, 구독·구독 취소, 댓글, upvote·downvote, 시청 확률을 예측해 합친 점수로 글을 가중 샘플링한다고 밝혔다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>. 그 뒤 홈 랭커의 예측 대상과 가중치, 목적 함수를 밝힌 자료는 찾지 못했다 <span class="badge obs">관찰</span> 2026-11-01. SnooRec 글의 good visit(15초 초과 체류)이 홈 랭커의 라벨인지도 글에 없다 <span class="badge ok">확인</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec 블로그 2026</a>.</li>
+<li><strong>홈 피드의 retrieval 소스와 단계별 후보 수는 지금 무엇인가.</strong> 2021-06 r/blog 글은 지난 24시간 게시물에서 구독, 비슷한 커뮤니티, 온보딩 카테고리, 최근 방문 커뮤니티, 인기·지역 인기 글을 후보로 모은다고 밝혔다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>. 그 뒤 공개된 것은 수천 개라는 2025 글과 SnooRec뿐이고, SnooRec이 전체 소스 가운데 어느 비중인지 알 수 없다 <span class="badge obs">관찰</span> 2026-11-01.</li>
+<li><strong>For You와 Following은 어떻게 정렬하는가.</strong> 공식 문서에 정해져 있지 않다 <span class="badge est">추정</span>. 근거는 2026-10-28 뉴스룸이 정렬을 언급하지 않고, 2026-10-08 변경 이력이 swiping과 sorting 옵션을 시험 중이라고만 적었다는 점이다.<ul>
+<li>Following에 팔로우한 사용자의 글이 들어가는지도 뉴스룸과 변경 이력이 다르게 적는다 <span class="badge ok">확인</span>.</li>
+<li>개편 뒤에도 홈 피드의 Best 정렬이 남는지는 알 수 없다 <span class="badge est">추정</span>. 근거는 Best를 설명하는 <a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">홈 추천 도움말</a>의 마지막 수정이 개편 발표 전인 2026-10-05라는 점이다.</li>
+</ul>
+</li>
+<li><strong>For You·Following 개편은 DSA와 관계가 있는가.</strong> 실험은 VLOP 지정(2026-08-31) 직후인 2026-09-02 다시 열렸고, 의무 시한(2027-01) 전에 정식 공지됐다 <span class="badge ok">확인</span>. 이를 DSA의 비프로파일링 추천 옵션과 연결한 문서는 찾지 못했다 <span class="badge obs">관찰</span> 2026-11-01. 집행위 보도자료는 의무의 예로 서비스와 algorithmic systems에서 오는 체계적 위험의 평가와 완화를 들고, 뉴스룸은 발견과 사용자 통제를 도입 동기로 적는다 <span class="badge ok">확인</span>.</li>
+<li><strong>커뮤니티 페이지의 기본 정렬은 best인가 hot인가.</strong> 추천 도움말(2026-10-28 수정)은 best라고 적고, <a href="https://support.reddithelp.com/hc/en-us/articles/360045989712-Why-can-t-I-see-my-post" target="_blank" rel="noopener">게시물 노출 도움말</a>(2026-10-05 수정)은 대부분의 커뮤니티가 hot을 쓴다고 적는다 <span class="badge ok">확인</span>.</li>
+<li><strong>지금의 Hot, Rising, Controversial, 글용 Best, 댓글 Best는 어떤 식인가.</strong> 2026-11-01에 영문 Help Center 문서 430개의 제목을 전수 검사했지만 피드 정렬을 설명하는 문서는 없었다 <span class="badge obs">관찰</span> 2026-11-01. 정렬을 따로 정의하는 문서는 <a href="https://support.reddithelp.com/hc/en-us/articles/19695706914196-What-filters-and-sorts-are-available" target="_blank" rel="noopener">검색 정렬 도움말</a> 1건이고, 다른 문서는 hot이나 Best를 한두 문장으로 언급하며 댓글 정렬은 모더레이터 문서가 선택지만 나열한다 <span class="badge obs">관찰</span> 2026-11-01.</li>
+<li><strong>홈 피드 랭커는 Transformer 계열로 바뀌었는가.</strong> 2025-11-10 글은 Transformer 변종의 초기 프로파일링에서 CPU와 GPU의 효율 격차가 커진다고만 적었다 <span class="badge ok">확인</span>. r/RedditEng 글 334건(2026-10-26까지)에서 도입을 밝힌 후속 글을 찾지 못했다 <span class="badge obs">관찰</span> 2026-11-01.</li>
+<li><strong>2026 Q3 서한의 vertical chaining과 modernized ranking pipeline은 무엇인가.</strong> 서한은 동영상 경험 문단에서 출시했다고만 적고 뜻을 설명하지 않아, 홈 피드 랭커와의 관계를 알 수 없다 <span class="badge ok">확인</span>.</li>
+<li><strong>COPTER의 trending 신호는 홈 피드나 알림에 실제로 쓰이는가.</strong> 글은 공통 레이어로 쓰려는 의도만 적었고, 2026-10 피드 trending 라벨 실험도 신호 출처를 밝히지 않았다 <span class="badge ok">확인</span>.</li>
+<li><strong>홈 피드의 다양성 장치는 지금 무엇인가.</strong> 2021-06 r/blog 글은 점수 가중 샘플링으로 피드를 다양하게 한다고 밝혔고, 작성자는 같은 글의 댓글에서 비슷한 글이 연달아 많으면 서로 떨어뜨린다고 덧붙였다 <span class="badge ok">확인</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>. 2026-10-28 도움말은 비슷한 글의 연속을 피한다고만 적고, 지금 DPP(서로 덜 닮은 묶음을 확률적으로 고르는 방법)나 서브레딧 상한을 쓰는지는 밝히지 않는다 <span class="badge ok">확인</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">추천 도움말 2026</a>. 안전 관련 엔지니어링 글에서도 피드 필터나 다운랭킹과 이어지는 서술을 찾지 못했다 <span class="badge obs">관찰</span> 2026-11-01.</li>
+<li><strong>2026년의 Ranking Platform은 2022년의 ML Ranking Platform(Pipedream)과 같은 시스템인가.</strong> Gazette Inference Service, 2025년 GPU 서빙 서비스와의 관계도 글들이 직접 서술하지 않는다 <span class="badge obs">관찰</span> 2026-11-01.</li>
+<li><strong>광고 경매는 지금도 second price인가.</strong> 이 서술은 S-1에만 있고 두 10-K와 광고주 도움말에는 없다 <span class="badge ok">확인</span>.</li>
+<li><strong>10-K FY2025에서 Good Visits 예시가 빠진 이유는 무엇인가.</strong> 지표를 바꾼 것인지 서술만 줄인 것인지 알 수 없다 <span class="badge obs">관찰</span> 2026-11-01. 근거 문서는 <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>와 S-1, 10-K FY2024의 같은 문단이다.</li>
+<li><strong>피드 번역은 어떤 엔진으로 하는가.</strong> <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344524000099/exhibit992q324.htm" target="_blank" rel="noopener">Q3 2024 주주서한</a>은 LLM 기반 기계번역이라 했고, <a href="https://support.reddithelp.com/hc/en-us/articles/27784816873236-Translations-for-feeds-posts-and-comments" target="_blank" rel="noopener">번역 도움말</a>(2026-10-05 수정)은 Google Translate 등 제3자 서비스라고 적는다 <span class="badge est">추정</span>. 근거는 제3자 서비스가 LLM일 수도 있어 둘이 모순이라 단정할 수 없다는 점이다.</li>
+</ol>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+<h2 id="출처">출처</h2>
+<p>reddit.com은 자동 요청을 막아, r/RedditEng 글은 글별 RSS나 Wayback 사본으로, Help Center는 공개 Zendesk API로 열람했다. 아래 연도는 발표 연도이고, 도움말은 마지막 수정 연도다.</p>
+<h3 id="reddit-엔지니어링-블로그-rredditeng">Reddit 엔지니어링 블로그 (r/RedditEng)</h3>
+<ul>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/neknjg/evolving_beyond_100_billion_recommendations_a_day/" target="_blank" rel="noopener">Evolving beyond 100 billion recommendations a day</a> — 2021, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/q14tsw/evolving_reddits_ml_model_deployment_and_serving/" target="_blank" rel="noopener">Evolving Reddit&#39;s ML Model Deployment and Serving Architecture</a> — 2021, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/xoqzgk/ml_ranking_platform_dynamic_pipeline_generator/" target="_blank" rel="noopener">ML Ranking Platform - Dynamic Pipeline Generator</a> — 2022, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/z137m3/from_service_to_platform_a_ranking_system_in_go/" target="_blank" rel="noopener">From Service to Platform: A Ranking System in Go</a> — 2022, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/10egj46/seeing_the_forest_in_the_trees_two_years_of/" target="_blank" rel="noopener">Seeing the forest in the trees</a> — 2023, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/158f8o3/evolving_reddits_feed_architecture/" target="_blank" rel="noopener">Evolving Reddit&#39;s Feed Architecture</a> — 2023, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1btowiw/rewriting_home_feed_on_android_ios/" target="_blank" rel="noopener">Rewriting Home Feed on Android &amp; iOS</a> — 2024, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1c6cn8w/instrumenting_home_feed_on_android_ios/" target="_blank" rel="noopener">Instrumenting Home Feed on Android &amp; iOS</a> — 2024, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">An In-Depth Look at the Notifications Recommender System</a> — 2025, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">Reddit&#39;s Home Feed on GPU</a> — 2025, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1ozxnjc/choosing_a_vector_database_for_ann_search_at/" target="_blank" rel="noopener">Choosing a vector database for ANN search at Reddit</a> — 2025, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">Breaking Through the Noise: A Hybrid ML and LLM Framework</a> — 2025, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1ttwqaj/from_proxy_to_proxyless_removing_envoy_from/" target="_blank" rel="noopener">From Proxy to Proxyless: Removing Envoy from Reddit&#39;s Feed Serving Path</a> — 2026, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec: A Shared Retrieval Foundation</a> — 2026, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1wo8pjw/contextual_popularity_trending_content_detection/" target="_blank" rel="noopener">Contextual Popularity Trending Content Detection (COPTER v1)</a> — 2026, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1wyhkcf/how_reddit_uses_causal_ml_to_personalise/" target="_blank" rel="noopener">How Reddit Uses Causal ML to Personalise Notification Volume</a> — 2026, 블로그</li>
+</ul>
+<h3 id="광고-엔지니어링-블로그-rredditeng">광고 엔지니어링 블로그 (r/RedditEng)</h3>
+<ul>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/15lkrd2/first_pass_ranker_and_ad_retrieval/" target="_blank" rel="noopener">First Pass Ranker and Ad Retrieval</a> — 2023, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/16bovfo/our_journey_to_developing_a_deep_neural_network/" target="_blank" rel="noopener">Deep Neural Network Model to Predict CTR for Ads</a> — 2023, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1b1i3bl/why_do_we_need_content_understanding_in_ads/" target="_blank" rel="noopener">Why do we need content understanding in Ads?</a> — 2024, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1d2wfsd/introducing_a_global_retrieval_ranking_model_in/" target="_blank" rel="noopener">Introducing a Global Retrieval Ranking Model in the Ads Funnel</a> — 2024, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1e5mhs3/scaling_ads_pacing_from_singleton_to_sharded/" target="_blank" rel="noopener">Scaling Ads Pacing from Singleton to Sharded</a> — 2024, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1gug4x9/product_candidate_generation_for_reddit_dynamic/" target="_blank" rel="noopener">Product Candidate Generation for Reddit Dynamic Product Ads</a> — 2024, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1itlrtk/adding_exploration_in_ads_retrieval_ranking/" target="_blank" rel="noopener">Adding Exploration in Ads Retrieval Ranking</a> — 2025, 블로그</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1r0hyfu/contextual_relevance_of_ads_reddit/" target="_blank" rel="noopener">Contextual Relevance of Ads @ Reddit</a> — 2026, 블로그</li>
+</ul>
+<h3 id="공개-소스코드">공개 소스코드</h3>
+<ul>
+<li><a href="https://github.com/reddit-archive/reddit" target="_blank" rel="noopener">reddit-archive/reddit</a> — 2008~2017, 코드. 본문 인용의 기준 커밋은 <code>753b174</code>(2017-10-14, 아카이브 직전 HEAD)다. 본문은 최초 커밋 <code>4778b17e</code>(2008), confidence 도입 <code>bf9f43cc</code>(2009)와 수정 <code>68a06c56</code>(2011), Hot 연속식 <code>50d35de0</code>(2014), Controversial 식 <code>6ced69c7</code>·<code>95be3639</code>(2014), Q&amp;A 정렬 <code>62db2373</code>(2015), /explore 추가 <code>87aa75df</code>(2013)도 인용했다.</li>
+<li><a href="https://github.com/reddit" target="_blank" rel="noopener">github.com/reddit</a> — 2026-11-01 조회, 조직 저장소 목록</li>
+</ul>
+<h3 id="rchangelog-rblog-옛-공식-블로그-wayback-사본">r/changelog, r/blog, 옛 공식 블로그 (Wayback 사본)</h3>
+<ul>
+<li><a href="http://web.archive.org/web/20140209092549/http://blog.reddit.com/2008/06/reddit-goes-open-source.html" target="_blank" rel="noopener">reddit goes open source</a> — 2008, 블로그</li>
+<li><a href="http://web.archive.org/web/20131115031059/http://blog.reddit.com/2009/10/reddits-new-comment-sorting-system.html" target="_blank" rel="noopener">reddit&#39;s new comment sorting system</a> — 2009, 블로그</li>
+<li><a href="http://web.archive.org/web/20260503231807/https://www.reddit.com/r/changelog/comments/6xfyfg/an_update_on_the_state_of_the_redditreddit_and/" target="_blank" rel="noopener">An update on the state of the reddit/reddit and reddit/reddit-mobile repositories</a> — 2017, 공지</li>
+<li><a href="http://web.archive.org/web/20180125111951/https://www.reddit.com/r/changelog/comments/7hkvjn/what_we_think_about_when_we_think_about_ranking/" target="_blank" rel="noopener">What we think about when we think about ranking</a> — 2017, 공지</li>
+<li><a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">Keeping the home feed fresh</a> — 2017, 공지</li>
+<li><a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">Best is the new hotness</a> — 2018, 공지</li>
+<li><a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">Evolving the Best Sort for Reddit’s Home Feed</a> — 2021, 블로그</li>
+</ul>
+<h3 id="help-center-supportreddithelpcom-businessreddithelpcom">Help Center (support.reddithelp.com, business.reddithelp.com)</h3>
+<ul>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a> — 2026(2024-02-06 작성, 2026-10-28 수정), 도움말. DSA 정보 페이지가 &#39;Other Information&#39; 목록에서 연결한 문서다.</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">What are home feed recommendations?</a> — 2026(2021-06-15 작성, 2026-10-05 수정), 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/47822249050132-Changelog-April-2-2026" target="_blank" rel="noopener">Changelog - April 2, 2026</a> — 2026, 변경 이력. r/all 폐지</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/52393330268436-Changelog-August-12-2026" target="_blank" rel="noopener">Changelog - August 12, 2026</a> — 2026, 변경 이력. X 아이콘 실험</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/53416317564820-Changelog-September-10-2026" target="_blank" rel="noopener">Changelog - September 10, 2026</a> — 2026, 변경 이력. For You·Following 재실험, 인증 미완료 계정 추천 제외</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">Changelog - October 8, 2026</a> — 2026, 변경 이력. swiping·sorting 실험, 피드 trending 라벨 실험</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/35343974642452-Changelog-March-6-2025" target="_blank" rel="noopener">Changelog - March 6, 2025</a> — 2025, 변경 이력</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360043033972-How-do-I-turn-off-trending-notifications" target="_blank" rel="noopener">How do I turn off trending notifications?</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360062429491-Managing-your-Location-Customization-setting" target="_blank" rel="noopener">Managing your Location Customization setting</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360049845011-How-Reddit-Uses-Location-Data" target="_blank" rel="noopener">How Reddit Uses Location Data</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/19695706914196-What-filters-and-sorts-are-available" target="_blank" rel="noopener">What filters and sorts are available?</a> — 2026, 도움말. 검색 정렬</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360045989712-Why-can-t-I-see-my-post" target="_blank" rel="noopener">Why can&#39;t I see my post?</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/52866343172500-Full-automoderator-documentation" target="_blank" rel="noopener">Full automoderator documentation</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/15484498369428-User-Management-moderators-and-permissions" target="_blank" rel="noopener">User Management - moderators and permissions</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/9810475384084-What-is-community-muting" target="_blank" rel="noopener">What is community muting?</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/7419626610708-What-are-upvotes-and-downvotes" target="_blank" rel="noopener">What are upvotes and downvotes?</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360045622611-What-is-incognito-and-how-does-it-work" target="_blank" rel="noopener">What is incognito and how does it work?</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/12731820767764-Control-the-ads-you-see-on-Reddit" target="_blank" rel="noopener">Control the ads you see on Reddit</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/23595536875796-Digital-Services-Act-DSA-Information-for-EU-users" target="_blank" rel="noopener">Digital Services Act (DSA) Information for EU users</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/40516897731220-Why-am-I-experiencing-changes-to-the-app-or-desktop-site" target="_blank" rel="noopener">Why am I experiencing changes to the app or desktop site?</a> — 2026, 도움말</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/27784816873236-Translations-for-feeds-posts-and-comments" target="_blank" rel="noopener">Translations for feeds, posts, and comments</a> — 2026, 도움말</li>
+<li><a href="https://business.reddithelp.com/articles/Knowledge/How-much-do-Reddit-Ads-cost" target="_blank" rel="noopener">How much do Reddit Ads cost?</a> — 날짜 없음(2026-11-01 열람), 광고주 도움말</li>
+<li><a href="https://business.reddithelp.com/articles/Knowledge/max-campaigns" target="_blank" rel="noopener">Max campaigns</a> — 날짜 없음(2026-11-01 열람), 광고주 도움말</li>
+</ul>
+<h3 id="reddit-뉴스룸-redditinccom">Reddit 뉴스룸 (redditinc.com)</h3>
+<ul>
+<li><a href="https://redditinc.com/news/explore-more-communities-with-reddits-new-feed-updates" target="_blank" rel="noopener">Explore More Communities with Reddit’s New Feed Updates</a> — 2026, 발표</li>
+<li><a href="https://redditinc.com/news/now-in-beta-max-campaigns-for-ai-powered-ad-performance-and-unique-audience-insights" target="_blank" rel="noopener">Now in beta: Max campaigns</a> — 2026, 발표</li>
+<li><a href="https://redditinc.com/news/performance-unlocked-reddit-max-campaigns-are-now-available-to-all-advertisers" target="_blank" rel="noopener">Performance unlocked: Reddit Max campaigns are now available to all advertisers</a> — 2026, 발표</li>
+<li><a href="https://redditinc.com/news/introducing-reddit-answers" target="_blank" rel="noopener">Introducing Reddit Answers</a> — 2024(2026-05-26 갱신), 발표</li>
+</ul>
+<h3 id="규제-제출-문서-sec-edgar">규제 제출 문서 (SEC EDGAR)</h3>
+<ul>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">Form S-1</a> — 2024, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000018/rddt-20241231.htm" target="_blank" rel="noopener">Form 10-K FY2024</a> — 2025, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">Form 10-K FY2025</a> — 2026, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">Form 10-Q Q3 2026</a> — 2026, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344524000099/exhibit992q324.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q3 2024 주주서한</a> — 2024, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000016/exhibit992q424.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q4 2024 주주서한</a> — 2025, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000225/exhibit992q325.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q3 2025 주주서한</a> — 2025, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000020/exhibit992q425.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q4 2025 주주서한</a> — 2026, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000098/exhibit992q226.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q2 2026 주주서한</a> — 2026, 규제 문서</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q3 2026 주주서한</a> — 2026, 규제 문서</li>
+</ul>
+<h3 id="eu-규제">EU 규제</h3>
+<ul>
+<li><a href="https://digital-strategy.ec.europa.eu/en/news/commission-designates-chatgpt-reddit-roblox-under-digital-services-act" target="_blank" rel="noopener">Commission designates ChatGPT, Reddit and Roblox under the Digital Services Act</a> — 2026, 보도자료</li>
+<li><a href="https://digital-strategy.ec.europa.eu/en/policies/list-designated-vlops-and-vloses" target="_blank" rel="noopener">List of designated VLOPs and VLOSEs</a> — 2026-10-28 갱신, 지정 목록</li>
+</ul>
+<h3 id="발표">발표</h3>
+<ul>
+<li><a href="https://www.infoq.com/presentations/reddit-architecture-evolution/" target="_blank" rel="noopener">Reddit 아키텍처의 변천 (QCon San Francisco 2017, Neil Williams)</a> — 2017, 발표 전사본</li>
+<li><a href="https://twimlai.com/conf/twimlcon/2022/session/platform-first-scaling-recommendation-and-personalization-at-reddit" target="_blank" rel="noopener">Platform First: Scaling Recommendation and Personalization at Reddit (TWIMLcon 2022)</a> — 2022, 발표 초록</li>
+<li><a href="https://program.berlinbuzzwords.de/bbuzz24/talk/WKMGWH/" target="_blank" rel="noopener">Learning to Rank at Reddit (Berlin Buzzwords 2024)</a> — 2024, 발표 초록. <a href="https://softwaredoug.com/assets/slidedecks/Learning%20to%20Rank%20at%20Reddit%20-%20Project%20Retro%20-%20BBuzz%202024%20-%20PUBLIC.pdf" target="_blank" rel="noopener">슬라이드</a></li>
+<li><a href="https://current.confluent.io/archive/2025/new-orleans-sessions" target="_blank" rel="noopener">Current 2025 New Orleans sessions</a> — 2025, 발표 초록. Signals-Joiner와 REV2</li>
+</ul>
+<p class="totop"><a href="#toc">↑ 목차</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">댓글</h2>
+<button type="button" class="btn" id="load-comments">댓글 보기 (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/reddit.html" data-title="Reddit"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>

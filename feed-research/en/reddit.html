@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self' 'sha256-H+TNqQsJYlv10jMffAFUV7rVKBvxfr/jzAOH5Bm+fOY='; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reddit — feed-research</title>
+<meta name="description" content="As of the 2026-10-28 revision, the Reddit help page describes home feed recommendation in four stages: candidate generation, filters, prediction-model…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/reddit.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/reddit.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/reddit.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/reddit.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Reddit — feed-research">
+<meta property="og:description" content="As of the 2026-10-28 revision, the Reddit help page describes home feed recommendation in four stages: candidate generation, filters, prediction-model…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/reddit.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body class="svc-reddit" data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/reddit.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / Service canon</p>
+<h1 id="reddit">Reddit</h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Updated</span><time datetime="2026-11-01">2026-11-01</time></li>
+<li><span class="meta-k">Translated from</span><a href="../reddit.html" hreflang="ko">Korean</a></li>
+</ul>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc toc-long"><summary>Contents<span class="toc-n">12</span></summary><ol><li><a href="#summary">Summary</a></li><li><a href="#feed-surfaces">Feed surfaces</a><ol><li><a href="#for-you-and-following">For You and Following</a></li><li><a href="#comment-sorting">Comment sorting</a></li></ol></li><li><a href="#candidate-generation-retrieval">Candidate generation (retrieval)</a><ol><li><a href="#home-feed-candidates">Home feed candidates</a></li><li><a href="#snoorec">SnooRec</a></li><li><a href="#notification-candidates">Notification candidates</a></li><li><a href="#community-recommendations">Community recommendations</a></li></ol></li><li><a href="#ranking">Ranking</a><ol><li><a href="#home-feed-ranker">Home feed ranker</a></li><li><a href="#personalization-inputs">Personalization inputs</a></li><li><a href="#notification-ranking-and-send-volume">Notification ranking and send volume</a></li><li><a href="#breaking-news-push-and-trending-verdict">Breaking-news push and trending verdict</a></li></ol></li><li><a href="#re-ranking-diversity-and-filters">Re-ranking, diversity, and filters</a><ol><li><a href="#home-feed-filters-and-diversity">Home feed filters and diversity</a></li><li><a href="#notification-re-ranking-and-snoorec-exploration">Notification re-ranking and SnooRec exploration</a></li></ol></li><li><a href="#cold-start">Cold start</a><ol><li><a href="#new-users">New users</a></li><li><a href="#logged-out-users">Logged-out users</a></li></ol></li><li><a href="#feedback-signals">Feedback signals</a><ol><li><a href="#explicit-signals-and-controls">Explicit signals and controls</a></li><li><a href="#dwell-and-implicit-signals">Dwell and implicit signals</a></li></ol></li><li><a href="#ads">Ads</a><ol><li><a href="#ads-funnel">Ads funnel</a></li><li><a href="#filings-and-automated-campaigns">Filings and automated campaigns</a></li></ol></li><li><a href="#infrastructure-and-platform">Infrastructure and platform</a><ol><li><a href="#ranking-platform">Ranking Platform</a></li><li><a href="#model-serving-and-vector-search">Model serving and vector search</a></li><li><a href="#points-of-contact-with-search-ranking">Points of contact with search ranking</a></li><li><a href="#regulation-and-experiments">Regulation and experiments</a></li></ol></li><li><a href="#history">History</a><ol><li><a href="#public-code-and-archive">Public code and archive</a></li><li><a href="#sort-formulas-in-the-2017-code">Sort formulas in the 2017 code</a></li><li><a href="#home-composition-and-recommendations-in-the-2017-code">Home composition and recommendations in the 2017 code</a></li><li><a href="#listing-storage-structure-in-2017">Listing storage structure in 2017</a></li><li><a href="#the-move-to-personalization">The move to personalization</a></li></ol></li><li><a href="#open-questions">Open questions</a></li><li><a href="#sources">Sources</a><ol><li><a href="#reddit-engineering-blog-rredditeng">Reddit engineering blog (r/RedditEng)</a></li><li><a href="#ads-engineering-blog-rredditeng">Ads engineering blog (r/RedditEng)</a></li><li><a href="#public-source-code">Public source code</a></li><li><a href="#rchangelog-rblog-old-official-blog-wayback-copies">r/changelog, r/blog, old official blog (Wayback copies)</a></li><li><a href="#help-center-supportreddithelpcom-businessreddithelpcom">Help Center (support.reddithelp.com, business.reddithelp.com)</a></li><li><a href="#reddit-newsroom-redditinccom">Reddit newsroom (redditinc.com)</a></li><li><a href="#regulatory-filings-sec-edgar">Regulatory filings (SEC EDGAR)</a></li><li><a href="#eu-regulation">EU regulation</a></li><li><a href="#talks">Talks</a></li></ol></li></ol></details></nav>
+<div class="prose">
+<h2 id="summary">Summary</h2>
+<p>As of the 2026-10-28 revision, the Reddit help page describes home feed recommendation in four stages: candidate generation, filters, prediction-model scoring, and diversity-aware ordering <span class="badge ok">verified</span>(<a href="#candidate-generation-retrieval">candidate generation section</a>, <a href="#home-feed-filters-and-diversity">home feed filter section</a>). As of the 2026-09 engineering post, candidate generation includes SnooRec, a multi-task two-tower model (a structure that embeds users and posts separately and matches them) shared by the home feed and notifications, but the home ranker&#39;s current prediction targets and weights are not public <span class="badge obs">observed</span> 2026-11-01(<a href="#ranking">ranking section</a>). Sort formulas such as Hot and comment Best (confidence) are confirmed only in the 2017 published code, and the ranking approaches of the home feed Best introduced in 2018-01 and of For You and Following announced on 2026-10-28 are not public <span class="badge obs">observed</span> 2026-11-01(<a href="#history">history section</a>, <a href="#for-you-and-following">For You and Following section</a>).</p>
+<figure class="diagram" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 628" font-family="-apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif" role="img" aria-label="Reddit home feed pipeline diagram (disclosure scope marked)">
+<style>
+.db{fill:var(--card,#fff);stroke:var(--line,#d9d5cd);stroke-width:1}
+.d2{fill:var(--code-bg,#f1efe9);stroke:var(--line,#d9d5cd);stroke-width:1}
+.hl{fill:color-mix(in srgb, var(--svc,#ff4500) 8%, var(--card,#fff));stroke:var(--svc,#ff4500);stroke-width:1.4}
+.bd{fill:none;stroke:var(--line,#d9d5cd);stroke-width:1;stroke-dasharray:4 4}
+.t{fill:var(--fg,#1a1a1a);font-size:13.5px;font-weight:700}
+.s{fill:var(--muted,#6b6b6b);font-size:11.5px}
+.n{fill:var(--muted,#6b6b6b);font-size:11px}
+.a{stroke:var(--muted,#8a877f);stroke-width:1.5;fill:none;marker-end:url(#arrd)}
+.af{stroke:var(--svc,#ff4500);stroke-width:1.3;fill:none;stroke-dasharray:5 4;marker-end:url(#arrd2)}
+</style>
+<defs>
+<marker id="arrd" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted,#8a877f)"/></marker>
+<marker id="arrd2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--svc,#ff4500)"/></marker>
+</defs>
+
+<rect class="hl" x="20" y="14" width="530" height="78" rx="10"/>
+<text class="t" x="285" y="38" text-anchor="middle">Candidate generation: SnooRec multi-task two-tower (since early 2025)</text>
+<text class="s" x="285" y="58" text-anchor="middle">Per-task user towers · shared item tower · one ANN index</text>
+<text class="s" x="285" y="78" text-anchor="middle">One query with per-surface task weights · exploration by temperature sampling</text>
+
+<rect class="bd" x="570" y="14" width="290" height="78" rx="10"/>
+<text class="t" x="715" y="38" text-anchor="middle" fill="var(--muted,#6b6b6b)">Other candidate sources</text>
+<text class="s" x="715" y="58" text-anchor="middle">Current source list and per-stage counts undisclosed</text>
+<text class="s" x="715" y="78" text-anchor="middle">Only source list (2021) and "thousands" (2025) published</text>
+
+<line class="a" x1="285" y1="92" x2="285" y2="118"/>
+<line class="a" x1="715" y1="92" x2="715" y2="118"/>
+
+<rect class="db" x="20" y="120" width="840" height="58" rx="10"/>
+<text class="t" x="440" y="144" text-anchor="middle">Filters: spam · already-seen posts · blocked content (help page 2026-10)</text>
+<text class="s" x="440" y="164" text-anchor="middle">Tries to leave out adult and sensitive topics unless joined or followed · posts from unverified accounts excluded (since 2026-09)</text>
+<line class="a" x1="440" y1="178" x2="440" y2="202"/>
+
+<rect class="hl" x="20" y="204" width="840" height="84" rx="10"/>
+<text class="t" x="440" y="228" text-anchor="middle">Ranking: PyTorch DNN, served on GPU (Triton)</text>
+<text class="s" x="440" y="248" text-anchor="middle">DCNv2 family · serving cost cut 10× (2025-11) · model freshness 9 days to 4 days (2026 Q3)</text>
+<text class="s" x="440" y="268" text-anchor="middle">Prediction targets (after 2021 post) · objective · weights undisclosed (help lists input categories only)</text>
+<line class="a" x1="440" y1="288" x2="440" y2="312"/>
+
+<rect class="bd" x="20" y="314" width="840" height="46" rx="10"/>
+<text class="t" x="440" y="333" text-anchor="middle" fill="var(--muted,#6b6b6b)">Ordering: tries to avoid many similar posts in a row</text>
+<text class="s" x="440" y="351" text-anchor="middle">Diversity algorithm name and current approach undisclosed (2021 post: score-weighted sampling)</text>
+<line class="a" x1="440" y1="360" x2="440" y2="384"/>
+
+<rect class="db" x="20" y="386" width="840" height="58" rx="10"/>
+<text class="t" x="440" y="410" text-anchor="middle">Home feed → For You / Following (announced 2026-10-28, ordering undisclosed)</text>
+<text class="s" x="440" y="430" text-anchor="middle">Logged-out default is Popular (net upvotes, location-tailored in some countries) · r/all retired 2026-04</text>
+
+<rect class="db" x="20" y="476" width="410" height="96" rx="10"/>
+<text class="t" x="225" y="500" text-anchor="middle" font-size="12.5">Notification pipeline (published 2025-05)</text>
+<text class="n" x="225" y="520" text-anchor="middle">Budgeter → Retrieval → Ranking → Reranking</text>
+<text class="n" x="225" y="538" text-anchor="middle">Score = Σ W × P(action) weighted sum · SnooRec embeddings in light ranker</text>
+<text class="n" x="225" y="556" text-anchor="middle">Send budget: S-learner causal model (trending push, 2026-10)</text>
+
+<rect class="db" x="450" y="476" width="410" height="96" rx="10"/>
+<text class="t" x="655" y="500" text-anchor="middle" font-size="12.5">Ads funnel (published)</text>
+<text class="n" x="655" y="520" text-anchor="middle">Eligibility filter → trimmer → heavy ranker → auction</text>
+<text class="n" x="655" y="538" text-anchor="middle">trimmer: two-tower (2024-05 multi-task) and NLB exploration (2025-02)</text>
+<text class="n" x="655" y="556" text-anchor="middle">eCPM = bid × P(billable event) (2023) · heavy predicts CTR and conversion</text>
+
+<path class="af" d="M 120 92 V 106 H 8 V 466 H 120 V 476"/>
+<path class="af" d="M 450 92 V 106 H 872 V 466 H 760 V 476"/>
+
+<rect class="d2" x="20" y="584" width="410" height="34" rx="8"/>
+<text class="n" x="225" y="605" text-anchor="middle">Hot · comment Best formulas only in 2017 published code · home Best formula undisclosed</text>
+<rect class="d2" x="450" y="584" width="410" height="34" rx="8"/>
+<text class="n" x="655" y="605" text-anchor="middle">Solid: published by primary source · gray dashed: approach undisclosed · colored dashed: SnooRec shared</text>
+</svg>
+<figcaption>Reddit home feed pipeline (disclosure scope marked)</figcaption></figure>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="feed-surfaces">Feed surfaces</h2>
+<p>As of the 2026-10-28 help page, the default feed for logged-in users is the home feed, which mixes posts from joined communities with recommendations in a personalized order, and the default feed for logged-out users is Popular, chosen by net upvotes <span class="badge ok">verified</span> (table below). On 2026-10-28 Reddit announced a new feed experience in which users choose between two feeds, For You and Following, rolling out worldwide over several weeks <span class="badge ok">verified</span> (<a href="#for-you-and-following">For You and Following section</a>). r/all was retired effective 2026-04-02 and redirects to the home feed <span class="badge ok">verified</span> (table below).</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>What it shows</th>
+<th>How order is decided</th>
+<th>Basis</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Home feed (logged-in default)</td>
+<td>Posts from joined communities, plus recommended content and communities not joined</td>
+<td>Personalized Best sort</td>
+<td>Recommendations help page <span class="nw">2026-10-28</span>, home recommendations help page <span class="nw">2026-10-05</span></td>
+</tr>
+<tr>
+<td>For You</td>
+<td>Posts from joined communities and interest-based recommendations</td>
+<td>Not public</td>
+<td>Newsroom <span class="nw">2026-10-28</span></td>
+</tr>
+<tr>
+<td>Following</td>
+<td>Posts from joined communities</td>
+<td>Not public</td>
+<td>Newsroom <span class="nw">2026-10-28</span></td>
+</tr>
+<tr>
+<td>Popular (logged-out default)</td>
+<td>Recent popular posts</td>
+<td>Net upvotes, location-tailored in some countries</td>
+<td>Recommendations help page <span class="nw">2026-10-28</span></td>
+</tr>
+<tr>
+<td>r/all</td>
+<td>Redirects to the home feed (old.reddit keeps it)</td>
+<td>Not applicable</td>
+<td>Change log <span class="nw">2026-04-02</span></td>
+</tr>
+<tr>
+<td>Community page</td>
+<td>Posts in that community</td>
+<td>Default sort is an <a href="#open-questions">open question</a></td>
+<td>Two help pages</td>
+</tr>
+<tr>
+<td>Trending notification</td>
+<td>Popular posts from recently visited communities</td>
+<td><a href="#notification-ranking-and-send-volume">Notification recommendation pipeline</a></td>
+<td>Help page <span class="nw">2026-02-26</span>, blog post <span class="nw">2026-10</span></td>
+</tr>
+</tbody></table></div>
+<ul>
+<li><p>The default feed for logged-in users is the home feed; by default it mixes in content from communities not joined and community recommendations, and posts from joined communities also appear in a personalized order <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
+<ul>
+<li>This page was written on 2024-02-06 and revised on 2026-10-28, the same day as the For You and Following announcement, but its text is written around the home feed.</li>
+</ul>
+<blockquote>
+<p>&quot;The main, default feed on Reddit for logged-in users is the home feed&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, revised 2026-10-28</p>
+</blockquote>
+</li>
+<li><p>Best sort in the home feed is a personalized sort, and home feed recommendation is part of the effort to personalize and rank Best sort with ML <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">Home recommendations help page 2026</a>.</p>
+<ul>
+<li>The page was written on 2021-06-15 and last revised on 2026-10-05, so it describes the state before the 2026-10-28 overhaul.</li>
+<li>Recommended posts are shown with the post itself, not the community, in front (→ <a href="#personalization-inputs">Personalization inputs section</a>).</li>
+</ul>
+</li>
+<li><p>The default feed for logged-out users is Popular, which picks recent popular posts by net upvotes <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
+<ul>
+<li>In some countries Popular is tailored to location. It uses IP when logged out and the Location Setting when logged in.</li>
+</ul>
+</li>
+<li><p>The last stage of the r/all retirement took effect on 2026-04-02, and all r/all links redirect to the home feed <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/47822249050132-Changelog-April-2-2026" target="_blank" rel="noopener">Change log 2026-04-02</a>.</p>
+<ul>
+<li>It applied to the app immediately, and the post says desktop rolls out that week. Trending content remains in r/popular.</li>
+<li>Users of old.reddit.com or the old Reddit default setting can still reach r/all.</li>
+</ul>
+</li>
+<li><p>The 2025-03-06 change log said, in its list of moderator-facing fixes, that a sort changed in a community no longer reverts to Best and persists on desktop and mobile <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/35343974642452-Changelog-March-6-2025" target="_blank" rel="noopener">Change log 2025-03-06</a>.</p>
+<ul>
+<li>The item concerns changing the sort in a community and ends with &quot;the feed you intended&quot;; it does not mention comment sorting.</li>
+</ul>
+</li>
+<li><p>A Trending notification is a notification about popular posts from recently visited communities <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/360043033972-How-do-I-turn-off-trending-notifications" target="_blank" rel="noopener">Trending notifications help page 2026</a>.</p>
+<ul>
+<li>The Trending posts toggle in notification settings turns off all of them, but specific communities cannot be turned off alone. This page was last revised on 2026-02-26.</li>
+</ul>
+</li>
+<li><p>The 2026-10-08 change log announced a small experiment, starting in October, that adds a trending label to feed posts <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">Change log 2026-10-08</a>.</p>
+<ul>
+<li>Tapping the label opens a detail page that gathers an AI summary of the trend and related communities and conversations.</li>
+<li>It targets some users on reddit.com, iOS, and Android, and does not state how the posts to label are chosen.</li>
+</ul>
+</li>
+</ul>
+<h3 id="for-you-and-following">For You and Following</h3>
+<p>On 2026-10-28 the Reddit newsroom announced a new feed experience in which users choose between two feeds, For You and Following <span class="badge ok">verified</span> — <a href="https://redditinc.com/news/explore-more-communities-with-reddits-new-feed-updates" target="_blank" rel="noopener">Feed overhaul announcement 2026</a>.</p>
+<ul>
+<li><p>For You mixes posts from joined communities with interest-based recommendations, and Following shows only posts from joined communities <span class="badge ok">verified</span> — <a href="https://redditinc.com/news/explore-more-communities-with-reddits-new-feed-updates" target="_blank" rel="noopener">Feed overhaul announcement 2026</a>.</p>
+<blockquote>
+<p>&quot;For You combines posts from communities you have joined with recommendations related to your interests.&quot;
+— <a href="https://redditinc.com/news/explore-more-communities-with-reddits-new-feed-updates" target="_blank" rel="noopener">Explore More Communities with Reddit’s New Feed Updates</a>, 2026-10-28</p>
+</blockquote>
+</li>
+<li><p>The worldwide rollout takes place over several weeks, and the next launch reopens the feed last viewed <span class="badge ok">verified</span> — same announcement.</p>
+<ul>
+<li>The same announcement said it will keep experimenting with controls such as hiding posts and seeing less.</li>
+</ul>
+</li>
+<li><p>The announcement does not use the term &#39;home feed&#39; and does not state how the two feeds are ordered <span class="badge ok">verified</span> — same announcement.</p>
+</li>
+<li><p>The description of splitting the home feed in two is in the Help Center change log, and this experiment reopened to a small number of users from 2026-09-02 <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/53416317564820-Changelog-September-10-2026" target="_blank" rel="noopener">Change log 2026-09-10</a>.</p>
+<ul>
+<li>The change log says only that there was a first experiment and does not give when.</li>
+<li>The change log says Following also includes posts from users you follow, which differs from the newsroom definition (only posts from joined communities).</li>
+<li>The 2026-10-08 change log said this experiment is testing swiping and sorting options <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">Change log 2026-10-08</a>.</li>
+</ul>
+</li>
+<li><p>The body of the recommendations help page revised on 2026-10-28 does not mention For You or Following <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
+</li>
+</ul>
+<h3 id="comment-sorting">Comment sorting</h3>
+<p>As of the AutoModerator documentation revised on 2026-09-30, the comment suggested sort values are best, new, qa, top, controversial, and old, and confidence is accepted as an alias of best <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/52866343172500-Full-automoderator-documentation" target="_blank" rel="noopener">AutoModerator documentation 2026</a>. The moderator permissions help page (revised 2026-04-02) lists Live instead of Top, so the lists in the two documents differ <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/15484498369428-User-Management-moderators-and-permissions" target="_blank" rel="noopener">Moderator permissions help page 2026</a>.</p>
+<ul>
+<li>The AutoModerator documentation lists the six above and blank as <code>set_suggested_sort</code> values <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/52866343172500-Full-automoderator-documentation" target="_blank" rel="noopener">AutoModerator documentation 2026</a>.<ul>
+<li>The documentation was last revised on 2026-09-30.</li>
+</ul>
+</li>
+<li>The moderator permissions help page lists Best, New, Controversial, Old, Q&amp;A, and Live as community suggested sorts <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/15484498369428-User-Management-moderators-and-permissions" target="_blank" rel="noopener">Moderator permissions help page 2026</a>.<ul>
+<li>The page was last revised on 2026-04-02, and Top is not in this list.</li>
+<li>The 2017 code&#39;s comment sort options have no live, while the comment sort menu HTML in the 2018-01 and 2018-02 Wayback copies contains live (beta) as a hidden option, like random <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/menus.py#L579-L588" target="_blank" rel="noopener"><code>r2/r2/lib/menus.py:579-588</code></a>, <a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">Wayback 2018-01-25</a>, <a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">Wayback 2018-02-02</a>.</li>
+</ul>
+</li>
+<li>The help pages do not give how these options are computed, and the only published formula is the 2017 code <span class="badge obs">observed</span> 2026-11-01(<a href="#open-questions">open question</a>, <a href="#sort-formulas-in-the-2017-code">2017 sort formulas section</a>).</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="candidate-generation-retrieval">Candidate generation (retrieval)</h2>
+<p>As of the 2026-10-28 revision, the Reddit help page describes the first stage of recommendation as candidate generation but does not disclose the kinds or number of candidate sources <span class="badge ok">verified</span>(<a href="#home-feed-candidates">home feed candidates section</a>). As of the 2025-11 engineering post, the home feed gathers thousands of candidates, and as of the 2026-09 post that candidate generation uses SnooRec, which has handled all production traffic since early 2025 <span class="badge ok">verified</span>(<a href="#home-feed-candidates">home feed candidates section</a>, <a href="#snoorec">SnooRec section</a>). As of a 2025 engineering post, notifications use both rule-based and model-based candidate sources, and breaking-news push uses a content-first approach that picks the post first <span class="badge ok">verified</span>(<a href="#notification-candidates">notification candidates section</a>).</p>
+<h3 id="home-feed-candidates">Home feed candidates</h3>
+<p>The home feed candidate sources were published as a list in the 2021 post; what has been published since is the 2025 post saying thousands are gathered, and SnooRec, and we could not find the current source list or per-stage candidate counts <span class="badge obs">observed</span> 2026-11-01 — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU blog post 2025</a>.</p>
+<ul>
+<li><p>When a user opens Reddit, the system gathers thousands of candidate posts, filters them with heuristics, and has a model score potential engagement, then sends the top to the home feed <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU blog post 2025</a>.</p>
+<blockquote>
+<p>&quot;we gather thousands of candidate posts, filter them using heuristics, and use a model to score potential engagement&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">Reddit&#39;s Home Feed on GPU</a> (blog post), 2025-11-10</p>
+</blockquote>
+</li>
+<li><p>As of the 2021-06 post, opening Home builds a candidate post list from several sources, passes it through several filter stages, and ranks it with the chosen sort <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>.</p>
+<ul>
+<li>The same post listed subscriptions, similar communities, onboarding categories, recently visited communities, and popular and regional popular posts from the past 24 hours as candidate sources. The post was read from a Wayback copy.</li>
+</ul>
+<blockquote>
+<p>&quot;Reddit’s systems build a list of potential candidate posts from multiple sources, pass the posts through multiple filtering steps&quot;
+— <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">Evolving the Best Sort for Reddit’s Home Feed</a> (r/blog, Wayback copy), 2021-06-22</p>
+</blockquote>
+</li>
+<li><p>The help page calls the first stage candidate generation, which builds an initial list of content the user may be interested in, but does not state the kinds, number, or approach of the sources <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
+</li>
+<li><p>Recommended posts carry a recommendation reason, and the help page gives &#39;Popular on Reddit right now&#39; and &#39;Similar to content you interacted with&#39; as examples of such reasons <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
+<ul>
+<li>The document does not say whether these two are the only candidate sources.</li>
+</ul>
+</li>
+<li><p>The 10-K FY2025 states that AI recommends posts and communities using factors such as search queries, post topics, and engagement by similar users <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025, filed 2026-02-06</a>.</p>
+</li>
+</ul>
+<h3 id="snoorec">SnooRec</h3>
+<p>SnooRec is Reddit&#39;s multi-task retrieval model; it has handled all production traffic since early 2025 and is used for candidate generation in the home feed and notifications <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog post 2026</a>.</p>
+<ul>
+<li><p>The user tower has per-task experts (sub-networks kept separately for each task) such as click, upvote, and good visit, and the item tower is shared <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog post 2026</a>.</p>
+<ul>
+<li>Because there is one item tower, all candidates go into a single ANN (approximate nearest neighbor search) index.</li>
+</ul>
+<blockquote>
+<p>&quot;task-specific capacity lives in the user tower, while the item tower remains shared&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec: A Shared Retrieval Foundation</a> (blog), 2026-09-15</p>
+</blockquote>
+</li>
+<li><p>At serving time, per-task user embeddings are combined as a weighted sum using the task weights set by the surface and then normalized, and only one query is sent to the shared index <span class="badge ok">verified</span> — SnooRec blog post.</p>
+<ul>
+<li>So changing the retrieval objective requires no model retraining or index rebuild.</li>
+</ul>
+</li>
+<li><p>Training uses an InfoNCE loss with in-batch negatives (a contrastive loss that separates the correct pair from the other pairs in the batch) and dot product similarity <span class="badge ok">verified</span> — SnooRec blog post.</p>
+<ul>
+<li>10% of the input features are randomly dropped out.</li>
+</ul>
+</li>
+</ul>
+<h3 id="notification-candidates">Notification candidates</h3>
+<p>Notification recommendation candidate sources split into rule-based and model-based, and breaking-news push picks the post first, separately from these <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog post 2025</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">Breaking-news push blog post 2025</a>.</p>
+<ul>
+<li>The rule-based source Subscribed picks the top X subscribed subreddits, takes the top Y posts by score from each subreddit&#39;s posts of the last few days, and fills the list in round-robin <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog post 2025</a>.<ul>
+<li>The score is computed from upvotes, downvotes, and post time.</li>
+</ul>
+</li>
+<li>The model-based source, a user-post two-tower, is trained on labels such as push notification (PN) clicks <span class="badge ok">verified</span> — Notification recommendation blog post.<ul>
+<li>Post embeddings for hundreds of thousands of recent posts are precomputed by an indexing job, and only the user embedding is computed in real time for nearest-neighbour search.</li>
+</ul>
+</li>
+<li>Breaking-news push picks candidates with a content-first approach that picks the post first and decides the interested users afterward <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">Breaking-news push blog post 2025</a>.<ul>
+<li>It was introduced to complement the existing user-first recommendation, which tends to pick older posts with accumulated engagement signals and adds latency.</li>
+<li>As of the 2025-11-25 post, it is used for Breaking News push (→ <a href="#breaking-news-push-and-trending-verdict">Breaking-news push section</a>).</li>
+</ul>
+</li>
+</ul>
+<h3 id="community-recommendations">Community recommendations</h3>
+<p>As of the 2026-10-28 help page, community recommendations are decided by regional and global activity and relevance to trending topics <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
+<ul>
+<li>The surfaces for this description are the mobile Explore Communities page and trending in search, among others <span class="badge ok">verified</span> — Recommendations help page.</li>
+<li>For logged-in users, similarity to communities already joined or interacted with is also used <span class="badge ok">verified</span> — Recommendations help page.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="ranking">Ranking</h2>
+<p>As of the 2025-11 engineering post, the home feed ranker is a DNN built in PyTorch and served on GPU, but its prediction targets, objective function, and weights are not public <span class="badge obs">observed</span> 2026-11-01(<a href="#home-feed-ranker">home feed ranker section</a>). The help page lists personalization inputs only at the category level and says the importance of each factor changes dynamically with user activity <span class="badge ok">verified</span>(<a href="#personalization-inputs">personalization inputs section</a>). By contrast, Reddit published that the notification ranker produces its final score as a weighted sum of per-action predicted probabilities <span class="badge ok">verified</span>(<a href="#notification-ranking-and-send-volume">notification ranking section</a>).</p>
+<h3 id="home-feed-ranker">Home feed ranker</h3>
+<p>As of the 2025-11 post, the home feed ranking model is a DNN written in PyTorch and served with ONNX Runtime <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU blog post 2025</a>.</p>
+<ul>
+<li><p>String features are tokenized and categorical features are embedded and concatenated, then passed through shared layers and target layers <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU blog post 2025</a>.</p>
+</li>
+<li><p>With architectures such as DCNv2 (a recommendation model structure that learns feature crosses explicitly), the layers grew and CPU serving hit its limit, so serving moved to GPU and cut serving cost 10× <span class="badge ok">verified</span> — GPU blog post (→ <a href="#model-serving-and-vector-search">model serving section</a>).</p>
+<blockquote>
+<p>&quot;Outcomes include a 10x reduction in serving costs.&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">Reddit&#39;s Home Feed on GPU</a> (blog post), 2025-11-10</p>
+</blockquote>
+</li>
+<li><p>The 2026 Q3 shareholder letter said that a new model architecture, trained with 20× more Reddit data, was launched in Q3 along with ranking improvements <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 shareholder letter</a>.</p>
+<ul>
+<li>The letter said this change broadened the signals used for personalization and sped up model releases.</li>
+<li>The same letter said feed model freshness fell from 9 days to 4 days.</li>
+<li>In the paragraph on the video experience, the letter said vertical chaining and a modernized ranking pipeline launched in Q3, but it did not explain what the two terms mean.</li>
+<li>The letter does not say whether that pipeline refers to the home feed ranker or is limited to the video surface.</li>
+</ul>
+</li>
+<li><p>The S-1 said New Home Feed ranking was retrained on much more data and user signals, and cited as a result that Good Visits (visits in which a post is consumed for more than 30 seconds) rose by more than 30% <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.</p>
+<ul>
+<li>The comparison period is the quarter ended 2023-12-31 versus the quarter ended 2023-06-30.</li>
+<li>The S-1 does not give when the retraining happened and only places the retraining and the figure side by side under &#39;For example&#39;, without stating causation.</li>
+<li>The 10-K FY2024 keeps the same sentence but changed the figure to +30% for 2024-Q4 versus 2023-Q4 <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000018/rddt-20241231.htm" target="_blank" rel="noopener">10-K FY2024</a>.</li>
+<li>The same paragraph of the 10-K FY2025 has neither this example nor the figure <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</li>
+</ul>
+</li>
+<li><p>The S-1 described an AI-based recommendation engine that selects and ranks content in the home feed, post detail pages, inside communities, and notifications and emails <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.</p>
+<ul>
+<li>This sentence appears only in the S-1 Business section and not in the body of the 10-K FY2024 or FY2025.</li>
+<li>The statement does not say whether it is a single model or a collective name for several systems.</li>
+</ul>
+</li>
+</ul>
+<h3 id="personalization-inputs">Personalization inputs</h3>
+<p>As of the 2026-10-28 revision, the Reddit help page lists personalization inputs in the categories of post information, user activity, account age, and location setting, and does not disclose the model structure or weights <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
+<ul>
+<li><p>Post-side inputs are upvotes and downvotes, the community posted in, comment history, post type, post age, and flair (a tag a community attaches to a post) <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
+</li>
+<li><p>User-activity inputs are content and communities interacted with during visits, votes, dwell time, subscriptions, topics of interest, and requests to see less <span class="badge ok">verified</span> — Recommendations help page.</p>
+<ul>
+<li>The interaction record covers both the current visit and past visits.</li>
+<li>Dwell time is measured per community, and recently visited communities are also considered separately.</li>
+<li>Topics of interest are those chosen at sign-up, and see-less refers to the post types for which the user requested &quot;show less&quot;.</li>
+</ul>
+<blockquote>
+<p>&quot;the time you’ve spent on specific communities, the communities you’ve visited recently, your community subscriptions&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, revised 2026-10-28</p>
+</blockquote>
+</li>
+<li><p>After the filter stage, predictive models predict whether the user will like the content or not, and content is ordered by that prediction <span class="badge ok">verified</span> — Recommendations help page.</p>
+<ul>
+<li>The document does not give the model type or the prediction target, that is, what counts as positive.</li>
+</ul>
+</li>
+<li><p>The importance of each factor is said to change dynamically with the user&#39;s activity, reactions to recommended content, and feedback <span class="badge ok">verified</span> — Recommendations help page.</p>
+<ul>
+<li>This appears to mean that weights differ per person rather than being global constants <span class="badge est">inferred</span>. The basis is that the document says it changes with &#39;your activity&#39;; the implementation is not public.</li>
+</ul>
+</li>
+<li><p>Best in the home feed takes into account a preference for new communities, account age, and the types of posts the user previously upvoted or commented on <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">Home recommendations help page 2026</a>.</p>
+</li>
+<li><p>The default for location personalization is approximate location based on IP, and choosing No location specified turns off only the location tailoring of the feed and recommendations <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/360062429491-Managing-your-Location-Customization-setting" target="_blank" rel="noopener">Location setting help page 2026</a>.</p>
+<ul>
+<li>Location inferred from IP is still used for ads and for deciding which terms apply. This page was last revised on 2026-03-29.</li>
+<li>A separate document states that precise location, meaning latitude and longitude, is not collected, stored, or used <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/360049845011-How-Reddit-Uses-Location-Data" target="_blank" rel="noopener">Location data help page 2026</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="notification-ranking-and-send-volume">Notification ranking and send volume</h3>
+<p>As of the 2025-05 post, notification post recommendation narrows candidates in the order Budgeter, which sets the number of sends per user, then Retrieval, ML scoring, and Reranking, which applies rules <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog post 2025</a>.</p>
+<ul>
+<li>It recommends from millions of posts to tens of millions of users every day, and is a near-real-time pipeline run with queues and asynchronous workers <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog post 2025</a>.</li>
+<li>The ranking model is a multi-task DNN with a block of shared layers and per-label target layers, and the final score is the sum of per-action predicted probabilities multiplied by weights <span class="badge ok">verified</span> — Notification recommendation blog post.<ul>
+<li><p>The post calls this model the SPR model.</p>
+</li>
+<li><p>Training data is collected from the prediction log to eliminate train-serve skew (the problem of feature values differing between training and serving), and only the last few weeks are used.</p>
+<pre tabindex="0"><code>score = Wclick×P(click) + Wupvote×P(upvote) + … + Wdownvote×P(downvote)
+</code></pre>
+</li>
+</ul>
+</li>
+<li>SnooRec&#39;s user and item embeddings are also used as input features of the notification light ranker (a front-stage ranker that first narrows candidates with a lightweight model) and the ads ranking model <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog post 2026</a>.<ul>
+<li>In notifications they are also used as dense features, along with derived similarities such as per-task dot products.</li>
+<li>Thanks to Matryoshka training (training that keeps the leading part of an embedding usable on its own), the ANN index can use the full 256 dimensions and the ranker can use a 32- or 64-dimension prefix.</li>
+<li>Whether these embeddings are used in the final home feed ranker is not in the post&#39;s surface table.</li>
+</ul>
+</li>
+<li>The Budgeter sets the daily budget per user by causal modeling <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog post 2025</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1wyhkcf/how_reddit_uses_causal_ml_to_personalise/" target="_blank" rel="noopener">Causal budget blog post 2026</a>.<ul>
+<li>The 2026-10 post describes that approach only for the Trending Budgeting system that sets the budget for trending recommendation push. The details below are from that post.</li>
+<li>An S-learner (an approach that estimates effect with one model that takes the treatment variable as a feature) model is trained on experiment data in which users were randomly assigned to fixed daily budgets.</li>
+<li>The model takes the budget as input and predicts future active days and the probability of turning off notifications.</li>
+<li>The policy score is a simplified form of activity weight × E[active days] − disable weight × P(disable).</li>
+</ul>
+</li>
+<li>The budget model runs inference in a daily batch and keeps per-user predictions in a KV store, and when a notification opportunity arrives, the ranking service applies the policy at request time <span class="badge ok">verified</span> — Causal budget blog post.<ul>
+<li>So policy weights and thresholds can be changed without retraining the model.</li>
+<li>New policies are first examined with off-policy evaluation (evaluation that estimates a new policy&#39;s performance from the logs of an existing policy). The approaches are direct matching and doubly robust.</li>
+<li>Then they are confirmed with online experiments and a long-term holdout (a control group left without the change).</li>
+</ul>
+</li>
+</ul>
+<h3 id="breaking-news-push-and-trending-verdict">Breaking-news push and trending verdict</h3>
+<p>As of the 2025-11 post, breaking-news push picks posts by a score that multiplies an Engagement Score predicted from first-hour engagement by an LLM-assigned Breakingness Score <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">Breaking-news push blog 2025</a>.</p>
+<ul>
+<li><p>The Engagement Score is the value XGBoost predicts for 24-hour consume from a post&#39;s first-hour comments, shares, upvotes, and consume <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">Breaking-news push blog 2025</a>.</p>
+</li>
+<li><p>The LLM scores urgency, source credibility, and newsworthiness against an editorial rubric and gives sensitive content a 0 <span class="badge ok">verified</span> — Breaking-news push blog.</p>
+<ul>
+<li>A post about the same story as a high-scoring post from the last 24 hours is penalized as a semantic duplicate.</li>
+<li>Only posts at or above the 99.8th percentile of candidate scores from the last 7 days are sent.</li>
+</ul>
+</li>
+<li><p>COPTER v1 (Reddit&#39;s trending content detection system) treats a post as trending when its engagement, projected to a comparison age, is exceptional relative to recent posts in the same context <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wo8pjw/contextual_popularity_trending_content_detection/" target="_blank" rel="noopener">COPTER blog 2026</a>.</p>
+<ul>
+<li>A context is split by subreddit or linked Wikidata topic, age bucket, metric, and growth-trajectory bucket.</li>
+<li>views, upvotes, and comments trigger the verdict, and downvotes are used only for diagnostics.</li>
+<li>It runs on three cycles: hourly observation, daily modeling, and hourly detection.</li>
+</ul>
+<blockquote>
+<p>&quot;trendingness measures whether attention to a post is unusual for its context and moment&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1wo8pjw/contextual_popularity_trending_content_detection/" target="_blank" rel="noopener">Contextual Popularity Trending Content Detection</a> (blog), 2026-09-23</p>
+</blockquote>
+</li>
+<li><p>COPTER&#39;s first consumer is search, and the post says only that it intends this signal as a common layer that feed candidate generation, ranking, and notifications could also use <span class="badge ok">verified</span> — COPTER blog.</p>
+<ul>
+<li>In search, trending_level is indexed as a Milvus corpus field and used as a filter for semantic search. The semantic search model is a query-to-post two-tower distilled from an LLM.</li>
+<li>The latest value is rechecked in Redis, and a trendingness dimension is added to the value model (a score formula that weights and combines several predictions).</li>
+<li>The post does not state whether this was applied to the feed.</li>
+<li>The feed trending label experiment in the 2026-10-08 change log (→ <a href="#feed-surfaces">Feed surface</a>) also does not say which detection signal it uses <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">Change log 2026-10-08</a>.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="re-ranking-diversity-and-filters">Re-ranking, diversity, and filters</h2>
+<p>As of the 2026-10-28 revision, the Reddit help page explains that after candidate generation it filters out spam, already-seen content, and blocked content, and that the final sort tries to keep too many similar posts from appearing in a row <span class="badge ok">verified</span> (<a href="#home-feed-filters-and-diversity">Home feed filters and diversity</a>). The name and approach of the diversity algorithm currently in use are not public <span class="badge obs">observed</span> 2026-11-01 (<a href="#home-feed-filters-and-diversity">Home feed filters and diversity</a>). Notifications adjust model scores with rules at the re-ranking stage, and SnooRec explores with temperature sampling after retrieval <span class="badge ok">verified</span> (<a href="#notification-re-ranking-and-snoorec-exploration">Notification re-ranking and SnooRec exploration</a>).</p>
+<h3 id="home-feed-filters-and-diversity">Home feed filters and diversity</h3>
+<p>The filter and diversity rules of the home feed are public only at the level of sentences in the help page and engineering posts <span class="badge obs">observed</span> 2026-11-01 — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendation help 2026</a>.</p>
+<ul>
+<li><p>There is a filter stage after candidate generation that removes spam, already-seen content, and blocked content <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendation help 2026</a>.</p>
+</li>
+<li><p>It says it tries to ensure diversity at the final sorting stage so that too many similar posts do not appear in a row, and does not disclose the approach <span class="badge ok">verified</span> — Recommendation help.</p>
+<blockquote>
+<p>&quot;we aim to avoid showing you too many similar posts in a row in the feed&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, revised 2026-10-28</p>
+</blockquote>
+</li>
+<li><p>It tries to keep adult and sensitive-topic content out of recommendations unless the user subscribed to that community or showed interest <span class="badge ok">verified</span> — Recommendation help.</p>
+<ul>
+<li>It adds that this type of recommendation may be limited even for subscribers.</li>
+</ul>
+</li>
+<li><p>Community muting removes the community from notifications, the home feed (including recommendations), and Popular, and up to 1,000 communities can be muted <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/9810475384084-What-is-community-muting" target="_blank" rel="noopener">Muting help 2026</a>.</p>
+<ul>
+<li>Another sentence says the scope will be expanded to other mixed feeds and recommendations, but it is not possible to tell when that sentence was written.</li>
+</ul>
+</li>
+<li><p>Since 2026-09, posts and comments from accounts that received a human verification or automation registration requirement and completed neither are removed from recommendations <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/53416317564820-Changelog-September-10-2026" target="_blank" rel="noopener">Change log 2026-09-10</a>.</p>
+<ul>
+<li>It applies first to some rule-violating content and accounts with high confidence and will widen gradually.</li>
+</ul>
+</li>
+<li><p>REV2, the real-time rules engine of Reddit&#39;s Safety team, receives slow ML signals through a Flink-based Signals-Joiner, but the source does not disclose whether it connects to feed filters <span class="badge ok">verified</span> — <a href="https://current.confluent.io/archive/2025/new-orleans-sessions" target="_blank" rel="noopener">Current 2025 session abstract</a>.</p>
+<ul>
+<li>The talk was given on 2025-10-29, and the speaker is affiliated with Reddit, Inc.</li>
+</ul>
+</li>
+</ul>
+<h3 id="notification-re-ranking-and-snoorec-exploration">Notification re-ranking and SnooRec exploration</h3>
+<p>Notifications adjust scores with rules in re-ranking, and SnooRec widens exploration with temperature sampling after ANN search <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog 2025</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog 2026</a>.</p>
+<ul>
+<li><p>The Reranking stage of notifications adjusts the model&#39;s final probability score with rules, for example placing subscription-based recommendations ahead of non-personalized content <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog 2025</a>.</p>
+<ul>
+<li>The post gives adding more diversity as an example of what re-ranking can do.</li>
+<li>What it says is under experiment is dynamically changing per-head weights according to product insights.</li>
+<li>Raising the comment head score of posts with few comments for users likely to react to comments is given as an example of what that approach makes possible.</li>
+</ul>
+</li>
+<li><p>SnooRec has an exploration mechanism that, after ANN search, samples from the top-k candidates with temperature softmax (softmax probabilities of scores divided by a temperature) <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog 2026</a>.</p>
+<ul>
+<li>The temperature is calibrated by the standard deviation of search scores, and because per-request calibration was not better than global calibration, production uses global calibration.</li>
+<li>Temperature sampling gave Days Active +0.236% and subreddit diversity +1.066%, but Show Less clicks, a negative feedback signal, also increased by +6.145%.</li>
+<li>This table bolds everything, including row names and headers, so it does not distinguish significance. It also does not distinguish which of the two temperatures (τ=0.0022, τ=0.0032) a value belongs to.</li>
+</ul>
+<blockquote>
+<p>&quot;exploration can improve discovery, but the temperature needs to be tuned per surface and monitored with guardrail metrics.&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec: A Shared Retrieval Foundation</a> (blog), 2026-09-15</p>
+</blockquote>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="cold-start">Cold start</h2>
+<p>As of the 2026-10-28 revision, the Reddit help page says that for users with new accounts or few subscriptions, the model may emphasize recommendations over subscribed content <span class="badge ok">verified</span> (<a href="#new-users">New users</a>). A 2025-05 post said that in notifications, users with few signals are receiving more generic content <span class="badge ok">verified</span> (<a href="#new-users">New users</a>). As of 2026 Q3, logged-out DAUq is 76.8M of 130.3M total, and Reddit will test a logged-in-only experience in some markets outside the U.S. starting in 2026 Q4 <span class="badge ok">verified</span> (<a href="#logged-out-users">Logged-out users</a>).</p>
+<h3 id="new-users">New users</h3>
+<p>Public material on new users includes a help-page sentence saying the share of recommendations may increase, a 2025-05 engineering post saying users with few signals get more generic content in notifications, and filing sentences saying AI is used for onboarding and personalization <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendation help 2026</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog 2025</a>, <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000020/exhibit992q425.htm" target="_blank" rel="noopener">Q4 2025 shareholder letter</a>, <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</p>
+<ul>
+<li><p>For users with new accounts or few subscribed communities, the model may emphasize recommendations over subscribed content <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendation help 2026</a>.</p>
+<ul>
+<li>Interest topics chosen at sign-up are also used as a recommendation factor.</li>
+<li>This is not a statement that a separate model exists for new users.</li>
+</ul>
+<blockquote>
+<p>&quot;For users with newer accounts or fewer community subscriptions, our models may emphasize recommendations over subscriptions.&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, revised 2026-10-28</p>
+</blockquote>
+</li>
+<li><p>As of the 2025-05 post, in notifications users with few signals are receiving more generic content, and improving this is a future plan <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">Notification recommendation blog 2025</a>.</p>
+<ul>
+<li>The post does not state how it will be improved.</li>
+</ul>
+</li>
+<li><p>The Q4 2025 shareholder letter said Reddit is increasing LLM use to improve content understanding and bring personalization forward <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000020/exhibit992q425.htm" target="_blank" rel="noopener">Q4 2025 shareholder letter</a>.</p>
+<ul>
+<li>The CEO wrote that Reddit uses AI and ML to make Reddit feel personalized and useful from the moment the app is opened.</li>
+</ul>
+</li>
+<li><p>The 10-K FY2025 said Reddit believes AI investment improved new-user onboarding and drove engagement of existing users <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</p>
+</li>
+</ul>
+<h3 id="logged-out-users">Logged-out users</h3>
+<p>As of 2026 Q3, logged-out DAUq is 76.8M of 130.3M total (about 59%), and Reddit will test a logged-in-only experience starting in 2026 Q4 <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 shareholder letter</a>.</p>
+<ul>
+<li><p>In 2026 Q3, logged-out DAUq (the daily unique visitors metric Reddit uses in its earnings reporting) was 76.8M, logged-in DAUq was 53.5M, and total DAUq was 130.3M <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 shareholder letter</a>.</p>
+<ul>
+<li>The figures are in the regional key metrics table in the letter&#39;s appendix. Year over year, logged-out grew 17% from 65.8M and logged-in grew 7% from 50.2M.</li>
+<li>The letter said Q3 search traffic fell sharply and the effect was largest on logged-out and web traffic.</li>
+</ul>
+</li>
+<li><p>The 10-Q Q3 2026 says visitors arriving from search engines are mostly not logged in, and their monetization comes mainly through conversation pages and feed ads <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 2026</a>.</p>
+<ul>
+<li>The <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a> used the same sentence.</li>
+</ul>
+</li>
+<li><p>The 10-K FY2025 said Reddit would stop reporting logged-in and logged-out DAUq separately from the quarter ending 2026-09-30, but the 10-Q Q3 2026 reversed this plan <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 2026</a>.</p>
+<ul>
+<li>The notice of discontinuation is in the user metrics description of the <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</li>
+<li>The 10-Q gave as the reason that search traffic has become more volatile because of the spread of AI summaries and other factors, so the two metrics are useful for understanding user trends.</li>
+</ul>
+<blockquote>
+<p>&quot;Accordingly, we are continuing to report these metrics for the quarter ended September 30, 2026.&quot;
+— <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 2026</a>, 2026-10-30</p>
+</blockquote>
+</li>
+<li><p>In 2024-Q4, logged-out DAUq was 55% of total DAUq <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000018/rddt-20241231.htm" target="_blank" rel="noopener">10-K FY2024</a>.</p>
+<ul>
+<li>The 10-K FY2024 said logged-out users mainly arrive from search engines, dwell briefly, and have a low monetization ratio.</li>
+</ul>
+</li>
+<li><p>The CEO letter in the Q3 2026 shareholder letter announced the shift to a logged-in-only experience and said full testing begins in select markets outside the U.S. in 2026 Q4 <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 shareholder letter</a>.</p>
+<ul>
+<li>It did not name the markets, and the test results will be used to design the global logged-in-only version.</li>
+<li>The CEO gave as business reasons the growth in ad-targeting signals and generally higher engagement when users are logged in.</li>
+</ul>
+<blockquote>
+<p>&quot;In Q4 we’ll begin fully testing this in select markets outside the U.S.&quot;
+— <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 shareholder letter</a>, 2026-10-29</p>
+</blockquote>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="feedback-signals">Feedback signals</h2>
+<p>The Reddit help page describes upvotes and downvotes as the basic signals that decide what is shown in communities and conversations <span class="badge ok">verified</span> (<a href="#explicit-signals-and-controls">Explicit signals and controls</a>). The 2026-10-28 help page says that tapping show fewer on a recommended post takes effect at the community level, not the post level <span class="badge ok">verified</span> (<a href="#explicit-signals-and-controls">Explicit signals and controls</a>). Dwell-based metrics are defined differently in each document: Good Visits in the S-1 is consumption over 30 seconds, and a good visit in the SnooRec post is dwell over 15 seconds <span class="badge ok">verified</span> (<a href="#dwell-and-implicit-signals">Dwell and implicit signals</a>).</p>
+<h3 id="explicit-signals-and-controls">Explicit signals and controls</h3>
+<p>Explicit signals and controls that are public include voting, community-level show fewer, the X icon experiment that began 2026-08-10, and incognito sessions that are excluded from personalization <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/7419626610708-What-are-upvotes-and-downvotes" target="_blank" rel="noopener">Voting help 2026</a>.</p>
+<ul>
+<li><p>Reddit explains that upvotes and downvotes are the basic signals that decide what is exposed across communities and conversations <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/7419626610708-What-are-upvotes-and-downvotes" target="_blank" rel="noopener">Voting help 2026</a>.</p>
+<ul>
+<li>This document was last modified on 2026-10-05.</li>
+</ul>
+</li>
+<li><p>Tapping show fewer posts like this on a recommended post stops recommendations from that community and also tries to show fewer posts from similar communities <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendation help 2026</a>.</p>
+<blockquote>
+<p>&quot;Once we receive this feedback, we’ll stop showing you recommendations from the community that the post came from&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a>, revised 2026-10-28</p>
+</blockquote>
+</li>
+<li><p>Since 2026-08-10, in an experiment with a small number of users, an X icon is attached to every post in the home feed and some ads, and tapping it is also used as a signal to show less similar content <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/52393330268436-Changelog-August-12-2026" target="_blank" rel="noopener">Change log 2026-08-12</a>.</p>
+<ul>
+<li>In the experiment group the existing Hide option is removed, and show fewer posts like this is kept as is.</li>
+</ul>
+</li>
+<li><p>Activity in an incognito session is not reflected in feed, recommendation, notification, or ad personalization <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/360045622611-What-is-incognito-and-how-does-it-work" target="_blank" rel="noopener">Incognito help 2026</a>.</p>
+<ul>
+<li>It is available only in the app, not in the logged-in home feed.</li>
+<li>It ends after 5 minutes of inactivity, but for some users this time differs because of experiments.</li>
+<li>It is not offered in some regions with age verification requirements. This document was last modified on 2026-10-27.</li>
+</ul>
+</li>
+</ul>
+<h3 id="dwell-and-implicit-signals">Dwell and implicit signals</h3>
+<p>Dwell-based signals appear in filings and engineering posts but are defined differently, and neither says whether they are training labels for the home ranker <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>, <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog 2026</a>.</p>
+<ul>
+<li><p>The S-1 defines Good Visits as visits that consume a post for more than 30 seconds and used it as a performance metric for home feed ranking improvements <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.</p>
+<ul>
+<li>The 10-K FY2024 used the same definition, and this metric was dropped from the 10-K FY2025.</li>
+</ul>
+<blockquote>
+<p>&quot;“Good Visits,” defined as a user consuming a post for more than 30 seconds&quot;
+— <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1</a>, 2024-02-22</p>
+</blockquote>
+</li>
+<li><p>The A/B table in the SnooRec post defines a good visit as post dwell over 15 seconds <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog 2026</a>.</p>
+<ul>
+<li>The post does not say whether this good visit is a training label for the home feed ranker.</li>
+</ul>
+</li>
+<li><p>In SnooRec&#39;s home feed A/B, the setting with only the good visit expert on gave user sessions +0.28% and visits over 15 seconds +1.21% <span class="badge ok">verified</span> — SnooRec blog.</p>
+<ul>
+<li>The comparison baseline is the previous multi-task setup that used a shared encoder with no task distinction.</li>
+<li>The upvote expert gave upvotes +0.91%, and the click expert gave clicks +0.74%.</li>
+<li>The post interprets the enabled task and the metric that rose as matching, but in the same table clicks rose more with the good visit expert (+0.90%, significant) than with the click expert.</li>
+<li>Only values in bold in the table (p&lt;0.05) are significant.</li>
+</ul>
+</li>
+<li><p>As of the 2024-04 post, client telemetry logs a post-consume event when a post stays on screen for 2 seconds or more, distinguishing it from fast scrolling <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1c6cn8w/instrumenting_home_feed_on_android_ios/" target="_blank" rel="noopener">Home feed instrumentation blog 2024</a>.</p>
+<ul>
+<li>It logs <code>post-view</code> when a post appears on screen, <code>post-click</code> on tap, <code>post-vote</code> on vote, and <code>feed-load-success</code> and <code>feed-load-fail</code> for feed loads.</li>
+<li>The post describes these events as health and guardrail metrics for the feed rewrite experiment and does not state whether they are used as ranking training labels.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="ads">Ads</h2>
+<p>As of the 2023-08 and 2024-05 posts, the Reddit ads funnel runs in the order of an eligibility filter, a trimmer that reduces the number of ads, a heavy prediction model, and the auction, and the 2023-08 post wrote the auction score as the bid times the probability of a charging event <span class="badge ok">verified</span> (<a href="#ads-funnel">Ads funnel</a>). As of the 2025-02 post, the trimmer is the two-tower that the 2024-05 post described as multi-task, with a Neural Linear Bandit (a method that places a linear bandit on top of embeddings and explores in proportion to uncertainty) layer added <span class="badge ok">verified</span> (<a href="#ads-funnel">Ads funnel</a>). Reddit explains that Max campaigns automate targeting and budget allocation with AI that predicts value per impression, and opened them to all advertisers on 2026-09-03 <span class="badge ok">verified</span> (<a href="#filings-and-automated-campaigns">Filings and automated campaigns</a>).</p>
+<h3 id="ads-funnel">Ads funnel</h3>
+<p>The stages of the ads funnel and the trimmer structure were published in 2023–2026 engineering posts <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/15lkrd2/first_pass_ranker_and_ad_retrieval/" target="_blank" rel="noopener">FPR blog 2023</a>. The 2026-02 post describes the heavy ranker as the stage that predicts calibrated probabilities of CTR and conversion rate and links the 2023-09 click prediction DNN post as an example, and some of its features are covered by the 2024-02 and 2026-02 posts <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1r0hyfu/contextual_relevance_of_ads_reddit/" target="_blank" rel="noopener">Ads contextual relevance blog 2026</a>.</p>
+<ul>
+<li><p>As of the 2023-08 post, ads ranking has four stages: eligibility filter, First Pass Ranker, heavy prediction model, and auction <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/15lkrd2/first_pass_ranker_and_ad_retrieval/" target="_blank" rel="noopener">FPR blog 2023</a>.</p>
+<ul>
+<li>The eligibility filter looks at targeting, brand safety, budget pacing (adjusting spend speed so the budget is used evenly over the period), and so on.</li>
+<li>The First Pass Ranker uses lightweight ML to reduce candidates from millions to hundreds.</li>
+<li>The auction score eCPM (a score converted to expected revenue per impression) is bid × P(charging event | user), and the bid can be adjusted by pacing and campaign type.</li>
+</ul>
+<blockquote>
+<p>&quot;Compute the final ad ranking score (eCPM) by multiplying bid value and P(Charging Event|user).&quot;
+— <a href="https://www.reddit.com/r/RedditEng/comments/15lkrd2/first_pass_ranker_and_ad_retrieval/" target="_blank" rel="noopener">First Pass Ranker and Ad Retrieval</a> (blog), 2023-08-08</p>
+</blockquote>
+</li>
+<li><p>The 2023-08 First Pass Ranker chose the top K with a utility function that takes the cosine similarity of user and ad flight embeddings as input <span class="badge ok">verified</span> — FPR blog.</p>
+<ul>
+<li>One of the several models tried as the embedding model was the two-tower sparse network (TTSN).</li>
+</ul>
+</li>
+<li><p>As of the 2024-05 post, the Global Auction Trimmer reduces millions of ads to thousands with a multi-task two-tower sparse network, and the heavy ranker then ranks them <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1d2wfsd/introducing_a_global_retrieval_ranking_model_in/" target="_blank" rel="noopener">Ads retrieval blog 2024</a>.</p>
+<ul>
+<li>It has ad embeddings per campaign objective (click, video view, conversion) and a single user embedding.</li>
+<li>The model is updated daily, user embeddings are cached for 24 hours, and ad embeddings are updated about every 5 minutes.</li>
+<li>The two towers are deployed separately on Gazette model servers. The scale is described differently from the hundreds stated in the 2023 post.</li>
+</ul>
+</li>
+<li><p>The 2025-02 post says the trimmer score is eCPM, the two-tower cosine similarity multiplied by the bid <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1itlrtk/adding_exploration_in_ads_retrieval_ranking/" target="_blank" rel="noopener">Ads exploration blog 2025</a>.</p>
+<ul>
+<li>A separate bid modifier applies to conversion- and install-oriented flights.</li>
+</ul>
+</li>
+<li><p>The same post stated that a Neural Linear Bandit layer is added on top of the two-tower to explore at the trimming stage <span class="badge ok">verified</span> — Ads exploration blog.</p>
+<ul>
+<li>Noise proportional to uncertainty is added to the cosine similarity so that new or low-impression ads are not eliminated early.</li>
+<li>ALO (Ad Level Optimization), which handled downstream exploration, is deprecated.</li>
+<li>The post said CTR and conversion rate improved significantly in online experiments, and the size of the improvement was given in an image table, not in the body text.</li>
+</ul>
+</li>
+<li><p>The ad click probability (pCTR) prediction model moved from logistic regression and GBDT to a DNN, and as of the 2023-09 post gave CTR +2–4% and CPC −2–3% in online experiments <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/16bovfo/our_journey_to_developing_a_deep_neural_network/" target="_blank" rel="noopener">Ads CTR DNN blog 2023</a>.</p>
+<ul>
+<li>The post says ads ranking depends heavily on real-time engagement prediction and real-time bids.</li>
+<li>The DNN has the advantage of handling sparse string and ID features as embeddings.</li>
+<li>Serving latency rose by 50–100%, but fixing other bottlenecks in the inference service let it serve at lower latency and cost than GBDT.</li>
+</ul>
+</li>
+<li><p>As of the 2024-02 post, the CTR prediction DNN takes as input user and ad embeddings pooled from Knowledge Graph entity embeddings and user-ad similarity features <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1b1i3bl/why_do_we_need_content_understanding_in_ads/" target="_blank" rel="noopener">Ads content understanding blog 2024</a>.</p>
+<ul>
+<li>In v2 these embeddings were made trainable.</li>
+</ul>
+</li>
+<li><p>The 2026-02 post defined contextual relevance of posts and ads with LLM labels and said it integrated embeddings fine-tuned on these labels into the main stages of the funnel <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1r0hyfu/contextual_relevance_of_ads_reddit/" target="_blank" rel="noopener">Ads contextual relevance blog 2026</a>.</p>
+<ul>
+<li>The label model was Gemini 1.5 Flash, and at the time of publication it was Gemini 2.5 Flash Lite, and SFT (supervised fine-tuning on correct examples) was also done with golden data.</li>
+<li>The fine-tuned embedding reached 3.2× the IAB category (industry-standard content classification for ads) match in normalized PR AUC, and pretrained Stella reached 2.08×.</li>
+<li>The integration targets are features for targeting, retrieval, and the light ranker and heavy ranker.</li>
+</ul>
+</li>
+<li><p>As of the 2024-07 post, pacing computes spend-rate control signals from per-campaign budget, remaining period, and past spend, and recomputes the signals of all campaigns at least once a minute <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1e5mhs3/scaling_ads_pacing_from_singleton_to_sharded/" target="_blank" rel="noopener">Ads pacing blog 2024</a>.</p>
+<ul>
+<li>Probability thresholds and bid modification are given as representative control means.</li>
+</ul>
+</li>
+<li><p>As of the 2024-11 post, the Dynamic Product Ads funnel runs in the order of Targeting, product candidate generation, product selection (light ranking), and auction <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1gug4x9/product_candidate_generation_for_reddit_dynamic/" target="_blank" rel="noopener">DPA blog 2024</a>.</p>
+<ul>
+<li>The auction decides the products shown by bid, ad relevance, and other factors.</li>
+<li>Rule-based candidates such as popular and trending are mixed in to ease cold start.</li>
+<li>The behavior-based two-tower is trained on past conversion events and retrained daily on Ray.</li>
+</ul>
+</li>
+</ul>
+<h3 id="filings-and-automated-campaigns">Filings and automated campaigns</h3>
+<p>SEC filings describe the ad auction and ML ranking without model structure, and the 2025–2026 shareholder letters report model improvements together with ad performance figures <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</p>
+<ul>
+<li>The S-1 stated that the Ad Server runs a second price auction that takes into account bid type, bid amount, remaining budget, engagement probability, and user experience quality factors <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.<ul>
+<li>About 88% of 2023-Q4 ad revenue was purchased through the auction.</li>
+<li>The second price auction statement is not in the 10-K FY2024 or FY2025.</li>
+</ul>
+</li>
+<li>The S-1 stated that its ad ranking and click prediction models use deep learning to maximize clicks and conversions and reduce advertiser cost <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">S-1 2024</a>.<ul>
+<li>This deep learning sentence is not in the 10-K FY2024 or FY2025.</li>
+</ul>
+</li>
+<li>The 10-K FY2025 states that ads are ranked by brand fit and ML-predicted user engagement, and the same wording appears in the 2024-02 S-1 <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>.</li>
+<li>The 10-K FY2025 states that using ML and predictive models to match supply and demand is at an early stage <span class="badge ok">verified</span> — 10-K FY2025.<ul>
+<li>It states that the company is now focused on making the predictive models work across campaign objectives, placements, and formats, and that this helps them better predict ad conversion rates such as installs or purchases.</li>
+</ul>
+</li>
+<li>The advertiser help page describes Reddit Ads as an auction-based platform where ads compete with each other, and states that the default bidding strategy is Lowest cost <span class="badge obs">observed</span> 2026-11-01 — <a href="https://business.reddithelp.com/articles/Knowledge/How-much-do-Reddit-Ads-cost" target="_blank" rel="noopener">Ad cost help page</a>.<ul>
+<li>It states that ad group spend can exceed the budget by up to 20%. The page has no date, so the grade uses the access date.</li>
+<li>Winning and pricing rules such as second price are not on this page.</li>
+</ul>
+</li>
+<li>Reddit describes Max campaigns as a campaign type that uses AI predicting value per impression to automate targeting, creative selection and rotation, placement, and budget allocation <span class="badge ok">verified</span> — <a href="https://redditinc.com/news/performance-unlocked-reddit-max-campaigns-are-now-available-to-all-advertisers" target="_blank" rel="noopener">Max full release 2026</a>.<ul>
+<li>It started on 2026-01-05 as a beta for some advertisers with traffic and conversion objectives <span class="badge ok">verified</span> — <a href="https://redditinc.com/news/now-in-beta-max-campaigns-for-ai-powered-ad-performance-and-unique-audience-insights" target="_blank" rel="noopener">Max beta 2026</a>.</li>
+<li>It opened to all advertisers on 2026-09-03, and the 10-K FY2025 also describes the 2026-01 beta in the same wording.</li>
+<li>The advertiser help page states that it predicts the best creative combination per impression and adjusts budget and bids to minimize CPA <span class="badge obs">observed</span> 2026-11-01 — <a href="https://business.reddithelp.com/articles/Knowledge/max-campaigns" target="_blank" rel="noopener">Max help page</a>.</li>
+<li>The same help page states that at least one audience hint must be set and that there is a calibration period after creation or edits, and it does not disclose the model structure.</li>
+</ul>
+</li>
+<li>It states that when ad personalization is on, ads can use activity within Reddit, inferred interests and demographic information, external activity shared by advertisers, and customer lists matched by email <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/12731820767764-Control-the-ads-you-see-on-Reddit" target="_blank" rel="noopener">Ad controls help page 2026</a>.<ul>
+<li>The usable information is within the settings scope by region. Demographic information is inference of age range, gender, and language, and external activity is received through Business Tools such as the Reddit Pixel.</li>
+<li>Even when it is off, ads are served based on content viewed in the current session, ad clicks in the same session, joined communities, account information, and general location based on IP.</li>
+</ul>
+</li>
+<li>Reddit stated that conversion revenue covered by CAPI (an integration where the advertiser&#39;s server sends conversion events directly) rose 3× year over year in the second half of 2024 <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000016/exhibit992q424.htm" target="_blank" rel="noopener">Q4 2024 shareholder letter</a>.</li>
+</ul>
+<p>The shareholder letters reported ad metrics together with model improvements, and the 10-Q reported price and impression metrics without mentioning models <span class="badge ok">verified</span>. The 2026 Q3 10-Q attributes the price increase to improved performance across all funnel ad objectives and higher advertiser demand, and part of the impression increase to ad load optimization including new ad surfaces <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 2026</a>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table><colgroup><col><col><col class="w10"><col></colgroup>
+<thead>
+<tr>
+<th>Source</th>
+<th>Metric</th>
+<th>Change</th>
+<th>Basis of comparison</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000225/exhibit992q325.htm" target="_blank" rel="noopener">Q3 <span class="nw">2025</span> shareholder letter</a></td>
+<td>Lower-funnel conversion objective performance</td>
+<td>+20% or more</td>
+<td>Not disclosed</td>
+</tr>
+<tr>
+<td><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000098/exhibit992q226.htm" target="_blank" rel="noopener">Q2 <span class="nw">2026</span> shareholder letter</a></td>
+<td>6-second Engaged Video View-through</td>
+<td>+130%</td>
+<td>Not disclosed</td>
+</tr>
+<tr>
+<td>Same letter</td>
+<td>Video completion rate</td>
+<td>+71%</td>
+<td>Not disclosed</td>
+</tr>
+<tr>
+<td>Same letter</td>
+<td>CTR</td>
+<td>+40% or more</td>
+<td>Year over year</td>
+</tr>
+<tr>
+<td><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">10-Q Q3 <span class="nw">2026</span></a></td>
+<td>Ad price</td>
+<td>about +34%</td>
+<td>Same period last year</td>
+</tr>
+<tr>
+<td>Same 10-Q</td>
+<td>Impressions</td>
+<td>about +15%</td>
+<td>Same period last year</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li>The Q3 2025 letter attributed the 20% improvement to optimized ML models, and also reported double-digit percent improvement in App Ads objectives from model and optimization improvements <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000225/exhibit992q325.htm" target="_blank" rel="noopener">Q3 2025 shareholder letter</a>.</li>
+<li>The Q2 2026 letter attributed the 130% and 71% to improved models, but did not quantify the 40% CTR as a model contribution <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000098/exhibit992q226.htm" target="_blank" rel="noopener">Q2 2026 shareholder letter</a>.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="infrastructure-and-platform">Infrastructure and platform</h2>
+<p>As of the 2026-06 engineering post, the Ranking Platform is a set of gRPC services that serves personalization for the home feed, search ranking, and notifications and handles tens of thousands of requests per second <span class="badge ok">verified</span>(<a href="#ranking-platform">Ranking Platform section</a>). As of the 2025-11 post, the home feed ranker is served on GPUs with Triton <span class="badge ok">verified</span>(<a href="#model-serving-and-vector-search">Model serving and vector search section</a>). On 2026-08-31 the European Commission designated Reddit a very large online platform (VLOP) under the Digital Services Act (DSA), so Reddit must meet additional obligations such as systemic risk assessment by 2027-01 <span class="badge ok">verified</span>(<a href="#regulation-and-experiments">Regulation and experiments section</a>).</p>
+<h3 id="ranking-platform">Ranking Platform</h3>
+<p>As of the 2026-06 post, the Ranking Platform serves the home feed, search ranking, and notifications together, and a 2022 post introduced the ML Ranking Platform as Pipedream, a stage graph service <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1ttwqaj/from_proxy_to_proxyless_removing_envoy_from/" target="_blank" rel="noopener">Proxyless blog post 2026</a>.</p>
+<ul>
+<li>The Ranking Platform is a set of gRPC services handling tens of thousands of requests per second across several Kubernetes namespaces and clusters <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1ttwqaj/from_proxy_to_proxyless_removing_envoy_from/" target="_blank" rel="noopener">Proxyless blog post 2026</a>.<ul>
+<li>Traffic comes from GraphQL, Notification Platform, Answers, and others.</li>
+<li>As of the 2026-06-01 post, it removed the front-end Envoy Gateway and moved to an xDS-based proxyless service mesh.</li>
+<li>It applied ORCA, where the server reports CPU utilization in a response trailer so clients adjust weights, and saved hundreds of CPU cores.</li>
+</ul>
+</li>
+<li>As of the 2022 post, the ML Ranking Platform (prototype name Pipedream) was a Go service that expresses ranking as an acyclic graph of stages <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/z137m3/from_service_to_platform_a_ranking_system_in_go/" target="_blank" rel="noopener">Pipedream blog post 2022</a>.<ul>
+<li>A stage does a single action such as adding candidates, adding features, filtering candidates, or scoring, and stages are grouped with series and parallel meta stages.</li>
+<li>The post described the ranking system in three stages: candidate generation, filtering, and scoring, and the RPAN live stream feed was the first prototype.</li>
+<li>Another post that year stated that this platform handled ranking for the discover tab, new-user onboarding, and the video surface <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/xoqzgk/ml_ranking_platform_dynamic_pipeline_generator/" target="_blank" rel="noopener">MLRP blog post 2022</a>.</li>
+</ul>
+</li>
+<li>At TWIMLcon 2022, Reddit presented a &#39;platform first&#39; approach to expanding recommendation and personalization onto the Ranking Platform <span class="badge ok">verified</span> — <a href="https://twimlai.com/conf/twimlcon/2022/session/platform-first-scaling-recommendation-and-personalization-at-reddit" target="_blank" rel="noopener">TWIMLcon 2022 session</a>.<ul>
+<li>The session page has a talk video of about 30 minutes, but these notes did not watch the video, so this source is not used to state the structure or models.</li>
+</ul>
+</li>
+</ul>
+<h3 id="model-serving-and-vector-search">Model serving and vector search</h3>
+<p>As of the 2025-11 post, the home feed model is served on GPUs, and a 2021 post stated that Gazette, which served feed models, was redesigned as a separate inference service <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU blog post 2025</a>.</p>
+<ul>
+<li>Moving the home feed model to GPUs involved reworking the entire serving path <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">GPU blog post 2025</a>.<ul>
+<li>On CPUs, thousands of pods received about 80 GB/s of feature data.</li>
+<li>Large embedding features were reduced from FP64 to FP32, and user features were sent once rather than per candidate, with the model server spreading them across the batch.</li>
+<li>Message size fell 5× and Inference Service latency fell by more than 2×. Triton&#39;s dynamic batching and queue policy control overload.</li>
+</ul>
+</li>
+<li>As of the 2021 post, ML inference was served by Gazette inside Minsky to Popular, Home Feed, Video, Push Notifications, and Email, and all models were embedded in the app server <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/q14tsw/evolving_reddits_ml_model_deployment_and_serving/" target="_blank" rel="noopener">GIS blog post 2021</a>.<ul>
+<li>It was redesigned as the Gazette Inference Service, a Go (baseplate.go) service with a single Predict endpoint.</li>
+<li>Each model runs in its own model server pool. A pool is a baseplate.py service wrapping a TensorFlow SavedModel and is deployed on Kubernetes.</li>
+<li>A 2024-05 ads post also calls this service Reddit&#39;s ML model hosting platform <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1d2wfsd/introducing_a_global_retrieval_ranking_model_in/" target="_blank" rel="noopener">Ads retrieval blog post 2024</a>.</li>
+</ul>
+</li>
+<li>In 2024, Reddit teams used Vertex AI Vector Search, Solr ANN, and FAISS separately for ANN search <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1ozxnjc/choosing_a_vector_database_for_ann_search_at/" target="_blank" rel="noopener">Vector DB blog post 2025</a>.<ul>
+<li>Solr ANN was being tested for large datasets, and FAISS was used as a sidecar for small datasets.</li>
+<li>In 2025, after comparing Qdrant and Milvus on about 340 million 384-dimension post vectors with HNSW (a graph-based ANN index), it judged that Milvus fit the organization better.</li>
+<li>This post has no sentence saying deployment was completed, and a 2026-09 COPTER post says search&#39;s semantic search uses a Milvus corpus <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wo8pjw/contextual_popularity_trending_content_detection/" target="_blank" rel="noopener">COPTER blog post 2026</a>.</li>
+</ul>
+</li>
+<li>As of the 2023-07 post, Reddit rewrote Home and Popular on a new feeds platform based on SDUI (an approach where the server decides and sends the types and order of screen elements) <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/158f8o3/evolving_reddits_feed_architecture/" target="_blank" rel="noopener">Feed architecture blog post 2023</a>.<ul>
+<li>It newly released the Watch and Latest feeds, and the post unit the server sends is a Group object holding an array of Cells.</li>
+<li>Home feed loading became 12% faster.</li>
+<li>The 2024-04-02 post stated that the new Home, Popular, News, Watch, and Latest feeds were rolled out to Android and iOS worldwide <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1btowiw/rewriting_home_feed_on_android_ios/" target="_blank" rel="noopener">Home feed rewrite blog post 2024</a>.</li>
+<li>The experiment ran for 8 months, and TTI (time from the splash screen until the home feed renders) improved by 10–12%.</li>
+</ul>
+</li>
+<li>As of the 2026-11-01 lookup, the 178 public repositories in the github.com/reddit organization contain no recommendation, ranking, feature store, or ML serving code <span class="badge obs">observed</span> 2026-11-01 — <a href="https://github.com/reddit" target="_blank" rel="noopener">github.com/reddit</a>.<ul>
+<li>The repositories are service frameworks such as baseplate, experiments.py, and decider, Devvit templates and games, tutorials, and so on.</li>
+<li>milvus, knowhere, and VectorDBBench are only forks of Zilliz projects and are not evidence of production use.</li>
+</ul>
+</li>
+</ul>
+<h3 id="points-of-contact-with-search-ranking">Points of contact with search ranking</h3>
+<p>As of the 2026-06 post, search is served from the same Ranking Platform as feeds and notifications, but the 2024 search LTR (a method that orders results by learning) ran on Solr <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1ttwqaj/from_proxy_to_proxyless_removing_envoy_from/" target="_blank" rel="noopener">Proxyless blog post 2026</a>, <a href="https://program.berlinbuzzwords.de/bbuzz24/talk/WKMGWH/" target="_blank" rel="noopener">BBuzz 2024 abstract</a>.</p>
+<ul>
+<li>In 2024, the site search team computed features with a Solr LTR plugin to re-rank the top-N, and presented lessons from scaling this to thousands of queries per second <span class="badge ok">verified</span> — <a href="https://program.berlinbuzzwords.de/bbuzz24/talk/WKMGWH/" target="_blank" rel="noopener">BBuzz 2024 abstract</a>.<ul>
+<li>The top-N re-ranking is on slide 34. The team also gave a talk with the same content, &quot;Learning to Rank at Reddit: A Project Retro&quot;, at <a href="https://haystackconf.com/2024/" target="_blank" rel="noopener">Haystack US 2024</a> (2024-04).</li>
+</ul>
+</li>
+<li>The search LTR chose LambdaMART loss (a training loss that directly targets ranking metrics) as the loss and a deep learning model as the model <span class="badge ok">verified</span> — <a href="https://softwaredoug.com/assets/slidedecks/Learning%20to%20Rank%20at%20Reddit%20-%20Project%20Retro%20-%20BBuzz%202024%20-%20PUBLIC.pdf" target="_blank" rel="noopener">BBuzz 2024 slides</a>.<ul>
+<li>The first training data was about 1000 head and tail queries with 20 results per query labeled by humans.</li>
+</ul>
+</li>
+<li>The engagement verdict built from click logs gave relative weights to position, click, and post-click dwell, and was applied to 30-day and 60-day sums <span class="badge ok">verified</span> — BBuzz 2024 slides.<ul>
+<li>The weights are <code>Position 0.05</code>, <code>Click 0.05</code>, and <code>Click+dwell 0.9</code>. It cited agreement between human labelers&#39; verdicts and post-click dwell as a good signal.</li>
+<li>Irrelevant documents are also somewhat related to the query, so there were no true negative examples; therefore documents from other queries were picked at random and added as negative labels.</li>
+</ul>
+</li>
+<li>The slides&#39; comparison table lists the content period covered as about 19 years for Solr LTR and 90 days for Reddit&#39;s existing ML infrastructure <span class="badge ok">verified</span> — BBuzz 2024 slides.<ul>
+<li>It states that the existing infrastructure has rich features and model types, but has multiple network hops and makes query-dependent features difficult.</li>
+<li>This existing infrastructure may be the Ranking Platform for feeds <span class="badge est">inferred</span>. The evidence is only that the comparison table calls it &#39;existing ML infra&#39; without a name, and there is no evidence that 90 days is the feed candidate window.</li>
+</ul>
+</li>
+<li>The 2024 search roadmap is a hybrid structure that runs LTR and embedding vector search together over lexical candidates and merges the two results by interleaving or rank fusion <span class="badge ok">verified</span> — BBuzz 2024 slides.<ul>
+<li>The search team judged that signals, which boost posts with high recent engagement per query, cover far more search traffic than expected and said they should be added as LTR features, and the last-updated slide shows a variant with signals added.</li>
+</ul>
+</li>
+<li>Hot, Top, New, and Relevance, whose definitions the help page gives, are search sorts <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/19695706914196-What-filters-and-sorts-are-available" target="_blank" rel="noopener">Search sort help page 2026</a>.<ul>
+<li>Hot prioritizes posts that recently receive upvotes and comments, and Relevance, the default, reflects term rarity, post age, votes, and comments.</li>
+<li>The document does not say whether the feed&#39;s Hot has the same definition. This document was last modified on 2026-03-27.</li>
+<li>Because Hot in the 2017 code used only net votes and posting time, the current Hot may have changed to reflect comment activity too <span class="badge est">inferred</span>. The evidence is only this one-line description, and the same document also describes Top loosely, so it is weak.</li>
+</ul>
+</li>
+<li>Reddit Answers was integrated into Reddit search on 2026-05-26 <span class="badge ok">verified</span> — <a href="https://redditinc.com/news/introducing-reddit-answers" target="_blank" rel="noopener">Reddit Answers newsroom post 2026</a>.<ul>
+<li>The Q4 2025 letter said that in Q4 more than 80 million people searched directly on Reddit every week, versus 60 million one year earlier <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000020/exhibit992q425.htm" target="_blank" rel="noopener">Q4 2025 shareholder letter</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="regulation-and-experiments">Regulation and experiments</h3>
+<p>Reddit has been a DSA VLOP since 2026-08-31 <span class="badge ok">verified</span> — <a href="https://digital-strategy.ec.europa.eu/en/news/commission-designates-chatgpt-reddit-roblox-under-digital-services-act" target="_blank" rel="noopener">EU designation press release 2026</a>. The recommendation system description appears to be handled by the recommendation help page that the DSA information page links to under &#39;Other Information&#39; <span class="badge est">inferred</span>. The evidence is only that link; the page does not call it a recommendation system disclosure, and the help page does not mention the DSA.</p>
+<ul>
+<li>On 2026-08-31 the European Commission designated Reddit a VLOP under the DSA <span class="badge ok">verified</span> — <a href="https://digital-strategy.ec.europa.eu/en/news/commission-designates-chatgpt-reddit-roblox-under-digital-services-act" target="_blank" rel="noopener">EU designation press release 2026</a>.<ul>
+<li>A VLOP is a very large online platform that the DSA designates and subjects to separate obligations.</li>
+<li>Reddit must meet additional obligations such as systemic risk assessment and mitigation by 2027-01. The press release was modified on 2026-09-04.</li>
+<li>The designation list gives 57.2M monthly EU users, main establishment Reddit Netherlands B.V., and supervising DSC the Netherlands, and marks the decision text as not yet public <span class="badge ok">verified</span> — <a href="https://digital-strategy.ec.europa.eu/en/policies/list-designated-vlops-and-vloses" target="_blank" rel="noopener">VLOP designation list 2026</a>.</li>
+</ul>
+</li>
+<li>Reddit&#39;s DSA information page explains that the annual transparency report covers EU content moderation and links the recommendation help page (Reddit&#39;s Approach to Content Recommendations) from the &#39;Other Information&#39; list <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23595536875796-Digital-Services-Act-DSA-Information-for-EU-users" target="_blank" rel="noopener">DSA information help page 2026</a>.<ul>
+<li>That recommendation help page does not give DSA article numbers.</li>
+</ul>
+</li>
+<li>Reddit states that if you are in an experiment, things may look different from usual or from what you see on an alt account, and that experiments cannot be opted out of <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/40516897731220-Why-am-I-experiencing-changes-to-the-app-or-desktop-site" target="_blank" rel="noopener">Experiments help page 2026</a>.<ul>
+<li>So it is hard to generalize behavior observed on a single account.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="history">History</h2>
+<p>Reddit released its site code on 2008-06-17 and archived the repositories after the 2017-09-01 announcement, so the 2017-10-14 commit is the last public code <span class="badge ok">verified</span>(<a href="#public-code-and-archive">Public code and archive section</a>). The Hot in that code is a score that adds a posting-time term to the logarithm of net votes, and it had no personalization signal <span class="badge ok">verified</span>(<a href="#sort-formulas-in-the-2017-code">Sort formulas in the 2017 code section</a>). The home feed went through a personalization experiment in 2017-12 and introduced Best as the new default sort on 2018-01-24, and personalization and removal of already-seen posts were to be turned back on after the Best rollout <span class="badge ok">verified</span>(<a href="#the-move-to-personalization">Personalization timeline section</a>).</p>
+<h3 id="public-code-and-archive">Public code and archive</h3>
+<p>The public code runs from the first commit on 2008-06-18 UTC (06-17 US West) to the 2017-10-14 commit, and this canon cites the last commit 753b174 as the reference <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/commit/753b17407e9a9dca09558526805922de24133d53" target="_blank" rel="noopener">reddit-archive/reddit@753b174</a>.</p>
+<ul>
+<li>Reddit released the code on its blog on 2008-06-17, and the repository&#39;s first commit is 2008-06-18 UTC (06-17 US West) <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20140209092549/http://blog.reddit.com/2008/06/reddit-goes-open-source.html" target="_blank" rel="noopener">Open source announcement 2008</a>, <a href="https://github.com/reddit-archive/reddit/commit/4778b17e939e119417cc5ec25b82c4e9a65621b2" target="_blank" rel="noopener">commit 4778b17e</a>.<ul>
+<li>The license is CPAL, and part of the anti-spam code was not released. The blog was read from a Wayback copy.</li>
+<li>The code that divides each subreddit&#39;s hot by its top score and merges them, and the Rising code, exist from the first commit <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/4778b17e939e119417cc5ec25b82c4e9a65621b2/r2/r2/lib/normalized_hot.py" target="_blank" rel="noopener"><code>normalized_hot.py@4778b17e</code></a>, <a href="https://github.com/reddit-archive/reddit/blob/4778b17e939e119417cc5ec25b82c4e9a65621b2/r2/r2/lib/rising.py" target="_blank" rel="noopener"><code>rising.py@4778b17e</code></a>.</li>
+<li>However, the 2008 Rising formula was <code>ups/(count*hours)</code> and differs from the 2017 formula in that it excluded posts whose count was at least half the average of the top 10 <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/4778b17e939e119417cc5ec25b82c4e9a65621b2/r2/r2/lib/rising.py#L31-L51" target="_blank" rel="noopener"><code>r2/r2/lib/rising.py:31-51</code></a>.</li>
+</ul>
+</li>
+<li>The 2017-09-01 r/changelog announcement stated that the reddit and reddit-mobile repositories would be archived <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20260503231807/https://www.reddit.com/r/changelog/comments/6xfyfg/an_update_on_the_state_of_the_redditreddit_and/" target="_blank" rel="noopener">Archive announcement 2017</a>.<ul>
+<li>The reason is that the internal branch had drifted from the public repository and, with the move to a service-oriented architecture underway, it was no longer a standalone runnable Reddit.</li>
+</ul>
+</li>
+<li>The last commit in the public repository is &#39;Update README for archival&#39;, authored 2017-10-14, and the repository is in archived state <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/commit/753b17407e9a9dca09558526805922de24133d53" target="_blank" rel="noopener">commit 753b174</a>.<ul>
+<li>The committer date is 2017-10-16 and GitHub pushed_at is 2017-10-17. There are no tags or releases.</li>
+</ul>
+</li>
+</ul>
+<h3 id="sort-formulas-in-the-2017-code">Sort formulas in the 2017 code</h3>
+<p>The sort formulas in the 2017 archived code mainly use vote counts and posting time (Q&amp;A also uses comment length and OP replies, and Rising also uses count) and have no personalization signal, and no primary source was found for post-2017 production formulas <span class="badge obs">observed</span> 2026-11-01 — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L44-L58" target="_blank" rel="noopener">Sort code 2017</a>.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
+<thead>
+<tr>
+<th>Sort</th>
+<th>Formula in the <span class="nw">2017</span> code (753b174)</th>
+<th>Author date of the commit that introduced the 753b174 formula</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hot</td>
+<td>sign(s) × log10(max(abs(s), 1)) + (t − 1134028003) / 45000, where s is net votes</td>
+<td><span class="nw">2014-01-12</span></td>
+</tr>
+<tr>
+<td>Comment Best (confidence)</td>
+<td>Lower bound of the Wilson interval (a proportion estimate cut more conservatively the fewer the samples), z = 1.281551565545</td>
+<td><span class="nw">2011-04-14</span></td>
+</tr>
+<tr>
+<td>Controversial</td>
+<td>(ups + downs) ^ (smaller / larger), 0 if either is 0 or less</td>
+<td><span class="nw">2014-05-08</span></td>
+</tr>
+<tr>
+<td>Top</td>
+<td>ups − downs descending</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Rising</td>
+<td>ups / max(count, 1), ups ≤ 1 excluded</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Comment Q&amp;A</td>
+<td>sum of confidence and the highest OP-reply confidence, plus log10(sum of lengths) / 5</td>
+<td><span class="nw">2015-02-10</span></td>
+</tr>
+</tbody></table></div>
+<p>For Top and Rising, the commits that introduced the formula were not traced, so the date cell is left blank.</p>
+<ul>
+<li><p>Hot is a score that treats a 10× increase in net votes as equal to being posted 12.5 hours more recently <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L44-L58" target="_blank" rel="noopener"><code>_sorts.pyx:44-58</code></a>.</p>
+<ul>
+<li>45000 seconds is 12.5 hours. Besides vote counts, no comment count or personalization signal is included.</li>
+<li>A Reddit employee stated on 2017-12-11 that this decay rate was chosen so the site turns over about twice a day and had stayed the same for 10 years <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">r/changelog 2017-12-11</a>.</li>
+<li>The same post said that experiments with increasing the decay or setting an age cap gave mixed results.</li>
+</ul>
+<blockquote>
+<p>&quot;ranks posts roughly by vote score decaying over time at a rate we chose to turn the site over roughly twice a day&quot;
+— <a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">Keeping the home feed fresh</a> (r/changelog, Wayback copy), 2017-12-11</p>
+</blockquote>
+</li>
+<li><p>The 2014-01-12 commit changed the Hot formula from order + sign·seconds/45000 to sign·order + seconds/45000, making it continuous <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/commit/50d35de04b928836b7ee955c8a26f197e24ab01e" target="_blank" rel="noopener">commit 50d35de0</a>.</p>
+<ul>
+<li>Deriving from the diff, the earlier formula had discontinuities: the time term vanished when the score was 0, and for negative scores a larger magnitude actually ranked higher.</li>
+<li>This commit was published (committer date) on 2014-01-13.</li>
+</ul>
+</li>
+<li><p>Comment Best (confidence) is the lower bound of the Wilson interval of the upvote ratio <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L70-L99" target="_blank" rel="noopener"><code>_sorts.pyx:70-99</code></a>.</p>
+<ul>
+<li>z is 1.281551565545, and the code comment says 80% confidence. If votes are 0, the score is 0.</li>
+<li>If ups is below 400 and downs is below 100, a precomputed table is used.</li>
+</ul>
+</li>
+<li><p>The 2009-10-15 Reddit blog post introduced Best as a new default sort applied only to comments <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20131115031059/http://blog.reddit.com/2009/10/reddits-new-comment-sorting-system.html" target="_blank" rel="noopener">Best comment sort announcement 2009</a>.</p>
+<ul>
+<li>The post describes it as a &#39;95% confidence score&#39;, but z in the public code was 1.0 when introduced in 2009-12 and has been 1.281551565545 since 2011-04 <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/commit/bf9f43ccacc4ee7933629c621f97d6ff0ddd11b8" target="_blank" rel="noopener">commit bf9f43cc</a>, <a href="https://github.com/reddit-archive/reddit/commit/68a06c568b0ef4adf8664a5626a81c4b1554a77c" target="_blank" rel="noopener">commit 68a06c56</a>.</li>
+<li>The formula in the 2009-12-01 merge (bf9f43cc) was a wrong form in which sqrt wrapped the entire numerator, and the &#39;April 2011 Merge&#39; (68a06c56, published 2011-04-18), authored 2011-04-14, fixed it.</li>
+</ul>
+</li>
+<li><p>Controversial scores 0 if ups or downs is 0 or less, and otherwise raises total votes to the power of the smaller/larger ratio <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L60-L68" target="_blank" rel="noopener"><code>_sorts.pyx:60-68</code></a>.</p>
+<ul>
+<li>The score grows as for and against votes are closer and total votes are higher.</li>
+<li>The commit authored 2014-05-08 introduced this formula in place of <code>(ups+downs)/max(abs(score),1)</code> <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/commit/6ced69c7628a49948ac7248e3eb7fcd0bdb81286" target="_blank" rel="noopener">commit 6ced69c7</a>. It was published 2014-06-18.</li>
+<li>Initially the score was 0 only when one side was 0, and the guard widening it to 0 or less was added by a commit authored 2014-05-31 <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/commit/95be3639032e9989d1ce5ed678d76c8130516bed" target="_blank" rel="noopener">commit 95be3639</a>.</li>
+</ul>
+</li>
+<li><p>Top is net votes descending, and the time windows for top and controversial are computed by an offline MapReduce job <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/queries.py#L81-L103" target="_blank" rel="noopener"><code>r2/r2/lib/db/queries.py:81-103</code></a>.</p>
+<ul>
+<li>The time windows are hour, day, week, month, year, and the job name is <code>mr_top</code>. The cron in the example install runs every 15 minutes.</li>
+<li>The hot, new, top, and controversial lists are precomputed and cached up to the top 1000 (<code>precompute_limit</code>).</li>
+<li>The &#39;all&#39; list is a cached query that is updated incrementally on votes or recovery.</li>
+</ul>
+</li>
+<li><p>The Rising score is ups divided by count, and posts with ups of 1 or less are excluded <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/rising.py#L33-L48" target="_blank" rel="noopener"><code>r2/r2/lib/rising.py:33-48</code></a>.</p>
+<ul>
+<li>Per the public stub, candidates are posts within <code>rising_period</code> (12 hours in the example config).</li>
+<li>On home and multireddits, it normalizes by each subreddit&#39;s top score and merges, and for a single subreddit it filters the full rising list down to that subreddit.</li>
+<li><code>get_link_counts</code> in the public repository is a stub that returns count 0, and the real implementation is in the private r2admin <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/count.py#L37-L49" target="_blank" rel="noopener"><code>r2/r2/lib/count.py:37-49</code></a>.</li>
+<li>So the public code&#39;s rising is effectively ordering by votes, and whether 2017 production rising normalized by impressions cannot be confirmed from the code.</li>
+</ul>
+</li>
+<li><p>Q&amp;A sort adds the highest OP-reply confidence among a comment&#39;s replies to the comment&#39;s confidence, and adds log10 of the sum of comment and answer lengths divided by 5 <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/db/_sorts.pyx#L101-L132" target="_blank" rel="noopener"><code>_sorts.pyx:101-132</code></a>.</p>
+<ul>
+<li>If there is no OP reply, the answer length counts as 1.</li>
+<li>If a comment written by the OP has no OP reply, its score is counted at 2× <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/link.py#L1572-L1577" target="_blank" rel="noopener"><code>r2/r2/models/link.py:1572-1577</code></a>.</li>
+<li>In the 2017 code, the only responder is the OP <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/link.py#L1009-L1016" target="_blank" rel="noopener"><code>r2/r2/models/link.py:1009-1016</code></a>.</li>
+<li>This sort came in with a commit authored 2015-02-10 and was published 2015-03-17 <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/commit/62db2373f2555df17ebeb13968e243fccfbeff5f" target="_blank" rel="noopener">commit 62db2373</a>.</li>
+</ul>
+</li>
+<li><p>In the 2017 code, the default comment sort is an account setting and the default is confidence (displayed as best) <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/controllers/front.py#L249-L253" target="_blank" rel="noopener"><code>r2/r2/controllers/front.py:249-253</code></a>.</p>
+<ul>
+<li>The old hot comment sort is gone and replaced by confidence.</li>
+<li>contest_mode posts force random for non-moderators and give top as the default to moderators.</li>
+<li>A post or subreddit can specify a suggested sort, and users can set it to be ignored.</li>
+</ul>
+</li>
+<li><p>The upvote an author automatically casts on their own post is already created with a score of 1, so it is not counted again in the score <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/vote.py#L235-L241" target="_blank" rel="noopener"><code>r2/r2/models/vote.py:235-241</code></a>.</p>
+<ul>
+<li>Whether other votes are counted in the score can be decided by the <code>vote.get_validator</code> hook, whose implementation is not in the public repository.</li>
+</ul>
+</li>
+<li><p>The example config changes posts and comments older than 180 days to archived so they accept no votes, replies, or reports <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/example.ini#L453-L458" target="_blank" rel="noopener"><code>r2/example.ini:453-458</code></a>.</p>
+<ul>
+<li>These are example config values, so there is no guarantee they match production. The memcache grace that covers the latency of asynchronous vote processing is at most 1 hour.</li>
+</ul>
+</li>
+</ul>
+<h3 id="home-composition-and-recommendations-in-the-2017-code">Home composition and recommendations in the 2017 code</h3>
+<p>In the 2017 code, home fetched the top hot posts from each subscribed subreddit, normalized them by the score of each subreddit&#39;s #1 post, and then mixed them <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/normalized_hot.py#L34-L103" target="_blank" rel="noopener">home aggregation code 2017</a>.</p>
+<ul>
+<li>It fetches the top 150 hot posts per subreddit, divides by the hot score of the #1 post (minimum 1), mixes them, and keeps at most 1,000 overall <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/normalized_hot.py#L34-L103" target="_blank" rel="noopener"><code>normalized_hot.py:34-103</code></a>.<ul>
+<li>The mixing function is <code>heapq.merge</code>. With no subscriptions, the same path runs on the default subreddits.</li>
+<li>The post age cap is <code>HOT_PAGE_AGE</code> (1,000 days in the example config).</li>
+</ul>
+</li>
+<li>The subscribed subreddits that become home candidates are limited to 50 by default and 100 for gold users <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/subreddit.py#L1202-L1221" target="_blank" rel="noopener"><code>r2/r2/models/subreddit.py:1202-1221</code></a>.<ul>
+<li>With more subscriptions, subreddits that have no posts within the age cap are filtered out first, and limit subreddits are drawn at random from the rest.</li>
+<li>That selection is cached for 30 minutes (memoize 1800 seconds) so home does not shift. automatic_reddits do not count toward the limit.</li>
+</ul>
+</li>
+<li>The hot sort for r/all uses a global hot sort query over all subreddits, cached for 60 seconds, with no per-subreddit normalization <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/subreddit.py#L1670-L1691" target="_blank" rel="noopener"><code>subreddit.py:1670-1691</code></a>.</li>
+<li>Multireddits (custom feeds) have two weighting approaches, classic and fresh <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/subreddit.py#L1912-L1915" target="_blank" rel="noopener"><code>subreddit.py:1912-1915</code></a>.<ul>
+<li>ageweight is 0.0 for classic and 0.15 for fresh. It adds an elapsed-time term to the hot score of the #1 post to enlarge the normalization denominator.</li>
+<li>It is ignored when the feature flag <code>scaled_normalized_hot</code> is off. Multis are merged without an age cap.</li>
+</ul>
+</li>
+<li>The /explore page takes up to 10 subreddits the user liked, receives 20 recommended subreddits, mixes posts, and returns at most 20 in random order <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/recommender.py#L123-L196" target="_blank" rel="noopener"><code>r2/r2/lib/recommender.py:123-196</code></a>.<ul>
+<li>This page was added by a commit authored on 2013-12-04 <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/commit/87aa75df59df0101eb7f0fa7f680498f036ff825" target="_blank" rel="noopener">commit 87aa75df</a>.</li>
+<li>The liked subreddits are drawn from subscriptions, multireddits, and recent /explore clicks.</li>
+<li>For half of the recommended subreddits it fetches hot posts and top comments; for the other half, hot posts.</li>
+<li>It mixes posts from 2 discovery subreddits and 4 rising posts, and the same subreddit appears only once.</li>
+<li>The code does not show whether this page was live in 2017 production.</li>
+</ul>
+</li>
+<li>Subreddit recommendation reads and merges precomputed SRRecommendation rows <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/lib/recommender.py#L269-L340" target="_blank" rel="noopener"><code>recommender.py:269-340</code></a>.<ul>
+<li>The source prefixes are <code>mr</code> (constant name SRC_MULTIREDDITS) and <code>e</code> (per a comment, preference for lesser-known subreddits).</li>
+<li>With match_set, it sorts by the number of inputs that recommended a subreddit; otherwise it mixes them round-robin.</li>
+<li>The batch or model code that produces these rows is not in the public repository <span class="badge obs">observed</span> 2026-11-01. Only the fact that the row TTL is 7 days 12 hours suggests that an external periodic job filled them.</li>
+</ul>
+</li>
+<li>/explore feedback is stored per subreddit, with TTLs of 6 hours for impressions, 30 minutes for clicks, and 60 days for dismissals <span class="badge ok">verified</span> — <a href="https://github.com/reddit-archive/reddit/blob/753b17407e9a9dca09558526805922de24133d53/r2/r2/models/recommend.py#L37-L83" target="_blank" rel="noopener"><code>r2/r2/models/recommend.py:37-83</code></a>.<ul>
+<li>A dismissed recommendation becomes a dislike and is removed from likes, and recently shown subreddits are not recommended again.</li>
+</ul>
+</li>
+</ul>
+<h3 id="listing-storage-structure-in-2017">Listing storage structure in 2017</h3>
+<p>As of the 2017 QCon talk, a listing was a sorted list of links shown on the front page and in subreddits, and a denormalized index that was updated in place when a vote arrived instead of rerunning the query <span class="badge ok">verified</span> — <a href="https://www.infoq.com/presentations/reddit-architecture-evolution/" target="_blank" rel="noopener">QCon 2017 talk</a>.</p>
+<ul>
+<li>At first, the result of a DB select was cached in memcache as a list of IDs <span class="badge ok">verified</span> — <a href="https://www.infoq.com/presentations/reddit-architecture-evolution/" target="_blank" rel="noopener">QCon 2017 talk</a>.</li>
+<li>When a vote arrives, the system reads the listing, which stores pairs of ID and sort information, modifies it, and writes it back, taking a lock to prevent race conditions <span class="badge ok">verified</span> — QCon 2017 talk.<ul>
+<li>This listing is a persisted index, not a cache, and was stored in Cassandra in 2017.</li>
+</ul>
+</li>
+<li>Votes are the most frequent event that forces a listing update, so the vote queue updates listings very often <span class="badge ok">verified</span> — QCon 2017 talk.<ul>
+<li>The vote processor also does anti-cheat processing besides applying scores. The talk does not describe what the anti-cheat does.</li>
+</ul>
+</li>
+<li>In mid-2012, lock contention on popular subreddit listings backed up the vote queue, and post scores were reflected several hours late <span class="badge ok">verified</span> — QCon 2017 talk.<ul>
+<li>It was eased by splitting the vote queue into 10 queues by the remainder of the subreddit ID divided by 10.</li>
+<li>Later that year contention arose again in domain listings, and it was solved later by splitting vote processing into several messages.</li>
+</ul>
+</li>
+<li>The comment tree is stored separately as a denormalized listing holding the parent relations of the whole thread, and the subset to show is decided first so that only those comments are read <span class="badge ok">verified</span> — QCon 2017 talk.<ul>
+<li>Tree updates are expensive, so they are deferred to offline jobs that collect messages and modify them in batches. The comment sorting formula is not in this talk.</li>
+</ul>
+</li>
+<li>In 2017 it began splitting listings into a separate listing service, with the goal of building listings relevant to the user from the data analysis pipeline, ML, and existing listings as sources <span class="badge ok">verified</span> — QCon 2017 talk.<ul>
+<li>This is a statement about work in progress, and it did not describe the result.</li>
+</ul>
+</li>
+</ul>
+<h3 id="the-move-to-personalization">The move to personalization</h3>
+<p>Reddit&#39;s home feed went through a personalization experiment in 2017-12, introduced a new default sort, Best, on 2018-01-24, and switched mobile Best to an ML-personalized sort from 2021-06-28 <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">r/changelog 2018-01-24</a>, <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>.</p>
+<ul>
+<li><p>In a 2021 post, Reddit recalled that in 2016 an ML model surfaced content that was fresh and liked by similar people <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/neknjg/evolving_beyond_100_billion_recommendations_a_day/" target="_blank" rel="noopener">100 billion recommendations blog 2021</a>.</p>
+<ul>
+<li>The post wrote that this approach started to break down as the content posted to the platform diversified, and that content now changes completely within minutes.</li>
+<li>A 2023-01 retrospective post summarizes that the system grew from the hot algorithm to generating 100 billion recommendations a day <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/10egj46/seeing_the_forest_in_the_trees_two_years_of/" target="_blank" rel="noopener">retrospective blog 2023</a>.</li>
+</ul>
+</li>
+<li><p>On 2017-12-04 a Reddit employee explained that the old Home mixed the front pages of subreddits randomly chosen from subscriptions, normalized by the #1 post <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20180125111951/https://www.reddit.com/r/changelog/comments/7hkvjn/what_we_think_about_when_we_think_about_ranking/" target="_blank" rel="noopener">r/changelog 2017-12-04</a>.</p>
+<ul>
+<li>They said Reddit was testing personalization that surfaces posts from communities the user recently showed interest in, and would roll it out within days.</li>
+<li>This change applied only to Home for logged-in users and did not change r/popular or r/all.</li>
+</ul>
+</li>
+<li><p>On 2017-12-11 Reddit said it had begun rolling out a change that removes already-seen posts from logged-in Home to raise feed turnover <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">r/changelog 2017-12-11</a>.</p>
+<ul>
+<li>It reported that the experiment increased dwell time and post and comment creation and decreased downvotes.</li>
+<li>It was not applied to subreddit lists, r/popular, or r/all.</li>
+</ul>
+</li>
+<li><p>On 2018-01-24 Reddit introduced Best, a new default sort for the home feed, without changing the meaning of Hot <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">r/changelog 2018-01-24</a>.</p>
+<ul>
+<li>It said it would halt the two releases above and turn personalization and removal of already-seen posts back on in Best.</li>
+<li>It said choosing Hot returns to the existing ranking, and that Best for posts is a different algorithm from best for comments.</li>
+</ul>
+<blockquote>
+<p>&quot;Rather than changing the meaning of “Hot” we are introducing a new default sort type for the home feed: Best*.&quot;
+— <a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">Best is the new hotness</a> (r/changelog, Wayback copy), 2018-01-24</p>
+</blockquote>
+</li>
+<li><p>As of the 2021-05 post, Reddit split personalization into supervised-learning subtasks and predicted upvote, subscribe, and comment probabilities with a multi-task DNN that embeds user, subreddit, post, and context together <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/neknjg/evolving_beyond_100_billion_recommendations_a_day/" target="_blank" rel="noopener">100 billion recommendations blog 2021</a>.</p>
+<ul>
+<li>It said these probabilities can be used to estimate long-term metrics such as retention.</li>
+<li>It added sequential Monte Carlo to model topology search and computed real-time features with Kafka and Flink.</li>
+<li>The p99 latency of feed composition was in the low hundreds of ms.</li>
+</ul>
+</li>
+<li><p>The 2021-06-22 r/blog post said that although ML Best would be introduced to mobile home from 2021-06-28, Hot, New, and Top would not change <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>.</p>
+<ul>
+<li>The post described Hot by votes and post age, and Controversial as posts with many both upvotes and downvotes.</li>
+<li>It described Rising as posts with many recent votes and comments, and the old Best by votes, post age, and the user&#39;s dwell time in the subreddit.</li>
+<li>This Rising description includes comments, so it differs from the formula in the 2017 code.</li>
+</ul>
+</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="open-questions">Open questions</h2>
+<p>The biggest gap is the prediction targets and weights of the home feed ranker after the 2021-06 r/blog post, followed by the ordering of For You and Following after the 2026-10-28 overhaul <span class="badge obs">observed</span> 2026-11-01 (<a href="#home-feed-ranker">Home feed ranker section</a>, <a href="#for-you-and-following">For You and Following section</a>). Primary sources for the ranking formula stop after the 2017 code <span class="badge obs">observed</span> 2026-11-01 (<a href="#sort-formulas-in-the-2017-code">Ranking formula section</a>).</p>
+<ol>
+<li><strong>What does the home feed ranker currently predict, and how does it combine the predictions?</strong> The 2021-06 r/blog post said Best predicts probabilities of view, subscribe and unsubscribe, comment, upvote and downvote, and watch, and samples posts by weight from the combined score <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>. We found no source disclosing the home ranker&#39;s prediction targets, weights, or objective function after that <span class="badge obs">observed</span> 2026-11-01. The SnooRec post also does not say whether its good visit (dwell over 15 seconds) is the home ranker&#39;s label <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog 2026</a>.</li>
+<li><strong>What are the home feed&#39;s retrieval sources and per-stage candidate counts now?</strong> The 2021-06 r/blog post said candidates are collected from posts of the past 24 hours, from subscriptions, similar communities, onboarding categories, recently visited communities, and popular and regionally popular posts <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>. The only things released since are a 2025 post saying thousands and SnooRec, and we cannot tell what share of all sources SnooRec accounts for <span class="badge obs">observed</span> 2026-11-01.</li>
+<li><strong>How are For You and Following sorted?</strong> Official documentation does not settle it <span class="badge est">inferred</span>. The basis is that the 2026-10-28 newsroom post does not mention sorting and the 2026-10-08 change log says only that swiping and sorting options are being tested.<ul>
+<li>The newsroom post and the change log also describe differently whether Following includes posts from followed users <span class="badge ok">verified</span>.</li>
+<li>It is unknown whether the home feed&#39;s Best sort remains after the overhaul <span class="badge est">inferred</span>. The basis is that the <a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">home recommendations help</a> article, which explains Best, was last edited on 2026-10-05, before the overhaul announcement.</li>
+</ul>
+</li>
+<li><strong>Is the For You and Following overhaul related to the DSA?</strong> The experiment reopened on 2026-09-02, right after the VLOP designation (2026-08-31), and was formally announced before the mandatory deadline (2027-01) <span class="badge ok">verified</span>. We found no document linking this to the DSA&#39;s non-profiling recommendation option <span class="badge obs">observed</span> 2026-11-01. The Commission press release cites, as examples of obligations, assessing and mitigating systemic risks from the service and algorithmic systems, and the newsroom post gives discovery and user control as the motivation <span class="badge ok">verified</span>.</li>
+<li><strong>Is the default sort of community pages best or hot?</strong> The recommendations help article (edited 2026-10-28) says best, while the <a href="https://support.reddithelp.com/hc/en-us/articles/360045989712-Why-can-t-I-see-my-post" target="_blank" rel="noopener">post visibility help</a> article (edited 2026-10-05) says most communities use hot <span class="badge ok">verified</span>.</li>
+<li><strong>What are the current formulas for Hot, Rising, Controversial, Best for posts, and Best for comments?</strong> On 2026-11-01 we checked the titles of all 430 English Help Center articles, and none explains feed sorting <span class="badge obs">observed</span> 2026-11-01. Only one article, the <a href="https://support.reddithelp.com/hc/en-us/articles/19695706914196-What-filters-and-sorts-are-available" target="_blank" rel="noopener">search sort help</a>, defines a sort separately; other articles mention hot or Best in a sentence or two, and for comment sorting the moderator article only lists the options <span class="badge obs">observed</span> 2026-11-01.</li>
+<li><strong>Has the home feed ranker changed to a Transformer family?</strong> A 2025-11-10 post said only that in early profiling of Transformer variants the efficiency gap between CPU and GPU grows <span class="badge ok">verified</span>. Among 334 r/RedditEng posts (through 2026-10-26), we found no follow-up post announcing adoption <span class="badge obs">observed</span> 2026-11-01.</li>
+<li><strong>What are vertical chaining and the modernized ranking pipeline in the 2026 Q3 letter?</strong> The letter says only that it launched them, in the video experience paragraph, and does not explain what they mean, so their relationship to the home feed ranker is unknown <span class="badge ok">verified</span>.</li>
+<li><strong>Is COPTER&#39;s trending signal actually used in the home feed or notifications?</strong> The post states only the intent to use it as a common layer, and the 2026-10 feed trending label experiment also does not disclose the signal&#39;s source <span class="badge ok">verified</span>.</li>
+<li><strong>What are the home feed&#39;s diversity mechanisms now?</strong> The 2021-06 r/blog post said it diversifies the feed through score-weighted sampling, and the author added in a comment on the same post that many similar posts in a row are separated from each other <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>. The 2026-10-28 help article says only that it avoids runs of similar posts and does not disclose whether it currently uses DPP (a method that probabilistically picks a set of mutually less similar items) or a subreddit cap <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">recommendations help 2026</a>. We also found no statement in safety-related engineering posts that connects to feed filters or down-ranking <span class="badge obs">observed</span> 2026-11-01.</li>
+<li><strong>Is the 2026 Ranking Platform the same system as the 2022 ML Ranking Platform (Pipedream)?</strong> The posts also do not directly describe its relationship to the Gazette Inference Service and the 2025 GPU serving service <span class="badge obs">observed</span> 2026-11-01.</li>
+<li><strong>Is the ads auction still second price?</strong> This statement appears only in the S-1, not in the two 10-Ks or the advertiser help <span class="badge ok">verified</span>.</li>
+<li><strong>Why was the Good Visits example dropped from the 10-K FY2025?</strong> We cannot tell whether the metric changed or only the wording was shortened <span class="badge obs">observed</span> 2026-11-01. The evidence documents are the same paragraph in the <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">10-K FY2025</a>, the S-1, and the 10-K FY2024.</li>
+<li><strong>Which engine translates the feed?</strong> The <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344524000099/exhibit992q324.htm" target="_blank" rel="noopener">Q3 2024 shareholder letter</a> said LLM-based machine translation, while the <a href="https://support.reddithelp.com/hc/en-us/articles/27784816873236-Translations-for-feeds-posts-and-comments" target="_blank" rel="noopener">translation help</a> article (edited 2026-10-05) says third-party services such as Google Translate <span class="badge est">inferred</span>. The basis is that a third-party service may itself be an LLM, so the two cannot be asserted to contradict each other.</li>
+</ol>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="sources">Sources</h2>
+<p>reddit.com blocks automated requests, so r/RedditEng posts were read through per-post RSS or Wayback copies, and the Help Center through the public Zendesk API. The years below are publication years; for help articles, the year of last edit.</p>
+<h3 id="reddit-engineering-blog-rredditeng">Reddit engineering blog (r/RedditEng)</h3>
+<ul>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/neknjg/evolving_beyond_100_billion_recommendations_a_day/" target="_blank" rel="noopener">Evolving beyond 100 billion recommendations a day</a> — 2021, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/q14tsw/evolving_reddits_ml_model_deployment_and_serving/" target="_blank" rel="noopener">Evolving Reddit&#39;s ML Model Deployment and Serving Architecture</a> — 2021, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/xoqzgk/ml_ranking_platform_dynamic_pipeline_generator/" target="_blank" rel="noopener">ML Ranking Platform - Dynamic Pipeline Generator</a> — 2022, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/z137m3/from_service_to_platform_a_ranking_system_in_go/" target="_blank" rel="noopener">From Service to Platform: A Ranking System in Go</a> — 2022, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/10egj46/seeing_the_forest_in_the_trees_two_years_of/" target="_blank" rel="noopener">Seeing the forest in the trees</a> — 2023, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/158f8o3/evolving_reddits_feed_architecture/" target="_blank" rel="noopener">Evolving Reddit&#39;s Feed Architecture</a> — 2023, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1btowiw/rewriting_home_feed_on_android_ios/" target="_blank" rel="noopener">Rewriting Home Feed on Android &amp; iOS</a> — 2024, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1c6cn8w/instrumenting_home_feed_on_android_ios/" target="_blank" rel="noopener">Instrumenting Home Feed on Android &amp; iOS</a> — 2024, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1kqjhwf/an_indepth_look_at_the_notifications_recommender/" target="_blank" rel="noopener">An In-Depth Look at the Notifications Recommender System</a> — 2025, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1otn0wl/reddits_home_feed_on_gpu_unlock_ml_growth_and/" target="_blank" rel="noopener">Reddit&#39;s Home Feed on GPU</a> — 2025, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1ozxnjc/choosing_a_vector_database_for_ann_search_at/" target="_blank" rel="noopener">Choosing a vector database for ANN search at Reddit</a> — 2025, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1p6gwub/breaking_through_the_noise_a_hybrid_ml_and_llm/" target="_blank" rel="noopener">Breaking Through the Noise: A Hybrid ML and LLM Framework</a> — 2025, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1ttwqaj/from_proxy_to_proxyless_removing_envoy_from/" target="_blank" rel="noopener">From Proxy to Proxyless: Removing Envoy from Reddit&#39;s Feed Serving Path</a> — 2026, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec: A Shared Retrieval Foundation</a> — 2026, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1wo8pjw/contextual_popularity_trending_content_detection/" target="_blank" rel="noopener">Contextual Popularity Trending Content Detection (COPTER v1)</a> — 2026, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1wyhkcf/how_reddit_uses_causal_ml_to_personalise/" target="_blank" rel="noopener">How Reddit Uses Causal ML to Personalise Notification Volume</a> — 2026, blog post</li>
+</ul>
+<h3 id="ads-engineering-blog-rredditeng">Ads engineering blog (r/RedditEng)</h3>
+<ul>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/15lkrd2/first_pass_ranker_and_ad_retrieval/" target="_blank" rel="noopener">First Pass Ranker and Ad Retrieval</a> — 2023, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/16bovfo/our_journey_to_developing_a_deep_neural_network/" target="_blank" rel="noopener">Deep Neural Network Model to Predict CTR for Ads</a> — 2023, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1b1i3bl/why_do_we_need_content_understanding_in_ads/" target="_blank" rel="noopener">Why do we need content understanding in Ads?</a> — 2024, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1d2wfsd/introducing_a_global_retrieval_ranking_model_in/" target="_blank" rel="noopener">Introducing a Global Retrieval Ranking Model in the Ads Funnel</a> — 2024, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1e5mhs3/scaling_ads_pacing_from_singleton_to_sharded/" target="_blank" rel="noopener">Scaling Ads Pacing from Singleton to Sharded</a> — 2024, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1gug4x9/product_candidate_generation_for_reddit_dynamic/" target="_blank" rel="noopener">Product Candidate Generation for Reddit Dynamic Product Ads</a> — 2024, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1itlrtk/adding_exploration_in_ads_retrieval_ranking/" target="_blank" rel="noopener">Adding Exploration in Ads Retrieval Ranking</a> — 2025, blog post</li>
+<li><a href="https://www.reddit.com/r/RedditEng/comments/1r0hyfu/contextual_relevance_of_ads_reddit/" target="_blank" rel="noopener">Contextual Relevance of Ads @ Reddit</a> — 2026, blog post</li>
+</ul>
+<h3 id="public-source-code">Public source code</h3>
+<ul>
+<li><a href="https://github.com/reddit-archive/reddit" target="_blank" rel="noopener">reddit-archive/reddit</a> — 2008–2017, code. The reference commit for quotes in the body is <code>753b174</code> (2017-10-14, the HEAD just before archiving). The body also cites the first commit <code>4778b17e</code> (2008), the confidence introduction <code>bf9f43cc</code> (2009) and fix <code>68a06c56</code> (2011), the Hot continuous formula <code>50d35de0</code> (2014), the Controversial formula <code>6ced69c7</code>·<code>95be3639</code> (2014), the Q&amp;A sort <code>62db2373</code> (2015), and the /explore addition <code>87aa75df</code> (2013).</li>
+<li><a href="https://github.com/reddit" target="_blank" rel="noopener">github.com/reddit</a> — looked up 2026-11-01, organization repository list</li>
+</ul>
+<h3 id="rchangelog-rblog-old-official-blog-wayback-copies">r/changelog, r/blog, old official blog (Wayback copies)</h3>
+<ul>
+<li><a href="http://web.archive.org/web/20140209092549/http://blog.reddit.com/2008/06/reddit-goes-open-source.html" target="_blank" rel="noopener">reddit goes open source</a> — 2008, blog post</li>
+<li><a href="http://web.archive.org/web/20131115031059/http://blog.reddit.com/2009/10/reddits-new-comment-sorting-system.html" target="_blank" rel="noopener">reddit&#39;s new comment sorting system</a> — 2009, blog post</li>
+<li><a href="http://web.archive.org/web/20260503231807/https://www.reddit.com/r/changelog/comments/6xfyfg/an_update_on_the_state_of_the_redditreddit_and/" target="_blank" rel="noopener">An update on the state of the reddit/reddit and reddit/reddit-mobile repositories</a> — 2017, notice</li>
+<li><a href="http://web.archive.org/web/20180125111951/https://www.reddit.com/r/changelog/comments/7hkvjn/what_we_think_about_when_we_think_about_ranking/" target="_blank" rel="noopener">What we think about when we think about ranking</a> — 2017, notice</li>
+<li><a href="http://web.archive.org/web/20180125111958/https://www.reddit.com/r/changelog/comments/7j5w9f/keeping_the_home_feed_fresh/" target="_blank" rel="noopener">Keeping the home feed fresh</a> — 2017, notice</li>
+<li><a href="http://web.archive.org/web/20180202012436/https://www.reddit.com/r/changelog/comments/7spgg0/best_is_the_new_hotness/" target="_blank" rel="noopener">Best is the new hotness</a> — 2018, notice</li>
+<li><a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">Evolving the Best Sort for Reddit’s Home Feed</a> — 2021, blog post</li>
+</ul>
+<h3 id="help-center-supportreddithelpcom-businessreddithelpcom">Help Center (support.reddithelp.com, business.reddithelp.com)</h3>
+<ul>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Reddit’s Approach to Content Recommendations</a> — 2026 (written 2024-02-06, edited 2026-10-28), help article. The DSA information page links to this article from its &#39;Other Information&#39; list.</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">What are home feed recommendations?</a> — 2026 (written 2021-06-15, edited 2026-10-05), help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/47822249050132-Changelog-April-2-2026" target="_blank" rel="noopener">Changelog - April 2, 2026</a> — 2026, change log. r/all retired</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/52393330268436-Changelog-August-12-2026" target="_blank" rel="noopener">Changelog - August 12, 2026</a> — 2026, change log. X icon experiment</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/53416317564820-Changelog-September-10-2026" target="_blank" rel="noopener">Changelog - September 10, 2026</a> — 2026, change log. For You and Following re-experiment, accounts with incomplete verification excluded from recommendations</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">Changelog - October 8, 2026</a> — 2026, change log. Swiping and sorting experiment, feed trending label experiment</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/35343974642452-Changelog-March-6-2025" target="_blank" rel="noopener">Changelog - March 6, 2025</a> — 2025, change log</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360043033972-How-do-I-turn-off-trending-notifications" target="_blank" rel="noopener">How do I turn off trending notifications?</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360062429491-Managing-your-Location-Customization-setting" target="_blank" rel="noopener">Managing your Location Customization setting</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360049845011-How-Reddit-Uses-Location-Data" target="_blank" rel="noopener">How Reddit Uses Location Data</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/19695706914196-What-filters-and-sorts-are-available" target="_blank" rel="noopener">What filters and sorts are available?</a> — 2026, help article. Search sort</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360045989712-Why-can-t-I-see-my-post" target="_blank" rel="noopener">Why can&#39;t I see my post?</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/52866343172500-Full-automoderator-documentation" target="_blank" rel="noopener">Full automoderator documentation</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/15484498369428-User-Management-moderators-and-permissions" target="_blank" rel="noopener">User Management - moderators and permissions</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/9810475384084-What-is-community-muting" target="_blank" rel="noopener">What is community muting?</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/7419626610708-What-are-upvotes-and-downvotes" target="_blank" rel="noopener">What are upvotes and downvotes?</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/360045622611-What-is-incognito-and-how-does-it-work" target="_blank" rel="noopener">What is incognito and how does it work?</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/12731820767764-Control-the-ads-you-see-on-Reddit" target="_blank" rel="noopener">Control the ads you see on Reddit</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/23595536875796-Digital-Services-Act-DSA-Information-for-EU-users" target="_blank" rel="noopener">Digital Services Act (DSA) Information for EU users</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/40516897731220-Why-am-I-experiencing-changes-to-the-app-or-desktop-site" target="_blank" rel="noopener">Why am I experiencing changes to the app or desktop site?</a> — 2026, help article</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/27784816873236-Translations-for-feeds-posts-and-comments" target="_blank" rel="noopener">Translations for feeds, posts, and comments</a> — 2026, help article</li>
+<li><a href="https://business.reddithelp.com/articles/Knowledge/How-much-do-Reddit-Ads-cost" target="_blank" rel="noopener">How much do Reddit Ads cost?</a> — undated (accessed 2026-11-01), advertiser help article</li>
+<li><a href="https://business.reddithelp.com/articles/Knowledge/max-campaigns" target="_blank" rel="noopener">Max campaigns</a> — undated (accessed 2026-11-01), advertiser help article</li>
+</ul>
+<h3 id="reddit-newsroom-redditinccom">Reddit newsroom (redditinc.com)</h3>
+<ul>
+<li><a href="https://redditinc.com/news/explore-more-communities-with-reddits-new-feed-updates" target="_blank" rel="noopener">Explore More Communities with Reddit’s New Feed Updates</a> — 2026, announcement</li>
+<li><a href="https://redditinc.com/news/now-in-beta-max-campaigns-for-ai-powered-ad-performance-and-unique-audience-insights" target="_blank" rel="noopener">Now in beta: Max campaigns</a> — 2026, announcement</li>
+<li><a href="https://redditinc.com/news/performance-unlocked-reddit-max-campaigns-are-now-available-to-all-advertisers" target="_blank" rel="noopener">Performance unlocked: Reddit Max campaigns are now available to all advertisers</a> — 2026, announcement</li>
+<li><a href="https://redditinc.com/news/introducing-reddit-answers" target="_blank" rel="noopener">Introducing Reddit Answers</a> — 2024 (updated 2026-05-26), announcement</li>
+</ul>
+<h3 id="regulatory-filings-sec-edgar">Regulatory filings (SEC EDGAR)</h3>
+<ul>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000162828024006294/reddits-1q423.htm" target="_blank" rel="noopener">Form S-1</a> — 2024, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000018/rddt-20241231.htm" target="_blank" rel="noopener">Form 10-K FY2024</a> — 2025, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000022/rddt-20251231.htm" target="_blank" rel="noopener">Form 10-K FY2025</a> — 2026, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000116/rddt-20260930.htm" target="_blank" rel="noopener">Form 10-Q Q3 2026</a> — 2026, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344524000099/exhibit992q324.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q3 2024 shareholder letter</a> — 2024, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000016/exhibit992q424.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q4 2024 shareholder letter</a> — 2025, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344525000225/exhibit992q325.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q3 2025 shareholder letter</a> — 2025, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000020/exhibit992q425.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q4 2025 shareholder letter</a> — 2026, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000098/exhibit992q226.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q2 2026 shareholder letter</a> — 2026, regulatory filing</li>
+<li><a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">8-K Ex.99.2 Q3 2026 shareholder letter</a> — 2026, regulatory filing</li>
+</ul>
+<h3 id="eu-regulation">EU regulation</h3>
+<ul>
+<li><a href="https://digital-strategy.ec.europa.eu/en/news/commission-designates-chatgpt-reddit-roblox-under-digital-services-act" target="_blank" rel="noopener">Commission designates ChatGPT, Reddit and Roblox under the Digital Services Act</a> — 2026, press release</li>
+<li><a href="https://digital-strategy.ec.europa.eu/en/policies/list-designated-vlops-and-vloses" target="_blank" rel="noopener">List of designated VLOPs and VLOSEs</a> — updated 2026-10-28, designation list</li>
+</ul>
+<h3 id="talks">Talks</h3>
+<ul>
+<li><a href="https://www.infoq.com/presentations/reddit-architecture-evolution/" target="_blank" rel="noopener">Evolution of Reddit&#39;s architecture (QCon San Francisco 2017, Neil Williams)</a> — 2017, talk transcript</li>
+<li><a href="https://twimlai.com/conf/twimlcon/2022/session/platform-first-scaling-recommendation-and-personalization-at-reddit" target="_blank" rel="noopener">Platform First: Scaling Recommendation and Personalization at Reddit (TWIMLcon 2022)</a> — 2022, talk abstract</li>
+<li><a href="https://program.berlinbuzzwords.de/bbuzz24/talk/WKMGWH/" target="_blank" rel="noopener">Learning to Rank at Reddit (Berlin Buzzwords 2024)</a> — 2024, talk abstract. <a href="https://softwaredoug.com/assets/slidedecks/Learning%20to%20Rank%20at%20Reddit%20-%20Project%20Retro%20-%20BBuzz%202024%20-%20PUBLIC.pdf" target="_blank" rel="noopener">Slides</a></li>
+<li><a href="https://current.confluent.io/archive/2025/new-orleans-sessions" target="_blank" rel="noopener">Current 2025 New Orleans sessions</a> — 2025, talk abstract. Signals-Joiner and REV2</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/reddit.html" data-title="Reddit"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a> &middot; <a href="/en/feed.xml">RSS</a></p>
+</div>
+</footer>
+</body>
+</html>
