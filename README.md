@@ -41,7 +41,7 @@ python3 -m http.server 4000 --bind 127.0.0.1 -d /tmp/site
   리서치 생성기가 `/assets/css/site.css` 를 링크하고, 공통 헤더·푸터
   (`_includes/site-header.html`, `_includes/site-footer.html`)와 같은 바이트를 낸다.
   리서치 컴포넌트 규칙을 지우거나 헤더·푸터를 바꿀 때는 그쪽 템플릿도 같이 바꾼다.
-  한국어·영어 헤더·푸터가 따로 있고(`page.lang`), 둘 다 생성기의 `HEADER_KO/EN`·`FOOTER_KO/EN` 과 같은 바이트여야 한다
+  헤더는 한국어·영어가 따로 있고(`page.lang`) 푸터는 두 언어가 같다. 둘 다 생성기의 `HEADER_KO/EN`·`FOOTER_KO` 와 같은 바이트여야 한다
   (페이지마다 다른 것은 언어 전환 `<a class="lang-switch">` 의 href 하나. 15번이 그 값만 비우고 비교한다).
   리서치 내용 페이지에도 글과 같은 댓글 버튼이 있다. 그 페이지들의 CSP(생성기의 `withCsp`)는
   Disqus 에 `embed.js` 와 `disqus.com/embed/comments/` iframe 만 열어 두므로, site.js 의 Disqus
@@ -72,7 +72,7 @@ python3 -m http.server 4000 --bind 127.0.0.1 -d /tmp/site
 - **페이지**: `en/index.html`, `en/posts.html`, `en/series.html`, `en/tags.html`, `en/about.html`, `en/feed.xml`. 한국어 페이지를
   고치면 짝 파일도 고친다. 공용 문자열(날짜·읽는 시간·목차·댓글 …)은 `_data/i18n.yml` 에 있다.
 - **언어 판정**: `_config.yml` 의 `defaults` 가 `page.lang`(`ko`/`en`)을 준다. `en/` 아래와 `_en_posts` 는 `en`.
-  `<html lang>`, 머리글·바닥글, `hreflang` 세 줄(짝이 있을 때만), `og:locale`, 피드 링크가 이것을 따른다.
+  `<html lang>`, 머리글, `hreflang` 세 줄(짝이 있을 때만), `og:locale`, 피드 링크가 이것을 따른다.
 - **댓글**: 영어 글은 한국어 원문 스레드를 같이 쓴다(`data-url`·`data-title` = 원문). 영어 글의 메타에는
   `Translated from: Korean` 링크가 있다.
 - **영어 글 갱신**: 번역 엔진은 feed-research 저장소의 `scripts/en-sync.py` 다. 한국어 글을 고친 뒤 그쪽 클론에서
