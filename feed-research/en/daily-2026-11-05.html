@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-05 — feed-research</title>
+<meta name="description" content="In one line: ByteDance reported merging reranking and mix-ranking into a single slate-generating decoder deployed on its e-commerce feed. The tracked…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-05.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-05.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-05.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-05.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-05 — feed-research">
+<meta property="og:description" content="In one line: ByteDance reported merging reranking and mix-ranking into a single slate-generating decoder deployed on its e-commerce feed. The tracked…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-05.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-05.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-05">2026-11-05</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>5 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-05.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>0</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>ByteDance reported merging reranking and mix-ranking into a single slate-generating decoder deployed on its e-commerce feed. The tracked services had no new sources.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-bytedance-builds-the-impression-slate-with-one-generative-policy--radar"><span class="num">1</span>ByteDance builds the impression slate with one generative policy — radar</a></li><li><a href="#2-reddit-tests-ads-on-search-results-pages--reddit"><span class="num">2</span>Reddit tests ads on search results pages — Reddit</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>Reddit started testing ads on search results pages. It is a search surface rather than a feed, so we did not fold it into the canon.</li>
+</ul>
+<h2 id="1-bytedance-builds-the-impression-slate-with-one-generative-policy--radar"><span class="num">1</span>ByteDance builds the impression slate with one generative policy — radar</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2611.04720" target="_blank" rel="noopener">OneTrans-GSR: A Generative Slate Ranking Paradigm Unifying Reranking and Mix-Ranking with One Autoregressive Transformer</a> — ByteDance global e-commerce recommendation team, 2026-11-03 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Industrial recommendation places reranking and mix-ranking after the ranking that scores each candidate. These stages build the slate (the set of items shown at once) that is actually sent to the screen, and mix-ranking mixes candidates from different channels, such as product cards, short videos, live streams, and ads, on one screen. These later stages rely on handcrafted rules and small models, so people tune the balance among objectives. This paper turns the two stages into a training problem in which one decoder generates the slate item by item, and it reports the result from a production A/B test.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. A generative policy trained with a reward model that sees the whole slate replaced the rule-based later stages</span></p></div>
+<ul>
+<li>The decoder picks T items from the candidate set without duplicates and builds an ordered impression slate <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2611.04720" target="_blank" rel="noopener">arXiv HTML</a>.<ul>
+<li>This decoder extends the OneTrans backbone (the same team&#39;s large-scale Transformer ranking model) that the team has already deployed.</li>
+<li>The previous production approach was a Generator–Evaluator structure, in which several generators produced candidate slates and a separately trained evaluator picked one.</li>
+</ul>
+</li>
+<li>The training reward comes from a reward model that evaluates the whole slate; this model is used only in training, so it is not bound by serving cost constraints <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2611.04720" target="_blank" rel="noopener">arXiv HTML</a>.<ul>
+<li>The efficiency objectives are ListClick, ListOrder, and ListGMV, and the long-term value objective predicts repurchase within 14 days.</li>
+<li>The scores for the multiple objectives are combined into a single reward by a geometric mean (GMR-PO).</li>
+</ul>
+</li>
+<li>Business constraints are applied at each decoding step through hard masks and finite logit adjustments <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2611.04720" target="_blank" rel="noopener">arXiv HTML</a>.<ul>
+<li>Per-tag impression frequency control and continuous score adjustment are introduced this way.</li>
+</ul>
+</li>
+<li>The paper reports GMV/u +2.63%, advertiser value +2.06%, and repurchase rate +2.03% in an online A/B test <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2611.04720" target="_blank" rel="noopener">arXiv abstract</a>.<ul>
+<li>It writes that end-to-end latency across the two stages, reranking and mix-ranking, fell by 13%.</li>
+<li>We could not find the experiment duration or the traffic share <span class="badge ok">verified</span>.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;Deployed in a large-scale industrial recommendation system, OneTrans-GSR mixes heterogeneous content types within a unified slate. In online A/B tests, it improves GMV/u by 2.63%, advertiser value by 2.06%, and repurchase rate by 2.03%, while reducing end-to-end latency across the reranking and mix-ranking stages by 13%.&quot;
+— <a href="https://arxiv.org/abs/2611.04720" target="_blank" rel="noopener">OneTrans-GSR</a> (paper), 2026-11-03</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Not folded into the canon. Added an entry to <code>## New this month</code> in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This adds one more piece of production evidence for the shift toward generative models even at the slate stage. It is not evidence about a tracked service, and it concerns an e-commerce surface, so it goes on the radar. Combined with the same team&#39;s OneTrans-V2 (ranking cascade unification), ByteDance e-commerce is moving everything from retrieval to the slate onto a single Transformer family <span class="badge est">inferred</span>. The basis is that both papers use the same OneTrans backbone as their starting point.</p></div>
+<h2 id="2-reddit-tests-ads-on-search-results-pages--reddit"><span class="num">2</span>Reddit tests ads on search results pages — Reddit</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://redditinc.com/news/we-are-testing-ad-placements-in-reddit-search-pages" target="_blank" rel="noopener">We Are Testing Ad Placements in Reddit Search Pages</a> — Reddit newsroom, 2026-11-03, blog post.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The canon&#39;s description of the Reddit ads funnel covers the eligibility filter, a lightweight ranker, the heavy prediction model, and the auction order, and it does not cover which surfaces carry ads. Search is a surface where users write down exactly what they want, so purchase intent is high. This announcement says Reddit is testing ad placements on search results pages.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Search ads appear based on several factors, including contextual relevance to the query, and start with only some advertisers</span></p></div>
+<ul>
+<li>Search ads use the existing ad targeting on search results pages and appear based on several factors, including contextual relevance to the search query <span class="badge ok">verified</span> — <a href="https://redditinc.com/news/we-are-testing-ad-placements-in-reddit-search-pages" target="_blank" rel="noopener">Reddit newsroom</a>.<ul>
+<li>As an example, it writes that a search for &quot;espresso station&quot; may show ads for espresso machines, coffee beans, and mugs.</li>
+</ul>
+</li>
+<li>It writes that the test starts with only some qualified advertisers and will be refined based on user reactions <span class="badge ok">verified</span> — same post.<ul>
+<li>It did not disclose the ranking approach, the placement positions, or the share of users in the test.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;Ads in search may appear based on a range of factors, including contextual relevance to a user’s search query.&quot;
+— <a href="https://redditinc.com/news/we-are-testing-ad-placements-in-reddit-search-pages" target="_blank" rel="noopener">We Are Testing Ad Placements in Reddit Search Pages</a> (blog), 2026-11-03</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Not folded into the canon. This is an ads announcement for a search surface rather than feed recommendation, and it does not disclose the ranking mechanism, so it stays in the daily only as a boundary source.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The product fact that Reddit&#39;s ad surface is expanding beyond the feed into search is confirmed, but it does not change our understanding of the ads funnel. The basis is that the announcement describes the selection factors only as &quot;a range of factors&quot;.</p></div>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="radar.html#bytedance-onetrans-gsr--reranking-and-mix-ranking-generated-by-one-decoder">ByteDance OneTrans-GSR — reranking and mix-ranking generated by one decoder</a> — <a href="https://arxiv.org/abs/2611.04720" target="_blank" rel="noopener">arXiv 2611.04720</a>.</li>
+<li>We triaged 30 arXiv cs.IR papers. Generative retrieval for search ads (ReuseGR) has an A/B test but covers a search ads surface, so we left it out; generative recommendation decoding acceleration (ZeroGR) has no deployment claim, so we left it out.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Whether Reddit search ads launch formally — if they do, the surface list in the ads section of reddit.md needs to be fixed.</li>
+<li>The Reddit RSS shutdown (2026-11-13) — we need to decide in advance how to look up r/RedditEng afterward.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts
+Lookup failed: research.netflix.com/publications — the page returned HTTP 404</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-04.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-04</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-05.html" data-title="일일 리포트 2026-11-05"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
