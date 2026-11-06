@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-06 — feed-research</title>
+<meta name="description" content="In one line: X changed the For You home ranker to a model that reads continued video viewing and profile dwell time, and on the same day re-tuned seven…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-06.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-06.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-06.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-06.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-06 — feed-research">
+<meta property="og:description" content="In one line: X changed the For You home ranker to a model that reads continued video viewing and profile dwell time, and on the same day re-tuned seven…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-06.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-06.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-06">2026-11-06</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>11 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-06.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>4</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>2</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X changed the For You home ranker to a model that reads continued video viewing and profile dwell time, and on the same day re-tuned seven ranking weights.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">5</span></summary><ol><li><a href="#1-home-excursion-aggregation-becomes-the-default-and-seven-weights-change--x"><span class="num">1</span>Home excursion aggregation becomes the default and seven weights change — X</a></li><li><a href="#2-home-ranker-training-uses-home-excursion-time-as-input-and-head--x"><span class="num">2</span>Home ranker training uses home excursion time as input and head — X</a></li><li><a href="#3-putting-high-scored-unexposed-candidates-back-into-recall--alibaba"><span class="num">3</span>Putting high-scored unexposed candidates back into recall — Alibaba</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>X added a term to Phoenix that predicts Grok analysis actions, but its weight is 0.0.</li>
+<li>X&#39;s visibility-filtering applies an engagement limit to posts that carry a dynamic product ad label.</li>
+<li>Alibaba reported that putting high-scored candidates that were never exposed back into recall increased discovery categories in the Taobao feed by 3.5%.</li>
+</ul>
+<h2 id="1-home-excursion-aggregation-becomes-the-default-and-seven-weights-change--x"><span class="num">1</span>Home excursion aggregation becomes the default and seven weights change — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/021afa44cb5c5b10afa773cb52c0f5087603d478" target="_blank" rel="noopener">xai-org/x-algorithm 021afa4</a> — X (xAI), 2026-11-05, code. In these notes&#39; numbering, this is Gen4+Gen57.4+N (N is the number these notes assigned in order to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You (a recommendation timeline that also mixes in posts from accounts the user does not follow) sorts posts by a weighted sum of per-action probabilities predicted by Phoenix (X&#39;s Grok-based ranking Transformer). The defaults of these weights and switches are published through a cron mirror (a file that syncs the production configuration defaults to the repo every day). The 2026-10-06 commit introduced a continuous-value head that predicts home excursion (the time spent after opening a video from the home feed to keep watching it, or after jumping to the author&#39;s profile), but left it off by default. This commit reflects the 2026-11-04 sync: it turns on home excursion aggregation and score intake by default and changes seven ranking weights at once.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The serving home ranker switched to an aggregation that carries home excursion history</span></p></div>
+<ul>
+<li>The default aggregation of the history that home-mixer (the service that receives For You requests) sends to Phoenix changed to the home excursion variant <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:166-171</code></a>.<ul>
+<li><code>PhoenixAggregationType</code>: <code>DENSE_WITH_LONG_DWELL</code> → <code>DENSE_WITH_LONG_DWELL_HOME_EXCURSION</code>.</li>
+<li>As of the 2026-10-20 commit, this aggregation was used only in the shadow cluster (a path that sends part of real requests to the experiment model as well and only logs its scores) <code>Experiment16Fou</code>.</li>
+</ul>
+</li>
+<li>The switch that extracts the two home excursion scores from the Phoenix response is also on by default now <span class="badge ok">verified</span> — same file, lines 307-311.<ul>
+<li><code>EnableHomeExcursionScores</code>: <code>false</code> → <code>true</code>.</li>
+</ul>
+</li>
+<li>Even so, the three home excursion terms in the home-mixer weighted sum are still fixed at 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/home-mixer/scorers/value_model.rs" target="_blank" rel="noopener"><code>home-mixer/scorers/value_model.rs:39-41</code></a>.<ul>
+<li>The extracted scores are passed to VMRanker (the slate re-ranking service) requests and to logs. The effect on ranking comes from the aggregation change, that is, from the model input side <span class="badge est">inferred</span>. The basis is that home-mixer uses a constant 0.0 as the weight of this term.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. In the same sync, seven weights changed by different factors</span></p></div>
+<ul>
+<li><p>favorite, share and cont_dwell_time went up, video_open, click and cont_click_dwell_time went down, and the penalty of not_interested grew slightly <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:399-512</code></a>.</p>
+<ul>
+<li>cont_dwell_time is the weight applied to the continuous dwell time value, and cont_click_dwell_time is the weight applied to the continuous value of dwell time after clicking in.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-text" data-lang="text">favorite               0.66    → 0.708   (×1.073)
+video_open             0.02    → 0.0
+click                  0.3     → 0.274   (×0.913)
+share                  2.0     → 2.118   (×1.059)
+cont_dwell_time        0.006   → 0.0075  (×1.25)
+cont_click_dwell_time  0.4     → 0.385   (×0.9625)
+not_interested       −52.272   → −53.07  (×1.015)
+</code></pre></figure>
+</li>
+<li><p>The previous three adjustments were exactly 1.1× each, but this time the factors vary <span class="badge ok">verified</span> (arithmetic). Because they arrived on the day the model input changed, they appear to be a recalibration to the probability distribution of the new model <span class="badge est">inferred</span>. The only basis is that the two changes came in at the same sync time (2026-11-04T16:00:31Z).</p>
+</li>
+<li><p>With the video_open weight at 0, the probability of opening a video no longer receives a score directly in the home-mixer weighted sum <span class="badge ok">verified</span>. The vm-ranker mirror is still 0.07 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs</code></a>.</p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Posts with a dynamic product ad label have limited engagement</span></p></div>
+<ul>
+<li>visibility-filtering (the stage that decides, post by post, whether a post may be shown to this viewer) gained a dynamic product ad rule <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs:1137-1142</code></a>.<ul>
+<li>The condition is the <code>SafetyLabelType::DYNAMIC_PRODUCT_AD</code> label, the target is all viewers, and the action is <code>LimitedEngagementReason::DynamicProductAd</code>.</li>
+<li>The rule was added to the rule list at the home timeline hydration level.</li>
+</ul>
+</li>
+<li>A separate verdict level for promoted posts in the home timeline was introduced <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/visibility-filtering/rules/levels.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/levels.rs:371-374</code></a>.<ul>
+<li><code>TIMELINE_HOME_PROMOTED_HYDRATION</code> looks only at the block relationship as its viewer-side rule, and for the post side it reuses the home hydration&#39;s own rules as they are.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The Following tab ads blender records the reasons it could not insert an ad (too few posts, adjacent-post risk, spacing limit, and so on) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/home-mixer/ads/following_ad_blender.rs" target="_blank" rel="noopener"><code>home-mixer/ads/following_ad_blender.rs</code></a>. The placement rules appear to be unchanged <span class="badge est">inferred</span>. The basis is that the blocking verdict order is the same as before: handle, keyword, low risk.</li>
+<li>A switch that also uses the ads impression history cache in other data centers was introduced, on by default <span class="badge ok">verified</span> — <code>EnableAdsHistoryXdcCacheWrite</code>, same param.rs lines 941-946.</li>
+<li>A new cache layer was introduced for safety label lookup, and it is off because the shadow and serving bucket defaults are 0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/safety-label-source/dragonfly.rs" target="_blank" rel="noopener"><code>safety-label-source/dragonfly.rs</code></a>.</li>
+<li>VMRanker gained an API that reads carousel model JSON files from a directory and returns them by name <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/vm-ranker/carousel_model.rs" target="_blank" rel="noopener"><code>vm-ranker/carousel_model.rs</code></a>. Which model goes in is not public.</li>
+<li>The action scores of the page RL re-ranker (a model that picks, in slot order, the posts to place on one page) gained DM share and link copy terms with weight 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/phoenix/xrex/models/page_rl.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/page_rl.py</code></a>.</li>
+<li>The spam verdict of grox PTOS (the policy-based violation verdict layer) also counts accounts tagged in media toward the mention count <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/grox/flows/ptos/task_filter.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_filter.py</code></a>.</li>
+<li>The Phoenix retrieval request gained author include and exclude list fields <span class="badge ok">verified</span>. Continuous action slots 6 and 7 for ads were renamed to video watch seconds and video length <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+</ul>
+<blockquote>
+<p>&quot;These weights reflect a combination of how much an action is valued in ranking and typical propensities of these actions across the X network (e.g. negative feedback is overall rare).&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/021afa44cb5c5b10afa773cb52c0f5087603d478/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs</code></a> (code comment), 2026-11-05</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a>, raised the reference commit of <code>## Summary</code> to 021afa4. Fixed the favorite, video_open, click, share, cont_dwell_time and cont_click_dwell_time cells of the positive table under <code>### Weights</code> and the not_interested cell of the negative table to the current values and reference, and moved the previous values to a newly created &#39;this section&#39;s change log&#39; list. Fixed the introduction of <code>### Ranker input features and SID reconstruction</code> and the home excursion paragraph, the dynamic product ad paragraph in <code>## Ads</code>, the bullet under question 2 of Gen4+45 in <code>## Open questions</code>, the home excursion row of the <code>## Glossary</code> table, and the reference commit table in <code>## Sources</code>, and added one row to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X&#39;s home ranker is now a model that reads &quot;how long the user stayed after opening&quot; as a history input. The basis is that the training preset and the serving aggregation changed together, one day apart. Whether the weight re-tuning is tied to this switch cannot be confirmed from the mirror alone, so we leave it as an inference.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-home-ranker-training-uses-home-excursion-time-as-input-and-head--x"><span class="num">2</span>Home ranker training uses home excursion time as input and head — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/b5089266c0fbad66f388051f8f89056e2a8f974d" target="_blank" rel="noopener">xai-org/x-algorithm b508926</a> — X (xAI), 2026-11-04, code. In these notes&#39; numbering, this is Gen4+56.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The home excursion head was designed to be multiplied with a probability head, as in &quot;probability of opening the video × seconds of continued viewing once opened&quot;, but until now no loss that trains this head was visible in the public training configuration. This commit turned on that loss and the history input together in the home ranker training preset for H100 GPUs, and created a weight slot of 0.0 for the Grok analysis action.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The training preset turned on home excursion time as both a history input and a prediction target</span></p></div>
+<ul>
+<li>The <code>home_direct_packed</code> preset adds video continuation seconds and profile dwell seconds to the embedding for each history item <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b5089266c0fbad66f388051f8f89056e2a8f974d/phoenix/xrex/models/recsys_feature_prep.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_feature_prep.py</code></a>.<ul>
+<li>The values are clipped to 0–300 seconds, normalized with <code>log1p(x)/log1p(300)</code>, multiplied by a training vector initialized to 0, and added.</li>
+<li>The flag is <code>enable_home_excursion_history</code> and it defaults to False. It is True only in this preset.</li>
+</ul>
+</li>
+<li>The same preset trains the two continuous heads only on cases where the video was opened and where the profile was tapped <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b5089266c0fbad66f388051f8f89056e2a8f974d/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py:262-313, 532-549</code></a>.<ul>
+<li>The loss weight is 0.013 for video continued viewing and 0.0035 for profile dwell. The loss form is CREAD (an approach that trains time as exceedance of multiple thresholds), the same as the existing dwell head.</li>
+<li>Conditional training is applied through <code>condition_action_index</code> (<code>CLIENT_TWEET_VIDEO_OPEN</code>, <code>CLIENT_TWEET_CLICK_PROFILE</code>) and is computed only on the two home timeline surfaces.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A weight term for the Grok analysis action was introduced at 0.0</span></p></div>
+<ul>
+<li>A grok_analyze weight was introduced in the shared value model and the two mirrors, with a default of 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b5089266c0fbad66f388051f8f89056e2a8f974d/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:483-488</code></a>.<ul>
+<li>The weighted sum went from 29 terms to 30 (<code>xai-value-model/scoring.rs</code>).</li>
+</ul>
+</li>
+<li>This term appears to be a prediction of the action of analyzing a post with Grok <span class="badge est">inferred</span>. The basis is the name alone, and the home-mixer Phoenix scorer in the 2026-11-05 commit has no code that fills this score.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The gRPC data loader path for Phoenix training was deleted <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/b5089266c0fbad66f388051f8f89056e2a8f974d" target="_blank" rel="noopener"><code>phoenix/xrex/data/grpc_recsys.py</code></a> (deleted).</li>
+<li>Reply two-tower training gained a rust_kafka dataset variant, and two-tower evaluation changed from ld-head-only to a general mixed-head form <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b5089266c0fbad66f388051f8f89056e2a8f974d/phoenix/xrex/configs/xrecsys_two_tower_evals.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys_two_tower_evals.py</code></a>.</li>
+<li>The training input TweetInfo gained an author engagement count field <span class="badge ok">verified</span> — <code>recsys.proto</code> field 49 <code>authorEngagementCounts</code>.</li>
+<li>The visibility-filtering hydration layer was substantially rewritten <span class="badge ok">verified</span>. We did not read whether policy changed.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a>, added a home excursion paragraph to <code>### Ranker input features and SID reconstruction</code>, added a grok_analyze row to the weight table, and added one row to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The home excursion head got only a placeholder on 2026-10-06 and a month later gained a training loss and a history input. However, it is still 0 in the home-mixer weighted sum, so for now it is a signal that changes the model representation, not the ranking.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="3-putting-high-scored-unexposed-candidates-back-into-recall--alibaba"><span class="num">3</span>Putting high-scored unexposed candidates back into recall — Alibaba</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2611.05997" target="_blank" rel="noopener">From Waste to Discovery: Recycling High-Scored Unexposed Candidates in Taobao Feed Recommendation</a> — Taobao &amp; Tmall Group of Alibaba, 2026-11-04 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Recommendation feeds often push less-exposed content so that users find new interests, but cold items with little information are easily overestimated by the ranker, which tends to cut only engagement. This paper proposes recycling items that the ranker scored highly but that were never exposed because they lost out on slots, instead of discarding them. It reports the results of deploying URED, a channel that collects such items for 30 days and puts them back into the recall (candidate generation) stage, in the Taobao feed.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Unexposed high-scored candidates increased discovery without cutting engagement</span></p></div>
+<ul>
+<li>In each session, the system collects items from the top 200 by ranking that are in categories the user has not seen recently and that were not exposed <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2611.05997v1" target="_blank" rel="noopener">HTML version</a>.<ul>
+<li>Up to 1000 items per request go into the unified pool together with other recall channels, and lookup is O(1) per request.</li>
+</ul>
+</li>
+<li>In the online A/B test, it gained +3.47% discovery categories, +8.47% content diversity, and +2.62% completed video views <span class="badge ok">verified</span> — same paper.<ul>
+<li>Each experiment ran for more than one week, with 10% of traffic for the control group and 5–10% for the treatment group.</li>
+<li>Shortening the collection period to one day reduces the discovery effect to +0.55% (not statistically significant), and inserting items at random without a score filter has no effect.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;URED has been deployed in production in the Taobao feed recommendation system for over six months, serving tens of millions of daily active users.&quot;
+— <a href="https://arxiv.org/html/2611.05997v1" target="_blank" rel="noopener">URED</a> (paper), 2026-11-04</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added an Alibaba URED entry to <code>## New this month</code> in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This is a production claim that exploration can be replaced by unexposed candidates the ranker is already confident about, without pushing cold items for exploration. There is no evidence that a tracked service uses the same mechanism, so it goes on the radar.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="radar.html#alibaba-ured--re-recalling-high-scoring-candidates-that-were-not-shown">Alibaba URED — recalling high-scored unexposed candidates</a> — <a href="https://arxiv.org/abs/2611.05997" target="_blank" rel="noopener">arXiv 2611.05997</a>.</li>
+<li>Added Meta Axia to the &quot;Recommendation model scaling laws&quot; thread — <a href="https://arxiv.org/abs/2611.05643" target="_blank" rel="noopener">arXiv 2611.05643</a>. It is a tool that finds the scaling law of each model with few experiments, and its abstract reports a cumulative online improvement of 0.36% in Meta&#39;s ads system.</li>
+<li>Triaged 30 arXiv cs.IR papers. A local commerce generative retrieval paper was not included because its deployment figures were development-stage measurements.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>The visibility-filtering hydration rewrite in b508926 — it is thousands of lines, so we could not confirm whether policy changes are mixed in. A deep dive is needed.</li>
+<li>The serving path that fills the grok_analyze score — the interpretation of the name is <span class="badge est">inferred</span>.</li>
+<li>Whether the weight re-tuning is tied to the home excursion model switch — we will check whether the values move again in the next sync.</li>
+<li>The Reddit RSS shutdown (2026-11-13) — we need to decide in advance how to look up r/RedditEng afterward.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts
+Lookup failed: research.netflix.com/publications — the page returned HTTP 404</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-05.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-05</span></a><a class="pg-next" href="daily-2026-11-07.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-11-07</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-06.html" data-title="일일 리포트 2026-11-06"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>

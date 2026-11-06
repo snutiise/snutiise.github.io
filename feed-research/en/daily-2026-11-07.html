@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-07 — feed-research</title>
+<meta name="description" content="In one line: X built a path that orders the For You video carousel with a dedicated CTR model and a filter that removes videos watched within three days.…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-07.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-07.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-07.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-07.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-07 — feed-research">
+<meta property="og:description" content="In one line: X built a path that orders the For You video carousel with a dedicated CTR model and a filter that removes videos watched within three days.…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-07.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-07.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-07">2026-11-07</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>8 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-07.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X built a path that orders the For You video carousel with a dedicated CTR model and a filter that removes videos watched within three days. Both are off by default, so current behavior is unchanged.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-the-video-carousel-gained-a-dedicated-ctr-model-and-a-watch-filter--x"><span class="num">1</span>The video carousel gained a dedicated CTR model and a watch filter — X</a></li><li><a href="#2-a-re-ranking-evaluator-that-sees-impressions-and-clicks-as-one-chain--alibaba"><span class="num">2</span>A re-ranking evaluator that sees impressions and clicks as one chain — Alibaba</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>X&#39;s mention and reply notifications are no longer sent to recipients who do not follow the author of a post carrying a risky reply label.</li>
+<li>Alibaba reported deploying a re-ranking evaluator that treats impressions and clicks as a single chain to all Taobao traffic.</li>
+</ul>
+<h2 id="1-the-video-carousel-gained-a-dedicated-ctr-model-and-a-watch-filter--x"><span class="num">1</span>The video carousel gained a dedicated CTR model and a watch filter — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe" target="_blank" rel="noopener">xai-org/x-algorithm 2e2295b</a> — X (xAI), 2026-11-06, code. In these notes&#39; numbering, this is Gen4+Gen58.4+N is the number these notes assigned in order to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You (a recommendation timeline that mixes in posts from accounts the user does not follow) has a carousel module that places 3–5 vertical videos as a bundle in the 6th slot of the feed. After it was introduced off by default on 2026-10-08, the order of videos in the carousel has been set by a value that sums the probabilities predicted by Phoenix (X&#39;s Grok-based ranking Transformer) multiplied by weights. Until now only the weight of &quot;probability of opening the video&quot; was not 0, so the order was effectively that probability. This commit added, off by default, a path that can replace that weighted sum with a carousel-specific CTR (click-through rate) model, and a filter that removes recently watched videos from the carousel.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. A dedicated logistic regression model that sets the carousel order was introduced</span></p></div>
+<ul>
+<li><p>When the switch is on, the score of a carousel video is the output of a linear model that takes &quot;the logit of the probability of opening the video and the video embedding&quot; as input, instead of the weighted sum <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/util/video_carousel_ctr_model.rs" target="_blank" rel="noopener"><code>home-mixer/util/video_carousel_ctr_model.rs:20-34</code></a>.</p>
+<ul>
+<li>The video embedding has 1024 dimensions, and the model is discarded if the number of weights in the model file is not 1024.</li>
+<li>The open probability is clipped to 1e-6–1−1e-6 and then converted to a logit, which is kept from falling below the lower bound set by the model (<code>video_open_logit_min</code>).</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">self.intercept + self.video_open_weight * video_open_logit + embedding_term
+// embedding_term = Σ embedding[i] * embedding_weights[i]
+</code></pre></figure>
+</li>
+<li><p>The model is not in the code; home-mixer (the service that receives For You requests) fetches it by name from VMRanker (a separate service that handles slate reordering) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/query_hydrators/video_carousel_ctr_model_query_hydrator.rs" target="_blank" rel="noopener"><code>query_hydrators/video_carousel_ctr_model_query_hydrator.rs:23-64</code></a>.</p>
+<ul>
+<li>The fetched model is re-fetched in the background every 60 seconds. The first request is handled with the existing weighted sum, without a model.</li>
+<li>The model is not used if the embedding version it was trained with differs from the embedding version in the serving configuration. The example version name in the test is v8_search_1.</li>
+<li>The switch <code>EnableVideoCarouselCtrModel</code> is false by default, and the model name <code>VideoCarouselCtrModelName</code> is an empty string — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs</code></a>.</li>
+</ul>
+</li>
+<li><p>In the same commit, a fifth term, &quot;probability of opening the video × expected seconds of continued home video viewing&quot;, was also added to the weighted-sum side, and the default weight is 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/util/video_carousel.rs" target="_blank" rel="noopener"><code>util/video_carousel.rs:58-74</code></a>.</p>
+<ul>
+<li>The continuation seconds are the value of the home excursion head (time spent continuing to watch a video opened in the home feed), which the home ranker began predicting in the 2026-11-04 commit. A missing value counts as 0.</li>
+<li>The parameter is <code>VideoCarouselVideoContinuationWeight</code> (default 0.0).</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A filter that does not re-insert videos watched in the carousel within the last 3 days was introduced</span></p></div>
+<ul>
+<li>When the switch is on, it reads the per-user carousel watch record from Redis and removes from the carousel candidates the videos watched in the carousel within the past 3 days and their original posts <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/query_hydrators/video_carousel_seen_query_hydrator.rs" target="_blank" rel="noopener"><code>query_hydrators/video_carousel_seen_query_hydrator.rs:9-46</code></a>.<ul>
+<li>The constants are <code>SEEN_WINDOW_MS = 3 days</code> and <code>MAX_IDS = 2_000</code>. The key prefix is <code>vcs:1:</code>.</li>
+<li>The same record is used in both the carousel candidate filter and the extra carousel candidates of the top-K selector — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/filters/video_carousel_filter.rs" target="_blank" rel="noopener"><code>filters/video_carousel_filter.rs</code></a>, <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/selectors/top_k_score_selector.rs" target="_blank" rel="noopener"><code>selectors/top_k_score_selector.rs</code></a>.</li>
+<li>The switch <code>EnableVideoCarouselSeenFilter</code> is false by default. If the Redis connection fails, the filter is replaced by a client that does nothing.</li>
+</ul>
+</li>
+<li>This commit has no code that writes the record <span class="badge est">inferred</span>. The basis is that the only code in the diff that writes to this key is the <code>zadd_prune_expire</code> call in a test.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Visibility rules for notifications and the Home timeline changed slightly</span></p></div>
+<ul>
+<li>Mention and reply notifications are not sent for a post carrying the RISKY_HIGH_VIZ_REPLY label (a safety label attached to high-impression risky replies) when the recipient does not follow the author <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs:1022-1027</code></a>.<ul>
+<li>The new rule was added only to the two levels <code>NOTIFICATIONS_WRITER_V2_MENTION</code> and <code>_REPLY</code> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/visibility-filtering/rules/levels.rs" target="_blank" rel="noopener"><code>rules/levels.rs:217, 261</code></a>.</li>
+<li>The golden corpus (expected-value tests that pin rule outcomes) pins that the post remains visible to followers and to the author themselves.</li>
+</ul>
+</li>
+<li>The region-restricted media (media that cannot be viewed in the requesting country) rule no longer applies to the author themselves, and was newly added to the <code>TimelineHome</code> level as well <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>tweet_rules.rs:891-896</code></a>.<ul>
+<li>The rule&#39;s target changed from <code>Everyone</code> to <code>NonAuthors</code>.</li>
+<li><code>TimelineHomeRecommendations</code> originally had this rule inside the media takedown bundle, and this time that bundle was unpacked so the rule is applied earlier — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/visibility-filtering/rules/levels.rs" target="_blank" rel="noopener"><code>levels.rs:313, 346</code></a>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The cron mirror (a file that syncs production configuration defaults to the repo daily) sync time changed to 2026-11-05T16:00:35Z, and ranking weights did not change <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs</code></a>.<ul>
+<li><code>Experiment22Fou</code> and <code>Experiment23Fou</code> were added at a 0.3 ratio to the shadow traffic targets (a path that also sends some real requests to experiment models and records scores only in logs).</li>
+</ul>
+</li>
+<li>The visibility verdict for Like and Repost notifications now looks at the recipient&#39;s own post as well as the acting account <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/visibility-filtering/rules/notification_kind.rs" target="_blank" rel="noopener"><code>rules/notification_kind.rs</code></a>.</li>
+<li>Four fields, <code>eta</code>, <code>nuAuthor</code>, <code>nuSid</code> and <code>priorTau</code>, were added to the page decode re-ranking request, and home-mixer sends all of them empty <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/home-mixer/scorers/page_decode_rerank_scorer.rs" target="_blank" rel="noopener"><code>scorers/page_decode_rerank_scorer.rs</code></a>.<ul>
+<li>Judging by the names, they are a repeat penalty per author and per SID (semantic ID, a representation of an item as a hierarchical code) and a prior-distribution temperature <span class="badge est">inferred</span>. The only basis is the field names.</li>
+</ul>
+</li>
+<li><code>DENSE_WITH_RECENT_IMPRESSIONS</code> was added to the history aggregation kinds in the proto, and nothing uses it yet <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+<li>An option to read ad campaign, line item and creative format as hashed IDs was introduced in the training data, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/phoenix/xrex/data/recsys/ad_side_ids.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/ad_side_ids.py</code></a>.<ul>
+<li>Campaign and line item are hashed into 2^19 buckets. The creative format is 48 card types and 8 media types.</li>
+</ul>
+</li>
+<li>The candidate bundle size in the immersive surface page RL training preset was fixed to 128 from [32, 128] <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/configs/xrecsys.py</code></a>.</li>
+<li>Ten filters were changed to use a shared split function, with no policy change <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/candidate-pipeline/filter.rs" target="_blank" rel="noopener"><code>candidate-pipeline/filter.rs</code></a>.</li>
+<li>DSCP (network packet priority marking) settings were introduced for the checkpoint server and the Phoenix prediction server <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/2e2295b0df598eee5aa05f9c9b458f4490c7fcbe/phoenix/crates/serving/xai-recsys-engine/src/bin/checkpoint_server.rs" target="_blank" rel="noopener"><code>checkpoint_server.rs</code></a>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> In the carousel ranking score sub-bullets under <code>## Feed surfaces</code>, added two lines for the continuation term and the CTR model path, and added a bullet for the 3-day watch filter under the carousel item. After the introduction of <code>## Safety / visibility-filtering / labeling pipeline</code>, added a paragraph on region-restricted media and notification rules. Raised the git log reference in <code>## Sources</code> to 2e2295b, and added a Gen4+58 row to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X is preparing to move the carousel order from a hand-tuned weighted sum to a trained model. The basis is that it has already built a path that fetches the model from outside the service and refreshes it every 60 seconds. However, the carousel itself and both features are off by default, so actual For You behavior does not change as of 2e2295b.</p></div>
+<h2 id="2-a-re-ranking-evaluator-that-sees-impressions-and-clicks-as-one-chain--alibaba"><span class="num">2</span>A re-ranking evaluator that sees impressions and clicks as one chain — Alibaba</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2611.07591" target="_blank" rel="noopener">Beyond Independent Predictions: Learning the Browsing Journey for Sequence-Level Re-ranking</a> — Alibaba Taobao &amp; Tmall Group, 2026-11-05 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In the Generator–Evaluator approach to re-ranking, several candidate slates (sets of items shown at once) are generated and an evaluator picks the best one. Usually the evaluator predicts CTR for each item separately and sums them, so it cannot reflect whether the user scrolls down to the lower items. This paper has the evaluator jointly model the chain &quot;show → actually view → click&quot;.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The paper writes that clicks and revenue rose in a Taobao app A/B test and that it was deployed to full traffic</span></p></div>
+<ul>
+<li>It reports +0.70% clicks and +3.67% revenue in a 14-day online A/B test <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2611.07591v1" target="_blank" rel="noopener">arXiv HTML</a>.<ul>
+<li>It writes that the latency increase is under 0.5ms.</li>
+</ul>
+</li>
+<li>Five of the seven authors are affiliated with Alibaba <span class="badge ok">verified</span> — same HTML.</li>
+</ul>
+<blockquote>
+<p>&quot;together with a 14-day online A/B test in the Taobao App (+0.70% clicks, +3.67% revenue) and full-traffic deployment, validate the effectiveness and robustness of our approach&quot;
+— <a href="https://arxiv.org/html/2611.07591v1" target="_blank" rel="noopener">Beyond Independent Predictions</a> (paper), 2026-11-05</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> It is not directly tied to a tracked service, so it was added only as an &quot;Alibaba ICE&quot; entry in <a href="radar.html">radar.md</a> <code>## New this month</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> There is one more piece of evidence that slate-level evaluation is used in e-commerce feed production. ByteDance&#39;s OneTrans-GSR from the same week also uses a reward model that evaluates the whole slate. X&#39;s VMRanker does DPP slate reordering with a different approach, so we put this under watching.</p></div>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="radar.html#alibaba-ice--re-ranking-that-evaluates-slates-with-an-impression-click-chain">Alibaba ICE</a> — re-ranking evaluator that models the impression-click chain, deployed to all Taobao traffic (<a href="https://arxiv.org/abs/2611.07591" target="_blank" rel="noopener">arXiv 2611.07591</a>).</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>The code that writes the carousel watch record — this commit has only the reading side, so we left it as <span class="badge est">inferred</span>.</li>
+<li>The training code or model file for the carousel CTR model — what it is trained on as the ground-truth label is not yet public.</li>
+<li>The Reddit RSS shutdown (2026-11-13) — we need to decide in advance how to look up r/RedditEng afterward.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts
+Lookup failed: research.netflix.com/publications — the page returned HTTP 404 (we checked the root page instead and found 0 new recsys posts)</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-06.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-06</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-07.html" data-title="일일 리포트 2026-11-07"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
