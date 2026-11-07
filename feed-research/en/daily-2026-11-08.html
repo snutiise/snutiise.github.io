@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-08 — feed-research</title>
+<meta name="description" content="In one line: X set the default name of the CTR model for the For You video carousel. The path switch that uses the model is still off, so current behavior…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-08.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-08.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-08.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-08.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-08 — feed-research">
+<meta property="og:description" content="In one line: X set the default name of the CTR model for the For You video carousel. The path switch that uses the model is still off, so current behavior…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-08.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-08.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-08">2026-11-08</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Sunday</li>
+<li><span class="meta-k">Reading time</span>5 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-08.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X set the default name of the CTR model for the For You video carousel. The path switch that uses the model is still off, so current behavior is unchanged.</div>
+</div>
+<div class="prose">
+<h2 id="1-default-name-set-for-the-video-carousel-ctr-model--x"><span class="num">1</span>Default name set for the video carousel CTR model — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/3b6919f87532e57063bb3f1e85c2f509323b513e" target="_blank" rel="noopener">xai-org/x-algorithm@3b6919f</a> — xAI, 2026-11-07, (code). In the numbering these notes assign, this is Gen4+59 (Gen4+N is the number these notes give, in order, to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You (a recommendation timeline that also mixes in posts from accounts the user does not follow) includes a carousel module, off by default, that groups 3–5 vertical videos. The previous day&#39;s commit (2e2295b) created a path that orders videos inside the carousel with a carousel-specific CTR (click-through rate) model instead of a hand-tuned weighted sum, but the model name to fetch was an empty string. With an empty name, the path cannot fetch a model even if it is turned on. This commit filled in the default for that model name and also changed one processing rule of the account enforcement service.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. A model is now named for the carousel CTR path, but the path is still off</span></p></div>
+<ul>
+<li>The default for the carousel CTR model name changed from an empty string to a specific model name <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:1272-1276</code></a>.<ul>
+<li>The parameter is <code>VideoCarouselCtrModelName</code> and its value is <code>&quot;lr_v8_search_video_1_2026-11-03_no_high_risk&quot;</code>.</li>
+<li>This value came from the cron mirror (a sync that copies X&#39;s internal feature switch defaults into this file every day). The sync time in the file&#39;s header comment is 2026-11-06T16:00:45Z.</li>
+</ul>
+</li>
+<li>The switch that turns the path on and the carousel itself are still off by default in this commit <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/home-mixer/params/param.rs" target="_blank" rel="noopener">same file:1224-1270</a>.<ul>
+<li><code>EnableVideoCarousel</code> and <code>EnableVideoCarouselCtrModel</code> are both <code>false</code>.</li>
+<li>The query hydrator that fetches the model runs only when both switches are on — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/home-mixer/query_hydrators/video_carousel_ctr_model_query_hydrator.rs" target="_blank" rel="noopener"><code>query_hydrators/video_carousel_ctr_model_query_hydrator.rs</code></a>.</li>
+</ul>
+</li>
+<li>The model is likely the 8th version of a logistic regression, trained on 2026-11-03 on data that excluded brand-safety HighRisk videos <span class="badge est">inferred</span> — an interpretation read from the <code>lr_v8</code>, date, and <code>no_high_risk</code> pieces of the name.<ul>
+<li>The <code>search_video</code> piece of the name may mean it was trained on video data from the search surface, but the training code is not public, so we cannot confirm it <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. An account enforcement classification head with no control record now only records instead of acting</span></p></div>
+<ul>
+<li>The handling changed in abuse-enforcement-service (AES, a service that takes label, challenge, and suspension actions on accounts based on model scores). A classification head (one output of a classification model) that no control record names no longer follows the default rule of taking action, and is only recorded in Recording mode <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/abuse-enforcement-service/service-lib/src/action_control.rs" target="_blank" rel="noopener"><code>service-lib/src/action_control.rs:1079-1098</code></a>.<ul>
+<li>Previously, when the repository had no record at all, it fell straight back to the default (apply the rules), and it also followed the rules when only other heads had records. The deleted test was named <code>no_record_follows_the_rules</code>.</li>
+<li>The new test <code>a_head_no_record_names_records_only</code> expects <code>ControlMode::Recording</code>, an empty action list, and the record reason <code>no_selection</code> in both cases.</li>
+<li>If the head name is empty or malformed, it returns the default as before.</li>
+</ul>
+</li>
+<li>When such a head is first saved, saving it narrowed to a classifier or band level is blocked. The record for the whole head must be saved first <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/abuse-enforcement-service/service-lib/src/action_control.rs" target="_blank" rel="noopener">same file:902-913</a>.<ul>
+<li>The error code is <code>unknown_head_needs_head_record</code>. A head saved for the first time has a setting on by default that lets verdicts not in the topic&#39;s label list pass.</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">&quot;save the whole head first, so its decisions keep getting past the topic&#39;s label list&quot;
+</code></pre></figure>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A deterministic performance test and benchmark that runs the entire For You candidate pipeline with 3,000 candidates was added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/home-mixer/candidate_pipeline/performance_tests.rs" target="_blank" rel="noopener"><code>candidate_pipeline/performance_tests.rs</code></a>.<ul>
+<li>The accompanying <code>performance_params.json</code> is a test configuration that turns off most switches and sets weights to 0. It should not be read as production defaults.</li>
+<li>The test checks 15 components that must be connected (PhoenixSource, PreviouslySeenPostsFilter, VMRanker, VFFilter, and others).</li>
+</ul>
+</li>
+<li>The cache hydrator was changed so that it does not copy the candidate list when there are no cache hits at all <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/candidate-pipeline/hydrator.rs" target="_blank" rel="noopener"><code>candidate-pipeline/hydrator.rs</code></a>.</li>
+<li>The TTL of the ads impression history cache changed from a constant to the parameter <code>AdsHistoryCacheTtlSecs</code>, and its default is 300 seconds, the same as before <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/home-mixer/side_effects/served_ad_history_cache_side_effect.rs" target="_blank" rel="noopener"><code>side_effects/served_ad_history_cache_side_effect.rs</code></a>.</li>
+<li><code>DISTILLED_FEEDBACK_RELEVANT_TO_SEARCH</code> (No. 114) was added to the action list of Phoenix (X&#39;s Grok-based ranking Transformer). No code uses it in this commit <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/3b6919f87532e57063bb3f1e85c2f509323b513e/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> Added a sub-bullet under the CTR model path bullet of the carousel entry in <code>## Feed surfaces</code>, recording the default model name and the off state of the switch. Moved the git log reference in <code>## Sources</code> to 2026-11-08, 3b6919f, and added a Gen4+59 row to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X actually trained the carousel CTR model and settled its name, so all that remains is turning the switch on. The evidence is that the model name left empty in the path built the day before was filled within a day with the name of a dated training artifact. However, because both the carousel and the CTR path are off by default, For You behavior does not change as of 3b6919f.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Whether the switch for the carousel CTR path or for the carousel itself gets turned on — if so, carousel ordering changes from the weighted sum to a trained model.</li>
+<li>What search_video in the model name means — whether the training data came from the search surface remains <span class="badge est">inferred</span>.</li>
+<li>Code that uses the DISTILLED_FEEDBACK_RELEVANT_TO_SEARCH action — it is not yet known whether X intends to use feedback distilled from search relevance as a label.</li>
+<li>The Reddit RSS shutdown (2026-11-13) — we need to decide in advance how to look up r/RedditEng afterward.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-07.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-07</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-08.html" data-title="일일 리포트 2026-11-08"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
