@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-09 — feed-research</title>
+<meta name="description" content="In one line: Pinterest turned on multi-epoch training for its home feed ranking model by freezing the embedding table in the first epoch, and reported a…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-09.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-09.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-09.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-09.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-09 — feed-research">
+<meta property="og:description" content="In one line: Pinterest turned on multi-epoch training for its home feed ranking model by freezing the embedding table in the first epoch, and reported a…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-09.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-09.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-09">2026-11-09</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Monday</li>
+<li><span class="meta-k">Reading time</span>3 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-09.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>Pinterest turned on multi-epoch training for its home feed ranking model by freezing the embedding table in the first epoch, and reported a 1.09% gain in online saves.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-training-the-home-feed-ranker-for-multiple-epochs-without-overfitting--pinterest"><span class="num">1</span>Training the home feed ranker for multiple epochs without overfitting — Pinterest</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-training-the-home-feed-ranker-for-multiple-epochs-without-overfitting--pinterest"><span class="num">1</span>Training the home feed ranker for multiple epochs without overfitting — Pinterest</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83" target="_blank" rel="noopener">Safe and Efficient Multi-Epoch Embedding Training</a> — Pinterest Engineering, 2026-11-06, blog post.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Recommendation ranking models are usually trained for 1 epoch, a single pass over the training data. A huge embedding table that holds a vector per item or user ID overfits sharply when it sees the same data twice (multi-epoch overfitting). To use more data, the training window has to be extended, which mixes in older data. This post narrows the cause of this overfitting in the Pinterest home feed ranking model to the embedding table, and reports the results of applying multi-epoch training in production by delaying when the table is trained.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Freezing the embedding table in the first epoch turns multi-epoch training into a gain</span></p></div>
+<ul>
+<li>When training of the home feed ranking model went from 1 epoch to 2 epochs, the offline save metric dropped by nearly 6% <span class="badge ok">verified</span> — <a href="https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83" target="_blank" rel="noopener">Pinterest blog post</a>.<ul>
+<li>This model had been fine-tuned for 1 epoch on a 3-week window, starting from a foundation model backbone pretrained on data from 5 surfaces.</li>
+</ul>
+</li>
+<li>Freezing parts of the model one at a time showed that the embedding table was the main cause of the drop <span class="badge ok">verified</span> — same post.<ul>
+<li>Freezing the table throughout and training for 3 epochs gave +1.25% against the 1-epoch model.</li>
+</ul>
+</li>
+<li>The adopted method is a delayed update: freeze the table in the first epoch, and train it together with the rest of the model from the next epoch on <span class="badge ok">verified</span> — same post.<ul>
+<li>On a 10-day window, freezing it through the last epoch gave +0.49%, while training it jointly only in the first epoch and freezing it in the rest gave −0.80%.</li>
+<li>On a 20-day window, the same approach gave +1.16%, and the gain saturated around 3 epochs.</li>
+</ul>
+</li>
+<li>Pinterest turned on multi-epoch training in the production home feed ranking model and got +1.09% online saves <span class="badge ok">verified</span> — same post.</li>
+</ul>
+<blockquote>
+<p>&quot;The modeling and system insights allowed us to enable multi-epoch training in production, leading to +1.09% online saves.&quot;
+— <a href="https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83" target="_blank" rel="noopener">Safe and Efficient Multi-Epoch Embedding Training</a> (blog), 2026-11-06</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>It writes that in Pinterest&#39;s own ads-side research, the ID embedding table did not show this multi-epoch drop <span class="badge ok">verified</span> — same post.</li>
+<li>On training time, distributed embedding lookup took more than 15% of total training time, so Pinterest added a semi-synchronous pipeline that prefetches the embeddings of the next batch <span class="badge ok">verified</span> — same post.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Added a Pinterest entry to <code>## New this month</code> in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This case separates, in production, the 1-epoch practice of recommendation rankers as being caused by the embedding table. There is no evidence that the tracked services (X, Meta, Netflix, Reddit) use the same training schedule, so it stays on the radar.</p></div>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="radar.html#pinterest--training-the-home-feed-ranker-embeddings-for-multiple-epochs">Pinterest — training the home feed ranker embeddings for multiple epochs</a> — <a href="https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83" target="_blank" rel="noopener">Pinterest blog post</a>.</li>
+<li>All 30 arXiv cs.IR responses were submitted 2026-11-04–05 and are a batch already triaged in a previous run. None newly passed.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Reddit RSS closes (2026-11-13); after that the r/RedditEng lookup has to move to the WebSearch fallback path.</li>
+<li>research.netflix.com/publications has returned HTTP 404 for more than two days, so we need to find an alternative listing path.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts
+Lookup failed: research.netflix.com/publications — the page returned HTTP 404</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-08.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-08</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-09.html" data-title="일일 리포트 2026-11-09"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
