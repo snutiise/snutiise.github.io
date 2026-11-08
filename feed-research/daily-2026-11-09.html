@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>일일 리포트 2026-11-09 — feed-research</title>
+<meta name="description" content="한 줄: Pinterest가 홈피드 랭킹 모델의 임베딩 테이블을 첫 epoch에 고정하는 방식으로 여러 epoch 학습을 켜고 온라인 저장 1.09% 상승을 보고했다.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/daily-2026-11-09.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="일일 리포트 2026-11-09 — feed-research">
+<meta property="og:description" content="한 줄: Pinterest가 홈피드 랭킹 모델의 임베딩 테이블을 첫 epoch에 고정하는 방식으로 여러 epoch 학습을 켜고 온라인 저장 1.09% 상승을 보고했다.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/daily-2026-11-09.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/">
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/">0x00</a>
+<nav class="site-nav" aria-label="주 메뉴"><ul>
+<li><a href="/posts/">글</a></li>
+<li><a href="/series/">시리즈</a></li>
+<li><a href="/tags/">태그</a></li>
+<li><a href="/feed-research/">리서치</a></li>
+<li><a href="/about/">소개</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/en/" hreflang="en" lang="en" aria-label="English (EN)"><span aria-hidden="true" lang="ko">한</span><span>EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">리서치</a> / <a href="daily.html">일일 리포트</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-09">2026-11-09</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">요일</span>월요일</li>
+<li><span class="meta-k">읽는 시간</span>3분</li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">읽은 자료 <b>1</b>건</li><li class="chip">정본 반영 <b>1</b>개 파일</li><li class="chip">레이더 <b>1</b>건</li></ul>
+<div class="lead"><span class="lb">한 줄 요약</span>Pinterest가 홈피드 랭킹 모델의 임베딩 테이블을 첫 epoch에 고정하는 방식으로 여러 epoch 학습을 켜고 온라인 저장 1.09% 상승을 보고했다.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc"><summary>목차<span class="toc-n">3</span></summary><ol><li><a href="#1-홈피드-랭커를-과적합-없이-여러-epoch-학습한다--pinterest"><span class="num">1</span>홈피드 랭커를 과적합 없이 여러 epoch 학습한다 — Pinterest</a></li><li><a href="#레이더">레이더</a></li><li><a href="#다음에-볼-것">다음에 볼 것</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-홈피드-랭커를-과적합-없이-여러-epoch-학습한다--pinterest"><span class="num">1</span>홈피드 랭커를 과적합 없이 여러 epoch 학습한다 — Pinterest</h2>
+<div class="blk src"><p><span class="lbl">자료</span> <a href="https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83" target="_blank" rel="noopener">Safe and Efficient Multi-Epoch Embedding Training</a> — Pinterest Engineering, 2026-11-06, 블로그.</p></div>
+<div class="blk ctx"><p><span class="lbl">배경</span> 추천 랭킹 모델은 보통 학습 데이터를 한 번만 훑는 1 epoch로 학습한다. 아이템·유저 ID마다 벡터를 두는 거대한 임베딩 테이블이 같은 데이터를 두 번 보면 급격히 과적합하기 때문이다(multi-epoch 과적합). 데이터를 더 많이 쓰려면 학습 기간 창을 늘려야 하고, 그만큼 오래된 데이터가 섞인다. 이번 글은 Pinterest 홈피드 랭킹 모델에서 이 과적합의 원인을 임베딩 테이블로 좁히고, 테이블 학습 시점을 늦춰 여러 epoch 학습을 프로덕션에 적용한 결과를 보고한다.</p></div>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">A. 임베딩 테이블을 첫 epoch에 고정하면 여러 epoch 학습이 이득으로 바뀐다</span></p></div>
+<ul>
+<li>홈피드 랭킹 모델은 학습을 1 epoch에서 2 epoch로 늘리면 오프라인 save 지표가 6% 가까이 떨어졌다 <span class="badge ok">확인</span> — <a href="https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83" target="_blank" rel="noopener">Pinterest 블로그</a>.<ul>
+<li>이 모델은 5개 지면 데이터로 사전학습한 foundation model 백본을 3주 창, 1 epoch로 미세조정해 왔다.</li>
+</ul>
+</li>
+<li>모델 부분을 하나씩 고정해 보니 하락의 주원인은 임베딩 테이블이었다 <span class="badge ok">확인</span> — 같은 글.<ul>
+<li>테이블을 끝까지 고정하고 3 epoch 학습하면 1 epoch 모델 대비 +1.25%였다.</li>
+</ul>
+</li>
+<li>채택한 방법은 첫 epoch에는 테이블을 고정하고, 다음 epoch부터 나머지 모델과 함께 학습하는 지연 갱신이다 <span class="badge ok">확인</span> — 같은 글.<ul>
+<li>10일 창에서 마지막 epoch까지 고정하면 +0.49%, 반대로 첫 epoch에만 함께 학습하고 나머지에서 고정하면 −0.80%였다.</li>
+<li>20일 창에서는 같은 방식이 +1.16%였고, 이득은 3 epoch 부근에서 포화했다.</li>
+</ul>
+</li>
+<li>프로덕션 홈피드 랭킹 모델에 여러 epoch 학습을 켜고 온라인 save +1.09%를 얻었다 <span class="badge ok">확인</span> — 같은 글.</li>
+</ul>
+<blockquote>
+<p>&quot;The modeling and system insights allowed us to enable multi-epoch training in production, leading to +1.09% online saves.&quot;
+— <a href="https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83" target="_blank" rel="noopener">Safe and Efficient Multi-Epoch Embedding Training</a> (블로그), 2026-11-06</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">새로 알게 된 것</span><span class="blk-t">그 밖의 변경</span></p></div>
+<ul>
+<li>같은 Pinterest의 광고 쪽 연구에서는 ID 임베딩 테이블이 이런 multi-epoch 하락을 보이지 않았다고 쓴다 <span class="badge ok">확인</span> — 같은 글.</li>
+<li>학습 시간 쪽에서는 분산 임베딩 조회가 전체 학습 시간의 15% 넘게 차지해, 다음 배치의 임베딩을 미리 가져오는 반동기 파이프라인을 붙였다 <span class="badge ok">확인</span> — 같은 글.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">정본 반영</span> <a href="radar.html">radar.md</a> <code>## 이번 달 신규</code>에 Pinterest 항목을 추가했다.</p></div>
+<div class="blk why"><p><span class="lbl">의미</span> 추천 랭커의 1 epoch 관행이 임베딩 테이블 때문이라는 점을 프로덕션에서 분리해 보인 사례다. 추적 서비스(X·Meta·Netflix·Reddit)가 같은 학습 일정을 쓴다는 근거는 없으므로 레이더에 둔다.</p></div>
+<h2 id="레이더">레이더</h2>
+<ul>
+<li><a href="radar.html#pinterest--%ED%99%88%ED%94%BC%EB%93%9C-%EB%9E%AD%EC%BB%A4-%EC%9E%84%EB%B2%A0%EB%94%A9%EC%9D%84-%EC%97%AC%EB%9F%AC-epoch-%ED%95%99%EC%8A%B5">Pinterest — 홈피드 랭커 임베딩을 여러 epoch 학습</a> — <a href="https://medium.com/pinterest-engineering/safe-and-efficient-multi-epoch-embedding-training-103bec2abc83" target="_blank" rel="noopener">Pinterest 블로그</a>.</li>
+<li>arXiv cs.IR 응답 30건은 모두 2026-11-04~05 제출로, 이전 실행에서 이미 triage한 묶음이다. 새로 통과한 것은 없다.</li>
+</ul>
+<h2 id="다음에-볼-것">다음에 볼 것</h2>
+<div class="next"><ul>
+<li>Reddit RSS 종료(2026-11-13) — 그 뒤 r/RedditEng 조회를 WebSearch 대체 경로로 바꿔야 한다.</li>
+<li>research.netflix.com/publications — 이틀 이상 HTTP 404라 대체 목록 경로를 찾아야 한다.</li>
+</ul>
+<p>조회 실패: ai.meta.com/blog — 목록이 2026-07 글까지만 보여 최근 글을 확인하지 못했다
+조회 실패: research.netflix.com/publications — 페이지가 HTTP 404를 돌려줬다</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="이전·다음 리포트"><a class="pg-prev" href="daily-2026-11-08.html" rel="prev"><span class="pg-k">← 이전 리포트</span><span class="pg-v mono">2026-11-08</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">댓글</h2>
+<button type="button" class="btn" id="load-comments">댓글 보기 (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-09.html" data-title="일일 리포트 2026-11-09"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
