@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-13 — feed-research</title>
+<meta name="description" content="In one line: X stopped applying the rules that drop DoNotAmplify and malicious-URL-label posts from recommendation surfaces to the author's followers.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-13.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-13.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-13.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-13.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-13 — feed-research">
+<meta property="og:description" content="In one line: X stopped applying the rules that drop DoNotAmplify and malicious-URL-label posts from recommendation surfaces to the author's followers.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-13.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-13.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-13">2026-11-13</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>7 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-13.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X stopped applying the rules that drop DoNotAmplify and malicious-URL-label posts from recommendation surfaces to the author&#39;s followers.</div>
+</div>
+<div class="prose">
+<h2 id="1-followers-no-longer-fall-under-the-label-post-drop-rules--x"><span class="num">1</span>Followers no longer fall under the label-post drop rules — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/cec61682937a4899360a340acba9e9b9bb8f43e3" target="_blank" rel="noopener">xai-org/x-algorithm@cec6168</a> — xAI, 2026-11-12, code. In these notes&#39; numbering, this is Gen4+62. Gen4+N is the number these notes assign, in order, to commits after the Gen4 release (2026-08-13).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X&#39;s For You (the home feed the algorithm picks) mixes in posts from accounts the user does not follow, that is, OON (out-of-network) candidates. For these recommendation candidates, VF (visibility filtering, a rule engine that drops or hides posts based on safety labels and relationships) applies a stricter rule set than for the Following feed. That set contained rules that drop posts carrying a DoNotAmplify (an internal safety label meaning &quot;do not amplify&quot;) or malicious-URL label, and they applied to everyone except the author. This commit narrows the audience of these two rules to &quot;viewers who do not follow the author&quot; and cleans up several experiment mechanisms in the home feed and training code.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The DoNotAmplify and malicious-URL drop rules no longer apply to followers</span></p></div>
+<ul>
+<li><p>The audience of the two rules changed from &quot;every viewer who is not the author&quot; to &quot;viewers who do not follow the author&quot; <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs:930-942</code></a>.</p>
+<ul>
+<li>The field change replaces <code>audience: NonAuthors</code> with <code>audience: NonFollowers</code>.</li>
+<li>The existing rule <code>RISKY_HIGH_VIZ_REPLY_OON_DROP_UNSPECIFIED</code> in the same set was already <code>NonFollowers</code>.</li>
+</ul>
+</li>
+<li><p>The two rules sit in the OON rule set of two safety levels for recommendation surfaces <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/visibility-filtering/rules/levels.rs" target="_blank" rel="noopener"><code>rules/levels.rs:195-200</code></a>.</p>
+<ul>
+<li>The set is named <code>OON_POST_DROPS</code>, and <code>TIMELINE_HOME_RECOMMENDATIONS</code> and <code>IMMERSIVE_EXPANDED_RECOMMENDATIONS</code> use it.</li>
+<li>The spam high-recall (<code>SPAM_HIGH_RECALL</code>) rule and the Brazil election rule in the same set did not change.</li>
+</ul>
+</li>
+<li><p>The golden corpus (a test table collecting the expected verdict for each input) that pins the expected verdicts also changed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/visibility-filtering/rules/golden_corpus/oon_tweet_label.rs" target="_blank" rel="noopener"><code>rules/golden_corpus/oon_tweet_label.rs</code></a>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">Role::each([Role::NonFollower, Role::LoggedOut]) =&gt; dropped(PossiblyUndesirable, &quot;malicious_url/drop/undesirable&quot;),
+Role::each([Role::Follower, Role::Author])       =&gt; allow(),
+</code></pre></figure>
+</li>
+<li><p>If the follow-relationship lookup fails, the rules also apply to followers <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/visibility-filtering/rules/rule_spec/laws.rs" target="_blank" rel="noopener"><code>rules/rule_spec/laws.rs</code></a>.</p>
+<ul>
+<li>This lookup is registered as best-effort (a lookup that does not stop the request when it fails). The registration comment states that the failure default drops the post even for actual followers.</li>
+</ul>
+</li>
+<li><p>In the home feed, the case actually affected is when a post from a followed author is judged at a recommendation level <span class="badge est">inferred</span>.</p>
+<ul>
+<li>The basis is that an OON candidate is by definition a post from an author the user does not follow. The canon records a rule that uses a stricter level for ancestor and quoted posts, but whether it was kept in Gen4 is an open question.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The shuffled-history retrieval source added a day earlier was deleted</span></p></div>
+<ul>
+<li>The source that shuffled the order of the user history and called Phoenix (X&#39;s Transformer-based retrieval and ranking model) retrieval one more time was removed together with its switch <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/cec61682937a4899360a340acba9e9b9bb8f43e3" target="_blank" rel="noopener">commit diff</a>.<ul>
+<li>The deleted items are <code>home-mixer/sources/shuffled_history_phoenix_source.rs</code>, the parameter <code>EnableShuffledHistoryRetrieval</code>, and a statistics function per served type.</li>
+<li>This source was introduced as off by default in the 2026-11-10 commit (660cd74, Gen4+60) and was never on by default.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The dismissal record of the Grok suggested-task card moved to a per-user store</span></p></div>
+<ul>
+<li>When the card is served or the user closes it, the card is not inserted again for 6 hours by default, counted from that time <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/home-mixer/frames/catalog.rs" target="_blank" rel="noopener"><code>home-mixer/frames/catalog.rs:236-249</code></a>.<ul>
+<li>Previously only the last impression time in the served history was checked. Now the expiry times of two keys, <code>home.grokbot_suggested_tasks.served</code> and <code>home.grokbot_suggested_tasks</code>, are stored in and read from Strato (X&#39;s internal data service).</li>
+<li>The impression record is written only in production, by a new side effect <code>FrameDismissalSideEffect</code>.</li>
+</ul>
+</li>
+<li>A request whose dismissal record could not be read does not get the card <span class="badge ok">verified</span> — same file.<ul>
+<li>If <code>frame_dismissals</code> is <code>None</code>, <code>is_none_or</code> yields a hidden verdict. The test is named <code>grokbot_suggested_tasks_frame_is_hidden_when_its_dismissal_could_not_be_read</code>.</li>
+</ul>
+</li>
+<li>The card height constant changed from 0 to 433 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/home-mixer/frames/catalog.rs" target="_blank" rel="noopener"><code>catalog.rs:87</code></a>. The card switch is still off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1252-1257</code></a>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Phoenix training gained an option, off by default, that drops history right before the request</span></p></div>
+<ul>
+<li>An option was added that drops, at a set rate, history rows inside a window right before the request in each training batch <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/phoenix/xrex/train/trainer_recsys.py" target="_blank" rel="noopener"><code>phoenix/xrex/train/trainer_recsys.py</code></a>.<ul>
+<li>The defaults are <code>recent_history_dropout_rate=0.0</code> and <code>recent_history_dropout_window_secs=900</code>.</li>
+<li>Rows with any of 10 explicit negative actions, such as report, not interested, show less, unfollow, block and mute, are not dropped. The list is <code>EXPLICIT_NEGATIVE_ACTIONS</code> in <code>constants.py</code>.</li>
+<li>The number of history rows per user in the 15-minute, 30-minute, 1-hour, 2-hour and 1-day windows is logged as a training metric.</li>
+</ul>
+</li>
+<li>The shared serving-side crate also gained the same handling function, but no public code calls it <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/phoenix/crates/common/xai-recsys/src/util.rs" target="_blank" rel="noopener"><code>phoenix/crates/common/xai-recsys/src/util.rs</code></a>.<ul>
+<li>The function is named <code>InputBuffer::drop_recent_history</code>.</li>
+</ul>
+</li>
+<li>We infer it is a device to simulate in training the situation where the newest part of the history arrives late at serving time <span class="badge est">inferred</span>. The basis is that the rows to drop are limited to those right before the request and negative signals are kept.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>An index event <code>ai_video_model</code> was added that collects immersive videos the content understanding model annotated as AI-generated. No serving request looks it up <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/phoenix-rankall-strato/columns/phoenix_rank_all/phoenixRankAllCandidateProcessor.strato" target="_blank" rel="noopener"><code>phoenixRankAllCandidateProcessor.strato:383-423</code></a>.</li>
+<li>A device orientation (portrait or landscape) field was added to the client context of Phoenix requests, and <code>IMMERSIVE_LONG_DWELL_GALLERY_3S</code> to the history aggregation kinds <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a>.</li>
+<li><code>Experiment29Fou:0.3</code> and <code>Experiment12Fou:0</code> were added to the shadow traffic (a path that sends only scoring to an experiment cluster and leaves the results only in logs) ratios <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:93-108</code></a>.</li>
+<li>The extra candidate selection of the video carousel (a group of vertical videos inside For You, off by default) now copies candidates instead of moving them. The selection result is the same <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/home-mixer/util/video_carousel.rs" target="_blank" rel="noopener"><code>util/video_carousel.rs</code></a>.</li>
+<li>A flag that keeps retrieval candidates only in debug requests, a shared dedup filter, and a 3,000-candidate benchmark test were added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/cec61682937a4899360a340acba9e9b9bb8f43e3" target="_blank" rel="noopener">commit diff</a>.</li>
+<li>VF also includes notification surface rule changes. A spam high-recall OON rule was added for media-tag notifications, and the quote, contact-sign-up and list-add notification kinds were added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/cec61682937a4899360a340acba9e9b9bb8f43e3/visibility-filtering/rules/levels.rs" target="_blank" rel="noopener"><code>rules/levels.rs</code></a>.</li>
+<li>The VF hydration layer and safety label cache code are mostly refactor. Small behavior differences are mixed in, such as a change that treats an account with a future creation time as a new account <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/cec61682937a4899360a340acba9e9b9bb8f43e3" target="_blank" rel="noopener">commit diff</a>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a> <code>## Summary</code>, the reference commit was raised to cec6168. The Grok suggested-task card sub-bullet in <code>## Feed surfaces</code> was revised to reflect the dismissal approach. In the <code>## Candidate generation (retrieval)</code> source table, the shuffled-history source row was removed and the detail bullet was changed to state the deletion. Under the <code>TimelineHomeRecommendations</code> bullet in the safety section, the change to the audience of the DoNotAmplify and malicious-URL rules was added. The option to drop recent history was added to the Phoenix training section, and the AI video model index to the retrieval index section. A Gen4+62 row was added to the verification reference and reference sha table and the change log summary table in <code>## Sources</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X moved toward making the follow relationship an exception in label drop rules on recommendation surfaces. The basis is that the RiskyHighVizReply rule in the same set already excluded followers, and the two rules are now aligned to the same audience. The home feed changes are all cleanups of off-by-default features, so For You behavior does not change now.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>A full review of the VF notification rules and hydration behavior differences — the VF diff in this commit is about 15,000 lines, so only part of the policy changes was checked. Needs a deep dive.</li>
+<li>Whether the rule that uses a stricter level for ancestor and quoted posts is still kept in Gen4 — where the follower exception actually takes effect in the home feed depends on this answer. <span class="badge est">inferred</span> Unresolved.</li>
+<li>The training config that turns on the recent-history drop option and the serving-side call — currently the default is 0.0 and there is no call.</li>
+<li>The r/RedditEng RSS lookup was fine as of today (25 items). If the 2026-11-13 closure notice holds, it may fail from the next lookup.</li>
+<li>The other sources checked today had no new feed or recommendation material. The only new r/RedditEng posts were infrastructure posts (workload identity and mTLS), and Meta Engineering, Netflix Tech Blog, the redditinc.com newsroom and the SEC filing list also had nothing new. Of the 30 arXiv cs.IR items, none newly passed.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-12.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-12</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-13.html" data-title="일일 리포트 2026-11-13"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>

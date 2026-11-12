@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-12 — feed-research</title>
+<meta name="description" content="In one line: X turned on by default a rule that removes MediumRisk posts and videos seen in the last 3 days from For You video carousel candidates. The…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-12.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-12.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-12.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-12.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-12 — feed-research">
+<meta property="og:description" content="In one line: X turned on by default a rule that removes MediumRisk posts and videos seen in the last 3 days from For You video carousel candidates. The…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-12.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-12.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-12">2026-11-12</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>8 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-12.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X turned on by default a rule that removes MediumRisk posts and videos seen in the last 3 days from For You video carousel candidates. The carousel itself is still off by default.</div>
+</div>
+<div class="prose">
+<h2 id="1-two-safety-and-dedup-rules-for-the-video-carousel-are-now-on-by-default--x"><span class="num">1</span>Two safety and dedup rules for the video carousel are now on by default — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/f06f45adc05578198e672db6c563a0435e7232dd" target="_blank" rel="noopener">xai-org/x-algorithm@f06f45a</a> — xAI, 2026-11-11, code. In these notes&#39; numbering, this is Gen4+Gen61.4 release 2026-08-13: the number these notes gave, in sequence, to xai-org/x-algorithm commits after it).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You (the algorithmic recommendation feed) has had a carousel, off by default since 2026-10-08, that bundles 3–5 vertical videos into the sixth slot of the feed. Later commits have defined, one rule at a time, which videos must not go in before the carousel is turned on, and have set the defaults. Excluding HighRisk brand safety (a rating that judges whether content is something advertisers do not want beside their ads) has been on by default since 10-31, while MediumRisk exclusion and the 3-day watch exclusion existed only as off by default. This commit turns both rules on by default and adds three new mechanisms to the carousel and the Home feed, all off by default.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Carousel candidate rules now have HighRisk exclusion, MediumRisk exclusion and 3-day watch exclusion all on by default</span></p></div>
+<ul>
+<li>The default of the switch that removes posts with a brand safety MediumRisk verdict from carousel candidates changed from false to true <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1354-1359</code></a>.<ul>
+<li>The switch is named <code>rust_home_mixer_enable_video_carousel_medium_risk_filter</code> and was introduced as off by default in the 2026-11-03 commit (Gen4+55).</li>
+<li>The filter code removes a post with no verdict if either the HighRisk exclusion or the MediumRisk exclusion is on. So the handling of posts with no verdict is the same as before.</li>
+</ul>
+</li>
+<li>The filter that does not re-insert videos seen through the carousel in the last 3 days is also on by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1360-1365</code></a>.<ul>
+<li>The switch is named <code>rust_home_mixer_enable_video_carousel_seen_filter</code> and was introduced as off by default in the 2026-11-06 commit (Gen4+58). The seen record is read from a per-user Redis.</li>
+</ul>
+</li>
+<li>The switch that turns on the carousel itself is still off by default in this commit <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1282-1287</code></a>.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A path for the carousel to take videos from lower in the main feed is introduced, off by default</span></p></div>
+<ul>
+<li><p>With the switch on, the carousel candidate pool starts from main feed posts below the carousel slot, and videos picked for the carousel are removed from the main feed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/filters/video_carousel_filter.rs" target="_blank" rel="noopener"><code>filters/video_carousel_filter.rs</code></a>.</p>
+<ul>
+<li>Until now the candidate pool was posts beyond the main feed result size (<code>RESULT_SIZE</code>) plus carousel-only extra candidates. When the switch is on, the starting point becomes <code>VideoCarouselPosition − 1</code> (default 5).</li>
+<li>When removing from the main feed, a post counts as the same video if any one of the tweet ID, the video media ID or the MD5 hash matches the carousel video — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/util/video_carousel.rs" target="_blank" rel="noopener"><code>util/video_carousel.rs</code></a>.</li>
+<li>The switch is named <code>rust_home_mixer_enable_video_carousel_take_from_feed</code> and defaults to false — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1366-1371</code></a>.</li>
+</ul>
+</li>
+<li><p>The test pins that the 11th video in the main feed moves to the carousel and that the 21st post, which uses the same media, is also removed from the main feed <span class="badge ok">verified</span> — same file.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">assert_eq!(ids(query.video_carousel.get().unwrap()), [11, 101, 102, 103, 104]);
+assert_eq!(kept[..5], [1, 2, 3, 4, 5]);
+assert!(!kept.contains(&amp;11) &amp;&amp; !kept.contains(&amp;21));
+</code></pre></figure>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A path that puts a Grok suggested-tasks card in the third slot of the For You Home is introduced, off by default</span></p></div>
+<ul>
+<li>A Grok suggested-tasks card was added to the frame list (frames are non-post cards inserted between feed items, such as sports cards), and its slot is third in the Home feed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/frames/catalog.rs" target="_blank" rel="noopener"><code>frames/catalog.rs</code></a>.<ul>
+<li>The path is <code>/grokbot/suggested_tasks</code>; until now frames existed only on soccer, NFL and MLB topic timelines.</li>
+<li>The card appears only in the first response, not in new-post check requests (polling) or in requests that scroll down for more. The user cannot dismiss it.</li>
+<li>It does not appear in Topic requests or in the Following feed.</li>
+</ul>
+</li>
+<li>After the card has been shown once, it reappears only after the fatigue time (default 6 hours) has passed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1256-1267</code></a>.<ul>
+<li>The switches are <code>rust_home_mixer_jetfuel_frame_grokbot_suggested_tasks_enabled</code> (default false) and <code>..._fatigue_hours</code> (default 6).</li>
+<li>The card content is received directly by viewer ID from a Jetfuel client (Jetfuel is an internal service that returns the rendered content of frame cards), not from Strato — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/sources/jetfuel_direct_frame_source.rs" target="_blank" rel="noopener"><code>sources/jetfuel_direct_frame_source.rs</code></a>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. A path that sends the viewer&#39;s recently viewed posts and candidate topics to VMRanker is introduced, off by default</span></p></div>
+<ul>
+<li>When on, up to 64 posts the viewer recently viewed are chosen in order of impression time and attached, together with topics, to the VMRanker (slate reordering service) request <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/query_hydrators/recent_views_query_hydrator.rs" target="_blank" rel="noopener"><code>query_hydrators/recent_views_query_hydrator.rs</code></a>.<ul>
+<li>For each viewed post it sends the impression time, surface, action type bits and dwell time (ms). The history is received as an aggregation type that includes recent impressions (<code>DENSE_WITH_RECENT_IMPRESSIONS</code>), up to 256 rows.</li>
+<li>It does not run for Following requests or Topic requests.</li>
+</ul>
+</li>
+<li>On the candidate side, the topics of up to 200 top candidates by local weighted-sum score are looked up within 80ms and attached to each candidate <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>scorers/vm_ranker.rs</code></a>.<ul>
+<li>The switch is <code>rust_home_mixer_vm_ranker_send_post_topics</code> (default false), and the caps are <code>PostTopicsMaxCandidates = 200</code>, <code>PostTopicsTimeoutMs = 80</code> and <code>RecentViewsRows = 64</code> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:385-414</code></a>.</li>
+<li>If the lookup times out, the request is sent without topics.</li>
+</ul>
+</li>
+<li>How VMRanker uses these values is again not in the public code <span class="badge ok">verified</span>. We infer this is preparation for testing a diversity objective that compares the &quot;just viewed&quot; topics with candidate topics <span class="badge est">inferred</span>. The basis is that it uses the same experiment payload path as the history topic sending in the 10-20 commit.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>The safety label cache, which after filling re-read the repository twice at 30 and 90 seconds, now reads it once at 60 seconds, and a metric counts whether the re-read result changed <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/safety-label-source/dragonfly.rs" target="_blank" rel="noopener"><code>safety-label-source/dragonfly.rs</code></a>.<ul>
+<li>The default retention time for a no-label result (<code>not_found_ttl</code>) increased from 10 minutes to 1 hour.</li>
+</ul>
+</li>
+<li>A post label action was added to the action settings of abuse-enforcement-service (a service that takes account and post actions based on model scores), and the selectable labels are NsfwHighPrecision and SoftNsfw <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/abuse-enforcement-service/types/src/action_control.rs" target="_blank" rel="noopener"><code>types/src/action_control.rs</code></a>.</li>
+<li>Experiment20Fou was removed from the shadow traffic targets (a path that sends only scoring to an experimental Phoenix cluster and is not used for serving), and Experiment24~28Fou were added at a 0.3 ratio each <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:91-106</code></a>.</li>
+<li>The TwHIN post and video embedding streaming job first filters for only like and video quality view (VQV) events, then writes to two paths. The action types each path receives are unchanged, so the result is the same <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/simclusters/simclusters_v2/summingbird/storm/TwhinTweetJob.scala" target="_blank" rel="noopener"><code>TwhinTweetJob.scala</code></a>.</li>
+<li>Several filters were changed to use the same split helper, and topic annotation decoding was moved to a shared util. There is no policy change <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/f06f45adc05578198e672db6c563a0435e7232dd" target="_blank" rel="noopener">commit diff</a>.</li>
+<li>Two unused history aggregation types (33, 35) were changed to reserved numbers in the proto, and a few help-link constants in the VF client were deleted <span class="badge ok">verified</span> — same diff.</li>
+<li>The last sync time of the parameter mirror is 2026-11-10T16:00:31Z <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/f06f45adc05578198e672db6c563a0435e7232dd/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1</code></a>.</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> The reference commit in <code>## Summary</code> was raised to f06f45a (Gen4+61). A sentence saying the two carousel rules are on by default was added to the <code>## Feed surfaces</code> introduction. The 3-day watch filter bullet in the carousel item was changed to on by default, and a bullet on taking videos from the main feed and a bullet on the Grok suggested-tasks card were added. The carousel MediumRisk bullet in the &quot;Final placement&quot; section was changed to on by default. A sub-bullet on recently viewed post topics was added under the VMRanker history topic bullet in the diversity section. A bullet on the label cache re-read and a bullet on the abuse-enforcement-service post label action were added to the safety section. A row for f06f45a was added to the table of lookup points in time and reference SHAs in <code>## Sources</code>, and a row for Gen4+61 was added to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The carousel is still off by default, but the safety and watch rules that will apply once it is on are now all on by default. The basis is that the HighRisk (10-31), MediumRisk and 3-day watch (this commit) exclusions became defaults in turn. We take the new path that takes videos from the main feed to come from a judgment that the carousel candidate pool is short, but the code gives no reason, so we leave it as an inference <span class="badge est">inferred</span>.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Whether the carousel itself (<code>EnableVideoCarousel</code>) becomes on by default — the defaults of nearly all carousel rules are now settled, so the next step may be turning it on <span class="badge est">inferred</span>.</li>
+<li>Where VMRanker uses the recently viewed post topics — the public code has no usage, so look at it together with the VMRanker history topic question in the x.md open questions.</li>
+<li>Read Meta Engineering&#39;s post on compute allocation for ads delivery, <a href="https://engineering.fb.com/2026/11/11/ml-applications/intelligent-delivery-serve-better-ads/" target="_blank" rel="noopener">Intelligent Delivery</a> (2026-11-11, blog post). It covers only compute allocation per ads request and not organic feed ranking, so it was not folded into the canon. Whether the idea of setting the number of candidates per ads ranking stage for each request fits topics is for a person to decide.</li>
+<li>Of 30 arXiv cs.IR responses, 14 submitted on 2026-11-10 were newly seen and 0 passed. A paper that predicts the results of recommendation model A/B experiments in advance with a scaling law (<a href="https://arxiv.org/abs/2611.13539" target="_blank" rel="noopener">arXiv 2611.13539</a>) was rejected because its abstract has no affiliation or production results.</li>
+<li>r/RedditEng, Netflix Tech Blog, the redditinc.com newsroom and the SEC filing list had no new recommendation-related sources. Reddit announced it will end RSS support on 2026-11-13, so tomorrow&#39;s lookup approach may change.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-11.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-11</span></a><a class="pg-next" href="daily-2026-11-13.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-11-13</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-12.html" data-title="일일 리포트 2026-11-12"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
