@@ -46,12 +46,11 @@
 <h1 id="reddit">Reddit</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">Updated</span><time datetime="2026-11-01">2026-11-01</time></li>
+<li><span class="meta-k">Updated</span><time datetime="2026-11-16">2026-11-16</time></li>
 <li><span class="meta-k">Translated from</span><a href="../reddit.html" hreflang="ko">Korean</a></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc toc-long"><summary>Contents<span class="toc-n">12</span></summary><ol><li><a href="#summary">Summary</a></li><li><a href="#feed-surfaces">Feed surfaces</a><ol><li><a href="#for-you-and-following">For You and Following</a></li><li><a href="#comment-sorting">Comment sorting</a></li></ol></li><li><a href="#candidate-generation-retrieval">Candidate generation (retrieval)</a><ol><li><a href="#home-feed-candidates">Home feed candidates</a></li><li><a href="#snoorec">SnooRec</a></li><li><a href="#notification-candidates">Notification candidates</a></li><li><a href="#community-recommendations">Community recommendations</a></li></ol></li><li><a href="#ranking">Ranking</a><ol><li><a href="#home-feed-ranker">Home feed ranker</a></li><li><a href="#personalization-inputs">Personalization inputs</a></li><li><a href="#notification-ranking-and-send-volume">Notification ranking and send volume</a></li><li><a href="#breaking-news-push-and-trending-verdict">Breaking-news push and trending verdict</a></li></ol></li><li><a href="#re-ranking-diversity-and-filters">Re-ranking, diversity, and filters</a><ol><li><a href="#home-feed-filters-and-diversity">Home feed filters and diversity</a></li><li><a href="#notification-re-ranking-and-snoorec-exploration">Notification re-ranking and SnooRec exploration</a></li></ol></li><li><a href="#cold-start">Cold start</a><ol><li><a href="#new-users">New users</a></li><li><a href="#logged-out-users">Logged-out users</a></li></ol></li><li><a href="#feedback-signals">Feedback signals</a><ol><li><a href="#explicit-signals-and-controls">Explicit signals and controls</a></li><li><a href="#dwell-and-implicit-signals">Dwell and implicit signals</a></li></ol></li><li><a href="#ads">Ads</a><ol><li><a href="#ads-funnel">Ads funnel</a></li><li><a href="#filings-and-automated-campaigns">Filings and automated campaigns</a></li></ol></li><li><a href="#infrastructure-and-platform">Infrastructure and platform</a><ol><li><a href="#ranking-platform">Ranking Platform</a></li><li><a href="#model-serving-and-vector-search">Model serving and vector search</a></li><li><a href="#points-of-contact-with-search-ranking">Points of contact with search ranking</a></li><li><a href="#regulation-and-experiments">Regulation and experiments</a></li></ol></li><li><a href="#history">History</a><ol><li><a href="#public-code-and-archive">Public code and archive</a></li><li><a href="#sort-formulas-in-the-2017-code">Sort formulas in the 2017 code</a></li><li><a href="#home-composition-and-recommendations-in-the-2017-code">Home composition and recommendations in the 2017 code</a></li><li><a href="#listing-storage-structure-in-2017">Listing storage structure in 2017</a></li><li><a href="#the-move-to-personalization">The move to personalization</a></li></ol></li><li><a href="#open-questions">Open questions</a></li><li><a href="#sources">Sources</a><ol><li><a href="#reddit-engineering-blog-rredditeng">Reddit engineering blog (r/RedditEng)</a></li><li><a href="#ads-engineering-blog-rredditeng">Ads engineering blog (r/RedditEng)</a></li><li><a href="#public-source-code">Public source code</a></li><li><a href="#rchangelog-rblog-old-official-blog-wayback-copies">r/changelog, r/blog, old official blog (Wayback copies)</a></li><li><a href="#help-center-supportreddithelpcom-businessreddithelpcom">Help Center (support.reddithelp.com, business.reddithelp.com)</a></li><li><a href="#reddit-newsroom-redditinccom">Reddit newsroom (redditinc.com)</a></li><li><a href="#regulatory-filings-sec-edgar">Regulatory filings (SEC EDGAR)</a></li><li><a href="#eu-regulation">EU regulation</a></li><li><a href="#talks">Talks</a></li></ol></li></ol></details></nav>
 <div class="prose">
-<p class="warn">⚠ The Korean original has changed since this translation (translated 2026-11-01). <a href="../reddit.html" hreflang="ko">Read the Korean original</a> for the latest version.</p>
 <h2 id="summary">Summary</h2>
 <p>As of the 2026-10-28 revision, the Reddit help page describes home feed recommendation in four stages: candidate generation, filters, prediction-model scoring, and diversity-aware ordering <span class="badge ok">verified</span>(<a href="#candidate-generation-retrieval">candidate generation section</a>, <a href="#home-feed-filters-and-diversity">home feed filter section</a>). As of the 2026-09 engineering post, candidate generation includes SnooRec, a multi-task two-tower model (a structure that embeds users and posts separately and matches them) shared by the home feed and notifications, but the home ranker&#39;s current prediction targets and weights are not public <span class="badge obs">observed</span> 2026-11-01(<a href="#ranking">ranking section</a>). Sort formulas such as Hot and comment Best (confidence) are confirmed only in the 2017 published code, and the ranking approaches of the home feed Best introduced in 2018-01 and of For You and Following announced on 2026-10-28 are not public <span class="badge obs">observed</span> 2026-11-01(<a href="#history">history section</a>, <a href="#for-you-and-following">For You and Following section</a>).</p>
 <figure class="diagram" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 628" font-family="-apple-system, 'Apple SD Gothic Neo', 'Segoe UI', sans-serif" role="img" aria-label="Reddit home feed pipeline diagram (disclosure scope marked)">
@@ -127,7 +126,7 @@
 <figcaption>Reddit home feed pipeline (disclosure scope marked)</figcaption></figure>
 <p class="totop"><a href="#toc">↑ Contents</a></p>
 <h2 id="feed-surfaces">Feed surfaces</h2>
-<p>As of the 2026-10-28 help page, the default feed for logged-in users is the home feed, which mixes posts from joined communities with recommendations in a personalized order, and the default feed for logged-out users is Popular, chosen by net upvotes <span class="badge ok">verified</span> (table below). On 2026-10-28 Reddit announced a new feed experience in which users choose between two feeds, For You and Following, rolling out worldwide over several weeks <span class="badge ok">verified</span> (<a href="#for-you-and-following">For You and Following section</a>). r/all was retired effective 2026-04-02 and redirects to the home feed <span class="badge ok">verified</span> (table below).</p>
+<p>As of the 2026-10-28 help page, the default feed for logged-in users is the home feed, which mixes posts from joined communities with recommendations in a personalized order, and the default feed for logged-out users is Popular, chosen by net upvotes <span class="badge ok">verified</span> (table below). On 2026-10-28 Reddit announced a new feed experience in which users choose between For You and Following, and as of the 2026-11-10 change log, the rollout started in all regions on 2026-10-27 <span class="badge ok">verified</span> (<a href="#for-you-and-following">For You and Following section</a>). r/all was retired effective 2026-04-02 and redirects to the home feed <span class="badge ok">verified</span> (table below).</p>
 <div class="tablewrap" tabindex="0" role="region" aria-label="Table"><table>
 <thead>
 <tr>
@@ -152,8 +151,8 @@
 <tr>
 <td>Following</td>
 <td>Posts from joined communities</td>
-<td>Not public</td>
-<td>Newsroom <span class="nw">2026-10-28</span></td>
+<td>Not public by default. Some users choose Hot, Top, Best, or New on web</td>
+<td>Newsroom <span class="nw">2026-10-28</span>, change log <span class="nw">2026-11-10</span></td>
 </tr>
 <tr>
 <td>Popular (logged-out default)</td>
@@ -243,9 +242,33 @@
 <li><p>The description of splitting the home feed in two is in the Help Center change log, and this experiment reopened to a small number of users from 2026-09-02 <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/53416317564820-Changelog-September-10-2026" target="_blank" rel="noopener">Change log 2026-09-10</a>.</p>
 <ul>
 <li>The change log says only that there was a first experiment and does not give when.</li>
-<li>The change log says Following also includes posts from users you follow, which differs from the newsroom definition (only posts from joined communities).</li>
+<li>This change log said Following also includes posts from users you follow. The 2026-11-10 change log says only posts from joined communities, as the newsroom does.</li>
 <li>The 2026-10-08 change log said this experiment is testing swiping and sorting options <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">Change log 2026-10-08</a>.</li>
 </ul>
+</li>
+<li><p>As of the 2026-11-10 change log, the rollout started on 2026-10-27 for users in all regions on iOS, Android, and reddit.com <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/55472297340308-Changelog-November-10-2026" target="_blank" rel="noopener">Change log 2026-11-10</a>.</p>
+<ul>
+<li>It says Following shows only posts from joined communities, the same as the newsroom definition.</li>
+<li>It also opens an experiment renaming the For You tab to Discover or Explore.</li>
+</ul>
+<blockquote>
+<p>&quot;Following will only show you content from communities that you have joined.&quot;
+— <a href="https://support.reddithelp.com/hc/en-us/articles/55472297340308-Changelog-November-10-2026" target="_blank" rel="noopener">Changelog - November 10, 2026</a>, 2026-11-10</p>
+</blockquote>
+</li>
+<li><p>As of the same change log, some users can choose Hot, Top, Best, and New sorting directly in Following on desktop and mobile web <span class="badge ok">verified</span> — same change log.</p>
+<ul>
+<li>It does not say what the default sort is or whether For You also gets a sort choice.</li>
+</ul>
+</li>
+<li><p>The same change log said it opens an experiment, starting 2026-10-27, that shows Popular as a tab next to Following for a small number of users on iOS and Android <span class="badge ok">verified</span> — same change log.</p>
+</li>
+<li><p>A carousel for swiping horizontally through recommended videos inside the home feed is being tested on iOS and Android <span class="badge ok">verified</span> — same change log.</p>
+<ul>
+<li>It does not say how the videos for the carousel are chosen.</li>
+</ul>
+</li>
+<li><p>A test that adds topic filters such as Business, Technology, and Sports above the News feed has also started <span class="badge ok">verified</span> — same change log.</p>
 </li>
 <li><p>The body of the recommendations help page revised on 2026-10-28 does not mention For You or Following <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/23511859482388-Reddit-s-Approach-to-Content-Recommendations" target="_blank" rel="noopener">Recommendations help page 2026</a>.</p>
 </li>
@@ -595,6 +618,7 @@
 <li><p>The CEO letter in the Q3 2026 shareholder letter announced the shift to a logged-in-only experience and said full testing begins in select markets outside the U.S. in 2026 Q4 <span class="badge ok">verified</span> — <a href="https://www.sec.gov/Archives/edgar/data/1713445/000171344526000114/exhibit992q326.htm" target="_blank" rel="noopener">Q3 2026 shareholder letter</a>.</p>
 <ul>
 <li>It did not name the markets, and the test results will be used to design the global logged-in-only version.</li>
+<li>The 2026-11-10 change log said this test starts in November and encourages logged-out visitors in those markets to log in, sign up, or use the app <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/55472297340308-Changelog-November-10-2026" target="_blank" rel="noopener">Change log 2026-11-10</a>.</li>
 <li>The CEO gave as business reasons the growth in ad-targeting signals and generally higher engagement when users are logged in.</li>
 </ul>
 <blockquote>
@@ -1193,8 +1217,9 @@
 <ol>
 <li><strong>What does the home feed ranker currently predict, and how does it combine the predictions?</strong> The 2021-06 r/blog post said Best predicts probabilities of view, subscribe and unsubscribe, comment, upvote and downvote, and watch, and samples posts by weight from the combined score <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>. We found no source disclosing the home ranker&#39;s prediction targets, weights, or objective function after that <span class="badge obs">observed</span> 2026-11-01. The SnooRec post also does not say whether its good visit (dwell over 15 seconds) is the home ranker&#39;s label <span class="badge ok">verified</span> — <a href="https://www.reddit.com/r/RedditEng/comments/1wh9mz7/snoorec_a_shared_retrieval_foundation_for_reddit/" target="_blank" rel="noopener">SnooRec blog 2026</a>.</li>
 <li><strong>What are the home feed&#39;s retrieval sources and per-stage candidate counts now?</strong> The 2021-06 r/blog post said candidates are collected from posts of the past 24 hours, from subscriptions, similar communities, onboarding categories, recently visited communities, and popular and regionally popular posts <span class="badge ok">verified</span> — <a href="http://web.archive.org/web/20250328090626/https://old.reddit.com/r/blog/comments/o5tjcn/evolving_the_best_sort_for_reddits_home_feed/" target="_blank" rel="noopener">r/blog 2021-06-22</a>. The only things released since are a 2025 post saying thousands and SnooRec, and we cannot tell what share of all sources SnooRec accounts for <span class="badge obs">observed</span> 2026-11-01.</li>
-<li><strong>How are For You and Following sorted?</strong> Official documentation does not settle it <span class="badge est">inferred</span>. The basis is that the 2026-10-28 newsroom post does not mention sorting and the 2026-10-08 change log says only that swiping and sorting options are being tested.<ul>
-<li>The newsroom post and the change log also describe differently whether Following includes posts from followed users <span class="badge ok">verified</span>.</li>
+<li><strong>How are For You and Following ordered?</strong> The default ordering of the two feeds is not set in the official documents <span class="badge est">inferred</span>. The basis is that neither the 2026-10-28 newsroom post nor the 2026-11-10 change log mentions a default sort.<ul>
+<li>As of the 2026-11-10 change log, some users can choose Hot, Top, Best, or New directly in Following on desktop and mobile web <span class="badge ok">verified</span> — <a href="https://support.reddithelp.com/hc/en-us/articles/55472297340308-Changelog-November-10-2026" target="_blank" rel="noopener">Change log 2026-11-10</a>.</li>
+<li>Only the 2026-09-10 change log said Following includes posts from users you follow; the 2026-11-10 change log says only posts from joined communities, as the newsroom does <span class="badge ok">verified</span>.</li>
 <li>It is unknown whether the home feed&#39;s Best sort remains after the overhaul <span class="badge est">inferred</span>. The basis is that the <a href="https://support.reddithelp.com/hc/en-us/articles/4402284777364-What-are-home-feed-recommendations" target="_blank" rel="noopener">home recommendations help</a> article, which explains Best, was last edited on 2026-10-05, before the overhaul announcement.</li>
 </ul>
 </li>
@@ -1266,6 +1291,7 @@
 <li><a href="https://support.reddithelp.com/hc/en-us/articles/52393330268436-Changelog-August-12-2026" target="_blank" rel="noopener">Changelog - August 12, 2026</a> — 2026, change log. X icon experiment</li>
 <li><a href="https://support.reddithelp.com/hc/en-us/articles/53416317564820-Changelog-September-10-2026" target="_blank" rel="noopener">Changelog - September 10, 2026</a> — 2026, change log. For You and Following re-experiment, accounts with incomplete verification excluded from recommendations</li>
 <li><a href="https://support.reddithelp.com/hc/en-us/articles/54353370049684-Changelog-October-8-2026" target="_blank" rel="noopener">Changelog - October 8, 2026</a> — 2026, change log. Swiping and sorting experiment, feed trending label experiment</li>
+<li><a href="https://support.reddithelp.com/hc/en-us/articles/55472297340308-Changelog-November-10-2026" target="_blank" rel="noopener">Changelog - November 10, 2026</a> — 2026, change log. For You and Following rollout, Following sort choice, Popular tab and video carousel experiments</li>
 <li><a href="https://support.reddithelp.com/hc/en-us/articles/35343974642452-Changelog-March-6-2025" target="_blank" rel="noopener">Changelog - March 6, 2025</a> — 2025, change log</li>
 <li><a href="https://support.reddithelp.com/hc/en-us/articles/360043033972-How-do-I-turn-off-trending-notifications" target="_blank" rel="noopener">How do I turn off trending notifications?</a> — 2026, help article</li>
 <li><a href="https://support.reddithelp.com/hc/en-us/articles/360062429491-Managing-your-Location-Customization-setting" target="_blank" rel="noopener">Managing your Location Customization setting</a> — 2026, help article</li>
