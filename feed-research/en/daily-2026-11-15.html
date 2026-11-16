@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-15 — feed-research</title>
+<meta name="description" content="In one line: X lowered the weight of share via copy link in the home-mixer weights mirror from 20.0 to 0.0. The vm-ranker mirror remains at 20.0.">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-15.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-15.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-15.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-15.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-15 — feed-research">
+<meta property="og:description" content="In one line: X lowered the weight of share via copy link in the home-mixer weights mirror from 20.0 to 0.0. The vm-ranker mirror remains at 20.0.">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-15.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-15.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-15">2026-11-15</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Sunday</li>
+<li><span class="meta-k">Reading time</span>8 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-15.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>1</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X lowered the weight of share via copy link in the home-mixer weights mirror from 20.0 to 0.0. The vm-ranker mirror remains at 20.0.</div>
+</div>
+<div class="prose">
+<h2 id="1-share-via-copy-link-weight-became-0-in-the-home-mixer-mirror--x"><span class="num">1</span>Share via copy link weight became 0 in the home-mixer mirror — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/590f3926e5bc33c50d9ece13953623e1e75ee595" target="_blank" rel="noopener">xai-org/x-algorithm@590f392</a> — xAI, 2026-11-13, code. In these notes&#39; numbering, this is Gen4+Gen63.4+N is the number these notes assign in order to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In X For You, Phoenix (a Grok-based Transformer ranker) predicts the probability of actions such as like, reply, and share for each candidate post, multiplies each probability by a per-action weight, and orders posts by the sum. X publishes the production defaults of these weights as a cron mirror (a script that copies the production configuration into repository code every day); since 2026-09-23 the mirror has been split into two files, one for home-mixer (the service that receives feed requests, gathers candidates, and scores them) and one for vm-ranker (a separate service that computes the weighted sum and DPP re-ranking). Until now, share via copy link was 20.0 in both mirrors, the largest of the positive weights. This commit reflects the 2026-11-12 sync, lowered this weight in the home-mixer mirror to 0.0, and added a new ordering mode to DPP, off by default.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Share via copy link no longer contributes to the score in the home-mixer mirror</span></p></div>
+<ul>
+<li>The share via copy link weight in the home-mixer mirror changed from 20.0 to 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:495-500</code></a><ul>
+<li>The parameter is <code>ShareViaCopyLinkWeight</code> (<code>rust_home_mixer_share_via_copy_link_weight</code>), and the sync time in the file header changed from 2026-11-11T16:00:37Z to 2026-11-12T16:00:36Z.</li>
+</ul>
+</li>
+<li>The same weight in the vm-ranker mirror remains at 20.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs:34-39</code></a></li>
+<li>For requests that vm-ranker answers, the local weighted sum in home-mixer is overwritten by the vm-ranker score, so 20.0 is likely still used for the main feed order <span class="badge est">inferred</span>. The basis is that the home-mixer VMRanker scorer first computes the local weighted sum and then overwrites it with the service score (<a href="x.html#phoenix-2026-current--gen4-release-update">services/x.md ranking section</a>).<ul>
+<li>The home-mixer weighted sum is used as is in paths such as the fallback score for requests where the vm-ranker call fails <span class="badge ok">verified</span> (<a href="x.html#diversity">services/x.md diversity section</a>).</li>
+<li>In the 2026-11-04 sync (Gen4+57) as well, seven weights changed first in the home-mixer mirror only. The order may be that home-mixer changes first and vm-ranker follows <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A mode where DPP suppresses candidates resembling posts higher on the page was introduced, off by default</span></p></div>
+<p>Until now, DPP (determinantal point process, a diversity technique that selects items as a set so that similar items are not picked together) chose by looking only at the top candidate set, then re-sorted the chosen candidates by score before emitting them. This commit added two options.</p>
+<ul>
+<li>An option to emit results in the order DPP picked was added. The scores are reassigned to match the ranks <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>vm-ranker/dpp.rs</code></a><ul>
+<li>The switch is <code>DppGreedyOrder</code> and its default is false (<a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs:260-271</code></a>).</li>
+<li>The ith picked candidate receives the ith highest raw score among the chosen candidates. As a result, the DPP order is preserved even if a later stage re-sorts by score.</li>
+</ul>
+</li>
+<li>The sliding-window mode suppresses candidates that resemble posts placed in the few slots directly above with a penalty that weakens with distance <span class="badge ok">verified</span> — same file.<ul>
+<li>The switches are <code>DppWindow</code> (window size; off if the default 0) and <code>DppWindowHalfDistance</code> (default 0.0).</li>
+<li>Posts emitted within the previous 10 minutes in earlier responses are used as the front of the window. The switch <code>VMRankerSendDppHistory</code>, with which home-mixer loads this history, is also false by default (up to 200 posts).</li>
+<li>The gain of a candidate is computed with the formula below, and at each slot the candidate with the largest gain is picked.</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-text" data-lang="text">gain(c) = exp(2α · score(c) / max_score) × Π_d (1 − w_d · cos²(c, post d slots above))
+w_d = 0.5^(d / half_distance)   (if half_distance = 0, w_d = 1)
+α = θ / (2(1 − θ))
+</code></pre></figure>
+<ul>
+<li>A test confirms that the window effect disappears when the history is older than 10 minutes <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/vm-ranker/scoring/dpp_model.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/dpp_model.rs</code></a><ul>
+<li>With a history from 1 minute ago the order becomes <code>[9, 5, 10]</code>, and with a history from 11 minutes ago it becomes <code>[10, 5, 9]</code>, the same as with no history.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A label that separately judges spam promoting shares was introduced</span></p></div>
+<p>The PtOS (post-level safety policy judge) path of grox (a Grok-based nearline classifier that attaches safety annotations to posts) attaches the SpamHighRecall label depending on the spam violation type. This label is read by the filter rules of recommendation surfaces.</p>
+<ul>
+<li>Spam promoting clicks, replies, and shares each became a separate policy type <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/grox/flows/ptos/state.py" target="_blank" rel="noopener"><code>grox/flows/ptos/state.py</code></a><ul>
+<li>The type names are <code>SpamPromotesClicks</code>, <code>SpamPromotesReplies</code>, and <code>SpamPromotesShares</code>.</li>
+</ul>
+</li>
+<li>Only the share-promoting type attaches SpamHighRecall, and it does not exempt high page-rank accounts (accounts with high PageRank-based trust) either <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/grox/flows/ptos/task_write_safety_post_annotations_result_sink.py" target="_blank" rel="noopener"><code>task_write_safety_post_annotations_result_sink.py</code></a><ul>
+<li>The existing types that receive the same treatment are EngagementBaiting, EngagementFarming, and CardManipulation.</li>
+<li>Click- and reply-promoting spam receives only the <code>PromotesClicks</code> and <code>PromotesReplies</code> labels without SpamHighRecall, and share-promoting spam also receives <code>PromotesShares</code>.</li>
+<li>The filter rules that read the three new labels, and the prompt changed so that the judge model emits these types, are not in this diff.</li>
+</ul>
+</li>
+<li>A test in abuse-enforcement-service (a service that takes account and post actions based on model scores) includes an example where the link-copy-bait detection head attaches SpamHighRecall <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/abuse-enforcement-service/service-lib/src/service.rs" target="_blank" rel="noopener"><code>abuse-enforcement-service/service-lib/src/service.rs</code></a><ul>
+<li>The head name is <code>CopyLinkBaitEmbeddingGrokDistilled</code>. This commit also made the label record the name of the detection head that attached it.</li>
+</ul>
+</li>
+<li>Lowering the share via copy link weight and adding the share-promoting spam verdict appear to respond to the same problem, namely posts aimed at shares exploiting the ranking <span class="badge est">inferred</span>. The basis is that both changes came in the same commit and that a link-copy-bait detection head exists.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>When a safety label lookup fails for any reason, the verdict uses the expired cached label if one exists. Previously this applied only during a label cache outage <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/safety-label-source/source.rs" target="_blank" rel="noopener"><code>safety-label-source/source.rs</code></a><ul>
+<li>The lookup is cut off 5 ms before the caller deadline, and keys that run past the time are also treated as failures and answered with the expired label.</li>
+</ul>
+</li>
+<li>For like and repost notifications on my reposts, the original post is also judged, and if the original is filtered, the notification is not sent <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/visibility-filtering/post_evaluator/notification.rs" target="_blank" rel="noopener"><code>visibility-filtering/post_evaluator/notification.rs</code></a></li>
+<li>An option was added to the Phoenix ranker that reduces the attention contribution of the most recent 15 minutes, or of the 5 most recent positive history items within 2 hours. The default multiplier is 1.0, so it is off <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a></li>
+<li>The response diversity metric gained SID (semantic ID, an id that represents a post as a hierarchical code) entropy that joins the recent 3-, 10-, and 30-minute history with the previous page <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/home-mixer/side_effects/response_diversity_stats_side_effect.rs" target="_blank" rel="noopener"><code>side_effects/response_diversity_stats_side_effect.rs</code></a><ul>
+<li>The windows overlap the 10-minute history of the DPP window mode, so this appears to be a metric for evaluating that experiment <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+<li>A flow was added that splits posts with more than 4 media items into groups of 4 and sends them to the PtOS judge. It runs only if the generator exists in the deployment config <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/grox/flows/ptos/task_safety_ptos_many_media.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_many_media.py</code></a></li>
+<li>Retrieval training dataset kinds for 1-, 2-, 7-, and 14-day windows, built from the AI video detection model results, were added to the proto <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/phoenix/python/common/xai-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a></li>
+<li>The minimum number of posts before ads start being inserted into the Following feed changed from a constant to a switch. The default is 5, the same as the previous constant <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:1031-1036</code></a></li>
+<li>A switch that specifies the list of clusters not to compress in Phoenix retrieval calls was added, with an empty list as the default <span class="badge ok">verified</span> — same file, lines 279-284.</li>
+<li>A cache was added to the AI trend feedback context lookup. It keeps entries for 5 minutes when a trend exists and 30 seconds when it does not <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/590f3926e5bc33c50d9ece13953623e1e75ee595/home-mixer/candidate_hydrators/ai_trend_feedback_context_hydrator.rs" target="_blank" rel="noopener"><code>candidate_hydrators/ai_trend_feedback_context_hydrator.rs</code></a></li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In the weights table of <a href="x.html">services/x.md</a> <code>## Ranking</code>, we corrected the share via copy link row with the values of both mirrors and the reference commit, and added one line to that section&#39;s change log list. We added a sequence option and a sliding-window bullet to the VMRanker DPP item in the <a href="x.html#diversity">diversity section</a>. In the safety section, we added an expired-label fallback bullet and, under the Labeling Rules list, a PtOS promoted-spam policy bullet. In <code>## Sources</code>, we raised the reference commit and commit count to 590f392 and 63, and added one row to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X lowered share via copy link, the largest positive weight since the 2026-08 release, to 0 in one mirror. Because the vm-ranker mirror remains at 20.0, it is not yet known whether the actual main feed order changed, so we leave it as an inference. The DPP window mode appears to prepare a shift of the goal from &quot;diversity within a set&quot; to &quot;diversity among posts seen in succession on screen&quot;, and because it is off by default, current behavior is unchanged.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Whether the vm-ranker mirror&#39;s share via copy link weight follows to 0 in the next sync — if it does, we can confirm a change in the main feed order, resolving the <span class="badge est">inferred</span> claim.</li>
+<li>research.netflix.com/publications — HTTP 404 again today. We need to find another listing address. The Netflix Tech Blog RSS had no new posts after 2026-11-09.</li>
+<li>The other sources checked today had no new feed or recommendation material. The r/RedditEng RSS responded normally (25 items) with no new posts. The only new Meta Engineering post was the Android virtual device post seen yesterday, and the redditinc.com newsroom (latest 2026-11-10) and the SEC filing list had no new material either. The 30 arXiv cs.IR responses were the same 2026-11-10–12 submissions as yesterday, so nothing new passed.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-14.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-14</span></a><a class="pg-next" href="daily-2026-11-16.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-11-16</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-15.html" data-title="일일 리포트 2026-11-15"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
