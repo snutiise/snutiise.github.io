@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-18 — feed-research</title>
+<meta name="description" content="In one line: X added a mode that combines For You scores by multiplication instead of a weighted sum, off by default. It also turned off again the DPP…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-18.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-18.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-18.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-18.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-18 — feed-research">
+<meta property="og:description" content="In one line: X added a mode that combines For You scores by multiplication instead of a weighted sum, off by default. It also turned off again the DPP…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-18.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-18.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-18">2026-11-18</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Wednesday</li>
+<li><span class="meta-k">Reading time</span>12 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-18.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>4</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X added a mode that combines For You scores by multiplication instead of a weighted sum, off by default. It also turned off again the DPP history transmission that it had turned on two days earlier.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-a-mode-that-combines-scores-by-multiplication-was-added-off-by-default--x"><span class="num">1</span>A mode that combines scores by multiplication was added, off by default — X</a></li><li><a href="#2-the-interest-layer-behind-instagram-your-algorithm-was-published-as-a-paper--instagram"><span class="num">2</span>The interest layer behind Instagram Your Algorithm was published as a paper — Instagram</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>X added, off by default, a mechanism that reduces For You ad volume by user activity level and a timeline that shows only ads to designated accounts.</li>
+<li>The Meta paper CLEAR published the natural-language interest layer behind Instagram Your Algorithm and randomized experiment results.</li>
+</ul>
+<h2 id="1-a-mode-that-combines-scores-by-multiplication-was-added-off-by-default--x"><span class="num">1</span>A mode that combines scores by multiplication was added, off by default — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/a284320" target="_blank" rel="noopener">xai-org/x-algorithm@a284320</a> — xAI, 2026-11-17, code. In the numbering these notes use, it is Gen4+65 (Gen4+N is the number these notes assigned, in order, to commits after the Gen4 release on 2026-08-13).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X&#39;s For You ranking model Phoenix (a Grok-family Transformer) outputs the probability of actions such as like, reply, and report for each candidate post. Until now, the final score was a weighted sum of these probabilities multiplied by per-action weights. In a weighted sum, a &quot;post nobody reacts to but people watch for a long time&quot; and a &quot;post that is skipped immediately but has many likes&quot; can offset each other on the same axis. This commit added, off by default, a combination mode that multiplies skip, engagement, and dwell time together.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The multiplicative score is the product of a skip term, an engagement term, and a dwell-time multiplier</span></p></div>
+<ul>
+<li><p>The new mode computes the score as &quot;degree of not being skipped × engagement value × dwell-time multiplier&quot; <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>xai-value-model/scoring.rs:75-110</code></a>.</p>
+<ul>
+<li>The engagement term is the weighted sum of all heads except the dwell and not_dwelled heads, plus the constant <code>engage_bias</code>.</li>
+<li>The skip term is <code>(P(not_dwelled) + offset)^exponent</code>. The offset does not go below 0.01.</li>
+<li>The dwell-time multiplier is <code>1 + max(cont_dwell_time weight × expected dwell seconds, 0)</code>.</li>
+</ul>
+</li>
+<li><p>A candidate whose engagement term is negative is not multiplied but sent to the existing negative-offset path <span class="badge ok">verified</span> — same file.</p>
+<ul>
+<li>This keeps posts with a high report or block probability from being inflated by the dwell multiplier.</li>
+<li>The negative sum used for normalization counts only four heads: not_interested, block_author, mute_author, and report. not_dwelled is left out.</li>
+</ul>
+</li>
+<li><p>A test in the same commit pins the expected behavior with numbers <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>scoring.rs:603</code></a>.</p>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">favorite: 0.5, report: -100.0, cont_dwell_time: 0.1,
+multiplicative: true, not_dwelled_power_exponent: -0.5,
+not_dwelled_power_offset: 0.11, engage_bias: 0.1,
+// P(favorite)=0.4, dwell_time=20.0, P(not_dwelled)=0.25
+let want = (0.36_f64).powf(-0.5) * 0.3 * 3.0 + 0.001;
+</code></pre></figure>
+<ul>
+<li>Because the exponent is negative, the larger P(not_dwelled) is, the smaller the skip term becomes.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. The switch is off, so current scores are unchanged</span></p></div>
+<ul>
+<li>The default of the mode switch is the existing weighted sum, and the exponent and bias defaults are also 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:577-600</code></a>.<ul>
+<li>The parameters are <code>rust_home_mixer_value_model_mode</code> (default <code>&quot;weighted&quot;</code>), <code>..._not_dwelled_power_exponent</code>, <code>..._not_dwelled_power_offset</code>, and <code>..._multiplicative_vm_engage_bias</code>.</li>
+<li>This file is a cron mirror that syncs production defaults daily and publishes them. The last sync in the header is 2026-11-16T16:00:37Z.</li>
+</ul>
+</li>
+<li>home-mixer (the service that receives For You requests), VMRanker (the slate reordering service), and the page decoder (an RL re-ranking model that picks a page&#39;s posts in slot order) read the same switch <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/scorers/page_decode_rerank_scorer.rs" target="_blank" rel="noopener"><code>scorers/page_decode_rerank_scorer.rs</code></a>.<ul>
+<li>When the multiplicative mode is on, cached weighted-sum scores are not used and scores are recomputed each time, and cached scores are also left out of VMRanker requests.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. The DPP history transmission switch turned on two days ago is off again</span></p></div>
+<ul>
+<li>The switch that makes home-mixer send posts it served within the previous 10 minutes to VMRanker went back from true to false <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:657-662</code></a>.<ul>
+<li>The switch was turned on in the 2026-11-14 commit (30647a8, Gen4+64). VMRanker reads this history only in the window mode, which is off by default, so the order did not change while the switch was on.</li>
+</ul>
+</li>
+<li>The same commit added to the window-mode penalty a term that adds a fixed amount for each history post with the same first SID level, and its default is 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/vm-ranker/dpp.rs" target="_blank" rel="noopener"><code>vm-ranker/dpp.rs</code></a>.<ul>
+<li>SID (semantic ID) is an ID that represents a post as a code sequence from coarse to fine levels. The first level is the coarsest topic group.</li>
+<li>The penalty is <code>min(cos² + (sid_lambda if same L1), 1)</code>, and the parameter is <code>rust_home_mixer_vm_ranker_dpp_window_sid_lambda</code>.</li>
+<li>A client and cache were newly added for VMRanker to look up the SID of history posts.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. Ad volume control by user activity level and an ads-only timeline were added, off by default</span></p></div>
+<ul>
+<li>The For You slot-spread ad blender (an approach that first places ad slots evenly across the page) can now drop some ad slots by user activity level <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/ads/user_load.rs" target="_blank" rel="noopener"><code>home-mixer/ads/user_load.rs</code></a>.<ul>
+<li>The eight levels are new, near_zero, very_light, light, medium_tweeter, medium_non_tweeter, heavy_non_tweeter, and heavy_tweeter.</li>
+<li>Each level sets the share of slots to keep (fixed at 50–100%) and the ad gap (minimum 3). Which slots to drop is decided by a hash made from the request id.</li>
+<li>It does not apply to Premium and Premium+ subscribers or to requests outside For You.</li>
+</ul>
+</li>
+<li>The per-level value lists are empty by default, so current ad volume is unchanged <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1099-1110</code></a>.</li>
+<li>A switch that sends a timeline containing only ads to specified viewer ids was added, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/models/query.rs" target="_blank" rel="noopener"><code>models/query.rs:295-301</code></a>.<ul>
+<li>When on, both For You and Following turn off organic post sources and serve only ads in order.</li>
+<li>Because it turns on only through an id list, we infer it is a mechanism for ad-review accounts <span class="badge est">inferred</span>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>Added a reverse RPC to the Phoenix retrieval service proto that, given a post, returns the top-k users likely to want to see it. The public Python host does not implement it <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto:24-25, 377-395</code></a></li>
+<li>Added a config to the page RL re-ranker that trains only the critic (the RL component that estimates a page&#39;s long-term value) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/phoenix/xrex/models/page_critic_only.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/page_critic_only.py</code></a></li>
+<li>Added an option to immersive two-tower (a retrieval model that embeds users and posts separately) training that removes cases where the user only clicked and stayed over 10 seconds from the long dwell label, and turned it on in that preset <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/phoenix/xrex/data/recsys/recsys_batch.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/recsys_batch.py</code></a></li>
+<li>Re-review by PtOS (the policy-violation verdict of the Grok-based safety pipeline) for media-heavy posts runs only when the post has 256 or more likes or an earlier verdict included an adult content violation. It is skipped if the post is already NSFW <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/grox/flows/ptos/task_safety_ptos_many_media.py" target="_blank" rel="noopener"><code>grox/flows/ptos/task_safety_ptos_many_media.py:52-68</code></a></li>
+<li>Home frames (such as the Grok recommended-task card) respect the user&#39;s dismissal record even when the impression fatigue time is 0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/frames/catalog.rs" target="_blank" rel="noopener"><code>home-mixer/frames/catalog.rs</code></a></li>
+<li>Added a video completion weight slot to the page decoder ranking weights, with a value of 0.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/scorers/page_decode_rerank_scorer.rs" target="_blank" rel="noopener"><code>scorers/page_decode_rerank_scorer.rs</code></a></li>
+<li>Added an ASCII pre-check to the muted keyword filter, and the quoted post text lookup now runs only for viewers who have muted keywords (a performance change) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/a284320/home-mixer/filters/viewer_muted_keyword_filter.rs" target="_blank" rel="noopener"><code>filters/viewer_muted_keyword_filter.rs</code></a></li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> Raised the reference commit in <code>## Summary</code> to a284320 and added a parenthetical saying the multiplicative mode is off by default. In the <code>### Phoenix</code> section, added a bullet for the multiplicative combination mode; in <code>### Diversity</code>, changed the DPP history transmission bullet to off by default and added a SID bonus bullet and a section change log. In <code>## Ads</code>, added a paragraph on ad volume by activity level and the ads-only timeline, and in <code>### Phoenix retrieval index</code> added a reverse RPC bullet. In <code>## Sources</code>, added one row each to the reference sha, the commit table, and the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> X has prepared to change the score formula, which has been a weighted sum since the Gen4 release, into a different form. The evidence is that home-mixer, VMRanker, and the page decoder were wired together at once to read the same switch. We infer that treating the skip probability as an exponent is meant to cut a &quot;quickly skipped post&quot; in proportion to its entire engagement value <span class="badge est">inferred</span>.</p></div>
+<h2 id="2-the-interest-layer-behind-instagram-your-algorithm-was-published-as-a-paper--instagram"><span class="num">2</span>The interest layer behind Instagram Your Algorithm was published as a paper — Instagram</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2611.19110" target="_blank" rel="noopener">CLEAR: Legible and Steerable Recommendation via Grounded Natural-Language Interests</a> — Meta, submitted to arXiv 2026-11-14 (date in the text 2026-10-24), paper. All authors are affiliated with Meta.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Instagram Your Algorithm is a screen that shows a summary of interests that affect recommendations and lets users write what they want to see more or less of. This repository had left open how that screen connects to ranking and how fast changes take effect. Typically, a recommender&#39;s preferences live in embeddings that people cannot read, so edits users make are easily overwritten silently in the next training. This paper published a system that stores interests as human-readable natural-language labels and uses those labels as the unit of retrieval and ranking.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The Your Algorithm screen is the window for viewing and editing Meta&#39;s interest layer</span></p></div>
+<ul>
+<li>The paper states that Instagram&#39;s Your Algorithm and Tune Your Explore screens let users view and edit this interest layer <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2611.19110v1" target="_blank" rel="noopener">CLEAR §3.1</a>.<ul>
+<li>The system spans four surfaces across the two apps, Instagram and Facebook. We could not confirm the list of the four surfaces.</li>
+<li>The paper states that the components had run in production for over 1 year.</li>
+</ul>
+</li>
+<li>Interests that users add or hide are stored separately from model output and take precedence over model inference until the user changes them again <span class="badge ok">verified</span> — same paper §3.1, §3.2.<ul>
+<li>Hidden interests are read by the removal path at serving time (§5.2).</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;Instagram&#39;s Your Algorithm and Tune Your Explore interfaces expose the interest layer for inspection and editing.&quot;
+&quot;Explicit state is stored separately from model output and takes precedence until the user changes it.&quot;
+— <a href="https://arxiv.org/html/2611.19110v1" target="_blank" rel="noopener">CLEAR</a>, 2026-11-14 (paper) §3.1</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. One interest label is used together as the unit of retrieval, ranking, and impression cap</span></p></div>
+<ul>
+<li>Each interest carries a label, evidence events, an embedding projection, and a fixed id, each serving a different path <span class="badge ok">verified</span> — same paper §4.2, §5.<ul>
+<li>The label becomes a lexical search query rewritten as a user profile.</li>
+<li>Evidence events (the user&#39;s own actions that led to inferring this interest) become the seed of co-engagement-based retrieval.</li>
+<li>The embedding projection queries an ANN (approximate nearest neighbor search) index.</li>
+<li>The fixed id is the key for cached candidates, contribution tracking, and impression aggregation.</li>
+</ul>
+</li>
+<li>Candidates must pass a strict topic-match check, and ranking gives a temporary bonus term to declared interests and can reserve top slots <span class="badge ok">verified</span> — same paper §5.</li>
+<li>Realized impressions per interest are counted with a decaying counter (Fireball) so that no single interest floods the feed <span class="badge ok">verified</span> — same paper §5.</li>
+<li>A newly added interest skips the evidence requirement for inferred interests even without behavioral evidence, and gets its first candidates through the lexical and embedding paths <span class="badge ok">verified</span> — same paper §4.1, §4.2.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A randomized experiment and production averages show the responsiveness effect</span></p></div>
+<ul>
+<li>In an experiment that randomly split supplementary supply, interest responsiveness by the 3-second engagement criterion rose +8.34% [+8.07%, +8.61%] <span class="badge ok">verified</span> — same paper Table 1.<ul>
+<li>For user-days when an explicit interest was actually delivered, it was +2.43% [+2.24%, +2.63%].</li>
+<li>Exposure control cut the days when one interest flooded the feed by 15.4% [13.4%, 17.4%].</li>
+</ul>
+</li>
+<li>For the one-week Instagram production average, the paper reported same-day responsiveness of 79.6%, declared-interest load of 82.6%, and topic match of 87.2% <span class="badge ok">verified</span> — same paper Table 1.<ul>
+<li>Topic match is the value from the most recent twice-weekly LLM judge run. We could not confirm the exact definitions of the three metrics.</li>
+</ul>
+</li>
+<li>In the experiment removing components one at a time, the losses were 8.7 pp for the interest ranking term, 11.1 pp for top-slot reservation, and 13.7 pp for interest-conditioned candidate sourcing <span class="badge ok">verified</span> — same paper abstract.<ul>
+<li>The paper states that these figures are conditional on the tested removal sequence.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;8.7 percentage points for added-interest ranking terms, 11.1 for reserved top-slot insertion, and 13.7 for interest-conditioned candidate sourcing, conditional on the tested removal sequence.&quot;
+— <a href="https://arxiv.org/abs/2611.19110" target="_blank" rel="noopener">CLEAR</a>, 2026-11-14 (paper) abstract</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="instagram.html">services/instagram.md</a> Added an interest-layer sentence to the intro of <code>### User control — Your Algorithm</code>, and replaced the &quot;the model is not public&quot; bullet with a group of CLEAR bullets and a model-type <span class="badge est">inferred</span> bullet. Revised the &quot;productized only on Instagram&quot; <span class="badge est">inferred</span> bullet based on the Facebook announcement and CLEAR, and updated open question 10 and the paper list in <code>## Sources</code>. Under the Your algorithm blog bullet in <a href="facebook.html">services/facebook.md</a>, added a bullet saying the same layer spans both apps. In <a href="llm-in-recsys.html">topics/llm-in-recsys.md</a>, added a CLEAR sub-bullet and one source line to the Instagram Your Algorithm bullet.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> ⚠ Claim changed: the claim in instagram.md that &quot;an explainable interest profile was productized only on Instagram&quot; <span class="badge est">inferred</span> was wrong. The evidence is that Facebook announced a similar Your algorithm on 2026-10-13, and CLEAR states that the layers of the two apps are the same. The structure that links interests to retrieval, ranking, and impression caps through a single label has the same direction as the &quot;four retrieval sources per interest&quot; structure described in the 2026-11-10 Facebook blog post <span class="badge est">inferred</span>.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>CLEAR paper §6 onward (experiment design, metric definitions, Facebook surface results) — the text read today was cut off near §7.1. The list of the four surfaces and the definition of same-day responsiveness remain unresolved.</li>
+<li>The commit that turns on X&#39;s multiplicative combination mode — once it is on, the interpretation of the weight table changes, so the canon ranking section must be rewritten along with the exponent and bias values.</li>
+<li>The caller of X&#39;s reverse RPC (finding users from a post) — public code does not confirm whether it is used for notifications or for distributing new posts.</li>
+<li>The other sources checked today had no new feed-related material. The r/RedditEng RSS was healthy (25 items), and the only new post, the 2026-11-16 Android image loading post, was skipped. The latest Netflix Tech Blog post is from 2026-11-09, the latest Meta Engineering post is the 2026-11-13 Android tooling post, and the latest redditinc.com post is from 2026-11-10. SEC had no 10-K, 10-Q, or earnings 8-K filings (only a 2026-11-16 Form 144). Of the 30 arXiv cs.IR papers (submitted 2026-11-14–16), only CLEAR passed, and it was folded straight into the Instagram canon. Xiaohongshu&#39;s IntentFlow is a search system, so it was not added to the radar.</li>
+</ul>
+<p>Lookup failed: ai.meta.com/blog — the list only shows posts up to 2026-07, so we could not confirm recent posts
+Lookup failed: Pinterest Engineering (medium.com/pinterest-engineering) — not looked up again because it is a Monday source, after the HTTP 403 on 2026-11-16</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-16.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-16</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-18.html" data-title="일일 리포트 2026-11-18"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>

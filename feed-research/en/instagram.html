@@ -46,12 +46,11 @@
 <h1 id="instagram">Instagram</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">Updated</span><time datetime="2026-10-22">2026-10-22</time></li>
+<li><span class="meta-k">Updated</span><time datetime="2026-11-18">2026-11-18</time></li>
 <li><span class="meta-k">Translated from</span><a href="../instagram.html" hreflang="ko">Korean</a></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc toc-long"><summary>Contents<span class="toc-n">11</span></summary><ol><li><a href="#summary">Summary</a></li><li><a href="#feed-surfaces">Feed surfaces</a></li><li><a href="#candidate-generation-retrieval">Candidate generation (retrieval)</a><ol><li><a href="#candidate-counts-by-stage--larger-than-facebook-and-monotonically-decreasing">Candidate counts by stage</a></li><li><a href="#4-source-types-and-tunable-weights">4 source types and tunable weights</a></li><li><a href="#the-reason-for-choosing-two-tower-is-the-cache">The reason for choosing two-tower is the cache</a></li><li><a href="#retraining-cadence--hourly">Retraining cadence</a></li><li><a href="#retrieval-dsl--real-queries-are-published">retrieval DSL</a></li><li><a href="#igql--ig2vec--could-not-obtain-the-primary-original-text">IGQL / IG2Vec</a></li></ol></li><li><a href="#ranking">Ranking</a><ol><li><a href="#three-combination-forms--the-biggest-difference-from-facebook">Three combination forms</a></li><li><a href="#how-weights-are-set--facebook-uses-surveys-instagram-uses-optimization">How weights are set</a></li><li><a href="#feed-value-model--the-original-prediction-and-the-increment-are-weighted-separately">Feed value model</a></li><li><a href="#the-1st-stage-is-a-distillation-of-the-2nd-stage">The 1st stage is a distillation of the 2nd stage</a></li><li><a href="#prediction-heads--they-differ-by-surface-all-verified-verbatim">Prediction heads</a></li><li><a href="#actual-feature-names-excerpt-all-verified-verbatim">Actual feature names (excerpt, all verified verbatim)</a></li><li><a href="#mosseris-per-surface-signal-order--a-form-of-disclosure-facebook-does-not-have">Mosseri&#39;s per-surface signal order</a></li><li><a href="#ultra-long-user-history--dv365">Ultra-long user history</a></li><li><a href="#model-operating-scale--only-instagram-disclosed-it">Model operating scale</a></li><li><a href="#removal-of-follower-count-as-an-input">Removal of follower count as an input</a></li></ol></li><li><a href="#re-ranking-diversity-and-filters">Re-ranking, diversity, and filters</a><ol><li><a href="#blocking-3-in-a-row-from-the-same-account-is-wrong--myth-check">&quot;Blocking 3 in a row from the same account&quot; is wrong</a></li><li><a href="#policy-filters--two-layers-score-threshold-and-policy-document">Policy filters</a></li><li><a href="#originality--instagram-applied-it-earlier-and-more-strongly-than-facebook">Originality</a></li><li><a href="#teens--recommendation-eligibility-itself-is-restricted-by-age">Teens</a></li></ol></li><li><a href="#cold-start">Cold start</a><ol><li><a href="#new-users--a-disclosure-that-facebook-does-not-have-is-here">New users</a></li><li><a href="#new-content">New content</a></li></ol></li><li><a href="#feedback-signals">Feedback signals</a><ol><li><a href="#negatives-exist-as-prediction-heads--with-different-names-on-each-surface">Negatives exist as prediction heads</a></li><li><a href="#dm-share-send-is-a-prediction-head">DM share (send) is a prediction head</a></li><li><a href="#user-control--your-algorithm">User control</a></li></ol></li><li><a href="#regulation--ongoing-as-of-2026">Regulation</a></li><li><a href="#generalizations-from-this-service">Generalizations from this service</a></li><li><a href="#open-questions">Open questions</a></li><li><a href="#sources">Sources</a><ol><li><a href="#meta-official--engineering">Meta official</a></li><li><a href="#meta-official--productpolicy">Meta official</a></li><li><a href="#transparency-center-ai-system-card-primary-document-for-regulatory-response">Transparency Center (AI system card, primary document for regulatory response)</a></li><li><a href="#papers">Papers</a></li><li><a href="#regulator">Regulator</a></li><li><a href="#secondary-grade-downgrade-required">Secondary (grade downgrade required)</a></li></ol></li></ol></details></nav>
 <div class="prose">
-<p class="warn">⚠ The Korean original has changed since this translation (translated 2026-10-23). <a href="../instagram.html" hreflang="ko">Read the Korean original</a> for the latest version.</p>
 <p><strong>This file covers only where Instagram differs from Facebook.</strong> The common Meta ground is in <a href="facebook.html">facebook.md</a> and <code>topics/</code>. That includes the value model <code>Vijt = Σ wijtk·Yijtk</code>, the DLRM→GEM lineage, and the ads pixel-height patent. Dwell time normalization and MSI (meaningful social interactions) are also covered there. The DSA (EU Digital Services Act) filings are in the same place.</p>
 <p class="warn">⚠ Every claim in this file that relies on a system card is a snapshot read on 2026-08-09. A system card is the document Meta publishes on its Transparency Center for each surface to describe an AI system. The full caveat is written once, in the &quot;Validity period of system card quotes&quot; section of <a href="facebook.html">facebook.md</a>.</p>
 <p>Compared with Facebook, <strong>Instagram is published in far more detail.</strong> The only formula Facebook published is the 2021 linear combination. Instagram published <strong>3 different combination forms</strong> as formulas, each in a different post. The text also gives the actual queries of the retrieval DSL (a dedicated language for writing candidate-fetching queries), candidate counts per funnel stage, the retraining cadence, and the definition of the distillation label. Conversely, <strong>Instagram has nothing like Facebook&#39;s Widely Viewed Content Report</strong>, a measured disclosure of surface composition.</p>
@@ -733,25 +732,43 @@ p_i(c) = max_{h ∈ H} sim_i(c, h)
 <li>However, the direction matches the cards <span class="badge ok">verified</span>. DM shares and external shares each exist as separate prediction heads.</li>
 </ul>
 <h3 id="user-control--your-algorithm">User control — Your Algorithm</h3>
-<p>Your Algorithm shows a summary of the topics influencing recommendations and lets users tell it in free text what they want to see more or less of <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/announcements/reels-algorithm-control" target="_blank" rel="noopener">Control Your Instagram Reels Algorithm</a>. It was first released in US Reels on 2025-12-10 and later expanded on 2026-04-15 and 2026-06-10 <span class="badge ok">verified</span>.</p>
+<p>Your Algorithm shows a summary of the topics influencing recommendations and lets users tell it in free text what they want to see more or less of <span class="badge ok">verified</span> <a href="https://about.instagram.com/blog/announcements/reels-algorithm-control" target="_blank" rel="noopener">Control Your Instagram Reels Algorithm</a>. It was first released in US Reels on 2025-12-10 and later expanded on 2026-04-15 and 2026-06-10 <span class="badge ok">verified</span>. As of the 2026-11-14 Meta paper, behind this screen is a layer that stores interests as natural-language labels, and a single label serves as the unit for retrieval, ranking boosts, and impression caps <span class="badge ok">verified</span> (<a href="#user-control--your-algorithm">CLEAR bullet</a>).</p>
 <ul>
-<li>As of the announcement post, the scope is all of Instagram, including Feed, Reels, and Explore <span class="badge ok">verified</span>: <em>&quot;Your Algorithm is now live across all of Instagram, including Feed, Reels, and Explore.&quot;</em></li>
-<li>The dashboard shows an AI summary of the topics influencing recommendations <span class="badge ok">verified</span>: <em>&quot;View an AI-generated summary of the topics influencing the posts and recommendations you see&quot;</em>.</li>
-<li>Individual posts get an interest label <span class="badge ok">verified</span>. Example: <em>&quot;From Running&quot;</em>.</li>
-<li>Controls are <strong>entered as free text</strong> <span class="badge ok">verified</span>: <em>&quot;tell us what you want to see more or less of, or add new topics entirely&quot;</em>.</li>
-<li><strong>Update speed is not public</strong> <span class="badge obs">observed</span> 2026-08-09. The corpus inspected was 1 body passage of the announcement post above, and unlike Threads Dear Algo, it has no time-window wording.</li>
-<li><strong>The model is not public.</strong> The original text says only &quot;AI&quot;.<ul>
-<li>Because it generates a topic summary in natural language and accepts free text, it is likely an LLM, but Meta did not state this explicitly <span class="badge est">inferred</span>. See <code>topics/llm-in-recsys.md</code>.</li>
-</ul>
+<li><p>As of the announcement post, the scope is all of Instagram, including Feed, Reels, and Explore <span class="badge ok">verified</span>: <em>&quot;Your Algorithm is now live across all of Instagram, including Feed, Reels, and Explore.&quot;</em></p>
 </li>
-<li><strong>It differs in nature from Facebook&#39;s Show more / Show less (→ Interested / Not interested).</strong><ul>
+<li><p>The dashboard shows an AI summary of the topics influencing recommendations <span class="badge ok">verified</span>: <em>&quot;View an AI-generated summary of the topics influencing the posts and recommendations you see&quot;</em>.</p>
+</li>
+<li><p>Individual posts get an interest label <span class="badge ok">verified</span>. Example: <em>&quot;From Running&quot;</em>.</p>
+</li>
+<li><p>Controls are <strong>entered as free text</strong> <span class="badge ok">verified</span>: <em>&quot;tell us what you want to see more or less of, or add new topics entirely&quot;</em>.</p>
+</li>
+<li><p>The announcement post has no wording about how fast changes take effect <span class="badge obs">observed</span> 2026-08-09. The corpus checked was the body of the single announcement post above, and unlike Threads Dear Algo it has no time-window wording.</p>
+</li>
+<li><p>The Meta paper <a href="https://arxiv.org/abs/2611.19110" target="_blank" rel="noopener">CLEAR</a> (2026-11-14 arXiv, paper) stated that the Your Algorithm and Tune Your Explore screens are the windows through which users see and edit the company&#39;s interest layer <span class="badge ok">verified</span>. This layer spans four surfaces across Instagram and Facebook, and its components have run in production for over 1 year <span class="badge ok">verified</span>.</p>
+<ul>
+<li>Each inferred interest carries a label, the user&#39;s own behavior events that grounded it, an embedding projection, and a fixed id. The label is used as a lexical search query, the grounding events as seeds for co-engagement-based retrieval, and the projection as an ANN index query <span class="badge ok">verified</span>.</li>
+<li>Interests that the user added or hid are stored separately from model output and take precedence over model inference until the user changes them again <span class="badge ok">verified</span>. A newly added interest gets its first candidates through the lexical and embedding paths even without behavioral grounding <span class="badge ok">verified</span>.</li>
+<li>Ranking can give declared interests a temporary boost term and reserve top slots, and it counts realized impressions per interest with a decay counter so that no single interest floods the feed <span class="badge ok">verified</span>.</li>
+<li>In a randomized experiment, supplemental supply raised interest responsiveness by +8.34%, and the same-day responsiveness was a 79.6% one-week production average on Instagram <span class="badge ok">verified</span>. The metric definition and detailed figures are in <a href="daily-2026-11-18.html">daily 2026-11-18</a>.</li>
+</ul>
+<blockquote>
+<p>&quot;Explicit state is stored separately from model output and takes precedence until the user changes it.&quot;
+— <a href="https://arxiv.org/html/2611.19110v1" target="_blank" rel="noopener">CLEAR</a>, 2026-11-14 (paper) §3.1</p>
+</blockquote>
+</li>
+<li><p>We could not confirm the kind of model that produces the interest summaries and labels, even from the paper&#39;s abstract. Because it generates natural language and accepts free text, it is likely an LLM <span class="badge est">inferred</span>. See <code>topics/llm-in-recsys.md</code>.</p>
+</li>
+<li><p><strong>It differs in nature from Facebook&#39;s Show more / Show less (→ Interested / Not interested).</strong></p>
+<ul>
 <li>Facebook&#39;s is per post and temporary: <em>&quot;temporarily increase/decrease the ranking score for that post and posts like it&quot;</em>.</li>
 <li>Instagram&#39;s Your Algorithm <strong>exposes and lets users edit a persistent topic-level profile.</strong></li>
-<li>The same company has productized an &quot;explainable interest profile&quot; only on Instagram <span class="badge est">inferred</span>.</li>
+<li>Facebook also announced a topic-level Your algorithm on 2026-10-13 <span class="badge ok">verified</span> (<a href="facebook.html">facebook.md</a>). The CLEAR paper stated that the interest layers of the two apps are the same system <span class="badge ok">verified</span>.</li>
 </ul>
 </li>
-<li>&quot;reset your recommendations&quot; (clearing recommendation history) appears to have been introduced between 2024 and 2025 and absorbed into Your Algorithm, but <strong>we could not obtain a primary URL for a standalone announcement</strong> <span class="badge est">inferred</span>.</li>
-<li>The re-ranking-related controls the cards state explicitly are, by surface, as follows <span class="badge ok">verified</span>.<ul>
+<li><p>&quot;reset your recommendations&quot; (clearing recommendation history) appears to have been introduced between 2024 and 2025 and absorbed into Your Algorithm, but <strong>we could not obtain a primary URL for a standalone announcement</strong> <span class="badge est">inferred</span>.</p>
+</li>
+<li><p>The re-ranking-related controls the cards state explicitly are, by surface, as follows <span class="badge ok">verified</span>.</p>
+<ul>
 <li>Explore: &quot;Not Interested&quot;, &quot;Tune Your Algorithm&quot;</li>
 <li>Feed: Mute, Favorites, &quot;See Newest Content First&quot;, Following/Favorites tabs</li>
 <li>Reels: &quot;Click &#39;Following&#39; on the Reels feed&quot;</li>
@@ -803,7 +820,7 @@ p_i(c) = max_{h ∈ H} sim_i(c, h)
 <li><strong>Where is the primary text URL for Mosseri&#39;s &quot;3 signals&quot; statement in 2025-01?</strong></li>
 <li><strong>How does Instagram handle cold start for new content?</strong> Epinet is a Facebook Reels case.</li>
 <li><strong>What is used to tune Explore&#39;s per-source weights?</strong> It says only &quot;tunable&quot; and does not disclose the objective function or the optimization method.</li>
-<li><strong>What are the topic generation model and the update latency of Your Algorithm?</strong></li>
+<li><strong>What is the topic generation model of Your Algorithm, and what exactly does the 79.6% same-day responsiveness in the CLEAR paper count?</strong> The structure of the interest layer was resolved by the CLEAR paper (2026-11-14).</li>
 <li><strong>Are the models for the three surfaces Feed, Explore and Reels being unified?</strong> Zuckerberg&#39;s &quot;three giant transformers&quot; statement is at the app level (FB/IG/ads), not at the level of surfaces within Instagram. The evidence is in facebook.md.</li>
 <li><strong>How will actual ranking change after the EC preliminary finding (2026-07-10)?</strong></li>
 </ol>
@@ -843,6 +860,7 @@ p_i(c) = max_{h ∈ H} sim_i(c, h)
 </ul>
 <h3 id="papers">Papers</h3>
 <ul>
+<li><a href="https://arxiv.org/abs/2611.19110" target="_blank" rel="noopener">CLEAR: Legible and Steerable Recommendation via Grounded Natural-Language Interests</a> — 2026-11-14 v1, paper. The primary source for the natural-language interest layer behind Your Algorithm and for the randomized experiment results. All authors are affiliated with Meta.</li>
 <li><a href="https://arxiv.org/abs/2610.27423" target="_blank" rel="noopener">Baseline and Incremental: User, Item, and Request Debiasing in Instagram Feed Ranking</a> — 2026-10-20 v1, paper. The primary source for the Feed value model&#39;s original-prediction and increment terms, the format-bias label, and the 4-arm ablation.</li>
 <li><a href="https://arxiv.org/abs/2506.00450" target="_blank" rel="noopener">DV365: Extremely Long User History Modeling at Instagram</a> — KDD 2025, paper. 70K/40K history, 15 downstream models, time spent +0.7%</li>
 </ul>
