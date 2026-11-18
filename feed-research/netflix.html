@@ -46,7 +46,7 @@
 <h1 id="netflix">Netflix</h1>
 </header>
 <ul class="meta">
-<li><span class="meta-k">갱신</span><time datetime="2026-10-19">2026-10-19</time></li>
+<li><span class="meta-k">갱신</span><time datetime="2026-11-19">2026-11-19</time></li>
 </ul>
 <nav class="toc-wrap" id="toc" aria-label="목차"><details class="toc toc-long"><summary>목차<span class="toc-n">13</span></summary><ol><li><a href="#한-줄-요약">한 줄 요약</a></li><li><a href="#세대-구분--이것을-먼저-알아야-자료가-헷갈리지-않는다">세대 구분</a></li><li><a href="#피드-지면">피드 지면</a></li><li><a href="#후보-생성-retrieval">후보 생성 (retrieval)</a></li><li><a href="#랭킹">랭킹</a><ol><li><a href="#foundation-model-2025-프로덕션">Foundation Model (2025, 프로덕션)</a></li><li><a href="#genrec-2026-대규모-ab">GenRec (2026, 대규모 A/B)</a></li><li><a href="#genrec의-서빙-층--별도-블로그로-공개-2026-07">GenRec의 서빙 층</a></li><li><a href="#genrec-arxiv-논문--블로그가-안-밝힌-정량치-2026-08-10">GenRec arXiv 논문</a></li><li><a href="#목적함수--가중합이-아니라-retention-계열">목적함수</a></li><li><a href="#고전-세대-랭커-참고용-2015">고전 세대 랭커 (참고용, 2015)</a></li></ol></li><li><a href="#재순위다양성필터">재순위·다양성·필터</a></li><li><a href="#아트워크비디오-프리뷰-개인화--maps-multimodal-asset-personalization-at-scale-2026-08-프로덕션">아트워크·비디오 프리뷰 개인화</a><ol><li><a href="#clip-기반-통합-two-tower--5개-캔버스-타입-단일-모델">CLIP 기반 통합 two-tower</a></li><li><a href="#mediafm--자체-tri-modal-foundation-model-비디오-프리뷰용">MediaFM</a></li><li><a href="#popularity-based-winner--오프라인-프록시-태스크">Popularity-Based Winner</a></li><li><a href="#netflix-embedding-store--인프라-레이어">Netflix Embedding Store</a></li><li><a href="#의미--아트워크프리뷰가-개인화-스택의-별개-축이-됐다">의미</a></li></ol></li><li><a href="#콜드스타트">콜드스타트</a></li><li><a href="#피드백-신호">피드백 신호</a></li><li><a href="#학습-주기평가">학습 주기·평가</a><ol><li><a href="#counterfactual-observability-프레임워크-2026-09-recsys-2026">Counterfactual observability 프레임워크 (2026-09, RecSys 2026)</a></li><li><a href="#추천의-가치-측정--선택-모델--소규모-nudge-ab-검증-ijio-논문-ec-26">추천의 가치 측정</a></li></ol></li><li><a href="#광고">광고</a></li><li><a href="#열린-질문">열린 질문</a></li><li><a href="#출처">출처</a></li></ol></details></nav>
 <div class="prose">
@@ -172,6 +172,11 @@
 <li>추천은 시청 시간의 약 80%에 영향을 주고, 나머지 20%는 검색이 담당한다 <span class="badge ok">확인</span> TMIS 2015. 2015년 수치라는 점에 주의한다.</li>
 <li>개인화와 추천으로 얻는 절감 효과는 &quot;$1B 이상/년&quot;이다 <span class="badge ok">확인</span> TMIS 2015. Netflix가 자체적으로 추산한 값이다.</li>
 <li>2025-05에 TV 홈을 개편하면서 순간의 기분과 관심에 반응하는 추천을 넣었다. 모바일에서는 세로 클립 피드를 테스트한다 <span class="badge ok">확인</span> <a href="https://about.netflix.com/en/news/unveiling-our-innovative-new-tv-experience" target="_blank" rel="noopener">About Netflix 2025</a>.</li>
+<li>2026-11 기준으로 TV 앱 일부 회원이 AI Discover 탭을 쓴다. 회원이 테마를 고르면 맞는 타이틀 행과 짧은 설명, 더 좁은 다음 테마가 나온다 <span class="badge ok">확인</span> — <a href="https://netflixtechblog.com/engineering-ai-discover-e244944cdc38" target="_blank" rel="noopener">Engineering AI Discover</a>(블로그, 2026-11-17).<ul>
+<li>요청마다 LLM 플래너나 검증된 기존 계획이 단계 그래프를 정하고, 코드가 그래프를 검증한 뒤 검색·랭킹·카탈로그 시스템을 단계로 부른다 <span class="badge ok">확인</span>(같은 블로그). 타이틀은 기존 retrieval과 랭커가 고르고, LLM은 테마와 행 제목, 설명 생성을 맡는다 <span class="badge ok">확인</span>(같은 블로그).</li>
+<li>자유 입력과 대화는 없고, 리모컨으로 테마를 고르고 &quot;don&#39;t recommend&quot; 같은 조정을 누른다 <span class="badge ok">확인</span>(같은 블로그). 세부는 <a href="daily-2026-11-19.html">daily 2026-11-19</a>에 있다.</li>
+</ul>
+</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
 <h2 id="후보-생성-retrieval">후보 생성 (retrieval)</h2>
@@ -555,6 +560,7 @@
 <li>% Match는 &quot;시청 습관·행동 분석만으로&quot; 산출되는 <strong>표시용</strong> 점수다 <span class="badge ok">확인</span> 2017 발표. 같은 발표는 thumbs가 취향을 더 배워 추천을 개선하는 데 쓰인다고 쓴다 <span class="badge ok">확인</span>. 명시 평점이 UI의 % Match에 들어간다는 진술은 없다 (→ <a href="survey-signals.html">survey-signals.md</a>).</li>
 <li>클릭베이트를 막는 장치도 있다. 아트워크 라벨에서 &quot;재생 유도했지만 저품질 참여&quot;를 배제한다 <span class="badge ok">확인</span> 2017.</li>
 <li>인구통계(연령·성별)는 쓰지 않는다고 명시한다 <span class="badge ok">확인</span> help.netflix.com.</li>
+<li>AI Discover에서 회원이 직접 고른 조정은 바로 적용되고 방문을 넘어 유지된다. 이 기억은 회원별 저장소 Memory Hub에, 사내 LLM MemberLLM이 시청 이력으로 미리 만든 취향 요약과 함께 보관된다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/engineering-ai-discover-e244944cdc38" target="_blank" rel="noopener">Engineering AI Discover</a>(블로그, 2026-11-17). 이 조정을 기존 개인화 모델과 어떻게 섞을지는 아직 열린 과제라고 썼다 <span class="badge ok">확인</span>(같은 블로그).</li>
 <li>세션 의도는 FM-Intent가 다룬다. 다음 의도와 아이템을 동시에 예측하며, 프로덕션에 들어가 있다 <span class="badge ok">확인</span> <a href="https://netflixtechblog.com/fm-intent-predicting-user-session-intent-with-hierarchical-multi-task-learning-94c75e18f4b8" target="_blank" rel="noopener">블로그 2025</a>.</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
@@ -731,6 +737,7 @@
 </ul>
 </li>
 <li><a href="https://arxiv.org/abs/2608.18322" target="_blank" rel="noopener">Multimedia Asset Personalization via Multimodal Embeddings at Netflix (arXiv 2608.18322)</a> — 2026-08-18, 논문. 아트워크 CLIP two-tower와 MediaFM tri-modal(SeqCLIP, wav2vec 2.0, text-embedding-3-large)의 프로덕션 배포, +0.127%/+0.193% A/B lift, popularity-based winner 프록시로 체크포인트를 gating하는 방식을 다룬다</li>
+<li><a href="https://netflixtechblog.com/engineering-ai-discover-e244944cdc38" target="_blank" rel="noopener">Engineering AI Discover</a> — 2026-11-17, 블로그. TV 앱 AI Discover 탭의 plan-and-execute 에이전트 하니스, 비동기 페이지 생성, Memory Hub와 MemberLLM 취향 요약을 다룬다</li>
 <li><a href="https://arxiv.org/abs/2609.22747" target="_blank" rel="noopener">Beyond Raw Engagement: A Counterfactual Observability Framework for Recommender Systems at Netflix (arXiv 2609.22747)</a> — 2026-09-19, 논문(RecSys 2026 accepted). Counterfactual measurement 기반 observability 프레임워크다. 세 축(bias reduction/relativity/incrementality), single-stage와 cascading 지원, Row Curators A/B alignment R²=0.8212, label misattribution 자동 감지 케이스를 다룬다</li>
 </ul>
 <p class="totop"><a href="#toc">↑ 목차</a></p>
