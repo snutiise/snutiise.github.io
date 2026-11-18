@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-19 — feed-research</title>
+<meta name="description" content="In one line: X reverted the link-copy share weight to 20.0, which it had set to 0 in the home-mixer mirror five days earlier. The two mirrors have the same…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-19.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-19.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-19.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-19.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-19 — feed-research">
+<meta property="og:description" content="In one line: X reverted the link-copy share weight to 20.0, which it had set to 0 in the home-mixer mirror five days earlier. The two mirrors have the same…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-19.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-19.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-19">2026-11-19</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Thursday</li>
+<li><span class="meta-k">Reading time</span>10 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-19.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>2</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>0</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X reverted the link-copy share weight to 20.0, which it had set to 0 in the home-mixer mirror five days earlier. The two mirrors have the same value again.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">3</span></summary><ol><li><a href="#1-the-link-copy-share-weight-returned-to-200-after-five-days--x"><span class="num">1</span>The link-copy share weight returned to 20.0 after five days — X</a></li><li><a href="#2-in-ai-discover-an-llm-plans-and-the-existing-rankers-pick-titles--netflix"><span class="num">2</span>In AI Discover an LLM plans and the existing rankers pick titles — Netflix</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>X added, off by default, a path that re-scores the candidates it served with a separate teacher model and stores the result, and a mechanism that changes ad volume based on page score.</li>
+<li>Netflix published the structure of the AI Discover tab in its TV app. Even though an LLM drafts the plan, the existing search and ranking systems still choose the titles.</li>
+</ul>
+<h2 id="1-the-link-copy-share-weight-returned-to-200-after-five-days--x"><span class="num">1</span>The link-copy share weight returned to 20.0 after five days — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/9081b332f25634db1c3249ebd3d56fba332fd2e6" target="_blank" rel="noopener">xai-org/x-algorithm@9081b33</a> — xAI, 2026-11-18, code. In these notes&#39; numbering, this is Gen4+Gen66.4+N is the number these notes assigned in order to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X For You&#39;s ranking model Phoenix (a Grok-family Transformer) outputs probabilities of actions such as like, reply, and share for each candidate post, and the score starts from a weighted sum that multiplies these probabilities by per-action weights. X publishes the production default weights through cron mirrors (scripts that copy the production config into repository code every day), which are two files: one for home-mixer (the service that receives feed requests, gathers candidates, and scores them) and one for vm-ranker (a separate service that computes the weighted sum and DPP re-ranking). The 2026-11-13 commit (Gen4+63) lowered the link-copy share weight in the home-mixer mirror from 20.0 to 0.0, while the vm-ranker mirror stayed at 20.0. This commit reverted that value while folding in the 2026-11-17 sync, and it added three switches for scoring, ads, and training data, all off by default.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The home-mixer mirror&#39;s link-copy share weight is 20.0 again</span></p></div>
+<ul>
+<li>The share via copy link weight in the home-mixer mirror changed from 0.0 to 20.0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>home-mixer/params/param.rs:495-500</code></a>.<ul>
+<li>The sync time in the file header changed from 2026-11-16T16:00:37Z to 2026-11-17T16:00:33Z.</li>
+<li>This is the only weight that changed in this sync.</li>
+</ul>
+</li>
+<li>The two mirrors have the same 20.0 again, and link-copy share is once more the largest of the positive weights <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs</code></a>.</li>
+<li>We infer that the five days at 0.0 were an experiment or a reverted misconfiguration <span class="badge est">inferred</span>. The evidence is that the vm-ranker mirror never followed it down in the meantime, and no other weight moved with it.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. In-network and OON candidates can now get separate multipliers for the engagement term and the dwell-time term</span></p></div>
+<ul>
+<li><p>Until now, vm-ranker multiplied the entire score of OON (posts from accounts the viewer does not follow) candidates by a single 0.75 multiplier. Now each candidate type can get separate multipliers for the engagement term and the dwell-time term <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>xai-value-model/scoring.rs:338-364</code></a>.</p>
+<ul>
+<li>The dwell-time term is the expected dwell seconds times the <code>cont_dwell_time</code> weight, clamped between 0 and the total score. The engagement term is the total score minus the dwell-time term.</li>
+<li>The author-diversity decay is still multiplied on top of this score.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">Some(level * (factors.engagement * (score - dwell_time) + factors.dwell_time * dwell_time))
+</code></pre></figure>
+</li>
+<li><p>The default of all four multipliers is −1.0, and negative values are treated as unset, so current scores are unchanged <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs:247-270</code></a>.</p>
+<ul>
+<li>If only one side is set, the other uses the existing multiplier (OON 0.75, in-network 1.0).</li>
+<li>They do not apply to the multiplicative combination mode (Gen4+65), topic requests, or new-user requests.</li>
+</ul>
+</li>
+<li><p>The test config gives an example of different multipliers by country condition <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/mod.rs</code></a>.</p>
+<ul>
+<li>The FR example is OON engagement 0.6, OON dwell 0.9, in-network engagement 1.2, and in-network dwell 0.7. The JP example sets only OON dwell to 0.9.</li>
+<li>These are test values, so there is no basis to treat them as the settings of a production experiment.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. A path now exists that re-scores served candidates with a teacher model and stores the result</span></p></div>
+<ul>
+<li>A side effect (a step that runs in the background without changing the response) now re-scores, on a separate Phoenix cluster, the candidates actually served and the top dropped candidates for sampled requests, and leaves the probabilities of the specified heads in the cache <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/home-mixer/side_effects/teacher_score_side_effect.rs" target="_blank" rel="noopener"><code>side_effects/teacher_score_side_effect.rs:60-81</code></a>.<ul>
+<li>It puts the served candidates in first, then fills in dropped candidates whose weighted sum is positive in score order, for up to 64 candidates. Retweets are deduplicated by original id.</li>
+<li>Results are written for 50 minutes to the caches of two data centers, using the same key scheme as the training request cache.</li>
+</ul>
+</li>
+<li>The switch is off by default, the sample rate is 0, and the cluster name and head list are empty, so it does not run now <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1251-1287</code></a>.</li>
+<li>We infer that this is data for distillation (training in which a smaller model learns to imitate a larger model&#39;s output), where a large model&#39;s predictions serve as the training target of the serving model <span class="badge est">inferred</span>. The evidence is that it is named teacher and that it scores even dropped candidates and places them next to the training cache.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. A mechanism now changes ad volume when the page&#39;s top posts score low</span></p></div>
+<ul>
+<li>The slot-spread blender for For You (an ad placer that first spreads ad slots evenly across the whole page) can now split the average score of the top 20 posts into three bands and set the ad ratio and spacing for each band <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/home-mixer/ads/user_load.rs" target="_blank" rel="noopener"><code>ads/user_load.rs:39-94, 152-171</code></a>.<ul>
+<li>The ad ratio to keep is limited to 50–100%, and the spacing does not go below the minimum spacing.</li>
+<li>It applies only in weighted-sum mode and does not apply to Premium subscribers.</li>
+</ul>
+</li>
+<li>The per-band value lists are empty and both boundary values are 0.0, so ad volume is unchanged now <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1111-1140</code></a>.</li>
+<li>If both the Gen4+65 activity-stage ad volume mechanism and this mechanism are set, the page-score band values override it <span class="badge ok">verified</span> — same file.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>Each VMRanker request and DPP history post now carries the request type (first load, refresh polling, load more on scroll down). How VMRanker uses it is not public <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/home-mixer/scorers/vm_ranker_request.rs" target="_blank" rel="noopener"><code>scorers/vm_ranker_request.rs</code></a></li>
+<li>Subscription tier can now be used in feature switch conditions. A test pins that only the premium_plus condition matches Premium+ viewers <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/home-mixer/models/fs_recipient.rs" target="_blank" rel="noopener"><code>models/fs_recipient.rs</code></a></li>
+<li>Phoenix training code gained, off by default, a semantic ID feature for ad products and a per-request CREAD restoration option for four dwell-time-family heads <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/phoenix/xrex/models/recsys_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_model.py</code></a></li>
+<li>A path to read training data from Iceberg tables was added <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/phoenix/xrex/data/recsys/iceberg_layout.py" target="_blank" rel="noopener"><code>phoenix/xrex/data/recsys/iceberg_layout.py</code></a></li>
+<li>abuse-enforcement-service (a service that takes actions such as account suspension based on scores) excludes test accounts from enforcement. It does not touch feed ranking <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/abuse-enforcement-service/service-lib/src/safety_checks.rs" target="_blank" rel="noopener"><code>service-lib/src/safety_checks.rs</code></a></li>
+<li>grox (Grok-based annotation pipeline) gained an option, off by default, to pick the sharpest frame in a video. Labels and thresholds are unchanged <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/9081b33/grox/libs/video_tools/video_frames.py" target="_blank" rel="noopener"><code>grox/libs/video_tools/video_frames.py</code></a></li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> Raised the reference commit in <code>## Summary</code> to 9081b33. Fixed the share via copy link row of the weights table to 20.0 in both mirrors and the new reference, and added one line to that section&#39;s change log. Added a per-surface multiplier bullet to the Phoenix section, a request-type bullet to the diversity section, a page-score band bullet to the ads section, and a teacher re-scoring paragraph to the training and serving infrastructure section. Added a teacher re-scoring row to the <code>## Glossary</code> table, a commit count of 66 and a reference sha row to <code>## Sources</code>, and one row to the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The question left by the 2026-11-15 daily, whether the 0.0 link-copy share weight leads to a change in main feed order, closed when the value was reverted. Because the vm-ranker mirror stayed at 20.0 throughout, there is no evidence that the actual order changed during the five days. The other three mechanisms are all off by default, so current behavior is unchanged.</p></div>
+<h2 id="2-in-ai-discover-an-llm-plans-and-the-existing-rankers-pick-titles--netflix"><span class="num">2</span>In AI Discover an LLM plans and the existing rankers pick titles — Netflix</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://netflixtechblog.com/engineering-ai-discover-e244944cdc38" target="_blank" rel="noopener">Engineering AI Discover</a> — Netflix TechBlog, 2026-11-17, blog.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Netflix recommendations have so far inferred taste from watch history and shown it as rows, and the only way for members to set direction themselves was something like thumbs ratings. In early 2026-11, an AI Discover tab opened to some members in the TV app; when a member picks a theme such as &quot;Quick Watches&quot;, rows of matching titles, descriptions, and next themes appear. Leaving the whole screen to an LLM can produce titles that do not exist or slow things down, so the question is what to give the LLM and what to leave to existing systems. This post describes the structure of the intelligence layer (the layer that decides how to combine the LLM and recommendation systems for each request) that sets that boundary.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Existing retrieval and rankers choose titles; the LLM handles plans and wording</span></p></div>
+<ul>
+<li>When a request arrives, a controller decides the plan and an executor runs it. The plan is a graph of approved steps <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/engineering-ai-discover-e244944cdc38" target="_blank" rel="noopener">AI Discover blog post</a>.<ul>
+<li>Steps run capabilities (task units wrapping existing systems such as search, large-scale ranking, and catalog metadata). Capabilities fall into retrieval, ranking, generation, and packaging families.</li>
+<li>Before execution, code validates the graph. It checks that every step is approved, that each input has a step that produces it, that there are no cycles, and that the graph ends in a single page.</li>
+</ul>
+</li>
+<li>A router controlled by Netflix chooses between an already tested existing plan and a plan the LLM drafts on the fly <span class="badge ok">verified</span> — same blog post.<ul>
+<li>If the planner is slow or the plan fails validation, it falls back to a tested plan.</li>
+<li>The blog post calls this a plan-and-execute agent (an agent where the LLM proposes the path and code decides whether to execute it).</li>
+</ul>
+</li>
+<li>The LLM handles theme generation, row titles and descriptions, and next-theme suggestions, while titles are chosen by retrieval and rankers together with the LLM <span class="badge ok">verified</span> — same blog post.</li>
+</ul>
+<blockquote>
+<p>&quot;Every pick must be a real, available title from our changing catalog. Retrieval and rankers work in tandem with LLMs to choose titles that fit the member&#39;s taste and intent.&quot;
+— <a href="https://netflixtechblog.com/engineering-ai-discover-e244944cdc38" target="_blank" rel="noopener">Engineering AI Discover</a>, 2026-11-17 (blog)</p>
+</blockquote>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. Adjustments a member picks stay in Memory Hub and apply on the next visit</span></p></div>
+<ul>
+<li>Member adjustments (such as &quot;don&#39;t recommend&quot;) apply immediately and persist across visits <span class="badge ok">verified</span> — same blog post.<ul>
+<li>The store is Memory Hub (a low-latency per-member memory store).</li>
+<li>The same place holds a taste summary that MemberLLM (an in-house language model for personalized recommendation) prebuilds from watch history. It is built outside the request path.</li>
+</ul>
+</li>
+<li>The post wrote that how to blend these adjustments with the existing personalization systems is a question it is still looking for an answer to <span class="badge ok">verified</span> — same blog post.</li>
+<li>Requests that involve generation are handled asynchronously. A tap returns an immediate acknowledgment, and the server notifies the TV when the result is ready <span class="badge ok">verified</span> — same blog post.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>Rules such as maturity rating are enforced in code, not in the prompt. The planner uses placeholders instead of values, and the controller fills them in after validation <span class="badge ok">verified</span> — <a href="https://netflixtechblog.com/engineering-ai-discover-e244944cdc38" target="_blank" rel="noopener">AI Discover blog post</a></li>
+<li>Before a model swap, the same tasks are scored with automatic checks and an LLM judge, and past request logs are replayed with the new prompt or model for comparison <span class="badge ok">verified</span> — same blog post</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="netflix.html">services/netflix.md</a> Added an AI Discover bullet and two sub-bullets to <code>## Feed surfaces</code>. Added a bullet on member adjustments kept in Memory Hub and the MemberLLM taste summary to <code>## Feedback signals</code>, and added this blog post to <code>## Sources</code>. Raised <code>Last updated</code> to 2026-11-19.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Netflix did not put the LLM in the ranker&#39;s role; it used it as a planner that calls the existing retrieval and rankers and as a wording generator. This is a different axis of LLM adoption from GenRec (an LLM ranker) the same year. The post has no traffic scale or A/B results, so we treat it as a small experimental surface.</p></div>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>MemberLLM follow-up post — the blog post said the next post would cover it. Check whether the taste summary is also used as a ranking feature.</li>
+<li>Whether the X teacher re-scoring switch turns on, and the cluster name — if it does, it becomes a clue for checking the <span class="badge est">inferred</span> reading that it is for distillation.</li>
+<li>Whether X per-surface multipliers are set in the production mirror — if set, the handling of OON dwell time changes.</li>
+<li>New r/RedditEng posts — the RSS feed broke, so the list of new posts could not be checked today. WebSearch returned only posts from 2024–2025.</li>
+<li>The other sources checked today had no new feed-related material. The latest Meta Engineering post was 2026-11-13 and the latest redditinc.com post was 2026-11-10, and SEC had no 10-K, 10-Q, or earnings 8-K filings. Of the 30 arXiv cs.IR papers, none of the 16 new submissions (2026-11-17) passed. 2611.22838, which finds that RL post-processing lowers recall in generative recommendation, was left out because it has no production evidence.</li>
+</ul>
+<p>Lookup failed: r/RedditEng RSS — 2026-11-18 HTTP 404 (after the 2026-11-13 notice ending RSS support)
+Lookup failed: ai.meta.com/blog — the list page could not be opened directly, so it was cross-checked only through WebSearch</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-18.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-18</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-19.html" data-title="일일 리포트 2026-11-19"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
