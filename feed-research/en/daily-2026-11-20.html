@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-20 — feed-research</title>
+<meta name="description" content="In one line: X fixed its teacher score storage within a day and turned it on by default. It no longer re-scores with a separate model; it keeps the serving…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-20.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-20.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-20.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-20.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-20 — feed-research">
+<meta property="og:description" content="In one line: X fixed its teacher score storage within a day and turned it on by default. It no longer re-scores with a separate model; it keeps the serving…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-20.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-20.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-20">2026-11-20</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Friday</li>
+<li><span class="meta-k">Reading time</span>7 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-20.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>5</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>2</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X fixed its teacher score storage within a day and turned it on by default. It no longer re-scores with a separate model; it keeps the serving score of the posts actually shown as the training label.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-teacher-score-storage-changed-to-serving-scores-and-is-on--x"><span class="num">1</span>Teacher score storage changed to serving scores and is on — X</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>Added a path, off by default, that sends VMRanker safety labels marking posts that solicit replies, shares or clicks.</li>
+<li>Taobao released MARS, in which a small LLM picks the recommendation pipeline configuration for each user, together with A/B results on five surfaces.</li>
+<li>The two Meta Engineering posts from 11-18 are about ads ranking development tools, so they were not added to the canon.</li>
+</ul>
+<h2 id="1-teacher-score-storage-changed-to-serving-scores-and-is-on--x"><span class="num">1</span>Teacher score storage changed to serving scores and is on — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/b55151777cd8901111c7b5985a724f671f05d2c4" target="_blank" rel="noopener">xai-org/x-algorithm@b551517</a> — xAI, 2026-11-19, code. In these notes&#39; numbering, this is Gen4+Gen67.4+N is the number these notes assigned in order to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> In X For You, Phoenix (a Grok-based Transformer ranker) outputs per-action probabilities such as like, reply and report for each candidate post, and a weighted sum of these sets the order. The previous day&#39;s commit added a teacher re-scoring path, off by default, to home-mixer (the service that assembles For You requests). In distillation (a method that uses a larger model&#39;s predictions as another model&#39;s training target), the teacher is the model that supplies the answers. This commit reworked that path to store serving scores without a separate model call and turned it on by default.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The probabilities from the production ranker become the teacher label as they are</span></p></div>
+<ul>
+<li><p>The teacher label is now the probability Phoenix already produced at serving time, copied over, rather than a fresh query to a separate cluster <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b55151777cd8901111c7b5985a724f671f05d2c4/home-mixer/side_effects/teacher_score_side_effect.rs" target="_blank" rel="noopener"><code>teacher_score_side_effect.rs:48-79</code></a></p>
+<ul>
+<li>The new function <code>served_prob</code> picks the candidate&#39;s <code>phoenix_scores</code> field for each action name (for example <code>favorite_score</code>, <code>reply_score</code>, <code>report_score</code>) and returns it.</li>
+<li>The test is named <code>served_probs_are_the_scores_the_ranker_returned</code>.</li>
+<li>The teacher cluster name, the sampling rate, the top-64 limit and the 2-second timeout parameters were deleted.</li>
+</ul>
+</li>
+<li><p>Only posts actually shown are stored, and the same source post is kept only once <span class="badge ok">verified</span> — same file <code>teacher_entry</code></p>
+<ul>
+<li>The previous day&#39;s version re-scored up to 64 candidates, including the top of the weighted sum among those that were dropped.</li>
+<li>The previous day&#39;s version also wrote per-candidate inputs to the cache, but this version writes only one bundle of per-head probabilities.</li>
+</ul>
+</li>
+<li><p>This path is on by default, and the 21 heads to store are filled in by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b55151777cd8901111c7b5985a724f671f05d2c4/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1269-1286</code></a></p>
+<ul>
+<li>The TTL is 3000 seconds (50 minutes), the same as before.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">param!(EnableTeacherScoreSideEffect, bool, &quot;rust_home_mixer_enable_teacher_score_side_effect&quot;, true);
+param!(TeacherActionIndices, Vec&lt;u64&gt;, &quot;rust_home_mixer_teacher_action_indices&quot;,
+    vec![1, 4, 5, 6, 11, 12, 13, 14, 16, 17, 21, 23, 25, 29, 30, 32, 33, 37, 38, 39, 59]);
+</code></pre></figure>
+</li>
+<li><p>It runs for every request whose resolved Phoenix cluster is a production cluster, with no sampling <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b55151777cd8901111c7b5985a724f671f05d2c4/home-mixer/side_effects/teacher_score_side_effect.rs" target="_blank" rel="noopener"><code>teacher_score_side_effect.rs:132-141</code></a></p>
+<ul>
+<li>The conditions are <code>is_prod()</code>, a request that is not a cache reuse, the training-request cache switch on (on by default), and <code>is_prod_cluster(resolve_cluster)</code>.</li>
+<li>The production clusters are <code>Experiment1Fou</code> and <code>Experiment2Fou</code>, and the verdict function was moved to <code>phoenix_scorer.rs</code> and shared.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A role now exists for sending engagement-soliciting labels to VMRanker</span></p></div>
+<ul>
+<li>A path, off by default, now exists in which home-mixer looks up safety labels marking posts that solicit replies, shares or clicks, marks the matching candidates, and sends them to VMRanker (the ranker service that handles DPP slate re-ranking and the weighted sum) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b55151777cd8901111c7b5985a724f671f05d2c4/home-mixer/scorers/vm_ranker_engagement_labels.rs" target="_blank" rel="noopener"><code>vm_ranker_engagement_labels.rs</code></a><ul>
+<li>There are three labels, <code>PROMOTES_REPLIES</code>, <code>PROMOTES_SHARES</code> and <code>PROMOTES_CLICKS</code>, carried in the experiment payload as <code>reply_ineligible</code>, <code>share_ineligible</code> and <code>click_ineligible</code> respectively.</li>
+<li>The switch is <code>VMRankerSendEngagementIneligible</code> (default false), and only the top 200 candidates by weighted sum are looked up (<a href="https://github.com/xai-org/x-algorithm/blob/b55151777cd8901111c7b5985a724f671f05d2c4/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>param.rs:663-674</code></a>).</li>
+<li>The lookup timeout is 80ms, and if it fails no marks are set.</li>
+</ul>
+</li>
+<li>What VMRanker does with this mark is not public <span class="badge ok">verified</span> — the same commit has no changes in the vm-ranker directory.<ul>
+<li>Because the field name is ineligible, we infer it is used to remove the probability of the matching action head from the weighted sum <span class="badge est">inferred</span>. The only evidence is the field name and the label names.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A mode that spreads the remaining ad slots evenly across the page when ad slots are trimmed was added, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b55151777cd8901111c7b5985a724f671f05d2c4/home-mixer/ads/slot_spread_blender.rs" target="_blank" rel="noopener"><code>ads/slot_spread_blender.rs</code></a><ul>
+<li>The switch is <code>AdsUserLoadEvenSpread</code> (default false), and the number of slots to keep is decided by rounding up the fractional part of the expected value using a request id hash.</li>
+</ul>
+</li>
+<li>For mention notifications on the notification surface, a rule was added that drops posts containing keywords the viewer muted for notifications <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b55151777cd8901111c7b5985a724f671f05d2c4/visibility-filtering/rules/tweet_rules.rs" target="_blank" rel="noopener"><code>visibility-filtering/rules/tweet_rules.rs</code></a><ul>
+<li>Keywords with the &quot;exclude accounts you follow&quot; option apply only when the viewer does not follow the author.</li>
+</ul>
+</li>
+<li>A loader was added to the Phoenix training data that reads the user&#39;s long-term author profile features (per-author engagement count, strong engagement count, time since last engagement, average dwell time) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/b55151777cd8901111c7b5985a724f671f05d2c4/phoenix/xrex/data/recsys/long_term_author_profile.py" target="_blank" rel="noopener"><code>long_term_author_profile.py</code></a></li>
+<li>A field for the advertiser&#39;s first run time was added to the ads proto, and the action control code in abuse-enforcement-service was cleaned up <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/b55151777cd8901111c7b5985a724f671f05d2c4" target="_blank" rel="noopener">commit diff</a></li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> The reference commit in <code>## Summary</code> was raised to b551517. The introductory sentence of <code>### Training and serving infrastructure</code> and the teacher paragraph were rewritten as &quot;serving score storage, on by default&quot;, and the earlier form was moved into a change log bullet of that section. The teacher re-scoring definition in the <code>## Glossary</code> table was corrected. An engagement-soliciting label sending bullet was added under the Phoenix section&#39;s debias bullet, and an even-spread bullet was added to <code>## Ads</code>. One row each was added to the <code>## Sources</code> reference sha table and the change log summary table.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> ⚠ Claim changed: the teacher path changed from &quot;off by default, re-scoring with a separate larger model&quot; to &quot;on by default, storing production ranker scores&quot;. The teacher is therefore not a larger model but the Phoenix currently serving. We infer that the student trained on these labels is a retrieval or lightweight ranker, but no consuming code exists, so we leave it as an inference.</p></div>
+<h2 id="corrections">Corrections</h2>
+<ul>
+<li>Yesterday&#39;s x.md presumed the teacher path to be &quot;distillation data that uses a large model&#39;s predictions as the training target of a small serving model&quot;. Because the teacher became the production serving model itself within a day, the presumption was corrected to &quot;data that uses the production ranker&#39;s predictions as another model&#39;s training target&quot;. <code>topics/</code> and <code>radar.md</code> had no sentence about the X teacher.</li>
+</ul>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="radar.html#taobao-mars--an-llm-sets-the-recommendation-pipeline-configuration-for-each-user">Taobao MARS — an LLM sets the recommendation pipeline configuration for each user</a> — <a href="https://arxiv.org/abs/2611.24006" target="_blank" rel="noopener">arXiv 2611.24006</a>. A Qwen3-0.6B agent picks per-user retrieval quotas and fusion weights in near-line, and it reports GMV of up to +7.34% in a 2-week A/B on five Taobao surfaces.</li>
+<li><a href="radar.html#argus-ads-ctr--reuse-offline-history-tokens-for-every-candidate">ARGUS ads CTR — reuse offline history tokens for each candidate</a> — <a href="https://arxiv.org/abs/2611.24283" target="_blank" rel="noopener">arXiv 2611.24283</a>. It distills a compressed-history ranker from a teacher that sees the uncompressed history, and it reports conversion value of +4.65% in an ads A/B.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>The training-side code that reads the X teacher labels — once it shows which model is the student, the <span class="badge est">inferred</span> can be resolved.</li>
+<li>Where VMRanker uses the engagement-soliciting mark — if vm-ranker changes are released, check whether it removes the matching head from the weighted sum. For now it is <span class="badge est">inferred</span>.</li>
+<li>Two r/RedditEng candidate new posts — WebSearch found only the titles, and we could not confirm the reddit.com original URL or the body. They are &quot;Introducing a Global Retrieval Ranking Model in the Ads Funnel&quot; (about 11-19) and &quot;An In-Depth Look at the Notifications Recommender System&quot; (about 11-16).</li>
+<li>The two Meta Engineering posts from 11-18 are about ads ranking development tools, so they were not added to the canon — <a href="https://engineering.fb.com/2026/11/18/ml-applications/ai-agents-to-scale-ml-innovations-across-ads-ranking-models/" target="_blank" rel="noopener">spreading ads ranking techniques with AI agents</a>, <a href="https://engineering.fb.com/2026/11/18/ml-applications/design-once-deploy-at-scale-template-driven-ml-ecosystem/" target="_blank" rel="noopener">Standard Model Templates</a>. They did not mention the organic feed.</li>
+<li>The other sources checked today had no new feed-related material. The latest Netflix blog post was the 11-17 AI Discover post seen yesterday, and the SEC had no 10-K, 10-Q or earnings 8-K filings. Of the 30 arXiv cs.IR items, 8 were new submissions (2026-11-18), and two of them passed.</li>
+</ul>
+<p>Lookup failed: r/RedditEng RSS — 2026-11-20 HTTP 404 (after the 2026-11-13 notice that RSS support was ending)
+Lookup failed: redditinc.com/news — the command to look up the listing page was denied in this session, so we could not confirm it
+Lookup failed: ai.meta.com/blog — we could not open the listing page directly, so we cross-checked only through WebSearch</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-19.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-19</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-20.html" data-title="일일 리포트 2026-11-20"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
