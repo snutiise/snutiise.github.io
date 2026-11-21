@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-21 — feed-research</title>
+<meta name="description" content="In one line: X lowered the minimum number of post groups required to place ads in the Following tab from 5 to 2. Ads can now appear even on Following…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-21.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-21.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-21.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-21.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-21 — feed-research">
+<meta property="og:description" content="In one line: X lowered the minimum number of post groups required to place ads in the Following tab from 5 to 2. Ads can now appear even on Following…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-21.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-21.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-21">2026-11-21</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Saturday</li>
+<li><span class="meta-k">Reading time</span>11 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-21.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>3</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>2</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X lowered the minimum number of post groups required to place ads in the Following tab from 5 to 2. Ads can now appear even on Following screens with few new posts.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">5</span></summary><ol><li><a href="#1-the-following-tab-ad-threshold-dropped-to-2-post-groups--x"><span class="num">1</span>The Following tab ad threshold dropped to 2 post groups — X</a></li><li><a href="#2-an-llm-agent-selects-ads-ranking-model-features--meta"><span class="num">2</span>An LLM agent selects ads ranking model features — Meta</a></li><li><a href="#3-a-fix-on-the-behavior-sequence-side-for-the-ctr-model-depth-bottleneck--alibaba"><span class="num">3</span>A fix on the behavior sequence side for the CTR model depth bottleneck — Alibaba</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<p>Other changes reviewed today:</p>
+<ul>
+<li>X added a path, off by default, in which the Phoenix ranker server calls VMRanker directly and returns the results together.</li>
+<li>X added a switch, off by default, that turns on Phoenix MoE retrieval only for video carousel candidates.</li>
+<li>Meta published on arXiv a system in which an LLM agent selects features for ads ranking models, together with A/B results.</li>
+</ul>
+<h2 id="1-the-following-tab-ad-threshold-dropped-to-2-post-groups--x"><span class="num">1</span>The Following tab ad threshold dropped to 2 post groups — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/ed78e0645cfafcd026cfc1fd0da964f630533334" target="_blank" rel="noopener">xai-org/x-algorithm@ed78e06</a> — xAI, 2026-11-20, code. In these notes&#39; numbering, this is Gen4+Gen68.4+N is the number these notes assigned, in order, to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> X&#39;s Following tab is a feed that shows posts from followed accounts in reverse chronological order, and it uses an ad blender separate from For You (code that decides ad slots among organic posts). This blender inserts no ads at all when too few posts would be placed on the screen. The param.rs file in home-mixer (the service that assembles For You and Following requests) is a mirror that copies internal feature-switch defaults every day. This commit lowers that threshold and adds several new ranking and carousel paths that are off by default.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Following tab ads are placed even with only 2 post groups</span></p></div>
+<ul>
+<li>The minimum number of post groups for the Following tab ad blender changed from 5 to 2, and because this value is a default, it takes effect immediately <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1080-1085</code></a><ul>
+<li>The param is <code>AdsFollowingMinPosts</code> (<code>rust_home_mixer_ads_following_min_posts</code>), and the mirror sync time is 2026-11-19T16:00:34Z.</li>
+<li>The Following blender selector passes this value to the blender as <code>min_posts</code> (<a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/selectors/following_blender_selector.rs" target="_blank" rel="noopener"><code>selectors/following_blender_selector.rs:41</code></a>).</li>
+</ul>
+</li>
+<li>When the number of groups is below the threshold, all ads are dropped and the reason &quot;too few posts&quot; is recorded <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/ads/following_ad_blender.rs" target="_blank" rel="noopener"><code>ads/following_ad_blender.rs:142-151</code></a><ul>
+<li>Consecutive posts that share an ancestor post are treated as the same conversation and counted as one group (same file, lines 72-92).</li>
+<li>The reason code is <code>AdDropReason::TooFewPosts</code>. The ad spacing calculation is unchanged, so how many ads fit on a screen with 2 groups depends on the spacing.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. A path now exists for the Phoenix ranker to handle the VMRanker call</span></p></div>
+<ul>
+<li>With the switch on, home-mixer attaches VMRanker call information to the Phoenix prediction request <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/scorers/phoenix_scorer.rs" target="_blank" rel="noopener"><code>scorers/phoenix_scorer.rs:120-123, 195-203</code></a><ul>
+<li>VMRanker is the service that computes a weighted sum of Phoenix&#39;s per-action probabilities (Phoenix is a Grok-based Transformer ranker) and reorders slates with a DPP (a probabilistic model that keeps similar candidates from being picked together).</li>
+<li>The attached values are the VMRanker host name, <code>eta</code>, and <code>prior_tau</code>. The first comes from <code>VMRankerClusterId</code>, and the other two come from <code>PageDecodeEta</code> (default 0.0) and <code>PageDecodePriorTau</code> (default 0.2).</li>
+</ul>
+</li>
+<li>If the Phoenix response contains a VMRanker response, the VMRanker scorer in home-mixer uses that response instead of calling VMRanker separately <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/scorers/vm_ranker.rs" target="_blank" rel="noopener"><code>scorers/vm_ranker.rs:171-176</code></a><ul>
+<li>If the response is missing, is an error, or fails to decode, it calls directly as before. Results are counted in the <code>VMRanker.ranker_vm_rank</code> metric as sent, received, used, missing, and error.</li>
+</ul>
+</li>
+<li>The <code>EnableRankerVmRank</code> switch is off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:345-357</code></a></li>
+<li>The same commit has no code in which the Phoenix server receives this request and calls VMRanker <span class="badge ok">verified</span> — the commit&#39;s changed-file list contains only the proto definitions.<ul>
+<li>The proto gained <code>VmRankSpec</code> (the request) and <code>VmRankResult</code> (the serialized VMRanker response and an error string).</li>
+<li>Because two parameters named after the decoder are sent together, we infer this is preparation for using the VMRanker result as the prior distribution of the page decoder <span class="badge est">inferred</span>. The only evidence is the name <code>prior_tau</code> and the fact that the call is made from the Phoenix side.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Phoenix MoE retrieval can now be turned on for the video carousel only</span></p></div>
+<ul>
+<li>With the new switch on and the carousel enabled for a request, the Phoenix MoE retrieval source runs even when the main feed switch is off <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/sources/phoenix_moe_source.rs" target="_blank" rel="noopener"><code>sources/phoenix_moe_source.rs:28-35</code></a><ul>
+<li>Phoenix MoE retrieval is one of the For You candidate sources, and its main feed switch <code>EnablePhoenixMOESource</code> is off by default.</li>
+<li>The new switch is <code>EnableVideoCarouselMoeSource</code> (default false) (<a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1520-1525</code></a>). The carousel itself (<code>EnableVideoCarousel</code>) is also off by default.</li>
+</ul>
+</li>
+<li>In this mode, candidates that came only from MoE are removed from the main feed top selection and go, with their scores cleared, only to the carousel candidate pool <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/selectors/top_k_score_selector.rs" target="_blank" rel="noopener"><code>selectors/top_k_score_selector.rs:15-29</code></a><ul>
+<li>Candidates that also came from other sources stay in the main feed competition as before (<a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/util/video_carousel.rs" target="_blank" rel="noopener"><code>util/video_carousel.rs:26-38</code></a>).</li>
+<li>A test confirms that a MoE candidate with a score of 1000 does not enter the top selection, and that it ranks first when the main feed switch is turned on (same selector file, lines 196-225).</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">D. In the multiplicative mode, video watch time moved into the time multiplier</span></p></div>
+<ul>
+<li>In the multiplicative combination mode, which is off by default (scoring as how unlikely a skip is × engagement value × dwell-time multiplier), the two post-open video watch-time terms are removed from the engagement term and added to the dwell-time multiplier <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/xai-value-model/scoring.rs" target="_blank" rel="noopener"><code>xai-value-model/scoring.rs:89-114</code></a><ul>
+<li>The two terms are <code>video_continuation</code> and <code>user_video_continuation</code>, and a negative sum is clipped to 0.</li>
+<li>The test expectation changed from a time multiplier of 3.0 to 3.015 (weight 0.003 × open probability 0.5 × 10 seconds).</li>
+</ul>
+</li>
+<li>In the training reward of the page decoder (an RL re-ranking model that picks one page in slot order from the ranker&#39;s top candidates), the video quality view (VQV) term was moved in the same way <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/phoenix/xrex/models/page_rl.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/page_rl.py</code></a><ul>
+<li>The sum in additive mode is the same as before, and only in multiplicative mode does it become <code>time = 1 + max(dwell, 0) + max(vqv, 0)</code>.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A settings screen was added under Under the Hood (the transparency screen where users see information about their own account and feed) that lets users turn the For You trace display on and off <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/under-the-hood/jetfuel/routes/timeline_trace.tsx" target="_blank" rel="noopener"><code>timeline_trace.tsx</code></a><ul>
+<li>The notice text says that refreshing For You shows a trace of the code that found, filtered, and ranked candidates, and that each stage links to the public code. The screen opens only to users who have a separate switch turned on.</li>
+</ul>
+</li>
+<li>In the Phoenix shadow traffic ratio (replicating the same request to an experiment cluster without using the response for live serving), Experiment19Fou changed from 0.3 to 0 <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:91-108</code></a></li>
+<li>The teacher score storage that was turned on yesterday now writes to the cache in one data center instead of two <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/side_effects/teacher_score_side_effect.rs" target="_blank" rel="noopener"><code>teacher_score_side_effect.rs:158-169</code></a></li>
+<li>The viewer&#39;s follower count was added to the feature-switch targeting attributes <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/home-mixer/models/fs_recipient.rs" target="_blank" rel="noopener"><code>models/fs_recipient.rs</code></a></li>
+<li>Five app conversion events (purchase, add to cart, level achieved, tutorial completed, sign-up) were added to the ads purchase value reference values <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/ed78e0645cfafcd026cfc1fd0da964f630533334/phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs" target="_blank" rel="noopener"><code>purchase_value.rs</code></a><ul>
+<li>The same commit added an ads CTR bucket embedding option to the Phoenix model (default dimension 0) and a per-viewer ads engagement aggregation field to the ads proto.</li>
+</ul>
+</li>
+<li>Changes with no policy change were also included: a path that runs the candidate pipeline hydrators as a separate parallel task, Grox skipping already-annotated posts, and cleanup of abuse-enforcement-service <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/ed78e0645cfafcd026cfc1fd0da964f630533334" target="_blank" rel="noopener">commit diff</a></li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> In <a href="x.html">services/x.md</a>, we raised the reference commit in <code>## Summary</code> to ed78e06. We added a sentence about the Following tab minimum post groups at the end of the 2026-11-05 paragraph in <code>## Ads</code> and added one line to that section&#39;s change log list. We added a VMRanker direct-call bullet and a multiplicative watch-time sub-bullet to the Phoenix section, a MoE source sub-bullet to the carousel item in the feed surfaces section, and a trace settings sub-bullet to the Under the Hood section. We added one row each to the reference sha table and the change log summary table in <code>## Sources</code>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> The only behavior change in this commit that takes effect by default is the Following tab ad threshold. Ads can now appear on the Following screens of users who follow few accounts or have few new posts. The path that moves the VMRanker call to the Phoenix side is a structural change that removes one round trip between home-mixer and VMRanker, but because the server code is absent, we treat the judgment that latency reduction is the goal as an inference.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="2-an-llm-agent-selects-ads-ranking-model-features--meta"><span class="num">2</span>An LLM agent selects ads ranking model features — Meta</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2611.26531" target="_blank" rel="noopener">Cost-Aware Agentic Feature Optimization System for Fleet-Scale Ranking Models</a> — Meta, 2026-11-19 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Large platforms run tens or hundreds of ranking models together, and each model must choose which of tens of thousands of features in a shared feature pool to use. Adding features raises accuracy, but feature pipeline cost and serving throughput (QPS) can exceed their limits. This paper reports a system that automates this selection by combining an LLM agent with deterministic experiment tools.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. The feature selection was handed to an agent and deployed</span></p></div>
+<ul>
+<li>All 9 authors are affiliated with Meta, and the target is a fleet of ads ranking models <span class="badge ok">verified</span> — <a href="https://arxiv.org/html/2611.26531v1" target="_blank" rel="noopener">HTML version</a><ul>
+<li>The body calls the system &quot;Agentic ML Exploration (A-MLE) for Ads Ranking&quot;.</li>
+</ul>
+</li>
+<li>An LLM generates cross-feature candidates, several feature importance metric rankings are blended, and a Researcher agent adjusts the selection through 10–25 asynchronous trials within a cost limit <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2611.26531" target="_blank" rel="noopener">arXiv abstract</a><ul>
+<li>For multi-task models, per-task rankings are blended with a Pareto front (the set of choices that cannot improve without making some task worse).</li>
+</ul>
+</li>
+<li>On production models it reports an average 0.31% NE improvement (normalized entropy, a log-loss metric where lower is better) and +0.20% on the primary online A/B metric after deployment <span class="badge ok">verified</span> — same abstract<ul>
+<li>It states that a final cleanup stage cut feature pipeline cost by 2.3% and that no regression exceeded measurement noise.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>&quot;The optimized models were launched, and in online A/B tests they improved a primary online metric by 0.20%.&quot;
+— <a href="https://arxiv.org/abs/2611.26531" target="_blank" rel="noopener">Cost-Aware Agentic Feature Optimization System for Fleet-Scale Ranking Models</a> (paper), 2026-11-19</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> Because this concerns ads ranking rather than the organic feed, we did not add it to the canon and instead added an entry to &quot;new this month&quot; in <a href="radar.html#meta-a-mle--an-llm-agent-selects-ads-ranking-model-features">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Two pieces of evidence in one week now show Meta putting agents into the ads ranking development process itself. We see it as part of the same trend as the 2026-11-18 Meta Engineering <a href="https://engineering.fb.com/2026/11/18/ml-applications/ai-agents-to-scale-ml-innovations-across-ads-ranking-models/" target="_blank" rel="noopener">post on ads ranking AI agents</a>, but we have not confirmed whether the paper cites that post, so we treat it as an inference.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="3-a-fix-on-the-behavior-sequence-side-for-the-ctr-model-depth-bottleneck--alibaba"><span class="num">3</span>A fix on the behavior sequence side for the CTR model depth bottleneck — Alibaba</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://arxiv.org/abs/2611.25659" target="_blank" rel="noopener">DNA: Unlocking Depth Scaling in CTR Models</a> — Taobao Search, 2026-11-19 v1, paper.</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> Long user behavior sequences are the strongest signal for CTR (click-through rate) prediction, and industrial rankers process them at linear cost with cross-attention (attention in which the request representation reads the behavior sequence). However, stacking more of these layers barely improves performance. This paper locates the cause in &quot;every layer re-reads the same sequence&quot; and proposes a structure in which the sequence is also updated at each layer.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. Updating the sequence at each layer makes depth effective again</span></p></div>
+<ul>
+<li>On Taobao Search, expanding the cross-attention stack from 16 to 28 layers raises AUC by only 0.02pt <span class="badge ok">verified</span> — <a href="https://arxiv.org/abs/2611.25659" target="_blank" rel="noopener">arXiv abstract</a></li>
+<li>In DNA, at each layer the request representation reads the sequence, and then each behavior token reads the updated request representation to correct itself <span class="badge ok">verified</span> — same abstract<ul>
+<li>The update happens once per request and all candidates share the result, so computation stays linear in sequence length.</li>
+</ul>
+</li>
+<li>It states that AUC is 0.08–0.26pt higher at the same compute, and that deploying DNA-4 on Taobao Search gave CTR +0.8% and GMV +0.5% in an A/B test <span class="badge ok">verified</span> — same abstract</li>
+</ul>
+<div class="blk app"><p><span class="lbl">Canon update</span> Because this is not a tracked-services source, we attached it as additional evidence to the &quot;recommendation model scaling law&quot; thread in <a href="radar.html#recommendation-model-scaling-laws--independent-confirmations-from-companies-are-accumulating">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> This adds one more claim that the scaling bottleneck on the depth axis lies in the key-value side input rather than in the model side. Because the surface is search, whether the same result holds for feed ranking remains open.</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="radar">Radar</h2>
+<ul>
+<li><a href="radar.html#meta-a-mle--an-llm-agent-selects-ads-ranking-model-features">Meta A-MLE — an LLM agent selects ads ranking model features</a> — <a href="https://arxiv.org/abs/2611.26531" target="_blank" rel="noopener">arXiv 2611.26531</a>. Automates feature selection for a fleet of ads ranking models with an agent and reports +0.20% in online A/B.</li>
+<li><a href="radar.html#recommendation-model-scaling-laws--independent-confirmations-from-companies-are-accumulating">DNA added to the recommendation model scaling law thread</a> — <a href="https://arxiv.org/abs/2611.25659" target="_blank" rel="noopener">arXiv 2611.25659</a>. Addresses depth scaling of the Taobao Search CTR model with sequence updates and reports CTR +0.8% in A/B.</li>
+</ul>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>Phoenix server&#39;s VMRanker call code — once released, check how <code>eta</code> and <code>prior_tau</code> are used in the page decoder. Currently it is <span class="badge est">inferred</span>.</li>
+<li>Change in Following tab ad volume — because the threshold was lowered, we can observe in the product whether ad impressions on Following screens actually increased.</li>
+<li>New r/RedditEng post candidates — the RSS still returns 404, and WebSearch returned only third-party mirrors, so we could not confirm new posts after 11-19. We also could not read the original text of the two candidates noted yesterday (an ads funnel retrieval ranking model and a notification recommendation system).</li>
+<li>The other sources checked today had no new feed-related material. The latest Meta Engineering post was the 11-18 post seen yesterday, and the latest Netflix blog post was from 11-17. SEC had no 10-K, 10-Q, or earnings 8-K filings, and of the 30 arXiv cs.IR items, 17 were new submissions (2026-11-19), of which two passed.</li>
+</ul>
+<p>Lookup failed: r/RedditEng RSS — 2026-11-21 HTTP 404 (after the 2026-11-13 notice that RSS support was ending)
+Lookup failed: redditinc.com/news — this session&#39;s page lookup tool could not open it
+Lookup failed: ai.meta.com/blog — the list loaded only partially and the latest post appeared to be from 2026-07, which is unreliable, so we treat it as not confirmed</p></div>
+<p class="totop"><a href="#toc">↑ Contents</a></p>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-20.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-20</span></a><a class="pg-next" href="daily-2026-11-22.html" rel="next"><span class="pg-k">Next report →</span><span class="pg-v mono">2026-11-22</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-21.html" data-title="일일 리포트 2026-11-21"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>

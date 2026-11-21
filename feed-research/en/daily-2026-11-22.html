@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://snutiise.disqus.com/embed.js; style-src 'self'; img-src 'self' data:; font-src 'self'; frame-src https://disqus.com/embed/comments/; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily report 2026-11-22 — feed-research</title>
+<meta name="description" content="In one line: X's VMRanker received code that removes the prediction for an action from the score on posts labeled as inducing replies, shares or clicks. The…">
+<link rel="canonical" href="https://snutiise.github.io/feed-research/en/daily-2026-11-22.html">
+<link rel="alternate" hreflang="ko" href="https://snutiise.github.io/feed-research/daily-2026-11-22.html">
+<link rel="alternate" hreflang="en" href="https://snutiise.github.io/feed-research/en/daily-2026-11-22.html">
+<link rel="alternate" hreflang="x-default" href="https://snutiise.github.io/feed-research/daily-2026-11-22.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="feed-research">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Daily report 2026-11-22 — feed-research">
+<meta property="og:description" content="In one line: X's VMRanker received code that removes the prediction for an action from the score on posts labeled as inducing replies, shares or clicks. The…">
+<meta property="og:url" content="https://snutiise.github.io/feed-research/en/daily-2026-11-22.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/site.js" defer></script>
+</head>
+<body data-nav="/feed-research/en/">
+<a class="skip" href="#content">Skip to content</a>
+<header class="site-head">
+<div class="wrap head-in">
+<a class="brand" href="/en/">0x00</a>
+<nav class="site-nav" aria-label="Main menu"><ul>
+<li><a href="/en/posts/">Posts</a></li>
+<li><a href="/en/series/">Series</a></li>
+<li><a href="/en/tags/">Tags</a></li>
+<li><a href="/feed-research/en/">Research</a></li>
+<li><a href="/en/about/">About</a></li>
+</ul></nav>
+<a class="lang-switch" href="/feed-research/daily-2026-11-22.html" hreflang="ko" lang="ko" aria-label="한국어 (KO)"><span>한</span><span aria-hidden="true" lang="en">EN</span></a>
+</div>
+</header>
+<main id="content" class="wrap">
+<article class="doc">
+<header class="doc-head">
+<p class="kicker"><a href="index.html">Research</a> / <a href="daily.html">Daily reports</a></p>
+<h1 class="h1-mono"><time datetime="2026-11-22">2026-11-22</time></h1>
+</header>
+<ul class="meta">
+<li><span class="meta-k">Day</span>Sunday</li>
+<li><span class="meta-k">Reading time</span>8 min</li>
+<li><span class="meta-k">Translated from</span><a href="../daily-2026-11-22.html" hreflang="ko">Korean</a></li>
+</ul>
+<div class="doc-intro">
+<ul class="chips"><li class="chip">Sources read: <b>1</b></li><li class="chip">Canon files updated: <b>2</b></li><li class="chip">Radar entries: <b>1</b></li></ul>
+<div class="lead"><span class="lb">In one line</span>X&#39;s VMRanker received code that removes the prediction for an action from the score on posts labeled as inducing replies, shares or clicks. The switch is off by default.</div>
+</div>
+<nav class="toc-wrap" id="toc" aria-label="Contents"><details class="toc"><summary>Contents<span class="toc-n">4</span></summary><ol><li><a href="#1-scores-for-the-targeted-action-can-now-be-removed-from-engagement-bait-posts--x"><span class="num">1</span>Scores for the targeted action can now be removed from engagement-bait posts — X</a></li><li><a href="#corrections">Corrections</a></li><li><a href="#radar">Radar</a></li><li><a href="#what-to-check-next">What to check next</a></li></ol></details></nav>
+<div class="prose">
+<h2 id="1-scores-for-the-targeted-action-can-now-be-removed-from-engagement-bait-posts--x"><span class="num">1</span>Scores for the targeted action can now be removed from engagement-bait posts — X</h2>
+<div class="blk src"><p><span class="lbl">Source</span> <a href="https://github.com/xai-org/x-algorithm/commit/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3" target="_blank" rel="noopener">xai-org/x-algorithm@269340c</a> — xAI, 2026-11-21, code. In these notes&#39; numbering, this is Gen4+69 (Gen4+N is the number these notes assigned, in order, to commits after the 2026-08-13 Gen4 release).</p></div>
+<div class="blk ctx"><p><span class="lbl">Background</span> The final score of X For You is the sum of per-action probabilities predicted by Phoenix (a Grok-based Transformer ranker), each multiplied by a weight, and VMRanker (the service that handles the weighted sum and DPP slate reordering) computes this weighted sum. Engagement-bait posts such as &quot;Please reply&quot; or &quot;Share and get ○○&quot; get high reply and share probabilities and benefit in the weighted sum. The 2026-11-19 commit (Gen4+67) only built the path that flags candidates carrying such safety labels and sends them to VMRanker; how VMRanker uses the flag was left empty. This commit fills in the VMRanker handling and adds a popular-video retrieval index and a teacher-score distillation loss.</p></div>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">A. When an engagement-bait label is present, only that action&#39;s prediction is dropped from the weighted sum</span></p></div>
+<ul>
+<li><p>When a candidate carries a reply, share or click bait flag, VMRanker clears the Phoenix prediction for that action and then computes the weighted sum <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/vm-ranker/scoring/value_model.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/value_model.rs:214-237</code></a></p>
+<ul>
+<li>home-mixer carries the flags in the experiment payload (extra information attached to each candidate) as <code>reply_ineligible</code>, <code>share_ineligible</code> and <code>click_ineligible</code>.</li>
+<li>The share flag clears three heads together: share, DM share and copy-link share. Other heads such as like remain.</li>
+</ul>
+<figure class="highlight"><pre tabindex="0"><code class="language-rust" data-lang="rust">if payload.reply_ineligible { scores.reply_score = None; }
+if payload.share_ineligible {
+    scores.share_score = None;
+    scores.share_via_dm_score = None;
+    scores.share_via_copy_link_score = None;
+}
+if payload.click_ineligible { scores.click_score = None; }
+</code></pre></figure>
+</li>
+<li><p>The switch that turns on this handling is off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/vm-ranker/params.rs" target="_blank" rel="noopener"><code>vm-ranker/params.rs:327-332</code></a></p>
+<ul>
+<li>The switch is <code>ExcludeIneligibleEngagementHeads</code> (<code>rust_home_mixer_vm_ranker_exclude_ineligible_engagement_heads</code>).</li>
+<li>The switch with which home-mixer sends the label (<code>VMRankerSendEngagementIneligible</code>, Gen4+67) is also off by default, so both switches must be on for scores to change.</li>
+<li>The number of candidates removed per head is recorded in the <code>vm_ranker_ineligible_head_candidates_total</code> metric.</li>
+</ul>
+</li>
+<li><p>A test confirms that when a reply flag is present the score drops by exactly &quot;reply weight × reply probability&quot;, and that it stays unchanged when the switch is off <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/vm-ranker/scoring/mod.rs" target="_blank" rel="noopener"><code>vm-ranker/scoring/mod.rs:482-553</code></a></p>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">B. An index was added that collects only videos that passed 10,000 views and 100 likes within 48 hours</span></p></div>
+<ul>
+<li>A pipeline that builds a popular-video SID index (a retrieval index that groups posts by semantic ID) was added to the index service for Phoenix retrieval <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/phoenix-rankall/src/config/mod.rs" target="_blank" rel="noopener"><code>phoenix-rankall/src/config/mod.rs:110-128, 262</code></a><ul>
+<li>The condition is a video post with at least 10,000 views and at least 100 likes. The time window is 48 hours.</li>
+<li>Posts in the NSFW video index of the last 7 days are excluded, and only posts in the 2-day video index are kept. Both lists are read as post IDs from parquet files.</li>
+<li>The processor is a new file, <code>processor/sid_popular_video_processor.rs</code> (167 lines), and a test confirms that a post is dropped if it misses either of the two thresholds.</li>
+</ul>
+</li>
+<li>This index was registered in the training and lookup-side proto as retrieval dataset 30 (<code>POPULAR_VIDEO_2DAY</code>) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/phoenix/crates/serving/xai-recsys-proto/proto/recsys.proto" target="_blank" rel="noopener"><code>recsys.proto</code></a></li>
+<li>home-mixer can now attach a per-dataset top-k to the Phoenix retrieval request, but the default is an empty string, so the default request is unchanged <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:22-27</code></a><ul>
+<li>The format is a string of &quot;datasetName=k&quot; pairs joined by commas (<a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/home-mixer/sources/phoenix_source.rs" target="_blank" rel="noopener"><code>sources/phoenix_source.rs:168-175</code></a>).</li>
+<li>This commit has no default setting that makes requests actually look up the popular-video index.</li>
+</ul>
+</li>
+<li>Candidates from the two AI-generated video 2-day indexes (author label, model detection) are marked with a separate served type (a label for the path by which the candidate entered) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/home-mixer/sources/phoenix_source.rs" target="_blank" rel="noopener"><code>sources/phoenix_source.rs:177-186</code></a><ul>
+<li>The label is <code>ForYouPhoenixRetrievalAiVideo</code>, and the numbers of selected and unselected candidates are recorded in the <code>PhoenixRetrievalAiVideoTweets</code> stats.</li>
+</ul>
+</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">C. Teacher scores were kept for use as a distillation loss for the ranking model</span></p></div>
+<ul>
+<li>The training code can now read the teacher score column of the training data and add a distillation (an approach in which one model uses the predicted probabilities of a larger model as its training target) loss to ranking model training <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/phoenix/xrex/models/recsys_overarch_model.py" target="_blank" rel="noopener"><code>phoenix/xrex/models/recsys_overarch_model.py:57-69</code></a><ul>
+<li>There are two loss types, probability BCE and logit MSE, and the default is BCE (<a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/phoenix/xrex/models/recsys_distillation_loss.py" target="_blank" rel="noopener"><code>recsys_distillation_loss.py</code></a>).</li>
+<li>The default distillation targets are three actions: link open, ads MMP click and VQV (an action of actually watching a video for at least a set time) (<a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/phoenix/xrex/data/recsys/teacher_distill.py" target="_blank" rel="noopener"><code>teacher_distill.py:13</code></a>).</li>
+<li>An option (<code>distill_bad_spans_ms</code>) discards the teacher scores of rows shown within specified time ranges. We infer it is meant to exclude periods when the teacher misbehaved <span class="badge est">inferred</span>. The only basis is that the name says bad spans.</li>
+</ul>
+</li>
+<li>This distillation is off by default <span class="badge ok">verified</span> — the default of the teacher name (<code>distill_teacher</code>) is an empty string, and no training config that sets it is in the same commit.</li>
+<li>We infer that the serving scores home-mixer has logged since Gen4+67 are the source of this teacher score column <span class="badge est">inferred</span>. The only basis is that both paths handle per-action probabilities under the name teacher, and the log conversion code linking the two is not in the repo.</li>
+</ul>
+<div class="blk find"><p><span class="lbl">What we learned</span><span class="blk-t">Other changes</span></p></div>
+<ul>
+<li>A switch that restricts video carousel candidates to videos that arrived through MoE retrieval (a retrieval path that mixes several expert models) was added, off by default <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:1538-1543</code></a></li>
+<li>A switch was added, off by default, that keeps the Under the Hood (a transparency tool where users see the labels and feed scores of their own account and posts) trace card from being inserted for people who turned off the user setting <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/home-mixer/params/param.rs" target="_blank" rel="noopener"><code>params/param.rs:817-822</code></a></li>
+<li>The video length of a quoted post is now computed from the quoted content already received instead of a separate TES call (no policy change) <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/home-mixer/candidate_hydrators/quote_hydrator.rs" target="_blank" rel="noopener"><code>candidate_hydrators/quote_hydrator.rs</code></a></li>
+<li>A live broadcast column was added to the training data, and an evaluation metric for broadcast posts was enabled in the immersive surface training config <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/phoenix/xrex/configs/xrecsys.py" target="_blank" rel="noopener"><code>configs/xrecsys.py</code></a></li>
+<li>A constant was added so that the app conversion value label does not count events under $0.10 and uses an 8-hour label window <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/phoenix/crates/serving/xai-recsys-proto/src/purchase_value.rs" target="_blank" rel="noopener"><code>purchase_value.rs</code></a></li>
+<li>Of the 59 changed files, 10 in the account enforcement service (abuse-enforcement-service) and 4 in grox are not directly related to feed ranking, so only the file list was checked <span class="badge ok">verified</span> — <a href="https://github.com/xai-org/x-algorithm/commit/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3.diff" target="_blank" rel="noopener">commit diff</a></li>
+</ul>
+<blockquote>
+<p>&quot;Candidates whose reply, share or click predictions were left out of the value model because home-mixer flagged that head as ineligible&quot;
+— <a href="https://github.com/xai-org/x-algorithm/blob/269340ce2eb8ca785bafa4f2c17a2e8b752bccd3/vm-ranker/metrics.rs" target="_blank" rel="noopener"><code>vm-ranker/metrics.rs</code></a> metric description (code), 2026-11-21</p>
+</blockquote>
+<div class="blk app"><p><span class="lbl">Canon update</span> <a href="x.html">services/x.md</a> Raised the reference commit in <code>## Summary</code> to 269340c. Rewrote the engagement-bait label bullet in the Phoenix section as &quot;VMRanker can drop the corresponding head, off by default&quot; and moved the home-mixer send path down to a sub-bullet. Added a popular-video index bullet to <code>### Phoenix retrieval index</code>, added distillation loss sentences to the intro of <code>### Training and serving infrastructure</code> and to the teacher paragraph, and changed the earlier <span class="badge est">inferred</span> bullet to <span class="badge ok">verified</span>. Added one off-by-default switch sub-bullet each to the carousel item and the Under the Hood section, a distillation row to <code>## Glossary</code>, and a 269340c row to the sources table and the commit summary table. Added one line of additional evidence on X&#39;s distillation loss to the ARGUS entry in <a href="radar.html">radar.md</a>.</p></div>
+<div class="blk why"><p><span class="lbl">Why it matters</span> Two items left as <span class="badge est">inferred</span> two days ago are now confirmed in code: the engagement-bait label is used to remove the score of the targeted action, and the teacher score is for distillation training. Both are off by default, so the For You ranking is currently unchanged. The engagement-bait handling does not cut the whole post; it removes only the share of the targeted action, so a labeled post keeps the score it earns from like and dwell predictions.</p></div>
+<h2 id="corrections">Corrections</h2>
+<ul>
+<li>The two r/RedditEng candidates in yesterday&#39;s daily (&quot;Introducing a Global Retrieval Ranking Model in the Ads Funnel&quot;, &quot;An In-Depth Look at the Notifications Recommender System&quot;) were not new posts. They are already listed in the sources of <a href="reddit.html">services/reddit.md</a> as posts from 2024 and 2025, and the &quot;a few days ago&quot; marking added by a third-party mirror was stale.</li>
+</ul>
+<h2 id="radar">Radar</h2>
+<ul>
+<li>Added one line of additional evidence on X&#39;s distillation loss to the <a href="radar.html#argus-ads-ctr--reuse-offline-history-tokens-for-every-candidate">ARGUS ads CTR</a> thread.</li>
+</ul>
+<h2 id="what-to-check-next">What to check next</h2>
+<div class="next"><ul>
+<li>The default values of the two engagement-bait switches — if either one turns on in the cron mirror, For You scores actually change.</li>
+<li>The popular-video index lookup setting — check whether popular video (dataset 30) enters the per-dataset top-k default.</li>
+<li>The training config that turns on distillation — once a config that sets the teacher name is public, confirm which model is the student. The source link is currently <span class="badge est">inferred</span>.</li>
+<li>The other sources checked today had no new material within the window. The latest Meta Engineering post was 11-18 and the latest Netflix blog post was 11-17. SEC had no 10-K, 10-Q or earnings 8-K filings, and the 30 arXiv cs.IR items run through the 2026-11-19 submissions classified yesterday, so there were no new submissions.</li>
+</ul>
+<p>Lookup failed: r/RedditEng RSS — 2026-11-22 HTTP 404 (after the 2026-11-13 notice that RSS support was ending)
+Lookup failed: redditinc.com/news — this session&#39;s page lookup tool could not open it
+Lookup failed: ai.meta.com/blog — the latest listed post appears to be from 2026-07, so we treat it as only partly loaded and as not confirmed
+Lookup failed: research.netflix.com/publications — HTTP 404</p></div>
+
+</div>
+<footer class="doc-foot">
+<nav class="pager" aria-label="Previous and next reports"><a class="pg-prev" href="daily-2026-11-21.html" rel="prev"><span class="pg-k">← Previous report</span><span class="pg-v mono">2026-11-21</span></a></nav>
+<section class="comments" aria-labelledby="cm-h">
+<h2 class="sec-h" id="cm-h">Comments</h2>
+<p class="cm-note">Comments are shared with the Korean original.</p>
+<button type="button" class="btn" id="load-comments">Show comments (Disqus)</button>
+<p class="cm-note" id="cm-note" role="status" hidden></p>
+<div id="disqus_thread" data-url="https://snutiise.github.io/feed-research/daily-2026-11-22.html" data-title="일일 리포트 2026-11-22"></div>
+</section>
+</footer>
+</article>
+</main>
+<footer class="site-foot">
+<div class="wrap foot-in">
+<p>&copy; Jeon Seung Hoon &middot; 0x00 - NULL</p>
+<p><a href="https://github.com/snutiise">GitHub</a> &middot; <a href="https://www.linkedin.com/in/%EC%8A%B9%ED%9B%88-%EC%A0%84-5381321b0/">LinkedIn</a> &middot; <a href="https://www.facebook.com/Iam.Jeon.Seung.1">Facebook</a></p>
+</div>
+</footer>
+</body>
+</html>
